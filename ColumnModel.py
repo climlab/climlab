@@ -1,41 +1,12 @@
-#   Version 1.4
-#
-#   Fixed yet another bug, this time in the calculation of OLR (which was giving a vector
-#   instead of a scalar due to the previous update)
-#    March 9, 2014
-#
-##   Version 1.3
-##
-##  Fixed a bug in the calculation of OLR_atm
-##    The previous version calculated the SUM of the contributions from all
-##    atmospheric layers to the total OLR, whereas this is supposed to give an
-##   array of values -- contributions to the OLR layer by layer
-##
-##   Brian Rose
-##   March 6 2014
-##
-###  Version 1.2
-###
-###  Brian Rose
-###  March 3 2014
-###
-###  Added vectorized radiative transfer code
-###   added the ability to specify shortwave absorption
-###  Added capacity for non-uniform pressure levels
-###
-###  also added the Transmissitivity class
-###  which computes and stores transmissivity matrices given column absorptivity
-###
-###
-####  Version 1.1
-####   Fixed a bug in the convective adjustment code
-####  and removed the Surface_Heat_Flux() method and associated parameters
-####
-####  also added code to Longwave_Heating() to keep track of contributions to OLR
-####    from different layers
-####
-####  Brian Rose
-####   February 26 2014
+"""ColumnModel.py
+
+Object-oriented code for one-dimensional radiative-convective models.
+
+Code developed by Brian Rose, University at Albany
+brose@albany.edu
+in support of the class ENV 480: Climate Laboratory
+Spring 2014 """
+
 
 import numpy as np
 import ClimateUtils as clim

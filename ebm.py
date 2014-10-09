@@ -1,10 +1,5 @@
 """ebm.py
 
-Version 1.1
-- fixed a bug in set_timestep() -- need to recompute the insolation array if 
-the timestep changes.
-- added a hack to have temperature-dependent diffusion (latent heat effect)
-
 Object-oriented code for diffusive energy balance models
 
 Code developed by Brian Rose, University at Albany

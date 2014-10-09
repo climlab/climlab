@@ -4,11 +4,6 @@ brose@albany.edu
 in support of the class ENV 480: Climate Laboratory
 Spring 2014
 
-Version 1.1
-some bug fixes and renaming of orbital variables
-Also made the length of year consistent with ClimateUtils.py
-and suppressed warning messages from numpy to get rid of annoying messages from np.arccos()
-
 This module contains orbital data tables for the past 5 Myr, and some 
 general-purpose routines for computing incoming solar radiation.
 
@@ -21,7 +16,7 @@ Cubic spline coefficients tck_ecc, tck_long_peri, tck_obliquity are computed onc
 importing this module and are then available for subsequent lookup calls.
 
 The function daily_insolation() computes daily average insolation at any time of
-year and location given orbital parameters"""
+year and location given orbital parameters."""
 
 import numpy as np
 from scipy import interpolate

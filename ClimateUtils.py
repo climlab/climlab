@@ -1,17 +1,12 @@
-#  Version 1.3
-#   added some more constants...
-#
-#   Version 1.2
-#     fixed a bug that prevented ClausiusClapeyron to work on arrays
-#   and added some new constants
-#
-##  Version 1.1
-##   Made days_per_year more accurate, for consistent insolation calculations with orbital.py
-##   also set the solar constant S0 to match the Trenberth et al. data we've been using in class
-#  Brian Rose
-#   March 10 2014
-#  A collection of constants and function definitions to handle common
-#  thermodynamic calculations for the atmosphere etc
+'''ClimateUtils.py
+
+A collection of constants and function definitions to handle common
+thermodynamic calculations for the atmosphere and ocean.
+
+Code developed by Brian Rose, University at Albany
+brose@albany.edu
+in support of the class ENV 480: Climate Laboratory
+Spring 2014.'''
 
 import numpy as np
 
@@ -31,7 +26,9 @@ g = 9.8          #  gravitational acceleration, in m / s**2
 sigma = 5.67E-8  #  Stefan-Boltzmann constant for blackbody radiation, W / m**2 / K**4
 kBoltzmann = 1.38E-23  #  J / K, the Boltzmann constant
 
-S0 = 1365.2       #  solar constant, W / m**2
+S0 = 1365.2       #  solar constant, W / m**2 
+# value is consistent with Trenberth and Fasullo, Surveys of Geophysics 2012
+
 ps = 1000.       #  approximate surface pressure, mb or hPa
 
 rho_w = 1000.    #  density of water, kg / m**3
@@ -50,8 +47,6 @@ seconds_per_year = seconds_per_day * days_per_year
 
 area_earth = 4 * np.math.pi * a**2
 
-#  Some useful general-purpose functions for atmosphere and ocean science
-
 
 def PotentialTemperature(T,p):
     """Compute potential temperature for an air parcel.
@@ -60,8 +55,6 @@ def PotentialTemperature(T,p):
             p is pressure in mb or hPa
     Output: potential temperature in Kelvin."""
     
-    #  not checking anymore because we take advantage of automatic NumPy broadcasting
-    #inputCheck(T,p)
     theta = T*(ps/p)**kappa
     return theta
 
@@ -72,8 +65,6 @@ def TfromTHETA(theta,p):
             p is pressure in mb or hPa
     Output: absolute temperature in Kelvin."""
     
-    #  not checking anymore because we take advantage of automatic NumPy broadcasting
-    #inputCheck(T,p)
     T = theta/((ps/p)**kappa)
     return T
 
@@ -100,8 +91,6 @@ def qsat(T,p):
             p is pressure in hPa or mb
     Output: saturation specific humidity (dimensionless)."""
     
-    #  not checking anymore because we take advantage of automatic NumPy broadcasting
-    #inputCheck(T,p)
     eps = Rd/Rv
     es = ClausiusClapeyron(T)
     q = eps * es / (p - (1 - eps) * es )
@@ -121,8 +110,6 @@ def pseudoadiabat(T,p):
     
     Formula from Raymond Pierrehumbert, "Principles of Planetary Climate" """
 
-    #  not checking anymore because we take advantage of automatic NumPy broadcasting
-    #inputCheck(T,p)
     esoverp = ClausiusClapeyron(T) / p
     Tcel = T - tempCtoK
     L = (2.501 - 0.00237 * Tcel) * 1.E6   # Accurate form of latent heat of vaporization in J/kg
@@ -133,8 +120,8 @@ def pseudoadiabat(T,p):
 # End of function pseudoadiabat(T,p)
 
 def EIS(T0,T700):
-    '''compute the "estimated inversion strength", T0 is surface temp, T700 is temp at 700 hPa, both in K.
-    Following Wood and Bretherton, J. Climate 2006'''
+    '''Compute the "estimated inversion strength", T0 is surface temp, T700 is temp at 700 hPa, both in K.
+    Following Wood and Bretherton, J. Climate 2006.'''
     RH = 0.8
     T850 = (T0+T700)/2;
     LCL = (20 + (T0-tempCtoK)/5)*(1-RH)  # approximate formula... could do this more accurately.
@@ -142,10 +129,3 @@ def EIS(T0,T700):
     Gammam = g/cp*(1.0 - (1.0 + Lhvap*qsat(T850,850) / Rd / T850) / (1.0 + Lhvap**2 * qsat(T850,850)/cp/Rv/T850**2))
     z700 = (Rd*T0/g)*np.log(1000/700)
     return LTS - Gammam*(z700 - LCL)
-
-
-# This routine just checks for correct dimensions in the input arrays T and p
-def inputCheck(T,p):
-    if ( np.shape(T) != np.shape(p) ) and np.size(T)>1 and np.size(p)>1:
-        raise ValueError('Inputs arrays must have same dimensions, or be scalar.')
-#  End of function inputCheck(T,p)
