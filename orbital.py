@@ -1,8 +1,7 @@
 """orbital.py
 Code developed by Brian Rose, University at Albany
 brose@albany.edu
-in support of the class ENV 480: Climate Laboratory
-Spring 2014
+in support of the class ATM/ENV 415: Climate Laboratory
 
 This module contains orbital data tables for the past 5 Myr, and some 
 general-purpose routines for computing incoming solar radiation.
@@ -16,7 +15,8 @@ Cubic spline coefficients tck_ecc, tck_long_peri, tck_obliquity are computed onc
 importing this module and are then available for subsequent lookup calls.
 
 The function daily_insolation() computes daily average insolation at any time of
-year and location given orbital parameters."""
+year and location given orbital parameters.
+"""
 
 import numpy as np
 from scipy import interpolate
@@ -40,7 +40,8 @@ def lookup_parameters( kyear = 0 ):
       the last 10 million years. Quaternary Science Reviews, 10(4), 297-317.
     Berger A. (1978). Long-term variations of daily insolation and
       Quaternary climatic changes. Journal of Atmospheric Science, 35(12),
-      2362-2367."""
+      2362-2367.
+      """
     
     #  values are computed by evaluating the spline fits to the data tables
     ecc = interpolate.splev(kyear,tck_ecc,der=0)
@@ -66,7 +67,7 @@ def daily_insolation(lat, day, ecc = 0.017236, long_peri = 281.37, obliquity = 2
     ecc:      eccentricity (dimensionless)
     long_peri:    longitude of perihelion (precession angle) (degrees)
     obliquity:  obliquity angle (degrees)
-    S0:       Solar constant in W/m^2, will try to read from ClimateUtils.py
+    S0:       Solar constant in W/m^2, will try to read from constants.py
     day_type: Convention for specifying time of year (+/- 1,2) [optional].
         day_type=1 (default): day input is calendar day (1-365.24), where day 1 
         is January first.  The calendar is referenced to the vernal equinox 
@@ -108,12 +109,13 @@ def daily_insolation(lat, day, ecc = 0.017236, long_peri = 281.37, obliquity = 2
      the last 10 million years. Quaternary Science Reviews, 10(4), 297-317.
     Berger A. (1978). Long-term variations of daily insolation and
      Quaternary climatic changes. Journal of Atmospheric Science, 35(12),
-     2362-2367."""
+     2362-2367.
+     """
     
-    #  If not given, try to set solar constant to the value in ClimateUtils.
+    #  If not given, try to set solar constant to the value in constants.py
     #  If that doesn't work, set a realistic default.
     if S0 is None:
-        try: from ClimateUtils import S0
+        try: from constants import S0
         except: S0 = 1365.2
     
     # Inputs can be scalar or vector. If scalar, convert to 0d numpy arrays
@@ -164,9 +166,10 @@ def solar_longitude( day, ecc = 0.017236, long_peri = 281.37 ):
     
     Works for both scalar and vector orbital parameters.
     
-    Reads the length of the year from ClimateUtils.py if available.'''
+    Reads the length of the year from constants.py if available.
+    '''
     
-    try: from ClimateUtils import days_per_year
+    try: from constants import days_per_year
     except: days_per_year = 365.2422
     
     day = np.array(day)

@@ -11,3 +11,7 @@ University at Albany
 brose@albany.edu
 October 2014
 
+to do:
+- merge orbital.py and orbital_extended.py
+- create a superclass for a time-stepping model that is used by both
+column.py and ebm.py
