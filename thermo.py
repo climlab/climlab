@@ -11,7 +11,6 @@ in support of the class ATM/ENV 415: Climate Laboratory
 import numpy as np
 from constants import *
 
-#def PotentialTemperature(T,p):
 def potential_temperature(T,p):
     """Compute potential temperature for an air parcel.
     
@@ -23,7 +22,11 @@ def potential_temperature(T,p):
     theta = T*(ps/p)**kappa
     return theta
 
-#def TfromTHETA(theta,p):
+def theta(T,p):
+    '''Convenience method, identical to thermo.potential_temperature(T,p).'''
+    return potential_temperature(T,p)
+
+
 def temperature_from_potential(theta,p):
     """Convert potential temperature to in-situ temperature.
     
@@ -36,7 +39,11 @@ def temperature_from_potential(theta,p):
     return T
 
 
-#def ClausiusClapeyron(T):
+def T(theta,p):
+    '''Convenience method, identical to thermo.temperature_from_potential(theta,p).'''
+    return temperature_from_potential(theta,p)
+    
+
 def clausius_clapeyron(T):
     """Compute saturation vapor pressure as function of temperature T.
     
@@ -52,6 +59,7 @@ def clausius_clapeyron(T):
     es = 6.112 * np.exp(17.67*Tcel/(Tcel+243.5))
     return es
 
+
 def qsat(T,p):
     """Compute saturation specific humidity as function of temperature and pressure.
 
@@ -64,7 +72,6 @@ def qsat(T,p):
     es = clausius_clapeyron(T)
     q = eps * es / (p - (1 - eps) * es )
     return q
-#  End of function qsat(T,p)
 
 
 def pseudoadiabat(T,p):
@@ -87,9 +94,8 @@ def pseudoadiabat(T,p):
     dTdp = (T / p * kappa * (1 + esoverp * ratio) / 
         (1 + kappa * (cpv / Rv + (ratio-1) * ratio) * esoverp))
     return dTdp
-# End of function pseudoadiabat(T,p)
 
-#def EIS(T0,T700):
+
 def estimated_inversion_strength(T0,T700):
     '''Compute the "estimated inversion strength", T0 is surface temp, T700 is temp at 700 hPa, both in K.
     Following Wood and Bretherton, J. Climate 2006.
@@ -102,3 +108,8 @@ def estimated_inversion_strength(T0,T700):
     Gammam = g/cp*(1.0 - (1.0 + Lhvap*qsat(T850,850) / Rd / T850) / (1.0 + Lhvap**2 * qsat(T850,850)/cp/Rv/T850**2))
     z700 = (Rd*T0/g)*np.log(1000/700)
     return LTS - Gammam*(z700 - LCL)
+
+def EIS(T0,T700):
+    '''Convenience method, identical to thermo.estimated_inversion_strength(T0,T700)'''
+    return estimated_inversion_strength(T0,T700)
+
