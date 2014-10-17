@@ -3,8 +3,7 @@
 Modification of orbital.py
 Code developed by Brian Rose, University at Albany
 brose@albany.edu
-in support of the class ENV 480: Climate Laboratory
-Spring 2014
+in support of the class ATM/ENV 415: Climate Laboratory
 
 added capability to read from extended orbital data tables
 from Laskar et al. (La2004)"""

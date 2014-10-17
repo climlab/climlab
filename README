@@ -6,7 +6,7 @@ For some example on how to use these tools, see the course webpage at
 http://www.atmos.albany.edu/facstaff/brose/classes/ENV480_Spring2014/
 
 This code is freely available under the MIT license.
-See the accompanying LICENSE.txt file.
+See the accompanying LICENSE file.
 
 Brian Rose
 Department of Atmospheric and Environmental Sciences
@@ -14,3 +14,7 @@ University at Albany
 brose@albany.edu
 October 2014
 
+to do:
+- merge orbital.py and orbital_extended.py
+- create a superclass for a time-stepping model that is used by both
+column.py and ebm.py

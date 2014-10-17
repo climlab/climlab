@@ -4,13 +4,13 @@ Object-oriented code for diffusive energy balance models
 
 Code developed by Brian Rose, University at Albany
 brose@albany.edu
-in support of the class ENV 480: Climate Laboratory
-Spring 2014 """
+in support of the class ATM/ENV 415: Climate Laboratory
+"""
 
 import numpy as np
 from scipy.linalg import solve_banded
 from scipy import integrate
-import ClimateUtils as clim
+import constants as const
 import orbital
 
 
@@ -33,7 +33,7 @@ class _EBM:
         self.B = 2.
         #self.water_depth =  10.0
         self.Tf =  0.0 
-        self.S0 = clim.S0
+        self.S0 = const.S0
         self.make_grid()
         self.set_timestep()
         #self.albedo_noice = 0.303 + 0.0779 * P2( np.sin( self.phi ) )
@@ -61,9 +61,9 @@ class _EBM:
     def set_timestep( self, num_steps_per_year = 90 ):
         '''Change the timestep, given a number of steps per calendar year.'''
         self.num_steps_per_year = num_steps_per_year
-        self.timestep = clim.seconds_per_year / self.num_steps_per_year
-        timestep_days = self.timestep / clim.seconds_per_day
-        self.days_of_year = np.arange(0., clim.days_per_year, timestep_days )
+        self.timestep = const.seconds_per_year / self.num_steps_per_year
+        timestep_days = self.timestep / const.seconds_per_day
+        self.days_of_year = np.arange(0., const.days_per_year, timestep_days )
         self.day_of_year_index = 0
         self.steps = 0
         self.days_elapsed = 0.
@@ -77,7 +77,7 @@ class _EBM:
             try: water_depth = self.water_depth
             except: ValueError("water_depth parameter is not specified.")
         self.water_depth = water_depth
-        self.C = clim.cw * clim.rho_w * self.water_depth
+        self.C = const.cw * const.rho_w * self.water_depth
         self.delta_time_over_C = self.timestep / self.C
         self.set_diffusivity(self.K)
    
@@ -91,7 +91,7 @@ class _EBM:
         
     def _make_diffusion_matrix(self):
         J = self.num_points
-        #Ka = clim.cp * clim.ps * clim.mb_to_Pa / clim.g / clim.a**2 * self.K * np.ones_like(self.phi_stag)
+        #Ka = const.cp * const.ps * const.mb_to_Pa / const.g / const.a**2 * self.K * np.ones_like(self.phi_stag)
         #cosKa = np.cos(self.phi_stag) * Ka
         cosKa = np.cos(self.phi_stag) * self.K
         Ka1  = cosKa[0:J] / np.cos(self.phi) * self.delta_time_over_C / self.dphi**2
@@ -135,7 +135,7 @@ class _EBM:
         
     def compute_degree_days( self, threshold=0. ):
         """Return temperature*time in degree-days wherever temperature is above the threshold, otherwise zero."""
-        return np.where( self.T > threshold, self.T * self.timestep / clim.seconds_per_day, 
+        return np.where( self.T > threshold, self.T * self.timestep / const.seconds_per_day, 
             np.zeros_like( self.T ) )
     
     def integrate_years(self, years=1.0, verbose=True ):
@@ -150,12 +150,12 @@ class _EBM:
             self.T_timeave += self.T
         self.T_timeave /= numsteps
         if verbose:
-            print( "Total elapsed time is " + str(self.days_elapsed/clim.days_per_year) + " years." )
+            print( "Total elapsed time is " + str(self.days_elapsed/const.days_per_year) + " years." )
 
     def update_time(self):
         """Increment the timestep counter by one. This function is called by the timestepping routines."""
         self.steps += 1
-        self.days_elapsed += self.timestep / clim.seconds_per_day  # time in days since beginning
+        self.days_elapsed += self.timestep / const.seconds_per_day  # time in days since beginning
         if self.day_of_year_index >= self.num_steps_per_year-1:
             self.do_new_calendar_year()
         else:
@@ -174,19 +174,19 @@ class _EBM:
     
     def diffusive_heat_transport( self ):
         '''Compute instantaneous diffusive heat transport in units of PW, on the staggered grid.'''
-        #return ( 1E-15 * -2 * np.math.pi * np.cos(self.phi_stag) * clim.cp * clim.ps * clim.mb_to_Pa / clim.g * self.K * 
+        #return ( 1E-15 * -2 * np.math.pi * np.cos(self.phi_stag) * const.cp * const.ps * const.mb_to_Pa / const.g * self.K * 
         #    np.append( np.append( 0., np.diff( self.T ) ), 0.) / self.dphi )
-        return ( 1E-15 * -2 * np.math.pi * np.cos(self.phi_stag) * clim.a**2 * self.K * 
+        return ( 1E-15 * -2 * np.math.pi * np.cos(self.phi_stag) * const.a**2 * self.K * 
             np.append( np.append( 0., np.diff( self.T ) ), 0.) / self.dphi )
     
     def heat_transport_convergence( self ):
         '''Returns instantaneous convergence of heat transport in units of W / m^2.'''
-        return ( -1./(2*np.math.pi*clim.a**2*np.cos(self.phi)) * np.diff( 1.E15*self.heat_transport() )
+        return ( -1./(2*np.math.pi*const.a**2*np.cos(self.phi)) * np.diff( 1.E15*self.heat_transport() )
             / np.diff(self.phi_stag) )
     
     def inferred_heat_transport( self ):
         '''Returns the inferred heat transport (in PW) by integrating the TOA energy imbalance from pole to pole.'''
-        return ( 1E-15 * 2 * np.math.pi * clim.a**2 * integrate.cumtrapz( np.cos(self.phi)*self.net_radiation,
+        return ( 1E-15 * 2 * np.math.pi * const.a**2 * integrate.cumtrapz( np.cos(self.phi)*self.net_radiation,
             x=self.phi, initial=0. ) )
             
     def find_icelines( self ):
@@ -253,9 +253,9 @@ class EBM_seasonal( _EBM ):
         _EBM.__init__( self, num_points )
         self.Tf = 0.
         #self.num_steps_per_year = 90
-        #self.set_timestep( timestep = clim.seconds_per_year / self.num_steps_per_year )
-        #timestep_days = self.timestep / clim.seconds_per_day
-        #self.days_of_year = np.arange(0., clim.days_per_year, timestep_days )
+        #self.set_timestep( timestep = const.seconds_per_year / self.num_steps_per_year )
+        #timestep_days = self.timestep / const.seconds_per_day
+        #self.days_of_year = np.arange(0., const.days_per_year, timestep_days )
         #self.day_of_year_index = 0
         #self.years_elapsed = 0
         #self.make_insolation_array()
@@ -268,7 +268,8 @@ class EBM_seasonal( _EBM ):
     
 class EBM_landocean( EBM_seasonal ):
     '''A model with both land and ocean, based on North and Coakley (1979)
-    Essentially just invokes two different EBM_seasonal objects, one for ocean, one for land.'''
+    Essentially just invokes two different EBM_seasonal objects, one for ocean, one for land.
+    '''
     def __str__(self):
         return ( "Instance of EBM_landocean class with " +  str(self.num_points) + " latitude points." )
     
@@ -331,13 +332,15 @@ class EBM_landocean( EBM_seasonal ):
 
 
 class OrbitalCycles:
-    def __init__( self, model, kyear_start = 20., kyear_stop = 0., segment_length_years = 100., orbital_year_factor = 1., verbose=True ):
+    def __init__( self, model, kyear_start = 20., kyear_stop = 0., 
+                  segment_length_years = 100., orbital_year_factor = 1., verbose=True ):
         """Automatically integrate an Energy Balance Model through changes in orbital parameters.
         
         model is an object of class EBM or its daughters.
         
         segment_length_years is the length of each integration with fixed orbital parameters.
-        orbital_year_factor is an optional speed-up to the orbital cycles."""
+        orbital_year_factor is an optional speed-up to the orbital cycles.
+        """
         
         self.model = model
         self.kyear_start = kyear_start
