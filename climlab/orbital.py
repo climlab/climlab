@@ -193,18 +193,32 @@ def solar_longitude( day, ecc = 0.017236, long_peri = 281.37 ):
 
 
 #  Orbital parameters are read from the accompanying file
-#     'orbital_parameter_data.csv'
-#  The data are copied from Eisenman and Huybers
+#     'BergerLoutre91_orbital.csv'
 #  Column 0 is kyr from present (negative because backward in time)
 #  Column 1 is eccentricity (dimensionless)
 #  Column 2 is longitude of perihelion (degrees)
 #  Column 3 is obliquity angle (degrees)
 #  The data are loaded here into a numpy.array object called orbital_table
 
+# NOTE: this is currently a bit of a mess.
+#  I have a module to read the Berger and Loutre data
+#  from NCDC ftp repository
+#  as well as La2004 orbital data
+# and there should be a switch to choose data source.
+#  Also, I think that the two data sources are in different units
+#
+#  TO DO:  implement a class for holding orbital data,
+#  along with methods for interpolating to specific years
+#  with that, some methods for accessing various data sources.
+#  Divorce this stuff from the actual insolation code, 
+#  which should be in its own module file and completely
+#  independent of the orbital data stuff.
+
+filename = 'BergerLoutre91_orbital.csv'
 #  This gives the full path to the data file, assuming it's in the same directory
-filename = os.path.join(os.path.dirname(__file__), 'orbital_parameter_data.csv')
-print 'Loading orbital parameter data from file ' + filename
-orbital_table = np.fromfile(filename, dtype=float, sep=',')
+fullfilename = os.path.join(os.path.dirname(__file__), filename)
+print 'Loading orbital parameter data from file ' + fullfilename
+orbital_table = np.fromfile(fullfilename, dtype=float, sep=',')
 orbital_table = np.reshape(orbital_table, (5001,4))
 
 #  No longer including the table of values here in the module file

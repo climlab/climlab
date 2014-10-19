@@ -15,7 +15,7 @@ Column 3: longitude of perihelion from moving equinox (radians)
 import numpy as np
 import urllib2
 
-def read_La2004():
+def get_data():
     base_url = 'http://www.imcce.fr/Equipes/ASD/insola/earth/La2004/'
     past_file = 'INSOLN.LA2004.BTL.ASC'
     future_file = 'INSOLP.LA2004.BTL.ASC'
