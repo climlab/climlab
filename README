@@ -24,7 +24,6 @@ This code is freely available under the MIT license.
 See the accompanying LICENSE file.
 
 to do:
-- clean up ebm.py to play better with orbital code (don't load the orbital table repeatedly)
-- create a superclass for a time-stepping model that is used by both
-column.py and ebm.py
+- add more flexible superstructure for timestepping with different averaging and diagnostics
 - add options for spectral bands to column.py
+- develop more courseware content, particularly to document EBM features.
