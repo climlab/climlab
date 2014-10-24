@@ -1,18 +1,27 @@
-This is a collection of Python code for simple climate modeling.
-The code was originally developed in winter / spring 2014
-in support of an undergraduate course at the University at Albany.
+****   climlab   ****
 
-For some example on how to use these tools, see the course webpage at
+Python code package for simple climate modeling
+Brian E. J. Rose
+Department of Atmospheric and Environmental Sciences
+University at Albany
+brose@albany.edu
+
+To install:
+python setup.py
+
+The directory courseware/ contains a collection of IPython notebooks (.ipynb)
+used for teaching some basics of climate science, 
+and documenting use of the climlab package.
+These should all run out-of-the-box once the package is installed, e.g:
+ipython notebook Insolation.ipynb
+
+The code and notebooks were originally developed in winter / spring 2014
+in support of an undergraduate course at the University at Albany.
+See the original course webpage at
 http://www.atmos.albany.edu/facstaff/brose/classes/ENV480_Spring2014/
 
 This code is freely available under the MIT license.
 See the accompanying LICENSE file.
-
-Brian Rose
-Department of Atmospheric and Environmental Sciences
-University at Albany
-brose@albany.edu
-October 2014
 
 to do:
 - clean up ebm.py to play better with orbital code (don't load the orbital table repeatedly)
