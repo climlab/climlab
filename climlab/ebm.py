@@ -237,12 +237,9 @@ class EBM_annual( EBM_simple ):
         return ( "Instance of EBM_annual class with " +  str(self.num_points) + " latitude points  \n" +
           "and global mean temperature " + str(self.global_mean_temperature()) + " degrees C.")
     
-    def make_insolation_array( self, orb = None ):
-        if orb is None:
-            table = OrbitalTable()
-            orb = table.lookup_parameters(0)
+    def make_insolation_array( self, orb = const.orb_present ):
         self.orb = orb
-        temp_array = insolation.daily_insolation(self.lat, self.days_of_year, **dict(self.orb, S0=self.S0))
+        temp_array = insolation.daily_insolation(self.lat, self.days_of_year, orb=self.orb, S0=self.S0)
         self.constant_insolation = np.mean( temp_array, axis=1 )
         self.insolation_array = np.tile( np.expand_dims(self.constant_insolation,axis=1), [1, self.num_steps_per_year] )
     
@@ -264,13 +261,10 @@ class EBM_seasonal( _EBM ):
         #self.years_elapsed = 0
         #self.make_insolation_array()
                 
-    def make_insolation_array( self, orb = None ):
-        if orb is None:
-            table = OrbitalTable()
-            orb = table.lookup_parameters(0)
+    def make_insolation_array( self, orb = const.orb_present ):
         self.orb = orb
         self.insolation_array = insolation.daily_insolation(self.lat, self.days_of_year, 
-            **dict(self.orb, S0=self.S0))
+            orb=self.orb, S0=self.S0)
             
     
 class EBM_landocean( EBM_seasonal ):

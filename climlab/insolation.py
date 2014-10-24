@@ -27,7 +27,7 @@ Berger A. (1978). Long-term variations of daily insolation and
 import numpy as np
 import constants as const
 
-def daily_insolation(lat, day, ecc = 0.017236, long_peri = 281.37, obliquity = 23.446, S0 = None, day_type=1 ):
+def daily_insolation(lat, day, orb=const.orb_present, S0 = None, day_type=1 ):
     """Compute daily average insolation given latitude, time of year and orbital parameters.
     
     Orbital parameters can be computed for any time in the last 5 Myears with
@@ -36,9 +36,10 @@ def daily_insolation(lat, day, ecc = 0.017236, long_peri = 281.37, obliquity = 2
     Inputs:
     lat:      Latitude in degrees (-90 to 90).
     day:      Indicator of time of year, by default day 1 is Jan 1.
-    ecc:      eccentricity (dimensionless)
-    long_peri:    longitude of perihelion (precession angle) (degrees)
-    obliquity:  obliquity angle (degrees)
+    orb:    a dictionary with three members (as provided by orbital.py)
+        ecc:      eccentricity (dimensionless)
+        long_peri:    longitude of perihelion (precession angle) (degrees)
+        obliquity:  obliquity angle (degrees)
     S0:       Solar constant in W/m^2, will try to read from constants.py
     day_type: Convention for specifying time of year (+/- 1,2) [optional].
         day_type=1 (default): day input is calendar day (1-365.24), where day 1 
@@ -65,7 +66,7 @@ def daily_insolation(lat, day, ecc = 0.017236, long_peri = 281.37, obliquity = 2
         table = OrbitalTable()
         years = np.linspace(0, 5000, 5001)
         orb = table.lookup_parameters( years )
-        S65 = orbital.daily_insolation( 65, 172, **orb )
+        S65 = orbital.daily_insolation( 65, 172, orb )
      """
     
     # If input argument S0 is not given, use the standard Earth value
@@ -75,16 +76,16 @@ def daily_insolation(lat, day, ecc = 0.017236, long_peri = 281.37, obliquity = 2
     # Inputs can be scalar or vector. If scalar, convert to 0d numpy arrays
     lat = np.array( lat )
     day = np.array( day )
-    ecc = np.array( ecc )
-    long_peri = np.array( long_peri )
-    obliquity = np.array( obliquity )
+    ecc = np.array( orb['ecc'] )
+    long_peri = np.array( orb['long_peri'] )
+    obliquity = np.array( orb['obliquity'] )
     
     # Convert precession angle and latitude to radians
     phi = np.deg2rad( lat )
     
     # lambda_long (solar longitude) is the angular distance along Earth's orbit measured from spring equinox (21 March)
     if day_type==1: # calendar days
-        lambda_long = solar_longitude( day, ecc=ecc, long_peri=long_peri )
+        lambda_long = solar_longitude( day, orb )
     elif day_type==2: #solar longitude (1-360) is specified in input, no need to convert days to longitude
         lambda_long = np.tile( np.expand_dims( np.deg2rad( day ), axis=1 ), [1, ecc.size] )  
     else:
@@ -113,7 +114,7 @@ def daily_insolation(lat, day, ecc = 0.017236, long_peri = 281.37, obliquity = 2
     return np.squeeze( Fsw )
 
 
-def solar_longitude( day, ecc = 0.017236, long_peri = 281.37, days_per_year = None ):
+def solar_longitude( day, orb=const.orb_present, days_per_year = None ):
     '''Estimate solar longitude (lambda = 0 at spring equinox) from calendar day 
     using an approximation from Berger 1978 section 3.
     
@@ -126,8 +127,8 @@ def solar_longitude( day, ecc = 0.017236, long_peri = 281.37, days_per_year = No
         days_per_year = const.days_per_year
     
     day = np.array(day)
-    ecc = np.array(ecc)
-    long_peri_rad = np.deg2rad( np.array(long_peri) )
+    ecc = np.array(orb['ecc'])
+    long_peri_rad = np.deg2rad( np.array(orb['long_peri']) )
     delta_lambda_long_m = ( ( np.tile( np.expand_dims( day, axis=1 ), [1, ecc.size]) - 80. ) * 2. *
         np.math.pi / days_per_year )
     beta = ( 1 - ecc**2 )**(1./2.)
