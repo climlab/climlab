@@ -11,6 +11,7 @@ import numpy as np
 from scipy.linalg import solve_banded
 from scipy import integrate
 import constants as const
+from model import _TimeSteppingModel
 import insolation
 from orbital import OrbitalTable
 
@@ -24,7 +25,7 @@ def P2( x ):
     return 1. / 2. * (3. * x**2 - 1. )
     
 
-class _EBM:
+class _EBM(_TimeSteppingModel):
     def __init__(self, num_points = 90 ):
         #  first set all parameters to sensible default values        
         self.num_points = num_points
@@ -36,7 +37,6 @@ class _EBM:
         self.Tf =  0.0 
         self.S0 = const.S0
         self.make_grid()
-        self.set_timestep()
         #self.albedo_noice = 0.303 + 0.0779 * P2( np.sin( self.phi ) )
         self.albedo_noice = 0.33 + 0.25 * P2( np.sin( self.phi ) )
         #self.albedo_ice = 0.62 * np.ones_like( self.phi )
@@ -45,6 +45,7 @@ class _EBM:
         self.positive_degree_days = np.zeros_like(self.phi)
         #self.make_insolation_array()  # now called from inside set_timestep()
         self.external_heat_source = np.zeros_like(self.phi)
+        super(_EBM,self).__init__()
 
     def make_grid(self):
         '''Build the grid for the computation, which is evenly spaced in latitude.'''
@@ -61,14 +62,7 @@ class _EBM:
         
     def set_timestep( self, num_steps_per_year = 90 ):
         '''Change the timestep, given a number of steps per calendar year.'''
-        self.num_steps_per_year = num_steps_per_year
-        self.timestep = const.seconds_per_year / self.num_steps_per_year
-        timestep_days = self.timestep / const.seconds_per_day
-        self.days_of_year = np.arange(0., const.days_per_year, timestep_days )
-        self.day_of_year_index = 0
-        self.steps = 0
-        self.days_elapsed = 0.
-        self.years_elapsed = 0
+        super(_EBM,self).set_timestep(num_steps_per_year)
         self.set_water_depth( )
         self.make_insolation_array()
     
@@ -132,40 +126,31 @@ class _EBM:
         #self.T = np.linalg.solve( self.diffTriDiag, Trad )
         self.T = solve_banded((1,1), self.diffTriDiag, Trad )
         self.positive_degree_days += self.compute_degree_days()
-        self.update_time()
+        super(_EBM,self).step_forward()
         
     def compute_degree_days( self, threshold=0. ):
         """Return temperature*time in degree-days wherever temperature is above the threshold, otherwise zero."""
         return np.where( self.T > threshold, self.T * self.timestep / const.seconds_per_day, 
             np.zeros_like( self.T ) )
     
-    def integrate_years(self, years=1.0, verbose=True ):
-        """Timestep the model forward a specified number of years and compute the time average temperature."""
-        numsteps = int( self.num_steps_per_year * years )
-        if verbose:
-            print("Integrating for " + str(numsteps) + " steps or " + str(years) + " years.")
-        self.T_timeave = np.zeros_like( self.T )
-        #  begin time loop
-        for count in range( numsteps ):
-            self.step_forward()
-            self.T_timeave += self.T
-        self.T_timeave /= numsteps
-        if verbose:
-            print( "Total elapsed time is " + str(self.days_elapsed/const.days_per_year) + " years." )
-
-    def update_time(self):
-        """Increment the timestep counter by one. This function is called by the timestepping routines."""
-        self.steps += 1
-        self.days_elapsed += self.timestep / const.seconds_per_day  # time in days since beginning
-        if self.day_of_year_index >= self.num_steps_per_year-1:
-            self.do_new_calendar_year()
-        else:
-            self.day_of_year_index += 1
+    #  parent class needs to implement time averaging!  For now, get rid of it.
+    #def integrate_years(self, years=1.0, verbose=True ):
+    #    """Timestep the model forward a specified number of years and compute the time average temperature."""
+    #    numsteps = int( self.num_steps_per_year * years )
+    #    if verbose:
+    #        print("Integrating for " + str(numsteps) + " steps or " + str(years) + " years.")
+    #    self.T_timeave = np.zeros_like( self.T )
+    #    #  begin time loop
+    #    for count in range( numsteps ):
+    #        self.step_forward()
+    #        self.T_timeave += self.T
+    #    self.T_timeave /= numsteps
+    #    if verbose:
+    #        print( "Total elapsed time is " + str(self.days_elapsed/const.days_per_year) + " years." )
 
     def do_new_calendar_year( self ):
         """This function is called once at the end of every calendar year."""
-        self.day_of_year_index = 0  # back to Jan. 1
-        self.years_elapsed += 1
+        super(_EBM,self).do_new_calendar_year()
         self.previous_positive_degree_days = self.positive_degree_days
         self.positive_degree_days = np.zeros_like( self.phi )
     
@@ -223,7 +208,7 @@ class EBM_simple( _EBM ):
     
     def __init__( self, num_points = 90 ):
         self.s2 = -0.48    
-        _EBM.__init__( self, num_points )
+        super(EBM_simple,self).__init__( num_points )
         self.Tf = -10.
         
     def make_insolation_array( self ):
@@ -251,15 +236,8 @@ class EBM_seasonal( _EBM ):
           "and global mean temperature " + str(self.global_mean_temperature()) + " degrees C.")
           
     def __init__( self, num_points = 90 ):
-        _EBM.__init__( self, num_points )
+        super(EBM_seasonal,self).__init__( num_points )
         self.Tf = 0.
-        #self.num_steps_per_year = 90
-        #self.set_timestep( timestep = const.seconds_per_year / self.num_steps_per_year )
-        #timestep_days = self.timestep / const.seconds_per_day
-        #self.days_of_year = np.arange(0., const.days_per_year, timestep_days )
-        #self.day_of_year_index = 0
-        #self.years_elapsed = 0
-        #self.make_insolation_array()
                 
     def make_insolation_array( self, orb = const.orb_present ):
         self.orb = orb
@@ -275,7 +253,7 @@ class EBM_landocean( EBM_seasonal ):
         return ( "Instance of EBM_landocean class with " +  str(self.num_points) + " latitude points." )
     
     def __init__( self, num_points = 90 ):
-        EBM_seasonal.__init__( self, num_points )
+        super(EBM_landocean,self).__init__( num_points )
         self.land_ocean_exchange_parameter = 1.0  # in W/m2/K
 
         self.land = EBM_seasonal( num_points )
@@ -329,7 +307,7 @@ class EBM_landocean( EBM_seasonal ):
         #  Here we make sure that both sub-models have the current insolation.
         self.land.make_insolation_array( self.orb )
         self.ocean.make_insolation_array( self.orb )
-        EBM_seasonal.integrate_years( self, years, verbose )
+        super(EBM_landocean,self).integrate_years( years, verbose )
 
 
 class OrbitalCycles:
