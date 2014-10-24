@@ -11,7 +11,8 @@ import numpy as np
 from scipy.linalg import solve_banded
 from scipy import integrate
 import constants as const
-import orbital
+import insolation
+from orbital import OrbitalTable
 
 
 def global_mean( field, lat_radians ):
@@ -236,9 +237,12 @@ class EBM_annual( EBM_simple ):
         return ( "Instance of EBM_annual class with " +  str(self.num_points) + " latitude points  \n" +
           "and global mean temperature " + str(self.global_mean_temperature()) + " degrees C.")
     
-    def make_insolation_array( self, orb = orbital.lookup_parameters(0) ):
+    def make_insolation_array( self, orb = None ):
+        if orb is None:
+            table = OrbitalTable()
+            orb = table.lookup_parameters(0)
         self.orb = orb
-        temp_array = orbital.daily_insolation(self.lat, self.days_of_year, **dict(self.orb, S0=self.S0))
+        temp_array = insolation.daily_insolation(self.lat, self.days_of_year, **dict(self.orb, S0=self.S0))
         self.constant_insolation = np.mean( temp_array, axis=1 )
         self.insolation_array = np.tile( np.expand_dims(self.constant_insolation,axis=1), [1, self.num_steps_per_year] )
     
@@ -260,9 +264,12 @@ class EBM_seasonal( _EBM ):
         #self.years_elapsed = 0
         #self.make_insolation_array()
                 
-    def make_insolation_array( self, orb = orbital.lookup_parameters(0) ):
+    def make_insolation_array( self, orb = None ):
+        if orb is None:
+            table = OrbitalTable()
+            orb = table.lookup_parameters(0)
         self.orb = orb
-        self.insolation_array = orbital.daily_insolation(self.lat, self.days_of_year, 
+        self.insolation_array = insolation.daily_insolation(self.lat, self.days_of_year, 
             **dict(self.orb, S0=self.S0))
             
     
@@ -367,12 +374,15 @@ class OrbitalCycles:
         self.T_segments_annual = np.empty_like( self.T_segments )
         self.orb_kyear = np.empty( self.num_segments )
         
+        # Get orbital data table
+        orbtable = OrbitalTable()
+        
         for n in range(self.num_segments):
             if verbose:
                 print("-------------------------")
                 print("Segment " + str(n) + " out of " + str(self.num_segments) )
                 print( "Using orbital parameters from " + str(kyear_before_present) + " kyears before present." )
-            orb = orbital.lookup_parameters( kyear_before_present )
+            orb = orbtable.lookup_parameters( kyear_before_present )
             self.model.make_insolation_array( orb )
             self.model.integrate_years( segment_length_years-1., verbose=False )
             #  Run one final year to characterize the current equilibrated state

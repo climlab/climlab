@@ -15,6 +15,7 @@ brose@albany.edu
 October 2014
 
 to do:
-- merge orbital.py and orbital_extended.py
+- clean up ebm.py to play better with orbital code (don't load the orbital table repeatedly)
 - create a superclass for a time-stepping model that is used by both
 column.py and ebm.py
+- add options for spectral bands to column.py
