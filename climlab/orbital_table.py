@@ -3,17 +3,6 @@ from scipy import interpolate
 import os
 import urllib2
 
-#  A new class will hold orbital table data in numpy arrays
-# as well as an associated method to load the data.
-
-#  OrbitalTable should have fields called
-#   kyear
-#   ecc
-#   long_peri  (degrees)
-#   obliquity   (degrees)
-#  Each is a 1D column array of same length
-#  Also will have min and max kyears loaded with the data, so that the lookup 
-#  can throw an exception if you give a year outside this range
 class OrbitalTable:
     def __init__(self):
         self.kyear = None
@@ -98,4 +87,3 @@ class OrbitalTable:
         self.f_obliquity = interpolate.interp1d(self.kyear, self.obliquity)
 
 #  Will then sub-class this to create a "Long Orbital Table" that uses the LA2004 data
-
