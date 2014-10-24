@@ -5,6 +5,7 @@ class _TimeSteppingModel(object):
     '''A generic parent class for all time-dependent models that use a
     discete forward timestep.'''
     def __init__( self ):
+        self.state = []
         self.set_timestep()
         #  Daughter classes will need to do a bunch of other initialization
     
@@ -44,13 +45,29 @@ class _TimeSteppingModel(object):
         if verbose:
             print("Integrating for " + str(numsteps) + " steps or " + str(years) + " years.")
         
-        #  This should implement a generic time-averaging feature using a list of model state variables
-        #self.T_timeave = np.zeros_like( self.T )
+        #  This implements a generic time-averaging feature using the list of model state variables
+        self.state_timeave = {}
+        for thisvar in self.state:
+            self.state_timeave[thisvar] = np.zeros_like( vars(self)[thisvar] )
         
         #  begin time loop
         for count in range( numsteps ):
             self.step_forward()
-            #self.T_timeave += self.T
-        #self.T_timeave /= numsteps
+            for thisvar in self.state:
+                self.state_timeave[thisvar] += vars(self)[thisvar]
+        for thisvar in self.state:
+            self.state_timeave[thisvar] /= numsteps
+        if verbose:
+            print( "Total elapsed time is " + str(self.days_elapsed/const.days_per_year) + " years." )
+
+    def integrate_days(self, days=1.0, verbose=True ):
+        '''Timestep the model forward a specified number of days.'''
+        numsteps = int( self.num_steps_per_year / const.days_per_year * days )
+        if verbose:
+            print("Integrating for " + str(numsteps) + " steps or " + str(days) + " days.")
+        
+        #  begin time loop
+        for count in range( numsteps ):
+            self.step_forward()
         if verbose:
             print( "Total elapsed time is " + str(self.days_elapsed/const.days_per_year) + " years." )

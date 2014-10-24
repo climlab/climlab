@@ -4,14 +4,16 @@ Object-oriented code for one-dimensional radiative-convective models.
 
 Code developed by Brian Rose, University at Albany
 brose@albany.edu
-in support of the class ATM/ENV 415: Climate Laboratory
 """
 
 
 import numpy as np
 import constants as const
+from model import _TimeSteppingModel
 
-class Column:
+# Need to make this more consistent with ebm.py -- don't use a dictionary for parameters
+
+class Column(_TimeSteppingModel):
     """The Column object represents surface temperature and air temperature on grid of pressure levels."""
     def __str__(self):
         return ( "Instance of Column class with surface temperature " + str(self.Ts) + " K, " + 
@@ -47,8 +49,10 @@ class Column:
         self.set_LW_emissivity()
         self.set_SW_absorptivity()
         
-        self.steps = 0
-        self.days_elapsed = 0.
+        #self.steps = 0
+        #self.days_elapsed = 0.
+        self.set_timestep( num_steps_per_year = const.seconds_per_year / params['timestep'])
+
         
     def set_LW_emissivity(self, eps = None ):
         """Set the longwave emissivity / absorptivity eps for the Column."""
@@ -212,31 +216,38 @@ class Column:
 
         return Tcol
 
-    def step_forward(self, num_steps=1 ):
-        """Update the Column temperature. If optional argument num_steps is given, 
-        the timestepping will repeat the specifed number of times.
-        
-        Calls rad_temperature_tendency() to compute radiative tendencies,
-        and if a lapse rate is specified in params['adj_lapse_rate'], also calls convective_adjustment().
-        """
-        
-        for n in range(num_steps):
-            self.rad_temperature_tendency()
-            self.Ts += self.rad_temp_tendency_sfc
-            self.Tatm += self.rad_temp_tendency_atm
-            if self.params['adj_lapse_rate'] is not None:
-                self.unstable_Ts = self.Ts
-                self.unstable_Tatm = self.Tatm
-                Tadj = self.convective_adjustment( lapserate = self.params['adj_lapse_rate'] )
-                self.Ts = Tadj[0]
-                self.Tatm = Tadj[1:self.params['num_levels']+1]
-            self.update_time()
-    
-    def update_time(self):
-        """Increment the timestep counter by one. This function is called by the timestepping routines."""
-        self.steps += 1
-        self.days_elapsed += self.params['timestep'] / const.seconds_per_day  # time in days since beginning
-        
+    def step_forward(self):
+        self.rad_temperature_tendency()
+        self.Ts += self.rad_temp_tendency_sfc
+        self.Tatm += self.rad_temp_tendency_atm
+        if self.params['adj_lapse_rate'] is not None:
+            self.unstable_Ts = self.Ts
+            self.unstable_Tatm = self.Tatm
+            Tadj = self.convective_adjustment( lapserate = self.params['adj_lapse_rate'] )
+            self.Ts = Tadj[0]
+            self.Tatm = Tadj[1:self.params['num_levels']+1]
+        super(Column,self).step_forward()
+
+    #def step_forward(self, num_steps=1 ):
+    #    """Update the Column temperature. If optional argument num_steps is given, 
+    #    the timestepping will repeat the specifed number of times.
+    #    
+    #    Calls rad_temperature_tendency() to compute radiative tendencies,
+    #    and if a lapse rate is specified in params['adj_lapse_rate'], also calls convective_adjustment().
+    #    """
+    #    
+    #    for n in range(num_steps):
+    #        self.rad_temperature_tendency()
+    #        self.Ts += self.rad_temp_tendency_sfc
+    #        self.Tatm += self.rad_temp_tendency_atm
+    #        if self.params['adj_lapse_rate'] is not None:
+    #            self.unstable_Ts = self.Ts
+    #            self.unstable_Tatm = self.Tatm
+    #            Tadj = self.convective_adjustment( lapserate = self.params['adj_lapse_rate'] )
+    #            self.Ts = Tadj[0]
+    #            self.Tatm = Tadj[1:self.params['num_levels']+1]
+    #        self.update_time()
+            
         
 class Transmissivity:
     def __init__(self, absorb ):

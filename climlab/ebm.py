@@ -4,7 +4,6 @@ Object-oriented code for diffusive energy balance models
 
 Code developed by Brian Rose, University at Albany
 brose@albany.edu
-in support of the class ATM/ENV 415: Climate Laboratory
 """
 
 import numpy as np
@@ -42,10 +41,12 @@ class _EBM(_TimeSteppingModel):
         #self.albedo_ice = 0.62 * np.ones_like( self.phi )
         self.albedo_ice = self.albedo_noice  # default to no albedo feedback
         self.T = 12. - 40. * P2( np.sin( self.phi ) )
+        #  A list of the variable names for all model state variables
+        self.state = ['T']
         self.positive_degree_days = np.zeros_like(self.phi)
         #self.make_insolation_array()  # now called from inside set_timestep()
         self.external_heat_source = np.zeros_like(self.phi)
-        super(_EBM,self).__init__()
+        self.set_timestep()
 
     def make_grid(self):
         '''Build the grid for the computation, which is evenly spaced in latitude.'''
