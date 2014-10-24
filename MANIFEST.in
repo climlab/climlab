@@ -1,2 +1,3 @@
 include README
-include climlab/orbital_parameter_data.csv
+include LICENSE
+include climlab/orbit91

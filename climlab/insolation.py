@@ -1,7 +1,4 @@
 """insolation.py
-Code developed by Brian Rose, University at Albany
-brose@albany.edu
-in support of the class ATM/ENV 415: Climate Laboratory
 
 This module contains general-purpose routines for computing incoming
 solar radiation at the top of the atmosphere.
@@ -61,11 +58,13 @@ def daily_insolation(lat, day, ecc = 0.017236, long_peri = 281.37, obliquity = 2
     
     Code is fully vectorized to handle array input for all arguments.
     Orbital arguments should all have the same sizes. 
-    This is automatic if computed from lookup_parameters()
+    This is automatic if computed from orbital.OrbitalTable.lookup_parameters()
     
     e.g. to compute the timeseries of insolation at 65N at summer solstice over the past 5 Myears
+        from climlab.orbital import OrbitalTable
+        table = OrbitalTable()
         years = np.linspace(0, 5000, 5001)
-        orb = orbital.lookup_parameters( years )
+        orb = table.lookup_parameters( years )
         S65 = orbital.daily_insolation( 65, 172, **orb )
      """
     
