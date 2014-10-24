@@ -13,15 +13,11 @@ import constants as const
 from model import _TimeSteppingModel
 import insolation
 from orbital import OrbitalTable
-
+from legendre import P2
 
 def global_mean( field, lat_radians ):
     '''Compute the area-weighted global mean. field must be a vector of values on a latitude grid.'''
     return np.sum( field * np.cos( lat_radians ) ) / np.sum( np.cos( lat_radians ) )      
-
-def P2( x ):
-    '''The second Legendre polynomial.'''
-    return 1. / 2. * (3. * x**2 - 1. )
     
 
 class _EBM(_TimeSteppingModel):
@@ -41,8 +37,8 @@ class _EBM(_TimeSteppingModel):
         #self.albedo_ice = 0.62 * np.ones_like( self.phi )
         self.albedo_ice = self.albedo_noice  # default to no albedo feedback
         self.T = 12. - 40. * P2( np.sin( self.phi ) )
-        #  A list of the variable names for all model state variables
-        self.state = ['T']
+        #  A dictionary of the model state variables
+        self.state = {'T':self.T}
         self.positive_degree_days = np.zeros_like(self.phi)
         #self.make_insolation_array()  # now called from inside set_timestep()
         self.external_heat_source = np.zeros_like(self.phi)

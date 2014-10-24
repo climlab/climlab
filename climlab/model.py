@@ -5,7 +5,8 @@ class _TimeSteppingModel(object):
     '''A generic parent class for all time-dependent models that use a
     discete forward timestep.'''
     def __init__( self ):
-        self.state = []
+        self.grid = {}
+        self.state = {}
         self.set_timestep()
         #  Daughter classes will need to do a bunch of other initialization
     
@@ -47,16 +48,16 @@ class _TimeSteppingModel(object):
         
         #  This implements a generic time-averaging feature using the list of model state variables
         self.state_timeave = {}
-        for thisvar in self.state:
-            self.state_timeave[thisvar] = np.zeros_like( vars(self)[thisvar] )
+        for varname,value in self.state.items():
+            self.state_timeave[varname] = np.zeros_like( value )
         
         #  begin time loop
         for count in range( numsteps ):
             self.step_forward()
-            for thisvar in self.state:
-                self.state_timeave[thisvar] += vars(self)[thisvar]
-        for thisvar in self.state:
-            self.state_timeave[thisvar] /= numsteps
+            for varname,value in self.state.items():
+                self.state_timeave[varname] += value
+        for varname,value in self.state.items():
+            self.state_timeave[varname] /= numsteps
         if verbose:
             print( "Total elapsed time is " + str(self.days_elapsed/const.days_per_year) + " years." )
 

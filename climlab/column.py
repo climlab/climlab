@@ -52,6 +52,8 @@ class Column(_TimeSteppingModel):
         #self.steps = 0
         #self.days_elapsed = 0.
         self.set_timestep( num_steps_per_year = const.seconds_per_year / params['timestep'])
+        #  A dictionary of the model state variables
+        self.state = {'Ts':self.Ts, 'Tatm':self.Tatm}
 
         
     def set_LW_emissivity(self, eps = None ):
