@@ -13,7 +13,7 @@ import constants as const
 from model import _TimeSteppingModel
 import insolation
 from orbital import OrbitalTable
-from legendre import P2
+import legendre
 
 def global_mean( field, lat_radians ):
     '''Compute the area-weighted global mean. field must be a vector of values on a latitude grid.'''
@@ -33,10 +33,10 @@ class _EBM(_TimeSteppingModel):
         self.S0 = const.S0
         self.make_grid()
         #self.albedo_noice = 0.303 + 0.0779 * P2( np.sin( self.phi ) )
-        self.albedo_noice = 0.33 + 0.25 * P2( np.sin( self.phi ) )
+        self.albedo_noice = 0.33 + 0.25 * legendre.P2( np.sin( self.phi ) )
         #self.albedo_ice = 0.62 * np.ones_like( self.phi )
         self.albedo_ice = self.albedo_noice  # default to no albedo feedback
-        self.T = 12. - 40. * P2( np.sin( self.phi ) )
+        self.T = 12. - 40. * legendre.P2( np.sin( self.phi ) )
         #  A dictionary of the model state variables
         self.state = {'T':self.T}
         self.positive_degree_days = np.zeros_like(self.phi)
@@ -130,21 +130,6 @@ class _EBM(_TimeSteppingModel):
         return np.where( self.T > threshold, self.T * self.timestep / const.seconds_per_day, 
             np.zeros_like( self.T ) )
     
-    #  parent class needs to implement time averaging!  For now, get rid of it.
-    #def integrate_years(self, years=1.0, verbose=True ):
-    #    """Timestep the model forward a specified number of years and compute the time average temperature."""
-    #    numsteps = int( self.num_steps_per_year * years )
-    #    if verbose:
-    #        print("Integrating for " + str(numsteps) + " steps or " + str(years) + " years.")
-    #    self.T_timeave = np.zeros_like( self.T )
-    #    #  begin time loop
-    #    for count in range( numsteps ):
-    #        self.step_forward()
-    #        self.T_timeave += self.T
-    #    self.T_timeave /= numsteps
-    #    if verbose:
-    #        print( "Total elapsed time is " + str(self.days_elapsed/const.days_per_year) + " years." )
-
     def do_new_calendar_year( self ):
         """This function is called once at the end of every calendar year."""
         super(_EBM,self).do_new_calendar_year()
@@ -209,7 +194,8 @@ class EBM_simple( _EBM ):
         self.Tf = -10.
         
     def make_insolation_array( self ):
-        self.constant_insolation = self.S0 / 4 * (1 + self.s2 * P2( np.sin( self.phi ) ) )
+        self.constant_insolation = self.S0 / 4 * (1 + self.s2 * 
+                legendre.P2( np.sin( self.phi ) ) )
         self.insolation_array = np.tile( np.expand_dims(self.constant_insolation,axis=1), [1, self.num_steps_per_year] )
 
 
