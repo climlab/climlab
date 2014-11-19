@@ -42,6 +42,7 @@ seconds_per_day = 24. * seconds_per_hour
 seconds_per_month = 30. * seconds_per_day  # approximate, for 30-day month.
 days_per_year = 365.2422  # the length of the "tropical year" -- time between vernal equinoxes
 seconds_per_year = seconds_per_day * days_per_year
+hours_per_year = seconds_per_year / seconds_per_hour
 
 area_earth = 4 * np.math.pi * a**2
 
