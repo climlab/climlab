@@ -37,12 +37,21 @@ mb_to_Pa = 100.  # conversion factor from mb to Pa
 
 #  Some useful time conversion factors
 seconds_per_minute = 60.
-seconds_per_hour = 60. * seconds_per_minute
-seconds_per_day = 24. * seconds_per_hour
-seconds_per_month = 30. * seconds_per_day  # approximate, for 30-day month.
+minutes_per_hour = 60.
+hours_per_day = 24.
 days_per_year = 365.2422  # the length of the "tropical year" -- time between vernal equinoxes
+seconds_per_hour = minutes_per_hour * seconds_per_minute
+minutes_per_day = hours_per_day * minutes_per_hour
+seconds_per_day = hours_per_day * seconds_per_hour
 seconds_per_year = seconds_per_day * days_per_year
+minutes_per_year = seconds_per_year / seconds_per_minute
 hours_per_year = seconds_per_year / seconds_per_hour
+#  these are average lenghts of months based on dividing the year into 12 equal parts
+months_per_year = 12.
+seconds_per_month = seconds_per_year / months_per_year
+minutes_per_month = minutes_per_year / months_per_year
+hours_per_month = hours_per_year / months_per_year
+days_per_month = days_per_year / months_per_year
 
 area_earth = 4 * np.math.pi * a**2
 
