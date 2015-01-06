@@ -9,6 +9,7 @@ brose@albany.edu
 
 import numpy as np
 import constants as const
+from convadj import convective_adjustment
 from model import _TimeSteppingModel
 
 # Need to make this more consistent with ebm.py -- don't use a dictionary for parameters
@@ -133,90 +134,6 @@ class Column(_TimeSteppingModel):
         #  temperature tendencies due only to radiation
         self.rad_temp_tendency_sfc = self.rad_heating_sfc * self.params['timestep'] / self.c_sfc
         self.rad_temp_tendency_atm = self.rad_heating_atm * self.params['timestep'] / self.c_atm
-    
-    def convective_adjustment(self, lapserate = 6.5):
-        """Convective Adjustment to a specified lapse rate.
-    
-        Input argument lapserate gives the lapse rate expressed in degrees K per km
-        (positive means temperature increasing downward).
-        
-        Default lapse rate is 6.5 K / km.
-        
-        Returns the adjusted Column temperature.
-        """
-    
-        # largely follows notation and algorithm in Akamaev (1991) MWR
-
-        if lapserate is 'DALR':
-            lapserate = const.g / const.cp * 1.E3
-        try:
-            alpha = const.Rd / const.g * lapserate / 1.E3
-            self.conv_lapse_rate = lapserate
-        except:
-            raise ValueError('Problem with lapse rate')
-        
-        Tcol = np.concatenate(([self.Ts],self.Tatm))
-        pnew = np.concatenate(([const.ps],self.p))
-        L = pnew.size
-        Pi = (pnew/const.ps)**alpha
-        beta = 1./Pi
-        theta = Tcol * beta
-        q = Pi * np.concatenate(([self.c_sfc], self.c_atm* np.ones_like(self.p)) ) 
-                    
-        n_k = np.zeros( L,dtype=np.int8 )
-        theta_k = np.zeros_like( pnew )
-        s_k = np.zeros_like( pnew )
-        t_k = np.zeros_like( pnew )
-        
-        k = 0
-        n_k[0] = 1
-        theta_k[0] = beta[0] * Tcol[0]
-        for l in range(1,L):
-            n = 1
-            theta = beta[l] * Tcol[l]
-            done = False
-            while not done:
-                if ( theta_k[k] > theta ):
-                # stratification is unstable
-                    if n == 1:
-                        # current layer is not an earlier-formed neutral layer
-                        s = q[l]
-                        t = s * theta
-                    if ( n_k[k] < 2 ):
-                        # the lower adjacent level is not an earlier-formed neutral layer
-                        s_k[k] = q[l-n]
-                        t_k[k] = s_k[k] * theta_k[k]
-                    #  join current and underlying layers
-                    n += n_k[k]
-                    s += s_k[k]
-                    s_k[k] = s
-                    t += t_k[k]
-                    t_k[k] = t
-                    theta = t / s
-                    if k==0:
-                        # joint neutral layer in the first one, done checking lower layers
-                        done = True
-                    else:
-                        k -= 1
-                        # go back and check the stability of the lower adjacent layer
-                else:
-                    k += 1  # statification is stable
-                    done = True
-            #if l < L-1:
-            n_k[k] = n
-            theta_k[k] = theta    
-        #  finished looping through to check stability
-        
-        # update the temperatures
-        newtheta = np.zeros(L)
-        count = 0
-        for i in range(L):
-            newtheta[count+np.arange(n_k[i])] = theta_k[i]
-            count += n_k[i]
-            
-        Tcol = newtheta * Pi
-
-        return Tcol
 
     def step_forward(self):
         self.rad_temperature_tendency()
@@ -225,7 +142,13 @@ class Column(_TimeSteppingModel):
         if self.params['adj_lapse_rate'] is not None:
             self.unstable_Ts = self.Ts
             self.unstable_Tatm = self.Tatm
-            Tadj = self.convective_adjustment( lapserate = self.params['adj_lapse_rate'] )
+            # Tadj = self.convective_adjustment( lapserate = self.params['adj_lapse_rate'] )
+            Tcol = np.concatenate(([self.Ts], self.Tatm))
+            pnew = np.concatenate(([const.ps], self.p))
+            cnew = np.concatenate(([self.c_sfc], self.c_atm *
+                                  np.ones_like(self.p)))
+            Tadj = convective_adjustment(pnew, Tcol, cnew,
+                            lapserate=self.params['adj_lapse_rate'])
             self.Ts = Tadj[0]
             self.Tatm = Tadj[1:self.params['num_levels']+1]
         super(Column,self).step_forward()
