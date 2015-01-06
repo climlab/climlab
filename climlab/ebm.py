@@ -15,131 +15,148 @@ import insolation
 from orbital import OrbitalTable
 import legendre
 
-def global_mean( field, lat_radians ):
-    '''Compute the area-weighted global mean. field must be a vector of values on a latitude grid.'''
-    return np.sum( field * np.cos( lat_radians ) ) / np.sum( np.cos( lat_radians ) )      
-    
+
+def global_mean(field, lat_radians):
+    '''Compute the area-weighted global mean.
+    Field must be a vector of values on a latitude grid.'''
+    return np.sum(field * np.cos(lat_radians)) / np.sum(np.cos(lat_radians))
+
 
 class _EBM(_TimeSteppingModel):
-    def __init__(self, num_points = 90 ):
-        #  first set all parameters to sensible default values        
+    def __init__(self, num_points=90):
+        #  first set all parameters to sensible default values
         self.num_points = num_points
-        #self.K = 2.2E6  # in m^2 / s
-        self.K = 0.555  #  in W / m^2 / degC, same as B
+        # self.K = 2.2E6  # in m^2 / s
+        self.K = 0.555  # in W / m^2 / degC, same as B
         self.A = 210.
         self.B = 2.
-        #self.water_depth =  10.0
-        self.Tf =  0.0 
+        # self.water_depth =  10.0
+        self.Tf = 0.0
         self.S0 = const.S0
         self.make_grid()
-        #self.albedo_noice = 0.303 + 0.0779 * P2( np.sin( self.phi ) )
-        self.albedo_noice = 0.33 + 0.25 * legendre.P2( np.sin( self.phi ) )
-        #self.albedo_ice = 0.62 * np.ones_like( self.phi )
+        # self.albedo_noice = 0.303 + 0.0779 * P2( np.sin( self.phi ) )
+        self.albedo_noice = 0.33 + 0.25 * legendre.P2(np.sin(self.phi))
+        # self.albedo_ice = 0.62 * np.ones_like( self.phi )
         self.albedo_ice = self.albedo_noice  # default to no albedo feedback
-        self.T = 12. - 40. * legendre.P2( np.sin( self.phi ) )
+        self.T = 12. - 40. * legendre.P2(np.sin(self.phi))
         #  A dictionary of the model state variables
-        self.state = {'T':self.T}
+        self.state = {'T': self.T}
         self.positive_degree_days = np.zeros_like(self.phi)
-        #self.make_insolation_array()  # now called from inside set_timestep()
+        # self.make_insolation_array()  # now called from inside set_timestep()
         self.external_heat_source = np.zeros_like(self.phi)
         self.set_timestep()
 
     def make_grid(self):
-        '''Build the grid for the computation, which is evenly spaced in latitude.'''
+        '''Build the grid for the computation, evenly spaced in latitude.'''
         #   dlat will be our grid spacing
-        #   lat will be our temperature grid: an array with exactly num_points evenly spaced points
-        #   lat_stag will be a staggered grid with numpoints+1 points, where the end points are the North and South poles
+        #   lat will be our temperature grid:
+        #     an array with exactly num_points evenly spaced points
+        #   lat_stag will be a staggered grid with numpoints+1 points,
+        #     where the end points are the North and South poles
         #  Then we convert these all to radians for the computation.
-        self.dlat = 180. / self.num_points  
-        self.lat = np.linspace(-90. + self.dlat/2, 90. - self.dlat/2, self.num_points) 
-        self.lat_stag = np.linspace(-90., 90., self.num_points+1)  
-        self.dphi = np.deg2rad( self.dlat )
-        self.phi = np.deg2rad( self.lat )
-        self.phi_stag = np.deg2rad( self.lat_stag )
-        
-    def set_timestep( self, num_steps_per_year = 90 ):
+        self.dlat = 180. / self.num_points
+        self.lat = np.linspace(-90. + self.dlat/2,
+                               90. - self.dlat/2, self.num_points)
+        self.lat_stag = np.linspace(-90., 90., self.num_points+1)
+        self.dphi = np.deg2rad(self.dlat)
+        self.phi = np.deg2rad(self.lat)
+        self.phi_stag = np.deg2rad(self.lat_stag)
+
+    def set_timestep(self, num_steps_per_year=90):
         '''Change the timestep, given a number of steps per calendar year.'''
-        super(_EBM,self).set_timestep(num_steps_per_year)
-        self.set_water_depth( )
+        super(_EBM, self).set_timestep(num_steps_per_year)
+        self.set_water_depth()
         self.make_insolation_array()
-    
-    def set_water_depth(self, water_depth=10. ):
-        '''Method for changing the water depth (heat capacity) with depth in m. Will also recompute the tridiagonal diffusion matrix.'''
+
+    def set_water_depth(self, water_depth=10.):
+        '''Method for changing the water depth (heat capacity) with depth in m.
+        Also recomputes the tridiagonal diffusion matrix.'''
         if water_depth is None:
-            try: water_depth = self.water_depth
-            except: ValueError("water_depth parameter is not specified.")
+            try:
+                water_depth = self.water_depth
+            except:
+                ValueError("water_depth parameter is not specified.")
         self.water_depth = water_depth
         self.C = const.cw * const.rho_w * self.water_depth
         self.delta_time_over_C = self.timestep / self.C
         self.set_diffusivity(self.K)
-   
+
     def set_diffusivity(self, K=None):
-        '''Method for changing the diffusivity, with K in W/m^2/degC. Will recompute the tridiagonal diffusion matrix.'''
+        '''Method for changing the diffusivity, with K in W/m^2/degC.
+        Recomputes the tridiagonal diffusion matrix.'''
         if K is None:
-            try: K = self.K
-            except: ValueError("Diffusivity parameter K is not specified.")
+            try:
+                K = self.K
+            except:
+                ValueError("Diffusivity parameter K is not specified.")
         self.K = K
-        self.diffTriDiag = self._make_diffusion_matrix( )
-        
+        self.diffTriDiag = self._make_diffusion_matrix()
+
     def _make_diffusion_matrix(self):
         J = self.num_points
-        #Ka = const.cp * const.ps * const.mb_to_Pa / const.g / const.a**2 * self.K * np.ones_like(self.phi_stag)
-        #cosKa = np.cos(self.phi_stag) * Ka
+        # Ka = (const.cp * const.ps * const.mb_to_Pa / const.g / const.a**2 *
+        #        self.K * np.ones_like(self.phi_stag))
+        # cosKa = np.cos(self.phi_stag) * Ka
         cosKa = np.cos(self.phi_stag) * self.K
-        Ka1  = cosKa[0:J] / np.cos(self.phi) * self.delta_time_over_C / self.dphi**2
-        Ka3 = cosKa[1:J+1] / np.cos(self.phi) * self.delta_time_over_C / self.dphi**2
-        Ka2 = np.insert(Ka1[1:J],0,0) + np.append(Ka3[0:J-1],0)
-        #  Atmosphere tridiagonal matrix     
-        diag = np.empty( (3,J) )
-        diag[0,1:] = -Ka3[0:J-1]
-        diag[1,:] = 1+Ka2
-        diag[2,0:J-1] = -Ka1[1:J]
+        Ka1 = (cosKa[0:J] / np.cos(self.phi) *
+               self.delta_time_over_C / self.dphi**2)
+        Ka3 = (cosKa[1:J+1] / np.cos(self.phi) *
+               self.delta_time_over_C / self.dphi**2)
+        Ka2 = np.insert(Ka1[1:J], 0, 0) + np.append(Ka3[0:J-1], 0)
+        #  Atmosphere tridiagonal matrix
+        diag = np.empty((3, J))
+        diag[0, 1:] = -Ka3[0:J-1]
+        diag[1, :] = 1 + Ka2
+        diag[2, 0:J-1] = -Ka1[1:J]
         return diag
-        
-    def compute_OLR( self ):
+
+    def compute_OLR(self):
         return self.A + self.B * self.T
 
-    def make_insolation_array( self ):
+    def make_insolation_array(self):
         # will be overridden by daughter classes
-        raise NotImplementedError("Subclasses of _EBM need to implement a method for computing insolation.")
-    
-    def compute_insolation( self ):
-        return self.insolation_array[:,self.day_of_year_index]
-                
-    def compute_albedo( self ):
-        '''Simple step-function albedo based on an ice line at temperature Tf.'''
-        return np.where( self.T >= self.Tf, self.albedo_noice, self.albedo_ice )
+        raise NotImplementedError("Subclasses of _EBM must implement a method for computing insolation.")
 
-    def compute_radiation( self ):
+    def compute_insolation(self):
+        return self.insolation_array[:, self.day_of_year_index]
+
+    def compute_albedo(self):
+        '''Simple step-function albedo based on ice line at temperature Tf.'''
+        return np.where(self.T >= self.Tf, self.albedo_noice, self.albedo_ice)
+
+    def compute_radiation(self):
         self.ASR = (1 - self.compute_albedo()) * self.compute_insolation()
         self.OLR = self.compute_OLR()
         self.net_radiation = self.ASR - self.OLR
-    
-    def step_forward( self ):
-        self.compute_radiation( )
+
+    def step_forward(self):
+        self.compute_radiation()
         #  updated temperature due to radiation:
-        Trad = self.T + ( self.net_radiation + self.external_heat_source ) * self.delta_time_over_C
-        # Time-stepping the diffusion is just inverting this matrix problem: 
-        #self.T = np.linalg.solve( self.diffTriDiag, Trad )
-        self.T = solve_banded((1,1), self.diffTriDiag, Trad )
+        Trad = (self.T + (self.net_radiation + self.external_heat_source) *
+                self.delta_time_over_C)
+        # Time-stepping the diffusion is just inverting this matrix problem:
+        # self.T = np.linalg.solve( self.diffTriDiag, Trad )
+        self.T = solve_banded((1, 1), self.diffTriDiag, Trad)
         self.positive_degree_days += self.compute_degree_days()
-        super(_EBM,self).step_forward()
-        
-    def compute_degree_days( self, threshold=0. ):
-        """Return temperature*time in degree-days wherever temperature is above the threshold, otherwise zero."""
-        return np.where( self.T > threshold, self.T * self.timestep / const.seconds_per_day, 
-            np.zeros_like( self.T ) )
-    
-    def do_new_calendar_year( self ):
+        super(_EBM, self).step_forward()
+
+    def compute_degree_days(self, threshold=0.):
+        """Return temperature*time in degree-days,
+        wherever temperature is above the threshold, otherwise zero."""
+        return np.where(self.T > threshold, self.T * self.timestep /
+                        const.seconds_per_day, np.zeros_like(self.T))
+
+    def do_new_calendar_year(self):
         """This function is called once at the end of every calendar year."""
-        super(_EBM,self).do_new_calendar_year()
+        super(_EBM, self).do_new_calendar_year()
         self.previous_positive_degree_days = self.positive_degree_days
-        self.positive_degree_days = np.zeros_like( self.phi )
-    
-    def heat_transport( self ):
-        '''Returns instantaneous heat transport in units on PW, on the staggered grid.'''
+        self.positive_degree_days = np.zeros_like(self.phi)
+
+    def heat_transport(self):
+        '''Returns instantaneous heat transport in units on PW,
+        on the staggered grid.'''
         return self.diffusive_heat_transport()
-    
+
     def diffusive_heat_transport( self ):
         '''Compute instantaneous diffusive heat transport in units of PW, on the staggered grid.'''
         #return ( 1E-15 * -2 * np.math.pi * np.cos(self.phi_stag) * const.cp * const.ps * const.mb_to_Pa / const.g * self.K * 
