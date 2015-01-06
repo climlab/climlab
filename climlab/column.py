@@ -21,9 +21,12 @@ class Column(_TimeSteppingModel):
     on grid of pressure levels."""
     def __str__(self):
         return ("Instance of Column class with surface temperature " +
-                str(self.Ts) + " K, " + str(self.num_levels) +
-                " atmospheric levels, and parameters: \n" + str(self.params))
-        #  NEED TO FIX THIS... NO MORE params DICTIONARY
+                str(self.Ts) + " K, and " + str(self.num_levels) +
+                " atmospheric levels.")
+            #  WILL WANT TO MAKE SOME BETTER OUTPUT HERE.
+#        return ("Instance of Column class with surface temperature " +
+#                str(self.Ts) + " K, " + str(self.num_levels) +
+#                " atmospheric levels, and parameters: \n" + str(self.params))
 
     def __init__(self,
                  p=None,

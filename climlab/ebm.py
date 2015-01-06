@@ -21,7 +21,7 @@ def global_mean(field, lat_radians):
     Field must be a vector of values on a latitude grid.'''
     return np.sum(field * np.cos(lat_radians)) / np.sum(np.cos(lat_radians))
 
-
+#  TO DO: give parameters as input arguments, like in column.py
 class _EBM(_TimeSteppingModel):
     def __init__(self, num_points=90):
         #  first set all parameters to sensible default values
