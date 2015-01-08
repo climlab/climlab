@@ -9,12 +9,19 @@ import numpy as np
 import constants as const
 
 
+axisTypes = ['lev', 'lat', 'lon']
+
+
 class Axis:
     '''
     '''
+    def __str__(self):
+        return ("Axis of type " + self.axisType + " with " +
+                str(self.num_points) + " points.")
+
     def __init__(self,
                  axisType='lev',
-                 npoints=30,
+                 num_points=30,
                  points=None,
                  bounds=None):
         # Initialize dictionaries
@@ -22,7 +29,6 @@ class Axis:
         self.units = {}
         self.long_name = {}
 
-        axisTypes = ['lev', 'lat', 'lon']
         if axisType in ['p', 'press', 'pressure', 'P', 'Pressure', 'Press']:
             axisType = 'lev'
         if axisType in ['Latitude', 'latitude']:
@@ -58,35 +64,40 @@ class Axis:
             end1 = defaultEndPoints[axisType][1]
             if points is not None:
                 # only points are given
-                npoints = points.size
+                num_points = points.size
                 bounds = points[:-1] + np.diff(points)/2.
-                bounds = np.concatenate((end0, bounds, end1))
+                temp = np.append(np.flipud(bounds), end0)
+                bounds = np.append(np.flipud(temp), end1)
             else:
                 # no points or bounds
                 # create an evenly spaced axis
-                delta = (end1 - end0) / npoints
-                bounds = np.linspace(end0, end1, npoints+1)
-                points = np.linspace(end0 + delta/2., end1-delta/2., npoints)
+                delta = (end1 - end0) / num_points
+                bounds = np.linspace(end0, end1, num_points+1)
+                points = np.linspace(end0 + delta/2., end1-delta/2., num_points)
         else:  # bounds are given
             end0 = bounds[0]
             end1 = bounds[1]
-            npoints = bounds.size - 1
+            num_points = bounds.size - 1
             if points is None:
                 # only bounds given. Assume points are halfway between bounds
                 points = bounds[:-1] + np.diff(bounds)/2.
             else:
                 # points and bounds both given, check that they are compatible
-                if points.size != npoints:
+                if points.size != num_points:
                     raise ValueError('points and bounds have incompatible sizes')
-        self.npoints = npoints
+        self.num_points = num_points
         self.units = defaultUnits[axisType]
+        # pressure axis should decrease from surface to TOA
+        if axisType is 'lev':
+            points = np.flipud(points)
+            bounds = np.flipud(bounds)
         self.points = points
         self.bounds = bounds
 
-        # Not sure if I should bother with the dictionary stuff        
-        #self.value['npoints'] = self.npoints
-        #self.value['units'] = self.units
-        #self.value['axisType'] = self.axisType
+        # Not sure if I should bother with the dictionary stuff
+        # self.value['num_points'] = self.num_npoints
+        # self.value['units'] = self.units
+        # self.value['axisType'] = self.axisType
 
     def __getitem__(self, key):
         try:

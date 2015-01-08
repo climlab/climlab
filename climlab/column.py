@@ -12,6 +12,7 @@ import constants as const
 from convadj import convective_adjustment
 from model import _TimeSteppingModel
 from transmissivity import Transmissivity
+from axis import Axis
 
 
 class Column(_TimeSteppingModel):
@@ -48,21 +49,30 @@ class Column(_TimeSteppingModel):
         self.abs_coeff = abs_coeff
         self.adj_lapse_rate = adj_lapse_rate
 
-        if p is None:
-            #  pressure interval in hPa or mb
-            self.dp = const.ps / self.num_levels
-            #  pressure at each level, in hPa or mb
-            self.p = np.linspace(const.ps - self.dp/2,
-                                 self.dp/2, self.num_levels)
-        else:
-            # if pressure levels are provided:
-            #  assume layer boundaries occur halfway between the given levels
-            self.p = np.flipud(np.sort(p))  # ensures that pressure decreases
-            N = self.p.size
-            self.pbounds = np.concatenate(([const.ps], (self.p[0:N-1] +
-                                          self.p[1:N])/2, [0.]))
-            self.dp = np.flipud(np.diff(np.flipud(self.pbounds)))
-            self.num_levels = N
+        pAxis = axis.Axis(axisType='lev')
+        self.grid = {'lev':}
+        self.p = self.grid['lev'].points
+        self.pbounds = self.grid['lev'].bounds
+        self.dp = self.grid['lev'].delta
+        self.num_levels = self.grid['lev'].num_points
+
+#==============================================================================
+#         if p is None:
+#             #  pressure interval in hPa or mb
+#             self.dp = const.ps / self.num_levels
+#             #  pressure at each level, in hPa or mb
+#             self.p = np.linspace(const.ps - self.dp/2,
+#                                  self.dp/2, self.num_levels)
+#         else:
+#             # if pressure levels are provided:
+#             #  assume layer boundaries occur halfway between the given levels
+#             self.p = np.flipud(np.sort(p))  # ensures that pressure decreases
+#             N = self.p.size
+#             self.pbounds = np.concatenate(([const.ps], (self.p[0:N-1] +
+#                                           self.p[1:N])/2, [0.]))
+#             self.dp = np.flipud(np.diff(np.flipud(self.pbounds)))
+#             self.num_levels = N
+#==============================================================================
 
         # initial surface temperature
         self.Ts = 288.
