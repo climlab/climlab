@@ -13,9 +13,6 @@ from convadj import convective_adjustment
 from model import _TimeSteppingModel
 from transmissivity import Transmissivity
 
-# Making this more consistent with ebm.py --
-#   no more dictionary for parameters
-
 
 class Column(_TimeSteppingModel):
     """The Column object represents surface temperature and air temperature
