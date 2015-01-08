@@ -23,9 +23,12 @@ class _TimeSteppingModel(object):
         self.years_elapsed = 0
 
     def step_forward(self):
-        '''Daughter classes need to implement details
-        for changes in model state.'''
-        pass
+        '''new oop climlab... just loop through processes
+        and add up the tendencies'''
+        for proc in processes:
+            proc.compute()
+        for proc in processes:
+            
         self._update_time()
 
     def _update_time(self):
