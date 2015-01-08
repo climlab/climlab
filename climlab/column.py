@@ -13,6 +13,7 @@ from convadj import convective_adjustment
 from model import _TimeSteppingModel
 from transmissivity import Transmissivity
 from axis import Axis
+from grid import Grid
 
 
 class Column(_TimeSteppingModel):
@@ -28,6 +29,7 @@ class Column(_TimeSteppingModel):
 #                " atmospheric levels, and parameters: \n" + str(self.params))
 
     def __init__(self,
+                 grid=None,
                  p=None,
                  #  first set all parameters to sensible default values
                  num_levels=30,
@@ -40,7 +42,7 @@ class Column(_TimeSteppingModel):
                  # lapse rate for convective adjustment, in K / km
                  adj_lapse_rate=None):
         #  Attach all parameters to the object
-        self.p = p
+        self.grid = grid
         self.num_levels = num_levels
         self.water_depth = water_depth
         self.albedo = albedo
@@ -49,8 +51,14 @@ class Column(_TimeSteppingModel):
         self.abs_coeff = abs_coeff
         self.adj_lapse_rate = adj_lapse_rate
 
-        pAxis = axis.Axis(axisType='lev')
-        self.grid = {'lev':}
+        if grid is None:
+            # Make a new grid using given number of levels
+            pAxis = Axis(axisType='lev', num_points=num_levels)
+            self.grid = Grid(lev=pAxis)
+        if p is not None:
+            # backward compatibility... make a new grid using the p array
+            pAxis = Axis(axisType='lev', points=p)
+            self.grid = Grid(lev=pAxis)
         self.p = self.grid['lev'].points
         self.pbounds = self.grid['lev'].bounds
         self.dp = self.grid['lev'].delta

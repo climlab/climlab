@@ -19,11 +19,7 @@ class Axis:
         return ("Axis of type " + self.axisType + " with " +
                 str(self.num_points) + " points.")
 
-    def __init__(self,
-                 axisType='lev',
-                 num_points=30,
-                 points=None,
-                 bounds=None):
+    def __init__(self, axisType='lev', num_points=30, points=None, bounds=None):
         # Initialize dictionaries
         self.value = {}
         self.units = {}

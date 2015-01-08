@@ -1,13 +1,12 @@
 import numpy as np
 import constants as const
-from grid import Grid
 
 
 class _TimeSteppingModel(object):
     '''A generic parent class for all time-dependent models that use a
     discete forward timestep.'''
-    def __init__(self):
-        self.grid = Grid()
+    def __init__(self, grid=None):
+        self.grid = grid
         self.state = {}
         self.set_timestep()
         #  Daughter classes will need to do a bunch of other initialization
