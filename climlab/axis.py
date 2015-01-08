@@ -89,6 +89,7 @@ class Axis:
             bounds = np.flipud(bounds)
         self.points = points
         self.bounds = bounds
+        self.delta = np.abs(np.diff(self.bounds))
 
         # Not sure if I should bother with the dictionary stuff
         # self.value['num_points'] = self.num_npoints
