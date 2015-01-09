@@ -125,7 +125,7 @@ class Column(_TimeSteppingModel):
         self.emit_sfc = const.sigma * self.Ts**4.
         self.emit_atm = eps * const.sigma * self.Tatm**4.
         absorbed_sfc, absorbed_atm, OLR, LWdown_sfc, OLR_sfc, OLR_atm = \
-            flux.LWflux(self.emit_atm, self.emit_sfc, eps)
+            flux.LWflux(self.emit_atm, self.emit_sfc, self.LWtrans)
         self.LW_down_sfc = LWdown_sfc
         self.OLR_sfc = OLR_sfc
         self.OLR_atm = OLR_atm
@@ -137,27 +137,13 @@ class Column(_TimeSteppingModel):
         '''Net shortwave heating at each level.'''
         self.SWdown_TOA = self.Q
         absorbed_sfc, absorbed_atm, absorbed_total, incident_sfc, up2space, planetary_albedo = \
-            flux.SWflux(self.Q, self.albedo, self.SWtrans.absorb)
+            flux.SWflux(self.Q, self.albedo, self.SWtrans)
         self.SWdown_sfc = incident_sfc
         self.SW_absorbed_sfc = absorbed_sfc
         self.SW_absorbed_atm = absorbed_atm
         self.SWup_TOA = up2space
         self.SW_absorbed_total = absorbed_total
         self.planetary_albedo = planetary_albedo
-
-#==============================================================================
-#         SW_incident_fromabove = self.SWdown_TOA * self.SWtrans.atm2space
-#         self.SWdown_sfc = self.SWdown_TOA * self.SWtrans.sfc2space
-#         self.SWup_sfc = self.albedo * self.SWdown_sfc
-#         self.SW_absorbed_sfc = self.SWdown_sfc - self.SWup_sfc
-#         SW_incident_frombelow = self.SWup_sfc * self.SWtrans.sfc2atm
-#         self.SW_absorbed_atm = ((SW_incident_fromabove + SW_incident_frombelow)
-#                                 * self.SWtrans.absorb)
-#         self.SWup_TOA = self.SWup_sfc * self.SWtrans.sfc2space
-#         self.SW_absorbed_total = (self.SW_absorbed_sfc +
-#                                   np.sum(self.SW_absorbed_atm))
-#         self.planetary_albedo = self.SWup_TOA / self.SWdown_TOA
-#==============================================================================
 
     def rad_temperature_tendency(self):
         """Compute net radiative heating everywhere in the Column (in W/m^2),
@@ -176,6 +162,11 @@ class Column(_TimeSteppingModel):
                                       self.c_atm)
 
     def step_forward(self):
+        """Update the Column temperature. 
+        
+        Calls rad_temperature_tendency() to compute radiative tendencies,
+        and if a lapse rate is specified in params['adj_lapse_rate'], also calls convective_adjustment().
+        """
         self.rad_temperature_tendency()
         self.Ts += self.rad_temp_tendency_sfc
         self.Tatm += self.rad_temp_tendency_atm
@@ -192,23 +183,3 @@ class Column(_TimeSteppingModel):
             self.Ts = Tadj[0]
             self.Tatm = Tadj[1:self.num_levels+1]
         super(Column, self).step_forward()
-
-    #def step_forward(self, num_steps=1 ):
-    #    """Update the Column temperature. If optional argument num_steps is given, 
-    #    the timestepping will repeat the specifed number of times.
-    #    
-    #    Calls rad_temperature_tendency() to compute radiative tendencies,
-    #    and if a lapse rate is specified in params['adj_lapse_rate'], also calls convective_adjustment().
-    #    """
-    #    
-    #    for n in range(num_steps):
-    #        self.rad_temperature_tendency()
-    #        self.Ts += self.rad_temp_tendency_sfc
-    #        self.Tatm += self.rad_temp_tendency_atm
-    #        if self.params['adj_lapse_rate'] is not None:
-    #            self.unstable_Ts = self.Ts
-    #            self.unstable_Tatm = self.Tatm
-    #            Tadj = self.convective_adjustment( lapserate = self.params['adj_lapse_rate'] )
-    #            self.Ts = Tadj[0]
-    #            self.Tatm = Tadj[1:self.params['num_levels']+1]
-    #        self.update_time()
