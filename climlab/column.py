@@ -11,10 +11,14 @@ import numpy as np
 import constants as const
 from convadj import convective_adjustment
 from model import _TimeSteppingModel
+from netcdf import make_ncColumn
 
-# Making this more consistent with ebm.py --
-#   no more dictionary for parameters
-
+# experiment to see if we can use a nc.Dataset object to hold the state variables etc
+#  seems to work just fine.
+#  but here I've just glued it on to my existing code
+#  what we really want to do is define the top-class model object
+#  as a sub-class of nc.Dataset!
+#   That way every aspect of the model and its run is stored inside a netCDF object
 
 class Column(_TimeSteppingModel):
     """The Column object represents surface temperature and air temperature
@@ -51,11 +55,12 @@ class Column(_TimeSteppingModel):
         self.adj_lapse_rate = adj_lapse_rate
 
         if p is None:
-            #  pressure interval in hPa or mb
-            self.dp = const.ps / self.num_levels
-            #  pressure at each level, in hPa or mb
-            self.p = np.linspace(const.ps - self.dp/2,
-                                 self.dp/2, self.num_levels)
+            #  Here trying out a netCDF structure
+            self.ncdata = make_ncColumn(num_levels)
+            self.p = self.ncdata.variables['level'][:]
+            self.pbounds = self.ncdata.variables['lev_bounds'][:]
+            self.dp = np.flipud(np.diff(np.flipud(self.pbounds)))
+            self.num_levels = self.p.size
         else:
             # if pressure levels are provided:
             #  assume layer boundaries occur halfway between the given levels
