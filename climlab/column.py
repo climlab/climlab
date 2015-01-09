@@ -11,6 +11,7 @@ import numpy as np
 import constants as const
 from convadj import convective_adjustment
 from timestepping_model import _TimeSteppingModel
+from transmissivity import Transmissivity
 
 # experiment to see if we can use a nc.Dataset object to hold the state variables etc
 #  seems to work just fine.
@@ -46,6 +47,9 @@ class Column(_TimeSteppingModel):
                  **kwargs):
         #  First create the dataset
         super(Column, self).__init__(**kwargs)
+        # groups to hold transmissivity data
+        self.createGroup('LWtrans')
+        self.createGroup('SWtrans')
         #  Attach all parameters to the object
         # self.p = p
         self.param('num_levels', num_levels)
@@ -71,6 +75,7 @@ class Column(_TimeSteppingModel):
             dp[:] = const.ps / num_levels
             self.params('num_levels', num_levels)            
         else:
+            #  THIS WILL NOT WORK FOR NOW with new dataset structure
             # if pressure levels are provided:
             #  assume layer boundaries occur halfway between the given levels
             self.p = np.flipud(np.sort(p))  # ensures that pressure decreases
@@ -87,7 +92,7 @@ class Column(_TimeSteppingModel):
         Tatm[:] = np.linspace(Ts[:]-10., 200., num_levels)
 
         #  heat capacity of atmospheric layers
-        c_atm = self.groups['fixed'].createVariable('c_atm', 'float')
+        c_atm = self.groups['fixed'].createVariable('c_atm', 'float', ('lev',))
         c_atm[:] = const.cp * const.mb_to_Pa / const.g * self.variables['dp'][:]
         #  heat capacity of surface in J / m**2 / K
         c_sfc = self.groups['fixed'].createVariable('c_sfc', 'float')
@@ -96,8 +101,6 @@ class Column(_TimeSteppingModel):
         self.set_LW_emissivity()
         self.set_SW_absorptivity()
 
-        # self.steps = 0
-        # self.days_elapsed = 0.
         self.set_timestep(num_steps_per_year=const.seconds_per_year /
                           self.timestep)
         #  A dictionary of the model state variables
@@ -116,34 +119,61 @@ class Column(_TimeSteppingModel):
         else:
             raise ValueError('eps must be scalar or have exactly ' +
                              self.param('num_levels') + ' elements.')
-
         if np.isscalar(eps):
             p = self.variables['level'][:]
             eps = eps*np.ones_like(p)
         LWtrans = Transmissivity(eps)
-        if 'eps' not in self.groups['fixed'].variables
-            self.groups['fixed'].createVariable
+        self.groups['LWtrans'].createVariable('eps', 'float', ('lev',))
+        self.groups['LWtrans'].variables['eps'][:] = eps
+        self.groups['LWtrans'].createVariable('absorb', 'float', ('lev',))
+        self.groups['LWtrans'].variables['absorb'][:] = LWtrans.absorb
+        self.groups['LWtrans'].createVariable('trans', 'float', ('lev',))
+        self.groups['LWtrans'].variables['trans'][:] = LWtrans.trans
+        self.groups['LWtrans'].createVariable('surf2atm', 'float', ('lev',))
+        self.groups['LWtrans'].variables['surf2atm'][:] = LWtrans.surf2atm
+        self.groups['LWtrans'].createVariable('atm2space', 'float', ('lev',))
+        self.groups['LWtrans'].variables['atm2space'][:] = LWtrans.atm2space
+        self.groups['LWtrans'].createVariable('surf2space', 'float')
+        self.groups['LWtrans'].variables['atm2space'][:] = LWtrans.surf2space
+        self.groups['LWtrans'].createVariable('atm2atm','float',('lev','lev',))
+        self.groups['LWtrans'].variables['atm2atm'][:] = LWtrans.atm2atm
 
     def set_SW_absorptivity(self, eps=None):
         """Set the shortwave absorptivity eps for the Column."""
         if eps is None:
             # default is no shortwave absorption
-            self.SWtrans = Transmissivity(np.zeros_like(self.p))
+            eps = np.zeros_like(self.variables['dp'][:])
         elif np.isscalar(eps):
             # passing a single scalar sets eps equal to this number everywhere
-            self.SWtrans = Transmissivity(self.eps * np.ones_like(self.p))
-        elif np.size(eps) == self.num_levels:
-            self.SWtrans = Transmissivity(eps)
+            p = self.variables['level'][:]
+            eps = eps*np.ones_like(p)
+        elif np.size(eps) == self.param('num_levels'):
+            pass
         else:
             raise ValueError('eps must be scalar or have exactly ' +
-                             self.num_levels + ' elements.')
+                             self.num_levels + ' elements.')        
+        SWtrans = Transmissivity(eps)
+        self.groups['SWtrans'].createVariable('eps', 'float', ('lev',))
+        self.groups['SWtrans'].variables['eps'][:] = eps
+        self.groups['SWtrans'].createVariable('absorb', 'float', ('lev',))
+        self.groups['SWtrans'].variables['absorb'][:] = SWtrans.absorb
+        self.groups['SWtrans'].createVariable('trans', 'float', ('lev',))
+        self.groups['SWtrans'].variables['trans'][:] = SWtrans.trans
+        self.groups['SWtrans'].createVariable('surf2atm', 'float', ('lev',))
+        self.groups['SWtrans'].variables['surf2atm'][:] = SWtrans.surf2atm
+        self.groups['SWtrans'].createVariable('atm2space', 'float', ('lev',))
+        self.groups['SWtrans'].variables['atm2space'][:] = SWtrans.atm2space
+        self.groups['SWtrans'].createVariable('surf2space', 'float')
+        self.groups['SWtrans'].variables['atm2space'][:] = SWtrans.surf2space
+        self.groups['SWtrans'].createVariable('atm2atm','float',('lev','lev',))
+        self.groups['SWtrans'].variables['atm2atm'][:] = SWtrans.atm2atm
 
     def longwave_heating(self):
         """Compute the net longwave radiative heating at every level
         and the surface. Also store the upwelling longwave radiation at the top
         (OLR), and the downwelling longwave radiation at the surface.
         """
-        eps = self.LWtrans.absorb
+        eps = self.groups['LWtrans'].variables['absorb'][:]
         # emissions from surface and each layer
         self.emit_sfc = const.sigma * self.Ts**4.
         self.emit_atm = eps * const.sigma * self.Tatm**4.
@@ -191,6 +221,12 @@ class Column(_TimeSteppingModel):
                                       self.c_atm)
 
     def step_forward(self):
+        '''Update the Column temperature. If optional argument num_steps is given, 
+        the timestepping will repeat the specifed number of times.
+        
+        Calls rad_temperature_tendency() to compute radiative tendencies,
+        and if a lapse rate is specified in params['adj_lapse_rate'], also calls convective_adjustment().
+        '''
         self.rad_temperature_tendency()
         self.Ts += self.rad_temp_tendency_sfc
         self.Tatm += self.rad_temp_tendency_atm
@@ -207,48 +243,3 @@ class Column(_TimeSteppingModel):
             self.Ts = Tadj[0]
             self.Tatm = Tadj[1:self.num_levels+1]
         super(Column, self).step_forward()
-
-    #def step_forward(self, num_steps=1 ):
-    #    """Update the Column temperature. If optional argument num_steps is given, 
-    #    the timestepping will repeat the specifed number of times.
-    #    
-    #    Calls rad_temperature_tendency() to compute radiative tendencies,
-    #    and if a lapse rate is specified in params['adj_lapse_rate'], also calls convective_adjustment().
-    #    """
-    #    
-    #    for n in range(num_steps):
-    #        self.rad_temperature_tendency()
-    #        self.Ts += self.rad_temp_tendency_sfc
-    #        self.Tatm += self.rad_temp_tendency_atm
-    #        if self.params['adj_lapse_rate'] is not None:
-    #            self.unstable_Ts = self.Ts
-    #            self.unstable_Tatm = self.Tatm
-    #            Tadj = self.convective_adjustment( lapserate = self.params['adj_lapse_rate'] )
-    #            self.Ts = Tadj[0]
-    #            self.Tatm = Tadj[1:self.params['num_levels']+1]
-    #        self.update_time()
-
-
-class Transmissivity:
-    '''Need to write something here.'''
-    def __init__(self, absorb):
-        if absorb.ndim is not 1:
-            raise ValueError('absorb argument must be a vector')
-        self.absorb = absorb
-        self.trans = 1 - self.absorb
-        N = self.absorb.size
-        # a matrix containing the transmission between atmospheric layers
-        #  multiply this matrix by vector of emissions to get the
-        # total incident beam at each layer.
-        self.atm2atm = np.diag(np.ones(N-1), 1)
-        for n in range(N):
-            self.atm2atm[n, n+2:N] = np.cumprod(self.trans[n+1:N-1])
-        self.atm2atm += self.atm2atm.transpose()
-
-        # the transmissivity between surface and layer k
-        self.surf2atm = np.concatenate(([1.], np.cumprod(self.trans[:N-1])))
-        # the transmissivity between layer k and space
-        self.atm2space = np.flipud(np.cumprod(np.concatenate(([1.],
-                                              np.flipud(self.trans[1:N])))))
-        #  the transmissivity between surface and space
-        self.surf2space = np.prod(self.trans)
