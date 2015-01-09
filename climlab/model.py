@@ -45,3 +45,6 @@ class _Model(Dataset):
                 # Assign the new value
                 self.groups['params'].variables[name][:] = value
 
+    def param_plusone(self, name):
+        '''Convenience method for adding 1 (integer) to a parameter.'''
+        self.groups['params'].variables[name][:] += 1

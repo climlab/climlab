@@ -39,18 +39,19 @@ class _TimeSteppingModel(_Model):
     def _update_time(self):
         '''Increment the timestep counter by one.
         This function is called by the timestepping routines.'''
-        self.param('steps') += 1
+        self.groups['params'].variables['steps'][:] += 1
         # time in days since beginning
-        self.param('days_elapsed') += self.param('timestep') / const.seconds_per_day
+        #self.param('days_elapsed') += self.param('timestep') / const.seconds_per_day
+        self.groups['params'].variables['days_elapsed'][:] += self.param('timestep') / const.seconds_per_day 
         if self.param('day_of_year_index') >= self.param('num_steps_per_year')-1:
             self._do_new_calendar_year()
         else:
-            self.param('day_of_year_index') += 1
+            self.groups['params'].variables['day_of_year_index'][:] += 1
 
     def _do_new_calendar_year(self):
         '''This function is called once at the end of every calendar year.'''
         self.param('day_of_year_index', 0)  # back to Jan. 1
-        self.param('years_elapsed') += 1
+        self.groups['params'].variables['years_elapsed'][:] += 1
 
     def integrate_years(self, years=1.0, verbose=True):
         '''Timestep the model forward a specified number of years.'''

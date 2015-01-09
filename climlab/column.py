@@ -122,21 +122,7 @@ class Column(_TimeSteppingModel):
         if np.isscalar(eps):
             p = self.variables['level'][:]
             eps = eps*np.ones_like(p)
-        LWtrans = Transmissivity(eps)
-        self.groups['LWtrans'].createVariable('eps', 'float', ('lev',))
-        self.groups['LWtrans'].variables['eps'][:] = eps
-        self.groups['LWtrans'].createVariable('absorb', 'float', ('lev',))
-        self.groups['LWtrans'].variables['absorb'][:] = LWtrans.absorb
-        self.groups['LWtrans'].createVariable('trans', 'float', ('lev',))
-        self.groups['LWtrans'].variables['trans'][:] = LWtrans.trans
-        self.groups['LWtrans'].createVariable('surf2atm', 'float', ('lev',))
-        self.groups['LWtrans'].variables['surf2atm'][:] = LWtrans.surf2atm
-        self.groups['LWtrans'].createVariable('atm2space', 'float', ('lev',))
-        self.groups['LWtrans'].variables['atm2space'][:] = LWtrans.atm2space
-        self.groups['LWtrans'].createVariable('surf2space', 'float')
-        self.groups['LWtrans'].variables['atm2space'][:] = LWtrans.surf2space
-        self.groups['LWtrans'].createVariable('atm2atm','float',('lev','lev',))
-        self.groups['LWtrans'].variables['atm2atm'][:] = LWtrans.atm2atm
+        self.set_transmissivity('LWtrans', eps)
 
     def set_SW_absorptivity(self, eps=None):
         """Set the shortwave absorptivity eps for the Column."""
@@ -151,22 +137,27 @@ class Column(_TimeSteppingModel):
             pass
         else:
             raise ValueError('eps must be scalar or have exactly ' +
-                             self.num_levels + ' elements.')        
-        SWtrans = Transmissivity(eps)
-        self.groups['SWtrans'].createVariable('eps', 'float', ('lev',))
-        self.groups['SWtrans'].variables['eps'][:] = eps
-        self.groups['SWtrans'].createVariable('absorb', 'float', ('lev',))
-        self.groups['SWtrans'].variables['absorb'][:] = SWtrans.absorb
-        self.groups['SWtrans'].createVariable('trans', 'float', ('lev',))
-        self.groups['SWtrans'].variables['trans'][:] = SWtrans.trans
-        self.groups['SWtrans'].createVariable('surf2atm', 'float', ('lev',))
-        self.groups['SWtrans'].variables['surf2atm'][:] = SWtrans.surf2atm
-        self.groups['SWtrans'].createVariable('atm2space', 'float', ('lev',))
-        self.groups['SWtrans'].variables['atm2space'][:] = SWtrans.atm2space
-        self.groups['SWtrans'].createVariable('surf2space', 'float')
-        self.groups['SWtrans'].variables['atm2space'][:] = SWtrans.surf2space
-        self.groups['SWtrans'].createVariable('atm2atm','float',('lev','lev',))
-        self.groups['SWtrans'].variables['atm2atm'][:] = SWtrans.atm2atm
+                             self.num_levels + ' elements.')
+        self.set_transmissivity('SWtrans', eps)
+
+    def set_transmissivity(self, group, eps):
+        trans = Transmissivity(eps)
+        thisgroup = self.groups[group]
+        thisgroup.createVariable('eps', 'float', ('lev',))
+        thisgroup.variables['eps'][:] = eps
+        thisgroup.createVariable('absorb', 'float', ('lev',))
+        thisgroup.variables['absorb'][:] = trans.absorb
+        thisgroup.createVariable('trans', 'float', ('lev',))
+        thisgroup.variables['trans'][:] = trans.trans
+        thisgroup.createVariable('surf2atm', 'float', ('lev',))
+        thisgroup.variables['surf2atm'][:] = trans.surf2atm
+        thisgroup.createVariable('atm2space', 'float', ('lev',))
+        thisgroup.variables['atm2space'][:] = trans.atm2space
+        thisgroup.createVariable('surf2space', 'float')
+        thisgroup.variables['atm2space'][:] = trans.surf2space
+        thisgroup.createVariable('atm2atm', 'float', ('lev', 'lev',))
+        thisgroup.variables['atm2atm'][:] = trans.atm2atm
+
 
     def longwave_heating(self):
         """Compute the net longwave radiative heating at every level
