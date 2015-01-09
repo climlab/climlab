@@ -84,7 +84,7 @@ class Column(_TimeSteppingModel):
                                           self.p[1:N])/2, [0.]))
             self.dp = np.flipud(np.diff(np.flipud(self.pbounds)))
             self.num_levels = N
-    
+
         # Create and initialize the state variables
         Ts = self.groups['state'].createVariable('Ts', 'float')
         Tatm = self.groups['state'].createVariable('Tatm', 'float', ('lev',))

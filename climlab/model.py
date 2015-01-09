@@ -48,3 +48,13 @@ class _Model(Dataset):
     def param_plusone(self, name):
         '''Convenience method for adding 1 (integer) to a parameter.'''
         self.groups['params'].variables[name][:] += 1
+    
+    def get_state(self, varname=None):
+        '''Convenience method to display current state variables.
+        If varname (or list of varnames) is given, only those variables
+        will be displayed.
+        varname option not yet implemented!'''
+        print "Current model state"
+        for name, value in self.groups['state'].variables.iteritems():
+            print("State variable: %s" % name)
+            print value[:]
