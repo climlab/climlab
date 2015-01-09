@@ -9,37 +9,43 @@ from transmissivity import Transmissivity
 
 def _flux(fromspace, albedo_sfc, emit_sfc, emit_atm, eps):
     trans = Transmissivity(eps)
-    space2sfc = TOA_down * trans.sfc2space
-    space2atm = TOA_down * trans.atm2space
+    space2sfc = fromspace * trans.sfc2space
+    space2atm = fromspace * trans.atm2space
     atm2sfc = np.dot(trans.sfc2atm, emit_atm)
     atm2atm = np.dot(trans.atm2atm, emit_atm)
-    incident_sfc = space2sfc + atm2sfc
+    incident_sfc = space2sfc + np.sum(atm2sfc)
     up_sfc = albedo_sfc * incident_sfc + emit_sfc
     sfc2atm = up_sfc * trans.sfc2atm
     sfc2space = up_sfc * trans.sfc2space
     atm2space = emit_atm * trans.atm2space
     absorbed_sfc = incident_sfc - up_sfc
     absorbed_atm = (atm2atm + sfc2atm + space2atm) * trans.absorb - 2*emit_atm
-    net2space = sfc2space + np.sum(atm2space)
-    return absorbed_sfc, absorbed_atm, net2space, sfc2space, atm2space, up_sfc
+    absorbed_total = absorbed_sfc + np.sum(absorbed_atm)
+    up2space = sfc2space + np.sum(atm2space)
+    net2sfc = incident_sfc - up_sfc
+    return absorbed_sfc, absorbed_atm, absorbed_total, up2space, net2sfc, \
+        sfc2space, atm2space, incident_sfc, up_sfc
+
 
 def SWflux(Q, albedo_sfc, eps):
     emit_atm = np.zeros_like(eps)
     emit_sfc = np.zeros_like(albedo_sfc)
-    absorbed_sfc, absorbed_atm, net2space, sfc2space, atm2space, up_sfc =  \
-        _flux(fromspace=Q, albedo_sfc=albedo_sfc, emit_sfc, emit_atm, eps)
-    planetary_albedo = net2space / Q
-    absorbed_total = absorbed_sfc + np.sum(absorbed_atm)
-    return absorbed_sfc, absorbed_atm, absorbed_total, planetary_albedo
+    absorbed_sfc, absorbed_atm, absorbed_total, up2space, net2sfc, sfc2space, atm2space, incident_sfc, up_sfc =  \
+        _flux(Q, albedo_sfc, emit_sfc, emit_atm, eps)
+    planetary_albedo = up2space / Q
+    return absorbed_sfc, absorbed_atm, absorbed_total, incident_sfc, up2space, planetary_albedo
+
 
 def LWflux(emit_atm, emit_sfc, eps):
     albedo_sfc = np.zeros_like(emit_sfc)
     fromspace = np.zeros_like(emit_sfc)
-    absorbed_sfc, absorbed_atm, net2space, sfc2space, atm2space, up_sfc =  \
+    absorbed_sfc, absorbed_atm, absorbed_total, up2space, net2sfc, sfc2space, atm2space, incident_sfc, up_sfc =  \
         _flux(fromspace, albedo_sfc, emit_sfc, emit_atm, eps)
     OLR_sfc = sfc2space
     OLR_atm = atm2space
-    OLR = net2space
+    OLR = up2space
+    LWdown_sfc = incident_sfc
+    return absorbed_sfc, absorbed_atm, OLR, LWdown_sfc, OLR_sfc, OLR_atm
 
 #==============================================================================
 #         self.SWdown_TOA = self.Q
@@ -71,6 +77,5 @@ def LWflux(emit_atm, emit_sfc, eps):
 #         incident_fromsfc = self.emit_sfc * self.LWtrans.surf2atm
 #         incident_fromatm = np.dot(self.LWtrans.atm2atm, self.emit_atm)
 #         self.LW_absorbed_atm = ((incident_fromatm + incident_fromsfc) * eps
+#                                - 2 * self.emit_atm)
 #==============================================================================
-                                - 2 * self.emit_atm)
-

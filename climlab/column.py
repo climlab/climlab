@@ -12,9 +12,7 @@ import constants as const
 from convadj import convective_adjustment
 from model import _TimeSteppingModel
 from transmissivity import Transmissivity
-
-# Making this more consistent with ebm.py --
-#   no more dictionary for parameters
+import flux
 
 
 class Column(_TimeSteppingModel):
@@ -126,32 +124,40 @@ class Column(_TimeSteppingModel):
         # emissions from surface and each layer
         self.emit_sfc = const.sigma * self.Ts**4.
         self.emit_atm = eps * const.sigma * self.Tatm**4.
-
-        self.LW_down_sfc = np.dot(self.LWtrans.surf2atm, self.emit_atm)
-        self.OLR_sfc = self.LWtrans.surf2space * self.emit_sfc
-        self.OLR_atm = self.LWtrans.atm2space * self.emit_atm
-        self.OLR = self.OLR_sfc + np.sum(self.OLR_atm)
-        self.LW_absorbed_sfc = self.LW_down_sfc - self.emit_sfc
-
-        incident_fromsfc = self.emit_sfc * self.LWtrans.surf2atm
-        incident_fromatm = np.dot(self.LWtrans.atm2atm, self.emit_atm)
-        self.LW_absorbed_atm = ((incident_fromatm + incident_fromsfc) * eps
-                                - 2 * self.emit_atm)
+        absorbed_sfc, absorbed_atm, OLR, LWdown_sfc, OLR_sfc, OLR_atm = \
+            flux.LWflux(self.emit_atm, self.emit_sfc, eps)
+        self.LW_down_sfc = LWdown_sfc
+        self.OLR_sfc = OLR_sfc
+        self.OLR_atm = OLR_atm
+        self.OLR = OLR
+        self.LW_absorbed_sfc = absorbed_sfc
+        self.LW_absorbed_atm = absorbed_atm
 
     def shortwave_heating(self):
         '''Net shortwave heating at each level.'''
         self.SWdown_TOA = self.Q
-        SW_incident_fromabove = self.SWdown_TOA * self.SWtrans.atm2space
-        self.SWdown_sfc = self.SWdown_TOA * self.SWtrans.surf2space
-        self.SWup_sfc = self.albedo * self.SWdown_sfc
-        self.SW_absorbed_sfc = self.SWdown_sfc - self.SWup_sfc
-        SW_incident_frombelow = self.SWup_sfc * self.SWtrans.surf2atm
-        self.SW_absorbed_atm = ((SW_incident_fromabove + SW_incident_frombelow)
-                                * self.SWtrans.absorb)
-        self.SWup_TOA = self.SWup_sfc * self.SWtrans.surf2space
-        self.SW_absorbed_total = (self.SW_absorbed_sfc +
-                                  np.sum(self.SW_absorbed_atm))
-        self.planetary_albedo = self.SWup_TOA / self.SWdown_TOA
+        absorbed_sfc, absorbed_atm, absorbed_total, incident_sfc, up2space, planetary_albedo = \
+            flux.SWflux(self.Q, self.albedo, self.SWtrans.absorb)
+        self.SWdown_sfc = incident_sfc
+        self.SW_absorbed_sfc = absorbed_sfc
+        self.SW_absorbed_atm = absorbed_atm
+        self.SWup_TOA = up2space
+        self.SW_absorbed_total = absorbed_total
+        self.planetary_albedo = planetary_albedo
+
+#==============================================================================
+#         SW_incident_fromabove = self.SWdown_TOA * self.SWtrans.atm2space
+#         self.SWdown_sfc = self.SWdown_TOA * self.SWtrans.sfc2space
+#         self.SWup_sfc = self.albedo * self.SWdown_sfc
+#         self.SW_absorbed_sfc = self.SWdown_sfc - self.SWup_sfc
+#         SW_incident_frombelow = self.SWup_sfc * self.SWtrans.sfc2atm
+#         self.SW_absorbed_atm = ((SW_incident_fromabove + SW_incident_frombelow)
+#                                 * self.SWtrans.absorb)
+#         self.SWup_TOA = self.SWup_sfc * self.SWtrans.sfc2space
+#         self.SW_absorbed_total = (self.SW_absorbed_sfc +
+#                                   np.sum(self.SW_absorbed_atm))
+#         self.planetary_albedo = self.SWup_TOA / self.SWdown_TOA
+#==============================================================================
 
     def rad_temperature_tendency(self):
         """Compute net radiative heating everywhere in the Column (in W/m^2),
