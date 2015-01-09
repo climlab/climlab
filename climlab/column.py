@@ -157,27 +157,28 @@ class Column(_TimeSteppingModel):
         thisgroup.createVariable('atm2atm', 'float', ('lev', 'lev',))
         thisgroup.variables['atm2atm'][:] = trans.atm2atm
 
-
     def longwave_heating(self):
         """Compute the net longwave radiative heating at every level
         and the surface. Also store the upwelling longwave radiation at the top
         (OLR), and the downwelling longwave radiation at the surface.
         """
         eps = self.groups['LWtrans'].variables['absorb'][:]
+        Ts = self.groups['state'].variables['Ts'][:]
+        Tatm = self.groups['state'].variables['Tatm'][:]
         # emissions from surface and each layer
-        self.emit_sfc = const.sigma * self.Ts**4.
-        self.emit_atm = eps * const.sigma * self.Tatm**4.
+        emit_sfc = const.sigma * Ts**4.
+        emit_atm = eps * const.sigma * Tatm**4.
 
-        self.LW_down_sfc = np.dot(self.LWtrans.surf2atm, self.emit_atm)
-        self.OLR_sfc = self.LWtrans.surf2space * self.emit_sfc
-        self.OLR_atm = self.LWtrans.atm2space * self.emit_atm
-        self.OLR = self.OLR_sfc + np.sum(self.OLR_atm)
-        self.LW_absorbed_sfc = self.LW_down_sfc - self.emit_sfc
+        LW_down_sfc = np.dot(self.groups['LWtrans'].variables['surf2atm'][:], emit_atm)
+        OLR_sfc = self.groups['LWtrans'].variables['surf2space'][:] * emit_sfc
+        OLR_atm = self.groups['LWtrans'].variables['atm2space'][:] * emit_atm
+        OLR = OLR_sfc + np.sum(OLR_atm)
+        LW_absorbed_sfc = LW_down_sfc - emit_sfc
 
-        incident_fromsfc = self.emit_sfc * self.LWtrans.surf2atm
-        incident_fromatm = np.dot(self.LWtrans.atm2atm, self.emit_atm)
-        self.LW_absorbed_atm = ((incident_fromatm + incident_fromsfc) * eps
-                                - 2 * self.emit_atm)
+        incident_fromsfc = emit_sfc * self.groups['LWtrans'].variables['surf2atm'][:]
+        incident_fromatm = np.dot(self.groups['LWtrans'].variables['atm2atm'][:], emit_atm)
+        LW_absorbed_atm = ((incident_fromatm + incident_fromsfc) * eps
+                                - 2 * emit_atm)
 
     def shortwave_heating(self):
         '''Net shortwave heating at each level.'''
