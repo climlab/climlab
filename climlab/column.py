@@ -23,10 +23,10 @@ from transmissivity import Transmissivity
 class Column(_TimeSteppingModel):
     """The Column object represents surface temperature and air temperature
     on grid of pressure levels."""
-    def __str__(self):
-        return ("Instance of Column class with surface temperature " +
-                str(self.Ts) + " K, and " + str(self.num_levels) +
-                " atmospheric levels.")
+#    def __str__(self):
+#        return ("Instance of Column class with surface temperature " +
+#                str(self.Ts) + " K, and " + str(self.num_levels) +
+#                " atmospheric levels.")
             #  WILL WANT TO MAKE SOME BETTER OUTPUT HERE.
 #        return ("Instance of Column class with surface temperature " +
 #                str(self.Ts) + " K, " + str(self.num_levels) +
@@ -56,7 +56,6 @@ class Column(_TimeSteppingModel):
         self.param('water_depth', water_depth)
         self.param('albedo', albedo)
         self.param('Q', Q)
-        self.param('timestep', timestep)
         self.param('abs_coeff', abs_coeff)
         if adj_lapse_rate is not None:
             self.param('adj_lapse_rate', adj_lapse_rate)
@@ -69,11 +68,12 @@ class Column(_TimeSteppingModel):
             levels = self.createVariable('level','float',('lev',))
             lev_bounds = self.createVariable('lev_bounds','float',('lev_bounds',))
             dp = self.createVariable('dp', 'float', ('lev',))
-            levels[:] = np.linspace(const.ps - dp/2, dp/2, num_levels)
+            dp_constant = const.ps / num_levels
+            levels[:] = np.linspace(const.ps - dp_constant/2, dp_constant/2, num_levels)
             lev_bounds[:] = np.concatenate(([const.ps], (levels[0:num_levels-1] +
                                           levels[1:num_levels])/2, [0.]))
-            dp[:] = const.ps / num_levels
-            self.params('num_levels', num_levels)            
+            dp[:] = const.ps / num_levels * np.ones_like(levels[:])            
+            self.param('num_levels', num_levels)            
         else:
             #  THIS WILL NOT WORK FOR NOW with new dataset structure
             # if pressure levels are provided:
@@ -101,8 +101,7 @@ class Column(_TimeSteppingModel):
         self.set_LW_emissivity()
         self.set_SW_absorptivity()
 
-        self.set_timestep(num_steps_per_year=const.seconds_per_year /
-                          self.timestep)
+        self.set_timestep(num_steps_per_year=const.seconds_per_year/timestep)
         #  A dictionary of the model state variables
                           # not needed anymore
         #self.state = {'Ts': self.Ts, 'Tatm': self.Tatm}

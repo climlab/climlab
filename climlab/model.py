@@ -42,8 +42,8 @@ class _Model(Dataset):
             if name not in self.groups['params'].variables:
                 # Create a new scalar variable in parameters group
                 self.groups['params'].createVariable(name, paramType)
-                # Assign the new value
-                self.groups['params'].variables[name][:] = value
+            # Assign the new value
+            self.groups['params'].variables[name][:] = value
 
     def param_plusone(self, name):
         '''Convenience method for adding 1 (integer) to a parameter.'''

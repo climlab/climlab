@@ -22,7 +22,8 @@ class _TimeSteppingModel(_Model):
         self.param('timestep', const.seconds_per_year / self.param('num_steps_per_year'))
         timestep_days = self.param('timestep') / const.seconds_per_day
         days_of_year = np.arange(0., const.days_per_year, timestep_days)
-        self.groups['timestepping'].createVariable('days_of_year',
+        if 'days_of_year' not in self.groups['timestepping'].variables:
+            self.groups['timestepping'].createVariable('days_of_year',
                                                    'float', ('time',))
         self.groups['timestepping'].variables['days_of_year'][:] = days_of_year
         self.param('day_of_year_index', 0, paramType='int')
