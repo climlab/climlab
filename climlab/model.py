@@ -1,80 +1,47 @@
-import numpy as np
-import constants as const
+from netCDF4 import Dataset
+import time
+
+# New concept: every model is actually a sub-class of netCDF4.Dataset
 
 
-class _TimeSteppingModel(object):
-    '''A generic parent class for all time-dependent models that use a
-    discete forward timestep.'''
-    def __init__(self):
-        self.grid = {}
-        self.state = {}
-        self.set_timestep()
-        #  Daughter classes will need to do a bunch of other initialization
+class _Model(Dataset):
+    '''An abstract parent class for all climlab models.
+    Every model object is a sub-class of netCDF4.Dataset
+    So we are using the netCDF conventions for storing grids,
+    state variables, diagnostic quanitities, parameters, etc.'''
+    def __init__(self, filename='ignored.nc', diskless=True, **kwargs):
+        # Create a netCDF4.Dataset object
+        super(_Model, self).__init__(filename=filename, mode="w",
+                                     diskless=diskless, format='NETCDF4')
+    # netCDF4 format allows for groups (and subgroups) of variables
+    # useful here... keep state variables and diagnostic quantities seperate
+        self.createGroup('state')
+        self.createGroup('diagnostics')
+        self.createGroup('params')
+        self.createGroup('fixed')
+        # Set some global attributes
+        self.description1 = "Model object created by climlab"
+        self.description2 = "Model type is " + str(type(self))
+        self.creation_date = time.strftime("%a, %d %b %Y %H:%M:%S %z",
+                                           time.localtime())
 
-    def set_timestep(self, num_steps_per_year=90):
-        '''Change the timestep, given a number of steps per calendar year.'''
-        self.num_steps_per_year = num_steps_per_year
-        self.timestep = const.seconds_per_year / self.num_steps_per_year
-        timestep_days = self.timestep / const.seconds_per_day
-        self.days_of_year = np.arange(0., const.days_per_year, timestep_days)
-        self.day_of_year_index = 0
-        self.steps = 0
-        self.days_elapsed = 0.
-        self.years_elapsed = 0
-
-    def step_forward(self):
-        '''Daughter classes need to implement details
-        for changes in model state.'''
-        pass
-        self._update_time()
-
-    def _update_time(self):
-        '''Increment the timestep counter by one.
-        This function is called by the timestepping routines.'''
-        self.steps += 1
-        # time in days since beginning
-        self.days_elapsed += self.timestep / const.seconds_per_day
-        if self.day_of_year_index >= self.num_steps_per_year-1:
-            self._do_new_calendar_year()
+    def param(self, name, value=None, paramType='float'):
+        '''Convenience method for adding, modifying or retrieving 
+        scalar model parameter.
+        If value is not given, the method will return existing value.
+        If name and value are given, new parameter will be created or updated.
+        If parameter type is not float, it needs to be specified.'''
+        if value is None:
+            try:
+                return self.groups['params'].variables[name][:]
+            except:
+                raise ValueError('No parameter %s found.' % name)
         else:
-            self.day_of_year_index += 1
+            # First check to see if this parameter already exists.
+            # If not, create it.
+            if name not in self.groups['params'].variables:
+                # Create a new scalar variable in parameters group
+                self.groups['params'].createVariable(name, paramType)
+                # Assign the new value
+                self.groups['params'].variables[name][:] = value
 
-    def _do_new_calendar_year(self):
-        '''This function is called once at the end of every calendar year.'''
-        self.day_of_year_index = 0  # back to Jan. 1
-        self.years_elapsed += 1
-
-    def integrate_years(self, years=1.0, verbose=True):
-        '''Timestep the model forward a specified number of years.'''
-        numsteps = int(self.num_steps_per_year * years)
-        if verbose:
-            print("Integrating for " + str(numsteps) + " steps or "
-                  + str(years) + " years.")
-        #  This implements a generic time-averaging feature
-        # using the list of model state variables
-        self.state_timeave = {}
-        for varname, value in self.state.items():
-            self.state_timeave[varname] = np.zeros_like(value)
-        #  begin time loop
-        for count in range(numsteps):
-            self.step_forward()
-            for varname, value in self.state.items():
-                self.state_timeave[varname] += value
-        for varname, value in self.state.items():
-            self.state_timeave[varname] /= numsteps
-        if verbose:
-            print("Total elapsed time is " +
-                  str(self.days_elapsed/const.days_per_year) + " years.")
-
-    def integrate_days(self, days=1.0, verbose=True):
-        '''Timestep the model forward a specified number of days.'''
-        numsteps = int(self.num_steps_per_year / const.days_per_year * days)
-        if verbose:
-            print("Integrating for " + str(numsteps) + " steps or " +
-                  str(days) + " days.")
-        #  begin time loop
-        for count in range(numsteps):
-            self.step_forward()
-        if verbose:
-            print("Total elapsed time is " +
-                  str(self.days_elapsed/const.days_per_year) + " years.")

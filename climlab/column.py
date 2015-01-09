@@ -10,8 +10,7 @@ brose@albany.edu
 import numpy as np
 import constants as const
 from convadj import convective_adjustment
-from model import _TimeSteppingModel
-from netcdf import make_ncColumn
+from timestepping_model import _TimeSteppingModel
 
 # experiment to see if we can use a nc.Dataset object to hold the state variables etc
 #  seems to work just fine.
@@ -43,24 +42,34 @@ class Column(_TimeSteppingModel):
                  # absorption coefficient in m**2 / kg
                  abs_coeff=1.229E-4,
                  # lapse rate for convective adjustment, in K / km
-                 adj_lapse_rate=None):
+                 adj_lapse_rate=None,
+                 **kwargs):
+        #  First create the dataset
+        super(Column, self).__init__(**kwargs)
         #  Attach all parameters to the object
-        self.p = p
-        self.num_levels = num_levels
-        self.water_depth = water_depth
-        self.albedo = albedo
-        self.Q = Q
-        self.timestep = timestep
-        self.abs_coeff = abs_coeff
-        self.adj_lapse_rate = adj_lapse_rate
+        # self.p = p
+        self.param('num_levels', num_levels)
+        self.param('water_depth', water_depth)
+        self.param('albedo', albedo)
+        self.param('Q', Q)
+        self.param('timestep', timestep)
+        self.param('abs_coeff', abs_coeff)
+        if adj_lapse_rate is not None:
+            self.param('adj_lapse_rate', adj_lapse_rate)
 
         if p is None:
-            #  Here trying out a netCDF structure
-            self.ncdata = make_ncColumn(num_levels)
-            self.p = self.ncdata.variables['level'][:]
-            self.pbounds = self.ncdata.variables['lev_bounds'][:]
-            self.dp = np.flipud(np.diff(np.flipud(self.pbounds)))
-            self.num_levels = self.p.size
+            #  Here trying out a netCDF structure            
+            lev = self.createDimension('lev', num_levels)
+            levbounds = self.createDimension('lev_bounds', num_levels+1)
+            # coordinate variable
+            levels = self.createVariable('level','float',('lev',))
+            lev_bounds = self.createVariable('lev_bounds','float',('lev_bounds',))
+            dp = self.createVariable('dp', 'float', ('lev',))
+            levels[:] = np.linspace(const.ps - dp/2, dp/2, num_levels)
+            lev_bounds[:] = np.concatenate(([const.ps], (levels[0:num_levels-1] +
+                                          levels[1:num_levels])/2, [0.]))
+            dp[:] = const.ps / num_levels
+            self.params('num_levels', num_levels)            
         else:
             # if pressure levels are provided:
             #  assume layer boundaries occur halfway between the given levels
@@ -70,15 +79,20 @@ class Column(_TimeSteppingModel):
                                           self.p[1:N])/2, [0.]))
             self.dp = np.flipud(np.diff(np.flipud(self.pbounds)))
             self.num_levels = N
+    
+        # Create and initialize the state variables
+        Ts = self.groups['state'].createVariable('Ts', 'float')
+        Tatm = self.groups['state'].createVariable('Tatm', 'float', ('lev',))
+        Ts[:] = 288.
+        Tatm[:] = np.linspace(Ts[:]-10., 200., num_levels)
 
-        # initial surface temperature
-        self.Ts = 288.
-        # intitial column temperature
-        self.Tatm = np.linspace(self.Ts-10., 200., self.num_levels)
         #  heat capacity of atmospheric layers
-        self.c_atm = const.cp * self.dp * const.mb_to_Pa / const.g
+        c_atm = self.groups['fixed'].createVariable('c_atm', 'float')
+        c_atm[:] = const.cp * const.mb_to_Pa / const.g * self.variables['dp'][:]
         #  heat capacity of surface in J / m**2 / K
-        self.c_sfc = const.cw * const.rho_w * self.water_depth
+        c_sfc = self.groups['fixed'].createVariable('c_sfc', 'float')
+        c_sfc[:] = const.cw * const.rho_w * self.param('water_depth')
+        
         self.set_LW_emissivity()
         self.set_SW_absorptivity()
 
@@ -87,25 +101,28 @@ class Column(_TimeSteppingModel):
         self.set_timestep(num_steps_per_year=const.seconds_per_year /
                           self.timestep)
         #  A dictionary of the model state variables
-        self.state = {'Ts': self.Ts, 'Tatm': self.Tatm}
+                          # not needed anymore
+        #self.state = {'Ts': self.Ts, 'Tatm': self.Tatm}
 
     def set_LW_emissivity(self, eps=None):
         """Set the longwave emissivity / absorptivity eps for the Column."""
         if eps is None:
             # default is to set eps equal at every level
             # use value consistent with the absorption coefficient parameter
-            self.eps = (2. / (1 + 2. * const.g / self.abs_coeff /
-                        (self.dp * const.mb_to_Pa)))
-        elif (np.isscalar(eps) or eps.size == self.num_levels):
-            self.eps = eps
+            eps = (2. / (1 + 2. * const.g / self.param('abs_coeff') /
+                        (self.variables['dp'][:] * const.mb_to_Pa)))
+        elif (np.isscalar(eps) or eps.size == self.param('num_levels')):
+            pass
         else:
             raise ValueError('eps must be scalar or have exactly ' +
-                             self.num_levels + ' elements.')
+                             self.param('num_levels') + ' elements.')
 
-        if np.isscalar(self.eps):
-            self.LWtrans = Transmissivity(self.eps * np.ones_like(self.p))
-        else:
-            self.LWtrans = Transmissivity(self.eps)
+        if np.isscalar(eps):
+            p = self.variables['level'][:]
+            eps = eps*np.ones_like(p)
+        LWtrans = Transmissivity(eps)
+        if 'eps' not in self.groups['fixed'].variables
+            self.groups['fixed'].createVariable
 
     def set_SW_absorptivity(self, eps=None):
         """Set the shortwave absorptivity eps for the Column."""
