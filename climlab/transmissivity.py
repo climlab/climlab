@@ -18,9 +18,9 @@ class Transmissivity:
         self.atm2atm += self.atm2atm.transpose()
 
         # the transmissivity between surface and layer k
-        self.surf2atm = np.concatenate(([1.], np.cumprod(self.trans[:N-1])))
+        self.sfc2atm = np.concatenate(([1.], np.cumprod(self.trans[:N-1])))
         # the transmissivity between layer k and space
         self.atm2space = np.flipud(np.cumprod(np.concatenate(([1.],
                                               np.flipud(self.trans[1:N])))))
         #  the transmissivity between surface and space
-        self.surf2space = np.prod(self.trans)
+        self.sfc2space = np.prod(self.trans)
