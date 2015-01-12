@@ -29,10 +29,25 @@ class _TimeSteppingModel(_Model):
     def step_forward(self):
         '''new oop climlab... just loop through processes
         and add up the tendencies'''
-        #for proc in processes:
-        #    proc.compute()
-        #for proc in processes:
-        pass    
+        adj_list = []
+        for proctype, proc in self.processes.iteritems():
+            if proc.is_explicit:
+                # Invoke process model, compute tendencies
+                proc.compute()
+                # increment state variables
+                for varname, value in self.state.iteritems():
+                    value += proc.tendencies[varname]
+            elif proc.is_implicit:
+                # need to implement generic implicit solver here
+                pass
+            elif proc.is_adjustment:
+                adj_list.append(proc)
+            else:
+                raise ValueError('Unrecognized process type')
+        # Adjustment processes change the state instantaneously
+        for proc in adj_list:
+            proc.compute()
+            self.state = proc.adjusted_state
         self._update_time()
 
     def _update_time(self):

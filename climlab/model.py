@@ -1,8 +1,12 @@
-import numpy as np
-import constants as const
 import time
 from grid import Grid
 
+
+#  fundamental process types (very climt-like):
+#    - radiation
+#    - dynamics
+#    - convection
+#    - turbulence
 
 class _Model(object):
     '''A generic parent class for all climlab model objects.
@@ -18,3 +22,9 @@ class _Model(object):
         self.diagnostics = {}
         self.creation_date = time.strftime("%a, %d %b %Y %H:%M:%S %z",
                                            time.localtime())
+        # Dictionary of the fundamental process types known to climlab
+        self.processes = {'radiation': None,
+                          'dynamics': None,
+                          'convection': None,
+                          'turbulence': None,
+                          'adjustment': None}
