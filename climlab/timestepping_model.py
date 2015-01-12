@@ -53,10 +53,11 @@ class _TimeSteppingModel(_Model):
 
     def integrate_years(self, years=1.0, verbose=True):
         '''Timestep the model forward a specified number of years.'''
+        days = years * const.days_per_year
         numsteps = int(self.time['num_steps_per_year'] * years)
         if verbose:
-            print("Integrating for " + str(numsteps) + " steps or "
-                  + str(years) + " years.")
+            print("Integrating for " + str(numsteps) + " steps, "
+                  + str(days) + " days, or " + str(years) + " years.")
         #  This implements a generic time-averaging feature
         # using the list of model state variables
         self.timeave = dict(self.state.items() + self.diagnostics.items())
