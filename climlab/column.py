@@ -5,8 +5,6 @@ Object-oriented code for one-dimensional radiative-convective models.
 Code developed by Brian Rose, University at Albany
 brose@albany.edu
 """
-
-
 import numpy as np
 import constants as const
 from convadj import convective_adjustment
@@ -15,6 +13,7 @@ from axis import Axis
 from grid import Grid
 from transmissivity import set_transmissitivity
 import flux
+import heat_capacity
 
 
 class Column(_TimeSteppingModel):
@@ -63,7 +62,7 @@ class Column(_TimeSteppingModel):
             self.grid = Grid(lev=pAxis)
         self.p = self.grid['lev'].points
         self.pbounds = self.grid['lev'].bounds
-        self.dp = self.grid['lev'].delta
+        #self.dp = self.grid['lev'].delta
         self.param['num_levels'] = self.grid['lev'].num_points
         self.param['abs_coeff'] = abs_coeff
         self.param['adj_lapse_rate'] = adj_lapse_rate
@@ -73,9 +72,9 @@ class Column(_TimeSteppingModel):
         # intitial column temperature
         self.state['Tatm'] = np.linspace(self.state['Ts']-10., 200., self.param['num_levels'])
         #  heat capacity of atmospheric layers
-        self.c_atm = const.cp * self.dp * const.mb_to_Pa / const.g
+        self.c_atm = heat_capacity.atmosphere(self.grid['lev'].delta)
         #  heat capacity of surface in J / m**2 / K
-        self.c_sfc = const.cw * const.rho_w * self.param['water_depth']
+        self.c_sfc = heat_capacity.slab_ocean(self.param['water_depth'])
         self.set_LW_emissivity()
         self.set_SW_absorptivity()
 
@@ -88,7 +87,7 @@ class Column(_TimeSteppingModel):
             # default is to set eps equal at every level
             # use value consistent with the absorption coefficient parameter
             self.eps = (2. / (1 + 2. * const.g / self.param['abs_coeff'] /
-                        (self.dp * const.mb_to_Pa)))
+                        (self.grid['lev'].delta * const.mb_to_Pa)))
         elif (np.isscalar(eps) or eps.size == self.param['num_levels']):
             self.eps = eps
         else:

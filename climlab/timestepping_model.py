@@ -9,6 +9,7 @@ class _TimeSteppingModel(_Model):
     def __init__(self, **kwargs):
         # Create the state dataset
         super(_TimeSteppingModel, self).__init__(**kwargs)
+        self.timeave = {}
         self.set_timestep()
         #  Daughter classes will need to do a bunch of other initialization
 
@@ -58,16 +59,15 @@ class _TimeSteppingModel(_Model):
                   + str(years) + " years.")
         #  This implements a generic time-averaging feature
         # using the list of model state variables
-        #self.state_timeave = {}
-        #for varname, value in self.state.items():
-        #    self.state_timeave[varname] = np.zeros_like(value)
+        for varname, value in self.state.items():
+            self.timeave[varname] = np.zeros_like(value)
         #  begin time loop
         for count in range(numsteps):
             self.step_forward()
-        #    for varname, value in self.state.items():
-        #        self.state_timeave[varname] += value
-        #for varname, value in self.state.items():
-        #    self.state_timeave[varname] /= numsteps
+            for varname, value in self.state.items():
+                self.timeave[varname] += value
+        for varname, value in self.state.items():
+            self.timeave[varname] /= numsteps
         if verbose:
             print("Total elapsed time is " +
                   str(self.time['days_elapsed']/const.days_per_year) + " years.")
