@@ -11,16 +11,14 @@ class _Model(object):
     '''
     def __init__(self, **kwargs):
         self.grid = Grid()        
-        # Create a netCDF4.Dataset object
-        #self.state = nc.Dataset(filename=filename, mode="w",
-        #                        diskless=diskless, format='NETCDF4')
-        ## Set some global attributes
-        #self.state.description1 = "Model object created by climlab"
-        #self.state.description2 = "Model type is " + str(type(self))
+        # dictionary of model parameters
+        self.param = {}
+        # dictionary of model state variables
+        self.state = {}
+        # dictionary of diagnostic quantities
+        self.diagnostics = {}
         self.creation_date = time.strftime("%a, %d %b %Y %H:%M:%S %z",
                                                  time.localtime())
-        # This dictionary will hold all model parameters
-        self.param = {}
 
 
 class _TimeSteppingModel(_Model):

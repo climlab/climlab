@@ -69,9 +69,9 @@ class Column(_TimeSteppingModel):
         self.param['adj_lapse_rate'] = adj_lapse_rate
 
         # initial surface temperature
-        self.Ts = 288.
+        self.state['Ts'] = 288.
         # intitial column temperature
-        self.Tatm = np.linspace(self.Ts-10., 200., self.param['num_levels'])
+        self.state['Tatm'] = np.linspace(self.state['Ts']-10., 200., self.param['num_levels'])
         #  heat capacity of atmospheric layers
         self.c_atm = const.cp * self.dp * const.mb_to_Pa / const.g
         #  heat capacity of surface in J / m**2 / K
@@ -81,8 +81,6 @@ class Column(_TimeSteppingModel):
 
         self.set_timestep(num_steps_per_year=const.seconds_per_year /
                           timestep)
-        #  A dictionary of the model state variables
-        #self.state = {'Ts': self.Ts, 'Tatm': self.Tatm}
 
     def set_LW_emissivity(self, eps=None):
         """Set the longwave emissivity / absorptivity eps for the Column."""
@@ -123,8 +121,8 @@ class Column(_TimeSteppingModel):
         """
         eps = self.LWtrans['absorb']
         # emissions from surface and each layer
-        self.emit_sfc = const.sigma * self.Ts**4.
-        self.emit_atm = eps * const.sigma * self.Tatm**4.
+        self.emit_sfc = const.sigma * self.state['Ts']**4.
+        self.emit_atm = eps * const.sigma * self.state['Tatm']**4.
         absorbed_sfc, absorbed_atm, OLR, LWdown_sfc, OLR_sfc, OLR_atm = \
             flux.LWflux(self.emit_atm, self.emit_sfc, self.LWtrans)
         self.LW_down_sfc = LWdown_sfc
@@ -169,17 +167,18 @@ class Column(_TimeSteppingModel):
         and if a lapse rate is specified in params['adj_lapse_rate'], also calls convective_adjustment().
         """
         self.rad_temperature_tendency()
-        self.Ts += self.rad_temp_tendency_sfc
-        self.Tatm += self.rad_temp_tendency_atm
+        self.state['Ts'] += self.rad_temp_tendency_sfc
+        self.state['Tatm'] += self.rad_temp_tendency_atm
         if self.param['adj_lapse_rate'] is not None:
-            self.unstable_Ts = self.Ts
-            self.unstable_Tatm = self.Tatm
-            Tcol = np.concatenate(([self.Ts], self.Tatm))
+            unstable_Ts = self.state['Ts']
+            unstable_Tatm = self.state['Tatm']
+            #Tcol = np.concatenate((unstable_Ts, unstable_Tatm))
+            Tcol = np.flipud(np.append(np.flipud(unstable_Tatm), unstable_Ts))
             pnew = np.concatenate(([const.ps], self.p))
             cnew = np.concatenate(([self.c_sfc], self.c_atm *
                                   np.ones_like(self.p)))
             Tadj = convective_adjustment(pnew, Tcol, cnew,
                                         lapserate=self.param['adj_lapse_rate'])
-            self.Ts = Tadj[0]
-            self.Tatm = Tadj[1:self.param['num_levels']+1]
+            self.state['Ts'] = Tadj[0]
+            self.state['Tatm'] = Tadj[1:self.param['num_levels']+1]
         super(Column, self).step_forward()
