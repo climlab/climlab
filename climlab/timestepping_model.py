@@ -59,28 +59,21 @@ class _TimeSteppingModel(_Model):
                   + str(years) + " years.")
         #  This implements a generic time-averaging feature
         # using the list of model state variables
-        for varname, value in self.state.items():
+        self.timeave = dict(self.state.items() + self.diagnostics.items())
+        for varname, value in self.timeave.items():
             self.timeave[varname] = np.zeros_like(value)
         #  begin time loop
         for count in range(numsteps):
             self.step_forward()
-            for varname, value in self.state.items():
+            for varname, value in self.timeave.iteritems():
                 self.timeave[varname] += value
-        for varname, value in self.state.items():
+        for varname, value in self.timeave.iteritems():
             self.timeave[varname] /= numsteps
         if verbose:
-            print("Total elapsed time is " +
-                  str(self.time['days_elapsed']/const.days_per_year) + " years.")
+            print("Total elapsed time is %s years." 
+                  % str(self.time['days_elapsed']/const.days_per_year))
 
     def integrate_days(self, days=1.0, verbose=True):
         '''Timestep the model forward a specified number of days.'''
-        numsteps = int(self.time['num_steps_per_year'] / const.days_per_year * days)
-        if verbose:
-            print("Integrating for " + str(numsteps) + " steps or " +
-                  str(days) + " days.")
-        #  begin time loop
-        for count in range(numsteps):
-            self.step_forward()
-        if verbose:
-            print("Total elapsed time is " +
-                  str(self.time['days_elapsed']/const.days_per_year) + " years.")
+        years = days / const.days_per_year
+        self.integrate_years(years=years, verbose=verbose)
