@@ -30,19 +30,15 @@ def convective_adjustment(p, T, c, lapserate=6.5):
         lapserate = const.g / const.cp * 1.E3
     try:
         alpha = const.Rd / const.g * lapserate / 1.E3
-        # col.conv_lapse_rate = lapserate
     except:
         raise ValueError('Problem with lapse rate')
 
-    # Tcol = np.concatenate(([col.Ts], col.Tatm))
-    # pnew = np.concatenate(([const.ps], col.p))
     Tcol = T
     pnew = p
     L = pnew.size
     Pi = (pnew/const.ps)**alpha
     beta = 1./Pi
     theta = Tcol * beta
-    # q = Pi * np.concatenate(([col.c_sfc], col.c_atm * np.ones_like(col.p)))
     q = Pi * c
 
     n_k = np.zeros(L, dtype=np.int8)
@@ -95,7 +91,5 @@ def convective_adjustment(p, T, c, lapserate=6.5):
     for i in range(L):
         newtheta[count+np.arange(n_k[i])] = theta_k[i]
         count += n_k[i]
-
     Tcol = newtheta * Pi
-
     return Tcol
