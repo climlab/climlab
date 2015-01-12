@@ -7,17 +7,17 @@ import numpy as np
 # maybe also some diagnostic quantities
 
 def _flux(fromspace, albedo_sfc, emit_sfc, emit_atm, trans):
-    space2sfc = fromspace * trans.sfc2space
-    space2atm = fromspace * trans.atm2space
-    atm2sfc = np.dot(trans.sfc2atm, emit_atm)
-    atm2atm = np.dot(trans.atm2atm, emit_atm)
+    space2sfc = fromspace * trans['sfc2space']
+    space2atm = fromspace * trans['atm2space']
+    atm2sfc = np.dot(trans['sfc2atm'], emit_atm)
+    atm2atm = np.dot(trans['atm2atm'], emit_atm)
     incident_sfc = space2sfc + np.sum(atm2sfc)
     up_sfc = albedo_sfc * incident_sfc + emit_sfc
-    sfc2atm = up_sfc * trans.sfc2atm
-    sfc2space = up_sfc * trans.sfc2space
-    atm2space = emit_atm * trans.atm2space
+    sfc2atm = up_sfc * trans['sfc2atm']
+    sfc2space = up_sfc * trans['sfc2space']
+    atm2space = emit_atm * trans['atm2space']
     absorbed_sfc = incident_sfc - up_sfc
-    absorbed_atm = (atm2atm + sfc2atm + space2atm) * trans.absorb - 2*emit_atm
+    absorbed_atm = (atm2atm + sfc2atm + space2atm) * trans['absorb'] - 2*emit_atm
     absorbed_total = absorbed_sfc + np.sum(absorbed_atm)
     up2space = sfc2space + np.sum(atm2space)
     net2sfc = incident_sfc - up_sfc
@@ -26,7 +26,7 @@ def _flux(fromspace, albedo_sfc, emit_sfc, emit_atm, trans):
 
 
 def SWflux(Q, albedo_sfc, trans):
-    emit_atm = np.zeros_like(trans.absorb)
+    emit_atm = np.zeros_like(trans['absorb'])
     emit_sfc = np.zeros_like(albedo_sfc)
     absorbed_sfc, absorbed_atm, absorbed_total, up2space, net2sfc, sfc2space, atm2space, incident_sfc, up_sfc =  \
         _flux(Q, albedo_sfc, emit_sfc, emit_atm, trans)

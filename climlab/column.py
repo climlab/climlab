@@ -11,7 +11,7 @@ import numpy as np
 import constants as const
 from convadj import convective_adjustment
 from model import _TimeSteppingModel
-from transmissivity import Transmissivity
+from transmissivity import set_transmissitivity
 import flux
 
 
@@ -97,20 +97,20 @@ class Column(_TimeSteppingModel):
                              self.num_levels + ' elements.')
 
         if np.isscalar(self.eps):
-            self.LWtrans = Transmissivity(self.eps * np.ones_like(self.p))
+            self.LWtrans = set_transmissitivity(self.eps * np.ones_like(self.p))
         else:
-            self.LWtrans = Transmissivity(self.eps)
+            self.LWtrans = set_transmissitivity(self.eps)
 
     def set_SW_absorptivity(self, eps=None):
         """Set the shortwave absorptivity eps for the Column."""
         if eps is None:
             # default is no shortwave absorption
-            self.SWtrans = Transmissivity(np.zeros_like(self.p))
+            self.SWtrans = set_transmissitivity(np.zeros_like(self.p))
         elif np.isscalar(eps):
             # passing a single scalar sets eps equal to this number everywhere
-            self.SWtrans = Transmissivity(self.eps * np.ones_like(self.p))
+            self.SWtrans = set_transmissitivity(self.eps * np.ones_like(self.p))
         elif np.size(eps) == self.num_levels:
-            self.SWtrans = Transmissivity(eps)
+            self.SWtrans = set_transmissitivity(eps)
         else:
             raise ValueError('eps must be scalar or have exactly ' +
                              self.num_levels + ' elements.')
@@ -120,7 +120,7 @@ class Column(_TimeSteppingModel):
         and the surface. Also store the upwelling longwave radiation at the top
         (OLR), and the downwelling longwave radiation at the surface.
         """
-        eps = self.LWtrans.absorb
+        eps = self.LWtrans['absorb']
         # emissions from surface and each layer
         self.emit_sfc = const.sigma * self.Ts**4.
         self.emit_atm = eps * const.sigma * self.Tatm**4.
