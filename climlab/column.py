@@ -10,7 +10,7 @@ brose@albany.edu
 import numpy as np
 import constants as const
 from convadj import convective_adjustment
-from model import _TimeSteppingModel
+from timestepping_model import _TimeSteppingModel
 from axis import Axis
 from grid import Grid
 from transmissivity import set_transmissitivity
