@@ -57,11 +57,11 @@ class Column(_TimeSteppingModel):
             pAxis = Axis(axisType='lev', num_points=num_levels)
             self.grid = Grid(lev=pAxis)
         if p is not None:
-            # backward compatibility... make a new grid using the p array
+            # Make a new grid using the p array
             pAxis = Axis(axisType='lev', points=p)
             self.grid = Grid(lev=pAxis)
-        self.p = self.grid['lev'].points
-        self.pbounds = self.grid['lev'].bounds
+        #self.p = self.grid['lev'].points
+        #self.pbounds = self.grid['lev'].bounds
         #self.dp = self.grid['lev'].delta
         self.param['num_levels'] = self.grid['lev'].num_points
         self.param['abs_coeff'] = abs_coeff
@@ -95,7 +95,7 @@ class Column(_TimeSteppingModel):
                              self.num_levels + ' elements.')
 
         if np.isscalar(self.eps):
-            self.LWtrans = set_transmissitivity(self.eps * np.ones_like(self.p))
+            self.LWtrans = set_transmissitivity(self.eps * np.ones_like(self.grid['lev'].points))
         else:
             self.LWtrans = set_transmissitivity(self.eps)
 
@@ -103,10 +103,10 @@ class Column(_TimeSteppingModel):
         """Set the shortwave absorptivity eps for the Column."""
         if eps is None:
             # default is no shortwave absorption
-            self.SWtrans = set_transmissitivity(np.zeros_like(self.p))
+            self.SWtrans = set_transmissitivity(np.zeros_like(self.grid['lev'].points))
         elif np.isscalar(eps):
             # passing a single scalar sets eps equal to this number everywhere
-            self.SWtrans = set_transmissitivity(self.eps * np.ones_like(self.p))
+            self.SWtrans = set_transmissitivity(self.eps * np.ones_like(self.grid['lev'].points))
         elif np.size(eps) == self.param['num_levels']:
             self.SWtrans = set_transmissitivity(eps)
         else:
@@ -173,9 +173,9 @@ class Column(_TimeSteppingModel):
             unstable_Tatm = self.state['Tatm']
             #Tcol = np.concatenate((unstable_Ts, unstable_Tatm))
             Tcol = np.flipud(np.append(np.flipud(unstable_Tatm), unstable_Ts))
-            pnew = np.concatenate(([const.ps], self.p))
+            pnew = np.concatenate(([const.ps], self.grid['lev'].points))
             cnew = np.concatenate(([self.c_sfc], self.c_atm *
-                                  np.ones_like(self.p)))
+                                  np.ones_like(self.grid['lev'].points)))
             Tadj = convective_adjustment(pnew, Tcol, cnew,
                                         lapserate=self.param['adj_lapse_rate'])
             self.state['Ts'] = Tadj[0]
