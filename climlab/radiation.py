@@ -20,18 +20,22 @@ Created on Thu Jan  8 15:30:13 2015
 
 #  all tendencies should have units [statevar unit] / second
 
+
+#  actually every process should be agnostic about the climlab model object...
+#  There should be reusable code modules that do the actual computations on simple numpy arrays.
+
 import numpy as np
 from climlab.process import Process
 import heatCapacity
 
-class AplusBT(Process):
-    def compute(self):
-        A = 200.
-        B = 2.
-        water_depth = 20.
-        T = self.state['Ts'].data
-        OLR = A + B*T
-        self.tendencies['Ts'] = -OLR / heatCapacity.slab_ocean(water_depth)
+def AplusBT(T, param):
+    tendencies = {}
+    diagnostics = {}
+    A = param['A']
+    B = param['B']
+    OLR = A + B*T
+    tendencies['Ts'] = -OLR / heatCapacity.slab_ocean(param['water_depth'])
+    diagnostics['OLR'] = OLR
 
 #class GreyRadiation(process)
     

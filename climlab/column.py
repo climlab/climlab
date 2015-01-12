@@ -169,15 +169,20 @@ class Column(_TimeSteppingModel):
         self.state['Ts'] += self.rad_temp_tendency_sfc
         self.state['Tatm'] += self.rad_temp_tendency_atm
         if self.param['adj_lapse_rate'] is not None:
-            unstable_Ts = self.state['Ts']
-            unstable_Tatm = self.state['Tatm']
-            #Tcol = np.concatenate((unstable_Ts, unstable_Tatm))
-            Tcol = np.flipud(np.append(np.flipud(unstable_Tatm), unstable_Ts))
-            pnew = np.concatenate(([const.ps], self.grid['lev'].points))
-            cnew = np.concatenate(([self.c_sfc], self.c_atm *
-                                  np.ones_like(self.grid['lev'].points)))
-            Tadj = convective_adjustment(pnew, Tcol, cnew,
-                                        lapserate=self.param['adj_lapse_rate'])
-            self.state['Ts'] = Tadj[0]
-            self.state['Tatm'] = Tadj[1:self.param['num_levels']+1]
+            conv_tendency_sfc, conv_tendency_atm = self.convective_adjustment()
+            self.state['Ts'] += conv_tendency_sfc
+            self.state['Tatm'] += conv_tendency_atm
         super(Column, self).step_forward()
+        
+    def convective_adjustment(self):
+        unstable_Ts = self.state['Ts']
+        unstable_Tatm = self.state['Tatm']
+        Tcol = np.flipud(np.append(np.flipud(unstable_Tatm), unstable_Ts))
+        pnew = np.concatenate(([const.ps], self.grid['lev'].points))
+        cnew = np.concatenate(([self.c_sfc], self.c_atm *
+                              np.ones_like(self.grid['lev'].points)))
+        Tadj = convective_adjustment(pnew, Tcol, cnew,
+                                     lapserate=self.param['adj_lapse_rate'])
+        Ts = Tadj[0]
+        Tatm = Tadj[1:self.param['num_levels']+1]
+        return Ts - unstable_Ts, Tatm - unstable_Tatm
