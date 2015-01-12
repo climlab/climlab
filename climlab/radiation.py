@@ -26,7 +26,8 @@ Created on Thu Jan  8 15:30:13 2015
 
 import numpy as np
 import constants as const
-from climlab.process import _Process
+#from climlab.process import _Process
+from timestepping_model import _TimeSteppingModel
 import heat_capacity
 from transmissivity import set_transmissitivity
 import flux
@@ -38,11 +39,11 @@ def AplusBT(T, param):
     A = param['A']
     B = param['B']
     OLR = A + B*T
-    tendencies['Ts'] = -OLR / heatCapacity.slab_ocean(param['water_depth'])
+    tendencies['Ts'] = -OLR / heat_capacity.slab_ocean(param['water_depth'])
     diagnostics['OLR'] = OLR
 
 
-class GreyRadiation(_Process):
+class GreyRadiation(_TimeSteppingModel):
     def __init__(self, grid=None, state=None, param=None, eps=None, abs_coeff=None, **kwargs):
         super(GreyRadiation, self).__init__(grid=grid, state=state, param=param, **kwargs)
         self.set_LW_emissivity(eps=eps, abs_coeff=self.param['abs_coeff'])

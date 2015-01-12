@@ -6,11 +6,15 @@ from model import _Model
 class _TimeSteppingModel(_Model):
     '''A generic parent class for all time-dependent models that use a
     discete forward timestep.'''
-    def __init__(self, **kwargs):
+    def __init__(self, is_explicit=True, is_implicit=False, is_adjustment=False, **kwargs):
         # Create the state dataset
         super(_TimeSteppingModel, self).__init__(**kwargs)
+        self.tendencies = {}
         self.timeave = {}
         self.set_timestep()
+        self.is_explicit = is_explicit
+        self.is_implicit = is_implicit
+        self.is_adjustment = is_adjustment
         #  Daughter classes will need to do a bunch of other initialization
 
     def set_timestep(self, num_steps_per_year=90):
@@ -27,25 +31,34 @@ class _TimeSteppingModel(_Model):
                      'days_of_year': days_of_year}
         self.param['timestep'] = timestep
 
+    def compute(self):
+        '''By default, the tendency is zero.'''
+        for varname in self.state.keys():
+            self.tendencies[varname] = np.zeros_like(self.state[varname])
+
     def step_forward(self):
         '''new oop climlab... just loop through processes
         and add up the tendencies'''
         adj_list = []
-        for procname, proc in self.processes.iteritems():
+        implicit_list = []
+        newstate = self.state.copy()
+        for proc in self.processes.values():
             if proc.is_explicit:
                 # Invoke process model, compute tendencies
                 # (for the forward timestep)
                 proc.compute()
                 # increment state variables
                 for varname in self.state.keys():
-                    self.state[varname] += proc.tendencies[varname]
+                    newstate[varname] += proc.tendencies[varname]
             elif proc.is_implicit:
+                implicit_list.append(proc)
                 # need to implement generic implicit solver here
                 pass
             elif proc.is_adjustment:
                 adj_list.append(proc)
             else:
                 raise ValueError('Unrecognized process type')
+        self.state = newstate
         # Adjustment processes change the state instantaneously
         for proc in adj_list:
             proc.compute()
