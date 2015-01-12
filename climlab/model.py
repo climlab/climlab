@@ -23,8 +23,13 @@ class _Model(object):
         self.creation_date = time.strftime("%a, %d %b %Y %H:%M:%S %z",
                                            time.localtime())
         # Dictionary of the fundamental process types known to climlab
-        self.processes = {'radiation': None,
-                          'dynamics': None,
-                          'convection': None,
-                          'turbulence': None,
-                          'adjustment': None}
+        #self.processes = {'radiation': None,
+        #                  'dynamics': None,
+        #                  'convection': None,
+        #                  'turbulence': None,
+        #                  'adjustment': None}
+        # Do this as a list instead
+        #self.processes = []
+                                           
+        # No it has to be a dictionary, but the key names are flexible
+        self.processes = {}

@@ -25,18 +25,20 @@ class _TimeSteppingModel(_Model):
                      'days_elapsed': 0,
                      'years_elapsed': 0,
                      'days_of_year': days_of_year}
+        self.param['timestep'] = timestep
 
     def step_forward(self):
         '''new oop climlab... just loop through processes
         and add up the tendencies'''
         adj_list = []
-        for proctype, proc in self.processes.iteritems():
+        for procname, proc in self.processes.iteritems():
             if proc.is_explicit:
                 # Invoke process model, compute tendencies
+                # (for the forward timestep)
                 proc.compute()
                 # increment state variables
-                for varname, value in self.state.iteritems():
-                    value += proc.tendencies[varname]
+                for varname in self.state.keys():
+                    self.state[varname] += proc.tendencies[varname]
             elif proc.is_implicit:
                 # need to implement generic implicit solver here
                 pass
