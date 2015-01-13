@@ -54,13 +54,16 @@ class _TimeDependentProcess(_Process):
             for varname in proc.state.keys():
                 try: proc.state[varname] += proc.tendencies[varname]
                 except: pass
-        ##  NEED TO IMPLEMENT GENERIC IMPLICIT SOLVER HERE
+        # Now compute all implicit processes -- matrix inversions
         for proc in self.process_types['implicit']:
-            pass
+            proc.compute()
+            for varname in proc.state.keys():
+                try: proc.state[varname] += proc.tendencies[varname]
+                except: pass
         # Adjustment processes change the state instantaneously
         for proc in self.process_types['adjustment']:
             proc.compute()
-            self.state = proc.adjusted_state
+            proc.state = proc.adjusted_state
         # Gather all diagnostics
         for procs in walk.walk_processes(self):
             self.diagnostics.update(procs.diagnostics)

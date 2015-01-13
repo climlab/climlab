@@ -1,7 +1,6 @@
 import numpy as np
 from time_dependent_process import _TimeDependentProcess
 import heat_capacity
-#from transmissivity import set_transmissitivity
 
 
 #==============================================================================
