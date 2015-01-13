@@ -30,7 +30,6 @@ class Diffusion(_TimeDependentProcess):
                  diffusion_axis=None,
                  **kwargs):
         super(Diffusion, self).__init__(**kwargs)
-        #  heat capacity of surface in J / m**2 / K
         self.process_type = 'implicit'
         self.K = K  # Diffusivity in units of [length]**2 / time
         # if diffusion axis is not specified and there is only one axis...
@@ -53,6 +52,15 @@ class Diffusion(_TimeDependentProcess):
             self.tendencies[varname] = newvar - value
 
 
+class MeridionalDiffusion(Diffusion):
+    '''Meridional diffusion process.'''
+    def __init__(self,
+                 K=None,
+                 **kwargs):
+        super(MeridionalDiffusion, self).__init__(K=K, diffusion_axis='lat', **kwargs)
+        self.diffTriDiag = _make_meridional_diffusion_matrix(self.K_dimensionless, self.grid)
+
+
 def _make_diffusion_matrix(K, weight1=None, weight2=None):
     '''K is array of dimensionless diffusivities at cell boundaries:
         physical K (length**2 / time) / (delta length)**2 * (delta time)
@@ -71,4 +79,14 @@ def _make_diffusion_matrix(K, weight1=None, weight2=None):
     diag[0, 1:] = -Ka3[0:J-1]
     diag[1, :] = 1 + Ka2
     diag[2, 0:J-1] = -Ka1[1:J]
+    return diag
+
+
+def _make_meridional_diffusion_matrix(K, grid):
+    lataxis = grid['lat']
+    phi_stag = np.deg2rad(lataxis.bounds)
+    phi = np.deg2rad(lataxis.points)
+    weight1 = np.cos(phi_stag)
+    weight2 = np.cos(phi)
+    diag = _make_diffusion_matrix(K, weight1, weight2)
     return diag

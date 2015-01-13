@@ -24,7 +24,7 @@ class _Radiation(_TimeDependentProcess):
         #  heat capacity of surface in J / m**2 / K
         self.c_sfc = heat_capacity.slab_ocean(self.param['water_depth'])
         self.process_type = 'explicit'
-    
+
     def emission(self):
         '''No emission unless overwritten by daughter class.'''
         emit_sfc = np.zeros_like(self.state['Ts'])
