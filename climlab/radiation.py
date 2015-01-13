@@ -3,6 +3,14 @@ from time_dependent_process import _TimeDependentProcess
 import heat_capacity
 
 
+# TO DO:
+#   come up with a more clever solution about heat capacities and tendencies
+#   The radiation class should maybe be agnostics about the atm / sfc divide.
+#  anyway, I want to have a very simple 'linear' class that just implements 
+#  OLR = A + B*T
+#  that will work elegantly for any temperature state variable
+
+
 #==============================================================================
 # def AplusBT(T, param):
 #     tendencies = {}
