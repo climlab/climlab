@@ -14,6 +14,17 @@ from radiation import GreyRadiation
 from convadj import ConvectiveAdjustment
 
 
+#  reorganize this code...
+#  top-level class for single-column models, with some intelligent grid creation
+# invoke two sub-models: LW grey radiation and SW grey radiation
+#  then create a daughter class that has the convective adjustment too.
+# THEN, will need to redesign my tutorial notebooks to use the new API.
+
+# also will need a more flexible intelligent mechanism to add arbitrary sub-models
+# right now I don't think it will work if I add a process that already has sub=processes
+
+
+
 class Column(_TimeSteppingModel):
     """The Column object represents surface temperature and air temperature
     on grid of pressure levels."""
