@@ -2,12 +2,6 @@ import time
 from grid import Grid
 
 
-#  fundamental process types (very climt-like):
-#    - radiation
-#    - dynamics
-#    - convection
-#    - turbulence
-
 class _Model(object):
     '''A generic parent class for all climlab model objects.
     Every model object has a set of state variables on a spatial grid.

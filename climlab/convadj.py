@@ -1,15 +1,44 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Jan  6 15:36:40 2015
-
-@author: Brian
-"""
 import numpy as np
 import constants as const
+from timestepping_model import _TimeSteppingModel
+import heat_capacity
+
+
+class ConvectiveAdjustment(_TimeSteppingModel):
+    def __init__(self, adj_lapse_rate=None, **kwargs):
+        super(ConvectiveAdjustment, self).__init__(**kwargs)
+        # lapse rate for convective adjustment, in K / km
+        self.param['adj_lapse_rate'] = adj_lapse_rate
+        #  heat capacity of atmospheric layers
+        self.c_atm = heat_capacity.atmosphere(self.grid['lev'].delta)
+        #  heat capacity of surface in J / m**2 / K
+        self.c_sfc = heat_capacity.slab_ocean(self.param['water_depth'])
+        self.is_adjustment = True
+        self.is_explicit = False
+        self.is_implicit = False
+        self.adjusted_state = {}
+    
+    def compute(self):
+        lapse_rate = self.param['adj_lapse_rate']
+        if lapse_rate is None:
+            self.adjusted_state = self.state.copy()
+        else:
+            unstable_Ts = self.state['Ts']
+            unstable_Tatm = self.state['Tatm']
+            Tcol = np.flipud(np.append(np.flipud(unstable_Tatm), unstable_Ts))
+            pnew = np.concatenate(([const.ps], self.grid['lev'].points))
+            cnew = np.concatenate(([self.c_sfc], self.c_atm *
+                                  np.ones_like(self.grid['lev'].points)))
+            Tadj = convective_adjustment_direct(pnew, Tcol, cnew,
+                                        lapserate=lapse_rate)
+            Ts = Tadj[0]
+            Tatm = Tadj[1:self.param['num_levels']+1]
+            self.adjusted_state['Ts'] = Ts
+            self.adjusted_state['Tatm'] = Tatm
 
 
 #  This routine works but is slow... lots of explicit looping
-def convective_adjustment(p, T, c, lapserate=6.5):
+def convective_adjustment_direct(p, T, c, lapserate=6.5):
     """Convective Adjustment to a specified lapse rate.
 
     Input argument lapserate gives the lapse rate expressed in degrees K per km

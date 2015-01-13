@@ -7,12 +7,11 @@ brose@albany.edu
 """
 import numpy as np
 import constants as const
-from convadj import convective_adjustment
 from timestepping_model import _TimeSteppingModel
 from axis import Axis
 from grid import Grid
-import heat_capacity
 from radiation import GreyRadiation
+from convadj import ConvectiveAdjustment
 
 
 class Column(_TimeSteppingModel):
@@ -78,7 +77,8 @@ class Column(_TimeSteppingModel):
         # self.set_SW_absorptivity()
         self.processes['radiation'] = GreyRadiation(grid=self.grid,
                                             state=self.state, param=self.param)
-
+        self.processes['convective adjustment'] = ConvectiveAdjustment(grid=self.grid,
+                state=self.state, adj_lapse_rate=adj_lapse_rate, param=self.param)
         self.set_timestep(num_steps_per_year=const.seconds_per_year /
                           timestep)
 #==============================================================================
@@ -181,15 +181,17 @@ class Column(_TimeSteppingModel):
 #         super(Column, self).step_forward()
 #==============================================================================
         
-    def convective_adjustment(self):
-        unstable_Ts = self.state['Ts']
-        unstable_Tatm = self.state['Tatm']
-        Tcol = np.flipud(np.append(np.flipud(unstable_Tatm), unstable_Ts))
-        pnew = np.concatenate(([const.ps], self.grid['lev'].points))
-        cnew = np.concatenate(([self.c_sfc], self.c_atm *
-                              np.ones_like(self.grid['lev'].points)))
-        Tadj = convective_adjustment(pnew, Tcol, cnew,
-                                     lapserate=self.param['adj_lapse_rate'])
-        Ts = Tadj[0]
-        Tatm = Tadj[1:self.param['num_levels']+1]
-        return Ts - unstable_Ts, Tatm - unstable_Tatm
+#==============================================================================
+#     def convective_adjustment(self):
+#         unstable_Ts = self.state['Ts']
+#         unstable_Tatm = self.state['Tatm']
+#         Tcol = np.flipud(np.append(np.flipud(unstable_Tatm), unstable_Ts))
+#         pnew = np.concatenate(([const.ps], self.grid['lev'].points))
+#         cnew = np.concatenate(([self.c_sfc], self.c_atm *
+#                               np.ones_like(self.grid['lev'].points)))
+#         Tadj = convective_adjustment(pnew, Tcol, cnew,
+#                                      lapserate=self.param['adj_lapse_rate'])
+#         Ts = Tadj[0]
+#         Tatm = Tadj[1:self.param['num_levels']+1]
+#         return Ts - unstable_Ts, Tatm - unstable_Tatm
+#==============================================================================
