@@ -57,6 +57,7 @@ class _TimeSteppingModel(_Model):
                 raise ValueError('Unrecognized process type')
         # Update state variables using all tendencies
         for proc in self.processes.values():
+            self.diagnostics.update(proc.diagnostics)            
             for varname in self.state.keys():
                 try:
                     self.state[varname] += proc.tendencies[varname]
@@ -66,6 +67,7 @@ class _TimeSteppingModel(_Model):
         # Adjustment processes change the state instantaneously
         for proc in adj_list:
             proc.compute()
+            self.diagnostics.update(proc.diagnostics)
             self.state = proc.adjusted_state
         self._update_time()
 
