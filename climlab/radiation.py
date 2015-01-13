@@ -84,6 +84,13 @@ class GreyRadiation(_TimeSteppingModel):
         else:
             raise ValueError('eps must be scalar or have exactly ' +
                              self.param['num_levels'] + ' elements.')
+    
+    def emission(self):
+        emit_sfc = const.sigma * self.state['Ts']**4
+        emit_atm = const.sigma * self.state['Tatm']**4
+        self.diagnostics['emit_sfc'] = emit_sfc
+        self.diagnostics['emit_atm'] = emit_atm
+    
     def longwave_heating(self):
         """Compute the net longwave radiative heating at every level
         and the surface. Also store the upwelling longwave radiation at the top
@@ -91,28 +98,29 @@ class GreyRadiation(_TimeSteppingModel):
         """
         eps = self.LWtrans['absorb']
         # emissions from surface and each layer
-        self.emit_sfc = const.sigma * self.state['Ts']**4.
-        self.emit_atm = eps * const.sigma * self.state['Tatm']**4.
+        self.emission()
         absorbed_sfc, absorbed_atm, OLR, LWdown_sfc, OLR_sfc, OLR_atm = \
-            flux.LWflux(self.emit_atm, self.emit_sfc, self.LWtrans)
-        self.LW_down_sfc = LWdown_sfc
-        self.OLR_sfc = OLR_sfc
-        self.OLR_atm = OLR_atm
-        self.OLR = OLR
-        self.LW_absorbed_sfc = absorbed_sfc
-        self.LW_absorbed_atm = absorbed_atm
+            flux.LWflux(self.diagnostics['emit_atm'], 
+                        self.diagnostics['emit_sfc'], 
+                        self.LWtrans)
+        self.diagnostics['LW_down_sfc'] = LWdown_sfc
+        self.diagnostics['OLR_sfc'] = OLR_sfc
+        self.diagnostics['OLR_atm'] = OLR_atm
+        self.diagnostics['OLR'] = OLR
+        self.diagnostics['LW_absorbed_sfc'] = absorbed_sfc
+        self.diagnostics['LW_absorbed_atm'] = absorbed_atm
     
     def shortwave_heating(self):
         '''Net shortwave heating at each level.'''
-        self.SWdown_TOA = self.param['Q']
+        self.diagnostics['SWdown_TOA'] = self.param['Q']
         absorbed_sfc, absorbed_atm, absorbed_total, incident_sfc, up2space, planetary_albedo = \
             flux.SWflux(self.SWdown_TOA, self.param['albedo'], self.SWtrans)
-        self.SWdown_sfc = incident_sfc
-        self.SW_absorbed_sfc = absorbed_sfc
-        self.SW_absorbed_atm = absorbed_atm
-        self.SWup_TOA = up2space
-        self.SW_absorbed_total = absorbed_total
-        self.planetary_albedo = planetary_albedo
+        self.diagnostics['SWdown_sfc'] = incident_sfc
+        self.diagnostics['SW_absorbed_sfc'] = absorbed_sfc
+        self.diagnostics['SW_absorbed_atm'] = absorbed_atm
+        self.diagnostics['SWup_TOA'] = up2space
+        self.diagnostics['SW_absorbed_total'] = absorbed_total
+        self.diagnostics['planetary_albedo'] = planetary_albedo
     
     def rad_temperature_tendency(self):
         """Compute net radiative heating everywhere in the Column (in W/m^2),
@@ -122,15 +130,17 @@ class GreyRadiation(_TimeSteppingModel):
         self.longwave_heating()
         self.shortwave_heating()
         # net radiative forcing
-        self.rad_heating_sfc = self.SW_absorbed_sfc + self.LW_absorbed_sfc
-        self.rad_heating_atm = self.SW_absorbed_atm + self.LW_absorbed_atm
+        self.diagnostics['rad_heating_sfc'] = (self.diagnostics['SW_absorbed_sfc'] 
+                                        + self.diagnostics['LW_absorbed_sfc'])
+        self.diagnostics['rad_heating_atm'] = (self.diagnostics['SW_absorbed_atm'] 
+                                        + self.diagnostics['LW_absorbed_atm'])
         #  temperature tendencies due only to radiation
-        self.rad_temp_tendency_sfc = (self.rad_heating_sfc * self.param['timestep'] /
-                                      self.c_sfc)
-        self.rad_temp_tendency_atm = (self.rad_heating_atm * self.param['timestep'] /
-                                      self.c_atm)
+        self.diagnostics['rad_temp_tendency_sfc'] = (self.diagnostics['rad_heating_sfc']
+                                    * self.param['timestep'] / self.c_sfc)
+        self.diagnostics['rad_temp_tendency_atm'] = (self.diagnostics['rad_heating_atm']
+                                    * self.param['timestep'] / self.c_atm)
     
     def compute(self):
         self.rad_temperature_tendency()
-        self.tendencies['Ts'] = self.rad_temp_tendency_sfc
-        self.tendencies['Tatm'] = self.rad_temp_tendency_atm
+        self.tendencies['Ts'] = self.diagnostics['rad_temp_tendency_sfc']
+        self.tendencies['Tatm'] = self.diagnostics['rad_temp_tendency_atm']
