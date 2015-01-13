@@ -1,3 +1,23 @@
+'''Module for one-dimensional diffusion operators.
+
+Here is an example showing implementation of a vertical diffusion.
+Example shows that a subprocess can work on just a subset of the parent process
+state variables.
+
+import numpy as np
+from climlab import column, diffusion
+c = column.SingleColumnModel()
+p = c.grid['lev'].bounds
+K = 0.005 * np.ones_like(p)
+dstate = {'Tatm': c.state['Tatm']}
+d = diffusion.Diffusion(K=K, grid=c.grid, state=dstate, param=c.param)
+c.subprocess = {'radiation': d}
+print c.state
+print d.state
+c.step_forward()
+print c.state
+print d.state
+'''
 import numpy as np
 from scipy.linalg import solve_banded
 from time_dependent_process import _TimeDependentProcess
@@ -5,12 +25,19 @@ from time_dependent_process import _TimeDependentProcess
 
 class Diffusion(_TimeDependentProcess):
     '''Parent class for implicit diffusion modules.'''
-    def __init__(self, K=None, **kwargs):
+    def __init__(self,
+                 K=None,
+                 diffusion_axis=None,
+                 **kwargs):
         super(Diffusion, self).__init__(**kwargs)
         #  heat capacity of surface in J / m**2 / K
         self.process_type = 'implicit'
         self.K = K  # Diffusivity in units of [length]**2 / time
-        self.diffusion_axis = 'lev'
+        # if diffusion axis is not specified and there is only one axis...
+        if diffusion_axis is None and len(self.grid.keys()) is 1:
+            self.diffusion_axis = self.grid.keys()[0]
+        else:
+            self.diffusion_axis = diffusion_axis
         # This currently only works with evenly space points
         delta = np.mean(self.grid[self.diffusion_axis].delta)
         self.K_dimensionless = self.K * self.param['timestep'] / delta
