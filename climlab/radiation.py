@@ -114,7 +114,9 @@ class GreyRadiation(_TimeSteppingModel):
         '''Net shortwave heating at each level.'''
         self.diagnostics['SWdown_TOA'] = self.param['Q']
         absorbed_sfc, absorbed_atm, absorbed_total, incident_sfc, up2space, planetary_albedo = \
-            flux.SWflux(self.SWdown_TOA, self.param['albedo'], self.SWtrans)
+            flux.SWflux(self.diagnostics['SWdown_TOA'],
+                        self.param['albedo'],
+                        self.SWtrans)
         self.diagnostics['SWdown_sfc'] = incident_sfc
         self.diagnostics['SW_absorbed_sfc'] = absorbed_sfc
         self.diagnostics['SW_absorbed_atm'] = absorbed_atm

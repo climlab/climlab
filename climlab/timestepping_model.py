@@ -41,15 +41,12 @@ class _TimeSteppingModel(_Model):
         and add up the tendencies'''
         adj_list = []
         implicit_list = []
-        newstate = self.state.copy()
+        #newstate = self.state.copy()
         for proc in self.processes.values():
             if proc.is_explicit:
                 # Invoke process model, compute tendencies
                 # (for the forward timestep)
                 proc.compute()
-                # increment state variables
-                for varname in self.state.keys():
-                    newstate[varname] += proc.tendencies[varname]
             elif proc.is_implicit:
                 implicit_list.append(proc)
                 # need to implement generic implicit solver here
@@ -58,7 +55,14 @@ class _TimeSteppingModel(_Model):
                 adj_list.append(proc)
             else:
                 raise ValueError('Unrecognized process type')
-        self.state = newstate
+        # Update state variables using all tendencies
+        for proc in self.processes.values():
+            for varname in self.state.keys():
+                try:
+                    self.state[varname] += proc.tendencies[varname]
+                except:
+                    pass
+
         # Adjustment processes change the state instantaneously
         for proc in adj_list:
             proc.compute()

@@ -21,7 +21,7 @@ class ConvectiveAdjustment(_TimeSteppingModel):
     def compute(self):
         lapse_rate = self.param['adj_lapse_rate']
         if lapse_rate is None:
-            self.adjusted_state = self.state.copy()
+            self.adjusted_state = self.state
         else:
             unstable_Ts = self.state['Ts']
             unstable_Tatm = self.state['Tatm']
