@@ -1,19 +1,18 @@
 import numpy as np
 import constants as const
-from model import _Model
+from process import _Process
 import walk
 
 
-class _TimeSteppingModel(_Model):
-    '''A generic parent class for all time-dependent models that use a
-    discete forward timestep.'''
-    def __init__(self, process_type='explicit', **kwargs):
+class _TimeDependentProcess(_Process):
+    '''A generic parent class for all time-dependent processes.'''
+    def __init__(self, time_type='explicit', **kwargs):
         # Create the state dataset
-        super(_TimeSteppingModel, self).__init__(**kwargs)
+        super(_TimeDependentProcess, self).__init__(**kwargs)
         self.tendencies = {}
         self.timeave = {}
         self.set_timestep()
-        self.process_type = process_type
+        self.time_type = time_type
 
     def set_timestep(self, num_steps_per_year=90):
         '''Change the timestep, given a number of steps per calendar year.'''
@@ -39,7 +38,7 @@ class _TimeSteppingModel(_Model):
         Currently, this can be 'explicit', 'implicit', or 'adjustment'.'''
         self.process_types = {'explicit': [], 'implicit': [], 'adjustment': []}        
         for proc in walk.walk_processes(self):
-            self.process_types[proc.process_type].append(proc)
+            self.process_types[proc.time_type].append(proc)
         self.has_process_type_list = True
         
     def step_forward(self):
@@ -53,10 +52,8 @@ class _TimeSteppingModel(_Model):
         # Update state variables using all explicit tendencies
         for proc in self.process_types['explicit']:
             for varname in proc.state.keys():
-                try:
-                    proc.state[varname] += proc.tendencies[varname]
-                except:
-                    pass
+                try: proc.state[varname] += proc.tendencies[varname]
+                except: pass
         ##  NEED TO IMPLEMENT GENERIC IMPLICIT SOLVER HERE
         for proc in self.process_types['implicit']:
             pass

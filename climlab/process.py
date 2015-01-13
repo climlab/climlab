@@ -2,9 +2,9 @@ import time
 from grid import Grid
 
 
-class _Model(object):
-    '''A generic parent class for all climlab model objects.
-    Every model object has a set of state variables on a spatial grid.
+class _Process(object):
+    '''A generic parent class for all climlab process objects.
+    Every process object has a set of state variables on a spatial grid.
     '''
     def __init__(self, grid=None, param=None, state=None):
         if grid is None:
@@ -25,6 +25,6 @@ class _Model(object):
         self.diagnostics = {}
         self.creation_date = time.strftime("%a, %d %b %Y %H:%M:%S %z",
                                            time.localtime())
-        # processes is a dictionary of any sub-processes
-        self.processes = {}
+        # subprocess is a dictionary of any sub-processes
+        self.subprocess = {}
         self.has_process_type_list = False

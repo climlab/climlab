@@ -11,8 +11,8 @@ def walk_processes(top, topdown=True):
     proc = top
     if topdown:
         yield proc
-    if len(proc.processes) > 0:  # there are sub-processes
-        for subproc in proc.processes.values():
+    if len(proc.subprocess) > 0:  # there are sub-processes
+        for subproc in proc.subprocess.values():
             for subproc2 in walk_processes(subproc, topdown):
                 yield subproc2
     if not topdown:

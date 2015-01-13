@@ -1,10 +1,10 @@
 import numpy as np
 import constants as const
-from timestepping_model import _TimeSteppingModel
+from time_dependent_process import _TimeDependentProcess
 import heat_capacity
 
 
-class ConvectiveAdjustment(_TimeSteppingModel):
+class ConvectiveAdjustment(_TimeDependentProcess):
     def __init__(self, adj_lapse_rate=None, **kwargs):
         super(ConvectiveAdjustment, self).__init__(**kwargs)
         # lapse rate for convective adjustment, in K / km
