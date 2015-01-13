@@ -25,7 +25,6 @@ class _Model(object):
         self.diagnostics = {}
         self.creation_date = time.strftime("%a, %d %b %Y %H:%M:%S %z",
                                            time.localtime())
-                      
-        myname = 'self'
-        # processes is a dictionary of the model itself and any sub-processes
-        self.processes = {myname: self}
+        # processes is a dictionary of any sub-processes
+        self.processes = {}
+        self.has_process_type_list = False

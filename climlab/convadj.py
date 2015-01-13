@@ -13,9 +13,7 @@ class ConvectiveAdjustment(_TimeSteppingModel):
         self.c_atm = heat_capacity.atmosphere(self.grid['lev'].delta)
         #  heat capacity of surface in J / m**2 / K
         self.c_sfc = heat_capacity.slab_ocean(self.param['water_depth'])
-        self.is_adjustment = True
-        self.is_explicit = False
-        self.is_implicit = False
+        self.process_type = 'adjustment'
         self.adjusted_state = {}
     
     def compute(self):

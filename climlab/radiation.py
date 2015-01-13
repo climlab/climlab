@@ -1,32 +1,5 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Jan  8 15:30:13 2015
-
-@author: Brian
-"""
-
-# in more oop climlab,
-#  every model will consist of:
-#   - a collection of state variables, and
-#   - a collection of "processes"
-#   - each "process" is a submodel
-#   - each state variable exists in connection with a grid object
-#   - but not all state variables need be on same grid
-#   - e.g. surface temp, atm. column
-#  - each process is an object that computes instantaneous rates of change on state variables
-#   - and also arbitrary diagnostics
-#  the model parent class just has to cycle through each process
-#   and get all tendencies
-
-#  all tendencies should have units [statevar unit] / second
-
-
-#  actually every process should be agnostic about the climlab model object...
-#  There should be reusable code modules that do the actual computations on simple numpy arrays.
-
 import numpy as np
 import constants as const
-#from climlab.process import _Process
 from timestepping_model import _TimeSteppingModel
 import heat_capacity
 from transmissivity import set_transmissitivity

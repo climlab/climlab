@@ -1,21 +1,19 @@
 import numpy as np
 import constants as const
 from model import _Model
+import walk
 
 
 class _TimeSteppingModel(_Model):
     '''A generic parent class for all time-dependent models that use a
     discete forward timestep.'''
-    def __init__(self, is_explicit=True, is_implicit=False, is_adjustment=False, **kwargs):
+    def __init__(self, process_type='explicit', **kwargs):
         # Create the state dataset
         super(_TimeSteppingModel, self).__init__(**kwargs)
         self.tendencies = {}
         self.timeave = {}
         self.set_timestep()
-        self.is_explicit = is_explicit
-        self.is_implicit = is_implicit
-        self.is_adjustment = is_adjustment
-        #  Daughter classes will need to do a bunch of other initialization
+        self.process_type = process_type
 
     def set_timestep(self, num_steps_per_year=90):
         '''Change the timestep, given a number of steps per calendar year.'''
@@ -36,39 +34,39 @@ class _TimeSteppingModel(_Model):
         for varname in self.state.keys():
             self.tendencies[varname] = np.zeros_like(self.state[varname])
 
+    def _build_process_type_list(self):
+        '''Generate lists of processes organized by process type
+        Currently, this can be 'explicit', 'implicit', or 'adjustment'.'''
+        self.process_types = {'explicit': [], 'implicit': [], 'adjustment': []}        
+        for proc in walk.walk_processes(self):
+            self.process_types[proc.process_type].append(proc)
+        self.has_process_type_list = True
+        
     def step_forward(self):
         '''new oop climlab... just loop through processes
         and add up the tendencies'''
-        adj_list = []
-        implicit_list = []
-        #newstate = self.state.copy()
-        for proc in self.processes.values():
-            if proc.is_explicit:
-                # Invoke process model, compute tendencies
-                # (for the forward timestep)
-                proc.compute()
-            elif proc.is_implicit:
-                implicit_list.append(proc)
-                # need to implement generic implicit solver here
-                pass
-            elif proc.is_adjustment:
-                adj_list.append(proc)
-            else:
-                raise ValueError('Unrecognized process type')
-        # Update state variables using all tendencies
-        for proc in self.processes.values():
-            self.diagnostics.update(proc.diagnostics)            
-            for varname in self.state.keys():
+        if not self.has_process_type_list:
+            self._build_process_type_list()
+        # Compute tendencies and diagnostics for all explicit processes
+        for proc in self.process_types['explicit']:
+            proc.compute()
+        # Update state variables using all explicit tendencies
+        for proc in self.process_types['explicit']:
+            for varname in proc.state.keys():
                 try:
-                    self.state[varname] += proc.tendencies[varname]
+                    proc.state[varname] += proc.tendencies[varname]
                 except:
                     pass
-
+        ##  NEED TO IMPLEMENT GENERIC IMPLICIT SOLVER HERE
+        for proc in self.process_types['implicit']:
+            pass
         # Adjustment processes change the state instantaneously
-        for proc in adj_list:
+        for proc in self.process_types['adjustment']:
             proc.compute()
-            self.diagnostics.update(proc.diagnostics)
             self.state = proc.adjusted_state
+        # Gather all diagnostics
+        for procs in walk.walk_processes(self):
+            self.diagnostics.update(procs.diagnostics)
         self._update_time()
 
     def _update_time(self):
