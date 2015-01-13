@@ -28,20 +28,24 @@ class SingleColumnModel(_TimeSteppingModel):
     '''SingleColumnModel '''
     def __init__(self,
                  grid=None,
+                 p=None,
                  #  first set all parameters to sensible default values
                  num_levels=30,
                  water_depth=1.0,
-                 albedo=0.299,
+                 albedo_sfc=0.299,
+                 Q=341.3,
                  timestep=1. * const.seconds_per_day,
                  # absorption coefficient in m**2 / kg
                  abs_coeff=1.229E-4,
+                 # lapse rate for convective adjustment, in K / km
+                 adj_lapse_rate=None,
                  **kwargs):
         #  First create the dataset
         super(SingleColumnModel, self).__init__(**kwargs)
         #  Attach all parameters to the object
         self.grid = grid
         self.param['water_depth'] = water_depth
-        self.param['albedo'] = albedo
+        self.param['albedo_sfc'] = albedo_sfc
         self.param['Q'] = Q
         self.abs_coeff = abs_coeff
         self.adj_lapse_rate = adj_lapse_rate
@@ -64,8 +68,10 @@ class SingleColumnModel(_TimeSteppingModel):
         self.state['Tatm'] = np.linspace(self.state['Ts']-10., 200., self.param['num_levels'])
         
         # create sub-modesl for longwave and shortwave radiation
+        epsLW = radiation.compute_layer_absorptivity(self.param['abs_coeff'], self.grid)
+        epsSW = np.zeros_like(epsLW)
         longwave = radiation.GreyRadiation_LW(grid=self.grid, state=self.state, param=self.param, eps=epsLW)
-        shortwave = radiation.GreyRadiation_SW(grid=self.grid, state=self.state, param=self.param, eps=epsSW, albedo_sfc=self.param['albedo'])
+        shortwave = radiation.GreyRadiation_SW(grid=self.grid, state=self.state, param=self.param, eps=epsSW, albedo_sfc=self.param['albedo_sfc'], Q=Q)
         self.processes['LW'] = longwave
         self.processes['SW'] = shortwave
         

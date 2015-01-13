@@ -52,7 +52,7 @@ class NbandModel(_Radiation):
         super(NbandModel, self).__init__(**kwargs)
         self.set_absorptivity(eps)
         self.set_emissivity(np.zeros_like(self.state['Ts']), np.zeros_like(self.state['Tatm']))
-        self.param['albedo_sfc'] = albedo_sfc
+        self.albedo_sfc = albedo_sfc
 
     def set_absorptivity(self, eps):
         '''Set or change the band absorptivity. 
@@ -68,7 +68,7 @@ class NbandModel(_Radiation):
     
     def blackbody_emission(self):
         self.diagnostics['blackbody_emission_sfc'] = const.sigma * self.state['Ts']**4
-        self.diagnostics['blackbody_emission_atm'] = const.sigma * self.state['Tatm']
+        self.diagnostics['blackbody_emission_atm'] = const.sigma * self.state['Tatm']**4
     
     def emission(self):
         self.blackbody_emission()
@@ -81,7 +81,7 @@ class NbandModel(_Radiation):
             fromspace = self.flux_from_space
         except:
             fromspace = np.zeros_like(self.state['Ts'])
-        albedo_sfc = self.param['albedo_sfc']
+        albedo_sfc = self.albedo_sfc
         absorbed, flux = _NbandFlux(fromspace, albedo_sfc, self.diagnostics['emit_sfc'], self.diagnostics['emit_atm'], self.trans)
         self.absorbed = absorbed
         self.flux = flux
@@ -97,7 +97,7 @@ class NbandModel(_Radiation):
         #  temperature tendencies due only to radiation
         self.tendencies['Ts'] = (self.diagnostics['absorbed_sfc'] *
                                  self.param['timestep'] / self.c_sfc)
-        self.tendencies['T_atm'] = (self.diagnostics['absorbed_atm'] *
+        self.tendencies['Tatm'] = (self.diagnostics['absorbed_atm'] *
                                     self.param['timestep'] / self.c_atm)
 
 
@@ -109,7 +109,7 @@ class GreyRadiation_LW(NbandModel):
         super(GreyRadiation_LW, self).__init__(eps=eps, **kwargs)
         self.set_absorptivity(eps)
         self.set_emissivity(np.ones_like(self.state['Ts']), eps)
-        self.param['albedo_sfc'] = np.zeros_like(self.state['Ts'])
+        self.albedo_sfc = np.zeros_like(self.state['Ts'])
         self.flux_from_space = np.zeros_like(self.state['Ts'])
         
     def radiative_heating(self):
@@ -124,7 +124,7 @@ class GreyRadiation_LW(NbandModel):
         
 class GreyRadiation_SW(NbandModel):
     def __init__(self, Q=341.5, eps=None, **kwargs):
-        super(GreyRadiation_LW, self).__init__(eps=eps, **kwargs)
+        super(GreyRadiation_SW, self).__init__(eps=eps, **kwargs)
         self.set_absorptivity(eps)
         self.set_emissivity(np.zeros_like(self.state['Ts']), np.zeros_like(self.state['Tatm']))
         self.flux_from_space = Q * np.ones_like(self.state['Ts'])
@@ -137,6 +137,13 @@ class GreyRadiation_SW(NbandModel):
         self.diagnostics['SWup_TOA'] = self.flux['up2space']
         self.diagnostics['SW_absorbed_total'] = self.absorbed['total']
         self.diagnostics['planetary_albedo'] = self.flux['up2space'] / self.flux_from_space
+
+
+def compute_layer_absorptivity(abs_coeff, grid):
+    '''Compute layer absorptivity from a constant absorption coefficient.'''
+    return (2. / (1 + 2. * const.g / abs_coeff /
+                         (grid['lev'].delta * const.mb_to_Pa)))
+
     
 #==============================================================================
 # 
