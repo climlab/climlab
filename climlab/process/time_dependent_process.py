@@ -1,7 +1,7 @@
 import numpy as np
-import constants as const
-from process import _Process
-import walk
+import utils.constants as const
+from process.process import _Process
+from utils.walk import walk_processes
 
 
 class _TimeDependentProcess(_Process):
@@ -37,7 +37,7 @@ class _TimeDependentProcess(_Process):
         '''Generate lists of processes organized by process type
         Currently, this can be 'explicit', 'implicit', or 'adjustment'.'''
         self.process_types = {'explicit': [], 'implicit': [], 'adjustment': []}        
-        for proc in walk.walk_processes(self):
+        for proc in walk_processes(self):
             self.process_types[proc.time_type].append(proc)
         self.has_process_type_list = True
         
@@ -65,7 +65,7 @@ class _TimeDependentProcess(_Process):
             proc.compute()
             proc.state = proc.adjusted_state
         # Gather all diagnostics
-        for procs in walk.walk_processes(self):
+        for procs in walk_processes(self):
             self.diagnostics.update(procs.diagnostics)
         self._update_time()
 

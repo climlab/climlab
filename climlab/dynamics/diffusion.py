@@ -20,7 +20,7 @@ print d.state
 '''
 import numpy as np
 from scipy.linalg import solve_banded
-from time_dependent_process import _TimeDependentProcess
+from process.time_dependent_process import _TimeDependentProcess
 
 
 class Diffusion(_TimeDependentProcess):

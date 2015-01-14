@@ -1,6 +1,5 @@
 import numpy as np
 
-
 # module to compute radiative transfer in a column
 # output: flux convergence (absorbed energy) at surface and each atm box
 # output: flux out at TOA

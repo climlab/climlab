@@ -1,6 +1,6 @@
 import numpy as np
-import constants as const
-from nband import NbandModel
+import utils.constants as const
+from radiation.nband import NbandModel
 
 
 class GreyRadiation_LW(NbandModel):

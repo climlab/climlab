@@ -9,11 +9,12 @@ brose@albany.edu
 import numpy as np
 from scipy.linalg import solve_banded
 from scipy import integrate
-import constants as const
-from model import _TimeSteppingModel
-import insolation
-from orbital import OrbitalTable
-import legendre
+import utils.constants as const
+from model import _TimeSteppingModel  ###  NEED TO REVISE THIS
+from process.time_dependent_process import _TimeDependentProcess
+import solar.insolation as insolation
+from solar.orbital import OrbitalTable
+import utils.legendre as legendre
 
 
 def global_mean(field, lat_radians):

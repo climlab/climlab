@@ -1,6 +1,6 @@
 import numpy as np
-from time_dependent_process import _TimeDependentProcess
-import heat_capacity
+from process.time_dependent_process import _TimeDependentProcess
+import utils.heat_capacity as heat_capacity
 
 
 # TO DO:

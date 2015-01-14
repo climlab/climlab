@@ -1,7 +1,7 @@
 import numpy as np
-import constants as const
-from time_dependent_process import _TimeDependentProcess
-import heat_capacity
+import utils.constants as const
+from process.time_dependent_process import _TimeDependentProcess
+import utils.heat_capacity as heat_capacity
 
 
 class ConvectiveAdjustment(_TimeDependentProcess):

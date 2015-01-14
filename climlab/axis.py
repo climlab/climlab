@@ -1,12 +1,5 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Thu Jan  8 11:55:04 2015
-
-@author: Brian
-"""
-
 import numpy as np
-import constants as const
+import utils.constants as const
 
 
 axisTypes = ['lev', 'lat', 'lon']
