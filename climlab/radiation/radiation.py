@@ -1,4 +1,4 @@
-from climlab.process.time_dependent_process import _TimeDependentProcess
+from climlab.process.energy_budget import _EnergyBudget
 
 
 #  I want to have a very simple 'linear' class that just implements 
@@ -18,7 +18,7 @@ from climlab.process.time_dependent_process import _TimeDependentProcess
 #==============================================================================
 
 
-class _Radiation(_TimeDependentProcess):
+class _Radiation(_EnergyBudget):
     '''Abstract parent class for all radiation modules.'''
     def __init__(self, **kwargs):
         super(_Radiation, self).__init__(**kwargs)

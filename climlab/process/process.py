@@ -23,6 +23,8 @@ class _Process(object):
             self.state = state
         # dictionary of diagnostic quantities
         self.diagnostics = {}
+        # dictionary of gridded properties (usually fixed)
+        self.properties = {}
         self.creation_date = time.strftime("%a, %d %b %Y %H:%M:%S %z",
                                            time.localtime())
         # subprocess is a dictionary of any sub-processes
