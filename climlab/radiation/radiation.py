@@ -1,36 +1,24 @@
 from climlab.process.energy_budget import _EnergyBudget
 
 
-#  I want to have a very simple 'linear' class that just implements 
-#  OLR = A + B*T
-#  that will work elegantly for any temperature state variable
-
-
-#==============================================================================
-# def AplusBT(T, param):
-#     tendencies = {}
-#     diagnostics = {}
-#     A = param['A']
-#     B = param['B']
-#     OLR = A + B*T
-#     tendencies['Ts'] = -OLR / heat_capacity.slab_ocean(param['water_depth'])
-#     diagnostics['OLR'] = OLR
-#==============================================================================
-
-
 class _Radiation(_EnergyBudget):
     '''Abstract parent class for all radiation modules.'''
-    def __init__(self, **kwargs):
-        super(_Radiation, self).__init__(**kwargs)
-        self.process_type = 'explicit'
+    #def __init__(self, **kwargs):
+    #    super(_Radiation, self).__init__(**kwargs)
+    #    self.process_type = 'explicit'
 
     def emission(self):
         pass
-
-    def radiative_tendencies(self):
+    
+    def radiative_heating(self):
+        '''Compute radiative flux convergences to get heating rates in W / m**2'''
+        self.emission()
         pass
 
-    def compute(self):
-        self.radiative_tendencies()
-        
-        
+    def _compute_heating_rates(self):
+        '''Compute energy flux convergences to get heating rates in W / m**2.
+        This method should be over-ridden by daughter classes.'''
+        self.radiative_heating()        
+        #self.heating_rate = {}
+        #for varname in self.state.keys():
+        #    self.heating_rate['varname'] = np.zeros_like(self.state[varname])

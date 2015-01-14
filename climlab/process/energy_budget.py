@@ -1,6 +1,5 @@
 import numpy as np
 from climlab.process.time_dependent_process import _TimeDependentProcess
-import climlab.utils.heat_capacity as heat_capacity
 
 
 class _EnergyBudget(_TimeDependentProcess):
@@ -9,27 +8,22 @@ class _EnergyBudget(_TimeDependentProcess):
     Every EnergyBudget object has a heat_capacity dictionary
     with items corresponding to each state variable.'''
     def __init__(self, **kwargs):
-        super(EnergyBudget, self).__init__(**kwargs)
+        super(_EnergyBudget, self).__init__(**kwargs)
         self.process_type = 'explicit'
-        self.heat_capacity = {}
-        for varname in self.state.keys():
-            if varname is 'Ts':
-                self.heat_capacity[varname] = heat_capacity.slab_ocean(self.param['water_depth'])
-            elif varname is 'Tatm':
-                self.heat_capacity[varname] = heat_capacity.atmosphere(self.grid['lev'].delta)
-            else:
-                # unrecognized state variable... mark heat capacity as missing or not applicable
-                self.heat_capacity[varname] = None
-        
-    def _heating_rates(self, statevar):
+        self.heating_rate = {}
+
+    def _compute_heating_rates(self):
         '''Compute energy flux convergences to get heating rates in W / m**2.
-        Input argument statevar is a string specifying which variable to get heating for.'''
-        return np.zeros_like(self.state[statevar])
-        
-    def _temperature_tendencies(self):
+        This method should be over-ridden by daughter classes.'''
         for varname in self.state.keys():
-            self.tendencies[varname] = (self._heating_rates(varname) *
-                          self.param['timestep'] / self.heat_capacity[varname])
+            self.heating_rate['varname'] = np.zeros_like(self.state[varname])
+
+    def _temperature_tendencies(self):
+        self._compute_heating_rates()
+        for varname in self.state.keys():
+            C = self.state_domain[varname].heat_capacity
+            self.tendencies[varname] = (self.heating_rate[varname] *
+                                        self.param['timestep'] / C)
 
     def compute(self):
         '''Update all diagnostic quantities using current model state.'''

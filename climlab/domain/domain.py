@@ -6,20 +6,6 @@ from climlab.domain.axis import Axis
 #from climlab.domain.grid import Grid
 import climlab.utils.heat_capacity as heat_capacity
 
-# A domain has these properties:
-#   - dimensions, axes
-#   - some well defined "volume" property
-#   - heat capacity
-
-#  Different flavors (sub-classes) of domains include
-#    - atmosphere: slab, pressure-varying
-#    - ocean: slab, depth-varying
-#    - land, ice, etc.... will implement later
-
-# A domain is essentially a grid plus properties
-
-#  get rid of the grid class! it isn't helping.
-# just have an explicit list of axes
 
 def make_slabocean_grid(num_points=1):
     '''Convenience method to create a simple grid for a slab ocean.'''
@@ -34,8 +20,8 @@ def make_slabatm_grid(num_points=1):
 
 class _Domain(object):
     def __str__(self):
-        return ("climlab Domain of type " + self.domain_type + " with " +
-                str(self.num_points) + " points.")
+        return ("climlab Domain object with domain_type=" + self.domain_type + " and shape=" +
+                str(self.shape))
     def __init__(self, grid=None, **kwargs):
         self.domain_type = 'undefined'
         # self.grid should be a dictionary of axes
@@ -92,11 +78,18 @@ def single_column(num_points=30, water_depth=1., **kwargs):
     num_points is the number of pressure levels (evenly spaced from surface to TOA)
     water_depth is the depth of the slab.
     
-    Returns two Domain object (slab ocean, atmosphere)
+    Returns a dictionary of Domain objects (slab ocean, atmosphere)
     
     Usage:
+    domains = domain.single_column()
+        or
+    domains = domain.single_column(num_points=2, water_depth=10.)
+    print domains
     '''
     levax = Axis(axis_type='lev', num_points=num_points)
     depthax = Axis(axis_type='depth', num_points=1)
-    return SlabOcean(grid=depthax, **kwargs), Atmosphere(grid=levax, **kwargs)
+    slab = SlabOcean(grid=depthax, **kwargs)
+    atm = Atmosphere(grid=levax, **kwargs)
+    return {'sfc': slab, 'atm': atm}
     
+#def zonal_mean_surface(num_points=)
