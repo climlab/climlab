@@ -1,4 +1,3 @@
-import numpy as np
 from climlab.process.time_dependent_process import _TimeDependentProcess
 
 
@@ -34,4 +33,4 @@ class _Radiation(_TimeDependentProcess):
     def compute(self):
         self.radiative_tendencies()
         
-
+        
