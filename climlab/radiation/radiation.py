@@ -16,9 +16,5 @@ class _Radiation(_EnergyBudget):
         pass
 
     def _compute_heating_rates(self):
-        '''Compute energy flux convergences to get heating rates in W / m**2.
-        This method should be over-ridden by daughter classes.'''
+        '''Compute energy flux convergences to get heating rates in W / m**2.'''
         self.radiative_heating()        
-        #self.heating_rate = {}
-        #for varname in self.state.keys():
-        #    self.heating_rate['varname'] = np.zeros_like(self.state[varname])

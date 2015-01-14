@@ -14,6 +14,10 @@ import climlab.radiation.grey_radiation as grey_radiation
 from climlab.convection.convadj import ConvectiveAdjustment
 
 
+#  Need to modify this to use Domains
+# and then test example notebooks again
+
+
 class SingleColumnModel(_TimeDependentProcess):
     '''SingleColumnModel '''
     def __init__(self,
