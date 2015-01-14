@@ -22,7 +22,7 @@ class Grid:
         self.units = {}
         self.num_points = {}
 
-        for ax in axis.axisTypes:
+        for ax in axis.axis_types:
             self.units[ax] = '-'
         try:
             self.num_lev = lev.num_points

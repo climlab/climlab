@@ -2,34 +2,34 @@ import numpy as np
 import climlab.utils.constants as const
 
 
-axisTypes = ['lev', 'lat', 'lon', 'depth']
+axis_types = ['lev', 'lat', 'lon', 'depth']
 
 
 class Axis(object):
     '''
     '''
     def __str__(self):
-        return ("Axis of type " + self.axisType + " with " +
+        return ("Axis of type " + self.axis_type + " with " +
                 str(self.num_points) + " points.")
 
-    def __init__(self, axisType='lev', num_points=30, points=None, bounds=None):
+    def __init__(self, axis_type='lev', num_points=30, points=None, bounds=None):
         # Initialize dictionaries
         self.value = {}
         self.units = {}
         self.long_name = {}
 
-        if axisType in ['p', 'press', 'pressure', 'P', 'Pressure', 'Press']:
-            axisType = 'lev'
-        if axisType in ['Latitude', 'latitude']:
-            axisType = 'lat'
-        if axisType in ['Longitude', 'longitude']:
-            axisType = 'lon'
-        if axisType in ['depth', 'Depth', 'waterDepth', 'water_depth', 'slab']:
-            axisType = 'depth'
-        if axisType not in axisTypes:
-            raise ValueError('axisType %s not recognized' % axisType)
+        if axis_type in ['p', 'press', 'pressure', 'P', 'Pressure', 'Press']:
+            axis_type = 'lev'
+        if axis_type in ['Latitude', 'latitude']:
+            axis_type = 'lat'
+        if axis_type in ['Longitude', 'longitude']:
+            axis_type = 'lon'
+        if axis_type in ['depth', 'Depth', 'waterDepth', 'water_depth', 'slab']:
+            axis_type = 'depth'
+        if axis_type not in axis_types:
+            raise ValueError('axis_type %s not recognized' % axis_type)
         else:
-            self.axisType = axisType
+            self.axis_type = axis_type
 
         defaultEndPoints = {'lev': (0., const.ps),
                             'lat': (-90., 90.),
@@ -53,8 +53,8 @@ class Axis(object):
 
         if bounds is None:
             # assume default end points
-            end0 = defaultEndPoints[axisType][0]
-            end1 = defaultEndPoints[axisType][1]
+            end0 = defaultEndPoints[axis_type][0]
+            end1 = defaultEndPoints[axis_type][1]
             if points is not None:
                 # only points are given
                 num_points = points.size
@@ -79,9 +79,9 @@ class Axis(object):
                 if points.size != num_points:
                     raise ValueError('points and bounds have incompatible sizes')
         self.num_points = num_points
-        self.units = defaultUnits[axisType]
+        self.units = defaultUnits[axis_type]
         # pressure axis should decrease from surface to TOA
-        if axisType is 'lev':
+        if axis_type is 'lev':
             points = np.flipud(points)
             bounds = np.flipud(bounds)
         self.points = points
@@ -91,7 +91,7 @@ class Axis(object):
         # Not sure if I should bother with the dictionary stuff
         # self.value['num_points'] = self.num_npoints
         # self.value['units'] = self.units
-        # self.value['axisType'] = self.axisType
+        # self.value['axis_type'] = self.axis_type
 
 #    def __getitem__(self, key):
 #        try:
