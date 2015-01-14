@@ -53,6 +53,11 @@ class SingleColumnModel(_TimeDependentProcess):
         # intitial column temperature
         self.state['Tatm'] = np.linspace(self.state['Ts']-10., 200., self.param['num_levels'])
         
+        #  heat capacity of atmospheric layers
+        #self.c_atm = heat_capacity.atmosphere(self.grid['lev'].delta)
+        #  heat capacity of surface in J / m**2 / K
+        #self.c_sfc = heat_capacity.slab_ocean(self.param['water_depth'])
+
         # create sub-modesl for longwave and shortwave radiation
         epsLW = grey_radiation.compute_layer_absorptivity(self.param['abs_coeff'], self.grid)
         epsSW = np.zeros_like(epsLW)

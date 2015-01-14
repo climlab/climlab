@@ -2,6 +2,7 @@ import numpy as np
 import climlab.utils.constants as const
 import climlab.radiation.nbandflux as nbandflux
 from climlab.radiation.radiation import _Radiation
+import climlab.utils.heat_capacity as heat_capacity
 
 
 class NbandModel(_Radiation):
@@ -34,8 +35,10 @@ class NbandModel(_Radiation):
     
     def emission(self):
         self.blackbody_emission()
-        self.diagnostics['emit_sfc'] = self.diagnostics['emissivity_sfc'] * self.diagnostics['blackbody_emission_sfc']
-        self.diagnostics['emit_atm'] = self.diagnostics['emissivity_atm'] * self.diagnostics['blackbody_emission_atm']
+        self.diagnostics['emit_sfc'] = (self.diagnostics['emissivity_sfc'] * 
+                                    self.diagnostics['blackbody_emission_sfc'])
+        self.diagnostics['emit_atm'] = (self.diagnostics['emissivity_atm'] * 
+                                    self.diagnostics['blackbody_emission_atm'])
         
     def radiative_heating(self):
         self.emission()
@@ -44,7 +47,10 @@ class NbandModel(_Radiation):
         except:
             fromspace = np.zeros_like(self.state['Ts'])
         albedo_sfc = self.albedo_sfc
-        absorbed, flux = nbandflux._NbandFluxCompute(fromspace, albedo_sfc, self.diagnostics['emit_sfc'], self.diagnostics['emit_atm'], self.trans)
+        absorbed, flux = nbandflux._NbandFluxCompute(fromspace, albedo_sfc, 
+                                            self.diagnostics['emit_sfc'], 
+                                            self.diagnostics['emit_atm'], 
+                                            self.trans)
         self.absorbed = absorbed
         self.flux = flux
         self.diagnostics['absorbed_sfc'] = absorbed['sfc']
@@ -56,8 +62,11 @@ class NbandModel(_Radiation):
         """
         # compute longwave heating rates
         self.radiative_heating()
-        #  temperature tendencies due only to radiation
+        #  Need heat capacities (J/m**2/K) to compute temperature tendencies from fluxes
+        c_atm = heat_capacity.atmosphere(self.grid['lev'].delta)
+        c_sfc = heat_capacity.slab_ocean(self.param['water_depth'])
+
         self.tendencies['Ts'] = (self.diagnostics['absorbed_sfc'] *
-                                 self.param['timestep'] / self.c_sfc)
+                                 self.param['timestep'] / c_sfc)
         self.tendencies['Tatm'] = (self.diagnostics['absorbed_atm'] *
-                                    self.param['timestep'] / self.c_atm)
+                                    self.param['timestep'] / c_atm)
