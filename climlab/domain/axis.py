@@ -2,10 +2,10 @@ import numpy as np
 import climlab.utils.constants as const
 
 
-axisTypes = ['lev', 'lat', 'lon']
+axisTypes = ['lev', 'lat', 'lon', 'depth']
 
 
-class Axis:
+class Axis(object):
     '''
     '''
     def __str__(self):
@@ -24,6 +24,8 @@ class Axis:
             axisType = 'lat'
         if axisType in ['Longitude', 'longitude']:
             axisType = 'lon'
+        if axisType in ['depth', 'Depth', 'waterDepth', 'water_depth', 'slab']:
+            axisType = 'depth'
         if axisType not in axisTypes:
             raise ValueError('axisType %s not recognized' % axisType)
         else:
@@ -31,10 +33,12 @@ class Axis:
 
         defaultEndPoints = {'lev': (0., const.ps),
                             'lat': (-90., 90.),
-                            'lon': (0., 360.)}
+                            'lon': (0., 360.),
+                            'depth': (0., 10.)}
         defaultUnits = {'lev': 'mb',
                         'lat': 'degrees',
-                        'lon': 'degrees'}
+                        'lon': 'degrees',
+                        'depth': 'meters'}
         # if points and/or bounds are supplied, make sure they are increasing
         if points is not None:
             try:
@@ -89,18 +93,18 @@ class Axis:
         # self.value['units'] = self.units
         # self.value['axisType'] = self.axisType
 
-    def __getitem__(self, key):
-        try:
-            return self.value[key]
-        except:
-            raise IndexError('\n\n %s not in Axis' % str(key))
+#    def __getitem__(self, key):
+#        try:
+#            return self.value[key]
+#        except:
+#            raise IndexError('\n\n %s not in Axis' % str(key))
 
 # Make this class behave like a dictionary
-    def __setitem__(self, key, value):
-        self.value[key] = value
-
-    def keys(self):
-        return self.value.keys()
-
-    def __iter__(self):
-        return self.value.__iter__()
+#    def __setitem__(self, key, value):
+#        self.value[key] = value
+#
+#    def keys(self):
+#        return self.value.keys()
+#
+#    def __iter__(self):
+#        return self.value.__iter__()
