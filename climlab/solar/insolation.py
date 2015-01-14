@@ -25,7 +25,7 @@ Berger A. (1978). Long-term variations of daily insolation and
 """
 
 import numpy as np
-import utils.constants as const
+import climlab.utils.constants as const
 
 def daily_insolation(lat, day, orb=const.orb_present, S0 = None, day_type=1 ):
     """Compute daily average insolation given latitude, time of year and orbital parameters.

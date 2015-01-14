@@ -11,6 +11,7 @@ in support of the class ATM/ENV 415: Climate Laboratory
 import numpy as np
 from climlab.utils.constants import *
 
+
 def potential_temperature(T,p):
     """Compute potential temperature for an air parcel.
     
