@@ -6,22 +6,12 @@ Code developed by Brian Rose, University at Albany
 brose@albany.edu
 """
 import numpy as np
-import constants as const
-from time_dependent_process import _TimeDependentProcess
-from axis import Axis
-from grid import Grid
-import grey_radiation
-from convadj import ConvectiveAdjustment
-
-
-#  reorganize this code...
-#  top-level class for single-column models, with some intelligent grid creation
-# invoke two sub-models: LW grey radiation and SW grey radiation
-#  then create a daughter class that has the convective adjustment too.
-# THEN, will need to redesign my tutorial notebooks to use the new API.
-
-# also will need a more flexible intelligent mechanism to add arbitrary sub-models
-# right now I don't think it will work if I add a process that already has sub=processes
+import climlab.utils.constants as const
+from climlab.process.time_dependent_process import _TimeDependentProcess
+from climlab.axis import Axis
+from climlab.grid import Grid
+import climlab.radiation.grey_radiation as grey_radiation
+from climlab.convection.convadj import ConvectiveAdjustment
 
 
 class SingleColumnModel(_TimeDependentProcess):

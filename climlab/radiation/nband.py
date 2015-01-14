@@ -1,7 +1,7 @@
 import numpy as np
-import constants as const
-import nbandflux
-from radiation import _Radiation
+import climlab.utils.constants as const
+import climlab.radiation.nbandflux as nbandflux
+from climlab.radiation.radiation import _Radiation
 
 
 class NbandModel(_Radiation):

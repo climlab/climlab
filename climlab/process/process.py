@@ -1,5 +1,5 @@
 import time
-from grid import Grid
+from climlab.grid import Grid
 
 
 class _Process(object):

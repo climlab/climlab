@@ -1,7 +1,7 @@
 import numpy as np
-import constants as const
-from time_dependent_process import _TimeDependentProcess
-import heat_capacity
+import climlab.utils.constants as const
+from climlab.process.time_dependent_process import _TimeDependentProcess
+import climlab.utils.heat_capacity as heat_capacity
 
 
 class ConvectiveAdjustment(_TimeDependentProcess):
