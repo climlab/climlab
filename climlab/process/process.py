@@ -1,6 +1,7 @@
 import time
 from climlab.domain.domain import _Domain
 import numpy as np
+import copy
 
 
 # new concept:
@@ -8,6 +9,7 @@ import numpy as np
 #   every state variable has a single domain
 #  There should be a dictionary of domains for state variables
 
+# need more shortcuts for easy process and domain generation
 
 class _Process(object):
     '''A generic parent class for all climlab process objects.
@@ -72,3 +74,7 @@ class _Process(object):
                 if value.shape == dom.shape:
                     # same shape, assume it's the right domain
                     self.state_domain[name] = dom
+
+def process_like(proc):
+    '''Return a new process identical to the given process.'''
+    return copy.deepcopy(proc)

@@ -5,7 +5,7 @@ import climlab.radiation.AplusBT as AplusBT
 import climlab.domain.domain as domain
 dom = domain.single_column()  # creates a column atmosphere and scalar surface
 # here we just want the surface
-state = {'Ts':15.}
+s = {'Ts':15.}
 olr = AplusBT.AplusBT(domains = dom['sfc'], state=s)
 # to compute tendencies and diagnostics
 olr.compute()

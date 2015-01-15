@@ -1,7 +1,6 @@
 #  new domain class
 #   every process should exist in the context of a domain
 
-import numpy as np
 from climlab.domain.axis import Axis
 #from climlab.domain.grid import Grid
 import climlab.utils.heat_capacity as heat_capacity
@@ -71,7 +70,8 @@ class SlabAtmosphere(Atmosphere):
     def __init__(self, grid=make_slabatm_grid(), **kwargs):
         super(SlabAtmosphere, self).__init__(grid=grid, **kwargs)
     
-def single_column(num_points=30, water_depth=1., **kwargs):
+    
+def single_column(num_points=30, water_depth=1., lev=None, **kwargs):
     '''Convenience method to create domains for a single column of atmosphere
     overlying a slab of water.
     
@@ -85,8 +85,18 @@ def single_column(num_points=30, water_depth=1., **kwargs):
         or
     domains = domain.single_column(num_points=2, water_depth=10.)
     print domains
+    
+    Can also pass a pressure array or pressure level axis object
     '''
-    levax = Axis(axis_type='lev', num_points=num_points)
+    if lev is None:
+        levax = Axis(axis_type='lev', num_points=num_points)
+    elif isinstance(lev, Axis):
+        levax = lev
+    else:
+        try:
+            levax = Axis(axis_type='lev', points=lev)
+        except:
+            raise ValueError('lev must be Axis object or pressure array')
     depthax = Axis(axis_type='depth', num_points=1)
     slab = SlabOcean(grid=depthax, **kwargs)
     atm = Atmosphere(grid=levax, **kwargs)
