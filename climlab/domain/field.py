@@ -7,7 +7,6 @@
 # http://docs.scipy.org/doc/numpy/user/basics.subclassing.html
 
 import numpy as np
-import copy
 
 '''test usage:
 import numpy as np
@@ -38,13 +37,18 @@ class Field(np.ndarray):
     def __new__(cls, input_array, domain=None):
         # Input array is an already formed ndarray instance
         # We first cast to be our class type
-        obj = np.asarray(input_array).view(cls)
+        #obj = np.asarray(input_array).view(cls)
+        # This should ensure that shape is (1,) for scalar input        
+        obj = np.atleast_1d(input_array).view(cls)
         # add the new attribute to the created instance
         #  do some checking for correct dimensions
         if obj.shape == domain.shape:
             obj.domain = domain
         else:
             raise ValueError('input_array and domain have different shapes.')
+            
+        #  would be nice to have some automatic domain creation here if none given
+            
         # Finally, we must return the newly created object:
         return obj
 
@@ -75,10 +79,3 @@ class Field(np.ndarray):
 
         self.domain = getattr(obj, 'domain', None)
         # We do not need to return anything
-
-#  Not needed!  np.zeros_like etc work automatically
-#def Field_like(field):
-#    '''Return a copy of an existing Field object with the same domain.'''
-#    # using copy.copy instead of copy.deepcopy should ensure that the domains
-#    # are actually pointing to the same domain object.
-#    return copy.copy(field)

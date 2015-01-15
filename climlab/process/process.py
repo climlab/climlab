@@ -1,5 +1,6 @@
 import time
 from climlab.domain.domain import _Domain
+from climlab.domain.field import Field
 import numpy as np
 import copy
 
@@ -20,36 +21,40 @@ class _Process(object):
     '''
     #def __init__(self, domains=None, state=None, state_domain=None, param=None, **kwargs):
     def __init__(self, state=None, param=None, **kwargs):
-        #if grid is None:
-        #    self.grid = Grid()
-        #else:
-        #    self.grid = grid
-        # dictionary of state variables
+
+        # dictionary of state variables (all of type Field)
         if state is None:
             self.state = {}
-        else:
+        elif type(state) is dict:
             self.state = state
-        # make sure all state variables are numpy arrays
-        for varname, value in self.state.iteritems():
-            self.state[varname] = np.atleast_1d(value)
+        elif isinstance(state, Field): # a single state variable, no name given
+            self.state = {'default': state}
+        else:
+            raise ValueError('state needs to be Field object or dictionary of Field objects')
+        ## make sure all state variables are type(Field)
+        #for varname, value in self.state.iteritems():
+        #    self.state[varname] = np.atleast_1d(value)
         # dictionary of model parameters
         if param is None:
             self.param = {}
         else:
             self.param = param
+        
+        # now domains are attached to all state and diagnostic quantities
+        
         # dictionary of domains. Keys are the domain names
         # make it possible to give just a single domain:
-        if type(domains) is dict:
-            self.domains = domains
-        elif isinstance(domains, _Domain):
-            self.domains = {'default': domains}
-        else:
-            raise ValueError('domains needs to be _Domain object or dictionary of _Domain object')
-        if state_domain is None:
-            self.state_domain = {}
-            self._guess_state_domains()
-        else:
-            self.state_domain = state_domain
+        #if type(domains) is dict:
+        #    self.domains = domains
+        #elif isinstance(domains, _Domain):
+        #    self.domains = {'default': domains}
+        #else:
+        #    raise ValueError('domains needs to be _Domain object or dictionary of _Domain object')
+        #if state_domain is None:
+        #    self.state_domain = {}
+        #    self._guess_state_domains()
+        #else:
+        #    self.state_domain = state_domain
         #for name, value in state.iteritems():
         #    self.set_state(name, value,)
         # dictionary of diagnostic quantities

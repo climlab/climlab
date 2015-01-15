@@ -20,8 +20,9 @@ class _EnergyBudget(_TimeDependentProcess):
 
     def _temperature_tendencies(self):
         self._compute_heating_rates()
-        for varname in self.state.keys():
-            C = self.state_domain[varname].heat_capacity
+        for varname, value in self.state.iteritems():
+            #C = self.state_domain[varname].heat_capacity
+            C = value.domain.heat_capacity
             self.tendencies[varname] = (self.heating_rate[varname] *
                                         self.param['timestep'] / C)
 

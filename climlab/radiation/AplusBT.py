@@ -3,10 +3,17 @@ Usage example:
 
 import climlab.radiation.AplusBT as AplusBT
 import climlab.domain.domain as domain
+import climlab.domain.field as field
 dom = domain.single_column()  # creates a column atmosphere and scalar surface
 # here we just want the surface
-s = {'Ts':15.}
-olr = AplusBT.AplusBT(domains = dom['sfc'], state=s)
+sfc = dom['sfc']
+# Create a state variable
+Ts = field.Field(15., domain=sfc)
+# Make a dictionary of state variables
+s = {'Ts': Ts}
+olr = AplusBT.AplusBT(state=s)
+#  OR, we can pass a single state variable
+olr = AplusBT.AplusBT(state=Ts)
 # to compute tendencies and diagnostics
 olr.compute()
 #  or to actually update the temperature

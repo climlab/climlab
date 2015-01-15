@@ -11,6 +11,7 @@ from climlab.process.time_dependent_process import _TimeDependentProcess
 #from climlab.axis import Axis
 #from climlab.grid import Grid
 import climlab.domain.domain as domain
+import climlab.domain.field as field
 import climlab.radiation.grey_radiation as grey_radiation
 from climlab.convection.convadj import ConvectiveAdjustment
 
@@ -36,15 +37,15 @@ class SingleColumnModel(_TimeDependentProcess):
         else:
             doms = domain.single_column(num_points=num_levels, 
                                         water_depth=water_depth)
+        atm = doms['atm']
+        sfc = doms['sfc']
        # initial surface temperature
         initial = {}
-        initial['Ts'] = 288.
+        initial['Ts'] = field.Field(288., domain=sfc)
         # intitial column temperature
-        initial['Tatm'] = np.linspace(initial['Ts']-10., 200., num_levels)
+        initial['Tatm'] = field.Field(np.linspace(initial['Ts']-10., 200., num_levels), domain=atm)
          #  Create process data structures
-        super(SingleColumnModel, self).__init__(domains=doms,
-                                                state=initial,
-                                                **kwargs)
+        super(SingleColumnModel, self).__init__(state=initial, **kwargs)
         #  Attach all parameters to the object
         #self.grid = grid
         self.param['water_depth'] = water_depth
@@ -60,18 +61,17 @@ class SingleColumnModel(_TimeDependentProcess):
         #    # Make a new grid using the p array
         #    pAxis = Axis(axisType='lev', points=p)
         #    self.grid = Grid(lev=pAxis)
-        self.param['num_levels'] = self.domains['atm'].axes['lev'].num_points
+        self.param['num_levels'] = atm.axes['lev'].num_points
         self.param['abs_coeff'] = abs_coeff
 
         # create sub-modesl for longwave and shortwave radiation
-        epsLW = grey_radiation.compute_layer_absorptivity(self.param['abs_coeff'], self.state_domain['Tatm'].axes)
+        dp = self.state['Tatm'].domain.axes['lev'].delta
+        epsLW = grey_radiation.compute_layer_absorptivity(self.param['abs_coeff'], dp)
         epsSW = np.zeros_like(epsLW)
-        longwave = grey_radiation.GreyRadiation_LW(domains=self.domains,
-                                                   state=self.state,
+        longwave = grey_radiation.GreyRadiation_LW(state=self.state,
                                                    param=self.param,
                                                    eps=epsLW)
-        shortwave = grey_radiation.GreyRadiation_SW(domains=self.domains,
-                                                    state=self.state,
+        shortwave = grey_radiation.GreyRadiation_SW(state=self.state,
                                                     param=self.param,
                                                     eps=epsSW,
                                                     albedo_sfc=self.param['albedo_sfc'],
@@ -91,6 +91,6 @@ class RadiativeConvectiveModel(SingleColumnModel):
         super(RadiativeConvectiveModel, self).__init__(**kwargs)
         self.param['adj_lapse_rate'] = adj_lapse_rate
         self.processes['convective adjustment'] = \
-            ConvectiveAdjustment(domains=self.domains, state=self.state, 
+            ConvectiveAdjustment(state=self.state, 
                                  adj_lapse_rate=adj_lapse_rate, param=self.param)
 

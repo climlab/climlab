@@ -27,7 +27,7 @@ class _Domain(object):
         self.heat_capacity = None
         #  implemented by daughter classes
     
-    def _make_axes_dict(axes):
+    def _make_axes_dict(self, axes):
         if type(axes) is dict:
             axdict = axes
         elif type(axes) is Axis:
@@ -57,6 +57,19 @@ class Ocean(_Domain):
 
     def set_heat_capacity(self):
         self.heat_capacity = heat_capacity.ocean(self.axes['depth'].delta)
+
+
+def make_slabocean_axis(num_points=1):
+    '''Convenience method to create a simple axis for a slab ocean.'''
+    depthax = Axis(axis_type='depth', num_points=num_points)
+    return depthax
+
+def make_slabatm_axis(num_points=1):
+    '''Convenience method to create a simple axis for a slab atmosphere.'''
+    depthax = Axis(axis_type='lev', num_points=num_points)
+    return depthax
+
+
 
 class SlabOcean(Ocean):
     def __init__(self, axes=make_slabocean_axis(), **kwargs):
@@ -115,14 +128,3 @@ def zonal_mean_surface(num_points=90, water_depth=10., lat=None, **kwargs):
     return {'sfc': slab}
     #latax = 
     
-
-def make_slabocean_axis(num_points=1):
-    '''Convenience method to create a simple axis for a slab ocean.'''
-    depthax = Axis(axis_type='depth', num_points=num_points)
-    return depthax
-
-def make_slabatm_axis(num_points=1):
-    '''Convenience method to create a simple axis for a slab atmosphere.'''
-    depthax = Axis(axis_type='lev', num_points=num_points)
-    return depthax
-
