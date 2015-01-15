@@ -20,19 +20,18 @@ print d.state
 '''
 import numpy as np
 from scipy.linalg import solve_banded
-from climlab.process.time_dependent_process import TimeDependentProcess
+from climlab.process.implicit import ImplicitProcess
 
 
 ## NEED TO UPDATE THIS TO USE NEW DOMAINS
 
-class Diffusion(TimeDependentProcess):
+class Diffusion(ImplicitProcess):
     '''Parent class for implicit diffusion modules.'''
     def __init__(self,
                  K=None,
                  diffusion_axis=None,
                  **kwargs):
         super(Diffusion, self).__init__(**kwargs)
-        self.process_type = 'implicit'
         self.K = K  # Diffusivity in units of [length]**2 / time
         # if diffusion axis is not specified and there is only one axis...
         if diffusion_axis is None and len(self.grid.keys()) is 1:
@@ -43,15 +42,15 @@ class Diffusion(TimeDependentProcess):
         delta = np.mean(self.grid[self.diffusion_axis].delta)
         self.K_dimensionless = self.K * self.param['timestep'] / delta
         self.diffTriDiag = _make_diffusion_matrix(self.K_dimensionless)
-        self.adjusted_state = {}
 
-    def compute(self):
+    def _implicit_solver(self):
         # Time-stepping the diffusion is just inverting this matrix problem:
         # self.T = np.linalg.solve( self.diffTriDiag, Trad )
+        newstate = {}
         for varname, value in self.state.iteritems():
             newvar = solve_banded((1, 1), self.diffTriDiag, value)
-            self.adjusted_state[varname] = newvar
-            self.tendencies[varname] = newvar - value
+            newstate[varname] = newvar
+        return newstate
 
 
 class MeridionalDiffusion(Diffusion):

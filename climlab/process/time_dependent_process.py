@@ -56,8 +56,8 @@ class TimeDependentProcess(_Process):
         #  Tendencies are d/dt(state) -- so just multiply by timestep for forward time
         for proc in self.process_types['explicit']:
             for varname in proc.state.keys():
-                try: proc.state[varname] += (proc.tendencies[varname] )#*
-                                             #self.param['timestep'])
+                try: proc.state[varname] += (proc.tendencies[varname] *
+                                             self.param['timestep'])
                 except: pass
         # Now compute all implicit processes -- matrix inversions
         for proc in self.process_types['implicit']:

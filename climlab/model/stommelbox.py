@@ -19,10 +19,9 @@ class StommelBox(TimeDependentProcess):
     def compute(self):
         x = self.state['x']
         y = self.state['y']    
-        dt = self.param['timestep']
         term = np.abs(-y + self.param['R']*x) / self.param['lam']
         self.tendencies['y'] = (1 - y - y * term)*dt
-        self.tendencies['x'] = (self.param['delta'] * (1 - x) - x * term)*dt
+        self.tendencies['x'] = (self.param['delta'] * (1 - x) - x * term)
 # make a parameter dictionary
 param = {'R': 2., 'lam': 1., 'delta': 1.}
 # instantiate the process

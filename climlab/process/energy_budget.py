@@ -23,8 +23,7 @@ class EnergyBudget(TimeDependentProcess):
         for varname, value in self.state.iteritems():
             #C = self.state_domain[varname].heat_capacity
             C = value.domain.heat_capacity
-            self.tendencies[varname] = (self.heating_rate[varname] *
-                                        self.param['timestep'] / C)
+            self.tendencies[varname] = (self.heating_rate[varname] / C)
 
     def compute(self):
         '''Update all diagnostic quantities using current model state.'''
