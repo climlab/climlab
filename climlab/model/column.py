@@ -39,6 +39,7 @@ class SingleColumnModel(_TimeDependentProcess):
                                         water_depth=water_depth)
         atm = doms['atm']
         sfc = doms['sfc']
+        num_levels = atm.axes['lev'].num_points
        # initial surface temperature
         initial = {}
         initial['Ts'] = field.Field(288., domain=sfc)
@@ -61,7 +62,7 @@ class SingleColumnModel(_TimeDependentProcess):
         #    # Make a new grid using the p array
         #    pAxis = Axis(axisType='lev', points=p)
         #    self.grid = Grid(lev=pAxis)
-        self.param['num_levels'] = atm.axes['lev'].num_points
+        self.param['num_levels'] = num_levels
         self.param['abs_coeff'] = abs_coeff
 
         # create sub-modesl for longwave and shortwave radiation
