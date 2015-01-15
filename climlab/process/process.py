@@ -76,5 +76,9 @@ class _Process(object):
                     self.state_domain[name] = dom
 
 def process_like(proc):
-    '''Return a new process identical to the given process.'''
-    return copy.deepcopy(proc)
+    '''Return a new process identical to the given process.
+    The creation date is updated.'''
+    newproc = copy.deepcopy(proc)
+    newproc.creation_date = time.strftime("%a, %d %b %Y %H:%M:%S %z",
+                                           time.localtime())
+    return newproc

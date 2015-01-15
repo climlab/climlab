@@ -15,10 +15,6 @@ import climlab.radiation.grey_radiation as grey_radiation
 from climlab.convection.convadj import ConvectiveAdjustment
 
 
-#  Need to modify this to use Domains
-# and then test example notebooks again
-
-
 class SingleColumnModel(_TimeDependentProcess):
     '''SingleColumnModel has an atmospheric column with radiative transfer
     and a single slab ocean point.'''
