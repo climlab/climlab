@@ -1,10 +1,10 @@
 import numpy as np
 import climlab.utils.constants as const
-from climlab.process.energy_budget import _TimeDependentProcess
+from climlab.process.energy_budget import TimeDependentProcess
 from climlab.domain.field import Field
 
 
-class ConvectiveAdjustment(_TimeDependentProcess):
+class ConvectiveAdjustment(TimeDependentProcess):
     def __init__(self, adj_lapse_rate=None, **kwargs):
         super(ConvectiveAdjustment, self).__init__(**kwargs)
         # lapse rate for convective adjustment, in K / km

@@ -7,11 +7,11 @@ from climlab.utils.walk import walk_processes
 # Have to fix the way I handle time!!
 # totally inappropriate for e.g. box models
 
-class _TimeDependentProcess(_Process):
+class TimeDependentProcess(_Process):
     '''A generic parent class for all time-dependent processes.'''
     def __init__(self, time_type='explicit', **kwargs):
         # Create the state dataset
-        super(_TimeDependentProcess, self).__init__(**kwargs)
+        super(TimeDependentProcess, self).__init__(**kwargs)
         self.tendencies = {}
         self.timeave = {}
         self.set_timestep()
@@ -53,9 +53,11 @@ class _TimeDependentProcess(_Process):
         for proc in self.process_types['explicit']:
             proc.compute()
         # Update state variables using all explicit tendencies
+        #  Tendencies are d/dt(state) -- so just multiply by timestep for forward time
         for proc in self.process_types['explicit']:
             for varname in proc.state.keys():
-                try: proc.state[varname] += proc.tendencies[varname]
+                try: proc.state[varname] += (proc.tendencies[varname] )#*
+                                             #self.param['timestep'])
                 except: pass
         # Now compute all implicit processes -- matrix inversions
         for proc in self.process_types['implicit']:

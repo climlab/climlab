@@ -20,12 +20,12 @@ print d.state
 '''
 import numpy as np
 from scipy.linalg import solve_banded
-from climlab.process.time_dependent_process import _TimeDependentProcess
+from climlab.process.time_dependent_process import TimeDependentProcess
 
 
 ## NEED TO UPDATE THIS TO USE NEW DOMAINS
 
-class Diffusion(_TimeDependentProcess):
+class Diffusion(TimeDependentProcess):
     '''Parent class for implicit diffusion modules.'''
     def __init__(self,
                  K=None,

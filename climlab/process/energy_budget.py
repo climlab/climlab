@@ -1,14 +1,14 @@
 import numpy as np
-from climlab.process.time_dependent_process import _TimeDependentProcess
+from climlab.process.time_dependent_process import TimeDependentProcess
 
 
-class _EnergyBudget(_TimeDependentProcess):
+class EnergyBudget(TimeDependentProcess):
     '''Parent class for explicit energy budget processes.
     Solves equations like C dT/dt = (flux convergence)
     Every EnergyBudget object has a heat_capacity dictionary
     with items corresponding to each state variable.'''
     def __init__(self, **kwargs):
-        super(_EnergyBudget, self).__init__(**kwargs)
+        super(EnergyBudget, self).__init__(**kwargs)
         self.process_type = 'explicit'
         self.heating_rate = {}
 

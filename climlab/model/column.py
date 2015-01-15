@@ -7,7 +7,7 @@ brose@albany.edu
 """
 import numpy as np
 import climlab.utils.constants as const
-from climlab.process.time_dependent_process import _TimeDependentProcess
+from climlab.process.time_dependent_process import TimeDependentProcess
 #from climlab.axis import Axis
 #from climlab.grid import Grid
 import climlab.domain.domain as domain
@@ -16,7 +16,8 @@ import climlab.radiation.grey_radiation as grey_radiation
 from climlab.convection.convadj import ConvectiveAdjustment
 
 
-class SingleColumnModel(_TimeDependentProcess):
+# this should really subclass EnergyBudget
+class SingleColumnModel(TimeDependentProcess):
     '''SingleColumnModel has an atmospheric column with radiative transfer
     and a single slab ocean point.'''
     def __init__(self,

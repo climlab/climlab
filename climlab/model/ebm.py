@@ -10,7 +10,7 @@ import numpy as np
 from scipy.linalg import solve_banded
 from scipy import integrate
 import cimlab.utils.constants as const
-from climlab.process.time_dependent_process import _TimeDependentProcess
+from climlab.process.time_dependent_process import TimeDependentProcess
 import climlab.solar.insolation as insolation
 from climlab.solar.orbital import OrbitalTable
 import climlab.utils.legendre as legendre
@@ -27,7 +27,7 @@ def global_mean(field, lat_radians):
 #  need to figure out a better way to deal with params
 # and **kwargs
 
-class _EBM(_TimeDependentProcess):
+class _EBM(TimeDependentProcess):
     def __init__(self, num_points=90, K=0.555, **kwargs):
         # first create the model domains
         doms = domain.zonal_mean_surface(num_points=num_points)

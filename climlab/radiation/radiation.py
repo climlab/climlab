@@ -1,7 +1,7 @@
-from climlab.process.energy_budget import _EnergyBudget
+from climlab.process.energy_budget import EnergyBudget
 
 
-class _Radiation(_EnergyBudget):
+class _Radiation(EnergyBudget):
     '''Abstract parent class for all radiation modules.'''
     #def __init__(self, **kwargs):
     #    super(_Radiation, self).__init__(**kwargs)

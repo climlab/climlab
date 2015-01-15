@@ -4,7 +4,7 @@
 
 # how easy is to implement the Stommel 1961 box model in climlab?
 import numpy as np
-from climlab.process.time_dependent_process import _TimeDependentProcess
+from climlab.process.time_dependent_process import TimeDependentProcess
 import climlab.domain.domain as domain
 import climlab.domain.field as field
 box = domain.box_model_domain()
@@ -15,7 +15,7 @@ x = field.Field([1.,0.], domain=box)
 y = field.Field([1.,1.], domain=box)
 state = {'x':x, 'y':y}
 # define the process
-class StommelBox(_TimeDependentProcess):
+class StommelBox(TimeDependentProcess):
     def compute(self):
         x = self.state['x']
         y = self.state['y']    
