@@ -5,6 +5,9 @@ import climlab.utils.constants as const
 axis_types = ['lev', 'lat', 'lon', 'depth']
 
 
+# will need to implement a simple cartesian distance axis type
+# and probaly also an abstract dimensionless axis type (for box models)
+
 class Axis(object):
     '''
     '''
@@ -13,11 +16,6 @@ class Axis(object):
                 str(self.num_points) + " points.")
 
     def __init__(self, axis_type='lev', num_points=30, points=None, bounds=None):
-        # Initialize dictionaries
-        self.value = {}
-        self.units = {}
-        self.long_name = {}
-
         if axis_type in ['p', 'press', 'pressure', 'P', 'Pressure', 'Press']:
             axis_type = 'lev'
         if axis_type in ['Latitude', 'latitude']:
@@ -87,24 +85,3 @@ class Axis(object):
         self.points = points
         self.bounds = bounds
         self.delta = np.abs(np.diff(self.bounds))
-
-        # Not sure if I should bother with the dictionary stuff
-        # self.value['num_points'] = self.num_npoints
-        # self.value['units'] = self.units
-        # self.value['axis_type'] = self.axis_type
-
-#    def __getitem__(self, key):
-#        try:
-#            return self.value[key]
-#        except:
-#            raise IndexError('\n\n %s not in Axis' % str(key))
-
-# Make this class behave like a dictionary
-#    def __setitem__(self, key, value):
-#        self.value[key] = value
-#
-#    def keys(self):
-#        return self.value.keys()
-#
-#    def __iter__(self):
-#        return self.value.__iter__()
