@@ -97,9 +97,24 @@ def single_column(num_points=30, water_depth=1., lev=None, **kwargs):
             levax = Axis(axis_type='lev', points=lev)
         except:
             raise ValueError('lev must be Axis object or pressure array')
-    depthax = Axis(axis_type='depth', num_points=1)
+    depthax = Axis(axis_type='depth', bounds=[water_depth, 0.])
     slab = SlabOcean(grid=depthax, **kwargs)
     atm = Atmosphere(grid=levax, **kwargs)
     return {'sfc': slab, 'atm': atm}
     
-#def zonal_mean_surface(num_points=)
+
+def zonal_mean_surface(num_points=90, water_depth=10., lat=None, **kwargs):
+    if lat is None:
+        latax = Axis(axis_type='lat', num_points=num_points)
+    elif isinstance(lat, Axis):
+        latax = lat
+    else:
+        try:
+            latax = Axis(axis_type='lat', points=lat)
+        except:
+            raise ValueError('lat must be Axis object or latitude array')
+    depthax = Axis(axis_type='depth', bounds=[water_depth, 0.])
+    grid = {'depth': depthax, 'lat': latax}
+    slab = SlabOcean(grid=grid, **kwargs)
+    return {'sfc': slab}
+    #latax = 

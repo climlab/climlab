@@ -1,6 +1,8 @@
 from climlab.process.process import _Process
 
 
+# haven't really used this for anything yet.
+
 class _DiagnosticProcess(_Process):
     '''parent class for all processes that are strictly diagnostic,
     i.e. no time dependence.'''

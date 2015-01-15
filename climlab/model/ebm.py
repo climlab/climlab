@@ -10,11 +10,11 @@ import numpy as np
 from scipy.linalg import solve_banded
 from scipy import integrate
 import cimlab.utils.constants as const
-from model import _TimeSteppingModel  ###  NEED TO REVISE THIS
 from climlab.process.time_dependent_process import _TimeDependentProcess
 import climlab.solar.insolation as insolation
 from climlab.solar.orbital import OrbitalTable
 import climlab.utils.legendre as legendre
+import climlab.domain.domain as domain
 
 
 def global_mean(field, lat_radians):
@@ -23,11 +23,22 @@ def global_mean(field, lat_radians):
     return np.sum(field * np.cos(lat_radians)) / np.sum(np.cos(lat_radians))
 
 
-#  TO DO: give parameters as input arguments, like in column.py
-class _EBM(_TimeSteppingModel):
-    def __init__(self, num_points=90):
+# lots of work to do here.
+#  need to figure out a better way to deal with params
+# and **kwargs
+
+class _EBM(_TimeDependentProcess):
+    def __init__(self, num_points=90, K=0.555, **kwargs):
+        # first create the model domains
+        doms = domain.zonal_mean_surface(num_points=num_points)
+        # initial surface temperature
+        lat = doms['sfc'].grid['lat'].points
+        initial = {}
+        initial['Ts'] = 12. - 40. * legendre.P2(np.sin(np.deg2rad(lat)))
+         #  Create process data structures
+        super(_EBM, self).__init__(domains=doms, state=initial, **kwargs)
         #  first set all parameters to sensible default values
-        self.num_points = num_points
+        #self.num_points = num_points
         # self.K = 2.2E6  # in m^2 / s
         self.K = 0.555  # in W / m^2 / degC, same as B
         self.A = 210.
