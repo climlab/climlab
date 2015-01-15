@@ -11,11 +11,15 @@ import copy
 
 # need more shortcuts for easy process and domain generation
 
+#  new new concept: domains are explicitly attached to all model variables
+# Through the Field class
+
 class _Process(object):
     '''A generic parent class for all climlab process objects.
     Every process object has a set of state variables on a spatial grid.
     '''
-    def __init__(self, domains=None, state=None, state_domain=None, param=None, **kwargs):
+    #def __init__(self, domains=None, state=None, state_domain=None, param=None, **kwargs):
+    def __init__(self, state=None, param=None, **kwargs):
         #if grid is None:
         #    self.grid = Grid()
         #else:
