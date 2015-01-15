@@ -41,8 +41,10 @@ class _Process(object):
             self.param = param
         
         # now domains are attached to all state and diagnostic quantities
-        
         # dictionary of domains. Keys are the domain names
+        self.domains = {}
+        for varname, value in state.iteritems():
+            self.domains.update({varname: value.domain})
         # make it possible to give just a single domain:
         #if type(domains) is dict:
         #    self.domains = domains
