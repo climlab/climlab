@@ -4,6 +4,9 @@ from climlab.process.process import _Process
 from climlab.utils.walk import walk_processes
 
 
+# Have to fix the way I handle time!!
+# totally inappropriate for e.g. box models
+
 class _TimeDependentProcess(_Process):
     '''A generic parent class for all time-dependent processes.'''
     def __init__(self, time_type='explicit', **kwargs):

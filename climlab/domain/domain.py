@@ -127,4 +127,11 @@ def zonal_mean_surface(num_points=90, water_depth=10., lat=None, **kwargs):
     slab = SlabOcean(axes=axes, **kwargs)
     return {'sfc': slab}
     #latax = 
+
+def box_model_domain(num_points=2, **kwargs):
+    '''Create a box model domain (a single abstract axis).'''
+    ax = Axis(axis_type='abstract', num_points=num_points)
+    boxes = _Domain(axes=ax, **kwargs)
+    boxes.domain_type = 'box'
+    return boxes
     

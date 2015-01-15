@@ -2,41 +2,50 @@ import numpy as np
 import climlab.utils.constants as const
 
 
-axis_types = ['lev', 'lat', 'lon', 'depth']
+axis_types = ['lev', 'lat', 'lon', 'depth', 'abstract']
 
 
 # will need to implement a simple cartesian distance axis type
 # and probaly also an abstract dimensionless axis type (for box models)
 
 class Axis(object):
-    '''
+    '''Create a new climlab Axis object
+    Valid axis types are:
+        'lev'
+        'lat'
+        'lon'
+        'depth'
+        'abstract' (default)
     '''
     def __str__(self):
         return ("Axis of type " + self.axis_type + " with " +
                 str(self.num_points) + " points.")
 
-    def __init__(self, axis_type='lev', num_points=30, points=None, bounds=None):
-        if axis_type in ['p', 'press', 'pressure', 'P', 'Pressure', 'Press']:
+    def __init__(self, axis_type='abstract', num_points=10, points=None, bounds=None):
+        if axis_type in axis_types:
+            pass
+        elif axis_type in ['p', 'press', 'pressure', 'P', 'Pressure', 'Press']:
             axis_type = 'lev'
-        if axis_type in ['Latitude', 'latitude']:
+        elif axis_type in ['Latitude', 'latitude']:
             axis_type = 'lat'
-        if axis_type in ['Longitude', 'longitude']:
+        elif axis_type in ['Longitude', 'longitude']:
             axis_type = 'lon'
-        if axis_type in ['depth', 'Depth', 'waterDepth', 'water_depth', 'slab']:
+        elif axis_type in ['depth', 'Depth', 'waterDepth', 'water_depth', 'slab']:
             axis_type = 'depth'
-        if axis_type not in axis_types:
-            raise ValueError('axis_type %s not recognized' % axis_type)
         else:
-            self.axis_type = axis_type
+            raise ValueError('axis_type %s not recognized' % axis_type)
+        self.axis_type = axis_type
 
         defaultEndPoints = {'lev': (0., const.ps),
                             'lat': (-90., 90.),
                             'lon': (0., 360.),
-                            'depth': (0., 10.)}
+                            'depth': (0., 10.),
+                            'abstract': (0, num_points)}
         defaultUnits = {'lev': 'mb',
                         'lat': 'degrees',
                         'lon': 'degrees',
-                        'depth': 'meters'}
+                        'depth': 'meters',
+                        'abstract': 'none'}
         # if points and/or bounds are supplied, make sure they are increasing
         if points is not None:
             try:

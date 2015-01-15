@@ -4,6 +4,11 @@ import climlab.radiation.nbandflux as nbandflux
 from climlab.radiation.radiation import _Radiation
 
 
+# should revise this
+# make the class strictly an atmospheric radiative transfer
+# and couple it to a surface radiation class
+
+
 class NbandModel(_Radiation):
     '''Parent class for all band radiation models,
     including grey and semi-grey model.
