@@ -3,6 +3,8 @@ import climlab.utils.constants as const
 from climlab.process.time_dependent_process import _TimeDependentProcess
 import climlab.utils.heat_capacity as heat_capacity
 
+## NEED TO UPDATE THIS TO USE NEW DOMAINS AND HEAT BUDGET CLASSES
+
 
 class ConvectiveAdjustment(_TimeDependentProcess):
     def __init__(self, adj_lapse_rate=None, **kwargs):

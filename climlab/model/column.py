@@ -60,11 +60,11 @@ class SingleColumnModel(_TimeDependentProcess):
         #    # Make a new grid using the p array
         #    pAxis = Axis(axisType='lev', points=p)
         #    self.grid = Grid(lev=pAxis)
-        self.param['num_levels'] = self.domains['atm'].grid['lev'].num_points
+        self.param['num_levels'] = self.domains['atm'].axes['lev'].num_points
         self.param['abs_coeff'] = abs_coeff
 
         # create sub-modesl for longwave and shortwave radiation
-        epsLW = grey_radiation.compute_layer_absorptivity(self.param['abs_coeff'], self.state_domain['Tatm'].grid)
+        epsLW = grey_radiation.compute_layer_absorptivity(self.param['abs_coeff'], self.state_domain['Tatm'].axes)
         epsSW = np.zeros_like(epsLW)
         longwave = grey_radiation.GreyRadiation_LW(domains=self.domains,
                                                    state=self.state,
@@ -79,8 +79,6 @@ class SingleColumnModel(_TimeDependentProcess):
         self.subprocess['LW'] = longwave
         self.subprocess['SW'] = shortwave
         
-#        self.processes['convective adjustment'] = ConvectiveAdjustment(grid=self.grid,
-#                state=self.state, adj_lapse_rate=adj_lapse_rate, param=self.param)
         self.set_timestep(num_steps_per_year=const.seconds_per_year /
                           timestep)
         

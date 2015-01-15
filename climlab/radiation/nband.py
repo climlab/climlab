@@ -56,20 +56,3 @@ class NbandModel(_Radiation):
         self.diagnostics['absorbed_atm'] = absorbed['atm']
         self.heating_rate['Ts'] = absorbed['sfc']
         self.heating_rate['Tatm'] = absorbed['atm']
-#==============================================================================
-# 
-#     def radiative_tendencies(self):
-#         """Compute net radiative heating everywhere in the Column (in W/m^2),
-#         and the resulting temperature change over a specified timestep (in K).
-#         """
-#         # compute longwave heating rates
-#         self.radiative_heating()
-#         #  Need heat capacities (J/m**2/K) to compute temperature tendencies from fluxes
-#         c_atm = heat_capacity.atmosphere(self.grid['lev'].delta)
-#         c_sfc = heat_capacity.slab_ocean(self.param['water_depth'])
-# 
-#         self.tendencies['Ts'] = (self.diagnostics['absorbed_sfc'] *
-#                                  self.param['timestep'] / c_sfc)
-#         self.tendencies['Tatm'] = (self.diagnostics['absorbed_atm'] *
-#                                     self.param['timestep'] / c_atm)
-#==============================================================================

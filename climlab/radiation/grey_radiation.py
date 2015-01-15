@@ -41,8 +41,8 @@ class GreyRadiation_SW(NbandModel):
         self.diagnostics['planetary_albedo'] = self.flux['up2space'] / self.flux_from_space
 
 
-def compute_layer_absorptivity(abs_coeff, grid):
+def compute_layer_absorptivity(abs_coeff, axes):
     '''Compute layer absorptivity from a constant absorption coefficient.'''
     return (2. / (1 + 2. * const.g / abs_coeff /
-                         (grid['lev'].delta * const.mb_to_Pa)))
+                         (axes['lev'].delta * const.mb_to_Pa)))
 

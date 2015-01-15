@@ -6,13 +6,13 @@ from climlab.domain.axis import Axis
 import climlab.utils.heat_capacity as heat_capacity
 
 
-def make_slabocean_grid(num_points=1):
-    '''Convenience method to create a simple grid for a slab ocean.'''
+def make_slabocean_axis(num_points=1):
+    '''Convenience method to create a simple axis for a slab ocean.'''
     depthax = Axis(axis_type='depth', num_points=num_points)
     return depthax
 
-def make_slabatm_grid(num_points=1):
-    '''Convenience method to create a simple grid for a slab ocean.'''
+def make_slabatm_axis(num_points=1):
+    '''Convenience method to create a simple axis for a slab atmosphere.'''
     depthax = Axis(axis_type='lev', num_points=num_points)
     return depthax
 
@@ -21,20 +21,20 @@ class _Domain(object):
     def __str__(self):
         return ("climlab Domain object with domain_type=" + self.domain_type + " and shape=" +
                 str(self.shape))
-    def __init__(self, grid=None, **kwargs):
+    def __init__(self, axes=None, **kwargs):
         self.domain_type = 'undefined'
-        # self.grid should be a dictionary of axes
+        # self.axes should be a dictionary of axes
         # make it possible to give just a single axis:
-        if type(grid) is dict:
-            self.grid = grid
-        elif type(grid) is Axis:
-            ax = grid
-            self.grid = {ax.axis_type: ax}
+        if type(axes) is dict:
+            self.axes = axes
+        elif type(axes) is Axis:
+            ax = axes
+            self.axes = {ax.axis_type: ax}
         else:
-            raise ValueError('grid needs to be Axis object or dictionary of Axis object')
-        self.numdims = len(self.grid.keys())
+            raise ValueError('axes needs to be Axis object or dictionary of Axis object')
+        self.numdims = len(self.axes.keys())
         shape = []
-        for axType, ax in self.grid.iteritems():
+        for axType, ax in self.axes.iteritems():
             shape.append(ax.num_points)
         self.shape = tuple(shape)
 
@@ -51,7 +51,7 @@ class Atmosphere(_Domain):
         self.domain_type = 'atm'
 
     def set_heat_capacity(self):
-        self.heat_capacity = heat_capacity.atmosphere(self.grid['lev'].delta)
+        self.heat_capacity = heat_capacity.atmosphere(self.axes['lev'].delta)
 
 
 class Ocean(_Domain):
@@ -60,15 +60,15 @@ class Ocean(_Domain):
         self.domain_type = 'ocean'
 
     def set_heat_capacity(self):
-        self.heat_capacity = heat_capacity.ocean(self.grid['depth'].delta)
+        self.heat_capacity = heat_capacity.ocean(self.axes['depth'].delta)
 
 class SlabOcean(Ocean):
-    def __init__(self, grid=make_slabocean_grid(), **kwargs):
-        super(SlabOcean, self).__init__(grid=grid, **kwargs)
+    def __init__(self, axes=make_slabocean_axis(), **kwargs):
+        super(SlabOcean, self).__init__(axes=axes, **kwargs)
 
 class SlabAtmosphere(Atmosphere):
-    def __init__(self, grid=make_slabatm_grid(), **kwargs):
-        super(SlabAtmosphere, self).__init__(grid=grid, **kwargs)
+    def __init__(self, axes=make_slabatm_axis(), **kwargs):
+        super(SlabAtmosphere, self).__init__(axes=axes, **kwargs)
     
     
 def single_column(num_points=30, water_depth=1., lev=None, **kwargs):
@@ -98,8 +98,8 @@ def single_column(num_points=30, water_depth=1., lev=None, **kwargs):
         except:
             raise ValueError('lev must be Axis object or pressure array')
     depthax = Axis(axis_type='depth', bounds=[water_depth, 0.])
-    slab = SlabOcean(grid=depthax, **kwargs)
-    atm = Atmosphere(grid=levax, **kwargs)
+    slab = SlabOcean(axes=depthax, **kwargs)
+    atm = Atmosphere(axes=levax, **kwargs)
     return {'sfc': slab, 'atm': atm}
     
 
@@ -114,7 +114,7 @@ def zonal_mean_surface(num_points=90, water_depth=10., lat=None, **kwargs):
         except:
             raise ValueError('lat must be Axis object or latitude array')
     depthax = Axis(axis_type='depth', bounds=[water_depth, 0.])
-    grid = {'depth': depthax, 'lat': latax}
-    slab = SlabOcean(grid=grid, **kwargs)
+    axes = {'depth': depthax, 'lat': latax}
+    slab = SlabOcean(axes=axes, **kwargs)
     return {'sfc': slab}
     #latax = 
