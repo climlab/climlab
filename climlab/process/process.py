@@ -1,7 +1,7 @@
 import time
-from climlab.domain.domain import _Domain
+#from climlab.domain.domain import _Domain
 from climlab.domain.field import Field
-import numpy as np
+#import numpy as np
 import copy
 
 
@@ -70,13 +70,9 @@ class _Process(object):
         self.subprocess = {}
         self.has_process_type_list = False
 
-    def set_state(self, name, value, domain):
+    def set_state(self, name, value):
         self.state[name] = value
-        if type(domain) is str:
-            thisdomain = self.domains[domain]
-        elif type(domain) is _Domain:
-            thisdomain = domain
-        self.state_domain[name] = thisdomain
+        self.domains.update({name: value.domain})
     #def set_property(self, name, value, domain):
     
     def _guess_state_domains(self):

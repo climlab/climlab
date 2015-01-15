@@ -90,7 +90,7 @@ class RadiativeConvectiveModel(SingleColumnModel):
                  **kwargs):
         super(RadiativeConvectiveModel, self).__init__(**kwargs)
         self.param['adj_lapse_rate'] = adj_lapse_rate
-        self.processes['convective adjustment'] = \
+        self.subprocess['convective adjustment'] = \
             ConvectiveAdjustment(state=self.state, 
                                  adj_lapse_rate=adj_lapse_rate, param=self.param)
 

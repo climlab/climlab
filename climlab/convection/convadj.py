@@ -1,9 +1,7 @@
 import numpy as np
 import climlab.utils.constants as const
-from climlab.process.time_dependent_process import _TimeDependentProcess
-import climlab.utils.heat_capacity as heat_capacity
-
-## NEED TO UPDATE THIS TO USE NEW DOMAINS AND HEAT BUDGET CLASSES
+from climlab.process.energy_budget import _TimeDependentProcess
+from climlab.domain.field import Field
 
 
 class ConvectiveAdjustment(_TimeDependentProcess):
@@ -11,11 +9,7 @@ class ConvectiveAdjustment(_TimeDependentProcess):
         super(ConvectiveAdjustment, self).__init__(**kwargs)
         # lapse rate for convective adjustment, in K / km
         self.param['adj_lapse_rate'] = adj_lapse_rate
-        #  heat capacity of atmospheric layers
-        self.c_atm = heat_capacity.atmosphere(self.grid['lev'].delta)
-        #  heat capacity of surface in J / m**2 / K
-        self.c_sfc = heat_capacity.slab_ocean(self.param['water_depth'])
-        self.process_type = 'adjustment'
+        self.time_type = 'adjustment'
         self.adjusted_state = {}
     
     def compute(self):
@@ -23,16 +17,20 @@ class ConvectiveAdjustment(_TimeDependentProcess):
         if lapse_rate is None:
             self.adjusted_state = self.state
         else:
-            unstable_Ts = self.state['Ts']
-            unstable_Tatm = self.state['Tatm']
+            unstable_Ts = np.array(self.state['Ts'])
+            unstable_Tatm = np.array(self.state['Tatm'])
+            c_atm = self.state['Tatm'].domain.heat_capacity
+            c_sfc = self.state['Ts'].domain.heat_capacity
             Tcol = np.flipud(np.append(np.flipud(unstable_Tatm), unstable_Ts))
-            pnew = np.concatenate(([const.ps], self.grid['lev'].points))
-            cnew = np.concatenate(([self.c_sfc], self.c_atm *
-                                  np.ones_like(self.grid['lev'].points)))
+            patm = self.state['Tatm'].domain.axes['lev'].points
+            pnew = np.flipud(np.append(np.flipud(patm), const.ps))
+            cnew = np.flipud(np.append(np.flipud(c_atm), c_sfc))
+            #pnew = np.concatenate(([const.ps], patm))
+            #cnew = np.concatenate(([c_sfc], c_atm))
             Tadj = convective_adjustment_direct(pnew, Tcol, cnew,
                                         lapserate=lapse_rate)
-            Ts = Tadj[0]
-            Tatm = Tadj[1:self.param['num_levels']+1]
+            Ts = Field(Tadj[0], domain=self.state['Ts'].domain)
+            Tatm = Field(Tadj[1:self.param['num_levels']+1], domain=self.state['Tatm'].domain)
             self.adjusted_state['Ts'] = Ts
             self.adjusted_state['Tatm'] = Tatm
 
