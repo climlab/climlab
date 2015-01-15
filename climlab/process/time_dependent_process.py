@@ -17,18 +17,23 @@ class TimeDependentProcess(_Process):
         self.set_timestep()
         self.time_type = time_type
 
-    def set_timestep(self, num_steps_per_year=90):
-        '''Change the timestep, given a number of steps per calendar year.'''
-        timestep = const.seconds_per_year / num_steps_per_year
+    def set_timestep(self, timestep=const.seconds_per_day, num_steps_per_year=None):
+        '''Change the timestep.
+        Input is either timestep in seconds,
+        or
+        num_steps_per_year: a number of steps per calendar year.'''
+        if num_steps_per_year is not None:
+            timestep = const.seconds_per_year / num_steps_per_year
         timestep_days = timestep / const.seconds_per_day
-        days_of_year = np.arange(0., const.days_per_year, timestep_days)
+        # Need a more sensible approach for annual cycle stuff
+        #days_of_year = np.arange(0., const.days_per_year, timestep_days)
         self.time = {'timestep': timestep,
                      'num_steps_per_year': num_steps_per_year,
                      'day_of_year_index': 0,
                      'steps': 0,
                      'days_elapsed': 0,
-                     'years_elapsed': 0,
-                     'days_of_year': days_of_year}
+                     'years_elapsed': 0}
+                     #'days_of_year': days_of_year}
         self.param['timestep'] = timestep
 
     def compute(self):
