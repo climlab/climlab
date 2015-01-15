@@ -6,17 +6,6 @@ from climlab.domain.axis import Axis
 import climlab.utils.heat_capacity as heat_capacity
 
 
-def make_slabocean_axis(num_points=1):
-    '''Convenience method to create a simple axis for a slab ocean.'''
-    depthax = Axis(axis_type='depth', num_points=num_points)
-    return depthax
-
-def make_slabatm_axis(num_points=1):
-    '''Convenience method to create a simple axis for a slab atmosphere.'''
-    depthax = Axis(axis_type='lev', num_points=num_points)
-    return depthax
-
-
 class _Domain(object):
     def __str__(self):
         return ("climlab Domain object with domain_type=" + self.domain_type + " and shape=" +
@@ -25,13 +14,7 @@ class _Domain(object):
         self.domain_type = 'undefined'
         # self.axes should be a dictionary of axes
         # make it possible to give just a single axis:
-        if type(axes) is dict:
-            self.axes = axes
-        elif type(axes) is Axis:
-            ax = axes
-            self.axes = {ax.axis_type: ax}
-        else:
-            raise ValueError('axes needs to be Axis object or dictionary of Axis object')
+        self.axes = self._make_axes_dict(axes)
         self.numdims = len(self.axes.keys())
         shape = []
         for axType, ax in self.axes.iteritems():
@@ -43,6 +26,19 @@ class _Domain(object):
     def set_heat_capacity(self):
         self.heat_capacity = None
         #  implemented by daughter classes
+    
+    def _make_axes_dict(axes):
+        if type(axes) is dict:
+            axdict = axes
+        elif type(axes) is Axis:
+            ax = axes
+            axdict = {ax.axis_type: ax}
+        elif axes is None:
+            axdict = {'empty': None}
+        else:
+            raise ValueError('axes needs to be Axis object or dictionary of Axis object')
+        return axdict
+
 
 
 class Atmosphere(_Domain):
@@ -118,3 +114,15 @@ def zonal_mean_surface(num_points=90, water_depth=10., lat=None, **kwargs):
     slab = SlabOcean(axes=axes, **kwargs)
     return {'sfc': slab}
     #latax = 
+    
+
+def make_slabocean_axis(num_points=1):
+    '''Convenience method to create a simple axis for a slab ocean.'''
+    depthax = Axis(axis_type='depth', num_points=num_points)
+    return depthax
+
+def make_slabatm_axis(num_points=1):
+    '''Convenience method to create a simple axis for a slab atmosphere.'''
+    depthax = Axis(axis_type='lev', num_points=num_points)
+    return depthax
+
