@@ -9,12 +9,15 @@ from climlab.utils.walk import walk_processes
 
 class TimeDependentProcess(_Process):
     '''A generic parent class for all time-dependent processes.'''
-    def __init__(self, time_type='explicit', **kwargs):
+    def __init__(self, time_type='explicit', timestep=None, **kwargs):
         # Create the state dataset
         super(TimeDependentProcess, self).__init__(**kwargs)
         self.tendencies = {}
         self.timeave = {}
-        self.set_timestep()
+        if timestep is None:
+            self.set_timestep()
+        else:
+            self.set_timestep(timestep=timestep)
         self.time_type = time_type
 
     def set_timestep(self, timestep=const.seconds_per_day, num_steps_per_year=None):
@@ -24,8 +27,10 @@ class TimeDependentProcess(_Process):
         num_steps_per_year: a number of steps per calendar year.'''
         if num_steps_per_year is not None:
             timestep = const.seconds_per_year / num_steps_per_year
-        timestep_days = timestep / const.seconds_per_day
+        else:
+            num_steps_per_year = const.seconds_per_year / timestep
         # Need a more sensible approach for annual cycle stuff
+        #timestep_days = timestep / const.seconds_per_day
         #days_of_year = np.arange(0., const.days_per_year, timestep_days)
         self.time = {'timestep': timestep,
                      'num_steps_per_year': num_steps_per_year,

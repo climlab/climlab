@@ -20,7 +20,7 @@ class _Process(object):
     Every process object has a set of state variables on a spatial grid.
     '''
     #def __init__(self, domains=None, state=None, state_domain=None, param=None, **kwargs):
-    def __init__(self, state=None, param=None, **kwargs):
+    def __init__(self, state=None, **kwargs):
 
         # dictionary of state variables (all of type Field)
         if state is None:
@@ -35,10 +35,11 @@ class _Process(object):
         #for varname, value in self.state.iteritems():
         #    self.state[varname] = np.atleast_1d(value)
         # dictionary of model parameters
-        if param is None:
-            self.param = {}
-        else:
-            self.param = param
+        self.param = kwargs
+        #if param is None:
+        #    self.param = {}
+        #else:
+        #    self.param = param
         
         # now domains are attached to all state and diagnostic quantities
         # dictionary of domains. Keys are the domain names

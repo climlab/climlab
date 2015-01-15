@@ -24,8 +24,8 @@ class StommelBox(TimeDependentProcess):
         self.tendencies['y'] = (1 - y - y * term)
         self.tendencies['x'] = (self.param['delta'] * (1 - x) - x * term)
 # make a parameter dictionary
-param = {'R': 2., 'lam': 1., 'delta': 1.}
+param = {'R': 2., 'lam': 1., 'delta': 1., 'timestep':0.01}
 # instantiate the process
-boxmodel = StommelBox(state=state, param=param)
+boxmodel = StommelBox(state=state, **param)
 # change the timestep
 boxmodel.set_timestep(num_steps_per_year=1E9)

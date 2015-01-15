@@ -47,7 +47,7 @@ class SingleColumnModel(TimeDependentProcess):
         # intitial column temperature
         initial['Tatm'] = field.Field(np.linspace(initial['Ts']-10., 200., num_levels), domain=atm)
          #  Create process data structures
-        super(SingleColumnModel, self).__init__(state=initial, **kwargs)
+        super(SingleColumnModel, self).__init__(state=initial, timestep=timestep, **kwargs)
         #  Attach all parameters to the object
         #self.grid = grid
         self.param['water_depth'] = water_depth
@@ -70,19 +70,25 @@ class SingleColumnModel(TimeDependentProcess):
         dp = self.state['Tatm'].domain.axes['lev'].delta
         epsLW = grey_radiation.compute_layer_absorptivity(self.param['abs_coeff'], dp)
         epsSW = np.zeros_like(epsLW)
+        #longwave = grey_radiation.GreyRadiation_LW(state=self.state,
+        #                                           param=self.param,
+        #                                           eps=epsLW)
         longwave = grey_radiation.GreyRadiation_LW(state=self.state,
-                                                   param=self.param,
-                                                   eps=epsLW)
+                                                   eps=epsLW,
+                                                   **self.param)
+        #shortwave = grey_radiation.GreyRadiation_SW(state=self.state,
+        #                                            param=self.param,
+        #                                            eps=epsSW,
+        #                                            albedo_sfc=self.param['albedo_sfc'],
+        #                                            Q=Q)
         shortwave = grey_radiation.GreyRadiation_SW(state=self.state,
-                                                    param=self.param,
                                                     eps=epsSW,
-                                                    albedo_sfc=self.param['albedo_sfc'],
-                                                    Q=Q)
+                                                    **self.param)
         self.subprocess['LW'] = longwave
         self.subprocess['SW'] = shortwave
         
-        self.set_timestep(num_steps_per_year=const.seconds_per_year /
-                          timestep)
+        #self.set_timestep(num_steps_per_year=const.seconds_per_year /
+        #                  timestep)
         
 
 class RadiativeConvectiveModel(SingleColumnModel):
@@ -93,6 +99,5 @@ class RadiativeConvectiveModel(SingleColumnModel):
         super(RadiativeConvectiveModel, self).__init__(**kwargs)
         self.param['adj_lapse_rate'] = adj_lapse_rate
         self.subprocess['convective adjustment'] = \
-            ConvectiveAdjustment(state=self.state, 
-                                 adj_lapse_rate=adj_lapse_rate, param=self.param)
+            ConvectiveAdjustment(state=self.state, **self.param)
 
