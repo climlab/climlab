@@ -31,6 +31,8 @@ class _Process(object):
         # dictionary of other gridded properties (usually fixed)
         # these properties should also have domains... their keys added to self.domains
         #self.properties = {}
+        # dictionary of input fields (usually filled by the parent process)
+        self.input = {}
         self.creation_date = time.strftime("%a, %d %b %Y %H:%M:%S %z",
                                            time.localtime())
         # subprocess is a dictionary of any sub-processes
