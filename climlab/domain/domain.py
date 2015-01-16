@@ -87,13 +87,13 @@ def single_column(num_points=30, water_depth=1., lev=None, **kwargs):
     num_points is the number of pressure levels (evenly spaced from surface to TOA)
     water_depth is the depth of the slab.
     
-    Returns a dictionary of Domain objects (slab ocean, atmosphere)
+    Returns a list of 2 Domain objects (slab ocean, atmosphere)
     
     Usage:
-    domains = domain.single_column()
+    sfc, atm = domain.single_column()
         or
-    domains = domain.single_column(num_points=2, water_depth=10.)
-    print domains
+    sfc, atm = domain.single_column(num_points=2, water_depth=10.)
+    print sfc, atm
     
     Can also pass a pressure array or pressure level axis object
     '''
@@ -109,7 +109,7 @@ def single_column(num_points=30, water_depth=1., lev=None, **kwargs):
     depthax = Axis(axis_type='depth', bounds=[water_depth, 0.])
     slab = SlabOcean(axes=depthax, **kwargs)
     atm = Atmosphere(axes=levax, **kwargs)
-    return {'sfc': slab, 'atm': atm}
+    return slab, atm
     
 
 def zonal_mean_surface(num_points=90, water_depth=10., lat=None, **kwargs):
