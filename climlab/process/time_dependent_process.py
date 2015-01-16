@@ -45,8 +45,8 @@ class TimeDependentProcess(_Process):
 
     def _build_process_type_list(self):
         '''Generate lists of processes organized by process type
-        Currently, this can be 'explicit', 'implicit', or 'adjustment'.'''
-        self.process_types = {'explicit': [], 'implicit': [], 'adjustment': []}        
+        Currently, this can be 'diagnostic', 'explicit', 'implicit', or 'adjustment'.'''
+        self.process_types = {'diagnostic': [], 'explicit': [], 'implicit': [], 'adjustment': []}        
         for proc in walk_processes(self):
             self.process_types[proc.time_type].append(proc)
         self.has_process_type_list = True
@@ -56,6 +56,9 @@ class TimeDependentProcess(_Process):
         and add up the tendencies'''
         if not self.has_process_type_list:
             self._build_process_type_list()
+        # First compute all strictly diagnostic processes
+        for proc in self.process_types['diagnostic']:
+            proc.compute()
         # Compute tendencies and diagnostics for all explicit processes
         for proc in self.process_types['explicit']:
             proc.compute()

@@ -2,7 +2,6 @@
 #   every process should exist in the context of a domain
 
 from climlab.domain.axis import Axis
-#from climlab.domain.grid import Grid
 import climlab.utils.heat_capacity as heat_capacity
 
 

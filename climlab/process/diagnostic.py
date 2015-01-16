@@ -1,13 +1,11 @@
 from climlab.process.process import _Process
 
 
-# haven't really used this for anything yet.
-
-class _DiagnosticProcess(_Process):
+class DiagnosticProcess(_Process):
     '''parent class for all processes that are strictly diagnostic,
     i.e. no time dependence.'''
     def __init__(self, **kwargs):
-        super(_DiagnosticProcess, self).__init__(**kwargs)
+        super(DiagnosticProcess, self).__init__(**kwargs)
         self.time_type = 'diagnostic'
 
     def compute():

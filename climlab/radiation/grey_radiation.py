@@ -23,13 +23,17 @@ class GreyRadiation_LW(NbandModel):
         self.diagnostics['LW_absorbed_sfc'] = self.absorbed['sfc']
         self.diagnostics['LW_absorbed_atm'] = self.absorbed['atm']
         
-        
+
+# use insolation class to calculate Q
+# implement a setter for SW class
+# the coupling process needs to look after exchanging between insolation and column
+
 class GreyRadiation_SW(NbandModel):
-    def __init__(self, Q=341.5, eps=None, **kwargs):
+    def __init__(self, eps=None, **kwargs):
         super(GreyRadiation_SW, self).__init__(eps=eps, **kwargs)
         self.set_absorptivity(eps)
         self.set_emissivity(np.zeros_like(self.state['Ts']), np.zeros_like(self.state['Tatm']))
-        self.flux_from_space = Q * np.ones_like(self.state['Ts'])
+        self.flux_from_space = np.ones_like(self.state['Ts'])
         
     def radiative_heating(self):
         super(GreyRadiation_SW, self).radiative_heating()

@@ -10,7 +10,7 @@ import climlab.utils.constants as const
 from climlab.process.time_dependent_process import TimeDependentProcess
 import climlab.domain.domain as domain
 from climlab.domain.field import Field
-import climlab.radiation.grey_radiation as grey_radiation
+from climlab.radiation import insolation, grey_radiation
 from climlab.convection.convadj import ConvectiveAdjustment
 
 
@@ -58,9 +58,16 @@ class SingleColumnModel(TimeDependentProcess):
         shortwave = grey_radiation.GreyRadiation_SW(state=self.state,
                                                     eps=epsSW,
                                                     **self.param)
+        Q = insolation.FixedInsolation(**self.param)
         self.subprocess['LW'] = longwave
         self.subprocess['SW'] = shortwave
-
+        self.subprocess['insolation'] = Q
+    
+    # This process has to handle the coupling between insolation and column radiation
+    def compute(self):
+        self.subprocess['SW'].flux_from_space = \
+            self.subprocess['insolation'].diagnostics['Q']
+        
 
 class RadiativeConvectiveModel(SingleColumnModel):
     def __init__(self,                  
