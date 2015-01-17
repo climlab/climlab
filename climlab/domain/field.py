@@ -45,7 +45,12 @@ class Field(np.ndarray):
         if obj.shape == domain.shape:
             obj.domain = domain
         else:
-            raise ValueError('input_array and domain have different shapes.')
+            try:
+                obj = np.atleast_2d(obj)
+                if obj.shape == domain.shape:
+                    obj.domain = domain
+            except:
+                raise ValueError('input_array and domain have different shapes.')
             
         #  would be nice to have some automatic domain creation here if none given
             

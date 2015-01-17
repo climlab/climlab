@@ -53,7 +53,7 @@ class NewEBM(EnergyBudget):
         self.param['water_depth'] = water_depth
         # create sub-models
         self.subprocess['LW'] = AplusBT(state=self.state, **self.param)
-        self.subprocess['insolation'] = P2Insolation(**self.param)
+        self.subprocess['insolation'] = P2Insolation(domains=sfc, **self.param)
         self.subprocess['albedo'] = StepFunctionAlbedo(state=self.state,
                                                        **self.param)
         self.subprocess['diffusion'] = MeridionalDiffusion(state=self.state,
