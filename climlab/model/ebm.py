@@ -9,19 +9,61 @@ brose@albany.edu
 import numpy as np
 from scipy.linalg import solve_banded
 from scipy import integrate
-import cimlab.utils.constants as const
+import climlab.utils.constants as const
 from climlab.process.time_dependent_process import TimeDependentProcess
 import climlab.solar.insolation as insolation
 from climlab.solar.orbital import OrbitalTable
+
+from climlab.domain.field import Field
+from climlab.process.energy_budget import EnergyBudget
 import climlab.utils.legendre as legendre
 import climlab.domain.domain as domain
-
+from climlab.radiation.AplusBT import AplusBT
+from climlab.radiation.insolation import P2Insolation
+from climlab.surface.albedo import StepFunctionAlbedo
+from climlab.dynamics.diffusion import MeridionalDiffusion
 
 def global_mean(field, lat_radians):
     '''Compute the area-weighted global mean.
     Field must be a vector of values on a latitude grid.'''
     return np.sum(field * np.cos(lat_radians)) / np.sum(np.cos(lat_radians))
 
+
+class NewEBM(EnergyBudget):
+    def __init__(self, 
+                 num_points=90,
+                 A = 210.,
+                 B = 2.,
+                 K=0.555,
+                 Tf = -10.0,
+                 water_depth=10.0,
+                 timestep=1. * const.seconds_per_day,
+                 **kwargs):
+        super(NewEBM, self).__init__(timestep=timestep, **kwargs)
+        if not self.domains and not self.state:  # no state vars or domains yet
+            sfc = domain.zonal_mean_surface(num_points=num_points, 
+                                            water_depth=water_depth)
+            lat = sfc.axes['lat'].points
+            initial = 12. - 40. * legendre.P2(np.sin(np.deg2rad(lat)))
+            self.set_state('Ts', Field(initial, domain=sfc))
+        self.param['A'] = A
+        self.param['B'] = B
+        self.param['K'] = K
+        self.param['Tf'] = Tf
+        self.param['water_depth'] = water_depth
+        # create sub-models
+        self.subprocess['LW'] = AplusBT(state=self.state, **self.param)
+        self.subprocess['insolation'] = P2Insolation(**self.param)
+        self.subprocess['albedo'] = StepFunctionAlbedo(state=self.state,
+                                                       **self.param)
+        self.subprocess['diffusion'] = MeridionalDiffusion(state=self.state,
+                                                           **self.param)
+
+    def _compute_heating_rates(self):
+        '''Compute energy flux convergences to get heating rates in W / m**2.
+        This method should be over-ridden by daughter classes.'''
+        self.heating_rate['Ts'] = self.subprocess['insolation'].diagnostics['insolation']
+        
 
 # lots of work to do here.
 #  need to figure out a better way to deal with params
