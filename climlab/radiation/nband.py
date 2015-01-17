@@ -47,7 +47,8 @@ class NbandModel(_Radiation):
     def radiative_heating(self):
         self.emission()
         try:
-            fromspace = self.flux_from_space
+            fromspace = self.input['from_space']
+
         except:
             fromspace = np.zeros_like(self.state['Ts'])
         albedo_sfc = self.albedo_sfc

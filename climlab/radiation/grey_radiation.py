@@ -12,7 +12,7 @@ class GreyRadiation_LW(NbandModel):
         self.set_absorptivity(eps)
         self.set_emissivity(np.ones_like(self.state['Ts']), eps)
         self.albedo_sfc = np.zeros_like(self.state['Ts'])
-        self.flux_from_space = np.zeros_like(self.state['Ts'])
+        #self.flux_from_space = np.zeros_like(self.state['Ts'])
         
     def radiative_heating(self):
         super(GreyRadiation_LW, self).radiative_heating()
@@ -33,7 +33,7 @@ class GreyRadiation_SW(NbandModel):
         super(GreyRadiation_SW, self).__init__(eps=eps, **kwargs)
         self.set_absorptivity(eps)
         self.set_emissivity(np.zeros_like(self.state['Ts']), np.zeros_like(self.state['Tatm']))
-        self.flux_from_space = np.ones_like(self.state['Ts'])
+        #self.flux_from_space = np.ones_like(self.state['Ts'])
         
     def radiative_heating(self):
         super(GreyRadiation_SW, self).radiative_heating()
@@ -42,7 +42,9 @@ class GreyRadiation_SW(NbandModel):
         self.diagnostics['SWdown_sfc'] = self.flux['incident_sfc']
         self.diagnostics['SWup_TOA'] = self.flux['up2space']
         self.diagnostics['SW_absorbed_total'] = self.absorbed['total']
-        self.diagnostics['planetary_albedo'] = self.flux['up2space'] / self.flux_from_space
+        self.diagnostics['planetary_albedo'] = (self.flux['up2space'] / 
+                                                self.input['from_space'])
+
 
 
 def compute_layer_absorptivity(abs_coeff, dp):

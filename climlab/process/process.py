@@ -7,7 +7,7 @@ class _Process(object):
     '''A generic parent class for all climlab process objects.
     Every process object has a set of state variables on a spatial grid.
     '''
-    def __init__(self, state=None, **kwargs):
+    def __init__(self, state=None, subprocess=None, **kwargs):
 
         # dictionary of state variables (all of type Field)
         if state is None:
@@ -36,7 +36,14 @@ class _Process(object):
         self.creation_date = time.strftime("%a, %d %b %Y %H:%M:%S %z",
                                            time.localtime())
         # subprocess is a dictionary of any sub-processes
-        self.subprocess = {}
+        if subprocess is None:
+            self.subprocess = {}
+        elif type(subprocess) is dict:
+            self.subprocess = subprocess
+        elif isinstance(subprocess, _Process):
+            self.subprocess = {'default': subprocess}
+        else:
+            raise ValueError('subprocess must be Process object or dictionary of Processes')
         self.has_process_type_list = False
 
     def set_state(self, name, value):
