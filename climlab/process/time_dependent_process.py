@@ -1,10 +1,10 @@
 import numpy as np
 import climlab.utils.constants as const
-from climlab.process.process import _Process
+from climlab.process.process import Process
 from climlab.utils.walk import walk_processes
 
 
-class TimeDependentProcess(_Process):
+class TimeDependentProcess(Process):
     '''A generic parent class for all time-dependent processes.'''
     def __init__(self, time_type='explicit', timestep=None, **kwargs):
         # Create the state dataset

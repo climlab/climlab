@@ -1,5 +1,5 @@
 from climlab.process.diagnostic import DiagnosticProcess
-
+from climlab.utils.legendre import P2
 
 # THis is a strictly diagnostic process...
 # and also one that doesn't require any state variable!
@@ -18,3 +18,8 @@ class _Insolation(DiagnosticProcess):
 class FixedInsolation(_Insolation):
     def _get_current_insolation(self):
         self.diagnostics['Q'] = self.param['Q']
+        
+
+class P2Insolation(_Insolation):
+    def _get_current_insolation(self):
+        self.diagnostics['Q'] = 

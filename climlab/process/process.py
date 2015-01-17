@@ -1,38 +1,44 @@
 import time
 from climlab.domain.field import Field
+from climlab.domain.domain import _Domain
 import copy
 
 
-class _Process(object):
+def _make_dict(arg, argtype):
+    if arg is None:
+        return {}
+    elif type(arg) is dict:
+        return arg
+    elif isinstance(arg, argtype):
+        return {'default': arg}
+    else:
+        raise ValueError('Problem with input type')
+
+
+class Process(object):
     '''A generic parent class for all climlab process objects.
     Every process object has a set of state variables on a spatial grid.
     '''
-    def __init__(self, state=None, subprocess=None, **kwargs):
+    def __init__(self, state=None, domains=None, subprocess=None, 
+                 input=None, properties=None, diagnostics=None, **kwargs):
 
         # dictionary of state variables (all of type Field)
-        if state is None:
-            self.state = {}
-        elif type(state) is dict:
-            self.state = state
-        elif isinstance(state, Field): # a single state variable, no name given
-            self.state = {'default': state}
-        else:
-            raise ValueError('state needs to be Field object or dictionary of Field objects')
+        self.state = _make_dict(state, Field)        
         # dictionary of model parameters
         self.param = kwargs
         
         # now domains are attached to all state and diagnostic quantities
         # dictionary of domains. Keys are the domain names
-        self.domains = {}
+        self.domains = _make_dict(domains, _Domain)
         for varname, value in self.state.iteritems():
             self.domains.update({varname: value.domain})
         # dictionary of diagnostic quantities
-        self.diagnostics = {}
+        self.diagnostics = _make_dict(diagnostics, Field)
         # dictionary of other gridded properties (usually fixed)
         # these properties should also have domains... their keys added to self.domains
-        #self.properties = {}
+        self.properties = _make_dict(diagnostics, Field)
         # dictionary of input fields (usually filled by the parent process)
-        self.input = {}
+        self.input = _make_dict(input, Field)
         self.creation_date = time.strftime("%a, %d %b %Y %H:%M:%S %z",
                                            time.localtime())
         # subprocess is a dictionary of any sub-processes
