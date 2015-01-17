@@ -24,6 +24,9 @@ class _Insolation(DiagnosticProcess):
 
 
 class FixedInsolation(_Insolation):
+    def __init__(self, **kwargs):
+        super(FixedInsolation, self).__init__(**kwargs)
+        self.diagnostics['insolation'] = self.param['Q']
     def _get_current_insolation(self):
         self.diagnostics['insolation'] = self.param['Q']
         # since this is fixed, could also just assign it in __init__

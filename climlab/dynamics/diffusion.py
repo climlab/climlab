@@ -4,26 +4,25 @@ Here is an example showing implementation of a vertical diffusion.
 Example shows that a subprocess can work on just a subset of the parent process
 state variables.
 
-import numpy as np
-from climlab import column, diffusion
-c = column.SingleColumnModel()
-p = c.grid['lev'].bounds
-K = 0.005 * np.ones_like(p)
-dstate = {'Tatm': c.state['Tatm']}
-d = diffusion.Diffusion(K=K, grid=c.grid, state=dstate, param=c.param)
-c.subprocess = {'radiation': d}
+from climlab.model.column import SingleColumnModel
+from climlab.dynamics.diffusion import Diffusion
+c = SingleColumnModel()
+K = 0.5
+d = Diffusion(K=K, state=c.state['Tatm'], **c.param)
+c.subprocess['diffusion'] = d
 print c.state
 print d.state
 c.step_forward()
 print c.state
 print d.state
 '''
+
+# I think this solver is broken... need to test carefully.
+
 import numpy as np
 from scipy.linalg import solve_banded
 from climlab.process.implicit import ImplicitProcess
 
-
-## NEED TO UPDATE THIS TO USE NEW DOMAINS
 
 class Diffusion(ImplicitProcess):
     '''Parent class for implicit diffusion modules.'''
@@ -32,15 +31,24 @@ class Diffusion(ImplicitProcess):
                  diffusion_axis=None,
                  **kwargs):
         super(Diffusion, self).__init__(**kwargs)
-        self.K = K  # Diffusivity in units of [length]**2 / time
+        self.param['K'] = K  # Diffusivity in units of [length]**2 / time
         # if diffusion axis is not specified and there is only one axis...
-        if diffusion_axis is None and len(self.grid.keys()) is 1:
-            self.diffusion_axis = self.grid.keys()[0]
+        #if diffusion_axis is None and len(self.grid.keys()) is 1:
+        #    self.diffusion_axis = self.grid.keys()[0]
+        if diffusion_axis is None:
+            try:
+                singledom = self.domains[self.domains.keys()[0]]
+                singleax = singledom.axes.keys()[0]
+                self.diffusion_axis = singleax
+            except:
+                raise ValueError('Couldn''t figure out diffusion_axis.')
         else:
             self.diffusion_axis = diffusion_axis
         # This currently only works with evenly space points
-        delta = np.mean(self.grid[self.diffusion_axis].delta)
-        self.K_dimensionless = self.K * self.param['timestep'] / delta
+        for dom in self.domains.values():
+            delta = np.mean(dom.axes[self.diffusion_axis].delta)
+            bounds = dom.axes[self.diffusion_axis].bounds
+        self.K_dimensionless = self.param['K'] * np.ones_like(bounds) * self.param['timestep'] / delta
         self.diffTriDiag = _make_diffusion_matrix(self.K_dimensionless)
 
     def _implicit_solver(self):
