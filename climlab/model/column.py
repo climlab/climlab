@@ -66,7 +66,7 @@ class SingleColumnModel(TimeDependentProcess):
     # This process has to handle the coupling between insolation and column radiation
     def compute(self):
         self.subprocess['SW'].input['from_space'] = \
-            self.subprocess['insolation'].diagnostics['Q']
+            self.subprocess['insolation'].diagnostics['insolation']
         
 
 class RadiativeConvectiveModel(SingleColumnModel):
