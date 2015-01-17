@@ -1,6 +1,6 @@
 from climlab.process.diagnostic import DiagnosticProcess
 from climlab.utils.legendre import P2
-import climlab.constants as const
+from climlab import constants as const
 import numpy as np
 
 # THis is a strictly diagnostic process...
