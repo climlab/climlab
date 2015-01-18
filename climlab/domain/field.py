@@ -46,7 +46,7 @@ class Field(np.ndarray):
             obj.domain = domain
         else:
             try:
-                obj = np.atleast_2d(obj)
+                obj = np.transpose(np.atleast_2d(obj))
                 if obj.shape == domain.shape:
                     obj.domain = domain
             except:

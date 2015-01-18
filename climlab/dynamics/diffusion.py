@@ -48,7 +48,7 @@ class Diffusion(ImplicitProcess):
         for dom in self.domains.values():
             delta = np.mean(dom.axes[self.diffusion_axis].delta)
             bounds = dom.axes[self.diffusion_axis].bounds
-        self.K_dimensionless = self.param['K'] * np.ones_like(bounds) * self.param['timestep'] / delta
+        self.K_dimensionless = self.param['K'] * np.ones_like(bounds) * self.param['timestep'] / delta**2
         self.diffTriDiag = _make_diffusion_matrix(self.K_dimensionless)
 
     def _implicit_solver(self):
@@ -67,7 +67,9 @@ class MeridionalDiffusion(Diffusion):
                  K=None,
                  **kwargs):
         super(MeridionalDiffusion, self).__init__(K=K, diffusion_axis='lat', **kwargs)
-        self.diffTriDiag = _make_meridional_diffusion_matrix(self.K_dimensionless, self.grid)
+        for dom in self.domains.values():
+            latax = dom.axes['lat']     
+        self.diffTriDiag = _make_meridional_diffusion_matrix(self.K_dimensionless, latax)
 
 
 def _make_diffusion_matrix(K, weight1=None, weight2=None):
@@ -91,8 +93,7 @@ def _make_diffusion_matrix(K, weight1=None, weight2=None):
     return diag
 
 
-def _make_meridional_diffusion_matrix(K, grid):
-    lataxis = grid['lat']
+def _make_meridional_diffusion_matrix(K, lataxis):
     phi_stag = np.deg2rad(lataxis.bounds)
     phi = np.deg2rad(lataxis.points)
     weight1 = np.cos(phi_stag)
