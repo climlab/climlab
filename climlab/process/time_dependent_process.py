@@ -73,13 +73,14 @@ class TimeDependentProcess(Process):
         for proc in self.process_types['implicit']:
             proc.compute()
             for varname in proc.state.keys():
-                try: proc.state[varname] += proc.tendencies[varname]
+                try: proc.state[varname] += proc.adjustment[varname]
                 except: pass
         # Adjustment processes change the state instantaneously
         for proc in self.process_types['adjustment']:
             proc.compute()
             for varname, value in proc.state.iteritems():
-                proc.set_state(varname, proc.adjusted_state[varname])
+                #proc.set_state(varname, proc.adjusted_state[varname])
+                proc.state[varname] += proc.adjustment[varname]
         # Gather all diagnostics
         for procs in walk_processes(self):
             self.diagnostics.update(procs.diagnostics)

@@ -10,7 +10,7 @@ class ConvectiveAdjustment(TimeDependentProcess):
         # lapse rate for convective adjustment, in K / km
         self.param['adj_lapse_rate'] = adj_lapse_rate
         self.time_type = 'adjustment'
-        self.adjusted_state = {}
+        self.adjustment = {}
     
     def compute(self):
         lapse_rate = self.param['adj_lapse_rate']
@@ -31,8 +31,8 @@ class ConvectiveAdjustment(TimeDependentProcess):
                                         lapserate=lapse_rate)
             Ts = Field(Tadj[0], domain=self.state['Ts'].domain)
             Tatm = Field(Tadj[1:self.param['num_levels']+1], domain=self.state['Tatm'].domain)
-            self.adjusted_state['Ts'] = Ts
-            self.adjusted_state['Tatm'] = Tatm
+            self.adjustment['Ts'] = Ts - self.state['Ts']
+            self.adjustment['Tatm'] = Tatm - self.state['Tatm']
 
 
 #  This routine works but is slow... lots of explicit looping
