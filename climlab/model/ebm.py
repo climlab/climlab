@@ -34,7 +34,7 @@ class NewEBM(EnergyBudget):
                  num_points=90,
                  A = 210.,
                  B = 2.,
-                 K=0.555,
+                 D=0.555, # in W / m^2 / degC, same as B
                  Tf = -10.0,
                  water_depth=10.0,
                  timestep=1. * const.seconds_per_day,
@@ -48,7 +48,7 @@ class NewEBM(EnergyBudget):
             self.set_state('Ts', Field(initial, domain=sfc))
         self.param['A'] = A
         self.param['B'] = B
-        self.param['K'] = K
+        self.param['D'] = D
         self.param['Tf'] = Tf
         self.param['water_depth'] = water_depth
         # create sub-models
@@ -56,7 +56,10 @@ class NewEBM(EnergyBudget):
         self.subprocess['insolation'] = P2Insolation(domains=sfc, **self.param)
         self.subprocess['albedo'] = StepFunctionAlbedo(state=self.state,
                                                        **self.param)
+        # diffusivity in units of 1/s
+        K = self.param['D'] / self.domains['Ts'].heat_capacity
         self.subprocess['diffusion'] = MeridionalDiffusion(state=self.state,
+                                                           K=K,
                                                            **self.param)
 
     def _compute_heating_rates(self):

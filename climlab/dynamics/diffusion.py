@@ -15,6 +15,27 @@ print d.state
 c.step_forward()
 print c.state
 print d.state
+
+And here is an example of meridional diffusion of temperature
+as a stand-alone process:
+
+import numpy as np
+from climlab.domain import domain, field
+from climlab.dynamics.diffusion import MeridionalDiffusion
+from climlab.utils import legendre
+sfc = domain.zonal_mean_surface(num_points=90, water_depth=10.)
+lat = sfc.axes['lat'].points
+initial = 12. - 40. * legendre.P2(np.sin(np.deg2rad(lat)))
+# make a copy of initial so that it remains unmodified
+Ts = field.Field(np.array(initial), domain=sfc)
+# thermal diffusivity in W/m**2/degC
+D = 0.55
+# meridional diffusivity in 1/s
+K = D / sfc.heat_capacity
+d = MeridionalDiffusion(state=Ts, K=K)
+d.integrate_years(1.)
+import matplotlib.pyplot as plt
+plt.plot(lat, initial, lat, Ts)
 '''
 
 # I think this solver is broken... need to test carefully.
@@ -22,7 +43,6 @@ print d.state
 import numpy as np
 from scipy.linalg import solve_banded
 from climlab.process.implicit import ImplicitProcess
-from climlab import constants as const
 from climlab.process.process import get_axes
 
 
@@ -63,18 +83,18 @@ class Diffusion(ImplicitProcess):
 def _solve_implicit_banded(current, banded_matrix):
         # Time-stepping the diffusion is just inverting this matrix problem:
         # self.T = np.linalg.solve( self.diffTriDiag, Trad )
-        return solve_banded((1, 1), self.diffTriDiag, value)
+        return solve_banded((1, 1), banded_matrix, current)
 
 
 class MeridionalDiffusion(Diffusion):
     '''Meridional diffusion process.
-    K in units of m**2 / s
+    K in units of 1 / s.
     '''
     def __init__(self,
                  K=None,
                  **kwargs):
         super(MeridionalDiffusion, self).__init__(K=K, diffusion_axis='lat', **kwargs)
-        self.K_dimensionless *= 1./const.a**2/np.deg2rad(1.)**2
+        self.K_dimensionless *= 1./np.deg2rad(1.)**2
         for dom in self.domains.values():
             latax = dom.axes['lat']     
         self.diffTriDiag = _make_meridional_diffusion_matrix(self.K_dimensionless, latax)
