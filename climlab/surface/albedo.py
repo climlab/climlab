@@ -3,7 +3,7 @@ import numpy as np
 
 
 class StepFunctionAlbedo(DiagnosticProcess):
-    def __init__(self, Tf=-10., albedo_noice=0.3, albedo_ice=0.6, **kwargs):
+    def __init__(self, Tf=-10., albedo_noice=0.33, albedo_ice=0.6, **kwargs):
         super(DiagnosticProcess, self).__init__(**kwargs)
         self.param['Tf'] = Tf
         self.time_type = 'diagnostic'

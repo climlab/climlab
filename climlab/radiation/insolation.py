@@ -1,4 +1,5 @@
 from climlab.process.diagnostic import DiagnosticProcess
+from climlab.domain.field import Field
 from climlab.utils.legendre import P2
 from climlab import constants as const
 import numpy as np
@@ -14,10 +15,10 @@ class _Insolation(DiagnosticProcess):
     '''Parent class for insolation processes.
     Calling compute() will update self.diagnostics['insolation']
     with current insolation values.'''
-    
+
     def _get_current_insolation(self):
         pass
-    
+
     def compute(self):
         '''Update all diagnostic quantities using current model state.'''
         self._get_current_insolation()
@@ -27,9 +28,11 @@ class FixedInsolation(_Insolation):
     def __init__(self, **kwargs):
         super(FixedInsolation, self).__init__(**kwargs)
         self.diagnostics['insolation'] = self.param['Q']
+
     def _get_current_insolation(self):
         self.diagnostics['insolation'] = self.param['Q']
         # since this is fixed, could also just assign it in __init__
+
 
 class P2Insolation(_Insolation):
     def __init__(self, S0=const.S0, s2=-0.48, **kwargs):
@@ -42,8 +45,11 @@ class P2Insolation(_Insolation):
             self.param['s2'] = s2
         lat = self.domains['default'].axes['lat'].points
         phi = np.deg2rad(lat)
-        self.diagnostics['insolation'] = self.param['S0'] / 4 * (1. + 
-                                         self.param['s2'] * P2(np.sin(phi)))
-        
+        insolation = (self.param['S0'] / 4 *
+                      (1. + self.param['s2'] * P2(np.sin(phi))))
+        # make sure that the diagnostic has the correct field dimensions.
+        dom = self.domains['default']
+        self.diagnostics['insolation'] = Field(insolation, domain=dom)
+
     def _get_current_insolation(self):
         pass

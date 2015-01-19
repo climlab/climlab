@@ -30,18 +30,18 @@ def global_mean(field, lat_radians):
 
 
 class NewEBM(EnergyBudget):
-    def __init__(self, 
+    def __init__(self,
                  num_points=90,
-                 A = 210.,
-                 B = 2.,
-                 D=0.555, # in W / m^2 / degC, same as B
-                 Tf = -10.0,
+                 A=210.,
+                 B=2.,
+                 D=0.555,  # in W / m^2 / degC, same as B
+                 Tf=-10.0,
                  water_depth=10.0,
                  timestep=1. * const.seconds_per_day,
                  **kwargs):
         super(NewEBM, self).__init__(timestep=timestep, **kwargs)
         if not self.domains and not self.state:  # no state vars or domains yet
-            sfc = domain.zonal_mean_surface(num_points=num_points, 
+            sfc = domain.zonal_mean_surface(num_points=num_points,
                                             water_depth=water_depth)
             lat = sfc.axes['lat'].points
             initial = 12. - 40. * legendre.P2(np.sin(np.deg2rad(lat)))
@@ -65,8 +65,11 @@ class NewEBM(EnergyBudget):
     def _compute_heating_rates(self):
         '''Compute energy flux convergences to get heating rates in W / m**2.
         This method should be over-ridden by daughter classes.'''
-        self.heating_rate['Ts'] = self.subprocess['insolation'].diagnostics['insolation']
-        
+        insolation = self.subprocess['insolation'].diagnostics['insolation']
+        albedo = self.subprocess['albedo'].diagnostics['albedo']
+        ASR = (1-albedo) * insolation
+        self.heating_rate['Ts'] = ASR
+        self.diagnostics['ASR'] = ASR
 
 # lots of work to do here.
 #  need to figure out a better way to deal with params
