@@ -2,6 +2,7 @@ import time
 from climlab.domain.field import Field
 from climlab.domain.domain import _Domain
 import copy
+from climlab.utils.walk import walk_processes
 
 
 def _make_dict(arg, argtype):
@@ -19,6 +20,16 @@ class Process(object):
     '''A generic parent class for all climlab process objects.
     Every process object has a set of state variables on a spatial grid.
     '''
+    def __str__(self):
+        str1 = 'climlab Process of type {0}. \n'.format(type(self))
+        str1 += 'State variables and domain shapes: \n'
+        for varname in self.state.keys():
+            str1 += '  {0}: {1} \n'.format(varname, self.domains[varname].shape)
+        str1 += 'The subprocess tree is \n'
+        for name, proc in walk_processes(self):
+            str1 += '  {0}: {1} \n'.format(name, type(proc))
+        return str1
+        
     def __init__(self, state=None, domains=None, subprocess=None, 
                  input=None, properties=None, diagnostics=None, **kwargs):
 
@@ -46,7 +57,7 @@ class Process(object):
             self.subprocess = {}
         elif type(subprocess) is dict:
             self.subprocess = subprocess
-        elif isinstance(subprocess, _Process):
+        elif isinstance(subprocess, Process):
             self.subprocess = {'default': subprocess}
         else:
             raise ValueError('subprocess must be Process object or dictionary of Processes')
