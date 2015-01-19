@@ -53,7 +53,7 @@ class EBM(EnergyBudget):
         self.subprocess['insolation'] = P2Insolation(domains=sfc, **self.param)
         #self.subprocess['albedo'] = StepFunctionAlbedo(state=self.state,
         #                                               **self.param)
-        self.subprocess['albedo'] = P2Albedo(state=self.state, **self.param)
+        self.subprocess['albedo'] = P2Albedo(domains=sfc, **self.param)
         # diffusivity in units of 1/s
         K = self.param['D'] / self.domains['Ts'].heat_capacity
         self.subprocess['diffusion'] = MeridionalDiffusion(state=self.state,
