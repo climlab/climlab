@@ -22,10 +22,13 @@ print d.state
 import numpy as np
 from scipy.linalg import solve_banded
 from climlab.process.implicit import ImplicitProcess
+from climlab import constants as const
 
 
 class Diffusion(ImplicitProcess):
-    '''Parent class for implicit diffusion modules.'''
+    '''Parent class for implicit diffusion modules.
+    Solves the 1D heat equation
+    C dT/dt = '''
     def __init__(self,
                  K=None,
                  diffusion_axis=None,
@@ -67,6 +70,7 @@ class MeridionalDiffusion(Diffusion):
                  K=None,
                  **kwargs):
         super(MeridionalDiffusion, self).__init__(K=K, diffusion_axis='lat', **kwargs)
+        self.K_dimensionless *= 1./const.a**2/np.deg2rad(1.)**2
         for dom in self.domains.values():
             latax = dom.axes['lat']     
         self.diffTriDiag = _make_meridional_diffusion_matrix(self.K_dimensionless, latax)
