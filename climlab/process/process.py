@@ -71,3 +71,22 @@ def process_like(proc):
     newproc.creation_date = time.strftime("%a, %d %b %Y %H:%M:%S %z",
                                            time.localtime())
     return newproc
+
+
+def get_axes(process_or_domain):
+    '''Return a dictionary of all axes in a domain or dictionary of domains.'''
+    if isinstance(process_or_domain, Process):
+        dom = process_or_domain.domains
+    else:
+        dom = process_or_domain
+    if isinstance(dom, _Domain):
+        return dom.axes
+    elif isinstance(dom, dict):
+        axes = {}
+        for thisdom in dom.values():
+            assert isinstance(thisdom, _Domain)
+            axes.update(thisdom.axes)
+        return axes
+    else:
+        raise TypeError('dom must be a domain or dictionary of domains.')
+    

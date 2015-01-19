@@ -23,28 +23,24 @@ import numpy as np
 from scipy.linalg import solve_banded
 from climlab.process.implicit import ImplicitProcess
 from climlab import constants as const
+from climlab.process.process import get_axes
 
 
 class Diffusion(ImplicitProcess):
     '''Parent class for implicit diffusion modules.
     Solves the 1D heat equation
-    C dT/dt = '''
+    dA/dt = d/dy( K * dA/dy )
+    
+    The diffusivity K should be given in units of [length]**2 / time
+    where length is the unit of the spatial axis on which the diffusion is occuring.'''
     def __init__(self,
                  K=None,
                  diffusion_axis=None,
                  **kwargs):
         super(Diffusion, self).__init__(**kwargs)
         self.param['K'] = K  # Diffusivity in units of [length]**2 / time
-        # if diffusion axis is not specified and there is only one axis...
-        #if diffusion_axis is None and len(self.grid.keys()) is 1:
-        #    self.diffusion_axis = self.grid.keys()[0]
         if diffusion_axis is None:
-            try:
-                singledom = self.domains[self.domains.keys()[0]]
-                singleax = singledom.axes.keys()[0]
-                self.diffusion_axis = singleax
-            except:
-                raise ValueError('Couldn''t figure out diffusion_axis.')
+            _guess_diffusion_axis(self)
         else:
             self.diffusion_axis = diffusion_axis
         # This currently only works with evenly space points
@@ -59,13 +55,21 @@ class Diffusion(ImplicitProcess):
         # self.T = np.linalg.solve( self.diffTriDiag, Trad )
         newstate = {}
         for varname, value in self.state.iteritems():
-            newvar = solve_banded((1, 1), self.diffTriDiag, value)
+            newvar = _solve_implicit_banded(value, self.diffTriDiag)
             newstate[varname] = newvar
         return newstate
 
 
+def _solve_implicit_banded(current, banded_matrix):
+        # Time-stepping the diffusion is just inverting this matrix problem:
+        # self.T = np.linalg.solve( self.diffTriDiag, Trad )
+        return solve_banded((1, 1), self.diffTriDiag, value)
+
+
 class MeridionalDiffusion(Diffusion):
-    '''Meridional diffusion process.'''
+    '''Meridional diffusion process.
+    K in units of m**2 / s
+    '''
     def __init__(self,
                  K=None,
                  **kwargs):
@@ -104,3 +108,19 @@ def _make_meridional_diffusion_matrix(K, lataxis):
     weight2 = np.cos(phi)
     diag = _make_diffusion_matrix(K, weight1, weight2)
     return diag
+
+def _guess_diffusion_axis(process_or_domain):
+    '''Input: a process, domain or dictionary of domains.
+    If there is only one axis with length > 1 in the process or 
+    set of domains, return the name of that axis.
+    Otherwise raise an error.'''
+    axes = get_axes(process_or_domain)
+    diff_ax = {}
+    for axname, ax in axes.iteritems():
+        if ax.num_points > 1:
+            diff_ax.update({axname: ax})
+    if len(diff_ax.keys()) == 1:
+        return diff_ax.keys()[0]
+    else:
+        raise ValueError('More than one possible diffusion axis.')
+    
