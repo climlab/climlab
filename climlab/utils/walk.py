@@ -1,4 +1,4 @@
-def walk_processes(top, topdown=True):
+def walk_processes(top, name='top', topdown=True):
     """Generator for recursive tree of climlab processes
     Usage:
         processes = []
@@ -9,13 +9,13 @@ def walk_processes(top, topdown=True):
     
     based on os.walk()    """
     proc = top
-    if 'name' not in locals():
-        name = 'top'
+    #if 'name' not in locals():
+    #    name = 'top'
     if topdown:
         yield name, proc
     if len(proc.subprocess) > 0:  # there are sub-processes
         for name, subproc in proc.subprocess.iteritems():
-            for name2, subproc2 in walk_processes(subproc, topdown=subproc.topdown):
+            for name2, subproc2 in walk_processes(subproc, name=name, topdown=subproc.topdown):
                 yield name2, subproc2
     if not topdown:
         yield name, proc
