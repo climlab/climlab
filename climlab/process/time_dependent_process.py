@@ -110,17 +110,27 @@ class TimeDependentProcess(Process):
         if verbose:
             print("Integrating for " + str(numsteps) + " steps, "
                   + str(days) + " days, or " + str(years) + " years.")
-        #  This implements a generic time-averaging feature
-        # using the list of model state variables
-        self.timeave = dict(self.state.items() + self.diagnostics.items())
-        for varname, value in self.timeave.items():
-            self.timeave[varname] = np.zeros_like(value)
         #  begin time loop
         for count in range(numsteps):
+            # Compute the timestep
             self.step_forward()
-            for varname, value in self.timeave.iteritems():
-                self.timeave[varname] += value
-        for varname, value in self.timeave.iteritems():
+            if count == 0:
+                # on first step only...
+                #  This implements a generic time-averaging feature
+                # using the list of model state variables
+                self.timeave = self.state.copy()
+                # add any new diagnostics to the timeave dictionary
+                self.timeave.update(self.diagnostics)
+                for varname, value in self.timeave.iteritems():
+                    self.timeave[varname] = np.zeros_like(value)
+            for varname in self.timeave.keys():
+                try:
+                    self.timeave[varname] += self.state[varname]
+                except:
+                    try:
+                        self.timeave[varname] += self.diagnostics[varname]
+                    except: pass
+        for varname in self.timeave.keys():
             self.timeave[varname] /= numsteps
         if verbose:
             print("Total elapsed time is %s years." 
