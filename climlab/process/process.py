@@ -26,6 +26,8 @@ class Process(object):
         for varname in self.state.keys():
             str1 += '  {0}: {1} \n'.format(varname, self.domains[varname].shape)
         str1 += 'The subprocess tree is \n'
+        for name, proc in self.subprocess.iteritems():
+            str1 += '  {0}: {1} \n'.format(name, type(proc))
         for name, proc in walk_processes(self):
             str1 += '  {0}: {1} \n'.format(name, type(proc))
         return str1
