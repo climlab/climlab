@@ -77,9 +77,9 @@ class DailyInsolation(_Insolation):
     
     def _get_current_insolation(self):
         #  this probably only works for 1D (latitude) domains
-        insolation = self.insolation_array
+        insolation_array = self.properties['insolation_array']
         # make sure that the diagnostic has the correct field dimensions.
         dom = self.domains['default']
-        time_index = self.time['days_of_year_index']
-        insolation = self.properties['insolation_array'][:,time_index]
+        time_index = self.time['day_of_year_index']   # THIS ONLY WORKS IF self IS THE MASTER PROCESS
+        insolation = insolation_array[:,time_index]
         self.diagnostics['insolation'] = Field(insolation, domain=dom)

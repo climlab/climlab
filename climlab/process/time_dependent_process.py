@@ -83,9 +83,9 @@ class TimeDependentProcess(Process):
                 #proc.set_state(varname, proc.adjusted_state[varname])
                 proc.state[varname] += proc.adjustment[varname]
         # Gather all diagnostics
-        for procs in walk_processes(self):
-            self.diagnostics.update(procs.diagnostics)
-        self._update_time()
+        for proc in walk_processes(self):
+            self.diagnostics.update(proc.diagnostics)
+            proc._update_time()
 
     def _update_time(self):
         '''Increment the timestep counter by one.
