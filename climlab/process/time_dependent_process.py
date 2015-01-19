@@ -6,7 +6,7 @@ from climlab.utils.walk import walk_processes
 
 class TimeDependentProcess(Process):
     '''A generic parent class for all time-dependent processes.'''
-    def __init__(self, time_type='explicit', timestep=None, **kwargs):
+    def __init__(self, time_type='explicit', timestep=None, topdown=True, **kwargs):
         # Create the state dataset
         super(TimeDependentProcess, self).__init__(**kwargs)
         self.tendencies = {}
@@ -16,6 +16,7 @@ class TimeDependentProcess(Process):
         else:
             self.set_timestep(timestep=timestep)
         self.time_type = time_type
+        self.topdown = topdown
 
     def set_timestep(self, timestep=const.seconds_per_day, num_steps_per_year=None):
         '''Change the timestep.
@@ -47,7 +48,7 @@ class TimeDependentProcess(Process):
         '''Generate lists of processes organized by process type
         Currently, this can be 'diagnostic', 'explicit', 'implicit', or 'adjustment'.'''
         self.process_types = {'diagnostic': [], 'explicit': [], 'implicit': [], 'adjustment': []}        
-        for proc in walk_processes(self, topdown=False):
+        for proc in walk_processes(self, topdown=self.topdown):
             self.process_types[proc.time_type].append(proc)
         self.has_process_type_list = True
         

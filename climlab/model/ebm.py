@@ -58,6 +58,7 @@ class EBM(EnergyBudget):
         self.subprocess['diffusion'] = MeridionalDiffusion(state=self.state,
                                                            K=K,
                                                            **self.param)
+        self.topdown = False  # call subprocess compute methods first
 
     def _compute_heating_rates(self):
         '''Compute energy flux convergences to get heating rates in W / m**2.
