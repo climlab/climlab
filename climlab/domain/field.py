@@ -84,3 +84,17 @@ class Field(np.ndarray):
 
         self.domain = getattr(obj, 'domain', None)
         # We do not need to return anything
+
+
+def global_mean(field):
+    '''Calculate global mean of a field with latitude dependence.'''
+    try:
+        lat = field.domain.axes['lat']
+    except:
+        raise ValueError('No latitude axis in input field.')
+    lat_radians = np.deg2rad(lat)
+    return _global_mean(field, lat_radians)
+
+
+def _global_mean(array, lat_radians):
+    return np.sum(array * np.cos(lat_radians)) / np.sum(np.cos(lat_radians))

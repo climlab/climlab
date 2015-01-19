@@ -3,6 +3,7 @@ from climlab.domain.field import Field
 from climlab.utils.legendre import P2
 from climlab import constants as const
 import numpy as np
+from climlab.solar.insolation import daily_insolation
 
 # THis is a strictly diagnostic process...
 # and also one that doesn't require any state variable!
@@ -53,3 +54,16 @@ class P2Insolation(_Insolation):
 
     def _get_current_insolation(self):
         pass
+
+
+class AnnualMeanInsolation(_Insolation):
+    def __init__(self, S0=const.S0, orb=const.orb_present, **kwargs):
+        super(AnnualMeanInsolation, self).__init__(**kwargs)
+        lat = self.domains['default'].axes['lat'].points
+        days_of_year = np.linspace(0., const.days_per_year, 100)
+        temp_array = daily_insolation(lat, days_of_year, orb=orb, S0=S0)
+        insolation = np.mean(temp_array, axis=1)
+        # make sure that the diagnostic has the correct field dimensions.
+        dom = self.domains['default']
+        self.diagnostics['insolation'] = Field(insolation, domain=dom)
+
