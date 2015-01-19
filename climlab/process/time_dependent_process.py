@@ -27,15 +27,15 @@ class TimeDependentProcess(Process):
         else:
             num_steps_per_year = const.seconds_per_year / timestep
         # Need a more sensible approach for annual cycle stuff
-        #timestep_days = timestep / const.seconds_per_day
-        #days_of_year = np.arange(0., const.days_per_year, timestep_days)
+        timestep_days = timestep / const.seconds_per_day
+        days_of_year = np.arange(0., const.days_per_year, timestep_days)
         self.time = {'timestep': timestep,
                      'num_steps_per_year': num_steps_per_year,
                      'day_of_year_index': 0,
                      'steps': 0,
                      'days_elapsed': 0,
-                     'years_elapsed': 0}
-                     #'days_of_year': days_of_year}
+                     'years_elapsed': 0,
+                     'days_of_year': days_of_year}
         self.param['timestep'] = timestep
 
     def compute(self):

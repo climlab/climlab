@@ -21,7 +21,7 @@ from climlab.process.energy_budget import EnergyBudget
 import climlab.utils.legendre as legendre
 import climlab.domain.domain as domain
 from climlab.radiation.AplusBT import AplusBT
-from climlab.radiation.insolation import P2Insolation, AnnualMeanInsolation
+from climlab.radiation.insolation import P2Insolation, AnnualMeanInsolation, DailyInsolation
 from climlab.surface.albedo import StepFunctionAlbedo
 from climlab.dynamics.diffusion import MeridionalDiffusion
 
@@ -80,6 +80,14 @@ class EBM_annual(EBM):
         sfc = self.domains['Ts']
         self.subprocess['insolation'] = AnnualMeanInsolation(domains=sfc, **self.param)
     
+
+class EBM_seasonal(EBM):
+    def __init__(self, **kwargs):
+        super(EBM_seasonal, self).__init__(**kwargs)
+        sfc = self.domains['Ts']
+        self.subprocess['insolation'] = DailyInsolation(domains=sfc, **self.param)
+
+
 #==============================================================================
 #     
 # class EBM_seasonal( _EBM ):

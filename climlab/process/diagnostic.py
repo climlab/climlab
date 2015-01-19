@@ -1,7 +1,7 @@
-from climlab.process.process import Process
+from climlab.process.time_dependent_process import TimeDependentProcess
 
 
-class DiagnosticProcess(Process):
+class DiagnosticProcess(TimeDependentProcess):
     '''parent class for all processes that are strictly diagnostic,
     i.e. no time dependence.'''
     def __init__(self, **kwargs):

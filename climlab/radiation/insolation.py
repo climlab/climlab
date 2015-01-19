@@ -67,3 +67,19 @@ class AnnualMeanInsolation(_Insolation):
         dom = self.domains['default']
         self.diagnostics['insolation'] = Field(insolation, domain=dom)
 
+
+class DailyInsolation(_Insolation):
+    def __init__(self, S0=const.S0, orb=const.orb_present, **kwargs):
+        super(DailyInsolation, self).__init__(**kwargs)
+        lat = self.domains['default'].axes['lat'].points
+        days_of_year = self.time['days_of_year']
+        self.properties['insolation_array'] = daily_insolation(lat, days_of_year, orb=orb, S0=S0)
+    
+    def _get_current_insolation(self):
+        #  this probably only works for 1D (latitude) domains
+        insolation = self.insolation_array
+        # make sure that the diagnostic has the correct field dimensions.
+        dom = self.domains['default']
+        time_index = self.time['days_of_year_index']
+        insolation = self.properties['insolation_array'][:,time_index]
+        self.diagnostics['insolation'] = Field(insolation, domain=dom)
