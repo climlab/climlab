@@ -31,7 +31,8 @@ class FixedInsolation(_Insolation):
         self.diagnostics['insolation'] = self.param['Q']
 
     def _get_current_insolation(self):
-        self.diagnostics['insolation'] = self.param['Q']
+        pass
+        #self.diagnostics['insolation'] = self.param['Q']
         # since this is fixed, could also just assign it in __init__
 
 
