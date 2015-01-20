@@ -29,14 +29,16 @@ interacting processes. ``climlab`` defines a base class called ``Process``, whic
 can contain an arbitrarily complex tree of sub-processes (each also some 
 sub-class of ``Process``.) Every climate process (radiative, dynamical, 
 physical, turbulent, convective, chemical, etc.) can be simulated as a stand-alone
-process model, or as a sub-process of a more complex model.
+process model, or as a sub-process of a more complex model. New classes of 
+model can easily be defined and run interactively by putting together an
+appropriate collection of sub-processes.
 
 Most of the actual computation uses standard vectorized ``numpy`` functions. 
-It should out-of-the-box on a standard scientific Python distribution.
+It should run out-of-the-box on a standard scientific Python distribution.
 Future versions of ``climlab`` will provide hooks to compiled Fortran code for 
 more numerically intensive processes.
 
-Currently, ``climlab`` has out-of-the-box support for 
+Currently, ``climlab`` has out-of-the-box support and documented examples for 
 
 - 1D grey-radiation and radiative-convective single column models
 - 1D diffusive energy balance models
