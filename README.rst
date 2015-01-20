@@ -12,10 +12,10 @@ Department of Atmospheric and Environmental Sciences
 University at Albany
 brose@albany.edu
 
+Installation:
 ----------------
-To install:
 python setup.py
-----------------
+
 
 The directory courseware/ contains a collection of IPython notebooks (.ipynb)
 used for teaching some basics of climate science, 
