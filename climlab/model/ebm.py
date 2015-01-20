@@ -90,24 +90,6 @@ class EBM_seasonal(EBM):
         self.subprocess['insolation'] = DailyInsolation(domains=sfc, **self.param)
 
 
-#==============================================================================
-#     
-# class EBM_seasonal( _EBM ):
-#     '''EBM with realistic time-varying seasonal insolation computed using real orbital parameters.'''
-#     def __str__(self):
-#         return ( "Instance of EBM_seasonal class with " +  str(self.num_points) + " latitude points  \n" +
-#           "and global mean temperature " + str(self.global_mean_temperature()) + " degrees C.")
-#           
-#     def __init__( self, num_points = 90 ):
-#         super(EBM_seasonal,self).__init__( num_points )
-#         self.Tf = 0.
-#                 
-#     def make_insolation_array( self, orb = const.orb_present ):
-#         self.orb = orb
-#         self.insolation_array = insolation.daily_insolation(self.lat, self.days_of_year, 
-#             orb=self.orb, S0=self.S0)
-#==============================================================================
-            
     
    
 # an EBM that computes degree-days has an additional state variable.
@@ -304,23 +286,6 @@ class EBM_seasonal(EBM):
 #       return self.global_mean( self.T )
 #==============================================================================
 
-#==============================================================================
-# class EBM_simple( _EBM ):
-#     '''The simplest diffusive energy balance model, uses constant prescribed insolation (2nd Legendre polynomial).'''
-#     def __str__(self):
-#         return ( "Instance of EBM_simple class with " +  str(self.num_points) + " latitude points  \n" +
-#           "and global mean temperature " + str(self.global_mean_temperature()) + " degrees C.")
-#     
-#     def __init__( self, num_points = 90 ):
-#         self.s2 = -0.48    
-#         super(EBM_simple,self).__init__( num_points )
-#         self.Tf = -10.
-#         
-#     def make_insolation_array( self ):
-#         self.constant_insolation = self.S0 / 4 * (1 + self.s2 * 
-#                 legendre.P2( np.sin( self.phi ) ) )
-#         self.insolation_array = np.tile( np.expand_dims(self.constant_insolation,axis=1), [1, self.num_steps_per_year] )
-#==============================================================================
 
 
 #==============================================================================

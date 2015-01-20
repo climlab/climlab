@@ -4,6 +4,18 @@ from climlab.utils.legendre import P2
 from climlab.domain.field import Field
 
 
+class ConstantAlbedo(DiagnosticProcess):
+    def __init__(self, albedo=0.33, **kwargs):
+        '''Uniform prescribed albedo.'''
+        super(ConstantAlbedo, self).__init__(**kwargs)
+        self.param['albedo'] = albedo
+        lat = self.domains['default'].axes['lat'].points
+        albedo = np.zeros_like(lat)
+        # make sure that the diagnostic has the correct field dimensions.
+        dom = self.domains['default']
+        self.diagnostics['albedo'] = Field(albedo, domain=dom)
+        
+
 class P2Albedo(DiagnosticProcess):
     def __init__(self, a0=0.33, a2=0.25, **kwargs):
         '''Second order Legendre polynomial formula for surface albedo.'''
