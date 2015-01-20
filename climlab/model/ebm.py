@@ -22,7 +22,7 @@ import climlab.utils.legendre as legendre
 import climlab.domain.domain as domain
 from climlab.radiation.AplusBT import AplusBT
 from climlab.radiation.insolation import P2Insolation, AnnualMeanInsolation, DailyInsolation
-from climlab.surface.albedo import StepFunctionAlbedo, P2Albedo
+from climlab.surface import albedo
 from climlab.dynamics.diffusion import MeridionalDiffusion
 
 
@@ -51,9 +51,11 @@ class EBM(EnergyBudget):
         # create sub-models
         self.subprocess['LW'] = AplusBT(state=self.state, **self.param)
         self.subprocess['insolation'] = P2Insolation(domains=sfc, **self.param)
-        #self.subprocess['albedo'] = StepFunctionAlbedo(state=self.state,
-        #                                               **self.param)
-        self.subprocess['albedo'] = P2Albedo(domains=sfc, **self.param)
+        #self.subprocess['iceline'] = albedo.Iceline(state=self.state, **self.param)
+        self.subprocess['albedo'] = albedo.StepFunctionAlbedo(state=self.state,
+                                                       **self.param)
+        #self.subprocess['warm albedo'] = albedo.P2Albedo(domains=sfc, **self.param)
+        #self.subprocess['cold albedo'] = albedo.ConstantAlbedo(domains=sfc, **self.param)
         # diffusivity in units of 1/s
         K = self.param['D'] / self.domains['Ts'].heat_capacity
         self.subprocess['diffusion'] = MeridionalDiffusion(state=self.state,
