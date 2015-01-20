@@ -7,13 +7,10 @@ climlab
 
 Author
 =============
-**Brian E. J. Rose**
-
-Department of Atmospheric and Environmental Sciences
-
-University at Albany
-
-brose@albany.edu
+| **Brian E. J. Rose**
+| Department of Atmospheric and Environmental Sciences
+| University at Albany
+| brose@albany.edu
 
 Installation
 ----------------
@@ -26,9 +23,9 @@ Installation
 
 About climlab
 --------------
-climlab is a flexible engine for modeling climate processes.
+``climlab`` is a flexible engine for modeling climate processes.
 It is based on a very general concept of a model as a collection of individual, 
-interacting processes. climlab defines a base class called ``Process``, which
+interacting processes. ``climlab`` defines a base class called ``Process``, which
 can contain an arbitrarily complex tree of sub-processes (each also some 
 sub-class of ``Process``.) Every climate process (radiative, dynamical, 
 physical, turbulent, convective, chemical, etc.) can be simulated as a stand-alone
@@ -40,6 +37,7 @@ Future versions of ``climlab`` will provide hooks to compiled Fortran code for
 more numerically intensive processes.
 
 Currently, ``climlab`` has out-of-the-box support for 
+
 - 1D grey-radiation and radiative-convective single column models
 - 1D diffusive energy balance models
 - Seasonal and steady-state models
@@ -49,8 +47,9 @@ Example usage
 ------------------
 The directory ``climlab/courseware/`` contains a collection of IPython notebooks (*.ipynb)
 used for teaching some basics of climate science, 
-and documenting use of the climlab package.
+and documenting use of the ``climlab`` package.
 These are self-describing, and should all run out-of-the-box once the package is installed, e.g:
+
 ``ipython notebook Insolation.ipynb``
 
 History
