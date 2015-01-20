@@ -16,10 +16,13 @@ class _Insolation(DiagnosticProcess):
     '''Parent class for insolation processes.
     Calling compute() will update self.diagnostics['insolation']
     with current insolation values.'''
+    # parameter S0 is now stored using a python property
+    # can be changed through self.S0 = newvalue
+    # which will also update the parameter dictionary
+    # CAUTION: changing self.param['S0'] will not work!
     def __init__(self, S0=const.S0, **kwargs):
         super(_Insolation, self).__init__(**kwargs)
-        self._S0 = S0
-        self.param['S0'] = self.S0
+        self.S0 = S0
         
     @property
     def S0(self):
@@ -28,12 +31,13 @@ class _Insolation(DiagnosticProcess):
     def S0(self, value):
         self._S0 = value
         self.param['S0'] = value
-        self._recompute_insolation()
+        self._compute_fixed()
 
     def _compute_fixed(self):
         '''Recompute any fixed quantities after a change in parameters'''
+        #self.oh = 'eh'
         pass
-
+    
     def _get_current_insolation(self):
         pass
 
@@ -42,75 +46,76 @@ class _Insolation(DiagnosticProcess):
         self._get_current_insolation()
 
 
-#  fix these up to use new property stuff...
 class FixedInsolation(_Insolation):
-    def __init__(self, S0=const.S0, **kwargs):
-        super(FixedInsolation, self).__init__(**kwargs)
-        if 'Q' in self.param and 'S0' not in self.param:
-            self.param['S0'] = 4.*self.param['Q']
-        elif 'S0' in self.param and 'Q' not in self.param:
-            self.param['Q'] = self.param['S0'] / 4.
-        elif 'S0' not in self.param and 'Q' not in self.param:
-            self.param['S0'] = S0
+    def __init__(self, S0=const.S0/4, **kwargs):
+        super(FixedInsolation, self).__init__(S0=S0, **kwargs)
 
-    def _get_current_insolation(self):
-        self.diagnostics['insolation'] = self.param['Q']
-        # since this is fixed, could also just assign it in __init__
-        # but that is dangerous because user can change parameters
+    def _compute_fixed(self):
+        self.diagnostics['insolation'] = self.S0
 
 
 class P2Insolation(_Insolation):
     def __init__(self, S0=const.S0, s2=-0.48, **kwargs):
-        super(P2Insolation, self).__init__(**kwargs)
-        if 'Q' in self.param and 'S0' not in self.param:
-            self.param['S0'] = 4*self.param['Q']
-        elif 'S0' not in self.param and 'Q' not in self.param:
-            self.param['S0'] = S0
-        if 's2' not in self.param:
-            self.param['s2'] = s2
+        super(P2Insolation, self).__init__(S0=S0, **kwargs)
+        self.s2 = s2
 
-    def _get_current_insolation(self):
+    @property
+    def s2(self):
+        return self._s2
+    @s2.setter
+    def s2(self, value):
+        self._s2 = value
+        self.param['s2'] = value
+        self._compute_fixed()
+
+    def _compute_fixed(self):
         lat = self.domains['default'].axes['lat'].points
         phi = np.deg2rad(lat)
-        insolation = (self.param['S0'] / 4 *
-                      (1. + self.param['s2'] * P2(np.sin(phi))))
-        # make sure that the diagnostic has the correct field dimensions.
-        dom = self.domains['default']
-        self.diagnostics['insolation'] = Field(insolation, domain=dom)
+        try:
+            insolation = self.S0 / 4 * (1. + self.s2 * P2(np.sin(phi)))
+            # make sure that the diagnostic has the correct field dimensions.
+            dom = self.domains['default']
+            self.diagnostics['insolation'] = Field(insolation, domain=dom)
+        except:
+            pass
 
 
 class AnnualMeanInsolation(_Insolation):
     def __init__(self, S0=const.S0, orb=const.orb_present, **kwargs):
-        super(AnnualMeanInsolation, self).__init__(**kwargs)
-        self.param['S0'] = S0
+        super(AnnualMeanInsolation, self).__init__(S0=S0, **kwargs)
         self.param['orb'] = orb
-# this would be a great place to use a Python property... if user changes S0,
-        # run a setter that recalculates annual mean insolation
-        #  but for now, just recompute at each timestep
+        self._compute_fixed()
 
-    def _get_current_insolation(self):
-        lat = self.domains['default'].axes['lat'].points
-        days_of_year = np.linspace(0., const.days_per_year, 100)
-        temp_array = daily_insolation(lat, days_of_year, orb=self.param['orb'],
-                                      S0=self.param['S0'])
-        insolation = np.mean(temp_array, axis=1)
-        # make sure that the diagnostic has the correct field dimensions.
-        dom = self.domains['default']
-        self.diagnostics['insolation'] = Field(insolation, domain=dom)
+    def _compute_fixed(self):
+        try:
+            lat = self.domains['default'].axes['lat'].points
+            days_of_year = np.linspace(0., const.days_per_year, 100)
+            temp_array = daily_insolation(lat, days_of_year,
+                                          orb=self.param['orb'],
+                                          S0=self.S0)
+            insolation = np.mean(temp_array, axis=1)
+            # make sure that the diagnostic has the correct field dimensions.
+            dom = self.domains['default']
+            self.diagnostics['insolation'] = Field(insolation, domain=dom)
+        except:
+            pass
 
 
 class DailyInsolation(_Insolation):
     def __init__(self, S0=const.S0, orb=const.orb_present, **kwargs):
-        super(DailyInsolation, self).__init__(**kwargs)
+        super(DailyInsolation, self).__init__(S0=S0, **kwargs)
+        self.param['orb'] = orb
+
+    def _compute_fixed(self):
         lat = self.domains['default'].axes['lat'].points
         days_of_year = self.time['days_of_year']
-        self.properties['insolation_array'] = daily_insolation(lat, days_of_year, orb=orb, S0=S0)
-    
+        self.properties['insolation_array'] = daily_insolation(lat, days_of_year, orb=self.param['orb'], S0=self.S0)
+
     def _get_current_insolation(self):
         #  this probably only works for 1D (latitude) domains
         insolation_array = self.properties['insolation_array']
         # make sure that the diagnostic has the correct field dimensions.
         dom = self.domains['default']
         time_index = self.time['day_of_year_index']   # THIS ONLY WORKS IF self IS THE MASTER PROCESS
-        insolation = insolation_array[:,time_index]
+        insolation = insolation_array[:, time_index]
         self.diagnostics['insolation'] = Field(insolation, domain=dom)
