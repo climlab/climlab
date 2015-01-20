@@ -51,11 +51,8 @@ class EBM(EnergyBudget):
         # create sub-models
         self.subprocess['LW'] = AplusBT(state=self.state, **self.param)
         self.subprocess['insolation'] = P2Insolation(domains=sfc, **self.param)
-        #self.subprocess['iceline'] = albedo.Iceline(state=self.state, **self.param)
         self.subprocess['albedo'] = albedo.StepFunctionAlbedo(state=self.state,
                                                        **self.param)
-        #self.subprocess['warm albedo'] = albedo.P2Albedo(domains=sfc, **self.param)
-        #self.subprocess['cold albedo'] = albedo.ConstantAlbedo(domains=sfc, **self.param)
         # diffusivity in units of 1/s
         K = self.param['D'] / self.domains['Ts'].heat_capacity
         self.subprocess['diffusion'] = MeridionalDiffusion(state=self.state,
@@ -90,7 +87,8 @@ class EBM_seasonal(EBM):
         super(EBM_seasonal, self).__init__(**kwargs)
         sfc = self.domains['Ts']
         self.subprocess['insolation'] = DailyInsolation(domains=sfc, **self.param)
-
+        # By default this EBM does not have an albedo feedback
+        self.subprocess['albedo'] = albedo.P2Albedo(domains=sfc, **self.param)
 
     
    
