@@ -5,14 +5,17 @@ climlab
  Python code package for object-oriented climate modeling
 ----------
 
-Python code package for simple climate modeling
+Author
+=============
 Brian E. J. Rose
 Department of Atmospheric and Environmental Sciences
 University at Albany
 brose@albany.edu
 
+----------------
 To install:
 python setup.py
+----------------
 
 The directory courseware/ contains a collection of IPython notebooks (.ipynb)
 used for teaching some basics of climate science, 
