@@ -38,8 +38,6 @@ class Iceline(DiagnosticProcess):
     def find_icelines(self):
         Tf = self.param['Tf']
         Ts = self.state['Ts']
-        iceline1 = 90.
-        iceline2 = -90.
         lat_bounds = self.domains['Ts'].axes['lat'].bounds
         noice = np.where(Ts >= Tf, True, False)
         ice = np.where(Ts < Tf, True, False)
@@ -47,10 +45,10 @@ class Iceline(DiagnosticProcess):
         self.diagnostics['ice'] = ice
         if ice.all():
             # 100% ice cover
-            icelat = np.array([-90., 90.])
+            icelat = np.array([-0., 0.])
         elif noice.all():
             # zero ice cover
-            icelat = np.array([0., 0.])
+            icelat = np.array([-90., 90.])
         else:  # there is some ice edge
             # Taking np.diff of a boolean array gives True at the boundaries between True and False
             boundary_indices = np.where(np.diff(ice.squeeze()))[0] + 1

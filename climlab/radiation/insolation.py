@@ -28,12 +28,11 @@ class _Insolation(DiagnosticProcess):
 class FixedInsolation(_Insolation):
     def __init__(self, **kwargs):
         super(FixedInsolation, self).__init__(**kwargs)
-        self.diagnostics['insolation'] = self.param['Q']
 
     def _get_current_insolation(self):
-        pass
-        #self.diagnostics['insolation'] = self.param['Q']
+        self.diagnostics['insolation'] = self.param['Q']
         # since this is fixed, could also just assign it in __init__
+        # but that is dangerous because user can change parameters
 
 
 class P2Insolation(_Insolation):
@@ -45,6 +44,8 @@ class P2Insolation(_Insolation):
             self.param['S0'] = S0
         if 's2' not in self.param:
             self.param['s2'] = s2
+
+    def _get_current_insolation(self):
         lat = self.domains['default'].axes['lat'].points
         phi = np.deg2rad(lat)
         insolation = (self.param['S0'] / 4 *
@@ -53,16 +54,21 @@ class P2Insolation(_Insolation):
         dom = self.domains['default']
         self.diagnostics['insolation'] = Field(insolation, domain=dom)
 
-    def _get_current_insolation(self):
-        pass
-
 
 class AnnualMeanInsolation(_Insolation):
     def __init__(self, S0=const.S0, orb=const.orb_present, **kwargs):
         super(AnnualMeanInsolation, self).__init__(**kwargs)
+        self.param['S0'] = S0
+        self.param['orb'] = orb
+# this would be a great place to use a Python property... if user changes S0,
+        # run a setter that recalculates annual mean insolation
+        #  but for now, just recompute at each timestep
+
+    def _get_current_insolation(self):
         lat = self.domains['default'].axes['lat'].points
         days_of_year = np.linspace(0., const.days_per_year, 100)
-        temp_array = daily_insolation(lat, days_of_year, orb=orb, S0=S0)
+        temp_array = daily_insolation(lat, days_of_year, orb=self.param['orb'],
+                                      S0=self.param['S0'])
         insolation = np.mean(temp_array, axis=1)
         # make sure that the diagnostic has the correct field dimensions.
         dom = self.domains['default']
