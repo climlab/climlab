@@ -9,8 +9,8 @@ class ConstantAlbedo(DiagnosticProcess):
         '''Uniform prescribed albedo.'''
         super(ConstantAlbedo, self).__init__(**kwargs)
         self.param['albedo'] = albedo
-        lat = self.domains['default'].axes['lat'].points
-        albedo = np.zeros_like(lat)
+        #lat = self.domains['default'].axes['lat'].points
+        #albedo = np.ones_like(lat)
         # make sure that the diagnostic has the correct field dimensions.
         dom = self.domains['default']
         self.diagnostics['albedo'] = Field(albedo, domain=dom)
