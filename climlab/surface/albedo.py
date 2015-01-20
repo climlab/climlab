@@ -63,7 +63,7 @@ class Iceline(DiagnosticProcess):
 
  
 class StepFunctionAlbedo(DiagnosticProcess):
-    def __init__(self, Tf=-10., a0=0.33, a2=0.25, ai=0.6, **kwargs):
+    def __init__(self, Tf=-10., a0=0.3, a2=0.078, ai=0.62, **kwargs):
         super(DiagnosticProcess, self).__init__(**kwargs)
         self.param['Tf'] = Tf
         self.param['a0'] = a0
