@@ -1,4 +1,9 @@
-****   climlab   ****
+================
+climlab
+================
+----------
+ Python code package for object-oriented climate modeling
+----------
 
 Python code package for simple climate modeling
 Brian E. J. Rose
