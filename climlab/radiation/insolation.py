@@ -16,6 +16,23 @@ class _Insolation(DiagnosticProcess):
     '''Parent class for insolation processes.
     Calling compute() will update self.diagnostics['insolation']
     with current insolation values.'''
+    def __init__(self, S0=const.S0, **kwargs):
+        super(_Insolation, self).__init__(**kwargs)
+        self._S0 = S0
+        self.param['S0'] = self.S0
+        
+    @property
+    def S0(self):
+        return self._S0
+    @S0.setter
+    def S0(self, value):
+        self._S0 = value
+        self.param['S0'] = value
+        self._recompute_insolation()
+
+    def _compute_fixed(self):
+        '''Recompute any fixed quantities after a change in parameters'''
+        pass
 
     def _get_current_insolation(self):
         pass
@@ -25,9 +42,16 @@ class _Insolation(DiagnosticProcess):
         self._get_current_insolation()
 
 
+#  fix these up to use new property stuff...
 class FixedInsolation(_Insolation):
-    def __init__(self, **kwargs):
+    def __init__(self, S0=const.S0, **kwargs):
         super(FixedInsolation, self).__init__(**kwargs)
+        if 'Q' in self.param and 'S0' not in self.param:
+            self.param['S0'] = 4.*self.param['Q']
+        elif 'S0' in self.param and 'Q' not in self.param:
+            self.param['Q'] = self.param['S0'] / 4.
+        elif 'S0' not in self.param and 'Q' not in self.param:
+            self.param['S0'] = S0
 
     def _get_current_insolation(self):
         self.diagnostics['insolation'] = self.param['Q']
