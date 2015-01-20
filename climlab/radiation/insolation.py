@@ -105,11 +105,15 @@ class DailyInsolation(_Insolation):
     def __init__(self, S0=const.S0, orb=const.orb_present, **kwargs):
         super(DailyInsolation, self).__init__(S0=S0, **kwargs)
         self.param['orb'] = orb
-
+        self._compute_fixed()
+        
     def _compute_fixed(self):
-        lat = self.domains['default'].axes['lat'].points
-        days_of_year = self.time['days_of_year']
-        self.properties['insolation_array'] = daily_insolation(lat, days_of_year, orb=self.param['orb'], S0=self.S0)
+        try:
+            lat = self.domains['default'].axes['lat'].points
+            days_of_year = self.time['days_of_year']
+            self.properties['insolation_array'] = daily_insolation(lat, days_of_year, orb=self.param['orb'], S0=self.S0)
+        except:
+            pass
 
     def _get_current_insolation(self):
         #  this probably only works for 1D (latitude) domains

@@ -34,7 +34,7 @@ class EBM(EnergyBudget):
                  D=0.555,  # in W / m^2 / degC, same as B
                  Tf=-10.0,
                  water_depth=10.0,
-                 timestep=1. * const.seconds_per_day,
+                 timestep=const.seconds_per_year/90.,
                  **kwargs):
         super(EBM, self).__init__(timestep=timestep, **kwargs)
         if not self.domains and not self.state:  # no state vars or domains yet
