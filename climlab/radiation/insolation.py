@@ -5,12 +5,6 @@ from climlab import constants as const
 import numpy as np
 from climlab.solar.insolation import daily_insolation
 
-# THis is a strictly diagnostic process...
-# and also one that doesn't require any state variable!
-#  Should use the 'slab atmosphere' domain
-#
-# serious implementations will have to think about time and access my insolation library
-# but the simplest classes will have fixed insolation.
 
 class _Insolation(DiagnosticProcess):
     '''Parent class for insolation processes.
@@ -80,19 +74,35 @@ class P2Insolation(_Insolation):
             pass
 
 
+# These classes calculate insolation based on orbital parameters
+#  and astronomical formulas
+
 class AnnualMeanInsolation(_Insolation):
     def __init__(self, S0=const.S0, orb=const.orb_present, **kwargs):
         super(AnnualMeanInsolation, self).__init__(S0=S0, **kwargs)
-        self.param['orb'] = orb
+        #self.param['orb'] = orb
+        self.orb = orb
         self._compute_fixed()
+    
+    @property
+    def orb(self):
+        return self._orb
+    @orb.setter
+    def orb(self, value):
+        self._orb = value
+        self.param['orb'] = value
+        self._compute_fixed()
+
+    def _daily_insolation_array(self):
+        lat = self.domains['default'].axes['lat'].points
+        days_of_year = self.time['days_of_year']
+        orb = self.orb
+        S0 = self.S0
+        return daily_insolation(lat, days_of_year, orb=orb, S0=S0)
 
     def _compute_fixed(self):
         try:
-            lat = self.domains['default'].axes['lat'].points
-            days_of_year = np.linspace(0., const.days_per_year, 100)
-            temp_array = daily_insolation(lat, days_of_year,
-                                          orb=self.param['orb'],
-                                          S0=self.S0)
+            temp_array = self._daily_insolation_array()            
             insolation = np.mean(temp_array, axis=1)
             # make sure that the diagnostic has the correct field dimensions.
             dom = self.domains['default']
@@ -101,17 +111,11 @@ class AnnualMeanInsolation(_Insolation):
             pass
 
 
-class DailyInsolation(_Insolation):
-    def __init__(self, S0=const.S0, orb=const.orb_present, **kwargs):
-        super(DailyInsolation, self).__init__(S0=S0, **kwargs)
-        self.param['orb'] = orb
-        self._compute_fixed()
-        
+class DailyInsolation(AnnualMeanInsolation):
+                
     def _compute_fixed(self):
         try:
-            lat = self.domains['default'].axes['lat'].points
-            days_of_year = self.time['days_of_year']
-            self.properties['insolation_array'] = daily_insolation(lat, days_of_year, orb=self.param['orb'], S0=self.S0)
+            self.properties['insolation_array'] = self._daily_insolation_array()
         except:
             pass
 
