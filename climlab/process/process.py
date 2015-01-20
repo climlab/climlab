@@ -2,7 +2,7 @@ import time
 from climlab.domain.field import Field
 from climlab.domain.domain import _Domain
 import copy
-from climlab.utils.walk import walk_processes
+from climlab.utils import walk
 
 
 def _make_dict(arg, argtype):
@@ -25,11 +25,8 @@ class Process(object):
         str1 += 'State variables and domain shapes: \n'
         for varname in self.state.keys():
             str1 += '  {0}: {1} \n'.format(varname, self.domains[varname].shape)
-        str1 += 'The subprocess tree is \n'
-        for name, proc in self.subprocess.iteritems():
-            str1 += '  {0}: {1} \n'.format(name, type(proc))
-        for name, proc in walk_processes(self):
-            str1 += '  {0}: {1} \n'.format(name, type(proc))
+        str1 += 'The subprocess tree: \n'
+        str1 += walk.process_tree(self)  
         return str1
         
     def __init__(self, state=None, domains=None, subprocess=None, 

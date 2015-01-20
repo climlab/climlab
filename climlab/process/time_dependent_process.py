@@ -48,7 +48,7 @@ class TimeDependentProcess(Process):
         '''Generate lists of processes organized by process type
         Currently, this can be 'diagnostic', 'explicit', 'implicit', or 'adjustment'.'''
         self.process_types = {'diagnostic': [], 'explicit': [], 'implicit': [], 'adjustment': []}        
-        for name, proc in walk_processes(self, topdown=self.topdown):
+        for name, proc, level in walk_processes(self, topdown=self.topdown):
             self.process_types[proc.time_type].append(proc)
         self.has_process_type_list = True
         
@@ -83,7 +83,7 @@ class TimeDependentProcess(Process):
                 #proc.set_state(varname, proc.adjusted_state[varname])
                 proc.state[varname] += proc.adjustment[varname]
         # Gather all diagnostics
-        for name, proc in walk_processes(self):
+        for name, proc, level in walk_processes(self):
             self.diagnostics.update(proc.diagnostics)
             proc._update_time()
 
