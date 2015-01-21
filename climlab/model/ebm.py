@@ -49,15 +49,15 @@ class EBM(EnergyBudget):
         self.param['Tf'] = Tf
         self.param['water_depth'] = water_depth
         # create sub-models
-        self.subprocess['LW'] = AplusBT(state=self.state, **self.param)
-        self.subprocess['insolation'] = P2Insolation(domains=sfc, **self.param)
-        self.subprocess['albedo'] = albedo.StepFunctionAlbedo(state=self.state,
-                                                       **self.param)
+        self.add_subprocess('LW', AplusBT(state=self.state, **self.param))
+        self.add_subprocess('insolation', P2Insolation(domains=sfc, **self.param))
+        self.add_subprocess('albedo', albedo.StepFunctionAlbedo(state=self.state,
+                                                       **self.param))
         # diffusivity in units of 1/s
         K = self.param['D'] / self.domains['Ts'].heat_capacity
-        self.subprocess['diffusion'] = MeridionalDiffusion(state=self.state,
+        self.add_subprocess('diffusion', MeridionalDiffusion(state=self.state,
                                                            K=K,
-                                                           **self.param)
+                                                           **self.param))
         self.topdown = False  # call subprocess compute methods first
 
     def _compute_heating_rates(self):
@@ -79,16 +79,16 @@ class EBM_annual(EBM):
     def __init__(self, **kwargs):
         super(EBM_annual, self).__init__(**kwargs)
         sfc = self.domains['Ts']
-        self.subprocess['insolation'] = AnnualMeanInsolation(domains=sfc, **self.param)
+        self.add_subprocess('insolation', AnnualMeanInsolation(domains=sfc, **self.param))
     
 
 class EBM_seasonal(EBM):
     def __init__(self, **kwargs):
         super(EBM_seasonal, self).__init__(**kwargs)
         sfc = self.domains['Ts']
-        self.subprocess['insolation'] = DailyInsolation(domains=sfc, **self.param)
+        self.add_subprocess('insolation', DailyInsolation(domains=sfc, **self.param))
         # By default this EBM does not have an albedo feedback
-        self.subprocess['albedo'] = albedo.P2Albedo(domains=sfc, **self.param)
+        self.add_subprocess('albedo', albedo.P2Albedo(domains=sfc, **self.param))
 
     
    

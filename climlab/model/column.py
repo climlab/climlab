@@ -59,9 +59,9 @@ class SingleColumnModel(TimeDependentProcess):
                                                     eps=epsSW,
                                                     **self.param)
         Q = insolation.FixedInsolation(S0=self.param['Q'], **self.param)
-        self.subprocess['LW'] = longwave
-        self.subprocess['SW'] = shortwave
-        self.subprocess['insolation'] = Q
+        self.add_subprocess('LW', longwave)
+        self.add_subprocess('SW', shortwave)
+        self.add_subprocess('insolation', Q)
     
     # This process has to handle the coupling between insolation and column radiation
     def compute(self):
@@ -76,6 +76,6 @@ class RadiativeConvectiveModel(SingleColumnModel):
                  **kwargs):
         super(RadiativeConvectiveModel, self).__init__(**kwargs)
         self.param['adj_lapse_rate'] = adj_lapse_rate
-        self.subprocess['convective adjustment'] = \
-            ConvectiveAdjustment(state=self.state, **self.param)
+        self.add_subprocess('convective adjustment', \
+            ConvectiveAdjustment(state=self.state, **self.param))
 

@@ -54,14 +54,44 @@ class Process(object):
         # subprocess is a dictionary of any sub-processes
         if subprocess is None:
             self.subprocess = {}
-        elif type(subprocess) is dict:
-            self.subprocess = subprocess
-        elif isinstance(subprocess, Process):
-            self.subprocess = {'default': subprocess}
         else:
-            raise ValueError('subprocess must be Process object or dictionary of Processes')
-        self.has_process_type_list = False
+            self.add_subprocesses(subprocess)
+        #elif type(subprocess) is dict:
+        #    self.subprocess = subprocess
+        #elif isinstance(subprocess, Process):
+        #    self.subprocess = {'default': subprocess}
+        #else:
+        #    raise ValueError('subprocess must be Process object or dictionary of Processes')
+        #self.has_process_type_list = False
 
+    def add_subprocesses(self, procdict):
+        '''Add a dictionary of subproceses to this process.
+        procdict is dictionary with process names as keys.
+        
+        Can also pass a single process, which will be called \'default\'
+        '''
+        if isinstance(procdict, Process):
+            self.add_subprocess('default', procdict)
+        else:
+            for name, proc in procdict.iteritems():
+                self.add_subprocess(name, proc)
+    
+    def add_subprocess(self, name, proc):
+        '''Add a single subprocess to this process.
+        name: name of the subprocess (str)
+        proc: a Process object.'''
+        if isinstance(proc, Process):
+            self.subprocess.update({name: proc})
+            self.has_process_type_list = False
+        else:
+            raise raise ValueError('subprocess must be Process object')
+    
+    def remove_subprocess(self, name):
+        '''Remove a single subprocess from this process.
+        name: name of the subprocess (str)'''
+        self.subprocess.pop(name, None)
+        self.has_process_type_list = False
+        
     def set_state(self, name, value):
         self.state[name] = value
         self.domains.update({name: value.domain})
