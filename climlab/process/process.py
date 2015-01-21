@@ -84,7 +84,7 @@ class Process(object):
             self.subprocess.update({name: proc})
             self.has_process_type_list = False
         else:
-            raise raise ValueError('subprocess must be Process object')
+            raise ValueError('subprocess must be Process object')
     
     def remove_subprocess(self, name):
         '''Remove a single subprocess from this process.
