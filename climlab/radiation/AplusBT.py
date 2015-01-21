@@ -28,13 +28,29 @@ class AplusBT(_Radiation):
     Should be invoked with a single temperature state variable.'''
     def __init__(self, A=200., B=2., **kwargs):
         super(AplusBT, self).__init__(**kwargs)
-        if 'A' not in self.param:
-            self.param['A'] = A
-            self.param['B'] = B
-
+        self.A = A
+        self.B = B        
+        #if 'A' not in self.param:
+        #    self.param['A'] = A
+        #    self.param['B'] = B
+    @property
+    def A(self):
+        return self._A
+    @A.setter
+    def A(self, value):
+        self._A = value
+        self.param['A'] = value
+    @property
+    def B(self):
+        return self._B
+    @B.setter
+    def B(self, value):
+        self._B = value
+        self.param['B'] = value
+    
     def emission(self):
-        A = self.param['A']
-        B = self.param['B']
+        A = self.A
+        B = self.B
         for varname, value in self.state.iteritems():
             flux = A + B * value
             self.diagnostics['OLR'] = flux
