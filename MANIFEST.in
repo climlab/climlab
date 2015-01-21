@@ -1,5 +1,5 @@
-include README
+include README.rst
 include LICENSE
 include climlab/orbit91
 include courseware/*.ipynb
-include courseware/README
+include courseware/README.rst
