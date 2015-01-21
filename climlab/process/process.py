@@ -74,6 +74,98 @@ class Process(object):
                     # same shape, assume it's the right domain
                     self.state_domain[name] = dom
 
+    # Some handy shortcuts... only really make sense when there is only
+    # a single axis of that type in the process.
+    @property
+    def lat(self):
+        try:
+            for domname, dom in self.domains.iteritems():
+                try:
+                    thislat = dom.axes['lat'].points
+                except:
+                    pass
+            return thislat
+        except:
+            raise ValueError('Can\'t resolve a lat axis.')
+    @property
+    def lat_bounds(self):
+        try:
+            for domname, dom in self.domains.iteritems():
+                try:
+                    thislat = dom.axes['lat'].bounds
+                except:
+                    pass
+            return thislat
+        except:
+            raise ValueError('Can\'t resolve a lat axis.')
+    @property
+    def lon(self):
+        try:
+            for domname, dom in self.domains.iteritems():
+                try:
+                    thislon = dom.axes['lon'].points
+                except:
+                    pass
+            return thislon
+        except:
+            raise ValueError('Can\'t resolve a lon axis.')
+    @property
+    def lon_bounds(self):
+        try:
+            for domname, dom in self.domains.iteritems():
+                try:
+                    thislon = dom.axes['lon'].bounds
+                except:
+                    pass
+            return thislon
+        except:
+            raise ValueError('Can\'t resolve a lon axis.')
+    @property
+    def lev(self):
+        try:
+            for domname, dom in self.domains.iteritems():
+                try:
+                    thislev = dom.axes['lev'].points
+                except:
+                    pass
+            return thislev
+        except:
+            raise ValueError('Can\'t resolve a lev axis.')
+    @property
+    def lev_bounds(self):
+        try:
+            for domname, dom in self.domains.iteritems():
+                try:
+                    thislev = dom.axes['lev'].bounds
+                except:
+                    pass
+            return thislev
+        except:
+            raise ValueError('Can\'t resolve a lev axis.')
+    @property
+    def depth(self):
+        try:
+            for domname, dom in self.domains.iteritems():
+                try:
+                    thisdepth = dom.axes['depth'].points
+                except:
+                    pass
+            return thisdepth
+        except:
+            raise ValueError('Can\'t resolve a depth axis.')
+    @property
+    def depth_bounds(self):
+        try:
+            for domname, dom in self.domains.iteritems():
+                try:
+                    thisdepth = dom.axes['depth'].bounds
+                except:
+                    pass
+            return thisdepth
+        except:
+            raise ValueError('Can\'t resolve a depth axis.')
+            
+        
 def process_like(proc):
     '''Return a new process identical to the given process.
     The creation date is updated.'''
