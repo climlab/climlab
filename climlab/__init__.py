@@ -9,3 +9,6 @@ __all__ = ["constants", "thermo", "orbital_table",
 
 # this should ensure that we can still import constants.py as climlab.constants           
 from climlab.utils import constants, thermo
+
+__version__ = '0.2'
+

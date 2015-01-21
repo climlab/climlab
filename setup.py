@@ -4,8 +4,10 @@ def readme():
     with open('README.rst') as f:
         return f.read()
 
+import climlab
+
 setup(name='climlab',
-      version='0.2',
+      version=climlab.__version__,
       description='Package for process-oriented climate modeling',
       long_description=readme(),
       classifiers=[
