@@ -58,7 +58,7 @@ class SingleColumnModel(TimeDependentProcess):
         shortwave = grey_radiation.GreyRadiation_SW(state=self.state,
                                                     eps=epsSW,
                                                     **self.param)
-        Q = insolation.FixedInsolation(**self.param)
+        Q = insolation.FixedInsolation(S0=self.param['Q'], **self.param)
         self.subprocess['LW'] = longwave
         self.subprocess['SW'] = shortwave
         self.subprocess['insolation'] = Q
