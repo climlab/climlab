@@ -17,6 +17,23 @@ from climlab.utils import walk
 #  e.g. radiation fields in N-band models... currently would not be labeled
 # in a way that lets the user know which process it came from
 
+# TO DO:
+#  go through every process code file
+#  and implement process parameters as attributes, or as properties with
+#  setter functions if necessary
+#  it should always be possible to quickly and easily change a process 
+#  parameter without messing anything up.
+#
+#  ALSO rationalize the use of diagnostics in all process code
+#  as described above. Diagnostics are to be used FOR QUANTITIES THAT ARE TO
+#  BE TIME AVERAGED or quantities that are of interest to parent processes.
+#  It might often be left up to the parent process whether to make a diagnostic
+#
+#  FINALLY we should implement a time_average list that controls which state
+# variables and diagnostics are to be time averaged by the master process.
+#  It should default to the complete list, which is the current behavior.
+#
+
 
 def _make_dict(arg, argtype):
     if arg is None:
