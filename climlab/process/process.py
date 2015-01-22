@@ -4,6 +4,20 @@ from climlab.domain.domain import _Domain
 import copy
 from climlab.utils import walk
 
+#  New organizing principle:
+#  processes are free to use object attributes to store whatever useful fields
+# the need. If later revisions require some special action to occur upon 
+# getting or setting the attribute, we can always implement a property to 
+# make that happen with no change in the API
+#
+#  the diagnostics dictionary will instead be used expressly for the purpose 
+# of passing fields up the process tree!
+#  so will often only be set by a parent process (and given a name that is
+#  appropriate from teh point of view of the parent process)
+#
+#  e.g. radiation fields in N-band models... currently would not be labeled
+# in a way that lets the user know which process it came from
+
 
 def _make_dict(arg, argtype):
     if arg is None:
@@ -31,17 +45,18 @@ class Process(object):
         
     def __init__(self, state=None, domains=None, subprocess=None, 
                  input=None, properties=None, diagnostics=None, **kwargs):
-
-        # dictionary of state variables (all of type Field)
-        self.state = _make_dict(state, Field)        
-        # dictionary of model parameters
-        self.param = kwargs
-        
-        # now domains are attached to all state and diagnostic quantities
         # dictionary of domains. Keys are the domain names
         self.domains = _make_dict(domains, _Domain)
-        for varname, value in self.state.iteritems():
-            self.domains.update({varname: value.domain})
+        # dictionary of state variables (all of type Field)
+        self.state = {}
+        states = _make_dict(state, Field)
+        for name, value in states.iteritems():
+            self.set_state(name, value)
+        # dictionary of model parameters
+        self.param = kwargs
+        # populate domains dictionary with domains from state variables
+        #for varname, value in self.state.iteritems():
+        #    self.domains.update({varname: value.domain})
         # dictionary of diagnostic quantities
         self.diagnostics = _make_dict(diagnostics, Field)
         # dictionary of other gridded properties (usually fixed)
@@ -93,9 +108,12 @@ class Process(object):
         self.has_process_type_list = False
         
     def set_state(self, name, value):
+        # set the state dictionary
         self.state[name] = value
+        # populate domains dictionary with domains from state variables
         self.domains.update({name: value.domain})
-    #def set_property(self, name, value, domain):
+        # state variables can also be accessed as attributes of the Process
+        setattr(self, name, value)
     
     def _guess_state_domains(self):
         for name, value in self.state.iteritems():
