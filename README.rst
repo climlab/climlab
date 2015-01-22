@@ -23,17 +23,17 @@ Installation
 
 About climlab
 --------------
-``climlab`` is a flexible engine for modeling climate processes.
+``climlab`` is a flexible engine for process-oriented climate modeling.
 It is based on a very general concept of a model as a collection of individual, 
 interacting processes. ``climlab`` defines a base class called ``Process``, which
 can contain an arbitrarily complex tree of sub-processes (each also some 
-sub-class of ``Process``.) Every climate process (radiative, dynamical, 
+sub-class of ``Process``). Every climate process (radiative, dynamical, 
 physical, turbulent, convective, chemical, etc.) can be simulated as a stand-alone
-process model, or as a sub-process of a more complex model. New classes of 
-model can easily be defined and run interactively by putting together an
+process model given appropriate input, or as a sub-process of a more complex model. 
+New classes of model can easily be defined and run interactively by putting together an
 appropriate collection of sub-processes.
 
-Most of the actual computation uses standard vectorized ``numpy`` functions. 
+Most of the actual computation uses vectorized ``numpy`` array functions. 
 It should run out-of-the-box on a standard scientific Python distribution.
 Future versions of ``climlab`` will provide hooks to compiled Fortran code for 
 more numerically intensive processes.
@@ -63,6 +63,9 @@ http://www.atmos.albany.edu/facstaff/brose/classes/ENV480_Spring2014/
 
 The package and its API was completely redesigned around a truly object-oriented 
 modeling framework in January 2015.
+
+It will be used extensively for a graduate-level climate modeling course in Spring 2015:
+http://www.atmos.albany.edu/facstaff/brose/classes/ATM623_Spring2015/
 
 License
 ---------------
