@@ -6,7 +6,7 @@ climlab
 ----------
 
 Author
-=============
+--------------
 | **Brian E. J. Rose**
 | Department of Atmospheric and Environmental Sciences
 | University at Albany
