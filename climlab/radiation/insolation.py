@@ -115,13 +115,13 @@ class DailyInsolation(AnnualMeanInsolation):
                 
     def _compute_fixed(self):
         try:
-            self.properties['insolation_array'] = self._daily_insolation_array()
+            self.insolation_array = self._daily_insolation_array()
         except:
             pass
 
     def _get_current_insolation(self):
         #  this probably only works for 1D (latitude) domains
-        insolation_array = self.properties['insolation_array']
+        insolation_array = self.insolation_array
         # make sure that the diagnostic has the correct field dimensions.
         dom = self.domains['default']
         time_index = self.time['day_of_year_index']   # THIS ONLY WORKS IF self IS THE MASTER PROCESS

@@ -43,7 +43,7 @@ class GreyRadiation_SW(NbandModel):
         self.diagnostics['SWup_TOA'] = self.flux['up2space']
         self.diagnostics['SW_absorbed_total'] = self.absorbed['total']
         self.diagnostics['planetary_albedo'] = (self.flux['up2space'] / 
-                                                self.input['from_space'])
+                                                self.from_space)
 
 
 

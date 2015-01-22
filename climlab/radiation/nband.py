@@ -47,7 +47,7 @@ class NbandModel(_Radiation):
     def radiative_heating(self):
         self.emission()
         try:
-            fromspace = self.input['from_space']
+            fromspace = self.from_space
 
         except:
             fromspace = np.zeros_like(self.state['Ts'])
