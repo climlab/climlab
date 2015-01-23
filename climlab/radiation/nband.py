@@ -30,19 +30,19 @@ class NbandModel(_Radiation):
     def set_emissivity(self, emissivity_sfc, emissivity_atm):
         '''emissivity should be a fraction 0-1
         of blackbody emission in that band.'''
-        self.diagnostics['emissivity_atm'] = emissivity_atm
-        self.diagnostics['emissivity_sfc'] = emissivity_sfc
+        self.emissivity_atm = emissivity_atm
+        self.emissivity_sfc = emissivity_sfc
     
     def blackbody_emission(self):
-        self.diagnostics['blackbody_emission_sfc'] = const.sigma * self.state['Ts']**4
-        self.diagnostics['blackbody_emission_atm'] = const.sigma * self.state['Tatm']**4
+        self.blackbody_emission_sfc = const.sigma * self.state['Ts']**4
+        self.blackbody_emission_atm = const.sigma * self.state['Tatm']**4
     
     def emission(self):
         self.blackbody_emission()
-        self.diagnostics['emit_sfc'] = (self.diagnostics['emissivity_sfc'] * 
-                                    self.diagnostics['blackbody_emission_sfc'])
-        self.diagnostics['emit_atm'] = (self.diagnostics['emissivity_atm'] * 
-                                    self.diagnostics['blackbody_emission_atm'])
+        self.diagnostics['emit_sfc'] = (self.emissivity_sfc * 
+                                    self.blackbody_emission_sfc)
+        self.diagnostics['emit_atm'] = (self.emissivity_atm * 
+                                    self.blackbody_emission_atm)
         
     def radiative_heating(self):
         self.emission()
