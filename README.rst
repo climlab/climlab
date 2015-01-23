@@ -2,7 +2,7 @@
 climlab
 ================
 ----------
- Python package for object-oriented climate modeling
+ Python package for process-oriented climate modeling
 ----------
 
 Author
