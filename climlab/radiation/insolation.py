@@ -5,6 +5,9 @@ from climlab import constants as const
 import numpy as np
 from climlab.solar.insolation import daily_insolation
 
+# REVISE TO MAKE ALL OF THESE CALLABLE WITH NO ARGUMENTS.
+# SET SOME SENSIBLE DEFAULTS FOR DOMAINS
+
 
 class _Insolation(DiagnosticProcess):
     '''Parent class for insolation processes.

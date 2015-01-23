@@ -17,6 +17,7 @@ class TimeDependentProcess(Process):
             self.set_timestep(timestep=timestep)
         self.time_type = time_type
         self.topdown = topdown
+        self.has_process_type_list = False
 
     def set_timestep(self, timestep=const.seconds_per_day, num_steps_per_year=None):
         '''Change the timestep.

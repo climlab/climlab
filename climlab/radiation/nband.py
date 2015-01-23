@@ -1,6 +1,6 @@
 import numpy as np
 import climlab.utils.constants as const
-import climlab.radiation.nbandflux as nbandflux
+from climlab.radiation import nbandflux
 from climlab.radiation.radiation import _Radiation
 
 

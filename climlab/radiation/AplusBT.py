@@ -1,19 +1,17 @@
 '''Simple linear radiation module.
 Usage example:
 
-import climlab.radiation.AplusBT as AplusBT
-import climlab.domain.domain as domain
-import climlab.domain.field as field
-dom = domain.single_column()  # creates a column atmosphere and scalar surface
-# here we just want the surface
-sfc = dom['sfc']
+import climlab
+sfc, atm = climlab.domain.single_column()  # creates a column atmosphere and scalar surface
 # Create a state variable
-Ts = field.Field(15., domain=sfc)
+Ts = climlab.Field(15., domain=sfc)
 # Make a dictionary of state variables
 s = {'Ts': Ts}
-olr = AplusBT.AplusBT(state=s)
+olr = climlab.radiation.AplusBT(state=s)
+print olr
 #  OR, we can pass a single state variable
-olr = AplusBT.AplusBT(state=Ts)
+olr = climlab.radiation.AplusBT(state=Ts)
+print olr
 # to compute tendencies and diagnostics
 olr.compute()
 #  or to actually update the temperature
@@ -30,9 +28,7 @@ class AplusBT(_Radiation):
         super(AplusBT, self).__init__(**kwargs)
         self.A = A
         self.B = B        
-        #if 'A' not in self.param:
-        #    self.param['A'] = A
-        #    self.param['B'] = B
+
     @property
     def A(self):
         return self._A
@@ -49,10 +45,8 @@ class AplusBT(_Radiation):
         self.param['B'] = value
     
     def emission(self):
-        A = self.A
-        B = self.B
         for varname, value in self.state.iteritems():
-            flux = A + B * value
+            flux = self.A + self.B * value
             self.diagnostics['OLR'] = flux
     
     def radiative_heating(self):
