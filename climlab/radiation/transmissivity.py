@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def set_transmissitivity(absorb):
+def set_transmissivity(absorb):
     '''Calculate transmissivity matrices between each level.
     Input: 1-dimensional numpy array of absorbptivities for each level.
 

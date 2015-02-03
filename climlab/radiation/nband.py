@@ -25,7 +25,7 @@ class NbandModel(_Radiation):
         '''Set or change the band absorptivity. 
         Input: eps
         must be same size as grid.'''
-        self.trans = nbandflux.set_transmissitivity(eps)
+        self.trans = nbandflux.set_transmissivity(eps)
         
     def set_emissivity(self, emissivity_sfc, emissivity_atm):
         '''emissivity should be a fraction 0-1
