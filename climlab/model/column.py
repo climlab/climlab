@@ -6,9 +6,9 @@ Code developed by Brian Rose, University at Albany
 brose@albany.edu
 """
 import numpy as np
-import climlab.utils.constants as const
+from climlab import constants as const
 from climlab.process.time_dependent_process import TimeDependentProcess
-import climlab.domain.domain as domain
+from climlab.domain import domain
 from climlab.domain.field import Field
 from climlab.radiation import insolation, grey_radiation
 from climlab.convection.convadj import ConvectiveAdjustment

@@ -2,7 +2,7 @@
 Routines for calculating heat capacities for grid boxes
 in units of J / m**2 / K
 """
-import climlab.utils.constants as const
+from climlab import constants as const
 
 
 def atmosphere(dp):

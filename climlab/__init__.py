@@ -10,7 +10,8 @@ __version__ = '0.2'
 #           "column", "convadj"]
 
 # this should ensure that we can still import constants.py as climlab.constants           
-from climlab.utils import constants, thermo
+from climlab.utils import constants
+from climlab.utils import thermo, legendre
 # some more useful shorcuts
 from climlab.model import ebm, column
 from climlab.domain import domain

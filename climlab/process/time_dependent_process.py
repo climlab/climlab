@@ -1,5 +1,5 @@
 import numpy as np
-import climlab.utils.constants as const
+from climlab import constants as const
 from climlab.process.process import Process
 from climlab.utils.walk import walk_processes
 

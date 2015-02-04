@@ -6,8 +6,9 @@
 #  currently... it still requires a fair bit of code:
 import numpy as np
 from climlab.process.time_dependent_process import TimeDependentProcess
-import climlab.domain.domain as domain
-import climlab.domain.field as field
+from climlab.domain import domain, field
+
+
 box = domain.box_model_domain()
 print box.shape
 

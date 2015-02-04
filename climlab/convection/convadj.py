@@ -1,5 +1,5 @@
 import numpy as np
-import climlab.utils.constants as const
+from climlab import constants as const
 from climlab.process.energy_budget import TimeDependentProcess
 from climlab.domain.field import Field
 

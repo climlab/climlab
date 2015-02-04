@@ -15,11 +15,11 @@ brose@albany.edu
 #from climlab.solar.orbital import OrbitalTable
 
 import numpy as np
-import climlab.utils.constants as const
+from climlab import constants as const
 from climlab.domain.field import Field, global_mean
 from climlab.process.energy_budget import EnergyBudget
-import climlab.utils.legendre as legendre
-import climlab.domain.domain as domain
+from climlab.utils import legendre
+from climlab.domain import domain
 from climlab.radiation.AplusBT import AplusBT
 from climlab.radiation.insolation import P2Insolation, AnnualMeanInsolation, DailyInsolation
 from climlab.surface import albedo

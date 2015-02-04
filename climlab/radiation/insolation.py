@@ -1,8 +1,8 @@
+import numpy as np
 from climlab.process.diagnostic import DiagnosticProcess
 from climlab.domain.field import Field
 from climlab.utils.legendre import P2
 from climlab import constants as const
-import numpy as np
 from climlab.solar.insolation import daily_insolation
 
 # REVISE TO MAKE ALL OF THESE CALLABLE WITH NO ARGUMENTS.
