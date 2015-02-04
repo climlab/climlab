@@ -50,13 +50,13 @@ class SingleColumnModel(TimeDependentProcess):
 
         # create sub-modesl for longwave and shortwave radiation
         dp = self.state['Tatm'].domain.axes['lev'].delta
-        epsLW = grey_radiation.compute_layer_absorptivity(self.param['abs_coeff'], dp)
-        epsSW = np.zeros_like(epsLW)
+        absorbLW = grey_radiation.compute_layer_absorptivity(self.param['abs_coeff'], dp)
+        absorbSW = np.zeros_like(absorbLW)
         longwave = grey_radiation.GreyRadiation_LW(state=self.state,
-                                                   eps=epsLW,
+                                                   absorb=absorbLW,
                                                    **self.param)
         shortwave = grey_radiation.GreyRadiation_SW(state=self.state,
-                                                    eps=epsSW,
+                                                    absorb=absorbSW,
                                                     **self.param)
         Q = insolation.FixedInsolation(S0=self.param['Q'], **self.param)
         self.add_subprocess('LW', longwave)
