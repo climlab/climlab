@@ -14,11 +14,16 @@ class NbandModel(_Radiation):
     including grey and semi-grey model.
     
     Input argument absorptivity is band absorptivity
-    (should same size as grid).'''
+    (should same size as grid).
+    
+    By default emissivity = absorptivity.
+    Subclasses can override this is necessary (e.g. for shortwave model)'''
     def __init__(self, absorptivity=None, albedo_sfc=0, **kwargs):
         super(NbandModel, self).__init__(**kwargs)
         self.absorptivity = absorptivity
         self.emissivity_sfc = np.zeros_like(self.state['Ts'])
+        # This sets self.emissivity_atm to point to self.absorptivity
+        #  gets automatically updated if absorptivity changes
         self.emissivity_atm = self.absorptivity
         self.albedo_sfc = albedo_sfc
 
