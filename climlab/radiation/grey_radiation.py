@@ -15,19 +15,6 @@ class GreyRadiation_LW(NbandModel):
         self.albedo_sfc = np.zeros_like(self.state['Ts'])
         #self.flux_from_space = np.zeros_like(self.state['Ts'])
 
-    # don't actually need this... 
-    # self.emissivity_atm already points to self.absorptivity
-    # by default in NbandModel
-
-    #  This should ensure that absorptivity is always == emissivity
-    #@property
-    #def absorptivity(self):
-    #    return self._trans.absorptivity
-    #@absorptivity.setter
-    #def absorptivity(self, value):
-    #    self._trans = Transmissivity(value)
-    #    self.emissivity_atm = self.absorptivity
-
     def radiative_heating(self):
         super(GreyRadiation_LW, self).radiative_heating()
         self.diagnostics['LW_down_sfc'] = self.flux['incident_sfc']
