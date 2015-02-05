@@ -1,6 +1,6 @@
 import numpy as np
 from climlab import constants as const
-from climlab.radiation.transmissivity import Transmissivity, NbandFluxCompute
+from climlab.radiation.transmissivity import Transmissivity#, NbandFluxCompute
 from climlab.radiation.radiation import _Radiation
 
 
@@ -59,10 +59,9 @@ class NbandModel(_Radiation):
         except:
             fromspace = np.zeros_like(self.state['Ts'])
         albedo_sfc = self.albedo_sfc
-        absorbed, flux = NbandFluxCompute(fromspace, albedo_sfc, 
+        absorbed, flux = self._trans.FluxCompute(fromspace, albedo_sfc, 
                                             self.diagnostics['emit_sfc'], 
-                                            self.diagnostics['emit_atm'], 
-                                            self._trans)
+                                            self.diagnostics['emit_atm'])
         self.absorbed = absorbed
         self.flux = flux
         self.diagnostics['absorbed_sfc'] = absorbed['sfc']
