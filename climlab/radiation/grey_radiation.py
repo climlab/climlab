@@ -8,23 +8,23 @@ class GreyRadiation_LW(NbandModel):
     '''Grey Radiation model: a single band for all longwave.
     Absorptivity = Emissivity in all atmospheric layers.
     Surface albedo is zero.'''
-    def __init__(self, absorb=None, **kwargs):
-        super(GreyRadiation_LW, self).__init__(absorb=absorb, **kwargs)
+    def __init__(self, absorptivity=None, **kwargs):
+        super(GreyRadiation_LW, self).__init__(absorptivity=absorptivity, **kwargs)
         #self.set_absorptivity(eps)
         #self.set_emissivity(np.ones_like(self.state['Ts']), absorb)
         self.emissivity_sfc = np.ones_like(self.state['Ts'])
-        self.emissivity_atm = self.absorb
+        self.emissivity_atm = self.absorptivity
         self.albedo_sfc = np.zeros_like(self.state['Ts'])
         #self.flux_from_space = np.zeros_like(self.state['Ts'])
 
     #  This should ensure that absorptivity is always == emissivity
     @property
-    def absorb(self):
-        return self._trans.absorb
-    @absorb.setter
-    def absorb(self, value):
+    def absorptivity(self):
+        return self._trans.absorptivity
+    @absorptivity.setter
+    def absorptivity(self, value):
         self._trans = Transmissivity(value)
-        self.emissivity_atm = self.absorb
+        self.emissivity_atm = self.absorptivity
 
     def radiative_heating(self):
         super(GreyRadiation_LW, self).radiative_heating()
@@ -41,8 +41,8 @@ class GreyRadiation_LW(NbandModel):
 # the coupling process needs to look after exchanging between insolation and column
 
 class GreyRadiation_SW(NbandModel):
-    def __init__(self, absorb=None, **kwargs):
-        super(GreyRadiation_SW, self).__init__(absorb=absorb, **kwargs)
+    def __init__(self, absorptivity=None, **kwargs):
+        super(GreyRadiation_SW, self).__init__(absorptivity=absorptivity, **kwargs)
         #self.set_absorptivity(eps)
         #self.set_emissivity(np.zeros_like(self.state['Ts']), np.zeros_like(self.state['Tatm']))
         self.emissivity_sfc = np.zeros_like(self.state['Ts'])

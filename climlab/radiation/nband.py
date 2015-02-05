@@ -14,29 +14,29 @@ class NbandModel(_Radiation):
     '''Parent class for all band radiation models,
     including grey and semi-grey model.
     
-    Input argument absorb is band absorptivity
+    Input argument absorptivity is band absorptivity
     (should same size as grid).'''
-    def __init__(self, absorb=None, albedo_sfc=0, **kwargs):
+    def __init__(self, absorptivity=None, albedo_sfc=0, **kwargs):
         super(NbandModel, self).__init__(**kwargs)
         #self.set_absorptivity(eps)
-        self.absorb = absorb
+        self.absorptivity = absorptivity
         self.emissivity_sfc = np.zeros_like(self.state['Ts'])
-        self.emissivity_atm = self.absorb
+        self.emissivity_atm = self.absorptivity
         #self.set_emissivity(np.zeros_like(self.state['Ts']), np.zeros_like(self.state['Tatm']))
         self.albedo_sfc = albedo_sfc
 
     @property
-    def absorb(self):
-        return self._trans.absorb
-    @absorb.setter
-    def absorb(self, value):
+    def absorptivity(self):
+        return self._trans.absorptivity
+    @absorptivity.setter
+    def absorptivity(self, value):
         self._trans = Transmissivity(value)
     @property
     def transmissivity(self):
         return self._trans.trans
     @transmissivity.setter
     def transmissivity(self, value):
-        self.absorb = 1 - value
+        self.absorptivity = 1 - value
 
 #    def set_absorptivity(self, eps):
 #        '''Set or change the band absorptivity. 

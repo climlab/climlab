@@ -53,10 +53,10 @@ class SingleColumnModel(TimeDependentProcess):
         absorbLW = grey_radiation.compute_layer_absorptivity(self.param['abs_coeff'], dp)
         absorbSW = np.zeros_like(absorbLW)
         longwave = grey_radiation.GreyRadiation_LW(state=self.state,
-                                                   absorb=absorbLW,
+                                                   absorptivity=absorbLW,
                                                    **self.param)
         shortwave = grey_radiation.GreyRadiation_SW(state=self.state,
-                                                    absorb=absorbSW,
+                                                    absorptivity=absorbSW,
                                                     **self.param)
         Q = insolation.FixedInsolation(S0=self.param['Q'], **self.param)
         self.add_subprocess('LW', longwave)
