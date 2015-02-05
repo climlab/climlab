@@ -16,15 +16,8 @@ class Transmissivity(object):
         if absorb.ndim is not 1:
             raise ValueError('absorb argument must be a vector')
         self.absorb = absorb
-
-    @property
-    def absorb(self):
-        return self._absorb
-    @absorb.setter
-    def absorb(self, value):
-        self._absorb = value
-        self._trans = 1 - value
-        N = self._absorb.size
+        self.trans = 1 - absorb
+        N = self.absorb.size
         # a matrix containing the transmission between atmospheric layers
         #  multiply this matrix by vector of emissions to get the
         # total incident beam at each layer.
@@ -39,13 +32,37 @@ class Transmissivity(object):
                                     np.flipud(self.trans[1:N])))))
         #  the transmissivity between surface and space
         self.sfc2space = np.prod(self.trans)
+        
 
-    @property
-    def trans(self):
-        return 1 - self.absorb
-    @trans.setter
-    def trans(self, value):
-        self.absorb = 1 - value
+#    @property
+#    def absorb(self):
+#        return self._absorb
+#    @absorb.setter
+#    def absorb(self, value):
+#        self._absorb = value
+#        self._trans = 1 - value
+#        N = self._absorb.size
+#        # a matrix containing the transmission between atmospheric layers
+#        #  multiply this matrix by vector of emissions to get the
+#        # total incident beam at each layer.
+#        self.atm2atm = np.diag(np.ones(N-1), 1)
+#        for n in range(N):
+#            self.atm2atm[n, n+2:N] = np.cumprod(self.trans[n+1:N-1])
+#        self.atm2atm += self.atm2atm.transpose()
+#        # the transmissivity between surface and layer k
+#        self.sfc2atm = np.concatenate(([1.], np.cumprod(self.trans[:N-1])))
+#        # the transmissivity between layer k and space
+#        self.atm2space = np.flipud(np.cumprod(np.concatenate(([1.],
+#                                    np.flipud(self.trans[1:N])))))
+#        #  the transmissivity between surface and space
+#        self.sfc2space = np.prod(self.trans)
+#
+#    @property
+#    def trans(self):
+#        return 1 - self.absorb
+#    @trans.setter
+#    def trans(self, value):
+#        self.absorb = 1 - value
 
 #
 #class NbandFlux(object):

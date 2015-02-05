@@ -1,6 +1,7 @@
 import numpy as np
 from climlab import constants as const
 from climlab.radiation.nband import NbandModel
+from climlab.radiation.transmissivity import Transmissivity
 
 
 class GreyRadiation_LW(NbandModel):
@@ -15,7 +16,16 @@ class GreyRadiation_LW(NbandModel):
         self.emissivity_atm = self.absorb
         self.albedo_sfc = np.zeros_like(self.state['Ts'])
         #self.flux_from_space = np.zeros_like(self.state['Ts'])
-        
+
+    #  This should ensure that absorptivity is always == emissivity
+    @property
+    def absorb(self):
+        return self._trans.absorb
+    @absorb.setter
+    def absorb(self, value):
+        self._trans = Transmissivity(value)
+        self.emissivity_atm = self.absorb
+
     def radiative_heating(self):
         super(GreyRadiation_LW, self).radiative_heating()
         self.diagnostics['LW_down_sfc'] = self.flux['incident_sfc']
