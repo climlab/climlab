@@ -1,6 +1,5 @@
 import numpy as np
 from climlab import constants as const
-#from climlab.radiation import nbandflux
 from climlab.radiation.transmissivity import Transmissivity, NbandFluxCompute
 from climlab.radiation.radiation import _Radiation
 
@@ -18,11 +17,9 @@ class NbandModel(_Radiation):
     (should same size as grid).'''
     def __init__(self, absorptivity=None, albedo_sfc=0, **kwargs):
         super(NbandModel, self).__init__(**kwargs)
-        #self.set_absorptivity(eps)
         self.absorptivity = absorptivity
         self.emissivity_sfc = np.zeros_like(self.state['Ts'])
         self.emissivity_atm = self.absorptivity
-        #self.set_emissivity(np.zeros_like(self.state['Ts']), np.zeros_like(self.state['Tatm']))
         self.albedo_sfc = albedo_sfc
 
     @property
@@ -37,20 +34,6 @@ class NbandModel(_Radiation):
     @transmissivity.setter
     def transmissivity(self, value):
         self.absorptivity = 1 - value
-
-#    def set_absorptivity(self, eps):
-#        '''Set or change the band absorptivity. 
-#        Input: eps
-#        must be same size as grid.'''
-#        #self.trans = nbandflux.set_transmissivity(eps)
-#        #self.trans = nbandflux.Transmissivity(eps)
-#        self.
-        
-#    def set_emissivity(self, emissivity_sfc, emissivity_atm):
-#        '''emissivity should be a fraction 0-1
-#        of blackbody emission in that band.'''
-#        self.emissivity_atm = emissivity_atm
-#        self.emissivity_sfc = emissivity_sfc
 
     def blackbody_emission(self):
         self.blackbody_emission_sfc = const.sigma * self.state['Ts']**4

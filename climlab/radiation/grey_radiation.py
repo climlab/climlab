@@ -10,8 +10,6 @@ class GreyRadiation_LW(NbandModel):
     Surface albedo is zero.'''
     def __init__(self, absorptivity=None, **kwargs):
         super(GreyRadiation_LW, self).__init__(absorptivity=absorptivity, **kwargs)
-        #self.set_absorptivity(eps)
-        #self.set_emissivity(np.ones_like(self.state['Ts']), absorb)
         self.emissivity_sfc = np.ones_like(self.state['Ts'])
         self.emissivity_atm = self.absorptivity
         self.albedo_sfc = np.zeros_like(self.state['Ts'])
@@ -43,8 +41,6 @@ class GreyRadiation_LW(NbandModel):
 class GreyRadiation_SW(NbandModel):
     def __init__(self, absorptivity=None, **kwargs):
         super(GreyRadiation_SW, self).__init__(absorptivity=absorptivity, **kwargs)
-        #self.set_absorptivity(eps)
-        #self.set_emissivity(np.zeros_like(self.state['Ts']), np.zeros_like(self.state['Tatm']))
         self.emissivity_sfc = np.zeros_like(self.state['Ts'])
         self.emissivity_atm = np.zeros_like(self.state['Tatm'])
         #self.flux_from_space = np.ones_like(self.state['Ts'])
@@ -58,7 +54,6 @@ class GreyRadiation_SW(NbandModel):
         self.diagnostics['SW_absorbed_total'] = self.absorbed['total']
         self.diagnostics['planetary_albedo'] = (self.flux['up2space'] / 
                                                 self.from_space)
-
 
 
 def compute_layer_absorptivity(abs_coeff, dp):
