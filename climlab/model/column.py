@@ -51,6 +51,7 @@ class SingleColumnModel(TimeDependentProcess):
         # create sub-modesl for longwave and shortwave radiation
         dp = self.state['Tatm'].domain.axes['lev'].delta
         absorbLW = grey_radiation.compute_layer_absorptivity(self.param['abs_coeff'], dp)
+        absorbLW = Field(absorbLW, domain=self.state['Tatm'].domain)        
         absorbSW = np.zeros_like(absorbLW)
         longwave = grey_radiation.GreyRadiation_LW(state=self.state,
                                                    absorptivity=absorbLW,
