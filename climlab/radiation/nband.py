@@ -76,7 +76,9 @@ def flux_compute(fromspace, albedo_sfc, emit_sfc, emit_atm, trans):
     absorbed = {}  # absorbed radiation (flux convergence) in W / m**2
     flux['space2sfc'] = fromspace * trans.sfc2space
     flux['space2atm'] = fromspace * trans.atm2space
-    flux['atm2sfc'] = np.dot(trans.sfc2atm, emit_atm)
+    #flux['atm2sfc'] = np.dot(trans.sfc2atm, emit_atm)
+    # I think that was a bug... this should give a vector
+    flux['atm2sfc'] = trans.sfc2atm * emit_atm
     flux['atm2atm'] = np.dot(trans.atm2atm, emit_atm)
     flux['incident_sfc'] = flux['space2sfc'] + np.sum(flux['atm2sfc'])
     flux['up_sfc'] = albedo_sfc * flux['incident_sfc'] + emit_sfc
