@@ -22,9 +22,7 @@ class NbandModel(_Radiation):
         super(NbandModel, self).__init__(**kwargs)
         self.absorptivity = absorptivity
         self.emissivity_sfc = np.zeros_like(self.state['Ts'])
-        # This sets self.emissivity_atm to point to self.absorptivity
-        #  gets automatically updated if absorptivity changes
-        self.emissivity_atm = self.absorptivity
+        # self.emissivity_atm is set by setting self.absorptivity
         self.albedo_sfc = albedo_sfc
 
     @property
@@ -32,7 +30,12 @@ class NbandModel(_Radiation):
         return self._trans.absorptivity
     @absorptivity.setter
     def absorptivity(self, value):
-        self._trans = Transmissivity(value)
+        self._trans = Transmissivity(np.array(value))
+    @property
+    def emissivity_atm(self):
+        # This ensures that emissivity = absorptivity at all times
+    #  needs to be overridden for shortwave classes
+        return self.absorptivity
     @property
     def transmissivity(self):
         return self._trans.trans

@@ -33,9 +33,13 @@ class GreyRadiation_SW(NbandModel):
     def __init__(self, absorptivity=None, **kwargs):
         super(GreyRadiation_SW, self).__init__(absorptivity=absorptivity, **kwargs)
         self.emissivity_sfc = np.zeros_like(self.state['Ts'])
-        self.emissivity_atm = np.zeros_like(self.state['Tatm'])
+        #self.emissivity_atm = np.zeros_like(self.state['Tatm'])
         #self.flux_from_space = np.ones_like(self.state['Ts'])
-        
+
+    @property
+    def emissivity_atm(self):
+        return np.zeros_like(self.state['Tatm'])
+
     def radiative_heating(self):
         super(GreyRadiation_SW, self).radiative_heating()
         self.diagnostics['SW_absorbed_sfc'] = self.absorbed['sfc']
