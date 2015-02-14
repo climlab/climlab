@@ -65,8 +65,7 @@ class NbandModel(_Radiation):
         absorbed, flux = flux_compute(fromspace, albedo_sfc, 
                                             self.diagnostics['emit_sfc'], 
                                             self.diagnostics['emit_atm'],
-                                            self._trans.absorptivity)
-        #                                    self._trans)
+                                            self._trans)
         self.absorbed = absorbed
         self.flux = flux
         self.diagnostics['absorbed_sfc'] = absorbed['sfc']
@@ -74,50 +73,22 @@ class NbandModel(_Radiation):
         self.heating_rate['Ts'] = absorbed['sfc']
         self.heating_rate['Tatm'] = absorbed['atm']
 
-def flux_compute(fromspace, albedo_sfc, emit_sfc, emit_atm, absorptivity):
+
+def flux_compute(fromspace, albedo_sfc, emit_sfc, emit_atm, trans):
     flux = {}  # fluxes in W / m**2
     absorbed = {}  # absorbed radiation (flux convergence) in W / m**2
-    trans = 1-absorptivity
-    N = absorptivity.size
+    #trans = 1-absorptivity
+    N = trans.N
     # it's convenient to define a N+2 vector of level emissions, including
     # the surface and outer space
     E = np.concatenate((np.atleast_1d(emit_sfc), emit_atm, np.atleast_1d(fromspace)))
         
     # fully vectorized version
-    tau = np.concatenate((np.atleast_1d(1.), trans))
-    B = np.tile(tau, (N+1,1)).transpose()    
-    A = np.tril(B,k=-1) + np.tri(N+1).transpose()
-    #  e.g. for N = 3 layers    
-    #  tau is a column vector of transmissivities
-    #  tau = [1, tau0, tau1, tau2]    
-    #  A is a matrix
-    #  A = [[   1,    1,    1,    1],
-    #       [tau0,    1,    1,    1],
-    #       [tau1, tau1,    1,    1],
-    #       [tau2, tau2, tau2,    1]]
-    #  so that when we take the lower triangle of its cumulative product,
-    #  Tup = [[             1,         0,    0,  0],
-    #         [          tau0,         1,    0,  0],
-    #         [     tau1*tau0,      tau0,    1,  0],
-    #         [tau2*tau1*tau0, tau2*tau1, tau2,  1]]
-    #  and Tdown = transpose(Tup)
-    #   now we can get the downwelling beam by matrix multiplication
-    #  Edown = [E0, E1, E2, fromspace]
-    #  D = Tdown * Edown
-    #  then we add the reflected part at the surface to the surface emissions
-    #   Eup = [emit_sfc + albedo_sfc*D[0], E0, E1, E2]
-    #  so that the upwelling flux is 
-    #  U = Tup * Eup
-    #   The total flux, positive up is thus
-    #   F = U - D
-    #  and absorbed radiation is just the flux convergence
-    Tup = np.tril(np.cumprod(A, axis=0))
-    Tdown = np.transpose(Tup)
     # downwelling beam
-    D = np.dot(Tdown, E[1:])
+    D = np.dot(trans.Tdown, E[1:])
     #  add in the reflected part at the surface
     E[0] += albedo_sfc * D[0]
-    U = np.dot(Tup, E[:N+1])
+    U = np.dot(trans.Tup, E[:N+1])
 
     # total upwelling flux
     F = U - D
