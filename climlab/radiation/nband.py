@@ -82,29 +82,35 @@ def flux_compute(fromspace, albedo_sfc, emit_sfc, emit_atm, absorptivity):
     # it's convenient to define a N+2 vector of level emissions, including
     # the surface and outer space
     E = np.concatenate((np.atleast_1d(emit_sfc), emit_atm, np.atleast_1d(fromspace)))
-    # Downwelling flux
-     # will first cycle backward through D from top to bottom
-    #D = np.zeros(N+1)
-    #trans2 = np.flipud(trans)
-    #E2 = np.flipud(E)
-    ## downwelling beam includes emissions from each level
-    #D += E2[:N+1]
-    #for n in range(N+1):
-    #    D[n+1:] += np.cumprod(trans2[n:]) * E2[n]
-    #D = np.flipud(D)
-    ## upwelling flux
-    #U = np.zeros(N+1)
-    ##  add in the reflected part at the surface
-    #E[0] += albedo_sfc * D[0]
-    ## Upwelling beam includes emissions from each level
-    #U += E[:N+1]
-    #for n in range(N+1):
-    #    U[n+1:] += np.cumprod(trans[n:]) * E[n]
         
     # fully vectorized version
     tau = np.concatenate((np.atleast_1d(1.), trans))
     B = np.tile(tau, (N+1,1)).transpose()    
     A = np.tril(B,k=-1) + np.tri(N+1).transpose()
+    #  e.g. for N = 3 layers    
+    #  tau is a column vector of transmissivities
+    #  tau = [1, tau0, tau1, tau2]    
+    #  A is a matrix
+    #  A = [[   1,    1,    1,    1],
+    #       [tau0,    1,    1,    1],
+    #       [tau1, tau1,    1,    1],
+    #       [tau2, tau2, tau2,    1]]
+    #  so that when we take the lower triangle of its cumulative product,
+    #  Tup = [[             1,         0,    0,  0],
+    #         [          tau0,         1,    0,  0],
+    #         [     tau1*tau0,      tau0,    1,  0],
+    #         [tau2*tau1*tau0, tau2*tau1, tau2,  1]]
+    #  and Tdown = transpose(Tup)
+    #   now we can get the downwelling beam by matrix multiplication
+    #  Edown = [E0, E1, E2, fromspace]
+    #  D = Tdown * Edown
+    #  then we add the reflected part at the surface to the surface emissions
+    #   Eup = [emit_sfc + albedo_sfc*D[0], E0, E1, E2]
+    #  so that the upwelling flux is 
+    #  U = Tup * Eup
+    #   The total flux, positive up is thus
+    #   F = U - D
+    #  and absorbed radiation is just the flux convergence
     Tup = np.tril(np.cumprod(A, axis=0))
     Tdown = np.transpose(Tup)
     # downwelling beam
