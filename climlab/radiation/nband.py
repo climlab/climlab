@@ -62,11 +62,33 @@ class NbandModel(_Radiation):
         except:
             fromspace = np.zeros_like(self.state['Ts'])
         albedo_sfc = self.albedo_sfc
-        absorbed, flux = flux_compute(fromspace, albedo_sfc, 
-                                            self.diagnostics['emit_sfc'], 
-                                            self.diagnostics['emit_atm'],
-                                            self._trans)
+        #absorbed, flux = flux_compute(fromspace, albedo_sfc, 
+        #                                    self.diagnostics['emit_sfc'], 
+        #                                    self.diagnostics['emit_atm'],
+        #                                    self._trans)
+        F = self._trans.flux_compute(fromspace, albedo_sfc, 
+                                        self.diagnostics['emit_sfc'], 
+                                        self.diagnostics['emit_atm'])
+        absorbed = {}  # absorbed radiation (flux convergence) in W / m**2
+        absorbed['atm'] = -np.diff(F)
+        absorbed['sfc'] = -F[0]
+        absorbed['total'] = absorbed['sfc'] + np.sum(absorbed['atm'])
         self.absorbed = absorbed
+        #  These are mostly just placeholders at the moment
+        N = self._trans.N
+        flux = {}  # fluxes in W / m**2
+        flux['space2sfc'] = 0.
+        flux['space2atm'] = np.zeros(N)
+        flux['atm2sfc'] = np.zeros(N)
+        flux['atm2atm'] = np.zeros(N)
+        flux['incident_sfc'] = 0.
+        flux['up_sfc'] = 0.
+        flux['sfc2atm'] = np.zeros(N)
+        flux['sfc2space'] = 0.
+        flux['atm2space'] = np.zeros(N)
+        flux['up2space'] = F[N]
+        flux['net2sfc'] = -F[0]
+
         self.flux = flux
         self.diagnostics['absorbed_sfc'] = absorbed['sfc']
         self.diagnostics['absorbed_atm'] = absorbed['atm']

@@ -58,7 +58,23 @@ class Transmissivity(object):
         A = np.tril(B,k=-1) + np.tri(N+1).transpose()
         self.Tup = np.tril(np.cumprod(A, axis=0))
         self.Tdown = np.transpose(self.Tup)
-        
+    
+    def flux_compute(self, fromspace, albedo_sfc, emit_sfc, emit_atm):
+        '''Compute radiative flux (defined positive up)
+        at interfaces between layers.'''        
+        # it's convenient to define a N+2 vector of level emissions, including
+        # the surface and outer space
+        E = np.concatenate((np.atleast_1d(emit_sfc), 
+                            emit_atm, np.atleast_1d(fromspace)))
+        # downwelling beam
+        D = np.dot(self.Tdown, E[1:])
+        #  add in the reflected part at the surface
+        E[0] += albedo_sfc * D[0]
+        U = np.dot(self.Tup, E[:self.N+1])
+        # total upwelling flux
+        F = U - D
+        return F
+
 
 #
 #class Transmissivity(object):
