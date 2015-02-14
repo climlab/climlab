@@ -84,22 +84,35 @@ def flux_compute(fromspace, albedo_sfc, emit_sfc, emit_atm, absorptivity):
     E = np.concatenate((np.atleast_1d(emit_sfc), emit_atm, np.atleast_1d(fromspace)))
     # Downwelling flux
      # will first cycle backward through D from top to bottom
-    D = np.zeros(N+1)
-    trans2 = np.flipud(trans)
-    E2 = np.flipud(E)
-    # downwelling beam includes emissions from each level
-    D += E2[:N+1]
-    for n in range(N+1):
-        D[n+1:] += np.cumprod(trans2[n:]) * E2[n]
-    D = np.flipud(D)
-    # upwelling flux
-    U = np.zeros(N+1)
+    #D = np.zeros(N+1)
+    #trans2 = np.flipud(trans)
+    #E2 = np.flipud(E)
+    ## downwelling beam includes emissions from each level
+    #D += E2[:N+1]
+    #for n in range(N+1):
+    #    D[n+1:] += np.cumprod(trans2[n:]) * E2[n]
+    #D = np.flipud(D)
+    ## upwelling flux
+    #U = np.zeros(N+1)
+    ##  add in the reflected part at the surface
+    #E[0] += albedo_sfc * D[0]
+    ## Upwelling beam includes emissions from each level
+    #U += E[:N+1]
+    #for n in range(N+1):
+    #    U[n+1:] += np.cumprod(trans[n:]) * E[n]
+        
+    # fully vectorized version
+    tau = np.concatenate((np.atleast_1d(1.), trans))
+    B = np.tile(tau, (N+1,1)).transpose()    
+    A = np.tril(B,k=-1) + np.tri(N+1).transpose()
+    Tup = np.tril(np.cumprod(A, axis=0))
+    Tdown = np.transpose(Tup)
+    # downwelling beam
+    D = np.dot(Tdown, E[1:])
     #  add in the reflected part at the surface
     E[0] += albedo_sfc * D[0]
-    # Upwelling beam includes emissions from each level
-    U += E[:N+1]
-    for n in range(N+1):
-        U[n+1:] += np.cumprod(trans[n:]) * E[n]
+    U = np.dot(Tup, E[:N+1])
+
     # total upwelling flux
     F = U - D
     # absorbed radiation is just flux convergence
@@ -107,10 +120,6 @@ def flux_compute(fromspace, albedo_sfc, emit_sfc, emit_atm, absorptivity):
     absorbed['sfc'] = -F[0]
     absorbed['total'] = absorbed['sfc'] + np.sum(absorbed['atm'])
     
-    # weighted emission
-    Eweight = [E[0], trans[0]*E[0]]
-    U = np.cumsum(Eweight)    
-    np.cumprod(trans*E)
     
     #  These are mostly just placeholders at the moment
     flux['space2sfc'] = 0.
