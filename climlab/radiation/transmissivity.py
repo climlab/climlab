@@ -2,7 +2,9 @@ import numpy as np
 
 
 class Transmissivity(object):
-    '''Calculate and store transmissivity matrices between each level.
+    '''Class for calculating and store transmissivity between levels, 
+    and computing radiative fluxes between levels.
+    
     Input: 1-dimensional numpy array of absorptivities for each level.
     Attributes: (all stored as numpy arrays):
         N: number of levels
@@ -10,7 +12,7 @@ class Transmissivity(object):
         trans: level transmissivity (N)
         Tup: transmissivity matrix for upwelling beam (N+1, N+1)
         Tdown: transmissivity matrix for downwelling beam (N+1, N+1)
-        
+
     Example for N = 3 atmospheric layers:
 
     tau is a vector of transmissivities
@@ -61,7 +63,17 @@ class Transmissivity(object):
     
     def flux_compute(self, fromspace, albedo_sfc, emit_sfc, emit_atm):
         '''Compute radiative flux (defined positive up)
-        at interfaces between layers.'''        
+        at interfaces between layers.
+        
+        Inputs:
+            fromspace: flux down at top
+            albedo_sfc: fraction of incident radation at surface reflected up
+            emit_sfc: emission from surface
+            emit_atm: emission from atmospheric levels (N)
+        Returns:
+            vector of net upward radiative flux between levels (N+1)
+            element 0 is the flux up from the surface
+            element N is the flux up to space.'''        
         # it's convenient to define a N+2 vector of level emissions, including
         # the surface and outer space
         E = np.concatenate((np.atleast_1d(emit_sfc), 
