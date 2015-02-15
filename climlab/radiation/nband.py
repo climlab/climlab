@@ -1,15 +1,15 @@
 import numpy as np
 from climlab import constants as const
-from climlab.radiation.transmissivity import Transmissivity#, NbandFluxCompute
-from climlab.radiation.radiation import _Radiation
-
+from climlab.radiation.transmissivity import Transmissivity
+#from climlab.radiation.radiation import _Radiation
+from climlab.process.energy_budget import EnergyBudget
 
 # should revise this
 # make the class strictly an atmospheric radiative transfer
 # and couple it to a surface radiation class
 
 
-class NbandModel(_Radiation):
+class NbandModel(EnergyBudget):
     '''Parent class for all band radiation models,
     including grey and semi-grey model.
     
@@ -97,3 +97,8 @@ class NbandModel(_Radiation):
         self.diagnostics['absorbed_atm'] = absorbed['atm']
         self.heating_rate['Ts'] = absorbed['sfc']
         self.heating_rate['Tatm'] = absorbed['atm']
+
+    def _compute_heating_rates(self):
+        '''Compute energy flux convergences to get heating rates in W / m**2.'''
+        self.radiative_heating()        
+

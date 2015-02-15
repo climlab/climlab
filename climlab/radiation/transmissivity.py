@@ -60,37 +60,34 @@ class Transmissivity(object):
         A = np.tril(B,k=-1) + np.tri(N+1).transpose()
         self.Tup = np.tril(np.cumprod(A, axis=0))
         self.Tdown = np.transpose(self.Tup)
-    
-    def flux_down(self, fluxDownTop, emission):
+
+    def flux_down(self, fluxDownTop, emission=None):
+        '''Compute downwelling radiative flux at interfaces between layers.
+        
+        Inputs:
+            fluxDownTop: flux down at top
+            emission: emission from atmospheric levels (N)
+                defaults to zero if not given
+        Returns:
+            vector of downwelling radiative flux between levels (N+1)
+            element 0 is the flux down to the surface.'''
+        if emission is None:
+            emission = np.zeros_like(self.absorptivity)
         E = np.append(emission, fluxDownTop)
         return np.dot(self.Tdown, E)
+
+    def flux_up(self, fluxUpBottom, emission=None):
+        '''Compute upwelling radiative flux at interfaces between layers.
         
-    def flux_up(self, fluxUpBottom, emission):
+        Inputs:
+            fluxUpBottom: flux up from bottom
+            emission: emission from atmospheric levels (N)
+                defaults to zero if not given
+        Returns:
+            vector of downwelling radiative flux between levels (N+1)
+            element N is the flux up to space.'''        
+        if emission is None:
+            emission = np.zeros_like(self.absorptivity)
         E = np.flipud(np.append(np.flipud(emission), fluxUpBottom))
         return np.dot(self.Tup, E)
     
-    def flux_compute(self, fromspace, albedo_sfc, emit_sfc, emit_atm):
-        '''Compute radiative flux (defined positive up)
-        at interfaces between layers.
-        
-        Inputs:
-            fromspace: flux down at top
-            albedo_sfc: fraction of incident radation at surface reflected up
-            emit_sfc: emission from surface
-            emit_atm: emission from atmospheric levels (N)
-        Returns:
-            vector of net upward radiative flux between levels (N+1)
-            element 0 is the flux up from the surface
-            element N is the flux up to space.'''        
-        # it's convenient to define a N+2 vector of level emissions, including
-        # the surface and outer space
-        E = np.concatenate((np.atleast_1d(emit_sfc), 
-                            emit_atm, np.atleast_1d(fromspace)))
-        # downwelling beam
-        D = np.dot(self.Tdown, E[1:])
-        #  add in the reflected part at the surface
-        E[0] += albedo_sfc * D[0]
-        U = np.dot(self.Tup, E[:self.N+1])
-        # total upwelling flux
-        F = U - D
-        return F
