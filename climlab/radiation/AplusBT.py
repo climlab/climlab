@@ -18,10 +18,11 @@ olr.compute()
 olr.step_forward()
 print olr.state
 '''
-from climlab.radiation.radiation import _Radiation
+#from climlab.radiation.radiation import _Radiation
+from climlab.process.energy_budget import EnergyBudget
 
 
-class AplusBT(_Radiation):
+class AplusBT(EnergyBudget):
     '''The simplest linear longwave radiation module.
     Should be invoked with a single temperature state variable.'''
     def __init__(self, A=200., B=2., **kwargs):
@@ -49,8 +50,8 @@ class AplusBT(_Radiation):
             flux = self.A + self.B * value
             self.diagnostics['OLR'] = flux
     
-    def radiative_heating(self):
-        '''Compute radiative flux convergences to get heating rates in W / m**2'''
-        super(AplusBT, self).radiative_heating()
+    def _compute_heating_rates(self):
+        '''Compute energy flux convergences to get heating rates in W / m**2.'''
+        self.emission()
         for varname, value in self.state.iteritems():
             self.heating_rate[varname] = -self.diagnostics['OLR']
