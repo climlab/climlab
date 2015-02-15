@@ -1,7 +1,6 @@
 import numpy as np
 from climlab import constants as const
 from climlab.radiation.nband import NbandModel
-from climlab.radiation.transmissivity import Transmissivity
 
 
 class GreyRadiation_LW(NbandModel):

@@ -1,7 +1,6 @@
 import numpy as np
 from climlab import constants as const
 from climlab.radiation.transmissivity import Transmissivity
-#from climlab.radiation.radiation import _Radiation
 from climlab.process.energy_budget import EnergyBudget
 
 # should revise this

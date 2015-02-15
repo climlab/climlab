@@ -18,7 +18,6 @@ olr.compute()
 olr.step_forward()
 print olr.state
 '''
-#from climlab.radiation.radiation import _Radiation
 from climlab.process.energy_budget import EnergyBudget
 
 
