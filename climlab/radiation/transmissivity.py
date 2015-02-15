@@ -61,6 +61,14 @@ class Transmissivity(object):
         self.Tup = np.tril(np.cumprod(A, axis=0))
         self.Tdown = np.transpose(self.Tup)
     
+    def flux_down(self, fluxDownTop, emission):
+        E = np.append(emission, fluxDownTop)
+        return np.dot(self.Tdown, E)
+        
+    def flux_up(self, fluxUpBottom, emission):
+        E = np.flipud(np.append(np.flipud(emission), fluxUpBottom))
+        return np.dot(self.Tup, E)
+    
     def flux_compute(self, fromspace, albedo_sfc, emit_sfc, emit_atm):
         '''Compute radiative flux (defined positive up)
         at interfaces between layers.
