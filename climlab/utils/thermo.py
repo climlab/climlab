@@ -115,4 +115,8 @@ def estimated_inversion_strength(T0,T700):
 def EIS(T0,T700):
     '''Convenience method, identical to thermo.estimated_inversion_strength(T0,T700)'''
     return estimated_inversion_strength(T0,T700)
+    
+def blackbody_emission(T):
+    '''Blackbody radiation following the Stefan-Boltzmann law.'''
+    return const.sigma * T**4
 

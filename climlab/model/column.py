@@ -12,6 +12,7 @@ from climlab.domain import domain
 from climlab.domain.field import Field
 from climlab.radiation import insolation, grey_radiation
 from climlab.convection.convadj import ConvectiveAdjustment
+from climlab.surface.surface_radiation import SurfaceRadiation
 
 
 class SingleColumnModel(TimeDependentProcess):
@@ -60,14 +61,20 @@ class SingleColumnModel(TimeDependentProcess):
                                                     absorptivity=absorbSW,
                                                     **self.param)
         Q = insolation.FixedInsolation(S0=self.param['Q'], **self.param)
+        surface = SurfaceRadiation(state=self.state, **self.param)
         self.add_subprocess('LW', longwave)
         self.add_subprocess('SW', shortwave)
         self.add_subprocess('insolation', Q)
+        self.add_subprocess('surface', surface)
     
     # This process has to handle the coupling between insolation and column radiation
     def compute(self):
-        self.subprocess['SW'].from_space = \
+        self.subprocess['SW'].flux_from_space = \
             self.subprocess['insolation'].diagnostics['insolation']
+        self.subprocess['SW'].albedo_sfc = self.subprocess['surface'].albedo_sfc
+        self.subprocess['surface'].LW_from_atm = self.subprocess['LW'].flux_to_sfc
+        self.subprocess['surface'].SW_from_atm = self.subprocess['SW'].flux_to_sfc
+        self.subprocess['LW'].flux_from_surface = self.subprocess['surface'].LW_to_atm
         
 
 class RadiativeConvectiveModel(SingleColumnModel):

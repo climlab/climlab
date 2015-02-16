@@ -9,7 +9,7 @@ class Transmissivity(object):
     Attributes: (all stored as numpy arrays):
         N: number of levels
         absorptivity: level absorptivity (N)
-        trans: level transmissivity (N)
+        transmissivity: level transmissivity (N)
         Tup: transmissivity matrix for upwelling beam (N+1, N+1)
         Tdown: transmissivity matrix for downwelling beam (N+1, N+1)
 
@@ -51,11 +51,11 @@ class Transmissivity(object):
         if absorptivity.ndim is not 1:
             raise ValueError('absorptivity argument must be a vector')
         self.absorptivity = absorptivity
-        self.trans = 1 - absorptivity
+        self.transmissivity = 1 - absorptivity
         N = self.absorptivity.size
         self.N = N
         # fully vectorized version
-        tau = np.concatenate((np.atleast_1d(1.), self.trans))
+        tau = np.concatenate((np.atleast_1d(1.), self.transmissivity))
         B = np.tile(tau, (N+1,1)).transpose()    
         A = np.tril(B,k=-1) + np.tri(N+1).transpose()
         self.Tup = np.tril(np.cumprod(A, axis=0))
