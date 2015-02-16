@@ -38,8 +38,8 @@ class GreyRadiation_SW(Radiation):
         #self.flux_from_space = np.ones_like(self.state['Ts'])
 
     @property
-    def emissivity_atm(self):
-        return np.zeros_like(self.state['Tatm'])
+    def emissivity(self):
+        return np.zeros_like(self.Tatm)
 
     def radiative_heating(self):
         super(GreyRadiation_SW, self).radiative_heating()

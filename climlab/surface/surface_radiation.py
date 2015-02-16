@@ -27,6 +27,5 @@ class SurfaceRadiation(EnergyBudget):
         '''Compute energy flux convergences to get heating rates in W / m**2.'''
         self.LW_to_atm = self.emission()
         self.SW_to_atm = self.reflected_flux()
-        self.heating_rate['Ts'] = ( self.LW_from_atm + self.SW_from_atm
-                                   - self.SW_to_atm
-                                   - self.LW_to_atm )
+        self.heating_rate['Ts'] = ( self.LW_from_atm - self.LW_to_atm 
+                                  + self.SW_from_atm - self.SW_to_atm )

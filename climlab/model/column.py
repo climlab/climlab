@@ -74,7 +74,7 @@ class SingleColumnModel(TimeDependentProcess):
         self.subprocess['SW'].albedo_sfc = self.subprocess['surface'].albedo_sfc
         self.subprocess['surface'].LW_from_atm = self.subprocess['LW'].flux_to_sfc
         self.subprocess['surface'].SW_from_atm = self.subprocess['SW'].flux_to_sfc
-        self.subprocess['LW'].flux_from_surface = self.subprocess['surface'].LW_to_atm
+        self.subprocess['LW'].flux_from_sfc = self.subprocess['surface'].LW_to_atm
         
 
 class RadiativeConvectiveModel(SingleColumnModel):
