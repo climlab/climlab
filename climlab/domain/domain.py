@@ -16,10 +16,16 @@ class _Domain(object):
         self.axes = self._make_axes_dict(axes)
         self.numdims = len(self.axes.keys())
         shape = []
+        axcount = 0
+        axindex = {}
         for axType, ax in self.axes.iteritems():
             shape.append(ax.num_points)
             #  can access axes as object attributes
             setattr(self, axType, ax)
+            #
+            axindex[axType] = axcount
+            axcount += 1
+        self.axis_index = axindex
         self.shape = tuple(shape)
 
         self.set_heat_capacity()
