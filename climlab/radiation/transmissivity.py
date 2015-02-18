@@ -1,4 +1,6 @@
 import numpy as np
+# experimental...  this is not well documented!
+from numpy.core.umath_tests import matrix_multiply
 
 
 class Transmissivity(object):
@@ -55,20 +57,20 @@ class Transmissivity(object):
         self.absorptivity = absorptivity
         self.transmissivity = 1 - absorptivity
         #N = self.absorptivity.size
-        shape = self.absorptivity.shape 
+        self.shape = self.absorptivity.shape 
         N = np.size(self.absorptivity, axis=self.axis)
         self.N = N
         #  For now, let's assume that the vertical axis is the last axis
         
         # simplest thing to do is just loop through all other axes
-        if len(shape)==1:
+        if len(self.shape)==1:
             Tup, Tdown = compute_T(self.transmissivity)
             self.Tup = Tup
             self.Tdown = Tdown
-        elif len(shape)==2:
-            self.Tup = np.zeros((shape[0],N+1,N+1))
+        elif len(self.shape)==2:
+            self.Tup = np.zeros((self.shape[0],N+1,N+1))
             self.Tdown = np.zeros_like(self.Tup)
-            for i in range(shape[0]):
+            for i in range(self.shape[0]):
                 # for now this is only going to work with one extra dimension
                 Tup, Tdown = compute_T(self.transmissivity[i,:])
                 self.Tup[i,:,:] = Tup
@@ -87,9 +89,10 @@ class Transmissivity(object):
         if emission is None:
             emission = np.zeros_like(self.absorptivity)
         E = np.append(emission, fluxDownTop)
-        #return np.inner(self.Tdown, E)
-        #return np.einsum('ij,i', self.Tdown, E)
-        return np.tensordot(self.Tdown, E, axes=[[1],[0]])
+        #  dot product (matrix multiplication) along last axes
+        #return np.tensordot(self.Tdown, E, axes=[[-1],[-1]])
+        #return np.einsum('...ij,...j->...', self.Tdown, E)
+        return np.squeeze(matrix_multiply(self.Tdown, E[..., np.newaxis]))
         
     def flux_up(self, fluxUpBottom, emission=None):
         '''Compute upwelling radiative flux at interfaces between layers.
@@ -104,9 +107,10 @@ class Transmissivity(object):
         if emission is None:
             emission = np.zeros_like(self.absorptivity)
         E = np.flipud(np.append(np.flipud(emission), fluxUpBottom))
-        #return np.inner(self.Tup, E)
-        #return np.einsum('ij,i', self.Tup, E)
-        return np.tensordot(self.Tup, E, axes=[[1],[0]])
+        #  dot product (matrix multiplication) along last axes
+        #return np.tensordot(self.Tup, E, axes=[[-1],[-1]])
+        #return np.einsum('...ij,...j->...', self.Tup, E)
+        return np.squeeze(matrix_multiply(self.Tup, E[..., np.newaxis]))
 
 def compute_T(transmissivity):
     # fully vectorized version
