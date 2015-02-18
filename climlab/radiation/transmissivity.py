@@ -47,19 +47,26 @@ class Transmissivity(object):
     The absorbed radiation in the atmosphere is the flux convergence:
         -diff(F)
     '''
-    def __init__(self, absorptivity):
-        if absorptivity.ndim is not 1:
-            raise ValueError('absorptivity argument must be a vector')
+    ##  experimenting with multidimensional domains
+    def __init__(self, absorptivity, axis=0):
+        #if absorptivity.ndim is not 1:
+        #    raise ValueError('absorptivity argument must be a vector')
         self.absorptivity = absorptivity
         self.transmissivity = 1 - absorptivity
-        N = self.absorptivity.size
+        #N = self.absorptivity.size
+        shape = self.absorptivity.shape 
+        N = np.size(self.absorptivity, axis=axis)
         self.N = N
+        #  For now, let's assume that the vertical axis is the last axis
+        Tup, Tdown = compute_Tup(self.transmissivity)
+        self.Tup = Tup
+        self.Tdown = Tdown
         # fully vectorized version
-        tau = np.concatenate((np.atleast_1d(1.), self.transmissivity))
-        B = np.tile(tau, (N+1,1)).transpose()    
-        A = np.tril(B,k=-1) + np.tri(N+1).transpose()
-        self.Tup = np.tril(np.cumprod(A, axis=0))
-        self.Tdown = np.transpose(self.Tup)
+        #tau = np.concatenate((np.atleast_1d(1.), self.transmissivity))
+        #B = np.tile(tau, (N+1,1)).transpose()    
+        #A = np.tril(B,k=-1) + np.tri(N+1).transpose()
+        #self.Tup = np.tril(np.cumprod(A, axis=0))
+        #self.Tdown = np.transpose(self.Tup)
 
     def flux_down(self, fluxDownTop, emission=None):
         '''Compute downwelling radiative flux at interfaces between layers.
@@ -90,4 +97,13 @@ class Transmissivity(object):
             emission = np.zeros_like(self.absorptivity)
         E = np.flipud(np.append(np.flipud(emission), fluxUpBottom))
         return np.dot(self.Tup, E)
-    
+
+def compute_Tup(transmissivity):
+    # fully vectorized version
+    N = transmissivity.size
+    tau = np.concatenate((np.atleast_1d(1.), transmissivity))
+    B = np.tile(tau, (N+1,1)).transpose()    
+    A = np.tril(B,k=-1) + np.tri(N+1).transpose()
+    Tup = np.tril(np.cumprod(A, axis=0))
+    Tdown = np.transpose(Tup)
+    return Tup, Tdown
