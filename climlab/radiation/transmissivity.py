@@ -10,16 +10,11 @@ import climlab
 sfc, atm = climlab.domain.zonal_mean_column()
 absorb = np.ones(atm.shape)
 trans = climlab.radiation.transmissivity.Transmissivity(absorptivity=absorb,
-                                                        axis=1)
-                                                        
+                                                        axis=1)                                                
 fromspace = np.zeros(sfc.shape)
 emission = 200*np.ones(atm.shape)
 A = trans.flux_down(fluxDownTop=fromspace, emission=emission)
-
-albedo_sfc = np.zeros(sfc.shape)
-emit_sfc = np.ones(sfc.shape)
-emit_atm = np.ones(atm.shape)
-climlab.radiation.nband.flux_compute(fromspace, albedo_sfc, emit_sfc, emit_atm, trans)
+A.shape
 
 '''
 
