@@ -126,6 +126,32 @@ def zonal_mean_surface(num_points=90, water_depth=10., lat=None, **kwargs):
     slab = SlabOcean(axes=axes, **kwargs)
     return slab
 
+def zonal_mean_column(num_lat=90, num_lev=30, water_depth=10., lat=None, 
+                      lev=None, **kwargs):
+    if lat is None:
+        latax = Axis(axis_type='lat', num_points=num_lat)
+    elif isinstance(lat, Axis):
+        latax = lat
+    else:
+        try:
+            latax = Axis(axis_type='lat', points=lat)
+        except:
+            raise ValueError('lat must be Axis object or latitude array')
+    if lev is None:
+        levax = Axis(axis_type='lev', num_points=num_lev)
+    elif isinstance(lev, Axis):
+        levax = lev
+    else:
+        try:
+            levax = Axis(axis_type='lev', points=lev)
+        except:
+            raise ValueError('lev must be Axis object or pressure array')
+
+    depthax = Axis(axis_type='depth', bounds=[water_depth, 0.])
+    #axes = {'depth': depthax, 'lat': latax, 'lev': levax}
+    slab = SlabOcean(axes={'depth':depthax, 'lat':latax}, **kwargs)
+    atm = Atmosphere(axes={'lev':levax, 'lat':latax}, **kwargs)
+    return slab, atm
 
 def box_model_domain(num_points=2, **kwargs):
     '''Create a box model domain (a single abstract axis).'''
