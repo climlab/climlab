@@ -19,7 +19,7 @@ class Radiation(EnergyBudget):
     def __init__(self, absorptivity=None, albedo_sfc=0, **kwargs):
         super(Radiation, self).__init__(**kwargs)
         self.absorptivity = absorptivity
-        self.albedo_sfc = albedo_sfc
+        self.albedo_sfc = albedo_sfc*np.ones_like(self.Ts)
         self.flux_from_space = np.zeros_like(self.Ts)
         self.flux_to_sfc = np.zeros_like(self.Ts)
         self.flux_from_sfc = np.zeros_like(self.Ts)
@@ -30,7 +30,8 @@ class Radiation(EnergyBudget):
         return self.trans.absorptivity
     @absorptivity.setter
     def absorptivity(self, value):
-        self.trans = Transmissivity(np.array(value))
+        self.trans = Transmissivity(np.array(value),
+                                    axis=self.Tatm.domain.axis_index['lev'])
     @property
     def emissivity(self):
         # This ensures that emissivity = absorptivity at all times
@@ -56,7 +57,9 @@ class Radiation(EnergyBudget):
             fromspace = np.zeros_like(self.Ts)
         
         self.flux_down = self.trans.flux_down(fromspace, self.emission)
-        flux_up_bottom = self.flux_from_sfc + self.albedo_sfc*self.flux_down[0]
+        # this ensure same dimensions as other fields
+        flux_down_sfc = self.flux_down[...,0,np.newaxis]
+        flux_up_bottom = self.flux_from_sfc + self.albedo_sfc*flux_down_sfc
         self.flux_up = self.trans.flux_up(flux_up_bottom, self.emission)
         self.flux_net = self.flux_up - self.flux_down
         # absorbed radiation (flux convergence) in W / m**2

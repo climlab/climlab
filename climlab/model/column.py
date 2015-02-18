@@ -15,6 +15,28 @@ from climlab.convection.convadj import ConvectiveAdjustment
 from climlab.surface.surface_radiation import SurfaceRadiation
 
 
+#class GreyRadiationModel(TimeDependentProcess):
+#    def __init__(self,
+#                 lev=None,
+#                 num_levels=30,
+#                 lat=None,
+#                 num_lat=1,
+#                 water_depth=1.0,
+#                 timestep=1. * const.seconds_per_day,
+#                 abs_coeff=1.229E-4,
+#                 **kwargs):
+#        super(GreyRadiationModel, self).__init__(timestep=timestep, **kwargs)
+#        if not self.domains and not self.state:  # no state vars or domains yet
+#            # first create the model domains
+#            if lev is not None:
+#                sfc, atm = domain.single_column(water_depth=water_depth,
+#                                                lev=lev)
+#            else:
+#                sfc, atm = domain.single_column(num_points=num_levels, 
+#                                                water_depth=water_depth)
+#            num_levels = atm.axes['lev'].num_points
+#        
+
 class SingleColumnModel(TimeDependentProcess):
     '''SingleColumnModel has an atmospheric column with radiative transfer
     and a single slab ocean point.'''
@@ -27,22 +49,31 @@ class SingleColumnModel(TimeDependentProcess):
                  timestep=1. * const.seconds_per_day,
                  # absorption coefficient in m**2 / kg
                  abs_coeff=1.229E-4,
+                 num_lat=1,
                  **kwargs):
         super(SingleColumnModel, self).__init__(timestep=timestep, **kwargs)
         if not self.domains and not self.state:  # no state vars or domains yet
             # first create the model domains
-            if lev is not None:
-                sfc, atm = domain.single_column(water_depth=water_depth,
-                                                lev=lev)
+            #if lev is not None:
+            #    sfc, atm = domain.single_column(water_depth=water_depth,
+            #                                    lev=lev)
+            #else:
+            #    sfc, atm = domain.single_column(num_points=num_levels, 
+            #                                    water_depth=water_depth)
+            if num_lat > 1:
+                sfc, atm = domain.zonal_mean_column(num_lat=num_lat, 
+                                                    num_lev=num_levels,
+                                                    water_depth=water_depth)
             else:
                 sfc, atm = domain.single_column(num_points=num_levels, 
                                                 water_depth=water_depth)
             num_levels = atm.axes['lev'].num_points
             # initial surface temperature
-            self.set_state('Ts', Field(288., domain=sfc))
+            self.set_state('Ts', Field(288.*np.ones(sfc.shape), domain=sfc))
             # intitial column temperature
-            self.set_state('Tatm', Field(np.linspace(288.-10., 200., 
-                                             num_levels), domain=atm))
+            Tinitial = np.tile(np.linspace(288.-10., 200., num_levels),
+                               sfc.shape)
+            self.set_state('Tatm', Field(Tinitial, domain=atm))
         self.param['water_depth'] = water_depth
         self.param['albedo_sfc'] = albedo_sfc
         self.param['Q'] = Q
@@ -52,7 +83,7 @@ class SingleColumnModel(TimeDependentProcess):
         # create sub-modesl for longwave and shortwave radiation
         dp = self.Tatm.domain.axes['lev'].delta
         absorbLW = grey_radiation.compute_layer_absorptivity(self.param['abs_coeff'], dp)
-        absorbLW = Field(absorbLW, domain=self.Tatm.domain)        
+        absorbLW = Field(np.tile(absorbLW, sfc.shape), domain=self.Tatm.domain)
         absorbSW = np.zeros_like(absorbLW)
         longwave = grey_radiation.GreyRadiation_LW(state=self.state,
                                                    absorptivity=absorbLW,
@@ -60,7 +91,8 @@ class SingleColumnModel(TimeDependentProcess):
         shortwave = grey_radiation.GreyRadiation_SW(state=self.state,
                                                     absorptivity=absorbSW,
                                                     **self.param)
-        Q = insolation.FixedInsolation(S0=self.param['Q'], **self.param)
+        thisQ = self.param['Q']*np.ones_like(self.Ts)
+        Q = insolation.FixedInsolation(S0=thisQ, domain=sfc, **self.param)
         surface = SurfaceRadiation(state=self.state, **self.param)
         self.add_subprocess('LW', longwave)
         self.add_subprocess('SW', shortwave)

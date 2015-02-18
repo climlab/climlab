@@ -104,6 +104,9 @@ class Transmissivity(object):
         if emission is None:
             emission = np.zeros_like(self.absorptivity)
         #E = np.append(emission, fluxDownTop)
+        #print emission.shape
+        #print fluxDownTop.shape
+        #print np.atleast_1d(fluxDownTop).shape
         E = np.concatenate((emission, np.atleast_1d(fluxDownTop)), axis=-1)
         #  dot product (matrix multiplication) along last axes
         #return np.tensordot(self.Tdown, E, axes=[[-1],[-1]])

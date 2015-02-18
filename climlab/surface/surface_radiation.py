@@ -9,7 +9,7 @@ class SurfaceRadiation(EnergyBudget):
         if albedo_sfc is None:
             self.albedo_sfc = np.zeros_like(self.Ts)
         else:
-            self.albedo_sfc = albedo_sfc
+            self.albedo_sfc = albedo_sfc*np.ones_like(self.Ts)
         self.LW_from_atm = np.zeros_like(self.Ts)
         self.SW_from_atm = np.zeros_like(self.Ts)
         self.LW_to_atm = np.zeros_like(self.Ts)
