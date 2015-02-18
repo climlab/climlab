@@ -58,15 +58,20 @@ class Transmissivity(object):
         N = np.size(self.absorptivity, axis=axis)
         self.N = N
         #  For now, let's assume that the vertical axis is the last axis
-        Tup, Tdown = compute_Tup(self.transmissivity)
-        self.Tup = Tup
-        self.Tdown = Tdown
-        # fully vectorized version
-        #tau = np.concatenate((np.atleast_1d(1.), self.transmissivity))
-        #B = np.tile(tau, (N+1,1)).transpose()    
-        #A = np.tril(B,k=-1) + np.tri(N+1).transpose()
-        #self.Tup = np.tril(np.cumprod(A, axis=0))
-        #self.Tdown = np.transpose(self.Tup)
+        
+        # simplest thing to do is just loop through all other axes
+        if len(shape)==1:
+            Tup, Tdown = compute_T(self.transmissivity)
+            self.Tup = Tup
+            self.Tdown = Tdown
+        elif len(shape)==2:
+            self.Tup = np.zeros((shape[0],N+1,N+1))
+            self.Tdown = np.zeros_like(self.Tup)
+            for i in range(shape[0]):
+                # for now this is only going to work with one extra dimension
+                Tup, Tdown = compute_T(self.transmissivity[i,:])
+                self.Tup[i,:,:] = Tup
+                self.Tdown[i,:,:] = Tdown
 
     def flux_down(self, fluxDownTop, emission=None):
         '''Compute downwelling radiative flux at interfaces between layers.
@@ -98,8 +103,9 @@ class Transmissivity(object):
         E = np.flipud(np.append(np.flipud(emission), fluxUpBottom))
         return np.dot(self.Tup, E)
 
-def compute_Tup(transmissivity):
+def compute_T(transmissivity):
     # fully vectorized version
+    # works on a vector transmissivity
     N = transmissivity.size
     tau = np.concatenate((np.atleast_1d(1.), transmissivity))
     B = np.tile(tau, (N+1,1)).transpose()    
