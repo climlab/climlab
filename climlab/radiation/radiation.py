@@ -43,28 +43,29 @@ class Radiation(EnergyBudget):
     def transmissivity(self, value):
         self.absorptivity = 1 - value
 
-    def emission(self):
+    def compute_emission(self):
         return self.emissivity * blackbody_emission(self.Tatm)
 
     def radiative_heating(self):
-        emission = self.emission()
-        self.diagnostics['emission'] = emission
+        self.emission = self.compute_emission()
+        #self.diagnostics['emission'] = emission
         try:
             fromspace = self.flux_from_space
 
         except:
-            fromspace = np.zeros_like(self.state['Ts'])
+            fromspace = np.zeros_like(self.Ts)
         
-        self.flux_down = self.trans.flux_down(fromspace, emission)
+        self.flux_down = self.trans.flux_down(fromspace, self.emission)
         flux_up_bottom = self.flux_from_sfc + self.albedo_sfc*self.flux_down[0]
-        self.flux_up = self.trans.flux_up(flux_up_bottom, emission)
+        self.flux_up = self.trans.flux_up(flux_up_bottom, self.emission)
         self.flux_net = self.flux_up - self.flux_down
         # absorbed radiation (flux convergence) in W / m**2
         self.absorbed = -np.diff(self.flux_net)
         self.absorbed_total = np.sum(self.absorbed)
-        self.diagnostics['absorbed_atm'] = self.absorbed
+        #self.diagnostics['absorbed_atm'] = self.absorbed
         self.heating_rate['Tatm'] = self.absorbed
         self.flux_to_sfc = self.flux_down[0]
+        self.flux_to_space = self.flux_up[-1]
 
     def _compute_heating_rates(self):
         '''Compute energy flux convergences to get heating rates in W / m**2.'''

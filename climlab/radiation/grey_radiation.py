@@ -18,13 +18,15 @@ class GreyRadiation_LW(Radiation):
     def radiative_heating(self):
         super(GreyRadiation_LW, self).radiative_heating()
         self.diagnostics['OLR'] = self.flux_net[-1]     
-        #self.diagnostics['LW_down_sfc'] = self.flux['incident_sfc']
+        self.diagnostics['LW_down_sfc'] = self.flux_to_sfc
+        self.diagnostics['LW_up_sfc'] = self.flux_from_sfc
+        #  need to compute contributions to OLR
         #self.diagnostics['OLR_sfc'] = self.flux['sfc2space']
         #self.diagnostics['OLR_atm'] = self.flux['atm2space']
-        #self.diagnostics['OLR'] = self.flux['up2space']
-        #self.diagnostics['LW_absorbed_sfc'] = self.absorbed['sfc']
-        #self.diagnostics['LW_absorbed_atm'] = self.absorbed['atm']
-        
+        self.diagnostics['OLR'] = self.flux_to_space
+        self.diagnostics['LW_absorbed_sfc'] = -self.flux_net[0]
+        self.diagnostics['LW_absorbed_atm'] = self.absorbed
+        self.diagnostics['LW_emission'] = self.emission
 
 class GreyRadiation_SW(Radiation):
     def __init__(self, absorptivity=None, **kwargs):
@@ -39,15 +41,17 @@ class GreyRadiation_SW(Radiation):
 
     def radiative_heating(self):
         super(GreyRadiation_SW, self).radiative_heating()
-                
-        #self.diagnostics['SW_absorbed_sfc'] = self.absorbed['sfc']
-        #self.diagnostics['SW_absorbed_atm'] = self.absorbed['atm']
-        #self.diagnostics['SWdown_sfc'] = self.flux['incident_sfc']
-        #self.diagnostics['SWup_TOA'] = self.flux['up2space']
-        #self.diagnostics['SW_absorbed_total'] = self.absorbed['total']
-        #self.diagnostics['planetary_albedo'] = (self.flux['up2space'] / 
-        #                                        self.from_space)
-
+        self.diagnostics['ASR'] = self.flux_from_space - self.flux_to_space
+        self.diagnostics['SW_absorbed_sfc'] = -self.flux_net[0]
+        self.diagnostics['SW_absorbed_atm'] = self.absorbed
+        self.diagnostics['SW_down_sfc'] = self.flux_to_sfc
+        self.diagnostics['SW_up_sfc'] = self.flux_from_sfc
+        self.diagnostics['SW_up_TOA'] = self.flux_to_space
+        self.diagnostics['SW_down_TOA'] = self.flux_from_space
+        self.diagnostics['SW_absorbed_total'] = self.absorbed_total - self.flux_net[0]
+        self.diagnostics['planetary_albedo'] = (self.flux_to_space / 
+                                                self.flux_from_space)
+        self.diagnostics['SW_emission'] = self.emission
 
 def compute_layer_absorptivity(abs_coeff, dp):
     '''Compute layer absorptivity from a constant absorption coefficient.'''
