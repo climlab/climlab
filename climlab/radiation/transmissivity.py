@@ -49,13 +49,14 @@ class Transmissivity(object):
     '''
     ##  experimenting with multidimensional domains
     def __init__(self, absorptivity, axis=0):
+        self.axis = axis
         #if absorptivity.ndim is not 1:
         #    raise ValueError('absorptivity argument must be a vector')
         self.absorptivity = absorptivity
         self.transmissivity = 1 - absorptivity
         #N = self.absorptivity.size
         shape = self.absorptivity.shape 
-        N = np.size(self.absorptivity, axis=axis)
+        N = np.size(self.absorptivity, axis=self.axis)
         self.N = N
         #  For now, let's assume that the vertical axis is the last axis
         
@@ -86,8 +87,10 @@ class Transmissivity(object):
         if emission is None:
             emission = np.zeros_like(self.absorptivity)
         E = np.append(emission, fluxDownTop)
-        return np.dot(self.Tdown, E)
-
+        #return np.inner(self.Tdown, E)
+        #return np.einsum('ij,i', self.Tdown, E)
+        return np.tensordot(self.Tdown, E, axes=[[1],[0]])
+        
     def flux_up(self, fluxUpBottom, emission=None):
         '''Compute upwelling radiative flux at interfaces between layers.
         
@@ -101,7 +104,9 @@ class Transmissivity(object):
         if emission is None:
             emission = np.zeros_like(self.absorptivity)
         E = np.flipud(np.append(np.flipud(emission), fluxUpBottom))
-        return np.dot(self.Tup, E)
+        #return np.inner(self.Tup, E)
+        #return np.einsum('ij,i', self.Tup, E)
+        return np.tensordot(self.Tup, E, axes=[[1],[0]])
 
 def compute_T(transmissivity):
     # fully vectorized version
