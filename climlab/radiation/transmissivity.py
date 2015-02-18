@@ -2,6 +2,26 @@ import numpy as np
 # experimental...  this is not well documented!
 from numpy.core.umath_tests import matrix_multiply
 
+'''
+Testing multi-dimensional column radiation
+
+import numpy as np
+import climlab
+sfc, atm = climlab.domain.zonal_mean_column()
+absorb = np.ones(atm.shape)
+trans = climlab.radiation.transmissivity.Transmissivity(absorptivity=absorb,
+                                                        axis=1)
+                                                        
+fromspace = np.zeros(sfc.shape)
+emission = 200*np.ones(atm.shape)
+A = trans.flux_down(fluxDownTop=fromspace, emission=emission)
+
+albedo_sfc = np.zeros(sfc.shape)
+emit_sfc = np.ones(sfc.shape)
+emit_atm = np.ones(atm.shape)
+climlab.radiation.nband.flux_compute(fromspace, albedo_sfc, emit_sfc, emit_atm, trans)
+
+'''
 
 class Transmissivity(object):
     '''Class for calculating and store transmissivity between levels, 
@@ -88,7 +108,8 @@ class Transmissivity(object):
             element 0 is the flux down to the surface.'''
         if emission is None:
             emission = np.zeros_like(self.absorptivity)
-        E = np.append(emission, fluxDownTop)
+        #E = np.append(emission, fluxDownTop)
+        E = np.concatenate((emission, np.atleast_1d(fluxDownTop)), axis=-1)
         #  dot product (matrix multiplication) along last axes
         #return np.tensordot(self.Tdown, E, axes=[[-1],[-1]])
         #return np.einsum('...ij,...j->...', self.Tdown, E)
@@ -106,7 +127,8 @@ class Transmissivity(object):
             element N is the flux up to space.'''        
         if emission is None:
             emission = np.zeros_like(self.absorptivity)
-        E = np.flipud(np.append(np.flipud(emission), fluxUpBottom))
+        #E = np.flipud(np.append(np.flipud(emission), fluxUpBottom))
+        E = np.concatenate((np.atleast_1d(fluxUpBottom),emission), axis=-1)
         #  dot product (matrix multiplication) along last axes
         #return np.tensordot(self.Tup, E, axes=[[-1],[-1]])
         #return np.einsum('...ij,...j->...', self.Tup, E)
