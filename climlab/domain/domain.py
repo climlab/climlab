@@ -18,6 +18,8 @@ class _Domain(object):
         shape = []
         for axType, ax in self.axes.iteritems():
             shape.append(ax.num_points)
+            #  can access axes as object attributes
+            setattr(self, axType, ax)
         self.shape = tuple(shape)
 
         self.set_heat_capacity()
