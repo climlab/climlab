@@ -62,7 +62,6 @@ class Radiation(EnergyBudget):
         # absorbed radiation (flux convergence) in W / m**2
         self.absorbed = -np.diff(self.flux_net)
         self.absorbed_total = np.sum(self.absorbed)
-        #self.diagnostics['absorbed_atm'] = self.absorbed
         self.heating_rate['Tatm'] = self.absorbed
         self.flux_to_sfc = self.flux_down[0]
         self.flux_to_space = self.flux_up[-1]

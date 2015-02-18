@@ -9,11 +9,7 @@ class GreyRadiation_LW(Radiation):
     Surface albedo is zero.'''
     def __init__(self, absorptivity=None, **kwargs):
         super(GreyRadiation_LW, self).__init__(absorptivity=absorptivity, **kwargs)
-        #self.emissivity_sfc = np.ones_like(self.state['Ts'])
-        #self.emissivity_atm = self.absorptivity
         self.albedo_sfc = np.zeros_like(self.Ts)
-        #self.albedo_sfc = 0.  #  need to vectorize this        
-        #self.flux_from_space = np.zeros_like(self.state['Ts'])
 
     def radiative_heating(self):
         super(GreyRadiation_LW, self).radiative_heating()
