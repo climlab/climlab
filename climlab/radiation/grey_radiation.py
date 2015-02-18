@@ -11,8 +11,8 @@ class GreyRadiation_LW(Radiation):
         super(GreyRadiation_LW, self).__init__(absorptivity=absorptivity, **kwargs)
         #self.emissivity_sfc = np.ones_like(self.state['Ts'])
         #self.emissivity_atm = self.absorptivity
-        #self.albedo_sfc = np.zeros_like(self.state['Ts'])
-        self.albedo_sfc = 0.  #  need to vectorize this        
+        self.albedo_sfc = np.zeros_like(self.Ts)
+        #self.albedo_sfc = 0.  #  need to vectorize this        
         #self.flux_from_space = np.zeros_like(self.state['Ts'])
 
     def radiative_heating(self):
@@ -25,10 +25,6 @@ class GreyRadiation_LW(Radiation):
         #self.diagnostics['LW_absorbed_sfc'] = self.absorbed['sfc']
         #self.diagnostics['LW_absorbed_atm'] = self.absorbed['atm']
         
-
-# use insolation class to calculate Q
-# implement a setter for SW class
-# the coupling process needs to look after exchanging between insolation and column
 
 class GreyRadiation_SW(Radiation):
     def __init__(self, absorptivity=None, **kwargs):

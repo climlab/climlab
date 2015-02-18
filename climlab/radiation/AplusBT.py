@@ -47,10 +47,11 @@ class AplusBT(EnergyBudget):
     def emission(self):
         for varname, value in self.state.iteritems():
             flux = self.A + self.B * value
-            self.diagnostics['OLR'] = flux
+            self.OLR = flux
+            self.diagnostics['OLR'] = self.OLR
     
     def _compute_heating_rates(self):
         '''Compute energy flux convergences to get heating rates in W / m**2.'''
         self.emission()
         for varname, value in self.state.iteritems():
-            self.heating_rate[varname] = -self.diagnostics['OLR']
+            self.heating_rate[varname] = -self.OLR
