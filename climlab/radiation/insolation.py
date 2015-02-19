@@ -66,7 +66,8 @@ class P2Insolation(_Insolation):
         self._compute_fixed()
 
     def _compute_fixed(self):
-        lat = self.domains['default'].axes['lat'].points
+        #lat = self.domains['default'].axes['lat'].points
+        lat = self.lat     
         phi = np.deg2rad(lat)
         try:
             insolation = self.S0 / 4 * (1. + self.s2 * P2(np.sin(phi)))

@@ -60,6 +60,8 @@ class SingleColumnModel(TimeDependentProcess):
             #else:
             #    sfc, atm = domain.single_column(num_points=num_levels, 
             #                                    water_depth=water_depth)
+            # need to re-integrate the above code to allow domains and state
+            # vars as arguments            
             if num_lat > 1:
                 sfc, atm = domain.zonal_mean_column(num_lat=num_lat, 
                                                     num_lev=num_levels,
