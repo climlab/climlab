@@ -58,16 +58,17 @@ class Radiation(EnergyBudget):
         
         self.flux_down = self.trans.flux_down(fromspace, self.emission)
         # this ensure same dimensions as other fields
-        flux_down_sfc = self.flux_down[...,0,np.newaxis]
+        flux_down_sfc = self.flux_down[..., 0, np.newaxis]
         flux_up_bottom = self.flux_from_sfc + self.albedo_sfc*flux_down_sfc
         self.flux_up = self.trans.flux_up(flux_up_bottom, self.emission)
         self.flux_net = self.flux_up - self.flux_down
+        flux_up_top = self.flux_up[..., -1, np.newaxis]
         # absorbed radiation (flux convergence) in W / m**2
         self.absorbed = -np.diff(self.flux_net)
         self.absorbed_total = np.sum(self.absorbed)
         self.heating_rate['Tatm'] = self.absorbed
-        self.flux_to_sfc = self.flux_down[0]
-        self.flux_to_space = self.flux_up[-1]
+        self.flux_to_sfc = flux_down_sfc
+        self.flux_to_space = flux_up_top
 
     def _compute_heating_rates(self):
         '''Compute energy flux convergences to get heating rates in W / m**2.'''
