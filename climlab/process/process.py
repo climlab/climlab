@@ -59,7 +59,8 @@ class Process(object):
         str1 += walk.process_tree(self)  
         return str1
         
-    def __init__(self, state=None, domains=None, subprocess=None, 
+    def __init__(self, state=None, domains=None, subprocess=None,
+                 lat=None, lev=None, num_lat=None, num_levels=None,
                  diagnostics=None, **kwargs):
         # dictionary of domains. Keys are the domain names
         self.domains = _make_dict(domains, _Domain)

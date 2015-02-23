@@ -87,11 +87,11 @@ class SlabAtmosphere(Atmosphere):
         super(SlabAtmosphere, self).__init__(axes=axes, **kwargs)
     
     
-def single_column(num_points=30, water_depth=1., lev=None, **kwargs):
+def single_column(num_lev=30, water_depth=1., lev=None, **kwargs):
     '''Convenience method to create domains for a single column of atmosphere
     overlying a slab of water.
     
-    num_points is the number of pressure levels (evenly spaced from surface to TOA)
+    num_lev is the number of pressure levels (evenly spaced from surface to TOA)
     water_depth is the depth of the slab.
     
     Returns a list of 2 Domain objects (slab ocean, atmosphere)
@@ -99,13 +99,13 @@ def single_column(num_points=30, water_depth=1., lev=None, **kwargs):
     Usage:
     sfc, atm = domain.single_column()
         or
-    sfc, atm = domain.single_column(num_points=2, water_depth=10.)
+    sfc, atm = domain.single_column(num_lev=2, water_depth=10.)
     print sfc, atm
     
     Can also pass a pressure array or pressure level axis object
     '''
     if lev is None:
-        levax = Axis(axis_type='lev', num_points=num_points)
+        levax = Axis(axis_type='lev', num_points=num_lev)
     elif isinstance(lev, Axis):
         levax = lev
     else:
@@ -117,11 +117,11 @@ def single_column(num_points=30, water_depth=1., lev=None, **kwargs):
     slab = SlabOcean(axes=depthax, **kwargs)
     atm = Atmosphere(axes=levax, **kwargs)
     return slab, atm
-    
 
-def zonal_mean_surface(num_points=90, water_depth=10., lat=None, **kwargs):
+
+def zonal_mean_surface(num_lat=90, water_depth=10., lat=None, **kwargs):
     if lat is None:
-        latax = Axis(axis_type='lat', num_points=num_points)
+        latax = Axis(axis_type='lat', num_points=num_lat)
     elif isinstance(lat, Axis):
         latax = lat
     else:

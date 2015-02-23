@@ -28,7 +28,7 @@ from climlab.dynamics.diffusion import MeridionalDiffusion
 
 class EBM(EnergyBudget):
     def __init__(self,
-                 num_points=90,
+                 num_lat=90,
                  A=210.,
                  B=2.,
                  D=0.555,  # in W / m^2 / degC, same as B
@@ -38,7 +38,7 @@ class EBM(EnergyBudget):
                  **kwargs):
         super(EBM, self).__init__(timestep=timestep, **kwargs)
         if not self.domains and not self.state:  # no state vars or domains yet
-            sfc = domain.zonal_mean_surface(num_points=num_points,
+            sfc = domain.zonal_mean_surface(num_lat=num_lat,
                                             water_depth=water_depth)
             lat = sfc.axes['lat'].points
             initial = 12. - 40. * legendre.P2(np.sin(np.deg2rad(lat)))

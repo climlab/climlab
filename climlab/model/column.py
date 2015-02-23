@@ -15,77 +15,27 @@ from climlab.convection.convadj import ConvectiveAdjustment
 from climlab.surface.surface_radiation import SurfaceRadiation
 
 
-#class GreyRadiationModel(TimeDependentProcess):
-#    def __init__(self,
-#                 lev=None,
-#                 num_levels=30,
-#                 lat=None,
-#                 num_lat=1,
-#                 water_depth=1.0,
-#                 timestep=1. * const.seconds_per_day,
-#                 abs_coeff=1.229E-4,
-#                 **kwargs):
-#        super(GreyRadiationModel, self).__init__(timestep=timestep, **kwargs)
-#        if not self.domains and not self.state:  # no state vars or domains yet
-#            # first create the model domains
-#            if lev is not None:
-#                sfc, atm = domain.single_column(water_depth=water_depth,
-#                                                lev=lev)
-#            else:
-#                sfc, atm = domain.single_column(num_points=num_levels, 
-#                                                water_depth=water_depth)
-#            num_levels = atm.axes['lev'].num_points
-#        
-
-class SingleColumnModel(TimeDependentProcess):
-    '''SingleColumnModel has an atmospheric column with radiative transfer
-    and a single slab ocean point.'''
+class GreyRadiationModel(TimeDependentProcess):
     def __init__(self,
-                 lev=None,
-                 num_levels=30,
                  water_depth=1.0,
                  albedo_sfc=0.299,
-                 Q=341.3,
                  timestep=1. * const.seconds_per_day,
+                 Q=341.3,
                  # absorption coefficient in m**2 / kg
                  abs_coeff=1.229E-4,
-                 num_lat=1,
                  **kwargs):
-        super(SingleColumnModel, self).__init__(timestep=timestep, **kwargs)
-        if not self.domains and not self.state:  # no state vars or domains yet
-            # first create the model domains
-            #if lev is not None:
-            #    sfc, atm = domain.single_column(water_depth=water_depth,
-            #                                    lev=lev)
-            #else:
-            #    sfc, atm = domain.single_column(num_points=num_levels, 
-            #                                    water_depth=water_depth)
-            # need to re-integrate the above code to allow domains and state
-            # vars as arguments            
-            if num_lat > 1:
-                sfc, atm = domain.zonal_mean_column(num_lat=num_lat, 
-                                                    num_lev=num_levels,
-                                                    water_depth=water_depth)
-            else:
-                sfc, atm = domain.single_column(num_points=num_levels, 
-                                                water_depth=water_depth)
-            num_levels = atm.axes['lev'].num_points
-            # initial surface temperature
-            self.set_state('Ts', Field(288.*np.ones(sfc.shape), domain=sfc))
-            # intitial column temperature
-            Tinitial = np.tile(np.linspace(288.-10., 200., num_levels),
-                               sfc.shape)
-            self.set_state('Tatm', Field(Tinitial, domain=atm))
+        super(GreyRadiationModel, self).__init__(timestep=timestep, **kwargs)
         self.param['water_depth'] = water_depth
         self.param['albedo_sfc'] = albedo_sfc
         self.param['Q'] = Q
-        self.param['num_levels'] = num_levels
         self.param['abs_coeff'] = abs_coeff
 
+        sfc = self.Ts.domain
+        atm = self.Tatm.domain
         # create sub-modesl for longwave and shortwave radiation
-        dp = self.Tatm.domain.axes['lev'].delta
+        dp = self.Tatm.domain.lev.delta
         absorbLW = grey_radiation.compute_layer_absorptivity(self.param['abs_coeff'], dp)
-        absorbLW = Field(np.tile(absorbLW, sfc.shape), domain=self.Tatm.domain)
+        absorbLW = Field(np.tile(absorbLW, sfc.shape), domain=atm)
         absorbSW = np.zeros_like(absorbLW)
         longwave = grey_radiation.GreyRadiation_LW(state=self.state,
                                                    absorptivity=absorbLW,
@@ -109,6 +59,61 @@ class SingleColumnModel(TimeDependentProcess):
         self.subprocess['surface'].LW_from_atm = self.subprocess['LW'].flux_to_sfc
         self.subprocess['surface'].SW_from_atm = self.subprocess['SW'].flux_to_sfc
         self.subprocess['LW'].flux_from_sfc = self.subprocess['surface'].LW_to_atm
+        
+        
+
+def InitialCondition(num_lev=30, num_lat=1, lev=None, lat=None):
+    if 
+    sfc, atm = domain.zonal_mean_column()
+    num_levels = atm.lev.num_points
+    Ts = Field(288.*np.ones(sfc.shape), domain=sfc)
+    Tinitial = np.tile(np.linspace(288.-10., 200., num_levels), sfc.shape)
+    Tatm = Field(Tinitial, domain=atm)
+    state = {'Ts': Ts, 'Tatm': Tatm}
+    return state
+
+
+
+class SingleColumnModel(GreyRadiationModel):
+    '''SingleColumnModel has an atmospheric column with radiative transfer
+    and a single slab ocean point.'''
+    def __init__(self,
+                 lev=None,
+                 num_lev=30,
+                 water_depth=1.0,
+                 num_lat=1,
+                 **kwargs):
+        super(SingleColumnModel, self).__init__(timestep=timestep, **kwargs)
+        if not self.domains and not self.state:  # no state vars or domains yet
+            # first create the model domains
+            #if lev is not None:
+            #    sfc, atm = domain.single_column(water_depth=water_depth,
+            #                                    lev=lev)
+            #else:
+            #    sfc, atm = domain.single_column(num_points=num_levels, 
+            #                                    water_depth=water_depth)
+            # need to re-integrate the above code to allow domains and state
+            # vars as arguments            
+            if num_lat > 1:
+                sfc, atm = domain.zonal_mean_column(num_lat=num_lat, 
+                                                    num_lev=num_lev,
+                                                    water_depth=water_depth)
+            else:
+                sfc, atm = domain.single_column(num_points=num_lev, 
+                                                water_depth=water_depth)
+            num_lev = atm.lev.num_points
+            # initial surface temperature
+            self.set_state('Ts', Field(288.*np.ones(sfc.shape), domain=sfc))
+            # intitial column temperature
+            Tinitial = np.tile(np.linspace(288.-10., 200., num_lev),
+                               sfc.shape)
+            self.set_state('Tatm', Field(Tinitial, domain=atm))
+        self.param['water_depth'] = water_depth
+        self.param['albedo_sfc'] = albedo_sfc
+        self.param['Q'] = Q
+        self.param['num_lev'] = num_lev
+        self.param['abs_coeff'] = abs_coeff
+
         
 
 class RadiativeConvectiveModel(SingleColumnModel):
