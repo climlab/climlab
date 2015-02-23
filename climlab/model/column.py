@@ -91,7 +91,7 @@ class GreyRadiationModel(TimeDependentProcess):
 class RadiativeConvectiveModel(GreyRadiationModel):
     def __init__(self,                  
                  # lapse rate for convective adjustment, in K / km
-                 adj_lapse_rate=None,
+                 adj_lapse_rate=6.5,
                  **kwargs):
         super(RadiativeConvectiveModel, self).__init__(**kwargs)
         self.param['adj_lapse_rate'] = adj_lapse_rate
