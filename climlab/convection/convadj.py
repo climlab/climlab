@@ -17,22 +17,23 @@ class ConvectiveAdjustment(TimeDependentProcess):
         if lapse_rate is None:
             self.adjusted_state = self.state
         else:
-            unstable_Ts = np.array(self.state['Ts'])
-            unstable_Tatm = np.array(self.state['Tatm'])
-            c_atm = self.state['Tatm'].domain.heat_capacity
-            c_sfc = self.state['Ts'].domain.heat_capacity
+            unstable_Ts = np.array(self.Ts)
+            unstable_Tatm = np.array(self.Tatm)
+            c_atm = self.Tatm.domain.heat_capacity
+            c_sfc = self.Ts.domain.heat_capacity
             Tcol = np.flipud(np.append(np.flipud(unstable_Tatm), unstable_Ts))
-            patm = self.state['Tatm'].domain.axes['lev'].points
+            patm = self.Tatm.domain.lev.points
             pnew = np.flipud(np.append(np.flipud(patm), const.ps))
             cnew = np.flipud(np.append(np.flipud(c_atm), c_sfc))
             #pnew = np.concatenate(([const.ps], patm))
             #cnew = np.concatenate(([c_sfc], c_atm))
             Tadj = convective_adjustment_direct(pnew, Tcol, cnew,
                                         lapserate=lapse_rate)
-            Ts = Field(Tadj[0], domain=self.state['Ts'].domain)
-            Tatm = Field(Tadj[1:self.param['num_levels']+1], domain=self.state['Tatm'].domain)
-            self.adjustment['Ts'] = Ts - self.state['Ts']
-            self.adjustment['Tatm'] = Tatm - self.state['Tatm']
+            Ts = Field(Tadj[0], domain=self.Ts.domain)
+            num_lev = self.Tatm.domain.lev.num_points
+            Tatm = Field(Tadj[1:num_lev+1], domain=self.Tatm.domain)
+            self.adjustment['Ts'] = Ts - self.Ts
+            self.adjustment['Tatm'] = Tatm - self.Tatm
 
 
 #  This routine works but is slow... lots of explicit looping
