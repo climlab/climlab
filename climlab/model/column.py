@@ -1,6 +1,6 @@
 """column.py
 
-Object-oriented code for one-dimensional radiative-convective models.
+Object-oriented code for radiative-convective models with grey-gas radiation.
 
 Code developed by Brian Rose, University at Albany
 brose@albany.edu
@@ -86,49 +86,7 @@ class GreyRadiationModel(TimeDependentProcess):
         self.subprocess['surface'].LW_from_atm = self.subprocess['LW'].flux_to_sfc
         self.subprocess['surface'].SW_from_atm = self.subprocess['SW'].flux_to_sfc
         self.subprocess['LW'].flux_from_sfc = self.subprocess['surface'].LW_to_atm
-        
-#
-#class SingleColumnModel(GreyRadiationModel):
-#    '''SingleColumnModel has an atmospheric column with radiative transfer
-#    and a single slab ocean point.'''
-#    def __init__(self,
-#                 lev=None,
-#                 num_lev=30,
-#                 water_depth=1.0,
-#                 num_lat=1,
-#                 **kwargs):
-#        super(SingleColumnModel, self).__init__(timestep=timestep, **kwargs)
-#        if not self.domains and not self.state:  # no state vars or domains yet
-#            # first create the model domains
-#            #if lev is not None:
-#            #    sfc, atm = domain.single_column(water_depth=water_depth,
-#            #                                    lev=lev)
-#            #else:
-#            #    sfc, atm = domain.single_column(num_points=num_levels, 
-#            #                                    water_depth=water_depth)
-#            # need to re-integrate the above code to allow domains and state
-#            # vars as arguments            
-#            if num_lat > 1:
-#                sfc, atm = domain.zonal_mean_column(num_lat=num_lat, 
-#                                                    num_lev=num_lev,
-#                                                    water_depth=water_depth)
-#            else:
-#                sfc, atm = domain.single_column(num_points=num_lev, 
-#                                                water_depth=water_depth)
-#            num_lev = atm.lev.num_points
-#            # initial surface temperature
-#            self.set_state('Ts', Field(288.*np.ones(sfc.shape), domain=sfc))
-#            # intitial column temperature
-#            Tinitial = np.tile(np.linspace(288.-10., 200., num_lev),
-#                               sfc.shape)
-#            self.set_state('Tatm', Field(Tinitial, domain=atm))
-#        self.param['water_depth'] = water_depth
-#        self.param['albedo_sfc'] = albedo_sfc
-#        self.param['Q'] = Q
-#        self.param['num_lev'] = num_lev
-#        self.param['abs_coeff'] = abs_coeff
-#
-#        
+      
 
 class RadiativeConvectiveModel(GreyRadiationModel):
     def __init__(self,                  
