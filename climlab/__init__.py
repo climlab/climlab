@@ -14,6 +14,8 @@ from climlab.utils import constants
 from climlab.utils import thermo, legendre
 # some more useful shorcuts
 from climlab.model import ebm, column
+from climlab.model.column import GreyRadiationModel, RadiativeConvectiveModel
+from climlab.model.ebm import EBM, EBM_annual, EBM_seasonal
 from climlab.domain import domain
 from climlab.domain.field import Field, global_mean
 from climlab.domain.axis import Axis
