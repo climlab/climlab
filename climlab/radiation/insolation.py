@@ -32,7 +32,6 @@ class _Insolation(DiagnosticProcess):
 
     def _compute_fixed(self):
         '''Recompute any fixed quantities after a change in parameters'''
-        #self.oh = 'eh'
         pass
     
     def _get_current_insolation(self):
@@ -98,7 +97,7 @@ class AnnualMeanInsolation(_Insolation):
         self._compute_fixed()
 
     def _daily_insolation_array(self):
-        lat = self.domains['default'].axes['lat'].points
+        lat = self.lat
         days_of_year = self.time['days_of_year']
         orb = self.orb
         S0 = self.S0
@@ -120,6 +119,7 @@ class DailyInsolation(AnnualMeanInsolation):
     def _compute_fixed(self):
         try:
             self.insolation_array = self._daily_insolation_array()
+            print 'oheh'
         except:
             pass
 
