@@ -17,21 +17,36 @@ class ConvectiveAdjustment(TimeDependentProcess):
         if lapse_rate is None:
             self.adjusted_state = self.state
         else:
+            # We need to loop over all dimensions except vertical levels
+            #  would be awesome if we could figure out how to vectorize this
+            
+            #  For now, let's assume that the vertical axis is the last axis
             unstable_Ts = np.array(self.Ts)
             unstable_Tatm = np.array(self.Tatm)
             c_atm = self.Tatm.domain.heat_capacity
             c_sfc = self.Ts.domain.heat_capacity
-            Tcol = np.flipud(np.append(np.flipud(unstable_Tatm), unstable_Ts))
-            patm = self.Tatm.domain.lev.points
+            #Tcol = np.flipud(np.append(np.flipud(unstable_Tatm), unstable_Ts))
+            Tcol = np.concatenate((np.atleast_1d(unstable_Ts),
+                                   unstable_Tatm),axis=-1)
+            patm = self.lev
             pnew = np.flipud(np.append(np.flipud(patm), const.ps))
             cnew = np.flipud(np.append(np.flipud(c_atm), c_sfc))
-            #pnew = np.concatenate(([const.ps], patm))
-            #cnew = np.concatenate(([c_sfc], c_atm))
-            Tadj = convective_adjustment_direct(pnew, Tcol, cnew,
-                                        lapserate=lapse_rate)
-            Ts = Field(Tadj[0], domain=self.Ts.domain)
-            num_lev = self.Tatm.domain.lev.num_points
-            Tatm = Field(Tadj[1:num_lev+1], domain=self.Tatm.domain)
+            #num_lat = self.Tatm.lat.num_points
+            #print num_lat
+            #Tadj = np.zeros_like(Tcol)
+            #print Tadj.shape
+            try:
+                num_lat = self.Tatm.domain.lat.num_points
+                Tadj = np.zeros_like(Tcol)
+                for n in range(num_lat):
+                    Tadj[n,:] = convective_adjustment_direct(pnew, Tcol[n,:],
+                                            cnew, lapserate=lapse_rate)
+            except:
+                Tadj = convective_adjustment_direct(pnew, Tcol,
+                                            cnew, lapserate=lapse_rate)
+            Ts = Field(Tadj[...,0], domain=self.Ts.domain)
+            #num_lev = self.Tatm.domain.lev.num_points
+            Tatm = Field(Tadj[...,1:], domain=self.Tatm.domain)
             self.adjustment['Ts'] = Ts - self.Ts
             self.adjustment['Tatm'] = Tatm - self.Tatm
 

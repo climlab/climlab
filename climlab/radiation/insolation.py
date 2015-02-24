@@ -119,7 +119,6 @@ class DailyInsolation(AnnualMeanInsolation):
     def _compute_fixed(self):
         try:
             self.insolation_array = self._daily_insolation_array()
-            print 'oheh'
         except:
             pass
 
