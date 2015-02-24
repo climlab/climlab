@@ -64,7 +64,6 @@ class Transmissivity(object):
     The absorbed radiation in the atmosphere is the flux convergence:
         -diff(F)
     '''
-    ##  experimenting with multidimensional domains
     def __init__(self, absorptivity, axis=0):
         self.axis = axis
         #if absorptivity.ndim is not 1:
@@ -103,14 +102,8 @@ class Transmissivity(object):
             element 0 is the flux down to the surface.'''
         if emission is None:
             emission = np.zeros_like(self.absorptivity)
-        #E = np.append(emission, fluxDownTop)
-        #print emission.shape
-        #print fluxDownTop.shape
-        #print np.atleast_1d(fluxDownTop).shape
         E = np.concatenate((emission, np.atleast_1d(fluxDownTop)), axis=-1)
         #  dot product (matrix multiplication) along last axes
-        #return np.tensordot(self.Tdown, E, axes=[[-1],[-1]])
-        #return np.einsum('...ij,...j->...', self.Tdown, E)
         return np.squeeze(matrix_multiply(self.Tdown, E[..., np.newaxis]))
         
     def flux_up(self, fluxUpBottom, emission=None):
@@ -125,11 +118,8 @@ class Transmissivity(object):
             element N is the flux up to space.'''        
         if emission is None:
             emission = np.zeros_like(self.absorptivity)
-        #E = np.flipud(np.append(np.flipud(emission), fluxUpBottom))
         E = np.concatenate((np.atleast_1d(fluxUpBottom),emission), axis=-1)
         #  dot product (matrix multiplication) along last axes
-        #return np.tensordot(self.Tup, E, axes=[[-1],[-1]])
-        #return np.einsum('...ij,...j->...', self.Tup, E)
         return np.squeeze(matrix_multiply(self.Tup, E[..., np.newaxis]))
 
 def compute_T(transmissivity):

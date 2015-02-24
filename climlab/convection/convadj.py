@@ -21,20 +21,14 @@ class ConvectiveAdjustment(TimeDependentProcess):
             #  would be awesome if we could figure out how to vectorize this
             
             #  For now, let's assume that the vertical axis is the last axis
-            unstable_Ts = np.array(self.Ts)
-            unstable_Tatm = np.array(self.Tatm)
+            unstable_Ts = np.atleast_1d(self.Ts)
+            unstable_Tatm = self.Tatm
             c_atm = self.Tatm.domain.heat_capacity
-            c_sfc = self.Ts.domain.heat_capacity
-            #Tcol = np.flipud(np.append(np.flipud(unstable_Tatm), unstable_Ts))
-            Tcol = np.concatenate((np.atleast_1d(unstable_Ts),
-                                   unstable_Tatm),axis=-1)
+            c_sfc = self.Ts.domain.heat_capacity       
+            Tcol = np.concatenate((unstable_Ts, unstable_Tatm),axis=-1)
             patm = self.lev
             pnew = np.flipud(np.append(np.flipud(patm), const.ps))
             cnew = np.flipud(np.append(np.flipud(c_atm), c_sfc))
-            #num_lat = self.Tatm.lat.num_points
-            #print num_lat
-            #Tadj = np.zeros_like(Tcol)
-            #print Tadj.shape
             try:
                 num_lat = self.Tatm.domain.lat.num_points
                 Tadj = np.zeros_like(Tcol)
@@ -45,7 +39,6 @@ class ConvectiveAdjustment(TimeDependentProcess):
                 Tadj = convective_adjustment_direct(pnew, Tcol,
                                             cnew, lapserate=lapse_rate)
             Ts = Field(Tadj[...,0], domain=self.Ts.domain)
-            #num_lev = self.Tatm.domain.lev.num_points
             Tatm = Field(Tadj[...,1:], domain=self.Tatm.domain)
             self.adjustment['Ts'] = Ts - self.Ts
             self.adjustment['Tatm'] = Tatm - self.Tatm
