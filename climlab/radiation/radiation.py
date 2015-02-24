@@ -23,6 +23,7 @@ class Radiation(EnergyBudget):
         self.flux_from_space = np.zeros_like(self.Ts)
         self.flux_to_sfc = np.zeros_like(self.Ts)
         self.flux_from_sfc = np.zeros_like(self.Ts)
+        self.flux_to_space = np.zeros_like(self.Ts)
         self.heating_rate['Ts'] = np.zeros_like(self.Ts)
         
     @property
