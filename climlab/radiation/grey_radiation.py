@@ -49,7 +49,3 @@ class GreyRadiation_SW(Radiation):
                                                 self.flux_from_space)
         self.diagnostics['SW_emission'] = self.emission
 
-def compute_layer_absorptivity(abs_coeff, dp):
-    '''Compute layer absorptivity from a constant absorption coefficient.'''
-    return (2. / (1 + 2. * const.g / abs_coeff /
-                         (dp * const.mb_to_Pa)))

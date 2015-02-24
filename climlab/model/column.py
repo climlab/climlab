@@ -10,7 +10,7 @@ from climlab import constants as const
 from climlab.process.time_dependent_process import TimeDependentProcess
 from climlab.domain import domain
 from climlab.domain.field import Field
-from climlab.radiation import insolation, grey_radiation
+from climlab.radiation.insolation import FixedInsolation
 from climlab.radiation.radiation import Radiation
 from climlab.convection.convadj import ConvectiveAdjustment
 from climlab.surface.surface_radiation import SurfaceRadiation
@@ -44,7 +44,7 @@ class GreyRadiationModel(TimeDependentProcess):
         atm = self.Tatm.domain
         # create sub-models for longwave and shortwave radiation
         dp = self.Tatm.domain.lev.delta
-        absorbLW = grey_radiation.compute_layer_absorptivity(self.param['abs_coeff'], dp)
+        absorbLW = compute_layer_absorptivity(self.param['abs_coeff'], dp)
         absorbLW = Field(np.tile(absorbLW, sfc.shape), domain=atm)
         absorbSW = np.zeros_like(absorbLW)
         longwave = Radiation(state=self.state, absorptivity=absorbLW, 
@@ -53,7 +53,7 @@ class GreyRadiationModel(TimeDependentProcess):
                               albedo_sfc=self.param['albedo_sfc'])
         # sub-model for insolation ... here we just set constant Q
         thisQ = self.param['Q']*np.ones_like(self.Ts)
-        Q = insolation.FixedInsolation(S0=thisQ, domain=sfc, **self.param)
+        Q = FixedInsolation(S0=thisQ, domain=sfc, **self.param)
         #  surface sub-model
         surface = SurfaceRadiation(state=self.state, **self.param)
         self.add_subprocess('LW', longwave)
@@ -148,3 +148,8 @@ class RadiativeConvectiveModel(GreyRadiationModel):
         self.add_subprocess('convective adjustment', \
             ConvectiveAdjustment(state=self.state, **self.param))
 
+
+def compute_layer_absorptivity(abs_coeff, dp):
+    '''Compute layer absorptivity from a constant absorption coefficient.'''
+    return (2. / (1 + 2. * const.g / abs_coeff /
+                         (dp * const.mb_to_Pa)))
