@@ -75,3 +75,39 @@ class Radiation(EnergyBudget):
         '''Compute energy flux convergences to get heating rates in W / m**2.'''
         self.radiative_heating()        
 
+    def flux_components_top(self):
+        '''Compute the contributions to the outgoing flux to space due to
+        emissions from each level and the surface.'''
+        N = self.lev.size
+        flux_up_bottom = self.flux_from_sfc
+        emission = np.zeros_like(self.emission)
+        this_flux_up = (np.ones_like(self.Ts) *
+                        self.trans.flux_up(flux_up_bottom, emission))
+        sfcComponent = this_flux_up[..., -1]
+        atmComponents = np.zeros_like(self.Tatm)
+        flux_up_bottom = np.zeros_like(self.Ts)
+        # I'm sure there's a way to write this as a vectorized operation
+        #  but the speed doesn't really matter if it's just for diagnostic
+        #  and we are not calling it every timestep
+        for n in range(N):
+            emission = np.zeros_like(self.emission)
+            emission[..., n] = self.emission[..., n]
+            this_flux_up = self.trans.flux_up(flux_up_bottom, emission)
+            atmComponents[..., n] = this_flux_up[..., -1]
+        return sfcComponent, atmComponents
+
+    def flux_components_bottom(self):
+        '''Compute the contributions to the downwelling flux to surface due to
+        emissions from each level.'''
+        N = self.lev.size
+        atmComponents = np.zeros_like(self.Tatm)
+        flux_down_top = np.zeros_like(self.Ts)
+        # I'm sure there's a way to write this as a vectorized operation
+        #  but the speed doesn't really matter if it's just for diagnostic
+        #  and we are not calling it every timestep
+        for n in range(N):
+            emission = np.zeros_like(self.emission)
+            emission[..., n] = self.emission[..., n]
+            this_flux_down = self.trans.flux_down(flux_down_top, emission)
+            atmComponents[..., n] = this_flux_down[..., 0]
+        return atmComponents
