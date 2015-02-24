@@ -1,15 +1,51 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Jan  6 15:36:40 2015
-
-@author: Brian
-"""
 import numpy as np
-import constants as const
+from climlab import constants as const
+from climlab.process.energy_budget import TimeDependentProcess
+from climlab.domain.field import Field
+
+
+class ConvectiveAdjustment(TimeDependentProcess):
+    def __init__(self, adj_lapse_rate=None, **kwargs):
+        super(ConvectiveAdjustment, self).__init__(**kwargs)
+        # lapse rate for convective adjustment, in K / km
+        self.param['adj_lapse_rate'] = adj_lapse_rate
+        self.time_type = 'adjustment'
+        self.adjustment = {}
+    
+    def compute(self):
+        lapse_rate = self.param['adj_lapse_rate']
+        if lapse_rate is None:
+            self.adjusted_state = self.state
+        else:
+            # We need to loop over all dimensions except vertical levels
+            #  would be awesome if we could figure out how to vectorize this
+            
+            #  For now, let's assume that the vertical axis is the last axis
+            unstable_Ts = np.atleast_1d(self.Ts)
+            unstable_Tatm = self.Tatm
+            c_atm = self.Tatm.domain.heat_capacity
+            c_sfc = self.Ts.domain.heat_capacity       
+            Tcol = np.concatenate((unstable_Ts, unstable_Tatm),axis=-1)
+            patm = self.lev
+            pnew = np.flipud(np.append(np.flipud(patm), const.ps))
+            cnew = np.flipud(np.append(np.flipud(c_atm), c_sfc))
+            try:
+                num_lat = self.Tatm.domain.lat.num_points
+                Tadj = np.zeros_like(Tcol)
+                for n in range(num_lat):
+                    Tadj[n,:] = convective_adjustment_direct(pnew, Tcol[n,:],
+                                            cnew, lapserate=lapse_rate)
+            except:
+                Tadj = convective_adjustment_direct(pnew, Tcol,
+                                            cnew, lapserate=lapse_rate)
+            Ts = Field(Tadj[...,0], domain=self.Ts.domain)
+            Tatm = Field(Tadj[...,1:], domain=self.Tatm.domain)
+            self.adjustment['Ts'] = Ts - self.Ts
+            self.adjustment['Tatm'] = Tatm - self.Tatm
 
 
 #  This routine works but is slow... lots of explicit looping
-def convective_adjustment(p, T, c, lapserate=6.5):
+def convective_adjustment_direct(p, T, c, lapserate=6.5):
     """Convective Adjustment to a specified lapse rate.
 
     Input argument lapserate gives the lapse rate expressed in degrees K per km
@@ -30,19 +66,15 @@ def convective_adjustment(p, T, c, lapserate=6.5):
         lapserate = const.g / const.cp * 1.E3
     try:
         alpha = const.Rd / const.g * lapserate / 1.E3
-        # col.conv_lapse_rate = lapserate
     except:
         raise ValueError('Problem with lapse rate')
 
-    # Tcol = np.concatenate(([col.Ts], col.Tatm))
-    # pnew = np.concatenate(([const.ps], col.p))
     Tcol = T
     pnew = p
     L = pnew.size
     Pi = (pnew/const.ps)**alpha
     beta = 1./Pi
     theta = Tcol * beta
-    # q = Pi * np.concatenate(([col.c_sfc], col.c_atm * np.ones_like(col.p)))
     q = Pi * c
 
     n_k = np.zeros(L, dtype=np.int8)
@@ -95,7 +127,5 @@ def convective_adjustment(p, T, c, lapserate=6.5):
     for i in range(L):
         newtheta[count+np.arange(n_k[i])] = theta_k[i]
         count += n_k[i]
-
     Tcol = newtheta * Pi
-
     return Tcol

@@ -9,7 +9,8 @@ in support of the class ATM/ENV 415: Climate Laboratory
 '''
 
 import numpy as np
-from constants import *
+from climlab import constants as const
+
 
 def potential_temperature(T,p):
     """Compute potential temperature for an air parcel.
@@ -19,7 +20,7 @@ def potential_temperature(T,p):
     Output: potential temperature in Kelvin.
     """
     
-    theta = T*(ps/p)**kappa
+    theta = T*(const.ps/p)**const.kappa
     return theta
 
 def theta(T,p):
@@ -35,7 +36,7 @@ def temperature_from_potential(theta,p):
     Output: absolute temperature in Kelvin.
     """
     
-    T = theta/((ps/p)**kappa)
+    T = theta/((const.ps/p)**const.kappa)
     return T
 
 
@@ -55,7 +56,7 @@ def clausius_clapeyron(T):
     Based on the paper by Bolton (1980, Monthly Weather Review).
     """
 
-    Tcel = T - tempCtoK
+    Tcel = T - const.tempCtoK
     es = 6.112 * np.exp(17.67*Tcel/(Tcel+243.5))
     return es
 
@@ -68,7 +69,7 @@ def qsat(T,p):
     Output: saturation specific humidity (dimensionless).
     """
     
-    eps = Rd/Rv
+    eps = const.Rd / const.Rv
     es = clausius_clapeyron(T)
     q = eps * es / (p - (1 - eps) * es )
     return q
@@ -88,11 +89,11 @@ def pseudoadiabat(T,p):
     """
 
     esoverp = clausius_clapeyron(T) / p
-    Tcel = T - tempCtoK
+    Tcel = T - const.tempCtoK
     L = (2.501 - 0.00237 * Tcel) * 1.E6   # Accurate form of latent heat of vaporization in J/kg
-    ratio = L / T / Rv
-    dTdp = (T / p * kappa * (1 + esoverp * ratio) / 
-        (1 + kappa * (cpv / Rv + (ratio-1) * ratio) * esoverp))
+    ratio = L / T / const.Rv
+    dTdp = (T / p * const.kappa * (1 + esoverp * ratio) / 
+        (1 + const.kappa * (const.cpv / const.Rv + (ratio-1) * ratio) * esoverp))
     return dTdp
 
 
@@ -103,13 +104,19 @@ def estimated_inversion_strength(T0,T700):
     
     RH = 0.8
     T850 = (T0+T700)/2;
-    LCL = (20 + (T0-tempCtoK)/5)*(1-RH)  # approximate formula... could do this more accurately.
+    LCL = (20 + (T0-const.tempCtoK)/5)*(1-RH)  # approximate formula... could do this more accurately.
     LTS = potential_temperature(T700, 700) - T0  # Lower Tropospheric Stability (theta700 - theta0)
-    Gammam = g/cp*(1.0 - (1.0 + Lhvap*qsat(T850,850) / Rd / T850) / (1.0 + Lhvap**2 * qsat(T850,850)/cp/Rv/T850**2))
-    z700 = (Rd*T0/g)*np.log(1000/700)
+    Gammam = (const.g/const.cp*(1.0 - (1.0 + const.Lhvap*qsat(T850,850) / 
+              const.Rd / T850) / (1.0 + const.Lhvap**2 * qsat(T850,850)/
+              const.cp/const.Rv/T850**2)))
+    z700 = (const.Rd*T0/const.g)*np.log(1000/700)
     return LTS - Gammam*(z700 - LCL)
 
 def EIS(T0,T700):
     '''Convenience method, identical to thermo.estimated_inversion_strength(T0,T700)'''
     return estimated_inversion_strength(T0,T700)
+    
+def blackbody_emission(T):
+    '''Blackbody radiation following the Stefan-Boltzmann law.'''
+    return const.sigma * T**4
 

@@ -6,17 +6,17 @@ solar radiation at the top of the atmosphere.
 Currently, only daily average insolation is computed.
 
 Ported and modified from MATLAB code daily_insolation.m
-Original authors: 
+Original authors:
     Ian Eisenman and Peter Huybers, Harvard University, August 2006
 Available online at http://eisenman.ucsd.edu/code/daily_insolation.m
-        
+
 If using calendar days, solar longitude is found using an
 approximate solution to the differential equation representing conservation
 of angular momentum (Kepler's Second Law).  Given the orbital parameters
 and solar longitude, daily average insolation is calculated exactly
 following Berger 1978.
 
-References: 
+References:
 Berger A. and Loutre M.F. (1991). Insolation values for the climate of
  the last 10 million years. Quaternary Science Reviews, 10(4), 297-317.
 Berger A. (1978). Long-term variations of daily insolation and
@@ -25,14 +25,15 @@ Berger A. (1978). Long-term variations of daily insolation and
 """
 
 import numpy as np
-import constants as const
+from climlab import constants as const
 
-def daily_insolation(lat, day, orb=const.orb_present, S0 = None, day_type=1 ):
+
+def daily_insolation(lat, day, orb=const.orb_present, S0=None, day_type=1):
     """Compute daily average insolation given latitude, time of year and orbital parameters.
-    
+
     Orbital parameters can be computed for any time in the last 5 Myears with
     ecc,long_peri,obliquity = orbital.lookup_parameters(kyears)
-    
+
     Inputs:
     lat:      Latitude in degrees (-90 to 90).
     day:      Indicator of time of year, by default day 1 is Jan 1.
@@ -42,8 +43,8 @@ def daily_insolation(lat, day, orb=const.orb_present, S0 = None, day_type=1 ):
         obliquity:  obliquity angle (degrees)
     S0:       Solar constant in W/m^2, will try to read from constants.py
     day_type: Convention for specifying time of year (+/- 1,2) [optional].
-        day_type=1 (default): day input is calendar day (1-365.24), where day 1 
-        is January first.  The calendar is referenced to the vernal equinox 
+        day_type=1 (default): day input is calendar day (1-365.24), where day 1
+        is January first.  The calendar is referenced to the vernal equinox
         which always occurs at day 80.
         day_type=2: day input is solar longitude (0-360 degrees). Solar
         longitude is the angle of the Earth's orbit measured from spring
@@ -51,16 +52,16 @@ def daily_insolation(lat, day, orb=const.orb_present, S0 = None, day_type=1 ):
         not linearly related because, by Kepler's Second Law, Earth's
         angular velocity varies according to its distance from the sun.
     Default values for orbital parameters are present-day
-    
+
     Output:
     Fsw = Daily average solar radiation in W/m^2.
-    
+
     Dimensions of output are (lat.size, day.size, ecc.size)
-    
+
     Code is fully vectorized to handle array input for all arguments.
-    Orbital arguments should all have the same sizes. 
+    Orbital arguments should all have the same sizes.
     This is automatic if computed from orbital.OrbitalTable.lookup_parameters()
-    
+
     e.g. to compute the timeseries of insolation at 65N at summer solstice over the past 5 Myears
         from climlab.orbital import OrbitalTable
         table = OrbitalTable()
@@ -68,7 +69,7 @@ def daily_insolation(lat, day, orb=const.orb_present, S0 = None, day_type=1 ):
         orb = table.lookup_parameters( years )
         S65 = orbital.daily_insolation( 65, 172, orb )
      """
-    
+
     # If input argument S0 is not given, use the standard Earth value
     if S0 is None:
         S0 = const.S0
