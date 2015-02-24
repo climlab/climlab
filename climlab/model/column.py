@@ -106,7 +106,8 @@ class GreyRadiationModel(TimeDependentProcess):
         except: pass
         try: self.diagnostics['LW_up_sfc'] = surf.LW_to_atm
         except: pass
-        try: self.diagnostics['LW_absorbed_sfc'] = surf.LW_from_atm - surf.LW_to_atm
+        try: self.diagnostics['LW_absorbed_sfc'] = (surf.LW_from_atm -
+                                                    surf.LW_to_atm)
         except: pass
         try: self.diagnostics['LW_absorbed_atm'] = LW.absorbed
         except: pass
@@ -129,14 +130,15 @@ class GreyRadiationModel(TimeDependentProcess):
         except: pass
         try: self.diagnostics['SW_down_TOA'] = SW.flux_from_space
         except: pass
-        try: self.diagnostics['SW_absorbed_total'] = SW.absorbed_total - SW.flux_net[0]
+        try: self.diagnostics['SW_absorbed_total'] = (SW.absorbed_total - 
+                                                      SW.flux_net[0])
         except: pass
         try: self.diagnostics['planetary_albedo'] = (SW.flux_to_space / 
-                                                SW.flux_from_space)
+                                                     SW.flux_from_space)
         except: pass
         try: self.diagnostics['SW_emission'] = SW.emission
         except: pass
-      
+
 
 class RadiativeConvectiveModel(GreyRadiationModel):
     def __init__(self,                  
