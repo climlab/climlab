@@ -18,6 +18,8 @@ class Radiation(EnergyBudget):
     Subclasses can override this is necessary (e.g. for shortwave model)'''
     def __init__(self, absorptivity=None, albedo_sfc=0, **kwargs):
         super(Radiation, self).__init__(**kwargs)
+        if absorptivity is None:
+            absorptivity = np.zeros_like(self.Tatm)
         self.absorptivity = absorptivity
         self.albedo_sfc = albedo_sfc*np.ones_like(self.Ts)
         self.flux_from_space = np.zeros_like(self.Ts)

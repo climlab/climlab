@@ -1,7 +1,7 @@
 import numpy as np
 from climlab.radiation.radiation import Radiation
 from climlab import constants as const
-from climlab.thermo import ClausiusClapeyron
+from climlab.utils.thermo import clausius_clapeyron
 
 class ThreeBandSW(Radiation):
     '''A three-band mdoel for shortwave radiation.
@@ -40,11 +40,12 @@ class ThreeBandSW(Radiation):
         self.qStrat = 5.E-6  # minimum specific humidity for stratosphere
 
     def Manabe_water_vapor(self):
-        #  compute water vapor mixing ratio profile following Manabe and Wetherald JAS 1967
-        #  fixed surface relative humidity and a specified fractional profile
+        '''Compute water vapor mixing ratio profile following 
+        Manabe and Wetherald JAS 1967
+        Fixed surface relative humidity and a specified fractional profile.'''
         Q = self.p / const.ps
         h = self.relative_humidity * ( (Q - 0.02) / (1-0.02) )
-        es = ClausiusClapeyron( self.Tatm )
+        es = clausius_clapeyron( self.Tatm )
         e = h * es
         # convert to specific humidity (assume dilute)
         qH2O = e / self.p * const.Rd / const.Rv 
@@ -56,7 +57,7 @@ class ThreeBandSW(Radiation):
         cosZen is the solar zenith angle.'''
         qO3 = O3vmr / (1+O3vmr)
         qH2O = H2Ovmr / (1+H2Ovmr)
-        return ((qO3*self.SW_sigmaO3 + qH2O*self.SW_sigmaH2O) / cosZen * 
+        return ((qO3*self.sigmaO3 + qH2O*self.sigmaH2O) / cosZen * 
                 self.mass_per_layer)
 
     def radiative_heating(self):
@@ -69,3 +70,7 @@ class ThreeBandSW(Radiation):
         self.absorptivity = epsSW
         super(ThreeBandSW, self).radiative_heating(self)
 
+## This doesn't work right now because
+#  absorptivity has dimensions (num_spectral_band, num_lev)
+#  but self.Tatm doesn't have the spectral band dimension
+#  so the call to Transmissivity has the wrong axis number
