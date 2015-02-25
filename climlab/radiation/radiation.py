@@ -33,8 +33,16 @@ class Radiation(EnergyBudget):
         return self.trans.absorptivity
     @absorptivity.setter
     def absorptivity(self, value):
-        self.trans = Transmissivity(np.array(value),
-                                    axis=self.Tatm.domain.axis_index['lev'])
+        #  value should be a Field,
+         #  or numpy array of same size as self.Tatm
+        try:
+            axis = value.domain.axis_index['lev']
+        except:
+            if value.shape == self.Tatm.shape:
+                axis = self.Tatm.domain.axis_index['lev']
+            else:
+                raise ValueError('absorptivity must be a Field or match atm grid dimensions')
+        self.trans = Transmissivity(value, axis=axis)
     @property
     def emissivity(self):
         # This ensures that emissivity = absorptivity at all times
@@ -113,3 +121,12 @@ class Radiation(EnergyBudget):
             this_flux_down = self.trans.flux_down(flux_down_top, emission)
             atmComponents[..., n] = this_flux_down[..., 0]
         return atmComponents
+
+
+class RadiationSW(Radiation):
+    '''Emissivity is always set to zero for shortwave classes.'''
+    @property
+    def emissivity(self):
+        # This ensures that emissivity is always zero for shortwave classes
+        return np.zeros_like(self.absorptivity)
+    

@@ -1,9 +1,12 @@
 import numpy as np
-from climlab.radiation.radiation import Radiation
+from climlab.radiation.radiation import RadiationSW
 from climlab import constants as const
 from climlab.utils.thermo import clausius_clapeyron
+from climlab.domain import domain, axis, field
+from copy import copy
 
-class ThreeBandSW(Radiation):
+
+class ThreeBandSW(RadiationSW):
     '''A three-band mdoel for shortwave radiation.
     
     The spectral decomposition used here is largely based on the
@@ -24,7 +27,13 @@ class ThreeBandSW(Radiation):
         # channel 1 is Chappuis band (27%, 450 - 800 nm)
         # channel 2 is remaining radiation (72%)
         #   fraction of the total solar flux in each band:
-        self.band_fraction = np.array([0.01, 0.27, 0.72])  
+        #self.band_fraction = np.array([0.01, 0.27, 0.72])
+        # abstract axis for channels
+        ax = axis.Axis(num_points=self.numSWchannels)
+        self.channel_ax = {'channel': ax}
+        dom = domain._Domain(axes=self.channel_ax)
+        #   fraction of the total solar flux in each band:
+        self.band_fraction = field.Field([0.01, 0.27, 0.72], domain=dom)
         ##  absorption cross-sections in m**2 / kg
         self.sigmaH2O = np.reshape(np.array([0.002, 0.002, 0.002]),
                                    (self.numSWchannels, 1))
@@ -38,6 +47,10 @@ class ThreeBandSW(Radiation):
         self.mass_per_layer = dp * const.mb_to_Pa / const.g
         self.relative_humidity = 0.77  # fixed relative humidity at surface
         self.qStrat = 5.E-6  # minimum specific humidity for stratosphere
+        self.flux_from_space = self.band_fraction*np.ones_like(self.Ts)
+        self.flux_from_sfc = self.band_fraction*np.zeros_like(self.Ts)
+        self.albedo_sfc = np.ones_like(self.band_fraction)*self.albedo_sfc
+        self.compute_absorptivity()
 
     def Manabe_water_vapor(self):
         '''Compute water vapor mixing ratio profile following 
@@ -60,17 +73,23 @@ class ThreeBandSW(Radiation):
         return ((qO3*self.sigmaO3 + qH2O*self.sigmaH2O) / cosZen * 
                 self.mass_per_layer)
 
-    def radiative_heating(self):
+    def compute_absorptivity(self):
         #  need to recompute transmissivities each time because 
         # water vapor is changing
         self.H2Ovmr = self.Manabe_water_vapor()
         opticalpath = self.compute_optical_path(self.O3vmr, self.H2Ovmr,
                                                      self.cosZen )
         epsSW = 1. - np.exp(-opticalpath)
-        self.absorptivity = epsSW
-        super(ThreeBandSW, self).radiative_heating(self)
+        axes = copy(self.Tatm.domain.axes)
+        # add these to the dictionary of axes
+        axes.update(self.channel_ax)
+        dom = domain.Atmosphere(axes=axes)
+        self.absorptivity = field.Field(epsSW, domain=dom)
+    
+    def radiative_heating(self):
+        #  need to recompute transmissivities each time because 
+        # water vapor is changing
+        self.compute_absorptivity()
+        super(ThreeBandSW, self).radiative_heating()
 
-## This doesn't work right now because
-#  absorptivity has dimensions (num_spectral_band, num_lev)
-#  but self.Tatm doesn't have the spectral band dimension
-#  so the call to Transmissivity has the wrong axis number
+#  Still some dimension mismatch issues in the flux calculations. Not working yet.

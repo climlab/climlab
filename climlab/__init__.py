@@ -9,11 +9,12 @@ __version__ = '0.2.1'
 #           "long_orbital_table", "insolation", "ebm",
 #           "column", "convadj"]
 
+#from climlab import radiation
 # this should ensure that we can still import constants.py as climlab.constants           
 from climlab.utils import constants
 from climlab.utils import thermo, legendre
 # some more useful shorcuts
-from climlab.model import ebm, column
+#from climlab.model import ebm, column
 from climlab.model.column import GreyRadiationModel, RadiativeConvectiveModel
 from climlab.model.ebm import EBM, EBM_annual, EBM_seasonal
 from climlab.domain import domain
