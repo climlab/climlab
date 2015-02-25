@@ -22,7 +22,9 @@ class Transmissivity(object):
     '''Class for calculating and store transmissivity between levels, 
     and computing radiative fluxes between levels.
     
-    Input: 1-dimensional numpy array of absorptivities for each level.
+    Input: numpy array of absorptivities.
+    It is assumed that the last dimension is vertical levels.
+
     Attributes: (all stored as numpy arrays):
         N: number of levels
         absorptivity: level absorptivity (N)
