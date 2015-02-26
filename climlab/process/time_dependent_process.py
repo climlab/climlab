@@ -89,13 +89,17 @@ class TimeDependentProcess(Process):
             self.diagnostics.update(proc.diagnostics)
             proc._update_time()
 
-    def compute_diagnostics(self):
-        '''Compute all tendencies and diagnostics, but don't update model state.'''
+    def compute_diagnostics(self, num_iter=3):
+        '''Compute all tendencies and diagnostics, but don't update model state.
+        By default it will call step_forward() 3 times to make sure all
+        subprocess coupling is accounted for. The number of iterations can
+        be changed with the input argument.'''
         #  This might create a time problem because it updates the time counter...
         this_state = copy.deepcopy(self.state)
-        self.step_forward()
-        for name, value in self.state.iteritems():
-            self.state[name][:] = this_state[name][:]
+        for n in range(num_iter):
+            self.step_forward()
+            for name, value in self.state.iteritems():
+                self.state[name][:] = this_state[name][:]
 
     def _update_time(self):
         '''Increment the timestep counter by one.
