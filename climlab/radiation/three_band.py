@@ -47,9 +47,12 @@ class ThreeBandSW(RadiationSW):
         self.mass_per_layer = dp * const.mb_to_Pa / const.g
         self.relative_humidity = 0.77  # fixed relative humidity at surface
         self.qStrat = 5.E-6  # minimum specific humidity for stratosphere
-        self.flux_from_space = self.band_fraction*np.ones_like(self.Ts)
+        #self.flux_from_space = self.band_fraction*np.ones_like(self.Ts)
+        #self.flux_from_space = self.flux_from_space[..., np.newaxis]
         self.flux_from_sfc = self.band_fraction*np.zeros_like(self.Ts)
+        self.flux_from_sfc = self.flux_from_sfc[..., np.newaxis]
         self.albedo_sfc = np.ones_like(self.band_fraction)*self.albedo_sfc
+        self.albedo_sfc = self.albedo_sfc[..., np.newaxis]
         self.compute_absorptivity()
 
     def Manabe_water_vapor(self):
@@ -78,7 +81,7 @@ class ThreeBandSW(RadiationSW):
         # water vapor is changing
         self.H2Ovmr = self.Manabe_water_vapor()
         opticalpath = self.compute_optical_path(self.O3vmr, self.H2Ovmr,
-                                                     self.cosZen )
+                                                self.cosZen )
         epsSW = 1. - np.exp(-opticalpath)
         axes = copy(self.Tatm.domain.axes)
         # add these to the dictionary of axes
@@ -90,6 +93,23 @@ class ThreeBandSW(RadiationSW):
         #  need to recompute transmissivities each time because 
         # water vapor is changing
         self.compute_absorptivity()
-        super(ThreeBandSW, self).radiative_heating()
-
-#  Still some dimension mismatch issues in the flux calculations. Not working yet.
+        self.emission = self.compute_emission()
+        #self.diagnostics['emission'] = emission
+        try:
+            fromspace = (self.band_fraction*self.flux_from_space)[..., np.newaxis]
+        except:
+            fromspace = np.zeros_like(self.Ts)
+        
+        self.flux_down = self.trans.flux_down(fromspace, self.emission)
+        # this ensure same dimensions as other fields
+        flux_down_sfc = self.flux_down[..., 0, np.newaxis]
+        flux_up_bottom = self.flux_from_sfc + self.albedo_sfc*flux_down_sfc
+        self.flux_up = self.trans.flux_up(flux_up_bottom, self.emission)
+        self.flux_net = self.flux_up - self.flux_down
+        flux_up_top = self.flux_up[..., -1, np.newaxis]
+        # absorbed radiation (flux convergence) in W / m**2
+        self.absorbed = -np.diff(self.flux_net)
+        self.absorbed_total = np.sum(self.absorbed)
+        self.heating_rate['Tatm'] = self.absorbed
+        self.flux_to_sfc = flux_down_sfc
+        self.flux_to_space = flux_up_top
