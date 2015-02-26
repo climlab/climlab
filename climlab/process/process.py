@@ -112,8 +112,6 @@ class Process(object):
         
     def set_state(self, name, value):
         if isinstance(value, Field):        
-            # set the state dictionary
-            self.state[name] = value
             # populate domains dictionary with domains from state variables
             self.domains.update({name: value.domain})
         else:
@@ -124,9 +122,11 @@ class Process(object):
                 raise ValueError('State variable needs a domain.')
             value = np.atleast_1d(value)
             if value.shape == domshape:
-                self.state[name] = Field(value, thisdom)
+                value = Field(value, domain=thisdom)
             else:
                 raise ValueError('Shape mismatch between existing domain and new state variable.')
+        # set the state dictionary
+        self.state[name] = value
         setattr(self, name, value)
     
     def _guess_state_domains(self):
