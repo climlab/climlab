@@ -38,10 +38,12 @@ class Radiation(EnergyBudget):
         try:
             axis = value.domain.axis_index['lev']
         except:
-            if value.shape == self.Tatm.shape:
-                axis = self.Tatm.domain.axis_index['lev']
-            else:
-                raise ValueError('absorptivity must be a Field or match atm grid dimensions')
+            axis = self.Tatm.domain.axis_index['lev']
+            # if a single scalar is given, broadcast that to all levels
+            if len(np.shape(np.array(value))) is 0:
+                value = np.ones_like(self.Tatm) * value
+            elif value.shape != self.Tatm.shape:
+                raise ValueError('absorptivity must be a Field, a scalar, or match atm grid dimensions')
         self.trans = Transmissivity(value, axis=axis)
     @property
     def emissivity(self):
