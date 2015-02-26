@@ -1,4 +1,5 @@
 import numpy as np
+import copy
 from climlab import constants as const
 from climlab.process.process import Process
 from climlab.utils.walk import walk_processes
@@ -87,6 +88,14 @@ class TimeDependentProcess(Process):
         for name, proc, level in walk_processes(self):
             self.diagnostics.update(proc.diagnostics)
             proc._update_time()
+
+    def compute_diagnostics(self):
+        '''Compute all tendencies and diagnostics, but don't update model state.'''
+        #  This might create a time problem because it updates the time counter...
+        this_state = copy.deepcopy(self.state)
+        self.step_forward()
+        for name, value in self.state.iteritems():
+            self.state[name][:] = this_state[name][:]
 
     def _update_time(self):
         '''Increment the timestep counter by one.
