@@ -1,4 +1,5 @@
 import time, copy
+import numpy as np
 from climlab.domain.field import Field
 from climlab.domain.domain import _Domain
 from climlab.utils import walk
@@ -110,11 +111,22 @@ class Process(object):
         self.has_process_type_list = False
         
     def set_state(self, name, value):
-        # set the state dictionary
-        self.state[name] = value
-        # populate domains dictionary with domains from state variables
-        self.domains.update({name: value.domain})
-        # state variables can also be accessed as attributes of the Process
+        if isinstance(value, Field):        
+            # set the state dictionary
+            self.state[name] = value
+            # populate domains dictionary with domains from state variables
+            self.domains.update({name: value.domain})
+        else:
+            try:
+                thisdom = self.state[name].domain
+                domshape = thisdom.shape
+            except:
+                raise ValueError('State variable needs a domain.')
+            value = np.atleast_1d(value)
+            if value.shape == domshape:
+                self.state[name] = Field(value, thisdom)
+            else:
+                raise ValueError('Shape mismatch between existing domain and new state variable.')
         setattr(self, name, value)
     
     def _guess_state_domains(self):
