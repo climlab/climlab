@@ -49,10 +49,10 @@ class ThreeBandSW(RadiationSW):
         self.qStrat = 5.E-6  # minimum specific humidity for stratosphere
         #self.flux_from_space = self.band_fraction*np.ones_like(self.Ts)
         #self.flux_from_space = self.flux_from_space[..., np.newaxis]
-        self.flux_from_sfc = self.band_fraction*np.zeros_like(self.Ts)
-        self.flux_from_sfc = self.flux_from_sfc[..., np.newaxis]
+        self.flux_from_sfc = np.zeros_like(self.Ts)
+        #self.flux_from_sfc = self.flux_from_sfc[..., np.newaxis]
         self.albedo_sfc = np.ones_like(self.band_fraction)*self.albedo_sfc
-        self.albedo_sfc = self.albedo_sfc[..., np.newaxis]
+        #self.albedo_sfc = self.albedo_sfc[..., np.newaxis]
         self.compute_absorptivity()
 
     def Manabe_water_vapor(self):
@@ -96,20 +96,26 @@ class ThreeBandSW(RadiationSW):
         self.emission = self.compute_emission()
         #self.diagnostics['emission'] = emission
         try:
-            fromspace = (self.band_fraction*self.flux_from_space)[..., np.newaxis]
+            fromspace = self.split_channels(self.flux_from_space)
         except:
-            fromspace = np.zeros_like(self.Ts)
+            fromspace = self.split_channels(np.zeros_like(self.Ts))
         
         self.flux_down = self.trans.flux_down(fromspace, self.emission)
         # this ensure same dimensions as other fields
         flux_down_sfc = self.flux_down[..., 0, np.newaxis]
-        flux_up_bottom = self.flux_from_sfc + self.albedo_sfc*flux_down_sfc
+        #flux_down_sfc = self.flux_down[..., 0]
+        self.flux_to_sfc = np.sum(flux_down_sfc, axis=0)
+
+        flux_from_sfc = self.split_channels(self.flux_from_sfc)
+        flux_up_bottom = flux_from_sfc + self.albedo_sfc*flux_down_sfc
         self.flux_up = self.trans.flux_up(flux_up_bottom, self.emission)
         self.flux_net = self.flux_up - self.flux_down
         flux_up_top = self.flux_up[..., -1, np.newaxis]
         # absorbed radiation (flux convergence) in W / m**2
-        self.absorbed = -np.diff(self.flux_net)
+        self.absorbed = -np.diff(self.flux_net, axis=1)
         self.absorbed_total = np.sum(self.absorbed)
-        self.heating_rate['Tatm'] = self.absorbed
-        self.flux_to_sfc = flux_down_sfc
-        self.flux_to_space = flux_up_top
+        self.heating_rate['Tatm'] = np.sum(self.absorbed, axis=0)
+        self.flux_to_space = np.sum(flux_up_top, axis=0)
+    
+    def split_channels(self, flux):
+        return (self.band_fraction*flux)[..., np.newaxis]

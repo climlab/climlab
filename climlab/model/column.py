@@ -118,7 +118,9 @@ class GreyRadiationModel(TimeDependentProcess):
             #self.diagnostics['OLR_atm'] = self.flux['atm2space']
         try: self.diagnostics['ASR'] = SW.flux_from_space - SW.flux_to_space
         except: pass
-        try: self.diagnostics['SW_absorbed_sfc'] = -SW.flux_net[0]
+        try: 
+            self.diagnostics['SW_absorbed_sfc'] = (surf.SW_from_atm - 
+                                                    surf.SW_to_atm)
         except: pass
         try: self.diagnostics['SW_absorbed_atm'] = SW.absorbed
         except: pass
