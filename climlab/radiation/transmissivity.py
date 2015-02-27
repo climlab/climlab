@@ -71,7 +71,10 @@ class Transmissivity(object):
         #if absorptivity.ndim is not 1:
         #    raise ValueError('absorptivity argument must be a vector')
         self.absorptivity = absorptivity
-        self.transmissivity = 1 - absorptivity
+        #self.transmissivity = 1 - absorptivity
+        #  1-absorptivity is an approximation that is only strictly valid 
+        # for very optically thin layers
+        self.transmissivity = np.exp(-absorptivity)
         #N = self.absorptivity.size
         self.shape = self.absorptivity.shape 
         N = np.size(self.absorptivity, axis=self.axis)

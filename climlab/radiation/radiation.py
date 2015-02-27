@@ -55,7 +55,9 @@ class Radiation(EnergyBudget):
         return self.trans.transmissivity
     @transmissivity.setter
     def transmissivity(self, value):
-        self.absorptivity = 1 - value
+        #self.absorptivity = 1 - value
+        #  more accurate for non-optically thin layers:
+        self.absorptivity = -np.log(value)
 
     def compute_emission(self):
         return self.emissivity * blackbody_emission(self.Tatm)

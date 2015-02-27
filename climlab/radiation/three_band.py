@@ -80,14 +80,15 @@ class ThreeBandSW(RadiationSW):
         #  need to recompute transmissivities each time because 
         # water vapor is changing
         self.H2Ovmr = self.Manabe_water_vapor()
-        opticalpath = self.compute_optical_path(self.O3vmr, self.H2Ovmr,
+        optical_path = self.compute_optical_path(self.O3vmr, self.H2Ovmr,
                                                 self.cosZen )
-        epsSW = 1. - np.exp(-opticalpath)
+        #epsSW = 1. - np.exp(-optical_path)
         axes = copy(self.Tatm.domain.axes)
         # add these to the dictionary of axes
         axes.update(self.channel_ax)
         dom = domain.Atmosphere(axes=axes)
-        self.absorptivity = field.Field(epsSW, domain=dom)
+        #self.absorptivity = field.Field(epsSW, domain=dom)
+        self.absorptivity = field.Field(optical_path, domain=dom)
     
     def radiative_heating(self):
         #  need to recompute transmissivities each time because 
