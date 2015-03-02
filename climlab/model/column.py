@@ -14,7 +14,8 @@ from climlab.radiation.insolation import FixedInsolation
 from climlab.radiation.radiation import Radiation, RadiationSW
 from climlab.convection.convadj import ConvectiveAdjustment
 from climlab.surface.surface_radiation import SurfaceRadiation
-
+from climlab.radiation.nband import ThreeBandSW, FourBandLW
+from climlab.radiation.water_vapor import ManabeWaterVapor
 
 class GreyRadiationModel(TimeDependentProcess):
     def __init__(self,
@@ -151,6 +152,21 @@ class RadiativeConvectiveModel(GreyRadiationModel):
         self.param['adj_lapse_rate'] = adj_lapse_rate
         self.add_subprocess('convective adjustment', \
             ConvectiveAdjustment(state=self.state, **self.param))
+
+
+class BandRCModel(RadiativeConvectiveModel):
+    def __init__(self, **kwargs):
+        super(BandRCModel, self).__init__(**kwargs)
+        #  Initialize specific humidity
+        if 'q' not in self.state:
+            q = np.zeros_like(self.Tatm)
+            self.set_state('q', q)
+        h2o = ManabeWaterVapor(state=self.state, **self.param)
+        longwave = FourBandLW(state=self.state, albedo_sfc=0.)
+        shortwave = ThreeBandSW(state=self.state, albedo_sfc=self.param['albedo_sfc'])
+        self.add_subprocess('H2O', h2o)
+        self.add_subprocess('LW', longwave)
+        self.add_subprocess('SW', shortwave)
 
 
 def compute_layer_absorptivity(abs_coeff, dp):

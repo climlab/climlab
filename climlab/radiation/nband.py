@@ -175,7 +175,7 @@ class FourBandLW(NbandRadiation):
         # band 1 is CO2 channel (the band of strong absorption by CO2 around 15 microns)
         # band 2 is weak H2O channel (aggregation of spectral regions with weak to moderate absorption by H2O)
         # band 3 is strong H2O channel (aggregation of regions with strong absorption by H2O)
-
+    
         #  SPEEDY uses an approximation to the Planck function
         #  and the band fraction for every emission is calculated from
         #  its current temperature
