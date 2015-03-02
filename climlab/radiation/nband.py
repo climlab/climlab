@@ -152,3 +152,24 @@ class ThreeBandSW(NbandRadiation):
     def radiative_heating(self):
         self.absorber_vmr['H2O'] = self.q
         super(ThreeBandSW, self).radiative_heating()
+        
+class ThreeBandLW(NbandRadiation):
+    def __init__(self, **kwargs):
+        super(ThreeBandLW, self).__init__(**kwargs)
+        # band 0 is window
+        # band 1 is CO2 channel
+        # band 2 is H2O channel 
+        self.band_fraction = np.array([0.3,0.35,0.35])
+        # for now the fractions in each band are fixed...
+          # really these should be computed from the Planck function  (to do later)
+         ##  these are absorption cross-sections in m**2 / kg
+        O3 = np.array([33.,0.,0.])
+        self.absorption_cross_section['O3'] = np.reshape(O3,
+            (self.num_channels, 1))
+        CO2 = np.array([0.,0.21,0.])
+        self.absorption_cross_section['CO2'] = np.reshape(CO2,
+            (self.num_channels, 1))
+        H2O = np.array([0.,0.126,0.126])
+        self.absorption_cross_section['H2O'] = np.reshape(H2O,
+            (self.num_channels, 1))
+        self.absorber_vmr['CO2'] = 380.E-6 * np.ones_like(self.Tatm)
