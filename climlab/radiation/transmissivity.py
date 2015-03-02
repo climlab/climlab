@@ -45,7 +45,7 @@ class Transmissivity(object):
         and finally take the lower triangle of the result to get
     Tup = [[             1,         0,    0,  0],
            [          tau0,         1,    0,  0],
-           [     tau1*tau0,      tau0,    1,  0],
+           [     tau1*tau0,      tau1,    1,  0],
            [tau2*tau1*tau0, tau2*tau1, tau2,  1]]
            
     and Tdown = transpose(Tup)
