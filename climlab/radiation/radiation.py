@@ -3,9 +3,6 @@ from climlab.utils.thermo import blackbody_emission
 from climlab.radiation.transmissivity import Transmissivity
 from climlab.process.energy_budget import EnergyBudget
 
-#  Renamed from NbandModel to Radiation
-#  Now strictly atmospheric process
-#  must be coupled to a surface model
 
 class Radiation(EnergyBudget):
     '''Base class for all band radiation models,

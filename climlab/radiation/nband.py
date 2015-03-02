@@ -1,7 +1,6 @@
 import numpy as np
 from climlab.radiation.radiation import Radiation
 from climlab import constants as const
-from climlab.utils.thermo import clausius_clapeyron
 from climlab.domain import domain, axis, field
 from copy import copy
 
@@ -66,6 +65,7 @@ class NbandRadiation(Radiation):
         self._band_fraction = field.Field(self.band_fraction, domain=dom)    
 
     def compute_optical_path(self):
+        # this will cause a problrm for a model without CO2
         tau = np.zeros_like(self.absorber_vmr['CO2']*
                             self.absorption_cross_section['CO2'])
         for gas, vmr in self.absorber_vmr.iteritems:
@@ -118,21 +118,22 @@ class NbandRadiation(Radiation):
         return (self.band_fraction*flux)[..., np.newaxis]
 
 
-def Manabe_water_vapor(Tatm, relative_humidity=0.77, qStrat=5.E-6):
-    '''Compute water vapor mixing ratio profile following 
-    Manabe and Wetherald JAS 1967
-    Fixed surface relative humidity and a specified fractional profile.
-    
-    relative_humidity is the specified surface RH
-    qStrat is the minimum specific humidity, ensuring that there is 
-    some water vapor in the stratosphere.'''
-    p = Tatm.domain.lev
-    Q = p / const.ps
-    h = relative_humidity * ( (Q - 0.02) / (1-0.02) )
-    es = clausius_clapeyron( Tatm )
-    e = h * es
-    # convert to specific humidity (assume dilute)
-    qH2O = e/p * const.Rd / const.Rv 
-    #  mixing ratio can't be smaller than qStrat 
-    #  (need some water in the stratosphere!)
-    return np.maximum( qStrat, qH2O )
+def ThreeBandSW(NbandRadiation):
+    def __init__(self, **kwargs):
+        super(ThreeBandSW, self).__init__(**kwargs)
+        #  Three SW channels:
+        # channel 0 is Hartley and Huggins band (UV, 1%, 200 - 340 nm)
+        # channel 1 is Chappuis band (27%, 450 - 800 nm)
+        # channel 2 is remaining radiation (72%)
+        #   fraction of the total solar flux in each band:
+        self.band_fraction = np.array([0.01, 0.27, 0.72])
+        self.absorber_vmr['CO2'] = 380.E-6 * np.ones_like(self.Tatm)
+        self.absorber_vmr['O3'] = np.zeros_like(self.Tatm)
+        ##  absorption cross-sections in m**2 / kg
+        O3 = np.array([200.E-24, 0.285E-24, 0.]) * const.Rd / const.kBoltzmann
+        self.absorption_cross_section['O3'] = np.reshape(O3,
+            (self.numSWchannels, 1))
+        H2O = np.array([0.002, 0.002, 0.002]
+        self.absorption_cross_section['H2O'] = np.reshape(H2O,
+            (self.numSWchannels, 1))
+        self.cosZen = 0.5  # cosine of the average solar zenith angle
