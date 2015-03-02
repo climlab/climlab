@@ -83,7 +83,8 @@ class TimeDependentProcess(Process):
             proc.compute()
             for varname, value in proc.state.iteritems():
                 #proc.set_state(varname, proc.adjusted_state[varname])
-                proc.state[varname] += proc.adjustment[varname]
+                try: proc.state[varname] += proc.adjustment[varname]
+                except: pass
         # Gather all diagnostics
         for name, proc, level in walk_processes(self):
             self.diagnostics.update(proc.diagnostics)
