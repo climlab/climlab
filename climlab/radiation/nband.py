@@ -70,7 +70,10 @@ class NbandRadiation(Radiation):
                             self.absorption_cross_section['CO2'])
         for gas, vmr in self.absorber_vmr.iteritems:
             # convert to mass of absorber per unit total mass
-            q = vmr / (1.+vmr)
+            if gas is 'H2O':  # H2O is stored as specific humidity, not VMR
+                q = vmr
+            else:
+                q = vmr / (1.+vmr)
             kappa = self.absorption_cross_section[gas]
             tau += q * kappa
         tau *= self.mass_per_layer / self.cosZen
@@ -129,6 +132,8 @@ def ThreeBandSW(NbandRadiation):
         self.band_fraction = np.array([0.01, 0.27, 0.72])
         self.absorber_vmr['CO2'] = 380.E-6 * np.ones_like(self.Tatm)
         self.absorber_vmr['O3'] = np.zeros_like(self.Tatm)
+        # water vapor is actually specific humidity, not VMR.
+        self.absorbed_vmr['H2O'] = self.q 
         ##  absorption cross-sections in m**2 / kg
         O3 = np.array([200.E-24, 0.285E-24, 0.]) * const.Rd / const.kBoltzmann
         self.absorption_cross_section['O3'] = np.reshape(O3,
@@ -137,3 +142,4 @@ def ThreeBandSW(NbandRadiation):
         self.absorption_cross_section['H2O'] = np.reshape(H2O,
             (self.numSWchannels, 1))
         self.cosZen = 0.5  # cosine of the average solar zenith angle
+        

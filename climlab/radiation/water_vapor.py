@@ -13,7 +13,7 @@ class ManabeWaterVapor(DiagnosticProcess):
         relative_humidity is the specified surface RH
         qStrat is the minimum specific humidity, ensuring that there is 
         some water vapor in the stratosphere.'''
-        super(Manabe_water_vapor, self).__init__(**kwargs)
+        super(ManabeWaterVapor, self).__init__(**kwargs)
         self.relative_humidity = relative_humidity
         self.qStrat = qStrat
     
