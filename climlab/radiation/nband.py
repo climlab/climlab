@@ -201,11 +201,15 @@ class FourBandLW(NbandRadiation):
         ABLCO2 = 4.0
         ABLWV1 = 0.7
         ABLWV2 = 50.0
+        #  I'm going to assume that the absorption in window region is by O3.
+        #   not sure if this makes any sense... maybe it should be zero
+        O3 = np.array([ABLWIN, 0., 0., 0.]) / 1E5 * const.g / 5E-6
+        self.absorption_cross_section['O3'] = np.reshape(O3,
+            (self.num_channels, 1))
         # the CO2 mixing ratio for which SPEEDY / MITgcm is tuned...
         #   not clear what this number should be
         AIMCO2 = 380E-6
-        #  I'm going to assume that the absorption in window region is by CO2.
-        CO2 = np.array([ABLWIN, ABLCO2, 0., 0.]) / 1E5 * const.g / AIMCO2
+        CO2 = np.array([0., ABLCO2, 0., 0.]) / 1E5 * const.g / AIMCO2
         self.absorption_cross_section['CO2'] = np.reshape(CO2,
             (self.num_channels, 1))
         # Need to multiply by 1E3 for H2O fields because we use kg/kg for mixing ratio
