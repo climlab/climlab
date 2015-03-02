@@ -162,9 +162,21 @@ class BandRCModel(RadiativeConvectiveModel):
             q = np.zeros_like(self.Tatm)
             self.set_state('q', q)
         h2o = ManabeWaterVapor(state=self.state, **self.param)
-        longwave = FourBandLW(state=self.state, albedo_sfc=0.)
-        shortwave = ThreeBandSW(state=self.state, albedo_sfc=self.param['albedo_sfc'])
         self.add_subprocess('H2O', h2o)
+        
+        #  initialize radiatively active gas inventories
+        self.absorber_vmr = {}
+        self.absorber_vmr['CO2'] = 380.E-6 * np.ones_like(self.Tatm)
+        self.absorber_vmr['O3'] = np.zeros_like(self.Tatm)
+        # water vapor is actually specific humidity, not VMR.
+        self.absorber_vmr['H2O'] = self.q
+
+        longwave = FourBandLW(state=self.state, 
+                              absorber_vmr=self.absorber_vmr,
+                              albedo_sfc=0.)
+        shortwave = ThreeBandSW(state=self.state, 
+                                absorber_vmr=self.absorber_vmr,
+                                albedo_sfc=self.param['albedo_sfc'])
         self.add_subprocess('LW', longwave)
         self.add_subprocess('SW', shortwave)
 

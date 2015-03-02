@@ -25,13 +25,17 @@ class NbandRadiation(Radiation):
     that gives the absorption cross-section per unit mass for each gas
     in every spectral band
     '''
-    def __init__(self, **kwargs):
+    def __init__(self, absorber_vmr=None, **kwargs):
         super(NbandRadiation, self).__init__(**kwargs)
         # this should be overridden by daughter classes
         self.band_fraction = np.array(1.)
         ##  a dictionary of absorbing gases, in volumetric mixing ratios
         #  each item should have dimensions of self.Tatm
-        self.absorber_vmr = {}
+        #  Can be passed as input argument
+        if absorber_vmr is None:
+            self.absorber_vmr = {}
+        else:
+            self.absorber_vmr = absorber_vmr
         #self.CO2vmr = 380.E-6 * np.ones_like(self.lev)
         #self.O3vmr = np.zeros_like(self.lev)
         
@@ -73,8 +77,12 @@ class NbandRadiation(Radiation):
                 q = vmr
             else:
                 q = vmr / (1.+vmr)
-            kappa = self.absorption_cross_section[gas]
-            tau += q * kappa
+            try: 
+                # if this gas isn't present in absorption dictionary
+                # the assumption is that there is no absorption!
+                kappa = self.absorption_cross_section[gas]
+                tau += q * kappa
+            except: pass
         tau *= self.mass_per_layer / self.cosZen
         return tau
 
@@ -146,10 +154,12 @@ class ThreeBandSW(NbandRadiation):
         # channel 2 is remaining radiation (72%)
         #   fraction of the total solar flux in each band:
         self.band_fraction = np.array([0.01, 0.27, 0.72])
-        self.absorber_vmr['CO2'] = 380.E-6 * np.ones_like(self.Tatm)
-        self.absorber_vmr['O3'] = np.zeros_like(self.Tatm)
-        # water vapor is actually specific humidity, not VMR.
-        self.absorber_vmr['H2O'] = self.q
+        if 'CO2' not in self.absorber_vmr:
+            self.absorber_vmr['CO2'] = 380.E-6 * np.ones_like(self.Tatm)
+        if 'O3' not in self.absorber_vmr:
+            self.absorber_vmr['O3'] = np.zeros_like(self.Tatm)
+        if 'H2O' not in self.absorber_vmr:
+            self.absorber_vmr['H2O'] = self.q
         ##  absorption cross-sections in m**2 / kg
         O3 = np.array([200.E-24, 0.285E-24, 0.]) * const.Rd / const.kBoltzmann
         self.absorption_cross_section['O3'] = np.reshape(O3,
@@ -169,13 +179,13 @@ class ThreeBandSW(NbandRadiation):
         
 class FourBandLW(NbandRadiation):
     def __init__(self, **kwargs):
-        super(FourBandLW, self).__init__(**kwargs)
-        #  Closely following SPEEDY / MITgcm longwave model
-        # band 0 is window region (between 8.5 and 11 microns)
-        # band 1 is CO2 channel (the band of strong absorption by CO2 around 15 microns)
-        # band 2 is weak H2O channel (aggregation of spectral regions with weak to moderate absorption by H2O)
-        # band 3 is strong H2O channel (aggregation of regions with strong absorption by H2O)
-    
+        '''Closely following SPEEDY / MITgcm longwave model
+        band 0 is window region (between 8.5 and 11 microns)
+        band 1 is CO2 channel (the band of strong absorption by CO2 around 15 microns)
+        band 2 is weak H2O channel (aggregation of spectral regions with weak to moderate absorption by H2O)
+        band 3 is strong H2O channel (aggregation of regions with strong absorption by H2O)
+        '''
+        super(FourBandLW, self).__init__(**kwargs)    
         #  SPEEDY uses an approximation to the Planck function
         #  and the band fraction for every emission is calculated from
         #  its current temperature
@@ -203,8 +213,12 @@ class FourBandLW(NbandRadiation):
         self.absorption_cross_section['H2O'] = np.reshape(H2O,
             (self.num_channels, 1))
         
-        self.absorber_vmr['CO2'] = 380.E-6 * np.ones_like(self.Tatm)
-        self.absorber_vmr['H2O'] = self.q
+        if 'CO2' not in self.absorber_vmr:
+            self.absorber_vmr['CO2'] = 380.E-6 * np.ones_like(self.Tatm)
+        if 'O3' not in self.absorber_vmr:
+            self.absorber_vmr['O3'] = np.zeros_like(self.Tatm)
+        if 'H2O' not in self.absorber_vmr:
+            self.absorber_vmr['H2O'] = self.q
 
 
 def SPEEDY_band_fraction(T):
