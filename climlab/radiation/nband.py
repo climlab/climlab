@@ -122,6 +122,18 @@ class NbandRadiation(Radiation):
 
 class ThreeBandSW(NbandRadiation):
     def __init__(self, **kwargs):
+        '''A three-band mdoel for shortwave radiation.
+    
+        The spectral decomposition used here is largely based on the
+        "Moist Radiative-Convective Model" by Aarnout van Delden, Utrecht University
+        a.j.vandelden@uu.nl
+        http://www.staff.science.uu.nl/~delde102/RCM.htm
+
+        Three SW channels:
+            channel 0 is Hartley and Huggins band (UV, 1%, 200 - 340 nm)
+            channel 1 is Chappuis band (27%, 450 - 800 nm)
+            channel 2 is remaining radiation (72%)
+        '''
         super(ThreeBandSW, self).__init__(**kwargs)
         #  Three SW channels:
         # channel 0 is Hartley and Huggins band (UV, 1%, 200 - 340 nm)
@@ -150,26 +162,97 @@ class ThreeBandSW(NbandRadiation):
         return np.zeros_like(self.absorptivity)
     
     def radiative_heating(self):
+        #  Is this necessary? Can't we just set a reference in __init__
+        #  and it will get updated dynamically?
         self.absorber_vmr['H2O'] = self.q
         super(ThreeBandSW, self).radiative_heating()
         
-class ThreeBandLW(NbandRadiation):
+class FourBandLW(NbandRadiation):
     def __init__(self, **kwargs):
-        super(ThreeBandLW, self).__init__(**kwargs)
-        # band 0 is window
-        # band 1 is CO2 channel
-        # band 2 is H2O channel 
-        self.band_fraction = np.array([0.3,0.35,0.35])
-        # for now the fractions in each band are fixed...
-          # really these should be computed from the Planck function  (to do later)
-         ##  these are absorption cross-sections in m**2 / kg
-        O3 = np.array([33.,0.,0.])
-        self.absorption_cross_section['O3'] = np.reshape(O3,
-            (self.num_channels, 1))
-        CO2 = np.array([0.,0.21,0.])
+        super(FourBandLW, self).__init__(**kwargs)
+        #  Closely following SPEEDY / MITgcm longwave model
+        # band 0 is window region (between 8.5 and 11 microns)
+        # band 1 is CO2 channel (the band of strong absorption by CO2 around 15 microns)
+        # band 2 is weak H2O channel (aggregation of spectral regions with weak to moderate absorption by H2O)
+        # band 3 is strong H2O channel (aggregation of regions with strong absorption by H2O)
+
+        #  SPEEDY uses an approximation to the Planck function
+        #  and the band fraction for every emission is calculated from
+        #  its current temperature
+        #  Here for simoplicity we'll just set an average band_fraction
+        #  and hold it fixed
+        Tarray = np.linspace(-30, 30) + 273.15
+        self.band_fraction = np.mean(SPEEDY_band_fraction(Tarray), axis=1)
+
+        # defaults from MITgcm/aim:
+        # these are layer absorptivities per dp = 10^5 Pa
+        # the water vapor terms are expressed for dq = 1 g/kg
+        ABLWIN = 0.7
+        ABLCO2 = 4.0
+        ABLWV1 = 0.7
+        ABLWV2 = 50.0
+        # the CO2 mixing ratio for which SPEEDY / MITgcm is tuned...
+        #   not clear what this number should be
+        AIMCO2 = 3.8E-6
+        #  I'm going to assume that the absorption in window region is by CO2.
+        CO2 = np.array([ABLWIN, ABLCO2, 0., 0.]) / 1E5 * const.g / AIMCO2
         self.absorption_cross_section['CO2'] = np.reshape(CO2,
             (self.num_channels, 1))
-        H2O = np.array([0.,0.126,0.126])
+        # Need to multiply by 1E3 for H2O fields because we use kg/kg for mixing ratio
+        H2O = np.array([0., 0., ABLWV1, ABLWV2]) / 1E5 * const.g * 1E3
         self.absorption_cross_section['H2O'] = np.reshape(H2O,
             (self.num_channels, 1))
+        
         self.absorber_vmr['CO2'] = 380.E-6 * np.ones_like(self.Tatm)
+        self.absorber_vmr['H2O'] = self.q
+
+
+def SPEEDY_band_fraction(T):
+    '''Python / numpy implementation of the formula used by SPEEDY and MITgcm
+    to partition longwave emissions into 4 spectral bands.
+    
+    Input: temperature in Kelvin
+    
+    returns: a four-element array of band fraction
+    
+    Reproducing here the FORTRAN code from MITgcm/pkg/aim_v23/phy_radiat.F
+    
+    
+	      EPS3=0.95 _d 0
+	
+	      DO JTEMP=200,320
+	        FBAND(JTEMP,0)= EPSLW
+	        FBAND(JTEMP,2)= 0.148 _d 0 - 3.0 _d -6 *(JTEMP-247)**2
+	        FBAND(JTEMP,3)=(0.375 _d 0 - 5.5 _d -6 *(JTEMP-282)**2)*EPS3
+	        FBAND(JTEMP,4)= 0.314 _d 0 + 1.0 _d -5 *(JTEMP-315)**2
+	        FBAND(JTEMP,1)= 1. _d 0 -(FBAND(JTEMP,0)+FBAND(JTEMP,2)
+	     &                           +FBAND(JTEMP,3)+FBAND(JTEMP,4))
+	      ENDDO
+	
+	      DO JB=0,NBAND
+	        DO JTEMP=lwTemp1,199
+	          FBAND(JTEMP,JB)=FBAND(200,JB)
+	        ENDDO
+	        DO JTEMP=321,lwTemp2
+	          FBAND(JTEMP,JB)=FBAND(320,JB)
+	        ENDDO
+	      ENDDO
+    '''
+    # EPSLW is the fraction of longwave emission to goes directly to space
+    #  It is set to zero by default in MITgcm code. We won't use it here.
+    Tarray = np.array(T)
+    Tarray = np.minimum(Tarray, 230.)
+    Tarray = np.maximum(Tarray, 200.)
+    num_band = 4
+    dims = [num_band]
+    dims.extend(Tarray.shape)
+    FBAND = np.zeros(dims)
+
+    EPS2=0.95
+    FBAND[1,:] = 0.148 - 3.0E-6 *(T-247.)**2
+    FBAND[2,:] = (0.375 - 5.5E-6 *(T-282.)**2)*EPS2
+    FBAND[3,:] = 0.314 + 1.0E-5 *(T-315.)**2
+    FBAND[0,:] = 1. - np.sum(FBAND, axis=0)
+    return FBAND
+    
+    
