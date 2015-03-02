@@ -165,12 +165,7 @@ class ThreeBandSW(NbandRadiation):
     def emissivity(self):
         # This ensures that emissivity is always zero for shortwave classes
         return np.zeros_like(self.absorptivity)
-    
-    def radiative_heating(self):
-        #  Is this necessary? Can't we just set a reference in __init__
-        #  and it will get updated dynamically?
-        self.absorber_vmr['H2O'] = self.q
-        super(ThreeBandSW, self).radiative_heating()
+ 
         
 class FourBandLW(NbandRadiation):
     def __init__(self, **kwargs):
