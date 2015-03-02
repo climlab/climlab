@@ -89,6 +89,11 @@ class NbandRadiation(Radiation):
         dom = domain.Atmosphere(axes=axes)
         self.absorptivity = field.Field(absorptivity, domain=dom)
     
+    def compute_emission(self):
+        #  need to split the total emission across the bands
+        total_emission = super(NbandRadiation, self).compute_emission()
+        return total_emission * self.band_fraction[:, np.newaxis]
+
     def radiative_heating(self):
         #  need to recompute transmissivities each time because 
         # water vapor is changing
@@ -193,7 +198,7 @@ class FourBandLW(NbandRadiation):
         ABLWV2 = 50.0
         # the CO2 mixing ratio for which SPEEDY / MITgcm is tuned...
         #   not clear what this number should be
-        AIMCO2 = 3.8E-6
+        AIMCO2 = 380E-6
         #  I'm going to assume that the absorption in window region is by CO2.
         CO2 = np.array([ABLWIN, ABLCO2, 0., 0.]) / 1E5 * const.g / AIMCO2
         self.absorption_cross_section['CO2'] = np.reshape(CO2,
