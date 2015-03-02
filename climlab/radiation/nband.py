@@ -27,7 +27,6 @@ class NbandRadiation(Radiation):
     '''
     def __init__(self, **kwargs):
         super(NbandRadiation, self).__init__(**kwargs)
-        #self.numSWchannels = 3
         # this should be overridden by daughter classes
         self.band_fraction = np.array(1.)
         ##  a dictionary of absorbing gases, in volumetric mixing ratios
@@ -49,7 +48,7 @@ class NbandRadiation(Radiation):
         self.flux_from_space = np.zeros_like(self.Ts)
         self.flux_from_sfc = np.zeros_like(self.Ts)
         self.albedo_sfc = np.ones_like(self.band_fraction)*self.albedo_sfc
-        self.compute_absorptivity()
+        #self.compute_absorptivity()
     
     @property 
     def band_fraction(self):
@@ -62,13 +61,13 @@ class NbandRadiation(Radiation):
         self.channel_ax = {'channel': ax}
         dom = domain._Domain(axes=self.channel_ax)
         #   fraction of the total solar flux in each band:
-        self._band_fraction = field.Field(self.band_fraction, domain=dom)    
+        self._band_fraction = field.Field(value, domain=dom)    
 
     def compute_optical_path(self):
         # this will cause a problrm for a model without CO2
         tau = np.zeros_like(self.absorber_vmr['CO2']*
                             self.absorption_cross_section['CO2'])
-        for gas, vmr in self.absorber_vmr.iteritems:
+        for gas, vmr in self.absorber_vmr.iteritems():
             # convert to mass of absorber per unit total mass
             if gas is 'H2O':  # H2O is stored as specific humidity, not VMR
                 q = vmr
@@ -121,7 +120,7 @@ class NbandRadiation(Radiation):
         return (self.band_fraction*flux)[..., np.newaxis]
 
 
-def ThreeBandSW(NbandRadiation):
+class ThreeBandSW(NbandRadiation):
     def __init__(self, **kwargs):
         super(ThreeBandSW, self).__init__(**kwargs)
         #  Three SW channels:
@@ -133,13 +132,23 @@ def ThreeBandSW(NbandRadiation):
         self.absorber_vmr['CO2'] = 380.E-6 * np.ones_like(self.Tatm)
         self.absorber_vmr['O3'] = np.zeros_like(self.Tatm)
         # water vapor is actually specific humidity, not VMR.
-        self.absorbed_vmr['H2O'] = self.q 
+        self.absorber_vmr['H2O'] = self.q
         ##  absorption cross-sections in m**2 / kg
         O3 = np.array([200.E-24, 0.285E-24, 0.]) * const.Rd / const.kBoltzmann
         self.absorption_cross_section['O3'] = np.reshape(O3,
-            (self.numSWchannels, 1))
-        H2O = np.array([0.002, 0.002, 0.002]
+            (self.num_channels, 1))
+        H2O = np.array([0.002, 0.002, 0.002])
         self.absorption_cross_section['H2O'] = np.reshape(H2O,
-            (self.numSWchannels, 1))
+            (self.num_channels, 1))
+        self.absorption_cross_section['CO2'] = \
+            np.zeros_like(self.absorption_cross_section['O3'])
         self.cosZen = 0.5  # cosine of the average solar zenith angle
-        
+
+    @property
+    def emissivity(self):
+        # This ensures that emissivity is always zero for shortwave classes
+        return np.zeros_like(self.absorptivity)
+    
+    def radiative_heating(self):
+        self.absorber_vmr['H2O'] = self.q
+        super(ThreeBandSW, self).radiative_heating()

@@ -6,7 +6,7 @@ from climlab.domain import domain, axis, field
 from copy import copy
 
 
-class ThreeBandSW(RadiationSW):
+class ThreeBandSW_old(RadiationSW):
     '''A three-band mdoel for shortwave radiation.
     
     The spectral decomposition used here is largely based on the

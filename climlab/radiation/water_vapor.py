@@ -18,7 +18,7 @@ class ManabeWaterVapor(DiagnosticProcess):
         self.qStrat = qStrat
     
     def compute(self):
-        p = self.Tatm.domain.lev
+        p = self.lev
         Q = p / const.ps
         h = self.relative_humidity * ( (Q - 0.02) / (1-0.02) )
         es = clausius_clapeyron( self.Tatm )
@@ -27,4 +27,7 @@ class ManabeWaterVapor(DiagnosticProcess):
         qH2O = e/p * const.Rd / const.Rv 
         #  mixing ratio can't be smaller than qStrat 
         #  (need some water in the stratosphere!)
-        self.q = np.maximum( self.qStrat, qH2O )
+        q = np.maximum( self.qStrat, qH2O )
+        self.q -= self.q
+        self.q += q
+
