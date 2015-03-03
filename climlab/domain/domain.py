@@ -18,7 +18,32 @@ class _Domain(object):
         shape = []
         axcount = 0
         axindex = {}
-        for axType, ax in self.axes.iteritems():
+        #  ordered list of axes
+        #  lev OR depth is last
+        #  lat is second-last
+        add_lev = False
+        add_depth = False
+        add_lat = False
+        axlist = self.axes.keys()
+        if 'lev' in axlist:
+            axlist.remove('lev')
+            add_lev = True
+        elif 'depth' in axlist:
+            axlist.remove('depth')
+            add_depth = True
+        if 'lat' in axlist:
+            axlist.remove('lat')
+            add_lat = True
+        axlist2 = axlist[:]
+        if add_lat:
+            axlist2.append('lat')
+        if add_depth:
+            axlist2.append('depth')
+        if add_lev:
+            axlist2.append('lev')
+        #for axType, ax in self.axes.iteritems():        
+        for axType in axlist2:
+            ax = self.axes[axType]
             shape.append(ax.num_points)
             #  can access axes as object attributes
             setattr(self, axType, ax)
@@ -157,8 +182,8 @@ def zonal_mean_column(num_lat=90, num_lev=30, water_depth=10., lat=None,
 
     depthax = Axis(axis_type='depth', bounds=[water_depth, 0.])
     #axes = {'depth': depthax, 'lat': latax, 'lev': levax}
-    slab = SlabOcean(axes={'depth':depthax, 'lat':latax}, **kwargs)
-    atm = Atmosphere(axes={'lev':levax, 'lat':latax}, **kwargs)
+    slab = SlabOcean(axes={'lat':latax, 'depth':depthax}, **kwargs)
+    atm = Atmosphere(axes={'lat':latax, 'lev':levax}, **kwargs)
     return slab, atm
 
 def box_model_domain(num_points=2, **kwargs):

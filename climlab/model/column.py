@@ -63,22 +63,7 @@ class GreyRadiationModel(TimeDependentProcess):
         self.add_subprocess('surface', surface)
     
     def initial_state(self, num_lev, num_lat, lev, lat, water_depth):
-        if num_lat is 1:
-            sfc, atm = domain.single_column(water_depth=water_depth,
-                                            num_lev=num_lev,
-                                            lev=lev)
-        else:
-            sfc, atm = domain.zonal_mean_column(water_depth=water_depth,
-                                                num_lev=num_lev,
-                                                lev=lev,
-                                                num_lat=num_lat,
-                                                lat=lat)
-        num_lev = atm.lev.num_points
-        Ts = Field(288.*np.ones(sfc.shape), domain=sfc)
-        Tinitial = np.tile(np.linspace(288.-10., 200., num_lev), sfc.shape)
-        Tatm = Field(Tinitial, domain=atm)
-        state = {'Ts': Ts, 'Tatm': Tatm}
-        return state
+        return initial_state(num_lev, num_lat, lev, lat, water_depth)
         
     # This process has to handle the coupling between insolation and column radiation
     def compute(self):
@@ -141,6 +126,25 @@ class GreyRadiationModel(TimeDependentProcess):
         except: pass
         try: self.diagnostics['SW_emission'] = SW.emission
         except: pass
+
+
+def initial_state(num_lev, num_lat, lev, lat, water_depth):
+    if num_lat is 1:
+        sfc, atm = domain.single_column(water_depth=water_depth,
+                                        num_lev=num_lev,
+                                        lev=lev)
+    else:
+        sfc, atm = domain.zonal_mean_column(water_depth=water_depth,
+                                            num_lev=num_lev,
+                                            lev=lev,
+                                            num_lat=num_lat,
+                                            lat=lat)
+    num_lev = atm.lev.num_points
+    Ts = Field(288.*np.ones(sfc.shape), domain=sfc)
+    Tinitial = np.tile(np.linspace(288.-10., 200., num_lev), sfc.shape)
+    Tatm = Field(Tinitial, domain=atm)
+    state = {'Ts': Ts, 'Tatm': Tatm}
+    return state
 
 
 class RadiativeConvectiveModel(GreyRadiationModel):

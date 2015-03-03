@@ -91,6 +91,14 @@ class Transmissivity(object):
                 Tup, Tdown = compute_T(self.transmissivity[i,:])
                 self.Tup[i,:,:] = Tup
                 self.Tdown[i,:,:] = Tdown
+        elif len(self.shape)==3:
+            self.Tup = np.zeros((self.shape[0],self.shape[1],N+1,N+1))
+            self.Tdown = np.zeros_like(self.Tup)
+            for i in range(self.shape[0]):
+                for j in range(self.shape[1]):
+                    Tup, Tdown = compute_T(self.transmissivity[i,j,:])
+                    self.Tup[i,j,:,:] = Tup
+                    self.Tdown[i,j,:,:] = Tdown
 
     def flux_down(self, fluxDownTop, emission=None):
         '''Compute downwelling radiative flux at interfaces between layers.

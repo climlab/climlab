@@ -100,7 +100,10 @@ class NbandRadiation(Radiation):
     def compute_emission(self):
         #  need to split the total emission across the bands
         total_emission = super(NbandRadiation, self).compute_emission()
-        return total_emission * self.band_fraction[:, np.newaxis]
+        band_fraction = self.band_fraction
+        for n in range(self.Tatm.domain.numdims):
+            band_fraction = band_fraction[:, np.newaxis]
+        return total_emission * band_fraction
 
     def radiative_heating(self):
         #  need to recompute transmissivities each time because 
@@ -162,11 +165,16 @@ class ThreeBandSW(NbandRadiation):
             self.absorber_vmr['H2O'] = self.q
         ##  absorption cross-sections in m**2 / kg
         O3 = np.array([200.E-24, 0.285E-24, 0.]) * const.Rd / const.kBoltzmann
-        self.absorption_cross_section['O3'] = np.reshape(O3,
-            (self.num_channels, 1))
+        #self.absorption_cross_section['O3'] = np.reshape(O3,
+        #    (self.num_channels, 1))
         H2O = np.array([0.002, 0.002, 0.002])
-        self.absorption_cross_section['H2O'] = np.reshape(H2O,
-            (self.num_channels, 1))
+        for n in range(self.Tatm.domain.numdims):
+            H2O = H2O[:, np.newaxis]
+            O3 = O3[:, np.newaxis]
+        self.absorption_cross_section['O3'] = O3
+        self.absorption_cross_section['H2O'] = H2O
+        #self.absorption_cross_section['H2O'] = np.reshape(H2O,
+        #    (self.num_channels, 1))
         self.absorption_cross_section['CO2'] = \
             np.zeros_like(self.absorption_cross_section['O3'])
         self.cosZen = 0.5  # cosine of the average solar zenith angle
@@ -210,13 +218,17 @@ class FourBandLW(NbandRadiation):
         #   not clear what this number should be
         AIMCO2 = 380E-6
         CO2 = np.array([0., ABLCO2, 0., 0.]) / 1E5 * const.g / AIMCO2
-        self.absorption_cross_section['CO2'] = np.reshape(CO2,
-            (self.num_channels, 1))
+        #self.absorption_cross_section['CO2'] = np.reshape(CO2,
+        #    (self.num_channels, 1))
         # Need to multiply by 1E3 for H2O fields because we use kg/kg for mixing ratio
         H2O = np.array([0., 0., ABLWV1, ABLWV2]) / 1E5 * const.g * 1E3
-        self.absorption_cross_section['H2O'] = np.reshape(H2O,
-            (self.num_channels, 1))
-        
+        #self.absorption_cross_section['H2O'] = np.reshape(H2O,
+        #    (self.num_channels, 1))
+        for n in range(self.Tatm.domain.numdims):
+            CO2 = CO2[:, np.newaxis]
+            O3 = O3[:, np.newaxis]
+            H2O = H2O[:, np.newaxis]
+        self.absorption_cross_section.update({'CO2': CO2, 'H2O': H2O, 'O3': O3})
         if 'CO2' not in self.absorber_vmr:
             self.absorber_vmr['CO2'] = 380.E-6 * np.ones_like(self.Tatm)
         if 'O3' not in self.absorber_vmr:
