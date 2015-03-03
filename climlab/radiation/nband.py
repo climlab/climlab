@@ -133,7 +133,12 @@ class NbandRadiation(Radiation):
         self.flux_to_space = np.sum(flux_up_top, axis=0)
     
     def split_channels(self, flux):
-        return (self.band_fraction*flux)[..., np.newaxis]
+        #return (self.band_fraction*flux)[..., np.newaxis]
+        split = np.outer(self.band_fraction, flux)
+        # make sure there's a singleton dimension at the last axis (level)
+        if np.size(split, axis=-1) is not 1:
+            split = split[..., np.newaxis]
+        return split
 
 
 class ThreeBandSW(NbandRadiation):

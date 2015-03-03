@@ -11,6 +11,11 @@ class ConvectiveAdjustment(TimeDependentProcess):
         self.param['adj_lapse_rate'] = adj_lapse_rate
         self.time_type = 'adjustment'
         self.adjustment = {}
+        patm = self.lev
+        c_atm = self.Tatm.domain.heat_capacity
+        c_sfc = self.Ts.domain.heat_capacity       
+        self.pnew = np.flipud(np.append(np.flipud(patm), const.ps))
+        self.cnew = np.flipud(np.append(np.flipud(c_atm), c_sfc))
     
     def compute(self):
         lapse_rate = self.param['adj_lapse_rate']
@@ -23,21 +28,16 @@ class ConvectiveAdjustment(TimeDependentProcess):
             #  For now, let's assume that the vertical axis is the last axis
             unstable_Ts = np.atleast_1d(self.Ts)
             unstable_Tatm = self.Tatm
-            c_atm = self.Tatm.domain.heat_capacity
-            c_sfc = self.Ts.domain.heat_capacity       
             Tcol = np.concatenate((unstable_Ts, unstable_Tatm),axis=-1)
-            patm = self.lev
-            pnew = np.flipud(np.append(np.flipud(patm), const.ps))
-            cnew = np.flipud(np.append(np.flipud(c_atm), c_sfc))
             try:
                 num_lat = self.Tatm.domain.lat.num_points
                 Tadj = np.zeros_like(Tcol)
                 for n in range(num_lat):
-                    Tadj[n,:] = convective_adjustment_direct(pnew, Tcol[n,:],
-                                            cnew, lapserate=lapse_rate)
+                    Tadj[n,:] = convective_adjustment_direct(self.pnew, Tcol[n,:],
+                                            self.cnew, lapserate=lapse_rate)
             except:
-                Tadj = convective_adjustment_direct(pnew, Tcol,
-                                            cnew, lapserate=lapse_rate)
+                Tadj = convective_adjustment_direct(self.pnew, Tcol,
+                                            self.cnew, lapserate=lapse_rate)
             Ts = Field(Tadj[...,0], domain=self.Ts.domain)
             Tatm = Field(Tadj[...,1:], domain=self.Tatm.domain)
             self.adjustment['Ts'] = Ts - self.Ts

@@ -30,6 +30,10 @@ class GreyRadiationModel(TimeDependentProcess):
                  # absorption coefficient in m**2 / kg
                  abs_coeff=1.229E-4,
                  **kwargs):
+        if lat is not None:
+            num_lat = np.array(lat).size
+        if lev is not None:
+            num_lev = np.array(lev).size
         # Check to see if an initial state is already provided
         #  If not, make one
         if 'state' not in kwargs:
