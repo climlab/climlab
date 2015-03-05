@@ -120,3 +120,42 @@ def blackbody_emission(T):
     '''Blackbody radiation following the Stefan-Boltzmann law.'''
     return const.sigma * T**4
 
+def Planck_frequency(nu, T):
+    '''The Planck function B(nu,T):
+    the flux density for blackbody radiation in frequency space
+    nu is frequency in 1/s
+    T is temperature in Kelvin
+    
+    Formula from Raymond Pierrehumbert, "Principles of Planetary Climate" 
+    '''
+    h = const.hPlanck
+    c = const.c_light
+    k = const.kBoltzmann
+    return 2*h*nu**3/c**2/(np.exp(h*nu/k/T)-1)
+    
+def Planck_wavenumber(n, T):
+    '''The Planck function (flux density for blackbody radition)
+    in wavenumber space
+    n is wavenumber in 1/cm
+    T is temperature in Kelvin
+    
+    Formula from Raymond Pierrehumbert, "Principles of Planetary Climate" 
+    '''
+    c = const.c_light
+    # convert to mks units
+    n = n*100.
+    return c * Planck_frequency(n*c, T)
+
+def Planck_wavelength(l, T):
+    '''The Planck function (flux density for blackbody radiation)
+    in wavelength space
+    l is wavelength in meters
+    T is temperature in Kelvin
+    
+    Formula from Raymond Pierrehumbert, "Principles of Planetary Climate" 
+    '''
+    h = const.hPlanck
+    c = const.c_light
+    k = const.kBoltzmann
+    u = h*c/l/k/T
+    return 2*k**5*T**5/h**4/c**3*u**5/(np.exp(u)-1)
