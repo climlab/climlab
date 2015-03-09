@@ -1,6 +1,6 @@
 import numpy as np
 from climlab import constants as const
-from climlab.process.energy_budget import TimeDependentProcess
+from climlab.process.time_dependent_process import TimeDependentProcess
 from climlab.domain.field import Field
 
 
