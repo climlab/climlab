@@ -18,10 +18,10 @@ class Radiation(EnergyBudget):
         super(Radiation, self).__init__(**kwargs)
         if reflectivity is None:
             reflectivity = np.zeros_like(self.Tatm)
-        self.reflectivity = reflectivity
         if absorptivity is None:
             absorptivity = np.zeros_like(self.Tatm)
         self.absorptivity = absorptivity
+        self.reflectivity = reflectivity
         self.albedo_sfc = albedo_sfc*np.ones_like(self.Ts)
         self.flux_from_space = np.zeros_like(self.Ts)
         self.flux_to_sfc = np.zeros_like(self.Ts)
@@ -45,8 +45,12 @@ class Radiation(EnergyBudget):
                 value = np.ones_like(self.Tatm) * value
             elif value.shape != self.Tatm.shape:
                 raise ValueError('absorptivity must be a Field, a scalar, or match atm grid dimensions')
-        self.trans = Transmissivity(value, reflectivity=self.reflectivity,
+        try:
+            self.trans = Transmissivity(absorptivity=value,
+                                    reflectivity=self.reflectivity,
                                     axis=axis)
+        except:
+            self.trans = Transmissivity(absorptivity=value, axis=axis)
     @property
     def emissivity(self):
         # This ensures that emissivity = absorptivity at all times
@@ -58,9 +62,26 @@ class Radiation(EnergyBudget):
     @transmissivity.setter
     def transmissivity(self, value):
         self.absorptivity = 1 - value
-        #  more accurate for non-optically thin layers:
-        #self.absorptivity = -np.log(value)
-
+    @property
+    def reflectivity(self):
+        return self.trans.reflectivity
+    @reflectivity.setter
+    def reflectivity(self, value):
+        #  value should be a Field,
+         #  or numpy array of same size as self.Tatm
+        try:
+            axis = value.domain.axis_index['lev']
+        except:
+            axis = self.Tatm.domain.axis_index['lev']
+            # if a single scalar is given, broadcast that to all levels
+            if len(np.shape(np.array(value))) is 0:
+                value = np.ones_like(self.Tatm) * value
+            elif value.shape != self.Tatm.shape:
+                raise ValueError('reflectivity must be a Field, a scalar, or match atm grid dimensions')
+        self.trans = Transmissivity(absorptivity=self.absorptivity,
+                                    reflectivity=value,
+                                    axis=axis)
+        
     def compute_emission(self):
         return self.emissivity * blackbody_emission(self.Tatm)
 

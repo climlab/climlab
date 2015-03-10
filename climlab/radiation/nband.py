@@ -60,7 +60,7 @@ class NbandRadiation(Radiation):
         self._band_fraction = field.Field(value, domain=dom)    
 
     def compute_optical_path(self):
-        # this will cause a problrm for a model without CO2
+        # this will cause a problem for a model without CO2
         tau = np.zeros_like(self.absorber_vmr['CO2']*
                             self.absorption_cross_section['CO2'])
         for gas, vmr in self.absorber_vmr.iteritems():
