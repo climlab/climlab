@@ -13,8 +13,12 @@ class Radiation(EnergyBudget):
     
     By default emissivity = absorptivity.
     Subclasses can override this is necessary (e.g. for shortwave model)'''
-    def __init__(self, absorptivity=None, albedo_sfc=0, **kwargs):
+    def __init__(self, absorptivity=None, reflectivity=None, 
+                 albedo_sfc=0, **kwargs):
         super(Radiation, self).__init__(**kwargs)
+        if reflectivity is None:
+            reflectivity = np.zeros_like(self.Tatm)
+        self.reflectivity = reflectivity
         if absorptivity is None:
             absorptivity = np.zeros_like(self.Tatm)
         self.absorptivity = absorptivity
@@ -41,7 +45,8 @@ class Radiation(EnergyBudget):
                 value = np.ones_like(self.Tatm) * value
             elif value.shape != self.Tatm.shape:
                 raise ValueError('absorptivity must be a Field, a scalar, or match atm grid dimensions')
-        self.trans = Transmissivity(value, axis=axis)
+        self.trans = Transmissivity(value, reflectivity=self.reflectivity,
+                                    axis=axis)
     @property
     def emissivity(self):
         # This ensures that emissivity = absorptivity at all times
