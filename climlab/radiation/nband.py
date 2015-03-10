@@ -35,24 +35,16 @@ class NbandRadiation(Radiation):
         if absorber_vmr is None:
             self.absorber_vmr = {}
         else:
-            self.absorber_vmr = absorber_vmr
-        #self.CO2vmr = 380.E-6 * np.ones_like(self.lev)
-        #self.O3vmr = np.zeros_like(self.lev)
-        
+            self.absorber_vmr = absorber_vmr        
         # a dictionary of absorption cross-sections in m**2 / kg
         # each item should have dimension...  (num_channels, 1)
         self.absorption_cross_section = {}
-        #self.sigmaH2O = np.reshape(np.array([0.002, 0.002, 0.002]),
-        #                           (self.numSWchannels, 1))
-        #self.sigmaO3 = np.reshape(np.array([200.E-24, 0.285E-24, 0.]) * 
-        #    const.Rd / const.kBoltzmann, (self.numSWchannels, 1))
         self.cosZen = 1.  # cosine of the average zenith angle
         dp = self.Tatm.domain.lev.delta
         self.mass_per_layer = dp * const.mb_to_Pa / const.g
         self.flux_from_space = np.zeros_like(self.Ts)
         self.flux_from_sfc = np.zeros_like(self.Ts)
         self.albedo_sfc = np.ones_like(self.band_fraction)*self.albedo_sfc
-        #self.compute_absorptivity()
     
     @property 
     def band_fraction(self):
@@ -273,7 +265,7 @@ def SPEEDY_band_fraction(T):
 	        ENDDO
 	      ENDDO
     '''
-    # EPSLW is the fraction of longwave emission to goes directly to space
+    # EPSLW is the fraction of longwave emission that goes directly to space
     #  It is set to zero by default in MITgcm code. We won't use it here.
     Tarray = np.array(T)
     Tarray = np.minimum(Tarray, 230.)

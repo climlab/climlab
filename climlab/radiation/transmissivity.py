@@ -66,12 +66,16 @@ class Transmissivity(object):
     The absorbed radiation in the atmosphere is the flux convergence:
         -diff(F)
     '''
-    def __init__(self, absorptivity, axis=0):
+    #  quick hack to get some simple cloud albedo
+    def __init__(self, absorptivity, reflectivity=None, axis=0):
         self.axis = axis
         #if absorptivity.ndim is not 1:
         #    raise ValueError('absorptivity argument must be a vector')
+        if reflectivity is None:
+            reflectivity = np.zeros_like(absorptivity)
+        self.reflectivity = reflectivity
         self.absorptivity = absorptivity
-        self.transmissivity = 1 - absorptivity
+        self.transmissivity = 1 - absorptivity - reflectivity
         #N = self.absorptivity.size
         self.shape = self.absorptivity.shape 
         N = np.size(self.absorptivity, axis=self.axis)
@@ -115,6 +119,11 @@ class Transmissivity(object):
         E = np.concatenate((emission, np.atleast_1d(fluxDownTop)), axis=-1)
         #  dot product (matrix multiplication) along last axes
         return np.squeeze(matrix_multiply(self.Tdown, E[..., np.newaxis]))
+    
+    def flux_reflected_up(self, fluxDown, albedo_sfc=0.):
+        reflectivity = np.concatenate((np.atleast_1d(albedo_sfc),
+                                       self.reflectivity), axis=-1)
+        return reflectivity*fluxDown
         
     def flux_up(self, fluxUpBottom, emission=None):
         '''Compute upwelling radiative flux at interfaces between layers.

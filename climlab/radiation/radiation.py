@@ -69,10 +69,16 @@ class Radiation(EnergyBudget):
             fromspace = np.zeros_like(self.Ts)
         
         self.flux_down = self.trans.flux_down(fromspace, self.emission)
+        self.flux_reflected_up = \
+            self.trans.flux_reflected_up(self.flux_down, self.albedo_sfc)
         # this ensure same dimensions as other fields
         flux_down_sfc = self.flux_down[..., 0, np.newaxis]
-        flux_up_bottom = self.flux_from_sfc + self.albedo_sfc*flux_down_sfc
-        self.flux_up = self.trans.flux_up(flux_up_bottom, self.emission)
+        #flux_up_bottom = self.flux_from_sfc + self.albedo_sfc*flux_down_sfc
+        flux_up_bottom = (self.flux_from_sfc + 
+                          self.flux_reflected_up[..., 0])
+        self.flux_up = self.trans.flux_up(flux_up_bottom,
+                                self.emission+self.flux_reflected_up[...,1:])
+        #self.flux_up = self.trans.flux_up(flux_up_bottom, self.emission)
         self.flux_net = self.flux_up - self.flux_down
         flux_up_top = self.flux_up[..., -1, np.newaxis]
         # absorbed radiation (flux convergence) in W / m**2
