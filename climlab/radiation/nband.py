@@ -128,7 +128,9 @@ class NbandRadiation(Radiation):
         #return (self.band_fraction*flux)[..., np.newaxis]
         split = np.outer(self.band_fraction, flux)
         # make sure there's a singleton dimension at the last axis (level)
-        if np.size(split, axis=-1) is not 1:
+        #if np.size(split, axis=-1) is not 1:
+        # To avoid problem on Windows, which uses type long for array dimensions        
+        if np.size(split, axis=-1) != 1:
             split = split[..., np.newaxis]
         return split
 
