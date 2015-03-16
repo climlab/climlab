@@ -87,7 +87,6 @@ class Radiation(EnergyBudget):
 
     def radiative_heating(self):
         self.emission = self.compute_emission()
-        #self.diagnostics['emission'] = emission
         try:
             fromspace = self.flux_from_space
 
@@ -99,12 +98,10 @@ class Radiation(EnergyBudget):
             self.trans.flux_reflected_up(self.flux_down, self.albedo_sfc)
         # this ensure same dimensions as other fields
         flux_down_sfc = self.flux_down[..., 0, np.newaxis]
-        #flux_up_bottom = self.flux_from_sfc + self.albedo_sfc*flux_down_sfc
         flux_up_bottom = (self.flux_from_sfc + 
-                          self.flux_reflected_up[..., 0])
+                          self.flux_reflected_up[..., 0, np.newaxis])
         self.flux_up = self.trans.flux_up(flux_up_bottom,
                                 self.emission+self.flux_reflected_up[...,1:])
-        #self.flux_up = self.trans.flux_up(flux_up_bottom, self.emission)
         self.flux_net = self.flux_up - self.flux_down
         flux_up_top = self.flux_up[..., -1, np.newaxis]
         # absorbed radiation (flux convergence) in W / m**2
@@ -145,9 +142,7 @@ class Radiation(EnergyBudget):
         N = self.lev.size
         atmComponents = np.zeros_like(self.Tatm)
         flux_down_top = np.zeros_like(self.Ts)
-        # I'm sure there's a way to write this as a vectorized operation
-        #  but the speed doesn't really matter if it's just for diagnostic
-        #  and we are not calling it every timestep
+        #  same comment as above... would be nice to vectorize
         for n in range(N):
             emission = np.zeros_like(self.emission)
             emission[..., n] = self.emission[..., n]
