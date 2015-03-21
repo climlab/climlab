@@ -64,7 +64,7 @@ class ConvectiveAdjustment(TimeDependentProcess):
 #  This routine works but is slow... lots of explicit looping
 from numba import jit
 #@jit(float32[:,:](float32[:], float32[:,:], float32[:], float32), nopython=True)
-@jit(nopython=True)
+#@jit(nopython=True)
 def convective_adjustment_direct(p, T, c, lapserate=6.5):
     """Convective Adjustment to a specified lapse rate.
 
@@ -100,39 +100,44 @@ def convective_adjustment_direct(p, T, c, lapserate=6.5):
         num_lat = 1
     #Tadj = np.zeros_like(T)
     #Tadj = T[:] * 0.
+    Pi = (p[:]/const.ps)**alpha  # will need to modify to allow variable lapse rates
+    beta = 1./Pi    
+    theta = T * beta
+    q = Pi * c
+    n_k = np.zeros(L, dtype=np.int8)
+    theta_k = np.zeros_like(p)
+    s_k = np.zeros_like(p)
+    t_k = np.zeros_like(p)
+    thetaadj = Akamaev_adjustment(theta, q, beta, n_k, theta_k, s_k, t_k)
+    T = thetaadj * Pi
+    return T
+
+@jit
+def Akamaev_adjustment(theta, q, beta, n_k, theta_k, s_k, t_k):
+    L = q.size  # number of vertical levels
+    size0 = theta.shape[0] #np.size(T, axis=0)
+    if size0 != L:
+        num_lat = size0
+    else:
+        num_lat = 1
     for lat in range(num_lat):
-        Tcol = T[lat,:]
-        #Pi = (p/const.ps)**alpha[lat,:]
-        Pi = (p[:]/const.ps)**alpha  # will need to modify to allow variable lapse rates
-        beta = 1./Pi
-        theta = Tcol * beta
-        q = Pi * c
-    
-        #n_k = np.zeros(L, dtype=np.int8)
-        n_k = range(L)
-        for i in range(L):
-            n_k[i] = 0
-        theta_k = 0. * p[:] #np.zeros_like(p)
-        s_k = 0. * p[:] #np.zeros_like(p)
-        t_k = 0. * p[:] #np.zeros_like(p)
-    
         k = 0
         n_k[0] = 1
-        theta_k[0] = beta[0] * Tcol[0]
+        theta_k[0] = theta[lat,0]
         
         for l in range(1, L):
             n = 1
-            theta = beta[l] * Tcol[l]
+            thistheta = theta[lat,l]
             done = False
             while not done:
-                if (theta_k[k] > theta):
+                if (theta_k[k] > thistheta):
                     s = 0.
                     t = 0.
                     # stratification is unstable
                     if n == 1:
                         # current layer is not an earlier-formed neutral layer
                         s = q[l]
-                        t = s * theta
+                        t = s * thistheta
                     if (n_k[k] < 2):
                         # lower adjacent level is not an earlier-formed neutral layer
                         s_k[k] = q[l-n]
@@ -143,7 +148,7 @@ def convective_adjustment_direct(p, T, c, lapserate=6.5):
                     s_k[k] = s
                     t += t_k[k]
                     t_k[k] = t
-                    theta = t / s
+                    thistheta = t / s
                     if k == 0:
                         # joint neutral layer in the first one, done checking lower layers
                         done = True
@@ -155,19 +160,19 @@ def convective_adjustment_direct(p, T, c, lapserate=6.5):
                     done = True
             # if l < L-1:
             n_k[k] = n
-            theta_k[k] = theta
+            theta_k[k] = thistheta
         #  finished looping through to check stability
     
         # update the temperatures
-        #newtheta = np.zeros(L)
-        newtheta = 0. * Tcol
         count = 0
         for i in range(L):
-            #newtheta[count+np.arange(n_k[i])] = theta_k[i]
             for j in range(n_k[i]):
-                newtheta[count+j] = theta_k[i]
+                # just borrow array s_k here for temporary storage
+                if count+j < L:
+                    s_k[count+j] = theta_k[i]
+                #theta[lat,count+j] = theta_k[i]
             count += n_k[i]
-        Tcol = newtheta * Pi
-        #Tadj[lat, :] = Tcol
-        T[lat,:] = Tcol
-    return T
+        #theta[lat,:] = s_k  # this causes problems with jit
+        for i in range(L):
+            theta[lat,i] = s_k[i]
+    return theta
