@@ -8,6 +8,7 @@ class ConvectiveAdjustment(TimeDependentProcess):
     def __init__(self, adj_lapse_rate=None, **kwargs):
         super(ConvectiveAdjustment, self).__init__(**kwargs)
         # lapse rate for convective adjustment, in K / km
+        self.adj_lapse_rate = adj_lapse_rate
         self.param['adj_lapse_rate'] = adj_lapse_rate
         self.time_type = 'adjustment'
         self.adjustment = {}
@@ -16,35 +17,33 @@ class ConvectiveAdjustment(TimeDependentProcess):
         c_sfc = self.Ts.domain.heat_capacity       
         self.pnew = np.flipud(np.append(np.flipud(patm), const.ps))
         self.cnew = np.flipud(np.append(np.flipud(c_atm), c_sfc))
+    @property
+    def adj_lapse_rate(self):
+        return self._adj_lapse_rate
+    @adj_lapse_rate.setter
+    def adj_lapse_rate(self, lapserate):
+        if lapserate is 'DALR':
+            self._adj_lapse_rate = const.g / const.cp * 1.E3
+        else:
+            self._adj_lapse_rate = lapserate
+        self.param['adj_lapse_rate'] = self._adj_lapse_rate
     
     def compute(self):
-        lapse_rate = self.param['adj_lapse_rate']
-        if lapse_rate is None:
+        #lapse_rate = self.param['adj_lapse_rate']
+        if self.adj_lapse_rate is None:
             self.adjusted_state = self.state
         else:
-            # We need to loop over all dimensions except vertical levels
-            #  would be awesome if we could figure out how to vectorize this
-            
             #  For now, let's assume that the vertical axis is the last axis
             unstable_Ts = np.atleast_1d(self.Ts)
             unstable_Tatm = self.Tatm
             Tcol = np.concatenate((unstable_Ts, unstable_Tatm),axis=-1)
-            try:
-                num_lat = self.Tatm.domain.lat.num_points
-                Tadj = np.zeros_like(Tcol)
-                for n in range(num_lat):
-                    Tadj[n,:] = convective_adjustment_direct(self.pnew, Tcol[n,:],
-                                            self.cnew, lapserate=lapse_rate)
-            except:
-                Tadj = convective_adjustment_direct(self.pnew, Tcol,
-                                            self.cnew, lapserate=lapse_rate)
+            Tadj = convective_adjustment_direct(self.pnew, Tcol, self.cnew, lapserate=self.adj_lapse_rate)            
             Ts = Field(Tadj[...,0], domain=self.Ts.domain)
             Tatm = Field(Tadj[...,1:], domain=self.Tatm.domain)
             self.adjustment['Ts'] = Ts - self.Ts
             self.adjustment['Tatm'] = Tatm - self.Tatm
 
 
-#  This routine works but is slow... lots of explicit looping
 def convective_adjustment_direct(p, T, c, lapserate=6.5):
     """Convective Adjustment to a specified lapse rate.
 
@@ -59,43 +58,67 @@ def convective_adjustment_direct(p, T, c, lapserate=6.5):
     T is temperature in K
     c is heat capacity in in J / m**2 / K
     """
-
     # largely follows notation and algorithm in Akamaev (1991) MWR
 
-    if lapserate is 'DALR':
-        lapserate = const.g / const.cp * 1.E3
-    try:
-        alpha = const.Rd / const.g * lapserate / 1.E3
-    except:
-        raise ValueError('Problem with lapse rate')
-
-    Tcol = T
-    pnew = p
-    L = pnew.size
-    Pi = (pnew/const.ps)**alpha
+    #if lapserate is 'DALR':
+    #    lapserate = const.g / const.cp * 1.E3
+    #try:
+    #    alpha = const.Rd / const.g * lapserate / 1.E3
+    #except:
+    #    raise ValueError('Problem with lapse rate')
+    #lapserate = lapserate * np.ones(T.shape)  # same dimensions as T
+    alpha = const.Rd / const.g * lapserate / 1.E3 # same dimensions as lapserate
+    L = p.size
+    Pi = (p[:]/const.ps)**alpha  # will need to modify to allow variable lapse rates
     beta = 1./Pi
-    theta = Tcol * beta
+    theta = T * beta
     q = Pi * c
-
     n_k = np.zeros(L, dtype=np.int8)
-    theta_k = np.zeros_like(pnew)
-    s_k = np.zeros_like(pnew)
-    t_k = np.zeros_like(pnew)
+    theta_k = np.zeros_like(p)
+    s_k = np.zeros_like(p)
+    t_k = np.zeros_like(p)
+    thetaadj = Akamaev_adjustment_multidim(theta, q, beta, n_k,
+                                           theta_k, s_k, t_k)
+    T = thetaadj * Pi
+    return T
 
+
+# @jit  # numba.jit not working here. Not clear why.
+#  At least we get something like 10x speedup from the inner loop
+def Akamaev_adjustment_multidim(theta, q, beta, n_k, theta_k, s_k, t_k):
+    L = q.size  # number of vertical levels
+    size0 = theta.shape[0] #np.size(T, axis=0)
+    if size0 != L:
+        num_lat = size0
+        for lat in range(num_lat):
+            theta[lat,:] = Akamaev_adjustment(theta[lat,:], q, beta, n_k,
+                                              theta_k, s_k, t_k)
+    else:
+        num_lat = 1
+        theta = Akamaev_adjustment(theta, q, beta, n_k, theta_k, s_k, t_k)
+    return theta
+
+
+def Akamaev_adjustment(theta, q, beta, n_k, theta_k, s_k, t_k):
+    '''Single column only.'''
+    L = q.size  # number of vertical levels
     k = 0
     n_k[0] = 1
-    theta_k[0] = beta[0] * Tcol[0]
+    theta_k[0] = theta[0]
+    
     for l in range(1, L):
         n = 1
-        theta = beta[l] * Tcol[l]
+        thistheta = theta[l]
         done = False
         while not done:
-            if (theta_k[k] > theta):
+            if (theta_k[k] > thistheta):
+                s = 0.
+                t = 0.
                 # stratification is unstable
                 if n == 1:
                     # current layer is not an earlier-formed neutral layer
                     s = q[l]
-                    t = s * theta
+                    t = s * thistheta
                 if (n_k[k] < 2):
                     # lower adjacent level is not an earlier-formed neutral layer
                     s_k[k] = q[l-n]
@@ -106,7 +129,7 @@ def convective_adjustment_direct(p, T, c, lapserate=6.5):
                 s_k[k] = s
                 t += t_k[k]
                 t_k[k] = t
-                theta = t / s
+                thistheta = t / s
                 if k == 0:
                     # joint neutral layer in the first one, done checking lower layers
                     done = True
@@ -118,14 +141,26 @@ def convective_adjustment_direct(p, T, c, lapserate=6.5):
                 done = True
         # if l < L-1:
         n_k[k] = n
-        theta_k[k] = theta
+        theta_k[k] = thistheta
     #  finished looping through to check stability
 
-    # update the temperatures
-    newtheta = np.zeros(L)
-    count = 0
-    for i in range(L):
-        newtheta[count+np.arange(n_k[i])] = theta_k[i]
-        count += n_k[i]
-    Tcol = newtheta * Pi
-    return Tcol
+    # update the potential temperatures
+    for l in range(L-1, -1, -1):
+        theta[l] = thistheta
+        if n > 1:
+            n -= 1
+        else:
+            k -= 1
+            n = n_k[k]
+            thistheta = theta_k[k]
+    return theta
+
+#  Attempt to use numba to compile the Akamaev_adjustment function
+#  which gives at least 10x speedup
+#   If numba is not available or compilation fails, the code will be executed
+#   in pure Python. Results should be identical
+try:
+    from numba import jit
+    Akamaev_adjustment = jit(signature_or_function=Akamaev_adjustment)
+except:
+    pass
