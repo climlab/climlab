@@ -106,7 +106,8 @@ class NbandRadiation(Radiation):
             fromspace = self.split_channels(self.flux_from_space)
         except:
             fromspace = self.split_channels(np.zeros_like(self.Ts))
-        
+        #  in this code the assumption is that vertical axis is axis=-1 (last)
+        #  The band axis is axis=0, which is provided by split_channels
         self.flux_down = self.trans.flux_down(fromspace, self.emission)
         # this ensure same dimensions as other fields
         flux_down_sfc = self.flux_down[..., 0, np.newaxis]
@@ -119,7 +120,7 @@ class NbandRadiation(Radiation):
         self.flux_net = self.flux_up - self.flux_down
         flux_up_top = self.flux_up[..., -1, np.newaxis]
         # absorbed radiation (flux convergence) in W / m**2
-        self.absorbed = -np.diff(self.flux_net, axis=1)
+        self.absorbed = -np.diff(self.flux_net, axis=-1)
         self.absorbed_total = np.sum(self.absorbed)
         self.heating_rate['Tatm'] = np.sum(self.absorbed, axis=0)
         self.flux_to_space = np.sum(flux_up_top, axis=0)

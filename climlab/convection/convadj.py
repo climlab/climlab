@@ -70,37 +70,35 @@ def convective_adjustment_direct(p, T, c, lapserate=6.5):
     alpha = const.Rd / const.g * lapserate / 1.E3 # same dimensions as lapserate
     L = p.size
     Pi = (p[:]/const.ps)**alpha  # will need to modify to allow variable lapse rates
-    beta = 1./Pi    
+    beta = 1./Pi
     theta = T * beta
     q = Pi * c
     n_k = np.zeros(L, dtype=np.int8)
     theta_k = np.zeros_like(p)
     s_k = np.zeros_like(p)
     t_k = np.zeros_like(p)
-    thetanew = np.zeros_like(p)
-    thetaadj = Akamaev_adjustment_multidim(theta, q, beta, n_k, 
-                                           theta_k, s_k, t_k, thetanew)
+    thetaadj = Akamaev_adjustment_multidim(theta, q, beta, n_k,
+                                           theta_k, s_k, t_k)
     T = thetaadj * Pi
     return T
 
-from numba import jit
-#@jit(nopython=True)
-def Akamaev_adjustment_multidim(theta, q, beta, n_k, theta_k, s_k, t_k, thetanew):
+
+# @jit  # numba.jit not working here. Not clear why.
+#  At least we get something like 10x speedup from the inner loop
+def Akamaev_adjustment_multidim(theta, q, beta, n_k, theta_k, s_k, t_k):
     L = q.size  # number of vertical levels
     size0 = theta.shape[0] #np.size(T, axis=0)
     if size0 != L:
         num_lat = size0
         for lat in range(num_lat):
-            thetanew = Akamaev_adjustment(theta[lat,:], q, beta, n_k, theta_k, s_k, t_k)
-            #theta[lat,:] = thetanew  # this causes problems with jit
-            for l in range(L):
-                theta[lat,l] = thetanew[l]
+            theta[lat,:] = Akamaev_adjustment(theta[lat,:], q, beta, n_k,
+                                              theta_k, s_k, t_k)
     else:
         num_lat = 1
         theta = Akamaev_adjustment(theta, q, beta, n_k, theta_k, s_k, t_k)
     return theta
 
-#@jit(nopython=True)
+
 def Akamaev_adjustment(theta, q, beta, n_k, theta_k, s_k, t_k):
     '''Single column only.'''
     L = q.size  # number of vertical levels
@@ -147,12 +145,22 @@ def Akamaev_adjustment(theta, q, beta, n_k, theta_k, s_k, t_k):
     #  finished looping through to check stability
 
     # update the potential temperatures
-    for l in range(L-1,-1,-1):
+    for l in range(L-1, -1, -1):
         theta[l] = thistheta
-        if n>1:
+        if n > 1:
             n -= 1
         else:
             k -= 1
             n = n_k[k]
             thistheta = theta_k[k]
     return theta
+
+#  Attempt to use numba to compile the Akamaev_adjustment function
+#  which gives at least 10x speedup
+#   If numba is not available or compilation fails, the code will be executed
+#   in pure Python. Results should be identical
+try:
+    from numba import jit
+    Akamaev_adjustment = jit(signature_or_function=Akamaev_adjustment)
+except:
+    pass
