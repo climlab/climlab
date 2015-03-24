@@ -76,33 +76,10 @@ class Transmissivity(object):
         self.reflectivity = reflectivity
         self.absorptivity = absorptivity
         self.transmissivity = 1 - absorptivity - reflectivity
-        #N = self.absorptivity.size
         self.shape = self.absorptivity.shape 
         N = np.size(self.absorptivity, axis=self.axis)
         self.N = N
         #  For now, let's assume that the vertical axis is the last axis
-        #  167 ms
-        # simplest thing to do is just loop through all other axes
-        #if len(self.shape)==1:
-        #    Tup, Tdown = compute_T(self.transmissivity)
-        #    self.Tup = Tup
-        #    self.Tdown = Tdown
-        #elif len(self.shape)==2:
-        #    self.Tup = np.zeros((self.shape[0],N+1,N+1))
-        #    self.Tdown = np.zeros_like(self.Tup)
-        #    for i in range(self.shape[0]):
-        #        # for now this is only going to work with one extra dimension
-        #        Tup, Tdown = compute_T(self.transmissivity[i,:])
-        #        self.Tup[i,:,:] = Tup
-        #        self.Tdown[i,:,:] = Tdown
-        #elif len(self.shape)==3:
-        #    self.Tup = np.zeros((self.shape[0],self.shape[1],N+1,N+1))
-        #    self.Tdown = np.zeros_like(self.Tup)
-        #    for i in range(self.shape[0]):
-        #        for j in range(self.shape[1]):
-        #            Tup, Tdown = compute_T(self.transmissivity[i,j,:])
-        #            self.Tup[i,j,:,:] = Tup
-        #            self.Tdown[i,j,:,:] = Tdown
         Tup, Tdown = compute_T_vectorized(self.transmissivity)
         self.Tup = Tup
         self.Tdown = Tdown
@@ -143,17 +120,17 @@ class Transmissivity(object):
         E = np.concatenate((np.atleast_1d(fluxUpBottom),emission), axis=-1)
         #  dot product (matrix multiplication) along last axes
         return np.squeeze(matrix_multiply(self.Tup, E[..., np.newaxis]))
-
-def compute_T(transmissivity):
-    # fully vectorized version
-    # works on a vector transmissivity
-    N = transmissivity.size
-    tau = np.concatenate((np.atleast_1d(1.), transmissivity))
-    B = np.tile(tau, (N+1,1)).transpose()
-    A = np.tril(B,k=-1) + np.tri(N+1).transpose()
-    Tup = np.tril(np.cumprod(A, axis=0))
-    Tdown = np.transpose(Tup)
-    return Tup, Tdown
+#
+#def compute_T(transmissivity):
+#    # fully vectorized version
+#    # works on a vector transmissivity
+#    N = transmissivity.size
+#    tau = np.concatenate((np.atleast_1d(1.), transmissivity))
+#    B = np.tile(tau, (N+1,1)).transpose()
+#    A = np.tril(B,k=-1) + np.tri(N+1).transpose()
+#    Tup = np.tril(np.cumprod(A, axis=0))
+#    Tdown = np.transpose(Tup)
+#    return Tup, Tdown
     
 def compute_T_vectorized(transmissivity):
     #  really vectorized version... to work with arbitrary dimensions
@@ -171,12 +148,28 @@ def compute_T_vectorized(transmissivity):
     matdims = np.append(np.array(otherdims),[1,1])
     # dimensions of matrix should be [otherdims,N+1,N+1]
     tri = np.tile(np.tri(N+1).transpose(),matdims)
-    #  This next line WORKS in numpy 1.9
-    #  BUT NOT IN numpy 1.8 !!!
-    #  because np.tril refuses to broadcast over other dims
-    A = np.tril(B,k=-1) + tri
-    Tup = np.tril(np.cumprod(A, axis=-2))
+    #  np.tril refuses to broadcast over other dims in numpy < 1.9
+    #  use a custom version instead, below
+    #  Performance is BETTER with numpy 1.9
+    A = tril(B,k=-1) + tri
+    Tup = tril(np.cumprod(A, axis=-2))
     #  transpose over last two axes
     Tdown = np.rollaxis(Tup, -1, -2)
     return Tup, Tdown
     
+
+def tril(array, k=0):
+    '''Lower triangle of an array.
+    Return a copy of an array with elements above the k-th diagonal zeroed.
+    Need a multi-dimensional version here because numpy.tril does not
+    broadcast for numpy verison < 1.9.'''
+    try:
+        tril_array = np.tril(array, k=k)
+    except:
+        # have to loop
+        tril_array = np.zeros_like(array)
+        shape = array.shape
+        otherdims = shape[:-2]
+        for index in np.ndindex(otherdims):
+            tril_array[index] = np.tril(array[index], k=k)
+    return tril_array
