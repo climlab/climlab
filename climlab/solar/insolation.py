@@ -105,12 +105,17 @@ def daily_insolation(lat, day, orb=const.orb_present, S0=None, day_type=1):
     oldsettings = np.seterr(invalid='ignore')
     # Compute Ho, the hour angle at sunrise / sunset
     #  Check for no sunrise or no sunset: Berger 1978 eqn (8),(9)
-    Ho = np.where( abs( delta_big ) - np.math.pi / 2. + abs( phi_big ) < 0., np.arccos( -np.tan( phi_big ) * np.tan( delta_big ) ), 
+    Ho = np.where( abs( delta_big ) - np.math.pi / 2. + abs( phi_big ) < 0., 
+                  np.arccos( -np.tan( phi_big ) * np.tan( delta_big ) ), 
             np.where( phi_big * delta_big > 0. , np.math.pi, 0. ) )
+    # this is not really the daily average cosine of the zenith angle...
+    #  it's the integral from sunrise to sunset of that quantity...
+    coszen = (Ho*np.sin(phi_big)*np.sin(delta_big) + 
+              np.cos(phi_big)*np.cos(delta_big)*np.sin(Ho))
     # Compute insolation: Berger 1978 eq (10)
-    Fsw = S0 / np.math.pi * ( ( 1 + ecc * np.cos( lambda_long_big - np.deg2rad(long_peri) ))**2 / (1 - ecc**2)**2 * 
-        ( Ho * np.sin( phi_big ) * np.sin( delta_big ) + np.cos( phi_big ) * np.cos( delta_big ) * np.sin( Ho ) ) )
-    
+    Fsw = S0/np.math.pi*( (1. + ecc*np.cos(lambda_long_big - 
+          np.deg2rad(long_peri)))**2 / (1. - ecc**2)**2 * coszen)
+            
     #  Remove singleton dimensions and return
     return np.squeeze( Fsw )
 
