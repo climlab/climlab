@@ -151,10 +151,6 @@ class ThreeBandSW(NbandRadiation):
             channel 2 is remaining radiation (72%)
         '''
         super(ThreeBandSW, self).__init__(**kwargs)
-        #  Three SW channels:
-        # channel 0 is Hartley and Huggins band (UV, 1%, 200 - 340 nm)
-        # channel 1 is Chappuis band (27%, 450 - 800 nm)
-        # channel 2 is remaining radiation (72%)
         #   fraction of the total solar flux in each band:
         self.band_fraction = np.array([0.01, 0.27, 0.72])
         if 'CO2' not in self.absorber_vmr:
@@ -167,7 +163,8 @@ class ThreeBandSW(NbandRadiation):
         O3 = np.array([200.E-24, 0.285E-24, 0.]) * const.Rd / const.kBoltzmann
         #self.absorption_cross_section['O3'] = np.reshape(O3,
         #    (self.num_channels, 1))
-        H2O = np.array([0.002, 0.002, 0.002])
+        #H2O = np.array([0.002, 0.002, 0.002])
+        H2O = np.array([0., 0., 0.001])
         for n in range(self.Tatm.domain.numdims):
             H2O = H2O[:, np.newaxis]
             O3 = O3[:, np.newaxis]
@@ -183,6 +180,57 @@ class ThreeBandSW(NbandRadiation):
     def emissivity(self):
         # This ensures that emissivity is always zero for shortwave classes
         return np.zeros_like(self.absorptivity)
+
+
+class FourBandSW(NbandRadiation):
+    #  The most recent RMCM program uses a four-channel SW model
+    #  this is probably a better way to do it... distinguishes between
+    #  visible band with no absorption and near-infrared with weak H2O absorption
+    #   But this needs some tuning and better documentation
+    def __init__(self, **kwargs):
+        '''A four-band mdoel for shortwave radiation.
+    
+        The spectral decomposition used here is largely based on the
+        "Moist Radiative-Convective Model" by Aarnout van Delden, Utrecht University
+        a.j.vandelden@uu.nl
+        http://www.staff.science.uu.nl/~delde102/RCM.htm
+
+        Four SW channels:
+            channel 0 is Hartley and Huggins band (UV, 6%, <340 nm)
+            channel 1 is part of visible with no O3 absorption (14%, 340 - 500 nm)
+            channel 2 is Chappuis band (27%, 500 - 700 nm)
+            channel 3 is near-infrared (53%, > 700 nm)
+        '''
+        super(FourBandSW, self).__init__(**kwargs)
+        #   fraction of the total solar flux in each band:
+        self.band_fraction = np.array([0.06, 0.14, 0.27, 0.53])
+        if 'CO2' not in self.absorber_vmr:
+            self.absorber_vmr['CO2'] = 380.E-6 * np.ones_like(self.Tatm)
+        if 'O3' not in self.absorber_vmr:
+            self.absorber_vmr['O3'] = np.zeros_like(self.Tatm)
+        if 'H2O' not in self.absorber_vmr:
+            self.absorber_vmr['H2O'] = self.q
+        ##  absorption cross-sections in m**2 / kg
+        O3 = np.array([200.E-24, 0., 0.285E-24, 0.]) * const.Rd / const.kBoltzmann
+        #self.absorption_cross_section['O3'] = np.reshape(O3,
+        #    (self.num_channels, 1))
+        H2O = np.array([0., 0., 0., 0.0012])
+        for n in range(self.Tatm.domain.numdims):
+            H2O = H2O[:, np.newaxis]
+            O3 = O3[:, np.newaxis]
+        self.absorption_cross_section['O3'] = O3
+        self.absorption_cross_section['H2O'] = H2O
+        #self.absorption_cross_section['H2O'] = np.reshape(H2O,
+        #    (self.num_channels, 1))
+        self.absorption_cross_section['CO2'] = \
+            np.zeros_like(self.absorption_cross_section['O3'])
+        self.cosZen = 0.5  # cosine of the average solar zenith angle
+
+    @property
+    def emissivity(self):
+        # This ensures that emissivity is always zero for shortwave classes
+        return np.zeros_like(self.absorptivity)
+
  
         
 class FourBandLW(NbandRadiation):
