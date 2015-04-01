@@ -14,7 +14,7 @@ from climlab.radiation.insolation import FixedInsolation
 from climlab.radiation.radiation import Radiation, RadiationSW
 from climlab.convection.convadj import ConvectiveAdjustment
 from climlab.surface.surface_radiation import SurfaceRadiation
-from climlab.radiation.nband import ThreeBandSW, FourBandLW
+from climlab.radiation.nband import ThreeBandSW, FourBandLW, FourBandSW
 from climlab.radiation.water_vapor import ManabeWaterVapor
 
 class GreyRadiationModel(TimeDependentProcess):

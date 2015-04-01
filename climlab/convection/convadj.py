@@ -102,57 +102,124 @@ def Akamaev_adjustment_multidim(theta, q, beta, n_k, theta_k, s_k, t_k):
 def Akamaev_adjustment(theta, q, beta, n_k, theta_k, s_k, t_k):
     '''Single column only.'''
     L = q.size  # number of vertical levels
-    k = 0
-    n_k[0] = 1
-    theta_k[0] = theta[0]
-    
-    for l in range(1, L):
+    # Akamaev step 1
+    k = 1
+    n_k[k-1] = 1
+    theta_k[k-1] = theta[k-1]
+    l = 2
+    while True:
+        # Akamaev step 2
         n = 1
-        thistheta = theta[l]
-        done = False
-        while not done:
-            if (theta_k[k] > thistheta):
-                s = 0.
-                t = 0.
-                # stratification is unstable
-                if n == 1:
-                    # current layer is not an earlier-formed neutral layer
-                    s = q[l]
-                    t = s * thistheta
-                if (n_k[k] < 2):
-                    # lower adjacent level is not an earlier-formed neutral layer
-                    s_k[k] = q[l-n]
-                    t_k[k] = s_k[k] * theta_k[k]
-                #  join current and underlying layers
-                n += n_k[k]
-                s += s_k[k]
-                s_k[k] = s
-                t += t_k[k]
-                t_k[k] = t
-                thistheta = t / s
-                if k == 0:
-                    # joint neutral layer in the first one, done checking lower layers
-                    done = True
-                else:
-                    k -= 1
-                    # go back and check stability of the lower adjacent layer
+        thistheta = theta[l-1]
+        while True:
+            # Akamaev step 3
+            if theta_k[k-1] <= thistheta:
+                # Akamaev step 6
+                k += 1
+                break  # to step 7
             else:
-                k += 1  # statification is stable
-                done = True
-        # if l < L-1:
-        n_k[k] = n
-        theta_k[k] = thistheta
-    #  finished looping through to check stability
+                if n <= 1:
+                    s = q[l-1]
+                    t = s*thistheta
+                # Akamaev step 4
+                if n_k[k-1] <= 1:
+                # lower adjacent level is not an earlier-formed neutral layer
+                    s_k[k-1] = q[l-n-1]
+                    t_k[k-1] = s_k[k-1] * theta_k[k-1]
+                # Akamaev step 5
+                    #  join current and underlying layers
+                n += n_k[k-1]
+                s += s_k[k-1]
+                t += t_k[k-1]
+                s_k[k-1] = s
+                t_k[k-1] = t
+                thistheta = t/s
+                if k==1:
+                    #  joint neutral layer is the first one
+                    break  # to step 7
+                k -= 1
+                # back to step 3
+        # Akamaev step 7
+        if l == L:  # the scan is over
+            break  # to step 8
+        l += 1
+        n_k[k-1] = n
+        theta_k[k-1] = thistheta
+        # back to step 2
+
+               
+#
+#    for l in range(2, L+1):  # l = 2,3,4,...,L
+#        n = 1
+#        thistheta = theta[l-1]
+#        done = False
+#        while not done:
+#            if (theta_k[k-1] > thistheta):
+#                s = 0.
+#                t = 0.
+#                # stratification is unstable
+#                if n == 1:
+#                    # current layer is not an earlier-formed neutral layer
+#                    s = q[l-1]
+#                    t = s * thistheta
+#                if (n_k[k-1] < 2):
+#                    # lower adjacent level is not an earlier-formed neutral layer
+#                    s_k[k-1] = q[l-n-1]
+#                    t_k[k-1] = s_k[k-1] * theta_k[k-1]
+#                #  join current and underlying layers
+#                n += n_k[k-1]
+#                s += s_k[k-1]
+#                s_k[k-1] = s
+#                t += t_k[k-1]
+#                t_k[k-1] = t
+#                thistheta = t / s
+#                if k == 1-1:
+#                    # joint neutral layer in the first one, done checking lower layers
+#                    done = True
+#                else:
+#                    k -= 1
+#                    # go back and check stability of the lower adjacent layer
+#            else:
+#                k += 1  # statification is stable
+#                done = True
+#        if l < L:
+#            n_k[k-1] = n
+#            theta_k[k-1] = thistheta
+#    #  finished looping through to check stability
 
     # update the potential temperatures
-    for l in range(L-1, -1, -1):
-        theta[l] = thistheta
-        if n > 1:
-            n -= 1
-        else:
-            k -= 1
-            n = n_k[k]
-            thistheta = theta_k[k]
+    while True:
+        while True:
+            # Akamaev step 8
+            if n==1: # current model level was not included in any neutral layer
+                break  # to step 11
+            while True:
+                #  Akamaev step 9
+                theta[l-1] = thistheta
+                if n==1:
+                    break
+                #  Akamaev step 10
+                l -= 1
+                n -= 1
+                #  back to step 9
+        # Akamaev step 11
+        if k==1:
+            break
+        k -= 1
+        l -= 1
+        n = n_k[k-1]
+        thistheta = theta_k[k-1]
+        # back to step 8
+    
+#    for l in range(L, 0, -1):
+#        if n > 1:
+#        while n>1:
+#            theta[l-1] = thistheta
+#            n -= 1
+#        else:
+#            k -= 1
+#            n = n_k[k]
+#            thistheta = theta_k[k]
     return theta
 
 #  Attempt to use numba to compile the Akamaev_adjustment function
@@ -162,5 +229,6 @@ def Akamaev_adjustment(theta, q, beta, n_k, theta_k, s_k, t_k):
 try:
     from numba import jit
     Akamaev_adjustment = jit(signature_or_function=Akamaev_adjustment)
+    #print 'Compiling Akamaev_adjustment() with numba.'
 except:
     pass
