@@ -23,8 +23,8 @@ import numpy as np
 import climlab
 from climlab.dynamics.diffusion import MeridionalDiffusion
 from climlab.utils import legendre
-sfc = climlab.domain.zonal_mean_surface(num_points=90, water_depth=10.)
-lat = sfc.axes['lat'].points
+sfc = climlab.domain.zonal_mean_surface(num_lat=90, water_depth=10.)
+lat = sfc.lat.points
 initial = 12. - 40. * legendre.P2(np.sin(np.deg2rad(lat)))
 # make a copy of initial so that it remains unmodified
 Ts = climlab.Field(np.array(initial), domain=sfc)
