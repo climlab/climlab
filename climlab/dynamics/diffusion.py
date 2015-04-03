@@ -4,9 +4,9 @@ Here is an example showing implementation of a vertical diffusion.
 Example shows that a subprocess can work on just a subset of the parent process
 state variables.
 
-from climlab.model.column import GreyRadiationModel
+import climlab
 from climlab.dynamics.diffusion import Diffusion
-c = GreyRadiationModel()
+c = climlab.GreyRadiationModel()
 K = 0.5
 d = Diffusion(K=K, state=c.state['Tatm'], **c.param)
 c.subprocess['diffusion'] = d
@@ -20,14 +20,14 @@ And here is an example of meridional diffusion of temperature
 as a stand-alone process:
 
 import numpy as np
-from climlab.domain import domain, field
+import climlab
 from climlab.dynamics.diffusion import MeridionalDiffusion
 from climlab.utils import legendre
-sfc = domain.zonal_mean_surface(num_points=90, water_depth=10.)
+sfc = climlab.domain.zonal_mean_surface(num_points=90, water_depth=10.)
 lat = sfc.axes['lat'].points
 initial = 12. - 40. * legendre.P2(np.sin(np.deg2rad(lat)))
 # make a copy of initial so that it remains unmodified
-Ts = field.Field(np.array(initial), domain=sfc)
+Ts = climlab.Field(np.array(initial), domain=sfc)
 # thermal diffusivity in W/m**2/degC
 D = 0.55
 # meridional diffusivity in 1/s
@@ -38,7 +38,6 @@ import matplotlib.pyplot as plt
 plt.plot(lat, initial, lat, Ts)
 '''
 
-# I think this solver is broken... need to test carefully.
 
 import numpy as np
 from scipy.linalg import solve_banded
