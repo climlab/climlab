@@ -4,9 +4,9 @@ Here is an example showing implementation of a vertical diffusion.
 Example shows that a subprocess can work on just a subset of the parent process
 state variables.
 
-from climlab.model.column import SingleColumnModel
+from climlab.model.column import GreyRadiationModel
 from climlab.dynamics.diffusion import Diffusion
-c = SingleColumnModel()
+c = GreyRadiationModel()
 K = 0.5
 d = Diffusion(K=K, state=c.state['Tatm'], **c.param)
 c.subprocess['diffusion'] = d
@@ -60,10 +60,10 @@ class Diffusion(ImplicitProcess):
         super(Diffusion, self).__init__(**kwargs)
         self.param['K'] = K  # Diffusivity in units of [length]**2 / time
         if diffusion_axis is None:
-            _guess_diffusion_axis(self)
+            self.diffusion_axis = _guess_diffusion_axis(self)
         else:
             self.diffusion_axis = diffusion_axis
-        # This currently only works with evenly space points
+        # This currently only works with evenly spaced points
         for dom in self.domains.values():
             delta = np.mean(dom.axes[self.diffusion_axis].delta)
             bounds = dom.axes[self.diffusion_axis].bounds
