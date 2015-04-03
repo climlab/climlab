@@ -6,14 +6,6 @@ Code developed by Brian Rose, University at Albany
 brose@albany.edu
 """
 
-#import numpy as np
-#from scipy.linalg import solve_banded
-#from scipy import integrate
-#import climlab.utils.constants as const
-#from climlab.process.time_dependent_process import TimeDependentProcess
-#import climlab.solar.insolation as insolation
-#from climlab.solar.orbital import OrbitalTable
-
 import numpy as np
 from climlab import constants as const
 from climlab.domain.field import Field, global_mean
@@ -50,14 +42,16 @@ class EBM(EnergyBudget):
         self.param['water_depth'] = water_depth
         # create sub-models
         self.add_subprocess('LW', AplusBT(state=self.state, **self.param))
-        self.add_subprocess('insolation', P2Insolation(domains=sfc, **self.param))
-        self.add_subprocess('albedo', albedo.StepFunctionAlbedo(state=self.state,
-                                                       **self.param))
+        self.add_subprocess('insolation',
+                            P2Insolation(domains=sfc, **self.param))
+        self.add_subprocess('albedo',
+                            albedo.StepFunctionAlbedo(state=self.state,
+                                                      **self.param))
         # diffusivity in units of 1/s
         K = self.param['D'] / self.domains['Ts'].heat_capacity
         self.add_subprocess('diffusion', MeridionalDiffusion(state=self.state,
-                                                           K=K,
-                                                           **self.param))
+                                                             K=K,
+                                                             **self.param))
         self.topdown = False  # call subprocess compute methods first
 
     def _compute_heating_rates(self):
@@ -352,69 +346,6 @@ class EBM_seasonal(EBM):
 #         self.land.make_insolation_array( self.orb )
 #         self.ocean.make_insolation_array( self.orb )
 #        super(EBM_landocean,self).integrate_years( years, verbose )
-#==============================================================================
-
-#==============================================================================
-# 
-# class OrbitalCycles:
-#     def __init__( self, model, kyear_start = 20., kyear_stop = 0., 
-#                   segment_length_years = 100., orbital_year_factor = 1., verbose=True ):
-#         """Automatically integrate an Energy Balance Model through changes in orbital parameters.
-#         
-#         model is an object of class EBM or its daughters.
-#         
-#         segment_length_years is the length of each integration with fixed orbital parameters.
-#         orbital_year_factor is an optional speed-up to the orbital cycles.
-#         """
-#         
-#         self.model = model
-#         self.kyear_start = kyear_start
-#         self.kyear_stop = kyear_stop
-#         self.segment_length_years = segment_length_years
-#         self.orbital_year_factor = orbital_year_factor
-#         self.verbose = verbose
-#         self.num_segments = int( (kyear_start - kyear_stop) * 1000. / segment_length_years / orbital_year_factor )
-#         
-#         kyear_before_present = kyear_start
-#         
-#         if verbose:
-#             print( "---------  OrbitalCycles  START ----------" )
-#             print( "Beginning integration for the model from " + str(kyear_start) + " to " + 
-#                 str(kyear_stop) + " kyears before present." )
-#             print( "Integration time for each set of orbital parameters is " + 
-#                 str(segment_length_years) + " years." )
-#             print( "Orbital cycles will be sped up by a factor " + str(orbital_year_factor) )
-#             print( "Total number of segments is " + str(self.num_segments) )
-#         
-#         # initialize storage arrays
-#         self.T_segments_global = np.empty( self.num_segments )
-#         self.T_segments = np.empty( (self.model.num_points, self.num_segments) )
-#         self.T_segments_annual = np.empty_like( self.T_segments )
-#         self.orb_kyear = np.empty( self.num_segments )
-#         
-#         # Get orbital data table
-#         orbtable = OrbitalTable()
-#         
-#         for n in range(self.num_segments):
-#             if verbose:
-#                 print("-------------------------")
-#                 print("Segment " + str(n) + " out of " + str(self.num_segments) )
-#                 print( "Using orbital parameters from " + str(kyear_before_present) + " kyears before present." )
-#             orb = orbtable.lookup_parameters( kyear_before_present )
-#             self.model.make_insolation_array( orb )
-#             self.model.integrate_years( segment_length_years-1., verbose=False )
-#             #  Run one final year to characterize the current equilibrated state
-#             self.model.integrate_years( 1.0, verbose=False )
-#             self.T_segments_annual[:,n] = self.model.T_timeave
-#             self.T_segments[:,n] = self.model.T
-#             self.T_segments_global[n] = self.model.global_mean( self.model.T_timeave )
-#             self.orb_kyear[n] = kyear_before_present
-#             kyear_before_present -= segment_length_years / 1000. * orbital_year_factor
-#             if verbose:
-#                 print( "Global mean temperature from the final year of integration is " + 
-#                     str(self.T_segments_global[n]) + " degrees C." )
-#        if verbose:
-#            print( "---------  OrbitalCycles  END ----------" )
 #==============================================================================
 
 
