@@ -8,26 +8,56 @@ class ConstantAlbedo(DiagnosticProcess):
     def __init__(self, albedo=0.33, **kwargs):
         '''Uniform prescribed albedo.'''
         super(ConstantAlbedo, self).__init__(**kwargs)
-        self.param['albedo'] = albedo
-        #lat = self.domains['default'].axes['lat'].points
-        #albedo = np.ones_like(lat)
-        # make sure that the diagnostic has the correct field dimensions.
+        self.albedo = albedo
+
+    @property
+    def albedo(self):
+        return self._albedo
+    @albedo.setter
+    def albedo(self, value):
+        self._albedo = value
+        self.param['albedo'] = value
+        self._compute_fixed()
+    def _compute_fixed(self):
+        '''Recompute any fixed quantities after a change in parameters'''
         dom = self.domains['default']
-        self.diagnostics['albedo'] = Field(albedo, domain=dom)
+        self.diagnostics['albedo'] = Field(self.albedo, domain=dom)
         
 
 class P2Albedo(DiagnosticProcess):
     def __init__(self, a0=0.33, a2=0.25, **kwargs):
         '''Second order Legendre polynomial formula for surface albedo.'''
         super(P2Albedo, self).__init__(**kwargs)
-        self.param['a0'] = a0
-        self.param['a2'] = a2
-        lat = self.domains['default'].axes['lat'].points
-        phi = np.deg2rad(lat)
-        albedo = a0 + a2 * P2(np.sin(phi))
+        self.a0 = a0
+        self.a2 = a2
+
+    @property
+    def a0(self):
+        return self._a0
+    @a0.setter
+    def a0(self, value):
+        self._a0 = value
+        self.param['a0'] = value
+        self._compute_fixed()
+    @property
+    def a2(self):
+        return self._a2
+    @a2.setter
+    def a2(self, value):
+        self._a2 = value
+        self.param['a2'] = value
+        self._compute_fixed()
+    def _compute_fixed(self):
+        '''Recompute any fixed quantities after a change in parameters'''
+        phi = np.deg2rad(self.lat)
+        try:
+            albedo = self.a0 + self.a2 * P2(np.sin(phi))
+        except:
+            albedo = np.zeros_like(phi)
         # make sure that the diagnostic has the correct field dimensions.
         dom = self.domains['default']
         self.diagnostics['albedo'] = Field(albedo, domain=dom)
+
 
 
 class Iceline(DiagnosticProcess):

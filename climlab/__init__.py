@@ -1,4 +1,4 @@
-__version__ = '0.2.6'
+__version__ = '0.2.7'
 
 #  This list defines all the modules that will be loaded if a user invokes
 #   from climLab import *

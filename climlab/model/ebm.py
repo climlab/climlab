@@ -24,8 +24,11 @@ class EBM(EnergyBudget):
                  A=210.,
                  B=2.,
                  D=0.555,  # in W / m^2 / degC, same as B
-                 Tf=-10.0,
                  water_depth=10.0,
+                 Tf=-10.,
+                 a0=0.3,
+                 a2=0.078,
+                 ai=0.62,
                  timestep=const.seconds_per_year/90.,
                  **kwargs):
         super(EBM, self).__init__(timestep=timestep, **kwargs)
@@ -40,6 +43,9 @@ class EBM(EnergyBudget):
         self.param['D'] = D
         self.param['Tf'] = Tf
         self.param['water_depth'] = water_depth
+        self.param['a0'] = a0
+        self.param['a2'] = a2
+        self.param['ai'] = ai
         # create sub-models
         self.add_subprocess('LW', AplusBT(state=self.state, **self.param))
         self.add_subprocess('insolation',
@@ -62,7 +68,8 @@ class EBM(EnergyBudget):
         ASR = (1-albedo) * insolation
         self.heating_rate['Ts'] = ASR
         self.diagnostics['ASR'] = ASR
-        self.diagnostics['net_radiation'] = ASR - self.subprocess['LW'].diagnostics['OLR']
+        self.diagnostics['net_radiation'] = (ASR - 
+                                    self.subprocess['LW'].diagnostics['OLR'])
 
     def global_mean_temperature(self):
         '''Convenience method to compute the global mean surface temperature.'''
@@ -73,19 +80,33 @@ class EBM_annual(EBM):
     def __init__(self, **kwargs):
         super(EBM_annual, self).__init__(**kwargs)
         sfc = self.domains['Ts']
-        self.add_subprocess('insolation', AnnualMeanInsolation(domains=sfc, **self.param))
+        self.add_subprocess('insolation',
+                            AnnualMeanInsolation(domains=sfc, **self.param))
     
 
 class EBM_seasonal(EBM):
-    def __init__(self, **kwargs):
-        super(EBM_seasonal, self).__init__(**kwargs)
+    def __init__(self, a0=0.33, a2=0.25, ai=None, **kwargs):
+        '''This EBM uses realistic daily insolation.
+        If ai is not given, the model will not have an albedo feedback.'''
+        super(EBM_seasonal, self).__init__(a0=a0, a2=a2, ai=ai, **kwargs)
         sfc = self.domains['Ts']
-        self.add_subprocess('insolation', DailyInsolation(domains=sfc, **self.param))
-        # By default this EBM does not have an albedo feedback
-        self.add_subprocess('albedo', albedo.P2Albedo(domains=sfc, **self.param))
+        self.add_subprocess('insolation',
+                            DailyInsolation(domains=sfc, **self.param))
+        self.param['a0'] = a0
+        self.param['a2'] = a2
+        if ai is None:
+            # No albedo feedback
+            # Remove unused parameters here for clarity
+            _ = self.param.pop('ai')
+            _ = self.param.pop('Tf')
+            self.add_subprocess('albedo',
+                            albedo.P2Albedo(domains=sfc, **self.param))
+        else:
+            self.param['ai'] = ai
+            self.add_subprocess('albedo',
+                    albedo.StepFunctionAlbedo(state=self.state, **self.param))
 
-    
-   
+
 # an EBM that computes degree-days has an additional state variable.
 #  Need to implement that
 #  could make a good working example to document creating a new model class
