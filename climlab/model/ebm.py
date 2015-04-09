@@ -16,6 +16,7 @@ from climlab.radiation.AplusBT import AplusBT
 from climlab.radiation.insolation import P2Insolation, AnnualMeanInsolation, DailyInsolation
 from climlab.surface import albedo
 from climlab.dynamics.diffusion import MeridionalDiffusion
+from scipy import integrate
 
 
 class EBM(EnergyBudget):
@@ -75,13 +76,32 @@ class EBM(EnergyBudget):
         '''Convenience method to compute the global mean surface temperature.'''
         return global_mean(self.state['Ts'])
 
+    def inferred_heat_transport( self ):
+        '''Returns the inferred heat transport (in PW) by integrating the TOA energy imbalance from pole to pole.'''
+        phi = self.phi
+        energy_in = self.diagnostics['net_radiation']
+        return ( 1E-15*2* np.math.pi*const.a**2 * 
+            integrate.cumtrapz(np.cos(phi)*energy_in,
+            x=phi, initial=0. ) )
 
-class EBM_annual(EBM):
-    def __init__(self, **kwargs):
-        super(EBM_annual, self).__init__(**kwargs)
-        sfc = self.domains['Ts']
-        self.add_subprocess('insolation',
-                            AnnualMeanInsolation(domains=sfc, **self.param))
+#     def heat_transport(self):
+#         '''Returns instantaneous heat transport in units on PW,
+#         on the staggered grid.'''
+#         return self.diffusive_heat_transport()
+# 
+#     def diffusive_heat_transport( self ):
+#         '''Compute instantaneous diffusive heat transport in units of PW, on the staggered grid.'''
+#         #return ( 1E-15 * -2 * np.math.pi * np.cos(self.phi_stag) * const.cp * const.ps * const.mb_to_Pa / const.g * self.K * 
+#         #    np.append( np.append( 0., np.diff( self.T ) ), 0.) / self.dphi )
+#         return ( 1E-15 * -2 * np.math.pi * np.cos(self.phi_stag) * const.a**2 * self.K * 
+#             np.append( np.append( 0., np.diff( self.T ) ), 0.) / self.dphi )
+#     
+#     def heat_transport_convergence( self ):
+#         '''Returns instantaneous convergence of heat transport in units of W / m^2.'''
+#         return ( -1./(2*np.math.pi*const.a**2*np.cos(self.phi)) * np.diff( 1.E15*self.heat_transport() )
+#             / np.diff(self.phi_stag) )
+#     
+
     
 
 class EBM_seasonal(EBM):
@@ -106,6 +126,14 @@ class EBM_seasonal(EBM):
             self.add_subprocess('albedo',
                     albedo.StepFunctionAlbedo(state=self.state, **self.param))
 
+class EBM_annual(EBM_seasonal):
+    def __init__(self, **kwargs):
+        '''This EBM uses realistic daily insolation.
+        If ai is not given, the model will not have an albedo feedback.'''
+        super(EBM_annual, self).__init__(**kwargs)
+        sfc = self.domains['Ts']
+        self.add_subprocess('insolation',
+                            AnnualMeanInsolation(domains=sfc, **self.param))
 
 # an EBM that computes degree-days has an additional state variable.
 #  Need to implement that
