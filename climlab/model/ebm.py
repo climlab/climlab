@@ -78,8 +78,8 @@ class EBM(EnergyBudget):
 
     def inferred_heat_transport( self ):
         '''Returns the inferred heat transport (in PW) by integrating the TOA energy imbalance from pole to pole.'''
-        phi = self.phi
-        energy_in = self.diagnostics['net_radiation']
+        phi = np.deg2rad(self.lat)
+        energy_in = np.squeeze(self.diagnostics['net_radiation'])
         return ( 1E-15*2* np.math.pi*const.a**2 * 
             integrate.cumtrapz(np.cos(phi)*energy_in,
             x=phi, initial=0. ) )
