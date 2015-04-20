@@ -69,40 +69,47 @@ class EBM(EnergyBudget):
         ASR = (1-albedo) * insolation
         self.heating_rate['Ts'] = ASR
         self.diagnostics['ASR'] = ASR
-        self.diagnostics['net_radiation'] = (ASR - 
+        self.diagnostics['net_radiation'] = (ASR -
                                     self.subprocess['LW'].diagnostics['OLR'])
 
     def global_mean_temperature(self):
-        '''Convenience method to compute the global mean surface temperature.'''
+        '''Convenience method to compute global mean surface temperature.'''
         return global_mean(self.state['Ts'])
 
-    def inferred_heat_transport( self ):
-        '''Returns the inferred heat transport (in PW) by integrating the TOA energy imbalance from pole to pole.'''
+    def inferred_heat_transport(self):
+        '''Returns the inferred heat transport (in PW)
+        by integrating the TOA energy imbalance from pole to pole.'''
         phi = np.deg2rad(self.lat)
         energy_in = np.squeeze(self.diagnostics['net_radiation'])
-        return ( 1E-15*2* np.math.pi*const.a**2 * 
-            integrate.cumtrapz(np.cos(phi)*energy_in,
-            x=phi, initial=0. ) )
+        return (1E-15 * 2 * np.math.pi * const.a**2 *
+                integrate.cumtrapz(np.cos(phi)*energy_in, x=phi, initial=0.))
 
-#     def heat_transport(self):
-#         '''Returns instantaneous heat transport in units on PW,
-#         on the staggered grid.'''
-#         return self.diffusive_heat_transport()
-# 
-#     def diffusive_heat_transport( self ):
-#         '''Compute instantaneous diffusive heat transport in units of PW, on the staggered grid.'''
-#         #return ( 1E-15 * -2 * np.math.pi * np.cos(self.phi_stag) * const.cp * const.ps * const.mb_to_Pa / const.g * self.K * 
-#         #    np.append( np.append( 0., np.diff( self.T ) ), 0.) / self.dphi )
-#         return ( 1E-15 * -2 * np.math.pi * np.cos(self.phi_stag) * const.a**2 * self.K * 
-#             np.append( np.append( 0., np.diff( self.T ) ), 0.) / self.dphi )
-#     
-#     def heat_transport_convergence( self ):
-#         '''Returns instantaneous convergence of heat transport in units of W / m^2.'''
-#         return ( -1./(2*np.math.pi*const.a**2*np.cos(self.phi)) * np.diff( 1.E15*self.heat_transport() )
-#             / np.diff(self.phi_stag) )
-#     
+    def heat_transport(self):
+        '''Returns instantaneous heat transport in units on PW,
+        on the staggered grid.'''
+        return self.diffusive_heat_transport()
 
-    
+    def diffusive_heat_transport(self):
+        '''Compute instantaneous diffusive heat transport in units of PW
+        on the staggered grid.'''
+        phi = np.deg2rad(self.lat)
+        phi_stag = np.deg2rad(self.lat_bounds)
+        D = self.param['D']
+        T = np.squeeze(self.Ts)
+        dTdphi = np.diff(T) / np.diff(phi)
+        dTdphi = np.append(dTdphi, 0.)
+        dTdphi = np.insert(dTdphi, 0, 0.)
+        return (1E-15*-2*np.math.pi*np.cos(phi_stag)*const.a**2*D*dTdphi)
+
+    def heat_transport_convergence(self):
+        '''Returns instantaneous convergence of heat transport
+        in units of W / m^2.'''
+        phi = np.deg2rad(self.lat)
+        phi_stag = np.deg2rad(self.lat_bounds)
+        H = 1.E15*self.heat_transport()
+        return (-1./(2*np.math.pi*const.a**2*np.cos(phi)) *
+                np.diff(H)/np.diff(phi_stag))
+
 
 class EBM_seasonal(EBM):
     def __init__(self, a0=0.33, a2=0.25, ai=None, **kwargs):
@@ -125,6 +132,7 @@ class EBM_seasonal(EBM):
             self.param['ai'] = ai
             self.add_subprocess('albedo',
                     albedo.StepFunctionAlbedo(state=self.state, **self.param))
+
 
 class EBM_annual(EBM_seasonal):
     def __init__(self, **kwargs):
