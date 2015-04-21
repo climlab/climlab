@@ -31,3 +31,16 @@ class EnergyBudget(TimeDependentProcess):
     def compute(self):
         '''Update all diagnostic quantities using current model state.'''
         self._temperature_tendencies()
+
+
+class ExternalEnergySource(EnergyBudget):
+    '''A fixed energy source or sink to be specified by the user.
+    The user should modify the fields in the heating_rate dictionary,
+    which contain heating rates in W / m**2 for all state variables.'''
+    def __init__(self, **kwargs):
+        super(ExternalEnergySource, self).__init__(**kwargs)
+        for varname in self.state.keys():
+            self.heating_rate[varname] = np.zeros_like(self.state[varname])
+
+    def _compute_heating_rates(self):
+        pass

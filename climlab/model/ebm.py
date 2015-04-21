@@ -22,6 +22,7 @@ from scipy import integrate
 class EBM(EnergyBudget):
     def __init__(self,
                  num_lat=90,
+                 S0=const.S0,
                  A=210.,
                  B=2.,
                  D=0.555,  # in W / m^2 / degC, same as B
@@ -39,6 +40,7 @@ class EBM(EnergyBudget):
             lat = sfc.axes['lat'].points
             initial = 12. - 40. * legendre.P2(np.sin(np.deg2rad(lat)))
             self.set_state('Ts', Field(initial, domain=sfc))
+        self.param['S0'] = S0
         self.param['A'] = A
         self.param['B'] = B
         self.param['D'] = D
