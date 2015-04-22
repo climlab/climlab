@@ -57,9 +57,9 @@ class Process(object):
         for varname in self.state.keys():
             str1 += '  {0}: {1} \n'.format(varname, self.domains[varname].shape)
         str1 += 'The subprocess tree: \n'
-        str1 += walk.process_tree(self)  
+        str1 += walk.process_tree(self)
         return str1
-        
+
     def __init__(self, state=None, domains=None, subprocess=None,
                  lat=None, lev=None, num_lat=None, num_levels=None,
                  diagnostics=None, **kwargs):
@@ -85,7 +85,7 @@ class Process(object):
     def add_subprocesses(self, procdict):
         '''Add a dictionary of subproceses to this process.
         procdict is dictionary with process names as keys.
-        
+
         Can also pass a single process, which will be called \'default\'
         '''
         if isinstance(procdict, Process):
@@ -93,7 +93,7 @@ class Process(object):
         else:
             for name, proc in procdict.iteritems():
                 self.add_subprocess(name, proc)
-    
+
     def add_subprocess(self, name, proc):
         '''Add a single subprocess to this process.
         name: name of the subprocess (str)
@@ -102,16 +102,16 @@ class Process(object):
             self.subprocess.update({name: proc})
             self.has_process_type_list = False
         else:
-            raise ValueError('subprocess must be Process object')            
-    
+            raise ValueError('subprocess must be Process object')
+
     def remove_subprocess(self, name):
         '''Remove a single subprocess from this process.
         name: name of the subprocess (str)'''
         self.subprocess.pop(name, None)
         self.has_process_type_list = False
-        
+
     def set_state(self, name, value):
-        if isinstance(value, Field):        
+        if isinstance(value, Field):
             # populate domains dictionary with domains from state variables
             self.domains.update({name: value.domain})
         else:
@@ -128,7 +128,7 @@ class Process(object):
         # set the state dictionary
         self.state[name] = value
         setattr(self, name, value)
-    
+
     def _guess_state_domains(self):
         for name, value in self.state.iteritems():
             for domname, dom in self.domains.iteritems():
@@ -149,6 +149,7 @@ class Process(object):
             return thislat
         except:
             raise ValueError('Can\'t resolve a lat axis.')
+
     @property
     def lat_bounds(self):
         try:
@@ -226,14 +227,14 @@ class Process(object):
             return thisdepth
         except:
             raise ValueError('Can\'t resolve a depth axis.')
-            
-        
+
+
 def process_like(proc):
     '''Return a new process identical to the given process.
     The creation date is updated.'''
     newproc = copy.deepcopy(proc)
     newproc.creation_date = time.strftime("%a, %d %b %Y %H:%M:%S %z",
-                                           time.localtime())
+                                          time.localtime())
     return newproc
 
 
@@ -253,4 +254,3 @@ def get_axes(process_or_domain):
         return axes
     else:
         raise TypeError('dom must be a domain or dictionary of domains.')
-    

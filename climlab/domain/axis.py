@@ -49,12 +49,13 @@ class Axis(object):
         # if points and/or bounds are supplied, make sure they are increasing
         if points is not None:
             try:
-                points = np.sort(np.array(points, dtype=float))
+                # using np.atleast_1d() ensures that we can use a single point
+                points = np.sort(np.atleast_1d(np.array(points, dtype=float)))
             except:
                 raise ValueError('points must be array_like.')
         if bounds is not None:
             try:
-                bounds = np.sort(np.array(bounds, dtype=float))
+                bounds = np.sort(np.atleast_1d(np.array(bounds, dtype=float)))
             except:
                 raise ValueError('bounds must be array_like.')
 
