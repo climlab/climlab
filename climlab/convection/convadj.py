@@ -5,6 +5,11 @@ from climlab.domain.field import Field
 
 
 class ConvectiveAdjustment(TimeDependentProcess):
+    '''Convective adjustment process
+    Instantly returns column to neutral lapse rate
+    
+    Adjustment includes the surface IF 'Ts' is included in the state
+    dictionary. Otherwise only the atmopsheric temperature is adjusted.'''
     def __init__(self, adj_lapse_rate=None, **kwargs):
         super(ConvectiveAdjustment, self).__init__(**kwargs)
         # lapse rate for convective adjustment, in K / km
@@ -14,9 +19,13 @@ class ConvectiveAdjustment(TimeDependentProcess):
         self.adjustment = {}
         patm = self.lev
         c_atm = self.Tatm.domain.heat_capacity
-        c_sfc = self.Ts.domain.heat_capacity       
-        self.pnew = np.flipud(np.append(np.flipud(patm), const.ps))
-        self.cnew = np.flipud(np.append(np.flipud(c_atm), c_sfc))
+        if 'Ts' in self.state:
+            c_sfc = self.Ts.domain.heat_capacity       
+            self.pnew = np.flipud(np.append(np.flipud(patm), const.ps))
+            self.cnew = np.flipud(np.append(np.flipud(c_atm), c_sfc))
+        else:
+            self.pnew = patm
+            self.cnew = c_atm
     @property
     def adj_lapse_rate(self):
         return self._adj_lapse_rate
@@ -34,13 +43,19 @@ class ConvectiveAdjustment(TimeDependentProcess):
             self.adjusted_state = self.state
         else:
             #  For now, let's assume that the vertical axis is the last axis
-            unstable_Ts = np.atleast_1d(self.Ts)
             unstable_Tatm = self.Tatm
-            Tcol = np.concatenate((unstable_Ts, unstable_Tatm),axis=-1)
+            if 'Ts' in self.state:
+                unstable_Ts = np.atleast_1d(self.Ts)
+                Tcol = np.concatenate((unstable_Ts, unstable_Tatm),axis=-1)
+            else:
+                Tcol = unstable_Tatm
             Tadj = convective_adjustment_direct(self.pnew, Tcol, self.cnew, lapserate=self.adj_lapse_rate)            
-            Ts = Field(Tadj[...,0], domain=self.Ts.domain)
-            Tatm = Field(Tadj[...,1:], domain=self.Tatm.domain)
-            self.adjustment['Ts'] = Ts - self.Ts
+            if 'Ts' in self.state:            
+                Ts = Field(Tadj[...,0], domain=self.Ts.domain)
+                Tatm = Field(Tadj[...,1:], domain=self.Tatm.domain)
+                self.adjustment['Ts'] = Ts - self.Ts
+            else:
+                Tatm = Field(Tadj, domain=self.Tatm.domain)
             self.adjustment['Tatm'] = Tatm - self.Tatm
 
 

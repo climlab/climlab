@@ -72,10 +72,10 @@ class GreyRadiationModel(TimeDependentProcess):
         absorbLW = compute_layer_absorptivity(self.param['abs_coeff'], dp)
         absorbLW = Field(np.tile(absorbLW, sfc.shape), domain=atm)
         absorbSW = np.zeros_like(absorbLW)
-        longwave = Radiation(state=self.state, absorptivity=absorbLW, 
+        longwave = Radiation(state=self.state, absorptivity=absorbLW,
                              albedo_sfc=0)
-        shortwave = RadiationSW(state=self.state, absorptivity=absorbSW, 
-                              albedo_sfc=self.param['albedo_sfc'])
+        shortwave = RadiationSW(state=self.state, absorptivity=absorbSW,
+                                albedo_sfc=self.param['albedo_sfc'])
         # sub-model for insolation ... here we just set constant Q
         thisQ = self.param['Q']*np.ones_like(self.Ts)
         Q = FixedInsolation(S0=thisQ, domain=sfc, **self.param)
