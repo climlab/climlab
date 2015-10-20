@@ -16,9 +16,9 @@ class TimeDependentProcess(Process):
             self.set_timestep()
         else:
             self.set_timestep(timestep=timestep)
-        self.time_type = time_type
-        self.topdown = topdown
-        self.has_process_type_list = False
+        self.attrs['time_type'] = time_type
+        self.attrs['topdown'] = topdown
+        self.attrs['has_process_type_list'] = False
 
     def set_timestep(self, timestep=const.seconds_per_day, num_steps_per_year=None):
         '''Change the timestep.
@@ -32,6 +32,7 @@ class TimeDependentProcess(Process):
         # Need a more sensible approach for annual cycle stuff
         timestep_days = timestep / const.seconds_per_day
         days_of_year = np.arange(0., const.days_per_year, timestep_days)
+        #  this will need to be reorganized, stored as attributes. But fine for now
         self.time = {'timestep': timestep,
                      'num_steps_per_year': num_steps_per_year,
                      'day_of_year_index': 0,
@@ -39,7 +40,7 @@ class TimeDependentProcess(Process):
                      'days_elapsed': 0,
                      'years_elapsed': 0,
                      'days_of_year': days_of_year}
-        self.param['timestep'] = timestep
+        self.attrs['timestep'] = timestep
 
     def compute(self):
         '''By default, the tendency is zero.'''
@@ -52,7 +53,7 @@ class TimeDependentProcess(Process):
         self.process_types = {'diagnostic': [], 'explicit': [], 'implicit': [], 'adjustment': []}        
         for name, proc, level in walk_processes(self, topdown=self.topdown):
             self.process_types[proc.time_type].append(proc)
-        self.has_process_type_list = True
+        self.attrs['has_process_type_list'] = True
         
     def step_forward(self):
         '''new oop climlab... just loop through processes
@@ -70,7 +71,7 @@ class TimeDependentProcess(Process):
         for proc in self.process_types['explicit']:
             for varname in proc.state.keys():
                 try: proc.state[varname] += (proc.tendencies[varname] *
-                                             self.param['timestep'])
+                                             self.timestep)
                 except: pass
         # Now compute all implicit processes -- matrix inversions
         for proc in self.process_types['implicit']:

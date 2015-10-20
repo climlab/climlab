@@ -9,7 +9,7 @@ class EnergyBudget(TimeDependentProcess):
     with items corresponding to each state variable.'''
     def __init__(self, **kwargs):
         super(EnergyBudget, self).__init__(**kwargs)
-        self.process_type = 'explicit'
+        self.attrs['process_type'] = 'explicit'
         self.heating_rate = {}
 
     def _compute_heating_rates(self):
