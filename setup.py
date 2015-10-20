@@ -1,12 +1,14 @@
 from setuptools import setup
 
 def readme():
-    with open('README') as f:
+    with open('README.rst') as f:
         return f.read()
 
+import climlab
+
 setup(name='climlab',
-      version='0.1',
-      description='Package for simple climate modeling',
+      version=climlab.__version__,
+      description='Package for process-oriented climate modeling',
       long_description=readme(),
       classifiers=[
         'Development Status :: 3 - Alpha',
