@@ -17,8 +17,23 @@ olr.compute()
 #  or to actually update the temperature
 olr.step_forward()
 print olr.state
+
+
+New prototype usage for xray version:
+
+import numpy as np
+import xray
+import climlab
+latarray = np.arange(-90,90.)
+Tarray = np.ones_like(latarray)
+da = xray.DataArray(data=Tarray, coords={'lat':latarray})
+model = climlab.radiation.AplusBT(variables={'Ts':da})
+model.heat_capacity = xray.Dataset(variables=model) *400
+model.compute()
+
 '''
 from climlab.process.energy_budget import EnergyBudget
+import xray
 
 
 class AplusBT(EnergyBudget):
@@ -26,32 +41,34 @@ class AplusBT(EnergyBudget):
     Should be invoked with a single temperature state variable.'''
     def __init__(self, A=200., B=2., **kwargs):
         super(AplusBT, self).__init__(**kwargs)
-        self.A = A
-        self.B = B        
-
-    @property
-    def A(self):
-        return self._A
-    @A.setter
-    def A(self, value):
-        self._A = value
-        self.param['A'] = value
-    @property
-    def B(self):
-        return self._B
-    @B.setter
-    def B(self, value):
-        self._B = value
-        self.param['B'] = value
+        self.attrs['A'] = A
+        self.attrs['B'] = B
+#
+#    @property
+#    def A(self):
+#        return self._A
+#    @A.setter
+#    def A(self, value):
+#        self._A = value
+#        self.param['A'] = value
+#    @property
+#    def B(self):
+#        return self._B
+#    @B.setter
+#    def B(self, value):
+#        self._B = value
+#        self.param['B'] = value
+#    
+#    def emission(self):
+#        for varname, value in self.state.iteritems():
+#            flux = self.A + self.B * value
+#            self.OLR = flux
+#            self.diagnostics['OLR'] = self.OLR
     
-    def emission(self):
-        for varname, value in self.state.iteritems():
-            flux = self.A + self.B * value
-            self.OLR = flux
-            self.diagnostics['OLR'] = self.OLR
-    
-    def _compute_heating_rates(self):
+    def _compute_heating_rates(self, inputData=None):
         '''Compute energy flux convergences to get heating rates in W / m**2.'''
-        self.emission()
-        for varname, value in self.state.iteritems():
-            self.heating_rate[varname] = -self.OLR
+        flux = self.A + self.B * self.Ts
+        diagnostics = xray.Dataset(coords=self.coords)
+        diagnostics['OLR'] = flux
+        heating_rates = -flux
+        return heating_rates, diagnostics

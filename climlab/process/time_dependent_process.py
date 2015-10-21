@@ -3,6 +3,7 @@ import copy
 from climlab import constants as const
 from climlab.process.process import Process
 from climlab.utils.walk import walk_processes
+import xray
 
 
 class TimeDependentProcess(Process):
@@ -42,10 +43,42 @@ class TimeDependentProcess(Process):
                      'days_of_year': days_of_year}
         self.attrs['timestep'] = timestep
 
-    def compute(self):
-        '''By default, the tendency is zero.'''
-        for varname in self.state.keys():
-            self.tendencies[varname] = np.zeros_like(self.state[varname])
+    #  new concept: there really shouldn't be any need to *walk* the 
+     # process tree!  Each process should compute the complete tendencies
+    #  due to itself and all its subprocesses! 
+    #  So basically the iterating through subprocesses should occur in the 
+    #  compute method, NOT the step_forward method
+    def compute(self, inputData=None):
+        '''Compute tendencies for all state variables given
+        current state and specified input.
+        
+        inputData should be of type xray.Dataset'''
+        #  make a new Dataset object to hold tendencies on state variables
+        tendencies = self * 0.
+        #  empty Dataset that inherits coordinate axes from the process
+        diagnostics = xray.Dataset(coords=self.coords)
+        if self.topdown:
+            tendencies, diagnostics = self._compute(inputData=inputData)
+            for name, proc in self.subprocess.iteritems():
+                tend_sub, diag_sub = proc.compute()
+                tendencies += tend_sub
+                diagnostics.merge(diag_sub)
+        else:
+            for name, proc in self.subprocess.iteritems():
+                tend_sub, diag_sub = proc.compute()
+                tendencies += tend_sub
+                diagnostics.merge(diag_sub)
+            tend_parent, diag_parent = self._compute(inputData=inputData)
+            tendencies += tend_parent
+            diagnostics.merge(diag_parent)
+        return tendencies, diagnostics
+       
+    def _compute(self, inputData=None):
+        # where the tendencies are actually computed... 
+        #  needs to be implemented for each daughter class
+        tendencies = self * 0.
+        diagnostics = xray.Dataset(coords=self.coords)
+        return tendencies, diagnostics
 
     def _build_process_type_list(self):
         '''Generate lists of processes organized by process type
@@ -55,41 +88,52 @@ class TimeDependentProcess(Process):
             self.process_types[proc.time_type].append(proc)
         self.attrs['has_process_type_list'] = True
         
-    def step_forward(self):
+    def step_forward(self, inputData=None):
         '''new oop climlab... just loop through processes
         and add up the tendencies'''
-        if not self.has_process_type_list:
-            self._build_process_type_list()
+        #if not self.has_process_type_list:
+        #    self._build_process_type_list()
+        #  new empty Dataset to hold all diagnostics
+        #full_diagnostics = xray.Dataset(coords=self.coords)
         # First compute all strictly diagnostic processes
-        for proc in self.process_types['diagnostic']:
-            proc.compute()
+        #for proc in self.process_types['diagnostic']:
+        #    diagnostics = proc.compute()
+        #    full_diagnostics.update(diagnostics)
         # Compute tendencies and diagnostics for all explicit processes
-        for proc in self.process_types['explicit']:
-            proc.compute()
         # Update state variables using all explicit tendencies
         #  Tendencies are d/dt(state) -- so just multiply by timestep for forward time
-        for proc in self.process_types['explicit']:
-            for varname in proc.state.keys():
-                try: proc.state[varname] += (proc.tendencies[varname] *
-                                             self.timestep)
-                except: pass
-        # Now compute all implicit processes -- matrix inversions
-        for proc in self.process_types['implicit']:
-            proc.compute()
-            for varname in proc.state.keys():
-                try: proc.state[varname] += proc.adjustment[varname]
-                except: pass
-        # Adjustment processes change the state instantaneously
-        for proc in self.process_types['adjustment']:
-            proc.compute()
-            for varname, value in proc.state.iteritems():
-                #proc.set_state(varname, proc.adjusted_state[varname])
-                try: proc.state[varname] += proc.adjustment[varname]
-                except: pass
-        # Gather all diagnostics
-        for name, proc, level in walk_processes(self):
-            self.diagnostics.update(proc.diagnostics)
-            proc._update_time()
+        #net_tendency = self * 0.
+        #for proc in self.process_types['explicit']:
+        #    #  use xray.Dataset arithmetic shortcut ...  all state variables
+        #    #   will be updated simultaneously
+        #    tendencies, diagnostics = proc.compute()
+        #    net_tendency += tendencies
+        #    full_diagnostics.update(diagnostics)
+        ##  apply the tendencies
+           #  this for now is just for explicit timesteps
+        net_tendency, diagnostics = self.compute(inputData=inputData)        
+        self += net_tendency * self.timestep
+        ## Now compute all implicit processes -- matrix inversions
+        #net_adjustment = self * 0.
+        #for proc in self.process_types['implicit']:
+        #    adjustment, diagnostics = proc.compute()
+        #    net_adjustment += adjustment
+        #    full_diagnostics.update(diagnostics)
+        #self += net_adjustment
+        ##  DO WE STILL NEED THIS BELOW?
+        ## Adjustment processes change the state instantaneously
+        #for proc in self.process_types['adjustment']:
+        #    proc.compute()
+        #    for varname, value in proc.state.iteritems():
+        #        #proc.set_state(varname, proc.adjusted_state[varname])
+        #        try: proc.state[varname] += proc.adjustment[varname]
+        #        except: pass
+#        # Gather all diagnostics
+                #  actually I don't think we'll do this anymore
+#        for name, proc, level in walk_processes(self):
+#            self.diagnostics.update(proc.diagnostics)
+#            proc._update_time()
+        return diagnostics
 
     def compute_diagnostics(self, num_iter=3):
         '''Compute all tendencies and diagnostics, but don't update model state.

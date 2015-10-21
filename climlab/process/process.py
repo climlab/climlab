@@ -16,6 +16,39 @@ import xray
 #  dimensional but fixed quantities will be stored as DataArrays just like
 #   state variables but will simply not get updated
 
+#   ...
+#  The previous climlab data structure had a bunch of named dictionaries
+#  of data arrays: state, tendencies, heating_rate, etc
+#  Would be nice to clean and rationalize all this
+#  and get back to a purer model:
+#   The process object should consist of state variables, attributes
+#  only what is really need to fully define the current state and compute
+#  the next timestep
+#
+#  There should be methods to COMPUTE all diagnostic quantities
+#  and probably return them in new Dataset objects
+#  But don't clutter the process object with all these extra fields!
+
+#  but... every process also needs inputs and boundary values!
+#  these are not state vars but need to be provided somehow.
+
+#  Does the compute() method of each process accept another Dataset
+#  as input argument, providing all the forcing/boundary values?
+
+#  COULD make code for complex coupled models more straightforward.
+#  or it could be a mess
+
+# Rather than storing a dictionary of tendencies,
+#  can each process have a method
+#  process.compute(inputData)
+# that returns a Dataset object containing the tendencies (on same grid as state)?
+
+#  OK this is what we will try:
+#   the data_vars dictionary of every process contains ONLY state variables!
+#  Everything else is computed by methods and returned as seperate datasets
+#
+#  This may prove to be too restrictive but let's try it out.
+
 def _make_dict(arg, argtype):
     if arg is None:
         return {}
@@ -61,7 +94,8 @@ class Process(xray.Dataset):
 #            self.subprocess = {}
 #        else:
 #            self.add_subprocesses(subprocess)
-    def __init__(self, lat=None, lev=None, num_lat=None, num_levels=None, **kwargs):
+    def __init__(self, lat=None, lev=None, num_lat=None, num_levels=None, 
+                 subprocess=None, **kwargs):
         coords = {}
         if lat is not None:
             coords.update({'lat': lat})
@@ -70,6 +104,11 @@ class Process(xray.Dataset):
         super(Process, self).__init__(coords=coords, **kwargs)
         self.attrs['creation_date'] = time.strftime("%a, %d %b %Y %H:%M:%S %z",
                                            time.localtime())
+        # subprocess is a dictionary of any sub-processes
+        if subprocess is None:
+            self.subprocess = {}
+        else:
+            self.add_subprocesses(subprocess)
 
     def add_subprocesses(self, procdict):
         '''Add a dictionary of subproceses to this process.
