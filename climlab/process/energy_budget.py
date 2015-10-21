@@ -13,23 +13,23 @@ class EnergyBudget(TimeDependentProcess):
         self.attrs['process_type'] = 'explicit'
         #self.heating_rate = {}
 
-    def _compute_heating_rates(self, inputData=None):
+    def _compute_heating_rates(self):
         '''Compute energy flux convergences to get heating rates in W / m**2.
+        Return them in a new xray.Dataset corresponding to state variables
         This method should be over-ridden by daughter classes.'''
-        heating_rates = self * 0.        
-        diagnostics = xray.Dataset(coords=self.coords)
-        return heating_rates, diagnostics
+        heating_rates = self.state * 0.        
+        return heating_rates
 
-    def _temperature_tendencies(self, inputData=None):
-        heating_rates, diagnostics = self._compute_heating_rates(inputData=inputData)
+    def _temperature_tendencies(self):
+        heating_rates = self._compute_heating_rates()
         #  Need to set up heat capacity as a Dataset with variables as process
         tendencies = heating_rates / self.heat_capacity
-        return tendencies, diagnostics
+        return tendencies
         
-    def _compute(self, inputData=None):
+    def _compute(self):
         '''Update all diagnostic quantities using current model state.'''
-        tendencies, diagnostics = self._temperature_tendencies(inputData=inputData)
-        return tendencies, diagnostics
+        tendencies = self._temperature_tendencies()
+        return tendencies
 
 #==============================================================================
 # 

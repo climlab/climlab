@@ -12,90 +12,49 @@ import xray
 
 #  Scalar parameters will be stored in the attributes dictionary .attrs
 #  which means they are always accessible as process.param_name
-#
-#  dimensional but fixed quantities will be stored as DataArrays just like
-#   state variables but will simply not get updated
 
-#   ...
-#  The previous climlab data structure had a bunch of named dictionaries
-#  of data arrays: state, tendencies, heating_rate, etc
-#  Would be nice to clean and rationalize all this
-#  and get back to a purer model:
-#   The process object should consist of state variables, attributes
-#  only what is really need to fully define the current state and compute
-#  the next timestep
-#
-#  There should be methods to COMPUTE all diagnostic quantities
-#  and probably return them in new Dataset objects
-#  But don't clutter the process object with all these extra fields!
+#  Each process will have several different kinds of data, aside from scalar params:
+#   - state variables
+#	- input data
+#	- diagnostics
 
-#  but... every process also needs inputs and boundary values!
-#  these are not state vars but need to be provided somehow.
+#  These will all be stored as xray.DataArrays in the Process object, and thus accessible
+#  either through the .data_vars dict interface or directly as attributes of the Process
 
-#  Does the compute() method of each process accept another Dataset
-#  as input argument, providing all the forcing/boundary values?
+#  But, importantly, we will extend the Dataset interface to distinguish between different
+#  types of data. Each DataArray will have an attribute 'var_type' to declare whether it is
+#  state, input, diag, and maybe others
 
-#  COULD make code for complex coupled models more straightforward.
-#  or it could be a mess
+#  This will extend the Dataset.data_vars attribute. Look at the xray code and emulate it.
 
-# Rather than storing a dictionary of tendencies,
-#  can each process have a method
-#  process.compute(inputData)
-# that returns a Dataset object containing the tendencies (on same grid as state)?
+#  There will be an attribute like Dataset.data_vars that returns dictionaries of just
+#  specific types of variables, so Process.state will return dict of state vars
+#   just like it did in climlab v 0.2.x
 
-#  OK this is what we will try:
-#   the data_vars dictionary of every process contains ONLY state variables!
-#  Everything else is computed by methods and returned as seperate datasets
-#
-#  This may prove to be too restrictive but let's try it out.
+#  Because all data is ultimately stored in a single object / dictionary,
+#   there is a restriction on names. Can't store tendencies with same names as state vars
+#  But that's okay and will actually clean up the interface
 
-#  later... I already think this is too restrictive
-#   each process object needs a state variables dict or Dataset
-#   but it also needs a Dataset of input data
-#  and produces a dataset of diagnostics and another of tendencies
-
-#  I think it actually doesn't make sense to glue this all on to a parent
-#  xray.Dataset object. The Process object should go back to a custom class
-#  but each Process object will have several xray.Dataset members,
-#  which should be accessible either through dictionary or attribute style
-
-#  Basically a Process object should be a dict-like container of xray.Datasets
-#   plus a compute method that generates tendencies and diagnostics using
-#  the current state and the current input data
-
-#  Might be useful to look at the source code for xray.Dataset to emulate it
-
-#  ok... maybe we CAN use a single parent Dataset.
-#  the key is to have a simple and robust way to differentiate between
-#  different kinds of data: state, input, tendencies, diagnostics, etc.
-
-#  But I think this should be pretty straightforward. Look at how the
-#  Dataset.data_vars property is implemented. Just need to specialize this
-#  so that there are distinct properties that return dicts of DataArrays
-#  for each different kind of data. 
-#  Then things should be nice and clean, because every field can be accessed
-#   EITHER through its group dictionary, or directly as attribute of the Process
-#  or through the master dictiondary Process.data_vars
-
-#  But how will we name the fields? Because I can't use same keys for state
-#  and tendency if they actually all reside in the same Dataset object!
-#  could use names like 'Ts_tend' but that would get clunky.
-
-#  So maybe we need a hybrid approach:
-#   a single Dataset that contains at least three types of data:
-#     - state variables
-#       - input data
-#       - diagnostics
-#  along with properties that can distinguish between these
-#   AND tendencies are handled by methods that return new Datasets
-#   with same keys as state variables
+#  Because the compute() method for each process will take current state and input data
+#   and RETURN a new Dataset with the tendencies (with same keys as state vars)
 #  (which CAN be attached as attributes of the Process object, but
 #   probably better and cleaner not to do this)
 #  If you want to store and retain tendencies, better for the Process to
 #  create a diagnostic variable with a descriptive name, e.g. Ts_tendency
 
-#  So... insist that each DataArray has an attribute 'type' that can be
-#   state, diag, input
+#  I am also changing the logic for handling subprocesses.
+#  In the spirit of modular, self-contained Processes, each Process object has a data type
+#  		Process.input
+#  which contains all the input and boundary values needed.
+#  Often these will actually be set by a parent Process.
+
+#  But the compute() method of each Process will iterate over all subprocesses
+#  to generate the net tendency for that Process including all subprocesses
+
+#  The step_forward() method will no longer have to 'walk the subprocess tree'
+#  because the compute() method of the top-level process will automatically call all
+#  the underlying subprocesses. No process needs (or should) search deeper in the tree 
+#  than its own immediate subprocesses.
 
 def _make_dict(arg, argtype):
     if arg is None:
@@ -185,7 +144,29 @@ class Process(xray.Dataset):
         name: name of the subprocess (str)'''
         self.subprocess.pop(name, None)
         self.has_process_type_list = False
+    
+    def _subset_by_var_type(self, type):
+    	'''Return a new xray.Dataset object containing just variables of specified type.'''
+    	typedict = {key:value for key,value in self.data_vars.items() if value.var_type is type}
+    	return xray.Dataset(typedict)
+    	
+    @property
+    def state(self):
+        '''Returns a new xray.Dataset object containing just state variables.
+        '''
+        return self._subset_by_var_type('state')
+    @property
+    def input(self):
+        '''Returns a new xray.Dataset object containing just state variables.
+        '''
+        return self._subset_by_var_type('input')
 
+    @property
+    def diagnostics(self):
+        '''Dictionary of xray.DataArray objects corresponding to input variables
+        '''
+        return self._subset_by_var_type('diag')
+    
 #==============================================================================
 #     def set_state(self, name, value):
 #         if isinstance(value, Field):

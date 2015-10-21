@@ -19,7 +19,7 @@ class TimeDependentProcess(Process):
             self.set_timestep(timestep=timestep)
         self.attrs['time_type'] = time_type
         self.attrs['topdown'] = topdown
-        self.attrs['has_process_type_list'] = False
+        #self.attrs['has_process_type_list'] = False
 
     def set_timestep(self, timestep=const.seconds_per_day, num_steps_per_year=None):
         '''Change the timestep.
@@ -48,47 +48,42 @@ class TimeDependentProcess(Process):
     #  due to itself and all its subprocesses! 
     #  So basically the iterating through subprocesses should occur in the 
     #  compute method, NOT the step_forward method
-    def compute(self, inputData=None):
+    def compute(self):
         '''Compute tendencies for all state variables given
-        current state and specified input.
-        
-        inputData should be of type xray.Dataset'''
-        #  make a new Dataset object to hold tendencies on state variables
-        tendencies = self * 0.
-        #  empty Dataset that inherits coordinate axes from the process
-        diagnostics = xray.Dataset(coords=self.coords)
+        current state and specified input.'''
         if self.topdown:
-            tendencies, diagnostics = self._compute(inputData=inputData)
+        	 #  tendencies is Dataset object with same names as state variables
+            tendencies = self._compute()
             for name, proc in self.subprocess.iteritems():
-                tend_sub, diag_sub = proc.compute()
+                tend_sub = proc.compute()
                 tendencies += tend_sub
-                diagnostics.merge(diag_sub)
+                #diagnostics.merge(diag_sub)
+                # will need a way to retrieve diagnostics from subprocesses
         else:
+        #  make a new Dataset object to hold tendencies on state variables
+            tendencies = self.state * 0.
             for name, proc in self.subprocess.iteritems():
-                tend_sub, diag_sub = proc.compute()
+                tend_sub = proc.compute()
                 tendencies += tend_sub
-                diagnostics.merge(diag_sub)
-            tend_parent, diag_parent = self._compute(inputData=inputData)
-            tendencies += tend_parent
-            diagnostics.merge(diag_parent)
-        return tendencies, diagnostics
+				#diagnostics.merge(diag_sub)
+            tendencies += self._compute()
+        return tendencies
        
-    def _compute(self, inputData=None):
+    def _compute(self):
         # where the tendencies are actually computed... 
         #  needs to be implemented for each daughter class
-        tendencies = self * 0.
-        diagnostics = xray.Dataset(coords=self.coords)
-        return tendencies, diagnostics
+        tendencies = self.state * 0.
+        return tendencies
 
-    def _build_process_type_list(self):
-        '''Generate lists of processes organized by process type
-        Currently, this can be 'diagnostic', 'explicit', 'implicit', or 'adjustment'.'''
-        self.process_types = {'diagnostic': [], 'explicit': [], 'implicit': [], 'adjustment': []}        
-        for name, proc, level in walk_processes(self, topdown=self.topdown):
-            self.process_types[proc.time_type].append(proc)
-        self.attrs['has_process_type_list'] = True
+#    def _build_process_type_list(self):
+#        '''Generate lists of processes organized by process type
+#        Currently, this can be 'diagnostic', 'explicit', 'implicit', or 'adjustment'.'''
+#        self.process_types = {'diagnostic': [], 'explicit': [], 'implicit': [], 'adjustment': []}        
+#        for name, proc, level in walk_processes(self, topdown=self.topdown):
+#            self.process_types[proc.time_type].append(proc)
+#        self.attrs['has_process_type_list'] = True
         
-    def step_forward(self, inputData=None):
+    def step_forward(self):
         '''new oop climlab... just loop through processes
         and add up the tendencies'''
         #if not self.has_process_type_list:
@@ -111,7 +106,7 @@ class TimeDependentProcess(Process):
         #    full_diagnostics.update(diagnostics)
         ##  apply the tendencies
            #  this for now is just for explicit timesteps
-        net_tendency, diagnostics = self.compute(inputData=inputData)        
+        net_tendency = self.compute()        
         self += net_tendency * self.timestep
         ## Now compute all implicit processes -- matrix inversions
         #net_adjustment = self * 0.
@@ -135,17 +130,17 @@ class TimeDependentProcess(Process):
 #            proc._update_time()
         return diagnostics
 
-    def compute_diagnostics(self, num_iter=3):
-        '''Compute all tendencies and diagnostics, but don't update model state.
-        By default it will call step_forward() 3 times to make sure all
-        subprocess coupling is accounted for. The number of iterations can
-        be changed with the input argument.'''
-        #  This might create a time problem because it updates the time counter...
-        this_state = copy.deepcopy(self.state)
-        for n in range(num_iter):
-            self.step_forward()
-            for name, value in self.state.iteritems():
-                self.state[name][:] = this_state[name][:]
+#    def compute_diagnostics(self, num_iter=3):
+#        '''Compute all tendencies and diagnostics, but don't update model state.
+#        By default it will call step_forward() 3 times to make sure all
+#        subprocess coupling is accounted for. The number of iterations can
+#        be changed with the input argument.'''
+#        #  This might create a time problem because it updates the time counter...
+#        this_state = copy.deepcopy(self.state)
+#        for n in range(num_iter):
+#            self.step_forward()
+#            for name, value in self.state.iteritems():
+#                self.state[name][:] = this_state[name][:]
 
     def _update_time(self):
         '''Increment the timestep counter by one.

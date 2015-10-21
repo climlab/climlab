@@ -27,13 +27,13 @@ import climlab
 latarray = np.arange(-90,90.)
 Tarray = np.ones_like(latarray)
 da = xray.DataArray(data=Tarray, coords={'lat':latarray})
+da.attrs['var_type'] = 'state'
 model = climlab.radiation.AplusBT(variables={'Ts':da})
-model.heat_capacity = xray.Dataset(variables=model) *400
+model['heat_capacity'] = xray.DataArray(model.Ts) *400
 model.compute()
 
 '''
 from climlab.process.energy_budget import EnergyBudget
-import xray
 
 
 class AplusBT(EnergyBudget):
@@ -65,10 +65,10 @@ class AplusBT(EnergyBudget):
 #            self.OLR = flux
 #            self.diagnostics['OLR'] = self.OLR
     
-    def _compute_heating_rates(self, inputData=None):
+    def _compute_heating_rates(self):
         '''Compute energy flux convergences to get heating rates in W / m**2.'''
         flux = self.A + self.B * self.Ts
-        diagnostics = xray.Dataset(coords=self.coords)
-        diagnostics['OLR'] = flux
+        flux.attrs['var_type'] = 'diag'
+        self['OLR'] = flux
         heating_rates = -flux
-        return heating_rates, diagnostics
+        return heating_rates
