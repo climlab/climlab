@@ -1,1 +1,1 @@
-__all__ = ['axis', 'domain']
+__all__ = ['axis', 'domain', 'grid']
