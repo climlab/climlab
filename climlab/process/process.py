@@ -49,6 +49,54 @@ import xray
 #
 #  This may prove to be too restrictive but let's try it out.
 
+#  later... I already think this is too restrictive
+#   each process object needs a state variables dict or Dataset
+#   but it also needs a Dataset of input data
+#  and produces a dataset of diagnostics and another of tendencies
+
+#  I think it actually doesn't make sense to glue this all on to a parent
+#  xray.Dataset object. The Process object should go back to a custom class
+#  but each Process object will have several xray.Dataset members,
+#  which should be accessible either through dictionary or attribute style
+
+#  Basically a Process object should be a dict-like container of xray.Datasets
+#   plus a compute method that generates tendencies and diagnostics using
+#  the current state and the current input data
+
+#  Might be useful to look at the source code for xray.Dataset to emulate it
+
+#  ok... maybe we CAN use a single parent Dataset.
+#  the key is to have a simple and robust way to differentiate between
+#  different kinds of data: state, input, tendencies, diagnostics, etc.
+
+#  But I think this should be pretty straightforward. Look at how the
+#  Dataset.data_vars property is implemented. Just need to specialize this
+#  so that there are distinct properties that return dicts of DataArrays
+#  for each different kind of data. 
+#  Then things should be nice and clean, because every field can be accessed
+#   EITHER through its group dictionary, or directly as attribute of the Process
+#  or through the master dictiondary Process.data_vars
+
+#  But how will we name the fields? Because I can't use same keys for state
+#  and tendency if they actually all reside in the same Dataset object!
+#  could use names like 'Ts_tend' but that would get clunky.
+
+#  So maybe we need a hybrid approach:
+#   a single Dataset that contains at least three types of data:
+#     - state variables
+#       - input data
+#       - diagnostics
+#  along with properties that can distinguish between these
+#   AND tendencies are handled by methods that return new Datasets
+#   with same keys as state variables
+#  (which CAN be attached as attributes of the Process object, but
+#   probably better and cleaner not to do this)
+#  If you want to store and retain tendencies, better for the Process to
+#  create a diagnostic variable with a descriptive name, e.g. Ts_tendency
+
+#  So... insist that each DataArray has an attribute 'type' that can be
+#   state, diag, input
+
 def _make_dict(arg, argtype):
     if arg is None:
         return {}
