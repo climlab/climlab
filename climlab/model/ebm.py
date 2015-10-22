@@ -8,15 +8,16 @@ brose@albany.edu
 
 import numpy as np
 from climlab import constants as const
-from climlab.domain.field import Field, global_mean
+#from climlab.domain.field import Field, global_mean
+from climlab.domain import grid
 from climlab.process.energy_budget import EnergyBudget
 from climlab.utils import legendre
-from climlab.domain import domain
+#from climlab.domain import domain
 from climlab.radiation.AplusBT import AplusBT
 from climlab.radiation.insolation import P2Insolation, AnnualMeanInsolation, DailyInsolation
 from climlab.surface import albedo
 from climlab.dynamics.diffusion import MeridionalDiffusion
-from scipy import integrate
+from scipy import integrate]
 
 
 class EBM(EnergyBudget):
@@ -34,33 +35,39 @@ class EBM(EnergyBudget):
                  timestep=const.seconds_per_year/90.,
                  **kwargs):
         super(EBM, self).__init__(timestep=timestep, **kwargs)
-        if not self.domains and not self.state:  # no state vars or domains yet
-            sfc = domain.zonal_mean_surface(num_lat=num_lat,
-                                            water_depth=water_depth)
-            lat = sfc.axes['lat'].points
-            initial = 12. - 40. * legendre.P2(np.sin(np.deg2rad(lat)))
-            self.set_state('Ts', Field(initial, domain=sfc))
-        self.param['S0'] = S0
-        self.param['A'] = A
-        self.param['B'] = B
-        self.param['D'] = D
-        self.param['Tf'] = Tf
-        self.param['water_depth'] = water_depth
-        self.param['a0'] = a0
-        self.param['a2'] = a2
-        self.param['ai'] = ai
+        #if not self.domains and not self.state:  # no state vars or domains yet
+        #    sfc = domain.zonal_mean_surface(num_lat=num_lat,
+        #                                    water_depth=water_depth)
+        #    lat = sfc.axes['lat'].points
+        #    initial = 12. - 40. * legendre.P2(np.sin(np.deg2rad(lat)))
+        #    self.set_state('Ts', Field(initial, domain=sfc))
+        slab = grid.zonal_mean_surface(num_lat)
+        Tarray = (12. - 40. * legendre.P2(np.sin(np.deg2rad(slab.lat.values))))
+        Tarray = Tarray.reshape((slab.lat.size, 1))
+        Tinitial = xray.DataArray(Tarray, name='Ts', 
+                                  coords={'lat':slab.lat, 'depth':slab.depth},
+                                  dims={'lat', 'depth'})
+        self.set_state(Tinitial)
+        self.attrs['S0'] = S0
+        self.attrs['A'] = A
+        self.attrs['B'] = B
+        self.attrs['D'] = D
+        self.attrs['Tf'] = Tf
+        self.attrs['water_depth'] = water_depth
+        self.attrs['a0'] = a0
+        self.attrs['a2'] = a2
+        self.attrs['ai'] = ai
         # create sub-models
-        self.add_subprocess('LW', AplusBT(state=self.state, **self.param))
+        self.add_subprocess('LW', AplusBT(variables=self, attrs=self.attrs))
         self.add_subprocess('insolation',
-                            P2Insolation(domains=sfc, **self.param))
+                            P2Insolation(variables=self, attrs=self.attrs))
         self.add_subprocess('albedo',
-                            albedo.StepFunctionAlbedo(state=self.state,
-                                                      **self.param))
+                            albedo.StepFunctionAlbedo(variables=self, attrs=self.attrs))        
+        
         # diffusivity in units of 1/s
-        K = self.param['D'] / self.domains['Ts'].heat_capacity
-        self.add_subprocess('diffusion', MeridionalDiffusion(state=self.state,
-                                                             K=K,
-                                                             **self.param))
+        K = (self.D / self.domains['Ts'].grid.heat_capacity(slab))['Ts'].values
+        self.add_subprocess('diffusion', MeridionalDiffusion(variables=self,
+                                                             K=K, attrs=self.attrs)
         self.topdown = False  # call subprocess compute methods first
 
     def _compute_heating_rates(self):
