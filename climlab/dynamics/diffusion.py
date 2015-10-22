@@ -19,23 +19,35 @@ print d.state
 And here is an example of meridional diffusion of temperature
 as a stand-alone process:
 
+REWORKED FOR THE NEW XRAY INTERFACE
+(definitely need to simply the object / state variable creation)
+
 import numpy as np
+import xray
 import climlab
 from climlab.dynamics.diffusion import MeridionalDiffusion
 from climlab.utils import legendre
-sfc = climlab.domain.zonal_mean_surface(num_lat=90, water_depth=10.)
-lat = sfc.lat.points
-initial = 12. - 40. * legendre.P2(np.sin(np.deg2rad(lat)))
-# make a copy of initial so that it remains unmodified
-Ts = climlab.Field(np.array(initial), domain=sfc)
+from climlab.domain import grid
+slab = grid.zonal_mean_surface()
 # thermal diffusivity in W/m**2/degC
 D = 0.55
 # meridional diffusivity in 1/s
-K = D / sfc.heat_capacity
-d = MeridionalDiffusion(state=Ts, K=K)
+K = (D / grid.heat_capacity(slab))['Ts'].values
+d = MeridionalDiffusion(variables=slab, K=K)
+Tarray = (12. - 40. * legendre.P2(np.sin(np.deg2rad(d.lat.values)))).reshape((slab.lat.size, 1))
+Tinitial = xray.DataArray(Tarray, name='Ts', 
+	coords={'lat':slab.lat, 'depth':slab.depth}, dims={'lat', 'depth'})
+d['Ts'] = Tinitial.copy()
+d.Ts.attrs['var_type'] = 'state'
+tend = d.compute()
+d.step_forward()
 d.integrate_years(1.)
 import matplotlib.pyplot as plt
-plt.plot(lat, initial, lat, Ts)
+Tinitial.plot()
+d.Ts.plot()
+plt.show()
+
+This works but seems very slow.
 '''
 
 
@@ -67,29 +79,33 @@ class Diffusion(ImplicitProcess):
                  **kwargs):
         super(Diffusion, self).__init__(**kwargs)
         self.attrs['K'] = K  # Diffusivity in units of [length]**2 / time
-        self.use_banded_solver = use_banded_solver
+        self.attrs['use_banded_solver'] = use_banded_solver
         if diffusion_axis is None:
-            self.diffusion_axis = _guess_diffusion_axis(self)
+            self.attrs['diffusion_axis'] = _guess_diffusion_axis(self)
         else:
-            self.diffusion_axis = diffusion_axis
+            self.attrs['diffusion_axis'] = diffusion_axis
         # This currently only works with evenly spaced points
-        for dom in self.domains.values():
-            delta = np.mean(dom.axes[self.diffusion_axis].delta)
-            bounds = dom.axes[self.diffusion_axis].bounds
-        self.K_dimensionless = (self.K * np.ones_like(bounds) *
-                                self.param['timestep'] / delta**2)
+        delta = self.lat_delta.mean(dim='lat').values
+        bounds = self.lat_bounds
+        #for dom in self.domains.values():
+        #    delta = np.mean(dom.axes[self.diffusion_axis].delta)
+        #    bounds = dom.axes[self.diffusion_axis].bounds
+        K_dimensionless = (self.K * np.ones_like(bounds.values) *
+                                self.timestep / delta**2)
+        #  just sticking with plain numpy implemention here
+        self.attrs['K_dimensionless'] = K_dimensionless
         self.diffTriDiag = _make_diffusion_matrix(self.K_dimensionless)
 
     def _implicit_solver(self):
         # Time-stepping the diffusion is just inverting this matrix problem:
         # self.T = np.linalg.solve( self.diffTriDiag, Trad )
-        newstate = {}
-        for varname, value in self.state.iteritems():
+        newstate = self.state * 0.
+        for varname, value in self.state.data_vars.iteritems():
             if self.use_banded_solver:
                 newvar = _solve_implicit_banded(value, self.diffTriDiag)
             else:
                 newvar = np.linalg.solve(self.diffTriDiag, value)
-            newstate[varname] = newvar
+            newstate[varname] += newvar
         return newstate
 
 
@@ -115,10 +131,11 @@ class MeridionalDiffusion(Diffusion):
         super(MeridionalDiffusion, self).__init__(K=K,
                                                 diffusion_axis='lat', **kwargs)
         self.K_dimensionless *= 1./np.deg2rad(1.)**2
-        for dom in self.domains.values():
-            latax = dom.axes['lat']
-        self.diffTriDiag = \
-            _make_meridional_diffusion_matrix(self.K_dimensionless, latax)
+        #for dom in self.domains.values():
+        #    latax = dom.axes['lat']
+        self.diffTriDiag = (
+            _make_meridional_diffusion_matrix(self.K_dimensionless, 
+               self.lat.values, self.lat_bounds.values))
 
 
 def _make_diffusion_matrix(K, weight1=None, weight2=None):
@@ -147,9 +164,9 @@ def _make_diffusion_matrix(K, weight1=None, weight2=None):
     return A
 
 
-def _make_meridional_diffusion_matrix(K, lataxis):
-    phi_stag = np.deg2rad(lataxis.bounds)
-    phi = np.deg2rad(lataxis.points)
+def _make_meridional_diffusion_matrix(K, latpoints, latbounds):
+    phi_stag = np.deg2rad(latbounds)
+    phi = np.deg2rad(latpoints)
     weight1 = np.cos(phi_stag)
     weight2 = np.cos(phi)
     diag = _make_diffusion_matrix(K, weight1, weight2)
