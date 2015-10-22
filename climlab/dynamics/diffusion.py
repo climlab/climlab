@@ -81,25 +81,24 @@ class Diffusion(ImplicitProcess):
             self.attrs['diffusion_axis'] = diffusion_axis
         # This currently only works with evenly spaced points
         delta = self.lat_delta.mean(dim='lat').values
-        bounds = self.lat_bounds
-        #for dom in self.domains.values():
-        #    delta = np.mean(dom.axes[self.diffusion_axis].delta)
-        #    bounds = dom.axes[self.diffusion_axis].bounds
-        K_dimensionless = (self.K * np.ones_like(bounds.values) *
-                                self.timestep / delta**2)
+        #bounds = self.lat_bounds
+        #K_dimensionless = (self.K * np.ones_like(bounds.values) *
+        #                        self.timestep / delta**2)
+        K_dimensionless = self.lat_bounds * 0.
+        K_dimensionless.values += (self.K * self.timestep / delta**2)
         #  just sticking with plain numpy implemention here
-        self.attrs['K_dimensionless'] = K_dimensionless
-        self.diffTriDiag = _make_diffusion_matrix(self.K_dimensionless)
+        self['K_dimensionless'] = K_dimensionless
+        self.diffTriDiag = _make_diffusion_matrix(self.K_dimensionless.values)
 
     def _implicit_solver(self):
         # Time-stepping the diffusion is just inverting this matrix problem:
         # self.T = np.linalg.solve( self.diffTriDiag, Trad )
         newstate = self.state * 0.
-        for varname, value in self.state.data_vars.iteritems():
+        for varname, var in self.state.data_vars.iteritems():
             if self.use_banded_solver:
-                newvar = _solve_implicit_banded(value, self.diffTriDiag)
+                newvar = _solve_implicit_banded(var.values, self.diffTriDiag)
             else:
-                newvar = np.linalg.solve(self.diffTriDiag, value)
+                newvar = np.linalg.solve(self.diffTriDiag, var.values)
             newstate[varname] += newvar
         return newstate
 
@@ -125,11 +124,11 @@ class MeridionalDiffusion(Diffusion):
                  **kwargs):
         super(MeridionalDiffusion, self).__init__(K=K,
                                                 diffusion_axis='lat', **kwargs)
-        self.K_dimensionless *= 1./np.deg2rad(1.)**2
+        self.K_dimensionless.values *= 1./np.deg2rad(1.)**2
         #for dom in self.domains.values():
         #    latax = dom.axes['lat']
         self.diffTriDiag = (
-            _make_meridional_diffusion_matrix(self.K_dimensionless, 
+            _make_meridional_diffusion_matrix(self.K_dimensionless.values, 
                self.lat.values, self.lat_bounds.values))
 
 

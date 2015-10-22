@@ -17,7 +17,7 @@ from climlab.radiation.AplusBT import AplusBT
 from climlab.radiation.insolation import P2Insolation, AnnualMeanInsolation, DailyInsolation
 from climlab.surface import albedo
 from climlab.dynamics.diffusion import MeridionalDiffusion
-from scipy import integrate]
+from scipy import integrate
 
 
 class EBM(EnergyBudget):
@@ -67,7 +67,7 @@ class EBM(EnergyBudget):
         # diffusivity in units of 1/s
         K = (self.D / self.domains['Ts'].grid.heat_capacity(slab))['Ts'].values
         self.add_subprocess('diffusion', MeridionalDiffusion(variables=self,
-                                                             K=K, attrs=self.attrs)
+                                                             K=K, attrs=self.attrs))
         self.topdown = False  # call subprocess compute methods first
 
     def _compute_heating_rates(self):
