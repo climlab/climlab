@@ -23,18 +23,19 @@ New prototype usage for xray version:
 (need some simpler methods for creating new state variables)
 
 import numpy as np
-import xray
-import climlab
-from climlab.domain import grid
-slab = grid.zonal_mean_surface()
+import xray, climlab
+slab = climlab.domain.grid.zonal_mean_surface()
 Tarray = np.ones_like(slab.lat).reshape((slab.lat.size, 1))
 Tinitial = xray.DataArray(Tarray, name='Ts', 
 	coords={'lat':slab.lat, 'depth':slab.depth}, dims={'lat', 'depth'})
 model = climlab.radiation.AplusBT(variables=slab)
-model['Ts'] = Tinitial
-model.Ts.attrs['var_type'] = 'state'
+model.set_state(Tinitial.copy())
 tend = model.compute()
 model.step_forward()
+import matplotlib.pyplot as plt
+Tinitial.plot()
+model.Ts.plot()
+plt.show()
 
 '''
 from climlab.process.energy_budget import EnergyBudget

@@ -172,6 +172,10 @@ class Process(xray.Dataset):
         '''
         return self._subset_by_var_type('diag')
     
+    def set_state(self, var):
+        '''Assign an xray.DataArray object as state variable of the process.'''
+        self[var.name] = var
+        self[var.name].attrs['var_type'] = 'state'
 #==============================================================================
 #     def set_state(self, name, value):
 #         if isinstance(value, Field):

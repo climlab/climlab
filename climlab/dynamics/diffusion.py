@@ -20,25 +20,20 @@ And here is an example of meridional diffusion of temperature
 as a stand-alone process:
 
 REWORKED FOR THE NEW XRAY INTERFACE
-(definitely need to simply the object / state variable creation)
+(definitely need to simplify the object / state variable creation)
 
 import numpy as np
-import xray
-import climlab
-from climlab.dynamics.diffusion import MeridionalDiffusion
-from climlab.utils import legendre
-from climlab.domain import grid
-slab = grid.zonal_mean_surface()
+import xray, climlab
+slab = climlab.domain.grid.zonal_mean_surface()
 # thermal diffusivity in W/m**2/degC
 D = 0.55
 # meridional diffusivity in 1/s
-K = (D / grid.heat_capacity(slab))['Ts'].values
-d = MeridionalDiffusion(variables=slab, K=K)
-Tarray = (12. - 40. * legendre.P2(np.sin(np.deg2rad(d.lat.values)))).reshape((slab.lat.size, 1))
+K = (D / climlab.domain.grid.heat_capacity(slab))['Ts'].values
+d = climlab.dynamics.diffusion.MeridionalDiffusion(variables=slab, K=K)
+Tarray = (12. - 40. * climlab.utils.legendre.P2(np.sin(np.deg2rad(d.lat.values)))).reshape((slab.lat.size, 1))
 Tinitial = xray.DataArray(Tarray, name='Ts', 
 	coords={'lat':slab.lat, 'depth':slab.depth}, dims={'lat', 'depth'})
-d['Ts'] = Tinitial.copy()
-d.Ts.attrs['var_type'] = 'state'
+d.set_state(Tinitial.copy())
 tend = d.compute()
 d.step_forward()
 d.integrate_years(1.)
