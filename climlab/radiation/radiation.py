@@ -16,6 +16,7 @@ class Radiation(EnergyBudget):
     def __init__(self, absorptivity=None, reflectivity=None, 
                  albedo_sfc=0, **kwargs):
         super(Radiation, self).__init__(**kwargs)
+        #  this shoul really all be packed into self.input        
         if reflectivity is None:
             reflectivity = np.zeros_like(self.Tatm)
         if absorptivity is None:
@@ -27,7 +28,7 @@ class Radiation(EnergyBudget):
         self.flux_to_sfc = np.zeros_like(self.Ts)
         self.flux_from_sfc = np.zeros_like(self.Ts)
         self.flux_to_space = np.zeros_like(self.Ts)
-        self.heating_rate['Ts'] = np.zeros_like(self.Ts)
+        #self.heating_rate['Ts'] = np.zeros_like(self.Ts)
         
     @property
     def absorptivity(self):

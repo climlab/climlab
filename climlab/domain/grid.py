@@ -9,6 +9,21 @@ from climlab.utils import heat_capacity as _heat_capacity
 #  Just want some convenience functions that create state variable datasets
 #  with appropriate grid information
 
+def zonal_mean_surface(num_lat=90, water_depth=10., lat=None, **kwargs):
+    if lat is None:
+        latax = create_axis(axis_type='lat', num_points=num_lat)
+    elif isinstance(lat, xray.Dataset):
+        latax = lat
+    else:
+        try:
+            latax = create_axis(axis_type='lat', points=lat)
+        except:
+            raise ValueError('lat must be Axis object or latitude array')
+    depthax = create_axis(axis_type='depth', bounds=[water_depth, 0.])
+    
+    return latax.update(depthax)
+    
+
 def single_column(num_lev=30, water_depth=1., lev=None, **kwargs):
     '''Convenience method to create domains for a single column of atmosphere
     overlying a slab of water.
@@ -44,6 +59,9 @@ def single_column(num_lev=30, water_depth=1., lev=None, **kwargs):
 
 
 def heat_capacity(grid_data):
-    atm = _heat_capacity.atmosphere(grid_data.lev_delta)
-    ocn = _heat_capacity.ocean(grid_data.depth_delta)
-    return xray.Dataset(variables={'C_atm': atm, 'C_ocn': ocn})
+    vars = {}
+    if 'lev_delta' in grid_data:
+	    vars['Tatm'] = _heat_capacity.atmosphere(grid_data.lev_delta)
+    if 'depth_delta' in grid_data:
+        vars['Ts'] = _heat_capacity.ocean(grid_data.depth_delta)
+    return xray.Dataset(variables=vars)

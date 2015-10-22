@@ -106,8 +106,9 @@ class TimeDependentProcess(Process):
         #    full_diagnostics.update(diagnostics)
         ##  apply the tendencies
            #  this for now is just for explicit timesteps
-        net_tendency = self.compute()        
-        self += net_tendency * self.timestep
+        net_tendency = self.compute()
+        for name, var in self.state.data_vars.iteritems():
+            var += net_tendency[name] * self.timestep    
         ## Now compute all implicit processes -- matrix inversions
         #net_adjustment = self * 0.
         #for proc in self.process_types['implicit']:
@@ -128,7 +129,7 @@ class TimeDependentProcess(Process):
 #        for name, proc, level in walk_processes(self):
 #            self.diagnostics.update(proc.diagnostics)
 #            proc._update_time()
-        return diagnostics
+
 
 #    def compute_diagnostics(self, num_iter=3):
 #        '''Compute all tendencies and diagnostics, but don't update model state.

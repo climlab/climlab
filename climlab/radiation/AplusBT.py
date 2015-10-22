@@ -20,17 +20,21 @@ print olr.state
 
 
 New prototype usage for xray version:
+(need some simpler methods for creating new state variables)
 
 import numpy as np
 import xray
 import climlab
-latarray = np.arange(-90,90.)
-Tarray = np.ones_like(latarray)
-da = xray.DataArray(data=Tarray, coords={'lat':latarray})
-da.attrs['var_type'] = 'state'
-model = climlab.radiation.AplusBT(variables={'Ts':da})
-model['heat_capacity'] = xray.DataArray(model.Ts) *400
-model.compute()
+from climlab.domain import grid
+slab = grid.zonal_mean_surface()
+Tarray = np.ones_like(slab.lat).reshape((slab.lat.size, 1))
+Tinitial = xray.DataArray(Tarray, name='Ts', 
+	coords={'lat':slab.lat, 'depth':slab.depth}, dims={'lat', 'depth'})
+model = climlab.radiation.AplusBT(variables=slab)
+model['Ts'] = Tinitial
+model.Ts.attrs['var_type'] = 'state'
+tend = model.compute()
+model.step_forward()
 
 '''
 from climlab.process.energy_budget import EnergyBudget

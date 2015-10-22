@@ -1,7 +1,7 @@
 import numpy as np
 from climlab.process.time_dependent_process import TimeDependentProcess
 import xray
-
+from climlab.domain import grid
 
 class EnergyBudget(TimeDependentProcess):
     '''Parent class for explicit energy budget processes.
@@ -23,7 +23,8 @@ class EnergyBudget(TimeDependentProcess):
     def _temperature_tendencies(self):
         heating_rates = self._compute_heating_rates()
         #  Need to set up heat capacity as a Dataset with variables as process
-        tendencies = heating_rates / self.heat_capacity
+        heat_capacity = grid.heat_capacity(self)        
+        tendencies = heating_rates / heat_capacity
         return tendencies
         
     def _compute(self):

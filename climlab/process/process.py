@@ -147,7 +147,12 @@ class Process(xray.Dataset):
     
     def _subset_by_var_type(self, type):
     	'''Return a new xray.Dataset object containing just variables of specified type.'''
-    	typedict = {key:value for key,value in self.data_vars.items() if value.var_type is type}
+    	typedict = {}
+    	for name, var in self.data_vars.iteritems():
+            if 'var_type' in var.attrs:
+                if var.var_type is type:
+                    typedict[name] = var
+    	#typedict = {key:value for key,value in self.data_vars.items() if value.var_type is type}
     	return xray.Dataset(typedict)
     	
     @property
