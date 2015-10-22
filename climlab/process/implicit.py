@@ -5,7 +5,7 @@ class ImplicitProcess(TimeDependentProcess):
     '''Parent class for modules that use implicit time discretization.'''
     def __init__(self, **kwargs):
         super(ImplicitProcess, self).__init__(**kwargs)
-        self.time_type = 'implicit'
+        self.attrs['process_type'] = 'implicit'
         self.adjustment = {}
 
     def compute(self):

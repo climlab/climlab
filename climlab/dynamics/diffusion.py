@@ -66,7 +66,7 @@ class Diffusion(ImplicitProcess):
                  use_banded_solver=False,
                  **kwargs):
         super(Diffusion, self).__init__(**kwargs)
-        self.param['K'] = K  # Diffusivity in units of [length]**2 / time
+        self.attrs['K'] = K  # Diffusivity in units of [length]**2 / time
         self.use_banded_solver = use_banded_solver
         if diffusion_axis is None:
             self.diffusion_axis = _guess_diffusion_axis(self)
@@ -76,7 +76,7 @@ class Diffusion(ImplicitProcess):
         for dom in self.domains.values():
             delta = np.mean(dom.axes[self.diffusion_axis].delta)
             bounds = dom.axes[self.diffusion_axis].bounds
-        self.K_dimensionless = (self.param['K'] * np.ones_like(bounds) *
+        self.K_dimensionless = (self.K * np.ones_like(bounds) *
                                 self.param['timestep'] / delta**2)
         self.diffTriDiag = _make_diffusion_matrix(self.K_dimensionless)
 
