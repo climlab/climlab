@@ -1,3 +1,46 @@
+'''
+Principles of the new `climlab` API design:
+
+- `climlab.Process` object has several dictionaries of named, gridded variables:
+    - `process.state`
+    - `process.diagnostic`
+    - `process.input`
+    - `process.param`  (which are basically just scalar input)
+- `climlab` will remain (as much as possible) agnostic about the data formats
+- But each dictionary will actually be a `xray.Dataset` object
+- Many variables will be accessible as attributes `process.name`
+    - this restricts to unique field names in the above dictionaries
+- There may be other dictionaries that do have name conflicts
+    - e.g. dictionary of heat capacity, with same keys as `process.state`
+    - These will *not* be accessible as `process.name`
+    - but *will* be accessible as `process.dict_name.name`
+    (as well as regular dict interface)
+    - will use `property` declarations as needed, e.g. to allow
+    `process.Ts.heat_capacity` to reference `process.heat_capacity['Ts']` 
+- Grid information (axes) will be accessible as attributes of variables
+    - e.g. `process.Ts.lat`
+    - This will be automatic if fields are stored as `xray.DataArray` objects
+    - Shortcuts like `process.lat` will work where these are unambiguous
+- There will be a dictionary of named subprocesses `process.subprocess`
+- Each item in subprocess dict will itself be a `climlab.Process` object
+- subprocesses should also be accessible as process attributes
+- `process.compute()`) is a method that computes tendencies (d/dt)
+    - returns a dictionary (or `xray.Dataset`) of tendencies for all state vars
+    - keys for this dictionary are same as keys of state dictionary
+    - tendency dictionary is the total tendency including all subprocesses
+    - method only computes d/dt, does not apply changes
+    - thus method is relatively independent of numerical scheme
+        - may need to make exception for implicit scheme?
+    - method *will* update diagnostic variables
+- `process.step_forward()` updates the state variables
+    - calls `process.compute()` to get current tendencies
+    - implements a particular time-stepping scheme
+    - user interface is agnostic about numerical scheme
+- `process.integrate_years()` etc will automate time-stepping
+    - also computation of time-average diagnostics.
+
+
+'''
 import time, copy
 import numpy as np
 #from climlab.domain.field import Field
@@ -5,7 +48,8 @@ import numpy as np
 from climlab.utils import walk
 import xray
 
-#  New concept: 
+
+#  New concept:
 #   every climlab process is actually a subclass of xray.Dataset
 #   which is an in-memory netcdf-like database of N-dimensional gridded data
 #  So will no longer use custom Field and Domain classes
@@ -53,7 +97,7 @@ import xray
 
 #  The step_forward() method will no longer have to 'walk the subprocess tree'
 #  because the compute() method of the top-level process will automatically call all
-#  the underlying subprocesses. No process needs (or should) search deeper in the tree 
+#  the underlying subprocesses. No process needs (or should) search deeper in the tree
 #  than its own immediate subprocesses.
 
 def _make_dict(arg, argtype):
@@ -101,7 +145,7 @@ class Process(xray.Dataset):
 #            self.subprocess = {}
 #        else:
 #            self.add_subprocesses(subprocess)
-    def __init__(self, lat=None, lev=None, num_lat=None, num_levels=None, 
+    def __init__(self, lat=None, lev=None, num_lat=None, num_levels=None,
                  subprocess=None, **kwargs):
         coords = {}
         if lat is not None:
@@ -144,7 +188,7 @@ class Process(xray.Dataset):
         name: name of the subprocess (str)'''
         self.subprocess.pop(name, None)
         self.has_process_type_list = False
-    
+
     def _subset_by_var_type(self, type):
     	'''Return a new xray.Dataset object containing just variables of specified type.'''
     	typedict = {}
@@ -154,7 +198,7 @@ class Process(xray.Dataset):
                     typedict[name] = var
     	#typedict = {key:value for key,value in self.data_vars.items() if value.var_type is type}
     	return xray.Dataset(typedict)
-    	
+
     @property
     def state(self):
         '''Returns a new xray.Dataset object containing just state variables.
@@ -171,7 +215,7 @@ class Process(xray.Dataset):
         '''Dictionary of xray.DataArray objects corresponding to input variables
         '''
         return self._subset_by_var_type('diag')
-    
+
     def set_state(self, var):
         '''Assign an xray.DataArray object as state variable of the process.'''
         self[var.name] = var
@@ -195,14 +239,14 @@ class Process(xray.Dataset):
 #         # set the state dictionary
 #         self.state[name] = value
 #         setattr(self, name, value)
-# 
+#
 #     def _guess_state_domains(self):
 #         for name, value in self.state.iteritems():
 #             for domname, dom in self.domains.iteritems():
 #                 if value.shape == dom.shape:
 #                     # same shape, assume it's the right domain
 #                     self.state_domain[name] = dom
-# 
+#
 #     # Some handy shortcuts... only really make sense when there is only
 #     # a single axis of that type in the process.
 #     @property
@@ -216,7 +260,7 @@ class Process(xray.Dataset):
 #             return thislat
 #         except:
 #             raise ValueError('Can\'t resolve a lat axis.')
-# 
+#
 #     @property
 #     def lat_bounds(self):
 #         try:
@@ -294,7 +338,7 @@ class Process(xray.Dataset):
 #             return thisdepth
 #         except:
 #             raise ValueError('Can\'t resolve a depth axis.')
-# 
+#
 #==============================================================================
 
 def process_like(proc):
