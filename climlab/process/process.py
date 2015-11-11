@@ -16,7 +16,7 @@ Principles of the new `climlab` API design:
     - but *will* be accessible as `process.dict_name.name`
     (as well as regular dict interface)
     - will use `property` declarations as needed, e.g. to allow
-    `process.Ts.heat_capacity` to reference `process.heat_capacity['Ts']` 
+    `process.Ts.heat_capacity` to reference `process.heat_capacity['Ts']`
 - Grid information (axes) will be accessible as attributes of variables
     - e.g. `process.Ts.lat`
     - This will be automatic if fields are stored as `xray.DataArray` objects
@@ -39,52 +39,28 @@ Principles of the new `climlab` API design:
 - `process.integrate_years()` etc will automate time-stepping
     - also computation of time-average diagnostics.
 
-
+Notes on implementation:
+- Regardless of details of storage, `process.state` must give an iterable dict
+over *only* the state variables
+- probably best to use internal storage and properties:
+    - `process._state` is of type `xray.Dataset`
+    - `process.state` is a property that returns `process._state.data_vars` only
+    - same for other dictionaries: input, diagnostics, etc.
+    - None of the public API should be dependent on `xray.Dataset` features
+    -  NEED TO CHOOSE diagnostic vs diagnostics...
+    - as much as possible, use properties to re-enable the v0.2 features of
+    domains and grids
+- `process.param` should be stored internally as `process._state.attrs`
+so they are always tied to state variables.
 '''
+
 import time, copy
 import numpy as np
 #from climlab.domain.field import Field
 #from climlab.domain.domain import _Domain
-from climlab.utils import walk
+from climlab.utils import walk, attr_dict
 import xray
-
-
-#  New concept:
-#   every climlab process is actually a subclass of xray.Dataset
-#   which is an in-memory netcdf-like database of N-dimensional gridded data
-#  So will no longer use custom Field and Domain classes
-
-#  Scalar parameters will be stored in the attributes dictionary .attrs
-#  which means they are always accessible as process.param_name
-
-#  Each process will have several different kinds of data, aside from scalar params:
-#   - state variables
-#	- input data
-#	- diagnostics
-
-#  These will all be stored as xray.DataArrays in the Process object, and thus accessible
-#  either through the .data_vars dict interface or directly as attributes of the Process
-
-#  But, importantly, we will extend the Dataset interface to distinguish between different
-#  types of data. Each DataArray will have an attribute 'var_type' to declare whether it is
-#  state, input, diag, and maybe others
-
-#  This will extend the Dataset.data_vars attribute. Look at the xray code and emulate it.
-
-#  There will be an attribute like Dataset.data_vars that returns dictionaries of just
-#  specific types of variables, so Process.state will return dict of state vars
-#   just like it did in climlab v 0.2.x
-
-#  Because all data is ultimately stored in a single object / dictionary,
-#   there is a restriction on names. Can't store tendencies with same names as state vars
-#  But that's okay and will actually clean up the interface
-
-#  Because the compute() method for each process will take current state and input data
-#   and RETURN a new Dataset with the tendencies (with same keys as state vars)
-#  (which CAN be attached as attributes of the Process object, but
-#   probably better and cleaner not to do this)
-#  If you want to store and retain tendencies, better for the Process to
-#  create a diagnostic variable with a descriptive name, e.g. Ts_tendency
+from xray.core.utils import is_dict_like
 
 #  I am also changing the logic for handling subprocesses.
 #  In the spirit of modular, self-contained Processes, each Process object has a data type
@@ -100,29 +76,30 @@ import xray
 #  the underlying subprocesses. No process needs (or should) search deeper in the tree
 #  than its own immediate subprocesses.
 
-def _make_dict(arg, argtype):
-    if arg is None:
-        return {}
-    elif type(arg) is dict:
-        return arg
-    elif isinstance(arg, argtype):
-        return {'default': arg}
-    else:
-        raise ValueError('Problem with input type')
+# def _make_dict(arg, argtype):
+#     if arg is None:
+#         return {}
+#     elif type(arg) is dict:
+#         return arg
+#     elif isinstance(arg, argtype):
+#         return {'default': arg}
+#     else:
+#         raise ValueError('Problem with input type')
 
 
-class Process(xray.Dataset):
+class Process(object):
     '''A generic parent class for all climlab process objects.
     Every process object has a set of state variables on a spatial grid.
     '''
-#    def __str__(self):
-#        str1 = 'climlab Process of type {0}. \n'.format(type(self))
-#        str1 += 'State variables and domain shapes: \n'
-#        for varname in self.state.keys():
-#            str1 += '  {0}: {1} \n'.format(varname, self.domains[varname].shape)
-#        str1 += 'The subprocess tree: \n'
-#        str1 += walk.process_tree(self)
-#        return str1
+
+    def __str__(self):
+        str1 = 'climlab Process of type {0}. \n'.format(type(self))
+        str1 += 'State variables and domain shapes: \n'
+        for varname in self.state.keys():
+            str1 += '  {0}: {1} \n'.format(varname, self.domains[varname].shape)
+        str1 += 'The subprocess tree: \n'
+        str1 += walk.process_tree(self)
+        return str1
 
 #    def __init__(self, state=None, domains=None, subprocess=None,
 #                 lat=None, lev=None, num_lat=None, num_levels=None,
@@ -145,8 +122,9 @@ class Process(xray.Dataset):
 #            self.subprocess = {}
 #        else:
 #            self.add_subprocesses(subprocess)
-    def __init__(self, lat=None, lev=None, num_lat=None, num_levels=None,
-                 subprocess=None, **kwargs):
+    def __init__(self, state=None, subprocess=None,
+                     lat=None, lev=None, num_lat=None, num_levels=None,
+                     input=None, param=None, **kwargs):
         coords = {}
         if lat is not None:
             coords.update({'lat': lat})
@@ -155,71 +133,100 @@ class Process(xray.Dataset):
         super(Process, self).__init__(coords=coords, **kwargs)
         self.attrs['creation_date'] = time.strftime("%a, %d %b %Y %H:%M:%S %z",
                                            time.localtime())
-        # subprocess is a dictionary of any sub-processes
+        # subprocess is an ordered dictionary of sub-processes
         if subprocess is None:
-            self.subprocess = {}
+            self.subprocess = attr_dict.OrderedAttrDict()
         else:
-            self.add_subprocesses(subprocess)
+            if is_dict_like(subprocess):
+                self.subprocess = attr_dict.OrderedAttrDict(subprocess)
+            else:
+                raise ValueError('Need a dict-like container of subproceses.')
+            #self.add_subprocesses(subprocess)
 
-    def add_subprocesses(self, procdict):
-        '''Add a dictionary of subproceses to this process.
-        procdict is dictionary with process names as keys.
-
-        Can also pass a single process, which will be called \'default\'
-        '''
-        if isinstance(procdict, Process):
-            self.add_subprocess('default', procdict)
+        if input is None:
+            self.input = attr_dict.AttrDict()
         else:
-            for name, proc in procdict.iteritems():
-                self.add_subprocess(name, proc)
+            if is_dict_like(input):
+                self.input = attr_dict.AttrDict(input)
+            else:
+                raise ValueError('Need a dict-like container of input.')
 
-    def add_subprocess(self, name, proc):
-        '''Add a single subprocess to this process.
-        name: name of the subprocess (str)
-        proc: a Process object.'''
-        if isinstance(proc, Process):
-            self.subprocess.update({name: proc})
-            self.has_process_type_list = False
-        else:
-            raise ValueError('subprocess must be Process object')
+        self.diagnostic = attr_dict.AttrDict()
 
-    def remove_subprocess(self, name):
-        '''Remove a single subprocess from this process.
-        name: name of the subprocess (str)'''
-        self.subprocess.pop(name, None)
-        self.has_process_type_list = False
+    # def add_subprocesses(self, procdict):
+    #     '''Add a dictionary of subproceses to this process.
+    #     procdict is dictionary with process names as keys.
+    #
+    #     Can also pass a single process, which will be called \'default\'
+    #     '''
+    #     if isinstance(procdict, Process):
+    #         self.add_subprocess('default', procdict)
+    #     else:
+    #         for name, proc in procdict.iteritems():
+    #             self.add_subprocess(name, proc)
+    #
+    # def add_subprocess(self, name, proc):
+    #     '''Add a single subprocess to this process.
+    #     name: name of the subprocess (str)
+    #     proc: a Process object.'''
+    #     if isinstance(proc, Process):
+    #         self.subprocess.update({name: proc})
+    #         self.has_process_type_list = False
+    #     else:
+    #         raise ValueError('subprocess must be Process object')
+    #
+    # def remove_subprocess(self, name):
+    #     '''Remove a single subprocess from this process.
+    #     name: name of the subprocess (str)'''
+    #     self.subprocess.pop(name, None)
+    #     self.has_process_type_list = False
 
-    def _subset_by_var_type(self, type):
-    	'''Return a new xray.Dataset object containing just variables of specified type.'''
-    	typedict = {}
-    	for name, var in self.data_vars.iteritems():
-            if 'var_type' in var.attrs:
-                if var.var_type is type:
-                    typedict[name] = var
-    	#typedict = {key:value for key,value in self.data_vars.items() if value.var_type is type}
-    	return xray.Dataset(typedict)
+    # def _subset_by_var_type(self, type):
+    # 	'''Return a new xray.Dataset object containing just variables of specified type.'''
+    # 	typedict = {}
+    # 	for name, var in self.data_vars.iteritems():
+    #         if 'var_type' in var.attrs:
+    #             if var.var_type is type:
+    #                 typedict[name] = var
+    # 	#typedict = {key:value for key,value in self.data_vars.items() if value.var_type is type}
+    # 	return xray.Dataset(typedict)
 
     @property
     def state(self):
         '''Returns a new xray.Dataset object containing just state variables.
         '''
-        return self._subset_by_var_type('state')
-    @property
-    def input(self):
-        '''Returns a new xray.Dataset object containing just state variables.
-        '''
-        return self._subset_by_var_type('input')
+        #return self._subset_by_var_type('state')
+        return self.data_vars
 
     @property
-    def diagnostics(self):
-        '''Dictionary of xray.DataArray objects corresponding to input variables
-        '''
-        return self._subset_by_var_type('diag')
+    def param(self):
+        return self.attrs
+    @param.setter
+    def param(self, paramdict):
+        if is_dict_like(paramdict):
+            for name, value in paramdict.iteritems():
+                self.attrs[name] = value
+        else:
+            raise ValueError('param must be a dict-like collection')
+
+
+    # @property
+    # def input(self):
+    #     '''Returns a new xray.Dataset object containing just state variables.
+    #     '''
+    #     return self._subset_by_var_type('input')
+    #
+    # @property
+    # def diagnostics(self):
+    #     '''Dictionary of xray.DataArray objects corresponding to input variables
+    #     '''
+    #     return self._subset_by_var_type('diag')
 
     def set_state(self, var):
         '''Assign an xray.DataArray object as state variable of the process.'''
         self[var.name] = var
-        self[var.name].attrs['var_type'] = 'state'
+        #self[var.name].attrs['var_type'] = 'state'
+
 #==============================================================================
 #     def set_state(self, name, value):
 #         if isinstance(value, Field):

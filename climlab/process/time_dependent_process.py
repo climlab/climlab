@@ -43,10 +43,10 @@ class TimeDependentProcess(Process):
                      'days_of_year': days_of_year}
         self.attrs['timestep'] = timestep
 
-    #  new concept: there really shouldn't be any need to *walk* the 
+    #  new concept: there really shouldn't be any need to *walk* the
      # process tree!  Each process should compute the complete tendencies
-    #  due to itself and all its subprocesses! 
-    #  So basically the iterating through subprocesses should occur in the 
+    #  due to itself and all its subprocesses!
+    #  So basically the iterating through subprocesses should occur in the
     #  compute method, NOT the step_forward method
     def compute(self):
         '''Compute tendencies for all state variables given
@@ -66,23 +66,25 @@ class TimeDependentProcess(Process):
                 tend_sub = proc.compute()
                 tendencies += tend_sub
 				#diagnostics.merge(diag_sub)
-            tendencies += self._compute()        
+            tendencies += self._compute()
         return tendencies
-       
+
     def _compute(self):
-        # where the tendencies are actually computed... 
+        # where the tendencies are actually computed...
         #  needs to be implemented for each daughter class
-        tendencies = self.state * 0.
+        tendencies = {}
+        for name, value in self.state.iteritems():
+            tendencies[name] = value * 0.
         return tendencies
 
 #    def _build_process_type_list(self):
 #        '''Generate lists of processes organized by process type
 #        Currently, this can be 'diagnostic', 'explicit', 'implicit', or 'adjustment'.'''
-#        self.process_types = {'diagnostic': [], 'explicit': [], 'implicit': [], 'adjustment': []}        
+#        self.process_types = {'diagnostic': [], 'explicit': [], 'implicit': [], 'adjustment': []}
 #        for name, proc, level in walk_processes(self, topdown=self.topdown):
 #            self.process_types[proc.time_type].append(proc)
 #        self.attrs['has_process_type_list'] = True
-        
+
     def step_forward(self):
         '''new oop climlab... just loop through processes
         and add up the tendencies'''
@@ -107,8 +109,8 @@ class TimeDependentProcess(Process):
         ##  apply the tendencies
            #  this for now is just for explicit timesteps
         net_tendency = self.compute()
-        for name, var in self.state.data_vars.iteritems():
-            var += net_tendency[name] * self.timestep    
+        for name, var in self.state.iteritems():
+            var += net_tendency[name] * self.timestep
         ## Now compute all implicit processes -- matrix inversions
         #net_adjustment = self * 0.
         #for proc in self.process_types['implicit']:
@@ -190,7 +192,7 @@ class TimeDependentProcess(Process):
         #for varname in self.timeave.keys():
         #    self.timeave[varname] /= numsteps
         if verbose:
-            print("Total elapsed time is %s years." 
+            print("Total elapsed time is %s years."
                   % str(self.time['days_elapsed']/const.days_per_year))
 
     def integrate_days(self, days=1.0, verbose=True):
