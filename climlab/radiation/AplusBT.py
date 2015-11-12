@@ -26,8 +26,10 @@ import numpy as np
 import xray, climlab
 slab = climlab.domain.grid.zonal_mean_surface()
 Tarray = np.ones_like(slab.lat).reshape((slab.lat.size, 1))
-Tinitial = xray.DataArray(Tarray, name='Ts', 
-	coords={'lat':slab.lat, 'depth':slab.depth}, dims={'lat', 'depth'})
+Tinitial = xray.DataArray(Tarray, name='Ts',
+	coords={'lat':slab.lat, 'depth':slab.depth,
+	'depth_bounds':slab.depth_bounds},
+	dims={'lat', 'depth', 'depth_bounds'})
 model = climlab.radiation.AplusBT(variables=slab)
 model.set_state(Tinitial.copy())
 tend = model.compute()
@@ -46,34 +48,34 @@ class AplusBT(EnergyBudget):
     Should be invoked with a single temperature state variable.'''
     def __init__(self, A=200., B=2., **kwargs):
         super(AplusBT, self).__init__(**kwargs)
-        self.attrs['A'] = A
-        self.attrs['B'] = B
-#
-#    @property
-#    def A(self):
-#        return self._A
-#    @A.setter
-#    def A(self, value):
-#        self._A = value
-#        self.param['A'] = value
-#    @property
-#    def B(self):
-#        return self._B
-#    @B.setter
-#    def B(self, value):
-#        self._B = value
-#        self.param['B'] = value
-#    
+        #self.attrs['A'] = A
+        #self.attrs['B'] = B
+        self.A = A
+        self.B = B
+
+    @property
+    def A(self):
+        return self.param['A']
+    @A.setter
+    def A(self, value):
+        self.param['A'] = value
+    @property
+    def B(self):
+        return self.param['B']
+    @B.setter
+    def B(self, value):
+        self.param['B'] = value
+
 #    def emission(self):
 #        for varname, value in self.state.iteritems():
 #            flux = self.A + self.B * value
 #            self.OLR = flux
 #            self.diagnostics['OLR'] = self.OLR
-    
+
     def _compute_heating_rates(self):
         '''Compute energy flux convergences to get heating rates in W / m**2.'''
         flux = self.A + self.B * self.Ts
-        flux.attrs['var_type'] = 'diag'
-        self['OLR'] = flux
+        #flux.attrs['var_type'] = 'diag'
+        self.diagnostic['OLR'] = flux
         heating_rates = -flux
         return heating_rates

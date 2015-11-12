@@ -17,8 +17,10 @@ class TimeDependentProcess(Process):
             self.set_timestep()
         else:
             self.set_timestep(timestep=timestep)
-        self.attrs['time_type'] = time_type
-        self.attrs['topdown'] = topdown
+        #self.attrs['time_type'] = time_type
+        #self.attrs['topdown'] = topdown
+        self.time_type = time_type
+        self.topdown = topdown
         #self.attrs['has_process_type_list'] = False
 
     def set_timestep(self, timestep=const.seconds_per_day, num_steps_per_year=None):
@@ -41,8 +43,9 @@ class TimeDependentProcess(Process):
                      'days_elapsed': 0,
                      'years_elapsed': 0,
                      'days_of_year': days_of_year}
-        self.attrs['timestep'] = timestep
-
+        #self.attrs['timestep'] = timestep
+        self.timestep = timestep
+        
     #  new concept: there really shouldn't be any need to *walk* the
      # process tree!  Each process should compute the complete tendencies
     #  due to itself and all its subprocesses!

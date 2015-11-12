@@ -95,9 +95,10 @@ class Process(object):
     def __str__(self):
         str1 = 'climlab Process of type {0}. \n'.format(type(self))
         str1 += 'State variables and domain shapes: \n'
-        for varname in self.state.keys():
-            str1 += '  {0}: {1} \n'.format(varname, self.domains[varname].shape)
-        str1 += 'The subprocess tree: \n'
+        #for varname in self.state.keys():
+        #    str1 += '  {0}: {1} \n'.format(varname, self.domains[varname].shape)
+        str1 += self._state.__str__()
+        str1 += '\n The subprocess tree: \n'
         str1 += walk.process_tree(self)
         return str1
 
@@ -130,9 +131,21 @@ class Process(object):
             coords.update({'lat': lat})
         if lev is not None:
             coords.update({'lev': lev})
-        super(Process, self).__init__(coords=coords, **kwargs)
-        self.attrs['creation_date'] = time.strftime("%a, %d %b %Y %H:%M:%S %z",
-                                           time.localtime())
+        if param is not None:
+            param.update(kwargs)
+        else:
+            param = {}
+        self._state = xray.Dataset(coords=coords, attrs=param)
+        self.param = self._state.attrs
+        #super(Process, self).__init__(coords=coords, **kwargs)
+        #self.attrs['creation_date'] = time.strftime("%a, %d %b %Y %H:%M:%S %z",
+        #                                   time.localtime())
+        self.creation_date = time.strftime("%a, %d %b %Y %H:%M:%S %z",
+                                            time.localtime())
+        #if param is not None:
+        #    self.param = param
+        #else:
+        #    self.param = kwargs
         # subprocess is an ordered dictionary of sub-processes
         if subprocess is None:
             self.subprocess = attr_dict.OrderedAttrDict()
@@ -152,6 +165,9 @@ class Process(object):
                 raise ValueError('Need a dict-like container of input.')
 
         self.diagnostic = attr_dict.AttrDict()
+        # Make all state variables accessible as process attributes
+        for name, var in self.state.iteritems():
+            setattr(self, name, var)
 
     # def add_subprocesses(self, procdict):
     #     '''Add a dictionary of subproceses to this process.
@@ -196,18 +212,22 @@ class Process(object):
         '''Returns a new xray.Dataset object containing just state variables.
         '''
         #return self._subset_by_var_type('state')
-        return self.data_vars
+        return self._state.data_vars
 
-    @property
-    def param(self):
-        return self.attrs
-    @param.setter
-    def param(self, paramdict):
-        if is_dict_like(paramdict):
-            for name, value in paramdict.iteritems():
-                self.attrs[name] = value
-        else:
-            raise ValueError('param must be a dict-like collection')
+    # the param dictionary will be stored internally as attributes
+    #  in the _state object which is xray.Dataset
+    #  does this work? what if I set self.param[name] = value?
+    #  is that stored in self._state.attrs[name] ?
+    #@property
+    #def param(self):
+    #    return self._state.attrs
+    # @param.setter
+    # def param(self, paramdict):
+    #     if is_dict_like(paramdict):
+    #         for name, value in paramdict.iteritems():
+    #             self._state.attrs[name] = value
+    #     else:
+    #         raise ValueError('param must be a dict-like collection')
 
 
     # @property
@@ -224,7 +244,11 @@ class Process(object):
 
     def set_state(self, var):
         '''Assign an xray.DataArray object as state variable of the process.'''
-        self[var.name] = var
+        self._state[var.name] = var
+        setattr(self, var.name, var)
+        # make coordinate data available
+        for name, var in self._state.coords.iteritems():
+            setattr(self, name, var)
         #self[var.name].attrs['var_type'] = 'state'
 
 #==============================================================================
