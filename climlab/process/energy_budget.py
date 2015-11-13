@@ -2,6 +2,8 @@ import numpy as np
 from climlab.process.time_dependent_process import TimeDependentProcess
 import xray
 from climlab.domain import grid
+from climlab.utils import heat_capacity as _heat_capacity
+
 
 class EnergyBudget(TimeDependentProcess):
     '''Parent class for explicit energy budget processes.
@@ -13,7 +15,7 @@ class EnergyBudget(TimeDependentProcess):
         #self.attrs['process_type'] = 'explicit'
         self.process_type = 'explicit'
         #self.heating_rate = {}
-        self.heat_capacity = grid.heat_capacity(self.state)
+        self._set_heat_capacity()
 
     def _compute_heating_rates(self):
         '''Compute energy flux convergences to get heating rates in W / m**2.
@@ -27,7 +29,7 @@ class EnergyBudget(TimeDependentProcess):
         try:
             tendencies = heating_rates / self.heat_capacity
         except:
-            self.heat_capacity = grid.heat_capacity(self.state)
+            self._set_heat_capacity()
             tendencies = heating_rates / self.heat_capacity
         return tendencies
 
@@ -35,6 +37,18 @@ class EnergyBudget(TimeDependentProcess):
         '''Update all diagnostic quantities using current model state.'''
         tendencies = self._temperature_tendencies()
         return tendencies
+
+    def _set_heat_capacity(self):
+        self.heat_capacity = self._state * 0. + 1
+        try:
+            self.heat_capacity['Tatm'] *= _heat_capacity.atmosphere(self.lev_delta.values)
+        except:
+            pass
+        try:
+            self.heat_capacity['Ts'] *= _heat_capacity.ocean(self.depth_delta.values)
+        except:
+            pass
+
 
 #==============================================================================
 #

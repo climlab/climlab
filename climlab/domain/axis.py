@@ -99,7 +99,7 @@ class Axis(object):
         self.points = points
         self.bounds = bounds
         self.delta = np.abs(np.diff(self.bounds))
-        
+
 
 def create_axis(axis_type='abstract', num_points=10, points=None, bounds=None):
     '''Create a new climlab Axis object
@@ -180,12 +180,14 @@ def create_axis(axis_type='abstract', num_points=10, points=None, bounds=None):
     name_points = axis_type
     name_bounds = axis_type + '_bounds'
     name_delta = axis_type + '_delta'
+    delta = np.abs(np.diff(bounds))
     #  create a new dataset with just these two coordinate arrays
-    ax = xray.Dataset(coords={name_points: points, name_bounds: bounds})
+    ax = xray.Dataset(coords={name_points: points, name_bounds: bounds,
+                              name_delta: delta})
     ax[name_points].attrs['units'] = defaultUnits[axis_type]
     ax[name_bounds].attrs['units'] = defaultUnits[axis_type]
-    ax[name_delta] = xray.DataArray(np.abs(np.diff(ax[name_bounds])),
-                                    coords={name_points: ax[name_points]})
+    #ax[name_delta] = xray.DataArray(np.abs(np.diff(ax[name_bounds])),
+    #                                coords={name_points: ax[name_points]})
     ax[name_delta].attrs['units'] = defaultUnits[axis_type]
 
     return ax

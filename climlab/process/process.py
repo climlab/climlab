@@ -126,17 +126,21 @@ class Process(object):
     def __init__(self, state=None, subprocess=None,
                      lat=None, lev=None, num_lat=None, num_levels=None,
                      input=None, param=None, **kwargs):
-        coords = {}
-        if lat is not None:
-            coords.update({'lat': lat})
-        if lev is not None:
-            coords.update({'lev': lev})
         if param is not None:
             param.update(kwargs)
         else:
             param = {}
-        self._state = xray.Dataset(coords=coords, attrs=param)
+        if state is None:
+            coords = {}
+            if lat is not None:
+                coords.update({'lat': lat})
+            if lev is not None:
+                coords.update({'lev': lev})
+            self._state = xray.Dataset(coords=coords, attrs=param)
+        else:
+            self._state = xray.Dataset(variables=state, attrs=param)
         self.param = self._state.attrs
+        self.coords = self._state.coords
         #super(Process, self).__init__(coords=coords, **kwargs)
         #self.attrs['creation_date'] = time.strftime("%a, %d %b %Y %H:%M:%S %z",
         #                                   time.localtime())
@@ -167,6 +171,8 @@ class Process(object):
         self.diagnostic = attr_dict.AttrDict()
         # Make all state variables accessible as process attributes
         for name, var in self.state.iteritems():
+            setattr(self, name, var)
+        for name, var in self.coords.iteritems():
             setattr(self, name, var)
 
     # def add_subprocesses(self, procdict):

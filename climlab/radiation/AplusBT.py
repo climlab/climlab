@@ -24,18 +24,14 @@ New prototype usage for xray version:
 
 import numpy as np
 import xray, climlab
-slab = climlab.domain.grid.zonal_mean_surface()
-Tarray = np.ones_like(slab.lat).reshape((slab.lat.size, 1))
-Tinitial = xray.DataArray(Tarray, name='Ts',
-	coords={'lat':slab.lat, 'depth':slab.depth,
-	'depth_bounds':slab.depth_bounds},
-	dims={'lat', 'depth', 'depth_bounds'})
-model = climlab.radiation.AplusBT(variables=slab)
-model.set_state(Tinitial.copy())
+initial = climlab.domain.grid.zonal_mean_surface()
+Tarray = np.ones_like(initial.lat).reshape((initial.lat.size, 1))
+initial['Ts'] = (('lat', 'depth'), Tarray)
+model = climlab.radiation.AplusBT(state=initial.copy(deep=True))
 tend = model.compute()
 model.step_forward()
 import matplotlib.pyplot as plt
-Tinitial.plot()
+initial.Ts.plot()
 model.Ts.plot()
 plt.show()
 
