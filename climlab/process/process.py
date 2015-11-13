@@ -187,21 +187,21 @@ class Process(object):
     #         for name, proc in procdict.iteritems():
     #             self.add_subprocess(name, proc)
     #
-    # def add_subprocess(self, name, proc):
-    #     '''Add a single subprocess to this process.
-    #     name: name of the subprocess (str)
-    #     proc: a Process object.'''
-    #     if isinstance(proc, Process):
-    #         self.subprocess.update({name: proc})
-    #         self.has_process_type_list = False
-    #     else:
-    #         raise ValueError('subprocess must be Process object')
-    #
-    # def remove_subprocess(self, name):
-    #     '''Remove a single subprocess from this process.
-    #     name: name of the subprocess (str)'''
-    #     self.subprocess.pop(name, None)
-    #     self.has_process_type_list = False
+    def add_subprocess(self, name, proc):
+        '''Add a single subprocess to this process.
+        name: name of the subprocess (str)
+        proc: a Process object.'''
+        if isinstance(proc, Process):
+            self.subprocess.update({name: proc})
+            #self.has_process_type_list = False
+        else:
+            raise ValueError('subprocess must be Process object')
+
+    def remove_subprocess(self, name):
+        '''Remove a single subprocess from this process.
+        name: name of the subprocess (str)'''
+        self.subprocess.pop(name, None)
+        #self.has_process_type_list = False
 
     # def _subset_by_var_type(self, type):
     # 	'''Return a new xray.Dataset object containing just variables of specified type.'''
