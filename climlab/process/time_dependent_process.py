@@ -45,7 +45,7 @@ class TimeDependentProcess(Process):
                      'days_of_year': days_of_year}
         #self.attrs['timestep'] = timestep
         self.timestep = timestep
-        
+
     #  new concept: there really shouldn't be any need to *walk* the
      # process tree!  Each process should compute the complete tendencies
     #  due to itself and all its subprocesses!
@@ -55,21 +55,27 @@ class TimeDependentProcess(Process):
         '''Compute tendencies for all state variables given
         current state and specified input.'''
         if (self.topdown and self.process_type is 'explicit'):
-        	 #  tendencies is Dataset object with same names as state variables
+        	 #  tendencies is dictionary with same names as state variables
             tendencies = self._compute()
             for name, proc in self.subprocess.iteritems():
                 tend_sub = proc.compute()
-                tendencies += tend_sub
+                for varname, tend in tend_sub.iteritems():
+                    tendencies[varname] += tend
                 #diagnostics.merge(diag_sub)
                 # will need a way to retrieve diagnostics from subprocesses
         else:
-        #  make a new Dataset object to hold tendencies on state variables
-            tendencies = self.state * 0.
+        #  make a new dictionary to hold tendencies on state variables
+            tendencies = {}
+            for varname in self.state:
+                tendencies[varname] = 0. * self.state[varname]
             for name, proc in self.subprocess.iteritems():
                 tend_sub = proc.compute()
-                tendencies += tend_sub
+                for varname, tend in tend_sub.iteritems():
+                    tendencies[varname] += tend
 				#diagnostics.merge(diag_sub)
-            tendencies += self._compute()
+            parent_tendencies = self._compute()
+            for varname, tend in parent_tendencies.iteritems():
+                tendencies[varname] += tend
         return tendencies
 
     def _compute(self):

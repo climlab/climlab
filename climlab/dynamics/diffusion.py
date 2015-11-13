@@ -20,25 +20,22 @@ And here is an example of meridional diffusion of temperature
 as a stand-alone process:
 
 REWORKED FOR THE NEW XRAY INTERFACE
-(definitely need to simplify the object / state variable creation)
 
 import numpy as np
 import xray, climlab
-slab = climlab.domain.grid.zonal_mean_surface()
+initial = climlab.domain.grid.zonal_mean_surface()
+Tarray = (12. - 40. * climlab.utils.legendre.P2(np.sin(np.deg2rad(initial.lat.values)))).reshape((initial.lat.size, 1))
+initial['Ts'] = (('lat', 'depth'), Tarray)
 # thermal diffusivity in W/m**2/degC
 D = 0.55
 # meridional diffusivity in 1/s
-K = (D / climlab.domain.grid.heat_capacity(slab))['Ts'].values
-d = climlab.dynamics.diffusion.MeridionalDiffusion(variables=slab, K=K)
-Tarray = (12. - 40. * climlab.utils.legendre.P2(np.sin(np.deg2rad(d.lat.values)))).reshape((slab.lat.size, 1))
-Tinitial = xray.DataArray(Tarray, name='Ts', 
-	coords={'lat':slab.lat, 'depth':slab.depth}, dims={'lat', 'depth'})
-d.set_state(Tinitial.copy())
+K = (D / climlab.domain.grid.heat_capacity(initial))['Ts'].values
+d = climlab.dynamics.diffusion.MeridionalDiffusion(state=initial.copy(deep=True), K=K)
 tend = d.compute()
 d.step_forward()
 d.integrate_years(1.)
 import matplotlib.pyplot as plt
-Tinitial.plot()
+initial.Ts.plot()
 d.Ts.plot()
 plt.show()
 
@@ -73,33 +70,48 @@ class Diffusion(ImplicitProcess):
                  use_banded_solver=False,
                  **kwargs):
         super(Diffusion, self).__init__(**kwargs)
-        self.attrs['K'] = K  # Diffusivity in units of [length]**2 / time
-        self.attrs['use_banded_solver'] = use_banded_solver
+        self.K = K  # Diffusivity in units of [length]**2 / time
+        self.use_banded_solver = use_banded_solver
         if diffusion_axis is None:
-            self.attrs['diffusion_axis'] = _guess_diffusion_axis(self)
+            self.diffusion_axis = _guess_diffusion_axis(self)
         else:
-            self.attrs['diffusion_axis'] = diffusion_axis
+            self.diffusion_axis = diffusion_axis
         # This currently only works with evenly spaced points
-        delta = self.lat_delta.mean(dim='lat').values
+        #delta = self.lat_delta.mean(dim='lat').values
         #bounds = self.lat_bounds
         #K_dimensionless = (self.K * np.ones_like(bounds.values) *
         #                        self.timestep / delta**2)
-        K_dimensionless = self.lat_bounds * 0.
-        K_dimensionless.values += (self.K * self.timestep / delta**2)
+        #K_dimensionless = self.lat_bounds * 0.
+        #K_dimensionless.values += (self.param['K'] * self.timestep / delta**2)
         #  just sticking with plain numpy implemention here
-        self['K_dimensionless'] = K_dimensionless
-        self.diffTriDiag = _make_diffusion_matrix(self.K_dimensionless.values)
+        #self._K_dimensionless = K_dimensionless
+        #self.diffTriDiag = _make_diffusion_matrix(self._K_dimensionless.values)
+
+    @property
+    def K(self):
+        return self.param['K']
+    @K.setter
+    def K(self, value):
+        self.param['K'] = value
+        K_dimensionless = self.lat_bounds * 0.
+        # This currently only works with evenly spaced points
+        delta = np.mean(self.lat_delta.values)
+        K_dimensionless.values += (self.param['K'] * self.timestep / delta**2)
+        #  just sticking with plain numpy implemention here
+        self._K_dimensionless = K_dimensionless
+        self.diffTriDiag = _make_diffusion_matrix(self._K_dimensionless.values)
 
     def _implicit_solver(self):
         # Time-stepping the diffusion is just inverting this matrix problem:
         # self.T = np.linalg.solve( self.diffTriDiag, Trad )
-        newstate = self.state * 0.
-        for varname, var in self.state.data_vars.iteritems():
+        #newstate = self.state * 0.
+        newstate = {}
+        for varname, var in self.state.iteritems():
             if self.use_banded_solver:
                 newvar = _solve_implicit_banded(var.values, self.diffTriDiag)
             else:
                 newvar = np.linalg.solve(self.diffTriDiag, var.values)
-            newstate[varname] += newvar
+            newstate[varname] = newvar
         return newstate
 
 
@@ -124,11 +136,11 @@ class MeridionalDiffusion(Diffusion):
                  **kwargs):
         super(MeridionalDiffusion, self).__init__(K=K,
                                                 diffusion_axis='lat', **kwargs)
-        self.K_dimensionless.values *= 1./np.deg2rad(1.)**2
+        self._K_dimensionless.values *= 1./np.deg2rad(1.)**2
         #for dom in self.domains.values():
         #    latax = dom.axes['lat']
         self.diffTriDiag = (
-            _make_meridional_diffusion_matrix(self.K_dimensionless.values, 
+            _make_meridional_diffusion_matrix(self._K_dimensionless.values,
                self.lat.values, self.lat_bounds.values))
 
 
