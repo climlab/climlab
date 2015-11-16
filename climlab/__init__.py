@@ -1,4 +1,4 @@
-__version__ = '0.2.11'
+__version__ = '0.3.0'
 
 #  This list defines all the modules that will be loaded if a user invokes
 #   from climLab import *
@@ -17,7 +17,7 @@ from climlab.utils import thermo, legendre
 #from climlab.model import ebm, column
 from climlab.model.column import GreyRadiationModel, RadiativeConvectiveModel, BandRCModel
 from climlab.model.ebm import EBM, EBM_annual, EBM_seasonal
-from climlab.domain import domain
+#from climlab.domain import domain
 from climlab.domain.field import Field, global_mean
 from climlab.domain.axis import Axis
 from climlab.process.process import Process, process_like, get_axes
