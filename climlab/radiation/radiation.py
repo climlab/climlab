@@ -7,13 +7,13 @@ from climlab.process.energy_budget import EnergyBudget
 class Radiation(EnergyBudget):
     '''Base class for all band radiation models,
     including grey and semi-grey model.
-    
+
     Input argument absorptivity is band absorptivity
     (should same size as grid).
-    
+
     By default emissivity = absorptivity.
     Subclasses can override this is necessary (e.g. for shortwave model)'''
-    def __init__(self, absorptivity=None, reflectivity=None, 
+    def __init__(self, absorptivity=None, reflectivity=None,
                  albedo_sfc=0, **kwargs):
         super(Radiation, self).__init__(**kwargs)
         if reflectivity is None:
@@ -28,7 +28,7 @@ class Radiation(EnergyBudget):
         self.flux_from_sfc = np.zeros_like(self.Ts)
         self.flux_to_space = np.zeros_like(self.Ts)
         self.heating_rate['Ts'] = np.zeros_like(self.Ts)
-        
+
     @property
     def absorptivity(self):
         return self.trans.absorptivity
@@ -37,9 +37,12 @@ class Radiation(EnergyBudget):
         #  value should be a Field,
          #  or numpy array of same size as self.Tatm
         try:
-            axis = value.domain.axis_index['lev']
+            #axis = value.domain.axis_index['lev']
+            #  this is a hack...
+            axis = value.domain.lev_delta.get_axis_num('lev')
         except:
-            axis = self.Tatm.domain.axis_index['lev']
+            #axis = self.Tatm.domain.axis_index['lev']
+            axis = self.Tatm.domain.lev_delta.get_axis_num('lev')
             # if a single scalar is given, broadcast that to all levels
             if len(np.shape(np.array(value))) is 0:
                 value = np.ones_like(self.Tatm) * value
@@ -70,10 +73,12 @@ class Radiation(EnergyBudget):
         #  value should be a Field,
          #  or numpy array of same size as self.Tatm
         try:
-            axis = value.domain.axis_index['lev']
+            #axis = value.domain.axis_index['lev']
+            #  this is a hack...
+            axis = value.domain.lev_delta.get_axis_num('lev')
         except:
-            axis = self.Tatm.domain.axis_index['lev']
-            # if a single scalar is given, broadcast that to all levels
+            #axis = self.Tatm.domain.axis_index['lev']
+            axis = self.Tatm.domain.lev_delta.get_axis_num('lev')# if a single scalar is given, broadcast that to all levels
             if len(np.shape(np.array(value))) is 0:
                 value = np.ones_like(self.Tatm) * value
             elif value.shape != self.Tatm.shape:
@@ -81,7 +86,7 @@ class Radiation(EnergyBudget):
         self.trans = Transmissivity(absorptivity=self.absorptivity,
                                     reflectivity=value,
                                     axis=axis)
-        
+
     def compute_emission(self):
         return self.emissivity * blackbody_emission(self.Tatm)
 
@@ -92,13 +97,13 @@ class Radiation(EnergyBudget):
 
         except:
             fromspace = np.zeros_like(self.Ts)
-        
+
         self.flux_down = self.trans.flux_down(fromspace, self.emission)
         self.flux_reflected_up = \
             self.trans.flux_reflected_up(self.flux_down, self.albedo_sfc)
         # this ensure same dimensions as other fields
         flux_down_sfc = self.flux_down[..., 0, np.newaxis]
-        flux_up_bottom = (self.flux_from_sfc + 
+        flux_up_bottom = (self.flux_from_sfc +
                           self.flux_reflected_up[..., 0, np.newaxis])
         self.flux_up = self.trans.flux_up(flux_up_bottom,
                                 self.emission+self.flux_reflected_up[...,1:])
@@ -113,7 +118,7 @@ class Radiation(EnergyBudget):
 
     def _compute_heating_rates(self):
         '''Compute energy flux convergences to get heating rates in W / m**2.'''
-        self.radiative_heating()        
+        self.radiative_heating()
 
     def flux_components_top(self):
         '''Compute the contributions to the outgoing flux to space due to
@@ -157,4 +162,3 @@ class RadiationSW(Radiation):
     def emissivity(self):
         # This ensures that emissivity is always zero for shortwave classes
         return np.zeros_like(self.absorptivity)
-    

@@ -29,72 +29,72 @@ print s2.domain
 '''
 
 
-#  Going to try to make the fewest changes possible
-#   to preserve all of climlab v0.2
-#  But use xray.DataArray as the basis of the climlab Field object
-class Field(xray.DataArray):
-    def __init__(self, input_array, domain=None):
-        super(Field, self).__init__(input_array, coords=domain)
-    @property
-    def domain(self):
-        return self.coords
+# #  Going to try to make the fewest changes possible
+# #   to preserve all of climlab v0.2
+# #  But use xray.DataArray as the basis of the climlab Field object
+# class Field(xray.DataArray):
+#     def __init__(self, input_array, domain=None):
+#         super(Field, self).__init__(input_array, coords=domain)
+#     @property
+#     def domain(self):
+#         return self.coords
 
-# class Field(np.ndarray):
-#     '''Custom class for climlab gridded quantities, called Field
-#     This class behaves exactly like numpy.ndarray
-#     but every object has an attribute called domain
-#     which is the domain associated with that field (e.g. state variables).'''
-#
-#     def __new__(cls, input_array, domain=None):
-#         # Input array is an already formed ndarray instance
-#         # We first cast to be our class type
-#         #obj = np.asarray(input_array).view(cls)
-#         # This should ensure that shape is (1,) for scalar input
-#         obj = np.atleast_1d(input_array).view(cls)
-#         # add the new attribute to the created instance
-#         #  do some checking for correct dimensions
-#         if obj.shape == domain.shape:
-#             obj.domain = domain
-#         else:
-#             try:
-#                 obj = np.transpose(np.atleast_2d(obj))
-#                 if obj.shape == domain.shape:
-#                     obj.domain = domain
-#             except:
-#                 raise ValueError('input_array and domain have different shapes.')
-#
-#         #  would be nice to have some automatic domain creation here if none given
-#
-#         # Finally, we must return the newly created object:
-#         return obj
-#
-#     def __array_finalize__(self, obj):
-#         # ``self`` is a new object resulting from
-#         # ndarray.__new__(Field, ...), therefore it only has
-#         # attributes that the ndarray.__new__ constructor gave it -
-#         # i.e. those of a standard ndarray.
-#         #
-#         # We could have got to the ndarray.__new__ call in 3 ways:
-#         # From an explicit constructor - e.g. Field():
-#         #    obj is None
-#         #    (we're in the middle of the Field.__new__
-#         #    constructor, and self.domain will be set when we return to
-#         #    Field.__new__)
-#         if obj is None: return
-#         # From view casting - e.g arr.view(Field):
-#         #    obj is arr
-#         #    (type(obj) can be Field)
-#         # From new-from-template - e.g statearr[:3]
-#         #    type(obj) is Field
-#         #
-#         # Note that it is here, rather than in the __new__ method,
-#         # that we set the default value for 'domain', because this
-#         # method sees all creation of default objects - with the
-#         # Field.__new__ constructor, but also with
-#         # arr.view(Field).
-#
-#         self.domain = getattr(obj, 'domain', None)
-#         # We do not need to return anything
+class Field(np.ndarray):
+    '''Custom class for climlab gridded quantities, called Field
+    This class behaves exactly like numpy.ndarray
+    but every object has an attribute called domain
+    which is the domain associated with that field (e.g. state variables).'''
+
+    def __new__(cls, input_array, domain=None):
+        # Input array is an already formed ndarray instance
+        # We first cast to be our class type
+        #obj = np.asarray(input_array).view(cls)
+        # This should ensure that shape is (1,) for scalar input
+        obj = np.atleast_1d(input_array).view(cls)
+        # add the new attribute to the created instance
+        #  do some checking for correct dimensions
+        if obj.shape == domain.shape:
+            obj.domain = domain
+        else:
+            try:
+                obj = np.transpose(np.atleast_2d(obj))
+                if obj.shape == domain.shape:
+                    obj.domain = domain
+            except:
+                raise ValueError('input_array and domain have different shapes.')
+
+        #  would be nice to have some automatic domain creation here if none given
+
+        # Finally, we must return the newly created object:
+        return obj
+
+    def __array_finalize__(self, obj):
+        # ``self`` is a new object resulting from
+        # ndarray.__new__(Field, ...), therefore it only has
+        # attributes that the ndarray.__new__ constructor gave it -
+        # i.e. those of a standard ndarray.
+        #
+        # We could have got to the ndarray.__new__ call in 3 ways:
+        # From an explicit constructor - e.g. Field():
+        #    obj is None
+        #    (we're in the middle of the Field.__new__
+        #    constructor, and self.domain will be set when we return to
+        #    Field.__new__)
+        if obj is None: return
+        # From view casting - e.g arr.view(Field):
+        #    obj is arr
+        #    (type(obj) can be Field)
+        # From new-from-template - e.g statearr[:3]
+        #    type(obj) is Field
+        #
+        # Note that it is here, rather than in the __new__ method,
+        # that we set the default value for 'domain', because this
+        # method sees all creation of default objects - with the
+        # Field.__new__ constructor, but also with
+        # arr.view(Field).
+
+        self.domain = getattr(obj, 'domain', None)
+        # We do not need to return anything
 
 
 def global_mean(field):

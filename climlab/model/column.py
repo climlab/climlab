@@ -68,7 +68,8 @@ class GreyRadiationModel(TimeDependentProcess):
         sfc = self.Ts.domain
         atm = self.Tatm.domain
         # create sub-models for longwave and shortwave radiation
-        dp = self.Tatm.domain.lev.delta
+        #dp = self.Tatm.domain.lev.delta
+        dp = self.Tatm.domain.lev_delta
         absorbLW = compute_layer_absorptivity(self.param['abs_coeff'], dp)
         absorbLW = Field(np.tile(absorbLW, sfc.shape), domain=atm)
         absorbSW = np.zeros_like(absorbLW)
@@ -164,8 +165,8 @@ def initial_state(num_lev, num_lat, lev, lat, water_depth):
                                             num_lat=num_lat,
                                             lat=lat)
     num_lev = atm.lev.size
-    #Ts = Field(288.*np.ones(sfc.shape), domain=sfc)
-    Ts = Field(288., domain=sfc)
+    Ts = Field(288.*np.ones(sfc.shape), domain=sfc)
+    #Ts = Field(288., domain=sfc)
     Tinitial = np.tile(np.linspace(288.-10., 200., num_lev), sfc.shape)
     Tatm = Field(Tinitial, domain=atm)
     state = {'Ts': Ts, 'Tatm': Tatm}
