@@ -22,7 +22,7 @@ Q = climlab.radiation.insolation.DailyInsolation(domains=col.Ts.domain, **col.pa
 #  replace the fixed insolation subprocess in the column model
 col.add_subprocess('insolation', Q)
 
-This model is now a single column with seasonally varying insolation 
+This model is now a single column with seasonally varying insolation
 calculated for 45N.
 """
 import numpy as np
@@ -85,10 +85,10 @@ class GreyRadiationModel(TimeDependentProcess):
         self.add_subprocess('SW', shortwave)
         self.add_subprocess('insolation', Q)
         self.add_subprocess('surface', surface)
-    
+
     def initial_state(self, num_lev, num_lat, lev, lat, water_depth):
         return initial_state(num_lev, num_lat, lev, lat, water_depth)
-        
+
     # This process has to handle the coupling between insolation and column radiation
     def compute(self):
         # some handy nicknames for subprocesses
@@ -104,7 +104,7 @@ class GreyRadiationModel(TimeDependentProcess):
         LW.flux_from_sfc = surf.LW_to_atm
         # set diagnostics
         self.do_diagnostics()
-    
+
     def do_diagnostics(self):
         '''Set all the diagnostics from long and shortwave radiation.'''
         LW = self.subprocess['LW']
@@ -128,8 +128,8 @@ class GreyRadiationModel(TimeDependentProcess):
             #self.diagnostics['OLR_atm'] = self.flux['atm2space']
         try: self.diagnostics['ASR'] = SW.flux_from_space - SW.flux_to_space
         except: pass
-        try: 
-            self.diagnostics['SW_absorbed_sfc'] = (surf.SW_from_atm - 
+        try:
+            self.diagnostics['SW_absorbed_sfc'] = (surf.SW_from_atm -
                                                     surf.SW_to_atm)
         except: pass
         try: self.diagnostics['SW_absorbed_atm'] = SW.absorbed
@@ -142,10 +142,10 @@ class GreyRadiationModel(TimeDependentProcess):
         except: pass
         try: self.diagnostics['SW_down_TOA'] = SW.flux_from_space
         except: pass
-        try: self.diagnostics['SW_absorbed_total'] = (SW.absorbed_total - 
+        try: self.diagnostics['SW_absorbed_total'] = (SW.absorbed_total -
                                                       SW.flux_net[0])
         except: pass
-        try: self.diagnostics['planetary_albedo'] = (SW.flux_to_space / 
+        try: self.diagnostics['planetary_albedo'] = (SW.flux_to_space /
                                                      SW.flux_from_space)
         except: pass
         try: self.diagnostics['SW_emission'] = SW.emission
@@ -163,8 +163,9 @@ def initial_state(num_lev, num_lat, lev, lat, water_depth):
                                             lev=lev,
                                             num_lat=num_lat,
                                             lat=lat)
-    num_lev = atm.lev.num_points
-    Ts = Field(288.*np.ones(sfc.shape), domain=sfc)
+    num_lev = atm.lev.size
+    #Ts = Field(288.*np.ones(sfc.shape), domain=sfc)
+    Ts = Field(288., domain=sfc)
     Tinitial = np.tile(np.linspace(288.-10., 200., num_lev), sfc.shape)
     Tatm = Field(Tinitial, domain=atm)
     state = {'Ts': Ts, 'Tatm': Tatm}
@@ -172,7 +173,7 @@ def initial_state(num_lev, num_lat, lev, lat, water_depth):
 
 
 class RadiativeConvectiveModel(GreyRadiationModel):
-    def __init__(self,                  
+    def __init__(self,
                  # lapse rate for convective adjustment, in K / km
                  adj_lapse_rate=6.5,
                  **kwargs):
@@ -191,7 +192,7 @@ class BandRCModel(RadiativeConvectiveModel):
             self.set_state('q', q)
         h2o = ManabeWaterVapor(state=self.state, **self.param)
         self.add_subprocess('H2O', h2o)
-        
+
         #  initialize radiatively active gas inventories
         self.absorber_vmr = {}
         self.absorber_vmr['CO2'] = 380.E-6 * np.ones_like(self.Tatm)
@@ -199,10 +200,10 @@ class BandRCModel(RadiativeConvectiveModel):
         # water vapor is actually specific humidity, not VMR.
         self.absorber_vmr['H2O'] = self.q
 
-        longwave = FourBandLW(state=self.state, 
+        longwave = FourBandLW(state=self.state,
                               absorber_vmr=self.absorber_vmr,
                               albedo_sfc=0.)
-        shortwave = ThreeBandSW(state=self.state, 
+        shortwave = ThreeBandSW(state=self.state,
                                 absorber_vmr=self.absorber_vmr,
                                 albedo_sfc=self.param['albedo_sfc'])
         self.add_subprocess('LW', longwave)

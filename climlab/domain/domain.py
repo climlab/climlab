@@ -105,6 +105,10 @@ def create_axis(axis_type='abstract', num_points=10, points=None, bounds=None):
     ax[name_delta] = xray.DataArray(delta, coords={name_points: points})
     ax[name_delta].attrs['units'] = defaultUnits[axis_type]
     ax.axes = ax.coords
+    # This is a hack
+    #  This whole section only works for 1D domains
+    ax.shape = ax[name_points].shape
+
     return ax
 
 
