@@ -26,16 +26,18 @@ This model is now a single column with seasonally varying insolation
 calculated for 45N.
 """
 import numpy as np
+import xray
 from climlab import constants as const
 from climlab.process.time_dependent_process import TimeDependentProcess
 from climlab.domain import domain
-from climlab.domain.field import Field
+#from climlab.domain.field import Field
 from climlab.radiation.insolation import FixedInsolation
 from climlab.radiation.radiation import Radiation, RadiationSW
 from climlab.convection.convadj import ConvectiveAdjustment
 from climlab.surface.surface_radiation import SurfaceRadiation
 from climlab.radiation.nband import ThreeBandSW, FourBandLW, FourBandSW
 from climlab.radiation.water_vapor import ManabeWaterVapor
+
 
 class GreyRadiationModel(TimeDependentProcess):
     def __init__(self,
@@ -71,7 +73,8 @@ class GreyRadiationModel(TimeDependentProcess):
         #dp = self.Tatm.domain.lev.delta
         dp = self.Tatm.domain.lev_delta
         absorbLW = compute_layer_absorptivity(self.param['abs_coeff'], dp)
-        absorbLW = Field(np.tile(absorbLW, sfc.shape), domain=atm)
+        #absorbLW = Field(np.tile(absorbLW, sfc.shape), domain=atm)
+        # is it necessary to cast this into a field variable?
         absorbSW = np.zeros_like(absorbLW)
         longwave = Radiation(state=self.state, absorptivity=absorbLW,
                              albedo_sfc=0)
@@ -165,10 +168,19 @@ def initial_state(num_lev, num_lat, lev, lat, water_depth):
                                             num_lat=num_lat,
                                             lat=lat)
     num_lev = atm.lev.size
-    Ts = Field(288.*np.ones(sfc.shape), domain=sfc)
+    #Ts = Field(288.*np.ones(sfc.shape), domain=sfc)
     #Ts = Field(288., domain=sfc)
-    Tinitial = np.tile(np.linspace(288.-10., 200., num_lev), sfc.shape)
-    Tatm = Field(Tinitial, domain=atm)
+    Tsarray = 288. * np.ones_like(sfc.heat_capacity)
+    # This only works for single column....  need to generalize
+    Ts = xray.DataArray(Tsarray, coords={'depth': sfc.depth})
+    Ts.assign_coords(heat_capacity=sfc.heat_capacity, depth_delta=sfc.depth_delta)
+    #  all the domain info can be attached to the state variable like this
+    Ts.domain = sfc
+    Tinitial = np.tile(np.linspace(288.-10., 200., num_lev), sfc.heat_capacity.shape)
+    #Tatm = Field(Tinitial, domain=atm)
+    Tatm = xray.DataArray(Tinitial, coords={'lev': atm.lev})
+    Tatm.assign_coords(heat_capacity=atm.heat_capacity, depth_delta=atm.lev_delta)
+    Tatm.domain = atm
     state = {'Ts': Ts, 'Tatm': Tatm}
     return state
 

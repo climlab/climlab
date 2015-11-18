@@ -102,12 +102,12 @@ def create_axis(axis_type='abstract', num_points=10, points=None, bounds=None):
     ax[name_points].attrs['units'] = defaultUnits[axis_type]
     ax[name_bounds].attrs['units'] = defaultUnits[axis_type]
     #  the delta field will be a data_var in the Dataset (not coordinate)
-    ax[name_delta] = xray.DataArray(delta, coords={name_points: points})
-    ax[name_delta].attrs['units'] = defaultUnits[axis_type]
-    ax.axes = ax.coords
+    #ax[name_delta] = xray.DataArray(delta, coords={name_points: points})
+    #ax[name_delta].attrs['units'] = defaultUnits[axis_type]
+    #ax.axes = ax.coords
     # This is a hack
     #  This whole section only works for 1D domains
-    ax.shape = ax[name_points].shape
+    #ax.shape = ax[name_points].shape
 
     return ax
 
@@ -207,26 +207,21 @@ class _Domain(xray.Dataset):
 #         self.heat_capacity = heat_capacity.ocean(self.axes['depth'].delta)
 
 
-def make_slabocean_axis(num_points=1):
-    '''Convenience method to create a simple axis for a slab ocean.'''
-    depthax = Axis(axis_type='depth', num_points=num_points)
-    return depthax
-
-def make_slabatm_axis(num_points=1):
-    '''Convenience method to create a simple axis for a slab atmosphere.'''
-    depthax = Axis(axis_type='lev', num_points=num_points)
-    return depthax
-
-
-
-# class SlabOcean(Ocean):
-#     def __init__(self, axes=make_slabocean_axis(), **kwargs):
-#         super(SlabOcean, self).__init__(axes=axes, **kwargs)
+# def make_slabocean_axis(num_points=1):
+#     '''Convenience method to create a simple axis for a slab ocean.'''
+#     depthax = Axis(axis_type='depth', num_points=num_points)
+#     return depthax
 #
-# class SlabAtmosphere(Atmosphere):
-#     def __init__(self, axes=make_slabatm_axis(), **kwargs):
-#         super(SlabAtmosphere, self).__init__(axes=axes, **kwargs)
+# def make_slabatm_axis(num_points=1):
+#     '''Convenience method to create a simple axis for a slab atmosphere.'''
+#     depthax = Axis(axis_type='lev', num_points=num_points)
+#     return depthax
 
+
+#  The idea is that we have creation routines for every kind of domain
+#  Each one creates axes, and for multi-dim domains, merges them into single
+#  xray.Dataset object
+#  It is here that domain properties like heat capacity are calculated
 
 def single_column(num_lev=30, water_depth=1., lev=None, **kwargs):
     '''Convenience method to create domains for a single column of atmosphere
@@ -256,14 +251,19 @@ def single_column(num_lev=30, water_depth=1., lev=None, **kwargs):
             raise ValueError('lev must be a valid coordinate dataset or pressure array')
 
     depthax = create_axis(axis_type='depth', bounds=[water_depth, 0.])
-    #slab = SlabOcean(axes=depthax, **kwargs)
-    #atm = Atmosphere(axes=levax, **kwargs)
+    #  These are 1D domains with only a single axis each
     slab = depthax
     atm = levax
     slab.attrs['domain_type'] = 'ocean'
-    slab.heat_capacity = heat_capacity.ocean(slab.depth_delta)
+    delta = np.abs(np.diff(slab.depth_bounds))
+    slab['depth_delta'] = xray.DataArray(delta, coords={'depth': slab.depth})
+    slab['depth_delta'].attrs['units'] = slab.depth.units
+    slab['heat_capacity'] = heat_capacity.ocean(slab.depth_delta)
+    delta = np.abs(np.diff(atm.lev_bounds))
+    atm['lev_delta'] = xray.DataArray(delta, coords={'lev': atm.lev})
+    atm['lev_delta'].attrs['units'] = atm.lev.units
     atm.attrs['domain_type'] = 'atm'
-    atm.heat_capacity = heat_capacity.atmosphere(atm.lev_delta)
+    atm['heat_capacity'] = heat_capacity.atmosphere(atm.lev_delta)
     return slab, atm
 
 

@@ -1,16 +1,17 @@
 import time, copy
 import numpy as np
+import xray
 from climlab.domain.field import Field
 from climlab.domain.domain import _Domain
 from climlab.utils import walk
 
 #  New organizing principle:
 #  processes are free to use object attributes to store whatever useful fields
-# the need. If later revisions require some special action to occur upon 
-# getting or setting the attribute, we can always implement a property to 
+# the need. If later revisions require some special action to occur upon
+# getting or setting the attribute, we can always implement a property to
 # make that happen with no change in the API
 #
-#  the diagnostics dictionary will instead be used expressly for the purpose 
+#  the diagnostics dictionary will instead be used expressly for the purpose
 # of passing fields up the process tree!
 #  so will often only be set by a parent process (and given a name that is
 #  appropriate from teh point of view of the parent process)
@@ -22,7 +23,7 @@ from climlab.utils import walk
 #  go through every process code file
 #  and implement process parameters as attributes, or as properties with
 #  setter functions if necessary
-#  it should always be possible to quickly and easily change a process 
+#  it should always be possible to quickly and easily change a process
 #  parameter without messing anything up.
 #
 #  ALSO rationalize the use of diagnostics in all process code
@@ -66,10 +67,12 @@ class Process(object):
         # dictionary of domains. Keys are the domain names
         self.domains = _make_dict(domains, _Domain)
         # dictionary of state variables (all of type Field)
+        #  new version, state variables are of type xray.DataArray
         self.state = {}
-        states = _make_dict(state, Field)
+        states = _make_dict(state, xray.DataArray)
         for name, value in states.iteritems():
             self.set_state(name, value)
+
         # dictionary of model parameters
         self.param = kwargs
         # dictionary of diagnostic quantities
@@ -111,20 +114,20 @@ class Process(object):
         self.has_process_type_list = False
 
     def set_state(self, name, value):
-        if isinstance(value, Field):
-            # populate domains dictionary with domains from state variables
-            self.domains.update({name: value.domain})
-        else:
-            try:
-                thisdom = self.state[name].domain
-                domshape = thisdom.shape
-            except:
-                raise ValueError('State variable needs a domain.')
-            value = np.atleast_1d(value)
-            if value.shape == domshape:
-                value = Field(value, domain=thisdom)
-            else:
-                raise ValueError('Shape mismatch between existing domain and new state variable.')
+        # if isinstance(value, Field):
+        #     # populate domains dictionary with domains from state variables
+        #     self.domains.update({name: value.domain})
+        # else:
+        #     try:
+        #         thisdom = self.state[name].domain
+        #         domshape = thisdom.shape
+        #     except:
+        #         raise ValueError('State variable needs a domain.')
+        #     value = np.atleast_1d(value)
+        #     if value.shape == domshape:
+        #         value = Field(value, domain=thisdom)
+        #     else:
+        #         raise ValueError('Shape mismatch between existing domain and new state variable.')
         # set the state dictionary
         self.state[name] = value
         setattr(self, name, value)

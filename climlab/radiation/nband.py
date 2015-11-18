@@ -58,7 +58,10 @@ class NbandRadiation(Radiation):
         self.channel_ax = {'channel': ax}
         dom = domain._Domain(axes=self.channel_ax)
         #   fraction of the total solar flux in each band:
-        self._band_fraction = field.Field(value, domain=dom)
+        #self._band_fraction = field.Field(value, domain=dom)
+        ###  Need to rewrite all this to take advantage of named axes
+        #  For now just ignore dimensional info
+        self._band_fraction = value
 
     def compute_optical_path(self):
         # this will cause a problem for a model without CO2
@@ -88,6 +91,7 @@ class NbandRadiation(Radiation):
         # add these to the dictionary of axes
         axes.update(self.channel_ax)
         dom = domain.Atmosphere(axes=axes)
+        ##  Need to do this a little differently in xray version
         self.absorptivity = field.Field(absorptivity, domain=dom)
 
     def compute_emission(self):
