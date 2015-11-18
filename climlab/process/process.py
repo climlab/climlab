@@ -104,6 +104,8 @@ class Process(object):
         if isinstance(proc, Process):
             self.subprocess.update({name: proc})
             self.has_process_type_list = False
+            # make subprocess available as object attribute
+            setattr(self, name, proc)
         else:
             raise ValueError('subprocess must be Process object')
 
@@ -112,6 +114,8 @@ class Process(object):
         name: name of the subprocess (str)'''
         self.subprocess.pop(name, None)
         self.has_process_type_list = False
+        #  Since we made every subprocess an object attribute, we also remove
+        delattr(self, name)
 
     def set_state(self, name, value):
         # if isinstance(value, Field):
