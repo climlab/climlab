@@ -39,6 +39,37 @@ print s2.domain
 #     def domain(self):
 #         return self.coords
 
+'''  A climlab state variable, or any other field, needs...
+To contain within its object ALL THE INFORMATION about the underlying grid
+This includes more than actual coordinates, because we need things like delta
+and heat capacity and any other gridded but fixed quantities
+These need to be stored in an object with the state variable.
+
+What sort of data structure would allow us to
+    - hold coordinate axes
+    - hold arbitrary gridded data and scalar attributes
+    - store the data itself in numpy.array type objects
+    - when passed as just the object name, behave just like numpy.array
+    with the primary data field
+
+The problem with xray.Dataset is that it does not have a 'primary' field
+So when you pass just the name of the Dataset you basically have a dictionary
+rather than an element in that dictionary.
+
+The solution is to use xray.DataArray
+Because we can use the `assign_coords` method of a `xray.DataArray` object
+to add an other DataArray as a coordinate variable. This is where things like
+heat capacity can go. Then they are accessible as attributes of the primary
+variable.
+
+BUT that only works for quantitites that share coordinate axes with
+the primary data (such as heat capacity)
+It does not solve the lat_bounds problem.
+
+But maybe the answer is just not to include the bounds in the field object!
+If we have the lat_delta etc on the same grid as the data, that's all we need!
+'''
+
 class Field(np.ndarray):
     '''Custom class for climlab gridded quantities, called Field
     This class behaves exactly like numpy.ndarray

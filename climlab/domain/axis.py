@@ -182,12 +182,15 @@ def create_axis(axis_type='abstract', num_points=10, points=None, bounds=None):
     name_delta = axis_type + '_delta'
     delta = np.abs(np.diff(bounds))
     #  create a new dataset with just these two coordinate arrays
-    ax = xray.Dataset(coords={name_points: points, name_bounds: bounds})
-    ax[name_points].attrs['units'] = defaultUnits[axis_type]
-    ax[name_bounds].attrs['units'] = defaultUnits[axis_type]
+    #ax = xray.Dataset(coords={name_points: points, name_bounds: bounds})
     #  the delta field will be a data_var in the Dataset (not coordinate)
-    ax[name_delta] = xray.DataArray(delta,
-                                    coords={name_points: points})
+    #ax[name_delta] = xray.DataArray(delta,
+    #                                coords={name_points: points})
+    #  new concept... we shouldn't even include the bounds
+    #  but the delta field SHOULD be a coordinate
+    ax = xray.Dataset(coords={name_points: points, name_delta: delta})
+    ax[name_points].attrs['units'] = defaultUnits[axis_type]
+    #ax[name_bounds].attrs['units'] = defaultUnits[axis_type]
     ax[name_delta].attrs['units'] = defaultUnits[axis_type]
 
     return ax
