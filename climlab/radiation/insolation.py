@@ -20,7 +20,7 @@ class _Insolation(DiagnosticProcess):
     def __init__(self, S0=const.S0, **kwargs):
         super(_Insolation, self).__init__(**kwargs)
         self.S0 = S0
-        
+
     @property
     def S0(self):
         return self._S0
@@ -33,14 +33,13 @@ class _Insolation(DiagnosticProcess):
     def _compute_fixed(self):
         '''Recompute any fixed quantities after a change in parameters'''
         pass
-    
+
     def _get_current_insolation(self):
         pass
 
-    def compute(self):
-        '''Update all diagnostic quantities using current model state.'''
+    def _compute(self):
         self._get_current_insolation()
-
+        return {}
 
 class FixedInsolation(_Insolation):
     def __init__(self, S0=const.S0/4, **kwargs):
@@ -65,7 +64,7 @@ class P2Insolation(_Insolation):
         self._compute_fixed()
 
     def _compute_fixed(self):
-        #lat = self.domains['default'].axes['lat'].points 
+        #lat = self.domains['default'].axes['lat'].points
         lat = self.lat
         phi = np.deg2rad(lat)
         try:
@@ -86,7 +85,7 @@ class AnnualMeanInsolation(_Insolation):
         #self.param['orb'] = orb
         self.orb = orb
         self._compute_fixed()
-    
+
     @property
     def orb(self):
         return self._orb
@@ -105,7 +104,7 @@ class AnnualMeanInsolation(_Insolation):
 
     def _compute_fixed(self):
         try:
-            temp_array = self._daily_insolation_array()            
+            temp_array = self._daily_insolation_array()
             insolation = np.mean(temp_array, axis=1)
             # make sure that the diagnostic has the correct field dimensions.
             dom = self.domains['default']
@@ -115,7 +114,7 @@ class AnnualMeanInsolation(_Insolation):
 
 
 class DailyInsolation(AnnualMeanInsolation):
-                
+
     def _compute_fixed(self):
         try:
             self.insolation_array = self._daily_insolation_array()

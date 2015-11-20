@@ -8,6 +8,5 @@ class DiagnosticProcess(TimeDependentProcess):
         super(DiagnosticProcess, self).__init__(**kwargs)
         self.time_type = 'diagnostic'
 
-    def compute(self):
-        '''Update all diagnostic quantities using current model state.'''
+    def _compute(self):
         pass

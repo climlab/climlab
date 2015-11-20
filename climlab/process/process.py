@@ -1,39 +1,66 @@
+'''
+Principles of the new `climlab` API design:
+
+- `climlab.Process` object has several iterable dictionaries of named,
+gridded variables:
+    - `process.state`
+        - state variables, usually time-dependent
+    - `process.input`
+        - boundary conditions and other gridded quantities independent of the
+        `process`
+        - often set by a parent `process`
+    - `process.param`  (which are basically just scalar `input`)
+    - `process.tendencies`
+        - iterable `dict` of time-tendencies (d/dt) for each state variable
+    - `process.diagnostics`
+        - any quantity derived from current state
+- The `process` is fully described by contents of `state`, `input` and `param`
+dictionaries. `tendencies` and `diagnostics` are always computable from current
+state.
+- `climlab` will remain (as much as possible) agnostic about the data formats
+    - Variables within the dictionaries will behave as `numpy.ndarray` objects
+    - Grid information and other domain details accessible as attributes
+    of each variable
+        - e.g. Tatm.lat
+        - Shortcuts like `process.lat` will work where these are unambiguous
+- Many variables will be accessible as process attributes `process.name`
+    - this restricts to unique field names in the above dictionaries
+- There may be other dictionaries that do have name conflicts
+    - e.g. dictionary of tendencies, with same keys as `process.state`
+    - These will *not* be accessible as `process.name`
+    - but *will* be accessible as `process.dict_name.name`
+    (as well as regular dict interface)
+- There will be a dictionary of named subprocesses `process.subprocess`
+- Each item in subprocess dict will itself be a `climlab.Process` object
+- Subprocesses should also be accessible as process attributes
+- `process.compute()` is a method that computes tendencies (d/dt)
+    - returns a dictionary of tendencies for all state variables
+    - keys for this dictionary are same as keys of state dictionary
+    - tendency dictionary is the total tendency including all subprocesses
+    - method only computes d/dt, does not apply changes
+    - thus method is relatively independent of numerical scheme
+        - may need to make exception for implicit scheme?
+    - method *will* update variables in `process.diagnostic`
+        - will also *gather all diagnostics* from `subprocesses`
+- `process.step_forward()` updates the state variables
+    - calls `process.compute()` to get current tendencies
+    - implements a particular time-stepping scheme
+    - user interface is agnostic about numerical scheme
+- `process.integrate_years()` etc will automate time-stepping
+    - also computation of time-average diagnostics.
+- Every `subprocess` should work independently of its parent `process` given
+appropriate `input`.
+    - investigating an individual `process` (possibly with its own
+    `subprocesses`) isolated from its parent needs to be as simple as doing:
+        - `newproc = climlab.process_like(procname.subprocname)`
+        - `newproc.compute()`
+        - anything in the `input` dictionary of `subprocname` will remain fixed
+'''
 import time, copy
 import numpy as np
 from climlab.domain.field import Field
 from climlab.domain.domain import _Domain
 from climlab.utils import walk
-
-#  New organizing principle:
-#  processes are free to use object attributes to store whatever useful fields
-# the need. If later revisions require some special action to occur upon 
-# getting or setting the attribute, we can always implement a property to 
-# make that happen with no change in the API
-#
-#  the diagnostics dictionary will instead be used expressly for the purpose 
-# of passing fields up the process tree!
-#  so will often only be set by a parent process (and given a name that is
-#  appropriate from teh point of view of the parent process)
-#
-#  e.g. radiation fields in N-band models... currently would not be labeled
-# in a way that lets the user know which process it came from
-
-# TO DO:
-#  go through every process code file
-#  and implement process parameters as attributes, or as properties with
-#  setter functions if necessary
-#  it should always be possible to quickly and easily change a process 
-#  parameter without messing anything up.
-#
-#  ALSO rationalize the use of diagnostics in all process code
-#  as described above. Diagnostics are to be used FOR QUANTITIES THAT ARE TO
-#  BE TIME AVERAGED or quantities that are of interest to parent processes.
-#  It might often be left up to the parent process whether to make a diagnostic
-#
-#  FINALLY we should implement a time_average list that controls which state
-# variables and diagnostics are to be time averaged by the master process.
-#  It should default to the complete list, which is the current behavior.
-#
 
 
 def _make_dict(arg, argtype):
@@ -62,7 +89,7 @@ class Process(object):
 
     def __init__(self, state=None, domains=None, subprocess=None,
                  lat=None, lev=None, num_lat=None, num_levels=None,
-                 diagnostics=None, **kwargs):
+                 input=None, diagnostics=None, **kwargs):
         # dictionary of domains. Keys are the domain names
         self.domains = _make_dict(domains, _Domain)
         # dictionary of state variables (all of type Field)
@@ -74,6 +101,8 @@ class Process(object):
         self.param = kwargs
         # dictionary of diagnostic quantities
         self.diagnostics = _make_dict(diagnostics, Field)
+        # dictionary of input quantities
+        self.input = _make_dict(input, Field)
         self.creation_date = time.strftime("%a, %d %b %Y %H:%M:%S %z",
                                            time.localtime())
         # subprocess is a dictionary of any sub-processes

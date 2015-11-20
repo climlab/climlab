@@ -9,7 +9,7 @@ class EnergyBudget(TimeDependentProcess):
     with items corresponding to each state variable.'''
     def __init__(self, **kwargs):
         super(EnergyBudget, self).__init__(**kwargs)
-        self.process_type = 'explicit'
+        self.time_type = 'explicit'
         self.heating_rate = {}
 
     def _compute_heating_rates(self):
@@ -20,17 +20,19 @@ class EnergyBudget(TimeDependentProcess):
 
     def _temperature_tendencies(self):
         self._compute_heating_rates()
+        tendencies = {}
         for varname, value in self.state.iteritems():
             #C = self.state_domain[varname].heat_capacity
             C = value.domain.heat_capacity
             try:  # there may be state variables without heating rates
-                self.tendencies[varname] = (self.heating_rate[varname] / C)
+                tendencies[varname] = (self.heating_rate[varname] / C)
             except:
                 pass
+        return tendencies
 
-    def compute(self):
-        '''Update all diagnostic quantities using current model state.'''
-        self._temperature_tendencies()
+    def _compute(self):
+        tendencies = self._temperature_tendencies()
+        return tendencies
 
 
 class ExternalEnergySource(EnergyBudget):
