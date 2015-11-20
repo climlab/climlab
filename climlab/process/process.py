@@ -55,6 +55,10 @@ appropriate `input`.
         - `newproc = climlab.process_like(procname.subprocname)`
         - `newproc.compute()`
         - anything in the `input` dictionary of `subprocname` will remain fixed
+
+To do:
+- use OrderedDict to hold the subprocess dictionary
+    - order of execution can then be controled by position in dictionary
 '''
 import time, copy
 import numpy as np
@@ -130,6 +134,8 @@ class Process(object):
         if isinstance(proc, Process):
             self.subprocess.update({name: proc})
             self.has_process_type_list = False
+            # make subprocess available as object attribute
+            setattr(self, name, proc)
         else:
             raise ValueError('subprocess must be Process object')
 
@@ -138,6 +144,8 @@ class Process(object):
         name: name of the subprocess (str)'''
         self.subprocess.pop(name, None)
         self.has_process_type_list = False
+        #  Since we made every subprocess an object attribute, we also remove
+        delattr(self, name)
 
     def set_state(self, name, value):
         if isinstance(value, Field):
