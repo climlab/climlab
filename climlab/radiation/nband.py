@@ -9,17 +9,17 @@ class NbandRadiation(Radiation):
     '''Process for radiative transfer.
     Solves the discretized Schwarschild two-stream equations
     with the spectrum divided into N spectral bands.
-    
+
     Every NbandRadiation object has an attribute
         self.band_fraction
     with sum(self.band_fraction) == 1
     that gives the fraction of the total beam in each band
-    
-    Also a dictionary 
+
+    Also a dictionary
         self.absorber_vmr
     that gives the volumetric mixing ratio of every absorbing gas
     on the same grid as temperature
-    
+
     and a dictionary
         self.absorption_cross_section
     that gives the absorption cross-section per unit mass for each gas
@@ -35,7 +35,7 @@ class NbandRadiation(Radiation):
         if absorber_vmr is None:
             self.absorber_vmr = {}
         else:
-            self.absorber_vmr = absorber_vmr        
+            self.absorber_vmr = absorber_vmr
         # a dictionary of absorption cross-sections in m**2 / kg
         # each item should have dimension...  (num_channels, 1)
         self.absorption_cross_section = {}
@@ -45,21 +45,21 @@ class NbandRadiation(Radiation):
         self.flux_from_space = np.zeros_like(self.Ts)
         self.flux_from_sfc = np.zeros_like(self.Ts)
         self.albedo_sfc = np.ones_like(self.band_fraction)*self.albedo_sfc
-    
-    @property 
+
+    @property
     def band_fraction(self):
         return self._band_fraction
     @band_fraction.setter
     def band_fraction(self, value):
-        self.num_channels = value.size        
+        self.num_channels = value.size
         # abstract axis for channels
         ax = axis.Axis(num_points=self.num_channels)
         self.channel_ax = {'channel': ax}
         dom = domain._Domain(axes=self.channel_ax)
         #   fraction of the total solar flux in each band:
-        self._band_fraction = field.Field(value, domain=dom)    
+        self._band_fraction = field.Field(value, domain=dom)
 
-    def compute_optical_path(self):
+    def _compute_optical_path(self):
         # this will cause a problem for a model without CO2
         tau = np.zeros_like(self.absorber_vmr['CO2']*
                             self.absorption_cross_section['CO2'])
@@ -69,7 +69,7 @@ class NbandRadiation(Radiation):
                 q = vmr
             else:
                 q = vmr / (1.+vmr)
-            try: 
+            try:
                 # if this gas isn't present in absorption dictionary
                 # the assumption is that there is no absorption!
                 kappa = self.absorption_cross_section[gas]
@@ -78,9 +78,9 @@ class NbandRadiation(Radiation):
         tau *= self.mass_per_layer / self.cosZen
         return tau
 
-    def compute_absorptivity(self):
+    def _compute_absorptivity(self):
         #  assume that the water vapor etc is current
-        optical_path = self.compute_optical_path()
+        optical_path = self._compute_optical_path()
         #  account for finite layer depth
         absorptivity = 1. - np.exp(-optical_path)
         axes = copy(self.Tatm.domain.axes)
@@ -88,20 +88,20 @@ class NbandRadiation(Radiation):
         axes.update(self.channel_ax)
         dom = domain.Atmosphere(axes=axes)
         self.absorptivity = field.Field(absorptivity, domain=dom)
-    
-    def compute_emission(self):
+
+    def _compute_emission(self):
         #  need to split the total emission across the bands
-        total_emission = super(NbandRadiation, self).compute_emission()
+        total_emission = super(NbandRadiation, self)._compute_emission()
         band_fraction = self.band_fraction
         for n in range(self.Tatm.domain.numdims):
             band_fraction = band_fraction[:, np.newaxis]
         return total_emission * band_fraction
 
     def radiative_heating(self):
-        #  need to recompute transmissivities each time because 
+        #  need to recompute transmissivities each time because
         # water vapor is changing
-        self.compute_absorptivity()
-        self.emission = self.compute_emission()
+        self._compute_absorptivity()
+        self.emission = self._compute_emission()
         try:
             fromspace = self.split_channels(self.flux_from_space)
         except:
@@ -124,13 +124,13 @@ class NbandRadiation(Radiation):
         self.absorbed_total = np.sum(self.absorbed)
         self.heating_rate['Tatm'] = np.sum(self.absorbed, axis=0)
         self.flux_to_space = np.sum(flux_up_top, axis=0)
-    
+
     def split_channels(self, flux):
         #return (self.band_fraction*flux)[..., np.newaxis]
         split = np.outer(self.band_fraction, flux)
         # make sure there's a singleton dimension at the last axis (level)
         #if np.size(split, axis=-1) is not 1:
-        # To avoid problem on Windows, which uses type long for array dimensions        
+        # To avoid problem on Windows, which uses type long for array dimensions
         if np.size(split, axis=-1) != 1:
             split = split[..., np.newaxis]
         return split
@@ -139,7 +139,7 @@ class NbandRadiation(Radiation):
 class ThreeBandSW(NbandRadiation):
     def __init__(self, **kwargs):
         '''A three-band mdoel for shortwave radiation.
-    
+
         The spectral decomposition used here is largely based on the
         "Moist Radiative-Convective Model" by Aarnout van Delden, Utrecht University
         a.j.vandelden@uu.nl
@@ -189,7 +189,7 @@ class FourBandSW(NbandRadiation):
     #   But this needs some tuning and better documentation
     def __init__(self, **kwargs):
         '''A four-band mdoel for shortwave radiation.
-    
+
         The spectral decomposition used here is largely based on the
         "Moist Radiative-Convective Model" by Aarnout van Delden, Utrecht University
         a.j.vandelden@uu.nl
@@ -231,8 +231,8 @@ class FourBandSW(NbandRadiation):
         # This ensures that emissivity is always zero for shortwave classes
         return np.zeros_like(self.absorptivity)
 
- 
-        
+
+
 class FourBandLW(NbandRadiation):
     def __init__(self, **kwargs):
         '''Closely following SPEEDY / MITgcm longwave model
@@ -241,7 +241,7 @@ class FourBandLW(NbandRadiation):
         band 2 is weak H2O channel (aggregation of spectral regions with weak to moderate absorption by H2O)
         band 3 is strong H2O channel (aggregation of regions with strong absorption by H2O)
         '''
-        super(FourBandLW, self).__init__(**kwargs)    
+        super(FourBandLW, self).__init__(**kwargs)
         #  SPEEDY uses an approximation to the Planck function
         #  and the band fraction for every emission is calculated from
         #  its current temperature
@@ -288,16 +288,16 @@ class FourBandLW(NbandRadiation):
 def SPEEDY_band_fraction(T):
     '''Python / numpy implementation of the formula used by SPEEDY and MITgcm
     to partition longwave emissions into 4 spectral bands.
-    
+
     Input: temperature in Kelvin
-    
+
     returns: a four-element array of band fraction
-    
+
     Reproducing here the FORTRAN code from MITgcm/pkg/aim_v23/phy_radiat.F
-    
-    
+
+
 	      EPS3=0.95 _d 0
-	
+
 	      DO JTEMP=200,320
 	        FBAND(JTEMP,0)= EPSLW
 	        FBAND(JTEMP,2)= 0.148 _d 0 - 3.0 _d -6 *(JTEMP-247)**2
@@ -306,7 +306,7 @@ def SPEEDY_band_fraction(T):
 	        FBAND(JTEMP,1)= 1. _d 0 -(FBAND(JTEMP,0)+FBAND(JTEMP,2)
 	     &                           +FBAND(JTEMP,3)+FBAND(JTEMP,4))
 	      ENDDO
-	
+
 	      DO JB=0,NBAND
 	        DO JTEMP=lwTemp1,199
 	          FBAND(JTEMP,JB)=FBAND(200,JB)
@@ -332,5 +332,3 @@ def SPEEDY_band_fraction(T):
     FBAND[3,:] = 0.314 + 1.0E-5 *(T-315.)**2
     FBAND[0,:] = 1. - np.sum(FBAND, axis=0)
     return FBAND
-    
-    

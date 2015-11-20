@@ -51,6 +51,16 @@ class TimeDependentProcess(Process):
     def compute(self):
         '''Compute tendencies for all state variables given
         current state and specified input.'''
+        # First compute all strictly diagnostic processes
+        #  But... should these processes actually modify state variables?
+        #  Need to think through the logic.
+        #   A 'diagnostic' process is really just setting input values
+        #  for other processes. But those inputs depend on the current state
+        #
+        #   BUT SHOUDN'T A DIAGNOSTIC PROCESS DO NOTHING BUT SET fields
+        #   IN THE DIAGNOSTICS DICTIONARY?
+        #  THAT"S NOT HOW THE WATER VAPOR MODULE CURRENTLY WORKS
+
         if (self.topdown and self.time_type is 'explicit'):
         	 #  tendencies is dictionary with same names as state variables
             tendencies = self._compute()

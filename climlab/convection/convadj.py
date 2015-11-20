@@ -7,7 +7,7 @@ from climlab.domain.field import Field
 class ConvectiveAdjustment(TimeDependentProcess):
     '''Convective adjustment process
     Instantly returns column to neutral lapse rate
-    
+
     Adjustment includes the surface IF 'Ts' is included in the state
     dictionary. Otherwise only the atmopsheric temperature is adjusted.'''
     def __init__(self, adj_lapse_rate=None, **kwargs):
@@ -20,7 +20,7 @@ class ConvectiveAdjustment(TimeDependentProcess):
         patm = self.lev
         c_atm = self.Tatm.domain.heat_capacity
         if 'Ts' in self.state:
-            c_sfc = self.Ts.domain.heat_capacity       
+            c_sfc = self.Ts.domain.heat_capacity
             self.pnew = np.flipud(np.append(np.flipud(patm), const.ps))
             self.cnew = np.flipud(np.append(np.flipud(c_atm), c_sfc))
         else:
@@ -36,11 +36,11 @@ class ConvectiveAdjustment(TimeDependentProcess):
         else:
             self._adj_lapse_rate = lapserate
         self.param['adj_lapse_rate'] = self._adj_lapse_rate
-    
-    def compute(self):
+
+    def _compute(self):
         #lapse_rate = self.param['adj_lapse_rate']
         if self.adj_lapse_rate is None:
-            self.adjusted_state = self.state
+            self.adjustment = self.state * 0.
         else:
             #  For now, let's assume that the vertical axis is the last axis
             unstable_Tatm = self.Tatm
@@ -49,14 +49,20 @@ class ConvectiveAdjustment(TimeDependentProcess):
                 Tcol = np.concatenate((unstable_Ts, unstable_Tatm),axis=-1)
             else:
                 Tcol = unstable_Tatm
-            Tadj = convective_adjustment_direct(self.pnew, Tcol, self.cnew, lapserate=self.adj_lapse_rate)            
-            if 'Ts' in self.state:            
+            Tadj = convective_adjustment_direct(self.pnew, Tcol, self.cnew, lapserate=self.adj_lapse_rate)
+            if 'Ts' in self.state:
                 Ts = Field(Tadj[...,0], domain=self.Ts.domain)
                 Tatm = Field(Tadj[...,1:], domain=self.Tatm.domain)
                 self.adjustment['Ts'] = Ts - self.Ts
             else:
                 Tatm = Field(Tadj, domain=self.Tatm.domain)
             self.adjustment['Tatm'] = Tatm - self.Tatm
+        # express the adjustment (already accounting for the finite time step)
+        #  as a tendency per unit time, so that it can be applied along with explicit
+        tendencies = {}
+        for name, adj in self.adjustment.iteritems():
+            tendencies[name] = adj / self.param['timestep']
+        return tendencies
 
 
 def convective_adjustment_direct(p, T, c, lapserate=6.5):
@@ -162,7 +168,7 @@ def Akamaev_adjustment(theta, q, beta, n_k, theta_k, s_k, t_k):
         theta_k[k-1] = thistheta
         # back to step 2
 
-               
+
 #
 #    for l in range(2, L+1):  # l = 2,3,4,...,L
 #        n = 1
@@ -225,7 +231,7 @@ def Akamaev_adjustment(theta, q, beta, n_k, theta_k, s_k, t_k):
         n = n_k[k-1]
         thistheta = theta_k[k-1]
         # back to step 8
-    
+
 #    for l in range(L, 0, -1):
 #        if n > 1:
 #        while n>1:

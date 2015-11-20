@@ -9,4 +9,5 @@ class DiagnosticProcess(TimeDependentProcess):
         self.time_type = 'diagnostic'
 
     def _compute(self):
-        pass
+        '''Diagnotic process returns no tendencies.'''
+        return {}

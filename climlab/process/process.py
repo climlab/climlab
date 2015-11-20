@@ -173,6 +173,11 @@ class Process(object):
                     # same shape, assume it's the right domain
                     self.state_domain[name] = dom
 
+    def set_input(self, name, value):
+        '''Add a single input field to this process.'''
+        self.input.update({name: value})
+        setattr(self, name, value)
+
     # Some handy shortcuts... only really make sense when there is only
     # a single axis of that type in the process.
     @property

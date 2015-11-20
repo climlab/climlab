@@ -22,7 +22,7 @@ class ConstantAlbedo(DiagnosticProcess):
         '''Recompute any fixed quantities after a change in parameters'''
         dom = self.domains['default']
         self.diagnostics['albedo'] = Field(self.albedo, domain=dom)
-        
+
 
 class P2Albedo(DiagnosticProcess):
     def __init__(self, a0=0.33, a2=0.25, **kwargs):
@@ -85,11 +85,12 @@ class Iceline(DiagnosticProcess):
             icelat = lat_bounds[boundary_indices]  # an array of boundary latitudes
         self.diagnostics['icelat'] = icelat
 
-        
-    def compute(self):
-        self.find_icelines()
 
- 
+    def _compute(self):
+        self.find_icelines()
+        return {}
+
+
 class StepFunctionAlbedo(DiagnosticProcess):
     def __init__(self, Tf=-10., a0=0.3, a2=0.078, ai=0.62, **kwargs):
         super(DiagnosticProcess, self).__init__(**kwargs)
@@ -112,5 +113,6 @@ class StepFunctionAlbedo(DiagnosticProcess):
         albedo = Field(np.where(ice, cold_albedo, warm_albedo), domain=self.domains['Ts'])
         return albedo
 
-    def compute(self):
+    def _compute(self):
         self.diagnostics['albedo'] = self._get_current_albedo()
+        return {}

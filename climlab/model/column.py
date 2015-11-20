@@ -91,17 +91,12 @@ class GreyRadiationModel(TimeDependentProcess):
 
     # This process has to handle the coupling between insolation and column radiation
     def _compute(self):
-        # some handy nicknames for subprocesses
-        LW = self.subprocess['LW']
-        SW = self.subprocess['SW']
-        insol = self.subprocess['insolation']
-        surf = self.subprocess['surface']
         # Do the coupling
-        SW.flux_from_space = insol.diagnostics['insolation']
-        SW.albedo_sfc = surf.albedo_sfc
-        surf.LW_from_atm = LW.flux_to_sfc
-        surf.SW_from_atm = SW.flux_to_sfc
-        LW.flux_from_sfc = surf.LW_to_atm
+        self.SW.flux_from_space = self.insolation.diagnostics['insolation']
+        self.SW.albedo_sfc = self.surface.albedo_sfc
+        self.surface.LW_from_atm = self.LW.flux_to_sfc
+        self.surface.SW_from_atm = self.SW.flux_to_sfc
+        self.LW.flux_from_sfc = self.surface.LW_to_atm
         # set diagnostics
         self.do_diagnostics()
         # no tendencies for the parent process
@@ -191,11 +186,10 @@ class BandRCModel(RadiativeConvectiveModel):
     def __init__(self, **kwargs):
         super(BandRCModel, self).__init__(**kwargs)
         #  Initialize specific humidity
-        if 'q' not in self.state:
-            q = np.zeros_like(self.Tatm)
-            self.set_state('q', q)
         h2o = ManabeWaterVapor(state=self.state, **self.param)
         self.add_subprocess('H2O', h2o)
+        # q is an input field for this process, which is set by subproc
+        self.set_input('q', self.H2O.q)
 
         #  initialize radiatively active gas inventories
         self.absorber_vmr = {}

@@ -13,7 +13,7 @@ class FixedRelativeHumidity(DiagnosticProcess):
         Same value is applied everywhere.
         qStrat is the minimum specific humidity, ensuring that there is
         some water vapor in the stratosphere.
-        
+
         The attribute RH_profile can be modified to set different
         vertical profiles of relative humidity
         (see daughter class ManabeWaterVapor() ).'''
@@ -21,8 +21,11 @@ class FixedRelativeHumidity(DiagnosticProcess):
         self.relative_humidity = relative_humidity
         self.qStrat = qStrat
         self.RH_profile = self.relative_humidity * np.ones_like(self.Tatm)
+        #  go ahead and set the initial q based on initial temperature
+        self.q = self.Tatm * 0.
+        self._compute()
 
-    def compute(self):
+    def _compute(self):
         es = clausius_clapeyron(self.Tatm)
         e = self.RH_profile * es
         # convert to specific humidity (assume dilute)
@@ -30,8 +33,18 @@ class FixedRelativeHumidity(DiagnosticProcess):
         #  mixing ratio can't be smaller than qStrat
         #  (need some water in the stratosphere!)
         q = np.maximum(self.qStrat, qH2O)
-        self.q -= self.q
-        self.q += q
+        #  Just set this directly here
+        q_adjustment = q - self.q
+        self.q += q_adjustment
+        return {}
+
+    @property
+    def q(self):
+        return self.diagnostics['q']
+    @q.setter
+    def q(self, value):
+        self.diagnostics['q'] = value
+
 
 
 class ManabeWaterVapor(FixedRelativeHumidity):
