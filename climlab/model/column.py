@@ -107,48 +107,46 @@ class GreyRadiationModel(TimeDependentProcess):
 
     def do_diagnostics(self):
         '''Set all the diagnostics from long and shortwave radiation.'''
-        LW = self.subprocess['LW']
-        SW = self.subprocess['SW']
-        surf = self.subprocess['surface']
-        try: self.diagnostics['OLR'] = LW.flux_to_space
+        try: self.diagnostics['OLR'] = self.LW.flux_to_space
         except: pass
-        try: self.diagnostics['LW_down_sfc'] = LW.flux_to_sfc
+        try: self.diagnostics['LW_down_sfc'] = self.LW.flux_to_sfc
         except: pass
-        try: self.diagnostics['LW_up_sfc'] = surf.LW_to_atm
+        try: self.diagnostics['LW_up_sfc'] = self.surface.LW_to_atm
         except: pass
-        try: self.diagnostics['LW_absorbed_sfc'] = (surf.LW_from_atm -
-                                                    surf.LW_to_atm)
+        try: self.diagnostics['LW_absorbed_sfc'] = (self.surface.LW_from_atm -
+                                                    self.surface.LW_to_atm)
         except: pass
-        try: self.diagnostics['LW_absorbed_atm'] = LW.absorbed
+        try: self.diagnostics['LW_absorbed_atm'] = self.LW.absorbed
         except: pass
-        try: self.diagnostics['LW_emission'] = LW.emission
+        try: self.diagnostics['LW_emission'] = self.LW.emission
         except: pass
             #  contributions to OLR from surface and atm. levels
             #self.diagnostics['OLR_sfc'] = self.flux['sfc2space']
             #self.diagnostics['OLR_atm'] = self.flux['atm2space']
-        try: self.diagnostics['ASR'] = SW.flux_from_space - SW.flux_to_space
+        try: self.diagnostics['ASR'] = (self.SW.flux_from_space -
+                                        self.SW.flux_to_space)
         except: pass
         try:
-            self.diagnostics['SW_absorbed_sfc'] = (surf.SW_from_atm -
-                                                    surf.SW_to_atm)
+            self.diagnostics['SW_absorbed_sfc'] = (self.surface.SW_from_atm -
+                                                   self.surface.SW_to_atm)
         except: pass
-        try: self.diagnostics['SW_absorbed_atm'] = SW.absorbed
+        try: self.diagnostics['SW_absorbed_atm'] = self.SW.absorbed
         except: pass
-        try: self.diagnostics['SW_down_sfc'] = SW.flux_to_sfc
+        try: self.diagnostics['SW_down_sfc'] = self.SW.flux_to_sfc
         except: pass
-        try: self.diagnostics['SW_up_sfc'] = SW.flux_from_sfc
+        try: self.diagnostics['SW_up_sfc'] = self.SW.flux_from_sfc
         except: pass
-        try: self.diagnostics['SW_up_TOA'] = SW.flux_to_space
+        try: self.diagnostics['SW_up_TOA'] = self.SW.flux_to_space
         except: pass
-        try: self.diagnostics['SW_down_TOA'] = SW.flux_from_space
+        try: self.diagnostics['SW_down_TOA'] = self.SW.flux_from_space
         except: pass
-        try: self.diagnostics['SW_absorbed_total'] = (SW.absorbed_total -
-                                                      SW.flux_net[0])
+        try: self.diagnostics['SW_absorbed_total'] = (self.SW.absorbed_total -
+                                                      self.SW.flux_net[0])
         except: pass
-        try: self.diagnostics['planetary_albedo'] = (SW.flux_to_space /
-                                                     SW.flux_from_space)
+        try: self.diagnostics['planetary_albedo'] = (self.SW.flux_to_space /
+                                                     self.SW.flux_from_space)
         except: pass
-        try: self.diagnostics['SW_emission'] = SW.emission
+        try: self.diagnostics['SW_emission'] = self.SW.emission
         except: pass
 
 

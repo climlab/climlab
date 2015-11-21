@@ -16,7 +16,7 @@ class EnergyBudget(TimeDependentProcess):
         '''Compute energy flux convergences to get heating rates in W / m**2.
         This method should be over-ridden by daughter classes.'''
         for varname in self.state.keys():
-            self.heating_rate[varname] = np.zeros_like(self.state[varname])
+            self.heating_rate[varname] = self.state[varname] * 0.
 
     def _temperature_tendencies(self):
         self._compute_heating_rates()
@@ -42,7 +42,7 @@ class ExternalEnergySource(EnergyBudget):
     def __init__(self, **kwargs):
         super(ExternalEnergySource, self).__init__(**kwargs)
         for varname in self.state.keys():
-            self.heating_rate[varname] = np.zeros_like(self.state[varname])
+            self.heating_rate[varname] = self.state[varname] * 0.
 
     def _compute_heating_rates(self):
         pass
