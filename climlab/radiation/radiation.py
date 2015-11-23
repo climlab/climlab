@@ -22,11 +22,11 @@ class Radiation(EnergyBudget):
             absorptivity = np.zeros_like(self.Tatm)
         self.absorptivity = absorptivity
         self.reflectivity = reflectivity
-        self.albedo_sfc = albedo_sfc*np.ones_like(self.Ts)
-        self.flux_from_space = np.zeros_like(self.Ts)
-        self.flux_to_sfc = np.zeros_like(self.Ts)
-        self.flux_from_sfc = np.zeros_like(self.Ts)
-        self.flux_to_space = np.zeros_like(self.Ts)
+        self.set_input('albedo_sfc', albedo_sfc*np.ones_like(self.Ts))
+        self.set_input('flux_from_space', 0. * self.Ts)
+        self.set_input('flux_to_sfc', 0. * self.Ts)
+        self.set_input('flux_from_sfc', 0. * self.Ts)
+        self.set_input('flux_to_space', 0. * self.Ts)
         self.heating_rate['Ts'] = np.zeros_like(self.Ts)
 
     @property
