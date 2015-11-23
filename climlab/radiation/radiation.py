@@ -12,7 +12,18 @@ class Radiation(EnergyBudget):
     (should same size as grid).
 
     By default emissivity = absorptivity.
-    Subclasses can override this is necessary (e.g. for shortwave model)'''
+    Subclasses can override this is necessary (e.g. for shortwave model).
+
+    The following boundary values are in the .input dictionary
+    and need to be specified by user or parent process:
+    - albedo_sfc
+    - flux_from_space
+    - flux_from_sfc
+
+    The following values are computed are stored in the .diagnostics dictionary:
+    - flux_to_sfc
+    - flux_to_space
+    '''
     def __init__(self, absorptivity=None, reflectivity=None,
                  albedo_sfc=0, **kwargs):
         super(Radiation, self).__init__(**kwargs)
@@ -24,9 +35,12 @@ class Radiation(EnergyBudget):
         self.reflectivity = reflectivity
         self.set_input('albedo_sfc', albedo_sfc*np.ones_like(self.Ts))
         self.set_input('flux_from_space', 0. * self.Ts)
-        self.set_input('flux_to_sfc', 0. * self.Ts)
         self.set_input('flux_from_sfc', 0. * self.Ts)
-        self.set_input('flux_to_space', 0. * self.Ts)
+        #  THESE ARE NOT INPUT! THEY ARE DIAGNOSTICS
+        self.flux_to_sfc = 0. * self.Ts
+        self.flux_to_space = 0. * self.Ts
+        #  This is set to zero because Ts is a state var...
+        #   But it shouldn't be??
         self.heating_rate['Ts'] = np.zeros_like(self.Ts)
 
     @property
