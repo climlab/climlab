@@ -10,12 +10,26 @@ class SurfaceRadiation(EnergyBudget):
             self.albedo_sfc = np.zeros_like(self.Ts)
         else:
             self.albedo_sfc = albedo_sfc*np.ones_like(self.Ts)
-        self.set_input('LW_from_atm', 0. * self.Ts)
-        self.set_input('SW_from_atm', 0. * self.Ts)
+        #self.set_input('LW_from_atm', 0. * self.Ts)
+        #self.set_input('SW_from_atm', 0. * self.Ts)
+        self.LW_from_atm = 0. * self.Ts
+        self.SW_from_atm = 0. * self.Ts
         self.set_diagnostic('LW_to_atm', 0. * self.Ts)
         self.set_diagnostic('SW_to_atm', 0. * self.Ts)
         self.heating_rate['Tatm'] = np.zeros_like(self.Tatm)
 
+    @property
+    def LW_from_atm(self):
+        return self.input['LW_from_atm']
+    @LW_from_atm.setter
+    def LW_from_atm(self, value):
+        self.input['LW_from_atm'] = value
+    @property
+    def SW_from_atm(self):
+        return self.input['SW_from_atm']
+    @SW_from_atm.setter
+    def SW_from_atm(self, value):
+        self.input['SW_from_atm'] = value
 
     def _compute_emission(self):
         return thermo.blackbody_emission(self.Ts)

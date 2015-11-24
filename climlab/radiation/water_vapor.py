@@ -25,6 +25,31 @@ class FixedRelativeHumidity(DiagnosticProcess):
         self.q = self.Tatm * 0.
         self._compute()
 
+    @property
+    def relative_humidity(self):
+        return self.input['relative_humidity']
+    @relative_humidity.setter
+    def relative_humidity(self, value):
+        self.input['relative_humidity'] = value
+    @property
+    def RH_profile(self):
+        return self.input['RH_profile']
+    @RH_profile.setter
+    def RH_profile(self, value):
+        self.input['RH_profile'] = value
+    @property
+    def qStrat(self):
+        return self.input['qStrat']
+    @qStrat.setter
+    def qStrat(self, value):
+        self.input['qStrat'] = value
+    @property
+    def q(self):
+        return self.diagnostics['q']
+    @q.setter
+    def q(self, value):
+        self.diagnostics['q'] = value
+
     def _compute(self):
         es = clausius_clapeyron(self.Tatm)
         e = self.RH_profile * es
@@ -37,13 +62,6 @@ class FixedRelativeHumidity(DiagnosticProcess):
         q_adjustment = q - self.q
         self.q += q_adjustment
         return {}
-
-    @property
-    def q(self):
-        return self.diagnostics['q']
-    @q.setter
-    def q(self, value):
-        self.diagnostics['q'] = value
 
 
 

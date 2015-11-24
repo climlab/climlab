@@ -92,11 +92,16 @@ class GreyRadiationModel(TimeDependentProcess):
     # This process has to handle the coupling between insolation and column radiation
     def _compute(self):
         # Do the coupling
-        self.SW.set_input('flux_from_space', self.insolation.diagnostics['insolation'])
-        self.SW.set_input('albedo_sfc', self.surface.albedo_sfc)
-        self.surface.set_input('LW_from_atm', self.LW.flux_to_sfc)
-        self.surface.set_input('SW_from_atm', self.SW.flux_to_sfc)
-        self.LW.set_input('flux_from_sfc', self.surface.LW_to_atm)
+        #self.SW.set_input('flux_from_space', self.insolation.diagnostics['insolation'])
+        #self.SW.set_input('albedo_sfc', self.surface.albedo_sfc)
+        #self.surface.set_input('LW_from_atm', self.LW.flux_to_sfc)
+        #self.surface.set_input('SW_from_atm', self.SW.flux_to_sfc)
+        #self.LW.set_input('flux_from_sfc', self.surface.LW_to_atm)
+        self.SW.flux_from_space = self.insolation.insolation
+        self.SW.albedo_sfc = self.surface.albedo_sfc
+        self.surface.LW_from_atm = self.LW.flux_to_sfc
+        self.surface.SW_from_atm = self.SW.flux_to_sfc
+        self.LW.flux_from_sfc = self.surface.LW_to_atm
         # set diagnostics
         self.do_diagnostics()
         # no tendencies for the parent process

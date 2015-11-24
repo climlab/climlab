@@ -28,25 +28,24 @@ class NbandRadiation(Radiation):
     def __init__(self, absorber_vmr=None, **kwargs):
         super(NbandRadiation, self).__init__(**kwargs)
         # this should be overridden by daughter classes
-        self.set_input('band_fraction', np.array(1.))
+        self.band_fraction = np.array(1.)
         ##  a dictionary of absorbing gases, in volumetric mixing ratios
         #  each item should have dimensions of self.Tatm
         #  Can be passed as input argument
         if absorber_vmr is None:
             absorber_vmr = {}
-        self.set_input('absorber_vmr', absorber_vmr)
+        self.absorber_vmr = absorber_vmr
         # a dictionary of absorption cross-sections in m**2 / kg
         # each item should have dimension...  (num_channels, 1)
         self.absorption_cross_section = {}
-        self.set_input('cosZen', 1.)  # cosine of the average zenith angle
+        self.cosZen = 1.  # cosine of the average zenith angle
         dp = self.Tatm.domain.lev.delta
         self.mass_per_layer = dp * const.mb_to_Pa / const.g
-        self.set_input('albedo_sfc',
-                       np.ones_like(self.band_fraction)*self.albedo_sfc)
+        self.albedo_sfc = np.ones_like(self.band_fraction) * self.albedo_sfc
 
     @property
     def band_fraction(self):
-        return self._band_fraction
+        return self.input['band_fraction']
     @band_fraction.setter
     def band_fraction(self, value):
         self.num_channels = value.size
@@ -55,7 +54,25 @@ class NbandRadiation(Radiation):
         self.channel_ax = {'channel': ax}
         dom = domain._Domain(axes=self.channel_ax)
         #   fraction of the total solar flux in each band:
-        self._band_fraction = field.Field(value, domain=dom)
+        self.input['band_fraction'] = field.Field(value, domain=dom)
+    @property
+    def absorber_vmr(self):
+        return self.input['absorber_vmr']
+    @absorber_vmr.setter
+    def absorber_vmr(self, value):
+        self.input['absorber_vmr'] = value
+    @property
+    def absorption_cross_section(self):
+        return self.input['absorption_cross_section']
+    @absorption_cross_section.setter
+    def absorption_cross_section(self, value):
+        self.input['absorption_cross_section'] = value
+    @property
+    def cosZen(self):
+        return self.input['cosZen']
+    @cosZen.setter
+    def cosZen(self, value):
+        self.input['cosZen'] = value 
 
     def _compute_optical_path(self):
         # this will cause a problem for a model without CO2

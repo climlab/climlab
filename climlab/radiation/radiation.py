@@ -14,11 +14,14 @@ class Radiation(EnergyBudget):
     By default emissivity = absorptivity.
     Subclasses can override this is necessary (e.g. for shortwave model).
 
-    The following boundary values are in the .input dictionary
-    and need to be specified by user or parent process:
+    The following boundary values need to be specified by user or parent process:
     - albedo_sfc (default is zero)
     - flux_from_space
     - flux_from_sfc
+    - absorptivity
+    - reflectivity (default is zero)
+    These are accessible (and settable) as process attributes
+    Also stored in process.input dictionary
 
     The following values are computed are stored in the .diagnostics dictionary:
     - flux_to_sfc
@@ -32,11 +35,11 @@ class Radiation(EnergyBudget):
             reflectivity = np.zeros_like(self.Tatm)
         if absorptivity is None:
             absorptivity = np.zeros_like(self.Tatm)
-        self.set_input('absorptivity', absorptivity)
-        self.set_input('reflectivity', reflectivity)
-        self.set_input('albedo_sfc', albedo_sfc*np.ones_like(self.Ts))
-        self.set_input('flux_from_space', 0. * self.Ts)
-        self.set_input('flux_from_sfc', 0. * self.Ts)
+        self.absorptivity = absorptivity
+        self.reflectivity = reflectivity
+        self.albedo_sfc = albedo_sfc*np.ones_like(self.Ts)
+        self.flux_from_space = 0. * self.Ts
+        self.flux_from_sfc = 0. * self.Ts
         #  THESE ARE NOT INPUT! THEY ARE DIAGNOSTICS
         #  But it is helpful to initialize them to zero
         self.set_diagnostic('emission', 0. * self.Tatm)
@@ -74,6 +77,7 @@ class Radiation(EnergyBudget):
                                     axis=axis)
         except:
             self.trans = Transmissivity(absorptivity=value, axis=axis)
+        self.input['absorptivity'] = value
     @property
     def emissivity(self):
         # This ensures that emissivity = absorptivity at all times
@@ -104,6 +108,26 @@ class Radiation(EnergyBudget):
         self.trans = Transmissivity(absorptivity=self.absorptivity,
                                     reflectivity=value,
                                     axis=axis)
+        self.input['reflectivity'] = value
+    #  Some simple mappings of process attributes to the input dictionary
+    @property
+    def albedo_sfc(self):
+        return self.input['albedo_sfc']
+    @albedo_sfc.setter
+    def albedo_sfc(self, value):
+        self.input['albedo_sfc'] = value
+    @property
+    def flux_from_space(self):
+        return self.input['flux_from_space']
+    @flux_from_space.setter
+    def flux_from_space(self, value):
+        self.input['flux_from_space'] = value
+    @property
+    def flux_from_sfc(self):
+        return self.input['flux_from_sfc']
+    @flux_from_sfc.setter
+    def flux_from_sfc(self, value):
+        self.input['flux_from_sfc'] = value
 
     def _compute_emission(self):
         return self.emissivity * blackbody_emission(self.Tatm)
