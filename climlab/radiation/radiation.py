@@ -38,8 +38,15 @@ class Radiation(EnergyBudget):
         self.set_input('flux_from_space', 0. * self.Ts)
         self.set_input('flux_from_sfc', 0. * self.Ts)
         #  THESE ARE NOT INPUT! THEY ARE DIAGNOSTICS
+        self.set_diagnostic('emission', 0. * self.Tatm)
         self.set_diagnostic('flux_to_sfc', 0. * self.Ts)
         self.set_diagnostic('flux_to_space', 0. * self.Ts)
+        #self.set_diagnostic('flux_down', 0. * self.Tatm)
+        #self.set_diagnostic('flux_up', 0. * self.Tatm)
+        #self.set_diagnostic('flux_net', 0. * self.Tatm)
+        self.set_diagnostic('flux_reflected_up', 0. * self.Ts)
+        self.set_diagnostic('absorbed', 0. * self.Tatm)
+        self.set_diagnostic('absorbed_total', 0. * self.Ts)
         #  This is set to zero because Ts is a state var...
         #   But it shouldn't be??
         self.heating_rate['Ts'] = np.zeros_like(self.Ts)
