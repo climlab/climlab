@@ -92,11 +92,6 @@ class GreyRadiationModel(TimeDependentProcess):
     # This process has to handle the coupling between insolation and column radiation
     def _compute(self):
         # Do the coupling
-        #self.SW.set_input('flux_from_space', self.insolation.diagnostics['insolation'])
-        #self.SW.set_input('albedo_sfc', self.surface.albedo_sfc)
-        #self.surface.set_input('LW_from_atm', self.LW.flux_to_sfc)
-        #self.surface.set_input('SW_from_atm', self.SW.flux_to_sfc)
-        #self.LW.set_input('flux_from_sfc', self.surface.LW_to_atm)
         self.SW.flux_from_space = self.insolation.insolation
         self.SW.albedo_sfc = self.surface.albedo_sfc
         self.surface.LW_from_atm = self.LW.flux_to_sfc
@@ -172,7 +167,7 @@ class BandRCModel(RadiativeConvectiveModel):
         h2o = ManabeWaterVapor(state=self.state, **self.param)
         self.add_subprocess('H2O', h2o)
         # q is an input field for this process, which is set by subproc
-        self.set_input('q', self.H2O.q)
+        self.q = self.H2O.q
 
         #  initialize radiatively active gas inventories
         self.absorber_vmr = {}
@@ -190,6 +185,12 @@ class BandRCModel(RadiativeConvectiveModel):
         self.add_subprocess('LW', longwave)
         self.add_subprocess('SW', shortwave)
 
+    @property
+    def q(self):
+        return self.input['q']
+    @q.setter
+    def q(self, value):
+        self.input['q'] = value
 
 def compute_layer_absorptivity(abs_coeff, dp):
     '''Compute layer absorptivity from a constant absorption coefficient.'''

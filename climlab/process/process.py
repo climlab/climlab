@@ -184,9 +184,9 @@ class Process(object):
         # setter method for that attribute
         self.__setattr__(name, value)
 
-    def set_input(self, name, value):
-        '''Add a single input field to this process.'''
-        self._set_field('input', name, value)
+#    def set_input(self, name, value):
+#        '''Add a single input field to this process.'''
+#        self._set_field('input', name, value)
 
     def set_diagnostic(self, name, value):
         '''Add a single diagnostic field to this process.'''

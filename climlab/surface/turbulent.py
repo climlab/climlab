@@ -9,8 +9,15 @@ class SurfaceFlux(EnergyBudget):
         super(SurfaceFlux, self).__init__(**kwargs)
         self.Cd = Cd
         #  fixed wind speed (for now)
-        self.set_input('U', 5. * np.ones_like(self.Ts))
+        self.U = 5. * np.ones_like(self.Ts))
         self.heating_rate['Tatm'] = np.zeros_like(self.Tatm)
+
+    @property
+    def U(self):
+        return self.input['U']
+    @U.setter
+    def U(self, value):
+        self.input['U'] = value
 
     def _compute_heating_rates(self):
         '''Compute energy flux convergences to get heating rates in W/m2.'''
