@@ -16,7 +16,7 @@ class Radiation(EnergyBudget):
 
     The following boundary values are in the .input dictionary
     and need to be specified by user or parent process:
-    - albedo_sfc
+    - albedo_sfc (default is zero)
     - flux_from_space
     - flux_from_sfc
 
@@ -37,8 +37,8 @@ class Radiation(EnergyBudget):
         self.set_input('flux_from_space', 0. * self.Ts)
         self.set_input('flux_from_sfc', 0. * self.Ts)
         #  THESE ARE NOT INPUT! THEY ARE DIAGNOSTICS
-        self.flux_to_sfc = 0. * self.Ts
-        self.flux_to_space = 0. * self.Ts
+        self.set_diagnostic('flux_to_sfc', 0. * self.Ts)
+        self.set_diagnostic('flux_to_space', 0. * self.Ts)
         #  This is set to zero because Ts is a state var...
         #   But it shouldn't be??
         self.heating_rate['Ts'] = np.zeros_like(self.Ts)
@@ -99,7 +99,7 @@ class Radiation(EnergyBudget):
     def _compute_emission(self):
         return self.emissivity * blackbody_emission(self.Tatm)
 
-    def radiative_heating(self):
+    def _compute_radiative_heating(self):
         self.emission = self._compute_emission()
         try:
             fromspace = self.flux_from_space
@@ -127,7 +127,7 @@ class Radiation(EnergyBudget):
 
     def _compute_heating_rates(self):
         '''Compute energy flux convergences to get heating rates in W / m**2.'''
-        self.radiative_heating()
+        self._compute_radiative_heating()
 
     def flux_components_top(self):
         '''Compute the contributions to the outgoing flux to space due to

@@ -85,8 +85,10 @@ class TimeDependentProcess(Process):
                 tendencies[varname] += tend
         self.tendencies = tendencies
         #  pass diagnostics up the process tree
-        for name, proc in self.subprocess.iteritems():
-            self.diagnostics.update(proc.diagnostics)
+        #  actually don't. This should be done explicitly by parent processes
+        #   but only where it is meaningful.
+        #for name, proc in self.subprocess.iteritems():
+        #    self.diagnostics.update(proc.diagnostics)
 
     def _compute(self):
         # where the tendencies are actually computed...

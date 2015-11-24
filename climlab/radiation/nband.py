@@ -97,24 +97,24 @@ class NbandRadiation(Radiation):
             band_fraction = band_fraction[:, np.newaxis]
         return total_emission * band_fraction
 
-    def radiative_heating(self):
+    def _compute_radiative_heating(self):
         #  need to recompute transmissivities each time because
         # water vapor is changing
         self._compute_absorptivity()
         self.emission = self._compute_emission()
         try:
-            fromspace = self.split_channels(self.flux_from_space)
+            fromspace = self._split_channels(self.flux_from_space)
         except:
-            fromspace = self.split_channels(np.zeros_like(self.Ts))
+            fromspace = self._split_channels(np.zeros_like(self.Ts))
         #  in this code the assumption is that vertical axis is axis=-1 (last)
-        #  The band axis is axis=0, which is provided by split_channels
+        #  The band axis is axis=0, which is provided by _split_channels
         self.flux_down = self.trans.flux_down(fromspace, self.emission)
         # this ensure same dimensions as other fields
         flux_down_sfc = self.flux_down[..., 0, np.newaxis]
         #flux_down_sfc = self.flux_down[..., 0]
         self.flux_to_sfc = np.sum(flux_down_sfc, axis=0)
 
-        flux_from_sfc = self.split_channels(self.flux_from_sfc)
+        flux_from_sfc = self._split_channels(self.flux_from_sfc)
         flux_up_bottom = flux_from_sfc + self.albedo_sfc*flux_down_sfc
         self.flux_up = self.trans.flux_up(flux_up_bottom, self.emission)
         self.flux_net = self.flux_up - self.flux_down
@@ -125,7 +125,7 @@ class NbandRadiation(Radiation):
         self.heating_rate['Tatm'] = np.sum(self.absorbed, axis=0)
         self.flux_to_space = np.sum(flux_up_top, axis=0)
 
-    def split_channels(self, flux):
+    def _split_channels(self, flux):
         #return (self.band_fraction*flux)[..., np.newaxis]
         split = np.outer(self.band_fraction, flux)
         # make sure there's a singleton dimension at the last axis (level)

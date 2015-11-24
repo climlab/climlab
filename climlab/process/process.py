@@ -184,8 +184,6 @@ class Process(object):
 
     def set_input(self, name, value):
         '''Add a single input field to this process.'''
-        #self.input.update({name: value})
-        #setattr(self, name, value)
         self._set_field('input', name, value)
 
     def set_diagnostic(self, name, value):
