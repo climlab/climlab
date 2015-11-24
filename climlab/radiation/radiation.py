@@ -23,6 +23,7 @@ class Radiation(EnergyBudget):
     The following values are computed are stored in the .diagnostics dictionary:
     - flux_to_sfc
     - flux_to_space
+    -  plus a bunch of others!!
     '''
     def __init__(self, absorptivity=None, reflectivity=None,
                  albedo_sfc=0, **kwargs):
@@ -100,30 +101,34 @@ class Radiation(EnergyBudget):
         return self.emissivity * blackbody_emission(self.Tatm)
 
     def _compute_radiative_heating(self):
-        self.emission = self._compute_emission()
+        self.set_diagnostic('emission', self._compute_emission())
         try:
             fromspace = self.flux_from_space
 
         except:
             fromspace = np.zeros_like(self.Ts)
 
-        self.flux_down = self.trans.flux_down(fromspace, self.emission)
-        self.flux_reflected_up = \
-            self.trans.flux_reflected_up(self.flux_down, self.albedo_sfc)
+        self.set_diagnostic('flux_down',
+                            self.trans.flux_down(fromspace, self.emission))
+        self.set_diagnostic('flux_reflected_up',
+                            self.trans.flux_reflected_up(self.flux_down,
+                                                         self.albedo_sfc))
         # this ensure same dimensions as other fields
         flux_down_sfc = self.flux_down[..., 0, np.newaxis]
         flux_up_bottom = (self.flux_from_sfc +
                           self.flux_reflected_up[..., 0, np.newaxis])
-        self.flux_up = self.trans.flux_up(flux_up_bottom,
-                                self.emission+self.flux_reflected_up[...,1:])
-        self.flux_net = self.flux_up - self.flux_down
+        self.set_diagnostic('flux_up',
+                            self.trans.flux_up(flux_up_bottom,
+                                               self.emission +
+                                               self.flux_reflected_up[...,1:]))
+        self.set_diagnostic('flux_net', self.flux_up - self.flux_down)
         flux_up_top = self.flux_up[..., -1, np.newaxis]
         # absorbed radiation (flux convergence) in W / m**2
-        self.absorbed = -np.diff(self.flux_net)
-        self.absorbed_total = np.sum(self.absorbed)
+        self.set_diagnostic('absorbed', -np.diff(self.flux_net))
+        self.set_diagnostic('absorbed_total', np.sum(self.absorbed))
         self.heating_rate['Tatm'] = self.absorbed
-        self.flux_to_sfc = flux_down_sfc
-        self.flux_to_space = flux_up_top
+        self.set_diagnostic('flux_to_sfc', flux_down_sfc)
+        self.set_diagnostic('flux_to_space', flux_up_top)
 
     def _compute_heating_rates(self):
         '''Compute energy flux convergences to get heating rates in W / m**2.'''

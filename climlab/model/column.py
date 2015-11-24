@@ -92,11 +92,11 @@ class GreyRadiationModel(TimeDependentProcess):
     # This process has to handle the coupling between insolation and column radiation
     def _compute(self):
         # Do the coupling
-        self.SW.flux_from_space = self.insolation.diagnostics['insolation']
-        self.SW.albedo_sfc = self.surface.albedo_sfc
-        self.surface.LW_from_atm = self.LW.flux_to_sfc
-        self.surface.SW_from_atm = self.SW.flux_to_sfc
-        self.LW.flux_from_sfc = self.surface.LW_to_atm
+        self.SW.set_input('flux_from_space', self.insolation.diagnostics['insolation'])
+        self.SW.set_input('albedo_sfc', self.surface.albedo_sfc)
+        self.surface.set_input('LW_from_atm', self.LW.flux_to_sfc)
+        self.surface.set_input('SW_from_atm', self.SW.flux_to_sfc)
+        self.LW.set_input('flux_from_sfc', self.surface.LW_to_atm)
         # set diagnostics
         self.do_diagnostics()
         # no tendencies for the parent process
@@ -107,46 +107,46 @@ class GreyRadiationModel(TimeDependentProcess):
 
     def do_diagnostics(self):
         '''Set all the diagnostics from long and shortwave radiation.'''
-        try: self.diagnostics['OLR'] = self.LW.flux_to_space
+        try: self.set_diagnostic('OLR', self.LW.flux_to_space)
         except: pass
-        try: self.diagnostics['LW_down_sfc'] = self.LW.flux_to_sfc
+        try: self.set_diagnostic('LW_down_sfc', self.LW.flux_to_sfc)
         except: pass
-        try: self.diagnostics['LW_up_sfc'] = self.surface.LW_to_atm
+        try: self.set_diagnostic('LW_up_sfc', self.surface.LW_to_atm)
         except: pass
-        try: self.diagnostics['LW_absorbed_sfc'] = (self.surface.LW_from_atm -
-                                                    self.surface.LW_to_atm)
+        try: self.set_diagnostic('LW_absorbed_sfc', (self.surface.LW_from_atm -
+                                                     self.surface.LW_to_atm))
         except: pass
-        try: self.diagnostics['LW_absorbed_atm'] = self.LW.absorbed
+        try: self.set_diagnostic('LW_absorbed_atm', self.LW.absorbed)
         except: pass
-        try: self.diagnostics['LW_emission'] = self.LW.emission
+        try: self.diagnostic('LW_emission', self.LW.emission)
         except: pass
             #  contributions to OLR from surface and atm. levels
             #self.diagnostics['OLR_sfc'] = self.flux['sfc2space']
             #self.diagnostics['OLR_atm'] = self.flux['atm2space']
-        try: self.diagnostics['ASR'] = (self.SW.flux_from_space -
-                                        self.SW.flux_to_space)
+        try: self.set_diagnostic('ASR', (self.SW.flux_from_space -
+                                         self.SW.flux_to_space))
         except: pass
         try:
-            self.diagnostics['SW_absorbed_sfc'] = (self.surface.SW_from_atm -
-                                                   self.surface.SW_to_atm)
+            self.set_diagnostic('SW_absorbed_sfc', (self.surface.SW_from_atm -
+                                                    self.surface.SW_to_atm))
         except: pass
-        try: self.diagnostics['SW_absorbed_atm'] = self.SW.absorbed
+        try: self.set_diagnostic('SW_absorbed_atm', self.SW.absorbed)
         except: pass
-        try: self.diagnostics['SW_down_sfc'] = self.SW.flux_to_sfc
+        try: self.set_diagnostic('SW_down_sfc', self.SW.flux_to_sfc)
         except: pass
-        try: self.diagnostics['SW_up_sfc'] = self.SW.flux_from_sfc
+        try: self.set_diagnostic('SW_up_sfc', self.SW.flux_from_sfc)
         except: pass
-        try: self.diagnostics['SW_up_TOA'] = self.SW.flux_to_space
+        try: self.set_diagnostic('SW_up_TOA', self.SW.flux_to_space)
         except: pass
-        try: self.diagnostics['SW_down_TOA'] = self.SW.flux_from_space
+        try: self.set_diagnostic('SW_down_TOA', self.SW.flux_from_space)
         except: pass
-        try: self.diagnostics['SW_absorbed_total'] = (self.SW.absorbed_total -
-                                                      self.SW.flux_net[0])
+        try: self.set_diagnostic('SW_absorbed_total', (self.SW.absorbed_total -
+                                                        self.SW.flux_net[0]))
         except: pass
-        try: self.diagnostics['planetary_albedo'] = (self.SW.flux_to_space /
-                                                     self.SW.flux_from_space)
+        try: self.set_diagnostic('planetary_albedo', (self.SW.flux_to_space /
+                                                      self.SW.flux_from_space))
         except: pass
-        try: self.diagnostics['SW_emission'] = self.SW.emission
+        try: self.set_diagnostic('SW_emission', self.SW.emission)
         except: pass
 
 

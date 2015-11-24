@@ -12,20 +12,20 @@ class SurfaceRadiation(EnergyBudget):
             self.albedo_sfc = albedo_sfc*np.ones_like(self.Ts)
         self.set_input('LW_from_atm', 0. * self.Ts)
         self.set_input('SW_from_atm', 0. * self.Ts)
-        self.LW_to_atm = 0. * self.Ts
-        self.SW_to_atm = 0. * self.Ts
+        self.set_diagnostic('LW_to_atm', 0. * self.Ts)
+        self.set_diagnostic('SW_to_atm', 0. * self.Ts)
         self.heating_rate['Tatm'] = np.zeros_like(self.Tatm)
 
 
-    def emission(self):
+    def _compute_emission(self):
         return thermo.blackbody_emission(self.Ts)
 
-    def reflected_flux(self):
+    def _compute_reflected_flux(self):
         return self.SW_from_atm * self.albedo_sfc
 
     def _compute_heating_rates(self):
         '''Compute energy flux convergences to get heating rates in W / m**2.'''
-        self.LW_to_atm = self.emission()
-        self.SW_to_atm = self.reflected_flux()
+        self.set_diagnostic('LW_to_atm', self._compute_emission())
+        self.set_diagnostic('SW_to_atm', self._compute_reflected_flux())
         self.heating_rate['Ts'] = ( self.LW_from_atm - self.LW_to_atm
                                   + self.SW_from_atm - self.SW_to_atm )
