@@ -28,14 +28,13 @@ class NbandRadiation(Radiation):
     def __init__(self, absorber_vmr=None, **kwargs):
         super(NbandRadiation, self).__init__(**kwargs)
         # this should be overridden by daughter classes
-        self.band_fraction = np.array(1.)
+        self.set_input('band_fraction', np.array(1.))
         ##  a dictionary of absorbing gases, in volumetric mixing ratios
         #  each item should have dimensions of self.Tatm
         #  Can be passed as input argument
         if absorber_vmr is None:
-            self.absorber_vmr = {}
-        else:
-            self.absorber_vmr = absorber_vmr
+            absorber_vmr = {}
+        self.set_input('absorber_vmr', absorber_vmr)
         # a dictionary of absorption cross-sections in m**2 / kg
         # each item should have dimension...  (num_channels, 1)
         self.absorption_cross_section = {}

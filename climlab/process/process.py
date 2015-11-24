@@ -178,9 +178,11 @@ class Process(object):
         as a process attribute. field_type can be 'input', 'diagnostic' '''
         try:
             self.__getattribute__(field_type).update({name: value})
-            setattr(self, name, value)
         except:
             raise ValueError('Problem with field_type %s'  %field_type)
+        #  Note that if process has attribute name, this will trigger The
+        # setter method for that attribute
+        self.__setattr__(name, value)
 
     def set_input(self, name, value):
         '''Add a single input field to this process.'''
