@@ -192,6 +192,15 @@ class Process(object):
         '''Add a single diagnostic field to this process.'''
         self._set_field('diagnostics', name, value)
 
+    def add_diagnostic(self, name):
+        def diag(self):
+            return self.diagnostics[name]
+        diag = property(diag)
+        def setter(self, name, value):
+            self.diagnostics[name] = value
+        diag = diag.setter(setter)
+        self.__setattr__(name, diag)
+
     # Some handy shortcuts... only really make sense when there is only
     # a single axis of that type in the process.
     @property
