@@ -15,13 +15,9 @@ class ConstantAlbedo(DiagnosticProcess):
         return self._albedo
     @albedo.setter
     def albedo(self, value):
-        self._albedo = value
-        self.param['albedo'] = value
-        self._compute_fixed()
-    def _compute_fixed(self):
-        '''Recompute any fixed quantities after a change in parameters'''
         dom = self.domains['default']
-        self.diagnostics['albedo'] = Field(self.albedo, domain=dom)
+        self._albedo = Field(value, domain=dom)
+        self.param['albedo'] = value
 
 
 class P2Albedo(DiagnosticProcess):
@@ -56,7 +52,7 @@ class P2Albedo(DiagnosticProcess):
             albedo = np.zeros_like(phi)
         # make sure that the diagnostic has the correct field dimensions.
         dom = self.domains['default']
-        self.diagnostics['albedo'] = Field(albedo, domain=dom)
+        self.set_diagnostic('albedo', Field(albedo, domain=dom))
 
 
 
@@ -71,8 +67,8 @@ class Iceline(DiagnosticProcess):
         lat_bounds = self.domains['Ts'].axes['lat'].bounds
         noice = np.where(Ts >= Tf, True, False)
         ice = np.where(Ts < Tf, True, False)
-        self.diagnostics['noice'] = noice
-        self.diagnostics['ice'] = ice
+        self.set_diagnostic('noice', noice)
+        self.set_diagnostic('ice', ice)
         if ice.all():
             # 100% ice cover
             icelat = np.array([-0., 0.])
@@ -83,7 +79,7 @@ class Iceline(DiagnosticProcess):
             # Taking np.diff of a boolean array gives True at the boundaries between True and False
             boundary_indices = np.where(np.diff(ice.squeeze()))[0] + 1
             icelat = lat_bounds[boundary_indices]  # an array of boundary latitudes
-        self.diagnostics['icelat'] = icelat
+        self.set_diagnostic('icelat', icelat)
 
 
     def _compute(self):
@@ -106,13 +102,13 @@ class StepFunctionAlbedo(DiagnosticProcess):
 
     def _get_current_albedo(self):
         '''Simple step-function albedo based on ice line at temperature Tf.'''
-        ice = self.subprocess['iceline'].diagnostics['ice']
+        ice = self.subprocess['iceline'].ice
         # noice = self.subprocess['iceline'].diagnostics['noice']
-        cold_albedo = self.subprocess['cold albedo'].diagnostics['albedo']
-        warm_albedo = self.subprocess['warm albedo'].diagnostics['albedo']
+        cold_albedo = self.subprocess['cold albedo'].albedo
+        warm_albedo = self.subprocess['warm albedo'].albedo
         albedo = Field(np.where(ice, cold_albedo, warm_albedo), domain=self.domains['Ts'])
         return albedo
 
     def _compute(self):
-        self.diagnostics['albedo'] = self._get_current_albedo()
+        self.set_diagnostic('albedo', self._get_current_albedo())
         return {}

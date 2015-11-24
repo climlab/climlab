@@ -11,8 +11,7 @@ from climlab.solar.insolation import daily_insolation
 
 class _Insolation(DiagnosticProcess):
     '''Parent class for insolation processes.
-    Calling compute() will update self.diagnostics['insolation']
-    with current insolation values.'''
+    Calling compute() will update self.insolation with current values.'''
     # parameter S0 is now stored using a python property
     # can be changed through self.S0 = newvalue
     # which will also update the parameter dictionary
@@ -20,6 +19,7 @@ class _Insolation(DiagnosticProcess):
     def __init__(self, S0=const.S0, **kwargs):
         super(_Insolation, self).__init__(**kwargs)
         self.S0 = S0
+        self.set_diagnostic('insolation', self.S0)
 
     @property
     def S0(self):
@@ -46,7 +46,7 @@ class FixedInsolation(_Insolation):
         super(FixedInsolation, self).__init__(S0=S0, **kwargs)
 
     def _compute_fixed(self):
-        self.diagnostics['insolation'] = self.S0
+        self.set_diagnostic('insolation', self.S0)
 
 
 class P2Insolation(_Insolation):
@@ -64,14 +64,13 @@ class P2Insolation(_Insolation):
         self._compute_fixed()
 
     def _compute_fixed(self):
-        #lat = self.domains['default'].axes['lat'].points
-        lat = self.lat
-        phi = np.deg2rad(lat)
+        phi = np.deg2rad(self.lat)
+        #  Why is there a silent fail here? Should get rid of this.
         try:
             insolation = self.S0 / 4 * (1. + self.s2 * P2(np.sin(phi)))
             # make sure that the diagnostic has the correct field dimensions.
             dom = self.domains['default']
-            self.diagnostics['insolation'] = Field(insolation, domain=dom)
+            self.set_diagnostic('insolation', Field(insolation, domain=dom))
         except:
             pass
 
@@ -108,7 +107,7 @@ class AnnualMeanInsolation(_Insolation):
             insolation = np.mean(temp_array, axis=1)
             # make sure that the diagnostic has the correct field dimensions.
             dom = self.domains['default']
-            self.diagnostics['insolation'] = Field(insolation, domain=dom)
+            self.set_diagnostic('insolation', Field(insolation, domain=dom))
         except:
             pass
 
@@ -128,4 +127,4 @@ class DailyInsolation(AnnualMeanInsolation):
         dom = self.domains['default']
         time_index = self.time['day_of_year_index']   # THIS ONLY WORKS IF self IS THE MASTER PROCESS
         insolation = insolation_array[..., time_index]
-        self.diagnostics['insolation'] = Field(insolation, domain=dom)
+        self.set_diagnostic('insolation', Field(insolation, domain=dom))
