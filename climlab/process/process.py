@@ -173,10 +173,24 @@ class Process(object):
                     # same shape, assume it's the right domain
                     self.state_domain[name] = dom
 
+    def _set_field(self, field_type, name, value):
+        '''Add a new field to a specified dictionary. The field is also added
+        as a process attribute. field_type can be 'input', 'diagnostic' '''
+        try:
+            self.__getattribute__(field_type).update({name: value})
+            setattr(self, name, value)
+        except:
+            raise ValueError('Problem with field_type %s'  %field_type)
+
     def set_input(self, name, value):
         '''Add a single input field to this process.'''
-        self.input.update({name: value})
-        setattr(self, name, value)
+        #self.input.update({name: value})
+        #setattr(self, name, value)
+        self._set_field('input', name, value)
+
+    def set_diagnostic(self, name, value):
+        '''Add a single diagnostic field to this process.'''
+        self._set_field('diagnostics', name, value)
 
     # Some handy shortcuts... only really make sense when there is only
     # a single axis of that type in the process.
