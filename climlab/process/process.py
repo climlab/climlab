@@ -110,7 +110,13 @@ class Process(object):
         #  so can be used as dictionary keys, which is the whole point
         self._diag_vars = frozenset()
         # dictionary of input quantities
-        self.input = _make_dict(input, Field)
+        #self.input = _make_dict(input, Field)
+        if input is None:
+            self._input_vars = frozenset()
+        else:
+            self.add_input(input.keys())
+            for name, var in input:
+                self.__dict__[name] = var
         self.creation_date = time.strftime("%a, %d %b %Y %H:%M:%S %z",
                                            time.localtime())
         # subprocess is a dictionary of any sub-processes
@@ -200,10 +206,18 @@ class Process(object):
         '''Given a list of names of diagnostic variables, update the master list.'''
         self._diag_vars = frozenset.union(self._diag_vars, diaglist)
 
+    def add_input(self, inputlist):
+        '''Given a list of names of input variables, update the master list.'''
+        self._input_vars = frozenset.union(self._input_vars, inputlist)
+
     @property
     def diagnostics(self):
         return { key:value for key, value in self.__dict__.items()
                  if key in self._diag_vars }
+    @property
+    def input(self):
+        return { key:value for key, value in self.__dict__.items()
+                 if key in self._input_vars }
 
     # Some handy shortcuts... only really make sense when there is only
     # a single axis of that type in the process.

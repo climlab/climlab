@@ -31,6 +31,12 @@ class Radiation(EnergyBudget):
     def __init__(self, absorptivity=None, reflectivity=None,
                  albedo_sfc=0, **kwargs):
         super(Radiation, self).__init__(**kwargs)
+        newinput = ['reflectivity',
+                    'absorptivity',
+                    'albedo_sfc',
+                    'flux_from_space',
+                    'flux_from_sfc']
+        self.add_input(newinput)
         if reflectivity is None:
             reflectivity = np.zeros_like(self.Tatm)
         if absorptivity is None:
@@ -112,26 +118,7 @@ class Radiation(EnergyBudget):
         self.trans = Transmissivity(absorptivity=self.absorptivity,
                                     reflectivity=value,
                                     axis=axis)
-        self.input['reflectivity'] = value
-    #  Some simple mappings of process attributes to the input dictionary
-    @property
-    def albedo_sfc(self):
-        return self.input['albedo_sfc']
-    @albedo_sfc.setter
-    def albedo_sfc(self, value):
-        self.input['albedo_sfc'] = value
-    @property
-    def flux_from_space(self):
-        return self.input['flux_from_space']
-    @flux_from_space.setter
-    def flux_from_space(self, value):
-        self.input['flux_from_space'] = value
-    @property
-    def flux_from_sfc(self):
-        return self.input['flux_from_sfc']
-    @flux_from_sfc.setter
-    def flux_from_sfc(self, value):
-        self.input['flux_from_sfc'] = value
+        #self.input['reflectivity'] = value
 
     def _compute_emission(self):
         return self.emissivity * blackbody_emission(self.Tatm)

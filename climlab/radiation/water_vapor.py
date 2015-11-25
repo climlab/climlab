@@ -18,6 +18,10 @@ class FixedRelativeHumidity(DiagnosticProcess):
         vertical profiles of relative humidity
         (see daughter class ManabeWaterVapor() ).'''
         super(FixedRelativeHumidity, self).__init__(**kwargs)
+        newinput = ['relative_humidity',
+                    'qStrat',
+                    'RH_profile',]
+        self.add_input(newinput)
         self.relative_humidity = relative_humidity
         self.qStrat = qStrat
         self.RH_profile = self.relative_humidity * np.ones_like(self.Tatm)
@@ -26,31 +30,6 @@ class FixedRelativeHumidity(DiagnosticProcess):
         #  go ahead and set the initial q based on initial temperature
         self.q = self.Tatm * 0.
         self._compute()
-
-    @property
-    def relative_humidity(self):
-        return self.input['relative_humidity']
-    @relative_humidity.setter
-    def relative_humidity(self, value):
-        self.input['relative_humidity'] = value
-    @property
-    def RH_profile(self):
-        return self.input['RH_profile']
-    @RH_profile.setter
-    def RH_profile(self, value):
-        self.input['RH_profile'] = value
-    @property
-    def qStrat(self):
-        return self.input['qStrat']
-    @qStrat.setter
-    def qStrat(self, value):
-        self.input['qStrat'] = value
-    # @property
-    # def q(self):
-    #     return self.diagnostics['q']
-    # @q.setter
-    # def q(self, value):
-    #     self.diagnostics['q'] = value
 
     def _compute(self):
         es = clausius_clapeyron(self.Tatm)

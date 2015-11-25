@@ -178,6 +178,9 @@ class BandRCModel(RadiativeConvectiveModel):
         h2o = ManabeWaterVapor(state=self.state, **self.param)
         self.add_subprocess('H2O', h2o)
         # q is an input field for this process, which is set by subproc
+        #  (though in this sense it is actually diagnostic...)
+        newinput = ['q']
+        self.add_input(newinput)
         self.q = self.H2O.q
 
         #  initialize radiatively active gas inventories
@@ -195,14 +198,6 @@ class BandRCModel(RadiativeConvectiveModel):
                                 albedo_sfc=self.param['albedo_sfc'])
         self.add_subprocess('LW', longwave)
         self.add_subprocess('SW', shortwave)
-
-    #  Actually shouldn't q be a diagnostic for this process???
-    @property
-    def q(self):
-        return self.input['q']
-    @q.setter
-    def q(self, value):
-        self.input['q'] = value
 
 def compute_layer_absorptivity(abs_coeff, dp):
     '''Compute layer absorptivity from a constant absorption coefficient.'''

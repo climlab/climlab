@@ -6,6 +6,10 @@ from climlab.process.energy_budget import EnergyBudget
 class SurfaceRadiation(EnergyBudget):
     def __init__(self, albedo_sfc=None, **kwargs):
         super(SurfaceRadiation, self).__init__(**kwargs)
+        newinput = ['albedo_sfc',
+                    'LW_from_atm',
+                    'SW_from_atm',]
+        self.add_input(newinput)
         if albedo_sfc is None:
             self.albedo_sfc = np.zeros_like(self.Ts)
         else:
@@ -18,19 +22,6 @@ class SurfaceRadiation(EnergyBudget):
         self.LW_to_atm = 0. * self.Ts
         self.SW_to_atm = 0. * self.Ts
         self.heating_rate['Tatm'] = np.zeros_like(self.Tatm)
-
-    @property
-    def LW_from_atm(self):
-        return self.input['LW_from_atm']
-    @LW_from_atm.setter
-    def LW_from_atm(self, value):
-        self.input['LW_from_atm'] = value
-    @property
-    def SW_from_atm(self):
-        return self.input['SW_from_atm']
-    @SW_from_atm.setter
-    def SW_from_atm(self, value):
-        self.input['SW_from_atm'] = value
 
     def _compute_emission(self):
         return thermo.blackbody_emission(self.Ts)

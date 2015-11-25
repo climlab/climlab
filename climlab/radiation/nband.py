@@ -27,6 +27,11 @@ class NbandRadiation(Radiation):
     '''
     def __init__(self, absorber_vmr=None, **kwargs):
         super(NbandRadiation, self).__init__(**kwargs)
+        newinput = ['band_fraction',
+                    'absorber_vmr',
+                    'absorption_cross_section',
+                    'cosZen',]
+        self.add_input(newinput)
         # this should be overridden by daughter classes
         self.band_fraction = np.array(1.)
         ##  a dictionary of absorbing gases, in volumetric mixing ratios
@@ -45,7 +50,7 @@ class NbandRadiation(Radiation):
 
     @property
     def band_fraction(self):
-        return self.input['band_fraction']
+        return self._band_fraction
     @band_fraction.setter
     def band_fraction(self, value):
         self.num_channels = value.size
@@ -54,25 +59,7 @@ class NbandRadiation(Radiation):
         self.channel_ax = {'channel': ax}
         dom = domain._Domain(axes=self.channel_ax)
         #   fraction of the total solar flux in each band:
-        self.input['band_fraction'] = field.Field(value, domain=dom)
-    @property
-    def absorber_vmr(self):
-        return self.input['absorber_vmr']
-    @absorber_vmr.setter
-    def absorber_vmr(self, value):
-        self.input['absorber_vmr'] = value
-    @property
-    def absorption_cross_section(self):
-        return self.input['absorption_cross_section']
-    @absorption_cross_section.setter
-    def absorption_cross_section(self, value):
-        self.input['absorption_cross_section'] = value
-    @property
-    def cosZen(self):
-        return self.input['cosZen']
-    @cosZen.setter
-    def cosZen(self, value):
-        self.input['cosZen'] = value
+        self._band_fraction = field.Field(value, domain=dom)
 
     def _compute_optical_path(self):
         # this will cause a problem for a model without CO2
