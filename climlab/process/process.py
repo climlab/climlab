@@ -106,8 +106,6 @@ class Process(object):
         # dictionary of diagnostic quantities
         #self.diagnostics = _make_dict(diagnostics, Field)
         #  basically a list of names of diagnostic variables
-        #  must use frozenset because it is immutable and hashable
-        #  so can be used as dictionary keys, which is the whole point
         self._diag_vars = frozenset()
         # dictionary of input quantities
         #self.input = _make_dict(input, Field)
@@ -193,14 +191,6 @@ class Process(object):
         #  Note that if process has attribute name, this will trigger The
         # setter method for that attribute
         self.__setattr__(name, value)
-
-#    def set_input(self, name, value):
-#        '''Add a single input field to this process.'''
-#        self._set_field('input', name, value)
-
-    # def set_diagnostic(self, name, value):
-    #     '''Add a single diagnostic field to this process.'''
-    #     self._set_field('diagnostics', name, value)
 
     def add_diagnostics(self, diaglist):
         '''Given a list of names of diagnostic variables, update the master list.'''
