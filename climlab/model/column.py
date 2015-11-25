@@ -86,6 +86,21 @@ class GreyRadiationModel(TimeDependentProcess):
         self.add_subprocess('insolation', Q)
         self.add_subprocess('surface', surface)
 
+        newdiags = ['OLR',
+                    'LW_down_sfc',
+                    'LW_up_sfc',
+                    'LW_absorbed_sfc',
+                    'LW_absorbed_atm',
+                    'LW_emission',
+                    'ASR',
+                    'SW_absorbed_sfc',
+                    'SW_absorbed_atm',
+                    'SW_up_sfc',
+                    'SW_up_TOA',
+                    'SW_down_TOA',
+                    'planetary_albedo']
+        self.add_diagnostics(newdiags)
+
     def initial_state(self, num_lev, num_lat, lev, lat, water_depth):
         return initial_state(num_lev, num_lat, lev, lat, water_depth)
 
@@ -107,27 +122,23 @@ class GreyRadiationModel(TimeDependentProcess):
 
     def do_diagnostics(self):
         '''Set all the diagnostics from long and shortwave radiation.'''
-        self.set_diagnostic('OLR', self.LW.flux_to_space)
-        self.set_diagnostic('LW_down_sfc', self.LW.flux_to_sfc)
-        self.set_diagnostic('LW_up_sfc', self.surface.LW_to_atm)
-        self.set_diagnostic('LW_absorbed_sfc', (self.surface.LW_from_atm -
-                                                     self.surface.LW_to_atm))
-        self.set_diagnostic('LW_absorbed_atm', self.LW.absorbed)
-        self.set_diagnostic('LW_emission', self.LW.emission)
+        self.OLR = self.LW.flux_to_space
+        self.LW_down_sfc = self.LW.flux_to_sfc
+        self.LW_up_sfc = self.surface.LW_to_atm
+        self.LW_absorbed_sfc = self.surface.LW_from_atm - self.surface.LW_to_atm
+        self.LW_absorbed_atm = self.LW.absorbed
+        self.LW_emission = self.LW.emission
             #  contributions to OLR from surface and atm. levels
             #self.diagnostics['OLR_sfc'] = self.flux['sfc2space']
             #self.diagnostics['OLR_atm'] = self.flux['atm2space']
-        self.set_diagnostic('ASR', (self.SW.flux_from_space -
-                                         self.SW.flux_to_space))
-        self.set_diagnostic('SW_absorbed_sfc', (self.surface.SW_from_atm -
-                                                    self.surface.SW_to_atm))
-        self.set_diagnostic('SW_absorbed_atm', self.SW.absorbed)
-        self.set_diagnostic('SW_down_sfc', self.SW.flux_to_sfc)
-        self.set_diagnostic('SW_up_sfc', self.SW.flux_from_sfc)
-        self.set_diagnostic('SW_up_TOA', self.SW.flux_to_space)
-        self.set_diagnostic('SW_down_TOA', self.SW.flux_from_space)
-        self.set_diagnostic('planetary_albedo', (self.SW.flux_to_space /
-                                                      self.SW.flux_from_space))
+        self.ASR = self.SW.flux_from_space - self.SW.flux_to_space
+        self.SW_absorbed_sfc = self.surface.SW_from_atm - self.surface.SW_to_atm
+        self.SW_absorbed_atm = self.SW.absorbed
+        self.SW_down_sfc = self.SW.flux_to_sfc
+        self.SW_up_sfc = self.SW.flux_from_sfc
+        self.SW_up_TOA = self.SW.flux_to_space
+        self.SW_down_TOA = self.SW.flux_from_space
+        self.planetary_albedo = self.SW.flux_to_space / self.SW.flux_from_space
 
 
 def initial_state(num_lev, num_lat, lev, lat, water_depth):
@@ -185,6 +196,7 @@ class BandRCModel(RadiativeConvectiveModel):
         self.add_subprocess('LW', longwave)
         self.add_subprocess('SW', shortwave)
 
+    #  Actually shouldn't q be a diagnostic for this process???
     @property
     def q(self):
         return self.input['q']

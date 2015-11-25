@@ -72,7 +72,7 @@ class NbandRadiation(Radiation):
         return self.input['cosZen']
     @cosZen.setter
     def cosZen(self, value):
-        self.input['cosZen'] = value 
+        self.input['cosZen'] = value
 
     def _compute_optical_path(self):
         # this will cause a problem for a model without CO2
@@ -116,31 +116,29 @@ class NbandRadiation(Radiation):
         #  need to recompute transmissivities each time because
         # water vapor is changing
         self._compute_absorptivity()
-        self.set_diagnostic('emission', self._compute_emission())
+        self.emission = self._compute_emission()
         try:
             fromspace = self._split_channels(self.flux_from_space)
         except:
             fromspace = self._split_channels(np.zeros_like(self.Ts))
         #  in this code the assumption is that vertical axis is axis=-1 (last)
         #  The band axis is axis=0, which is provided by _split_channels
-        self.set_diagnostic('flux_down',
-                            self.trans.flux_down(fromspace, self.emission))
+        self.flux_down = self.trans.flux_down(fromspace, self.emission)
         # this ensure same dimensions as other fields
         flux_down_sfc = self.flux_down[..., 0, np.newaxis]
         #flux_down_sfc = self.flux_down[..., 0]
-        self.set_diagnostic('flux_to_sfc', np.sum(flux_down_sfc, axis=0))
+        self.flux_to_sfc = np.sum(flux_down_sfc, axis=0)
 
         flux_from_sfc = self._split_channels(self.flux_from_sfc)
         flux_up_bottom = flux_from_sfc + self.albedo_sfc*flux_down_sfc
-        self.set_diagnostic('flux_up',
-                            self.trans.flux_up(flux_up_bottom, self.emission))
-        self.set_diagnostic('flux_net', self.flux_up - self.flux_down)
+        self.flux_up = self.trans.flux_up(flux_up_bottom, self.emission)
+        self.flux_net = self.flux_up - self.flux_down
         flux_up_top = self.flux_up[..., -1, np.newaxis]
         # absorbed radiation (flux convergence) in W / m**2
-        self.set_diagnostic('absorbed', -np.diff(self.flux_net, axis=-1))
-        self.set_diagnostic('absorbed_total', np.sum(self.absorbed))
+        self.absorbed = -np.diff(self.flux_net, axis=-1)
+        self.absorbed_total = np.sum(self.absorbed)
         self.heating_rate['Tatm'] = np.sum(self.absorbed, axis=0)
-        self.set_diagnostic('flux_to_space', np.sum(flux_up_top, axis=0))
+        self.flux_to_space = np.sum(flux_up_top, axis=0)
 
     def _split_channels(self, flux):
         #return (self.band_fraction*flux)[..., np.newaxis]

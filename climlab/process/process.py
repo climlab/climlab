@@ -93,7 +93,7 @@ class Process(object):
 
     def __init__(self, state=None, domains=None, subprocess=None,
                  lat=None, lev=None, num_lat=None, num_levels=None,
-                 input=None, diagnostics=None, **kwargs):
+                 input=None, **kwargs):
         # dictionary of domains. Keys are the domain names
         self.domains = _make_dict(domains, _Domain)
         # dictionary of state variables (all of type Field)
@@ -104,7 +104,11 @@ class Process(object):
         # dictionary of model parameters
         self.param = kwargs
         # dictionary of diagnostic quantities
-        self.diagnostics = _make_dict(diagnostics, Field)
+        #self.diagnostics = _make_dict(diagnostics, Field)
+        #  basically a list of names of diagnostic variables
+        #  must use frozenset because it is immutable and hashable
+        #  so can be used as dictionary keys, which is the whole point
+        self._diag_vars = frozenset()
         # dictionary of input quantities
         self.input = _make_dict(input, Field)
         self.creation_date = time.strftime("%a, %d %b %Y %H:%M:%S %z",
@@ -188,18 +192,18 @@ class Process(object):
 #        '''Add a single input field to this process.'''
 #        self._set_field('input', name, value)
 
-    def set_diagnostic(self, name, value):
-        '''Add a single diagnostic field to this process.'''
-        self._set_field('diagnostics', name, value)
+    # def set_diagnostic(self, name, value):
+    #     '''Add a single diagnostic field to this process.'''
+    #     self._set_field('diagnostics', name, value)
 
-    def add_diagnostic(self, name):
-        def diag(self):
-            return self.diagnostics[name]
-        diag = property(diag)
-        def setter(self, name, value):
-            self.diagnostics[name] = value
-        diag = diag.setter(setter)
-        self.__setattr__(name, diag)
+    def add_diagnostics(self, diaglist):
+        '''Given a list of names of diagnostic variables, update the master list.'''
+        self._diag_vars = frozenset.union(self._diag_vars, diaglist)
+
+    @property
+    def diagnostics(self):
+        return { key:value for key, value in self.__dict__.items()
+                 if key in self._diag_vars }
 
     # Some handy shortcuts... only really make sense when there is only
     # a single axis of that type in the process.
