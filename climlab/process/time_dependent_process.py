@@ -115,6 +115,10 @@ class TimeDependentProcess(Process):
         for name, var in self.state.iteritems():
             var += self.tendencies[name] * self.param['timestep']
 
+        # Update all time counters for this and all subprocesses in the tree
+        for name, proc, level in walk_processes(self):
+            proc._update_time()
+
         # if not self.has_process_type_list:
         #     self._build_process_type_list()
         # # First compute all strictly diagnostic processes
