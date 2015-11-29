@@ -62,14 +62,19 @@ class EBM(EnergyBudget):
                                                              K=K,
                                                              **self.param))
         self.topdown = False  # call subprocess compute methods first
+        newdiags = ['OLR',
+                    'ASR',
+                    'net_radiation']
+        self.add_diagnostics(newdiags)
+
 
     def _compute_heating_rates(self):
         '''Compute energy flux convergences to get heating rates in W / m**2'''
         insolation = self.insolation.insolation
         albedo = self.albedo.albedo
-        self.set_diagnostic('ASR', (1-albedo) * insolation)
-        self.set_diagnostic('OLR', self.LW.OLR)
-        self.set_diagnostic('net_radiation', self.ASR - self.OLR)
+        self.ASR = (1-albedo) * insolation
+        self.OLR = self.LW.OLR
+        self.net_radiation = self.ASR - self.OLR
         #  The part of the heating due just to shortwave
         #  (longwave part is computed in subprocess)
         self.heating_rate['Ts'] = self.ASR

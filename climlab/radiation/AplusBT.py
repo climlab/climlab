@@ -28,6 +28,8 @@ class AplusBT(EnergyBudget):
         super(AplusBT, self).__init__(**kwargs)
         self.A = A
         self.B = B
+        newdiags = ['OLR',]
+        self.add_diagnostics(newdiags)
 
     @property
     def A(self):
@@ -46,8 +48,7 @@ class AplusBT(EnergyBudget):
 
     def _compute_emission(self):
         for varname, value in self.state.iteritems():
-            flux = self.A + self.B * value
-            self.set_diagnostic('OLR', flux)
+            self.OLR = self.A + self.B * value
 
     def _compute_heating_rates(self):
         '''Compute energy flux convergences to get heating rates in W / m**2.'''
