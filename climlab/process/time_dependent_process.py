@@ -68,20 +68,24 @@ class TimeDependentProcess(Process):
         for name, var in self.state.iteritems():
             var += tendencies_implicit[name] * self.timestep
         # Finally compute all instantaneous adjustments
-        tendencies_adjustment = self._compute_type('adjustment')
+        #  and express in terms of discrete timestep
+        adjustments = self._compute_type('adjustment')
+        tendencies_adjustment = {}
+        for name in adjustments:
+            tendencies_adjustment[name] = adjustments[name] / self.timestep
         #  Now remove the changes from the model state
         for name, var in self.state.iteritems():
-            var -= (tendencies_implicit[name] + tendencies_explicit[name])
-
+            var -= ( (tendencies_implicit[name] + tendencies_explicit[name]) *
+                    self.timestep)
+        # Finally sum up all the tendencies from all processes
         self.tendencies = {}
         for varname in self.state:
             self.tendencies[varname] = 0. * self.state[varname]
-        for name in tendencies_explicit:
-            self.tendencies[name] += tendencies_explicit[name]
-        for name in tendencies_implicit:
-            self.tendencies[name] += tendencies_implicit[name]
-        for name in tendencies_adjustment:
-            self.tendencies[name] += tendencies_adjustment[name]
+        for tend_dict in [tendencies_explicit,
+                          tendencies_implicit,
+                          tendencies_adjustment]:
+            for name in tend_dict:
+                self.tendencies[name] += tend_dict[name]
         #
         #
         # if (self.topdown and self.time_type is 'explicit'):
@@ -121,7 +125,6 @@ class TimeDependentProcess(Process):
             for varname, tend in proctend.iteritems():
                 tendencies[varname] += tend
         return tendencies
-
 
     def _compute(self):
         # where the tendencies are actually computed...
