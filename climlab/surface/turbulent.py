@@ -8,16 +8,11 @@ class SurfaceFlux(EnergyBudget):
     def __init__(self, Cd=3E-3, **kwargs):
         super(SurfaceFlux, self).__init__(**kwargs)
         self.Cd = Cd
-        #  fixed wind speed (for now)
-        self.U = 5. * np.ones_like(self.Ts))
         self.heating_rate['Tatm'] = np.zeros_like(self.Tatm)
-
-    @property
-    def U(self):
-        return self.input['U']
-    @U.setter
-    def U(self, value):
-        self.input['U'] = value
+        newinput = ['U',]
+        self.add_input(newinput)
+        #  fixed wind speed (for now)
+        self.U = 5. * np.ones_like(self.Ts)
 
     def _compute_heating_rates(self):
         '''Compute energy flux convergences to get heating rates in W/m2.'''
@@ -27,6 +22,11 @@ class SurfaceFlux(EnergyBudget):
 
 
 class SensibleHeatFlux(SurfaceFlux):
+    def __init__(self, Cd=3E-3, **kwargs):
+        super(SensibleHeatFlux, self).__init__(Cd=Cd, **kwargs)
+        newdiags = ['SHF',]
+        self.add_diagnostics(newdiags)
+
     def _compute_flux(self):
         # this ensure same dimensions as Ts
         Ta = self.Tatm[..., 0, np.newaxis]
@@ -37,10 +37,15 @@ class SensibleHeatFlux(SurfaceFlux):
         #  wind speed
         #  flux from bulk formula
         self._flux = const.cp * rho * self.Cd * self.U * DeltaT
-        self.set_diagnostic('SHF', self.flux)
+        self.SHF = self._flux
 
 
 class LatentHeatFlux(SurfaceFlux):
+    def __init__(self, Cd=3E-3, **kwargs):
+        super(LatentHeatFlux, self).__init__(Cd=Cd, **kwargs)
+        newdiags = ['LHF',]
+        self.add_diagnostics(newdiags)
+
     def _compute_flux(self):
         #  specific humidity at lowest model level
         #  assumes pressure is the last axis
@@ -52,4 +57,4 @@ class LatentHeatFlux(SurfaceFlux):
         rho = const.ps * const.mb_to_Pa / const.Rd / Ta
         #  flux from bulk formula
         self._flux = const.Lhvap * rho * self.Cd * self.U * Deltaq
-        self.set_diagnostic('LHF', self._flux)
+        self.LHF = self._flux
