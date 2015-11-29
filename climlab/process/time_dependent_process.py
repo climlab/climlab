@@ -37,7 +37,7 @@ class TimeDependentProcess(Process):
                      'days_elapsed': 0,
                      'years_elapsed': 0,
                      'days_of_year': days_of_year}
-        self.param['timestep'] = timestep
+        self.param['timestep'] = value
 
     def set_timestep(self, timestep=const.seconds_per_day, num_steps_per_year=None):
         '''Change the timestep.
