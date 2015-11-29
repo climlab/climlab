@@ -10,7 +10,7 @@ import climlab
 sfc, atm = climlab.domain.zonal_mean_column()
 absorb = np.ones(atm.shape)
 trans = climlab.radiation.transmissivity.Transmissivity(absorptivity=absorb,
-                                                        axis=1)                                                
+                                                        axis=1)
 fromspace = np.zeros(sfc.shape)
 emission = 200*np.ones(atm.shape)
 A = trans.flux_down(fluxDownTop=fromspace, emission=emission)
@@ -19,9 +19,9 @@ A.shape
 '''
 
 class Transmissivity(object):
-    '''Class for calculating and store transmissivity between levels, 
+    '''Class for calculating and store transmissivity between levels,
     and computing radiative fluxes between levels.
-    
+
     Input: numpy array of absorptivities.
     It is assumed that the last dimension is vertical levels.
 
@@ -35,7 +35,7 @@ class Transmissivity(object):
     Example for N = 3 atmospheric layers:
 
     tau is a vector of transmissivities
-        tau = [1, tau0, tau1, tau2]    
+        tau = [1, tau0, tau1, tau2]
     A is a matrix
         A = [[   1,    1,    1,    1],
              [tau0,    1,    1,    1],
@@ -47,18 +47,18 @@ class Transmissivity(object):
            [          tau0,         1,    0,  0],
            [     tau1*tau0,      tau1,    1,  0],
            [tau2*tau1*tau0, tau2*tau1, tau2,  1]]
-           
+
     and Tdown = transpose(Tup)
-    
+
     Construct an emission vector for the downwelling beam:
         Edown = [E0, E1, E2, fromspace]
     Now we can get the downwelling beam by matrix multiplication:
         D = Tdown * Edown
-    
-    For the upwelling beam, we start by adding the reflected part 
+
+    For the upwelling beam, we start by adding the reflected part
     at the surface to the surface emissions:
         Eup = [emit_sfc + albedo_sfc*D[0], E0, E1, E2]
-    So that the upwelling flux is 
+    So that the upwelling flux is
         U = Tup * Eup
     The total flux, positive up is thus
         F = U - D
@@ -76,17 +76,17 @@ class Transmissivity(object):
         self.reflectivity = reflectivity
         self.absorptivity = absorptivity
         self.transmissivity = 1 - absorptivity - reflectivity
-        self.shape = self.absorptivity.shape 
+        self.shape = self.absorptivity.shape
         N = np.size(self.absorptivity, axis=self.axis)
         self.N = N
         #  For now, let's assume that the vertical axis is the last axis
         Tup, Tdown = compute_T_vectorized(self.transmissivity)
         self.Tup = Tup
         self.Tdown = Tdown
-        
+
     def flux_down(self, fluxDownTop, emission=None):
         '''Compute downwelling radiative flux at interfaces between layers.
-        
+
         Inputs:
             fluxDownTop: flux down at top
             emission: emission from atmospheric levels (N)
@@ -99,22 +99,22 @@ class Transmissivity(object):
         E = np.concatenate((emission, np.atleast_1d(fluxDownTop)), axis=-1)
         #  dot product (matrix multiplication) along last axes
         return np.squeeze(matrix_multiply(self.Tdown, E[..., np.newaxis]))
-    
+
     def flux_reflected_up(self, fluxDown, albedo_sfc=0.):
         reflectivity = np.concatenate((np.atleast_1d(albedo_sfc),
                                        self.reflectivity), axis=-1)
         return reflectivity*fluxDown
-        
+
     def flux_up(self, fluxUpBottom, emission=None):
         '''Compute upwelling radiative flux at interfaces between layers.
-        
+
         Inputs:
             fluxUpBottom: flux up from bottom
             emission: emission from atmospheric levels (N)
                 defaults to zero if not given
         Returns:
-            vector of downwelling radiative flux between levels (N+1)
-            element N is the flux up to space.'''        
+            vector of upwelling radiative flux between levels (N+1)
+            element N is the flux up to space.'''
         if emission is None:
             emission = np.zeros_like(self.absorptivity)
         E = np.concatenate((np.atleast_1d(fluxUpBottom),emission), axis=-1)
@@ -131,7 +131,7 @@ class Transmissivity(object):
 #    Tup = np.tril(np.cumprod(A, axis=0))
 #    Tdown = np.transpose(Tup)
 #    return Tup, Tdown
-    
+
 def compute_T_vectorized(transmissivity):
     #  really vectorized version... to work with arbitrary dimensions
     #  of input transmissivity
@@ -156,7 +156,7 @@ def compute_T_vectorized(transmissivity):
     #  transpose over last two axes
     Tdown = np.rollaxis(Tup, -1, -2)
     return Tup, Tdown
-    
+
 
 def tril(array, k=0):
     '''Lower triangle of an array.

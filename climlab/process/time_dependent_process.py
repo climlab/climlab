@@ -22,19 +22,15 @@ class TimeDependentProcess(Process):
         self.topdown = topdown
         self.has_process_type_list = False
 
-    def set_timestep(self, timestep=const.seconds_per_day, num_steps_per_year=None):
-        '''Change the timestep.
-        Input is either timestep in seconds,
-        or
-        num_steps_per_year: a number of steps per calendar year.'''
-        if num_steps_per_year is not None:
-            timestep = const.seconds_per_year / num_steps_per_year
-        else:
-            num_steps_per_year = const.seconds_per_year / timestep
-        # Need a more sensible approach for annual cycle stuff
-        timestep_days = timestep / const.seconds_per_day
+    @property
+    def timestep(self):
+        return self.param['timestep']
+    @timestep.setter
+    def timestep(self, value):
+        num_steps_per_year = const.seconds_per_year / value
+        timestep_days = value / const.seconds_per_day
         days_of_year = np.arange(0., const.days_per_year, timestep_days)
-        self.time = {'timestep': timestep,
+        self.time = {'timestep': value,
                      'num_steps_per_year': num_steps_per_year,
                      'day_of_year_index': 0,
                      'steps': 0,
@@ -42,6 +38,16 @@ class TimeDependentProcess(Process):
                      'years_elapsed': 0,
                      'days_of_year': days_of_year}
         self.param['timestep'] = timestep
+
+    def set_timestep(self, timestep=const.seconds_per_day, num_steps_per_year=None):
+        '''Change the timestep.
+        Input is either timestep in seconds,
+        or
+        num_steps_per_year: a number of steps per calendar year.'''
+        if num_steps_per_year is not None:
+            timestep = const.seconds_per_year / num_steps_per_year
+        # Need a more sensible approach for annual cycle stuff
+        self.timestep = timestep
 
     #  new concept: there really shouldn't be any need to *walk* the
      # process tree!  Each process should compute the complete tendencies
@@ -152,17 +158,13 @@ class TimeDependentProcess(Process):
         #     self.diagnostics.update(proc.diagnostics)
         #     proc._update_time()
 
-    # def compute_diagnostics(self, num_iter=3):
-    #     '''Compute all tendencies and diagnostics, but don't update model state.
-    #     By default it will call step_forward() 3 times to make sure all
-    #     subprocess coupling is accounted for. The number of iterations can
-    #     be changed with the input argument.'''
-    #     #  This might create a time problem because it updates the time counter...
-    #     this_state = copy.deepcopy(self.state)
-    #     for n in range(num_iter):
-    #         self.step_forward()
-    #         for name, value in self.state.iteritems():
-    #             self.state[name][:] = this_state[name][:]
+    def compute_diagnostics(self, num_iter=3):
+        '''Compute all tendencies and diagnostics, but don't update model state.
+        By default it will call compute() 3 times to make sure all
+        subprocess coupling is accounted for. The number of iterations can
+        be changed with the input argument.'''
+        for n in range(num_iter):
+            self.compute()
 
     def _update_time(self):
         '''Increment the timestep counter by one.
