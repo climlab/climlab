@@ -49,52 +49,79 @@ class TimeDependentProcess(Process):
         # Need a more sensible approach for annual cycle stuff
         self.timestep = timestep
 
-    #  new concept: there really shouldn't be any need to *walk* the
-     # process tree!  Each process should compute the complete tendencies
-    #  due to itself and all its subprocesses!
-    #  So basically the iterating through subprocesses should occur in the
-    #  compute method, NOT the step_forward method
     def compute(self):
         '''Compute tendencies for all state variables given
         current state and specified input.'''
+        if not self.has_process_type_list:
+            self._build_process_type_list()
         # First compute all strictly diagnostic processes
-        #  But... should these processes actually modify state variables?
-        #  Need to think through the logic.
-        #   A 'diagnostic' process is really just setting input values
-        #  for other processes. But those inputs depend on the current state
-        #
-        #   BUT SHOUDN'T A DIAGNOSTIC PROCESS DO NOTHING BUT SET fields
-        #   IN THE DIAGNOSTICS DICTIONARY?
-        #  THAT"S NOT HOW THE WATER VAPOR MODULE CURRENTLY WORKS
+        ignored = self._compute_type('diagnostic')
+        # Compute tendencies and diagnostics for all explicit processes
+        tendencies_explicit = self._compute_type('explicit')
+        #  Tendencies due to implicit and adjustment processes need to be
+        #  calculated from a state that is already adjusted after explicit stuff
+        #  So apply the tendencies temporarily and then remove them again
+        for name, var in self.state.iteritems():
+            var += tendencies_explicit[name] * self.timestep
+        # Now compute all implicit processes -- matrix inversions
+        tendencies_implicit = self._compute_type('implicit')
+        for name, var in self.state.iteritems():
+            var += tendencies_implicit[name] * self.timestep
+        # Finally compute all instantaneous adjustments
+        tendencies_adjustment = self._compute_type('adjustment')
+        #  Now remove the changes from the model state
+        for name, var in self.state.iteritems():
+            var -= (tendencies_implicit[name] + tendencies_explicit[name])
 
-        if (self.topdown and self.time_type is 'explicit'):
-        	 #  tendencies is dictionary with same names as state variables
-            tendencies = self._compute()
-            for name, proc in self.subprocess.iteritems():
-                proc.compute()
-                for varname, tend in proc.tendencies.iteritems():
-                    tendencies[varname] += tend
-                #diagnostics.merge(diag_sub)
-                # will need a way to retrieve diagnostics from subprocesses
-        else:
-        #  make a new dictionary to hold tendencies on state variables
-            tendencies = {}
-            for varname in self.state:
-                tendencies[varname] = 0. * self.state[varname]
-            for name, proc in self.subprocess.iteritems():
-                proc.compute()
-                for varname, tend in proc.tendencies.iteritems():
-                    tendencies[varname] += tend
-				#diagnostics.merge(diag_sub)
-            parent_tendencies = self._compute()
-            for varname, tend in parent_tendencies.iteritems():
+        self.tendencies = {}
+        for varname in self.state:
+            self.tendencies[varname] = 0. * self.state[varname]
+        for name in tendencies_explicit:
+            self.tendencies[name] += tendencies_explicit[name]
+        for name in tendencies_implicit:
+            self.tendencies[name] += tendencies_implicit[name]
+        for name in tendencies_adjustment:
+            self.tendencies[name] += tendencies_adjustment[name]
+        #
+        #
+        # if (self.topdown and self.time_type is 'explicit'):
+        # 	 #  tendencies is dictionary with same names as state variables
+        #     tendencies = self._compute()
+        #     for name, proc in self.subprocess.iteritems():
+        #         proc.compute()
+        #         for varname, tend in proc.tendencies.iteritems():
+        #             tendencies[varname] += tend
+        # else:
+        # #  make a new dictionary to hold tendencies on state variables
+        #     tendencies = {}
+        #     for varname in self.state:
+        #         tendencies[varname] = 0. * self.state[varname]
+        #     for name, proc in self.subprocess.iteritems():
+        #         proc.compute()
+        #         for varname, tend in proc.tendencies.iteritems():
+        #             tendencies[varname] += tend
+		# 		#diagnostics.merge(diag_sub)
+        #     parent_tendencies = self._compute()
+        #     for varname, tend in parent_tendencies.iteritems():
+        #         tendencies[varname] += tend
+        # self.tendencies = tendencies
+        # #  pass diagnostics up the process tree
+        # #  actually don't. This should be done explicitly by parent processes
+        # #   but only where it is meaningful.
+        # #for name, proc in self.subprocess.iteritems():
+        # #    self.diagnostics.update(proc.diagnostics)
+
+    def _compute_type(self, proctype):
+        '''Compute tendencies due to all subprocesses of given type.'''
+        tendencies = {}
+        for varname in self.state:
+            tendencies[varname] = 0. * self.state[varname]
+        for proc in self.process_types[proctype]:
+            proctend = proc._compute()
+            for varname, tend in proctend.iteritems():
                 tendencies[varname] += tend
-        self.tendencies = tendencies
-        #  pass diagnostics up the process tree
-        #  actually don't. This should be done explicitly by parent processes
-        #   but only where it is meaningful.
-        #for name, proc in self.subprocess.iteritems():
-        #    self.diagnostics.update(proc.diagnostics)
+        return tendencies
+
 
     def _compute(self):
         # where the tendencies are actually computed...
@@ -117,7 +144,8 @@ class TimeDependentProcess(Process):
         '''Call the compute() method to get current tendencies, then
         apply them to update state variables.'''
         self.compute()
-        #  Explicit forward timestep
+        #  Total tendency is applied as an explicit forward timestep
+        # (already accounting properly for order of operations in compute() )
         for name, var in self.state.iteritems():
             var += self.tendencies[name] * self.param['timestep']
 
