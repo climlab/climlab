@@ -64,7 +64,8 @@ class EBM(EnergyBudget):
         self.topdown = False  # call subprocess compute methods first
         newdiags = ['OLR',
                     'ASR',
-                    'net_radiation']
+                    'net_radiation',
+                    'icelat']
         self.add_diagnostics(newdiags)
 
 
@@ -78,6 +79,11 @@ class EBM(EnergyBudget):
         #  The part of the heating due just to shortwave
         #  (longwave part is computed in subprocess)
         self.heating_rate['Ts'] = self.ASR
+        # useful diagnostics
+        try:
+            self.icelat = self.albedo.iceline.icelat
+        except:
+            pass
 
     def global_mean_temperature(self):
         '''Convenience method to compute global mean surface temperature.'''
