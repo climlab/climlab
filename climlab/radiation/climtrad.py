@@ -12,8 +12,11 @@ col.Tatm
 #  climt must be pre-compiled and installed with correct grid dimensions.
 #  otherwise this won't work.
 from climlab.radiation.climtrad import CliMTRad
-c2 = CliMTRad(state=col.state)
-c2.step_forward()
+state = col.state
+state.update({'q': col.q})
+c2 = CliMTRad(state=state)
+c2.flux_from_sfc = climlab.constants.sigma * c2.Ts**4
+c2.compute_diagnostics()
 
 This seems to be working but so far I have only implemented the longwave
 atmospheric part. Need to couple to surface, and make shortwave functional.
@@ -41,17 +44,37 @@ class CliMTRad(EnergyBudget):
         super(CliMTRad, self).__init__(**kwargs)
         self.r = climt.radiation(scheme=scheme)
         self.param['climt_scheme'] = scheme
+        newinput = ['flux_from_sfc',
+                    'cldf',
+                    'clwp',]
+        self.add_input(newinput)
+        #  cloud input
+        self.cldf = 0. * self.Tatm
+        self.clwp = 0. * self.Tatm
+        #  upwelling surface radiation... should be set by parent process
+        self.flux_from_sfc = 0. * self.Ts
+        newdiags = ['flux_to_sfc',
+                    'flux_to_space',]
+        self.add_diagnostics(newdiags)
+
 
     def _temperature_tendencies(self):
         #  This will just set all tendencies to zero
-        super(CliMTRad, self)._temperature_tendencies()
+        tendencies = {}
+        for varname, value in self.state.iteritems():
+            tendencies[varname] = 0. * value
         #  Call the climt object
+        #  (vertical axis is reversed, and needs specific humidity in g/kg)
         self.r(p=np.flipud(self.lev), ps=1000., T=np.flipud(self.Tatm),
-               Ts=self.Ts, q=np.flipud(self.q), cldf=np.zeros_like(self.Tatm),
-               clwp=np.zeros_like(self.Tatm))
+               Ts=self.Ts, q=np.flipud(self.q)*1000., flus=self.flux_from_sfc,
+               cldf=self.cldf, clwp=self.clwp)
+        # some DIAGNOSTICS (translating from the CliMT conventions)
+        self.flux_to_space = -self.r.LwToa
+        self.flux_to_sfc = self.flux_from_sfc + self.r.LwSrf
         # Now set the temperature tendency in K / s
         #   Need to convert from K / day in CliMT
-        self.tendencies['Tatm'] = (np.flipud(np.squeeze(self.r.lwhr)) /
+        tendencies['Tatm'] = (np.flipud(np.squeeze(self.r.lwhr)) /
                                    const.seconds_per_day)
         #  so far this is just LW
         #  The module also computes SW but we need to set insolation and zenith
+        return tendencies
