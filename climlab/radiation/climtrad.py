@@ -12,9 +12,8 @@ col.Tatm
 #  climt must be pre-compiled and installed with correct grid dimensions.
 #  otherwise this won't work.
 from climlab.radiation.climtrad import CliMTRad
-state = col.state
-state.update({'q': col.q})
-c2 = CliMTRad(state=state)
+c2 = CliMTRad(state=col.state)
+c2.q = col.q
 c2.flux_from_sfc = climlab.constants.sigma * c2.Ts**4
 c2.compute_diagnostics()
 
@@ -40,14 +39,24 @@ class CliMTRad(EnergyBudget):
 
     At the moment this requires that CliMT is pre-compiled
     with the correct grid dimensions.'''
-    def __init__(self, scheme='cam3', **kwargs):
+    def __init__(self, scheme='cam3', absorber_vmr=None, **kwargs):
         super(CliMTRad, self).__init__(**kwargs)
         self.r = climt.radiation(scheme=scheme)
         self.param['climt_scheme'] = scheme
-        newinput = ['flux_from_sfc',
+        newinput = ['q',
+                    'flux_from_sfc',
                     'cldf',
-                    'clwp',]
+                    'clwp',
+                    'absorber_vmr',]
         self.add_input(newinput)
+        #  absorbing gases
+        if absorber_vmr is None:
+            absorber_vmr = {'CO2': 350.,
+                            'N2O': 0.,
+                            'CH4': 0.,
+                            'CFC11': 0.,
+                            'CFC12': 0.}
+        self.absorber_vmr = absorber_vmr
         #  cloud input
         self.cldf = 0. * self.Tatm
         self.clwp = 0. * self.Tatm
@@ -56,7 +65,6 @@ class CliMTRad(EnergyBudget):
         newdiags = ['flux_to_sfc',
                     'flux_to_space',]
         self.add_diagnostics(newdiags)
-
 
     def _temperature_tendencies(self):
         #  This will just set all tendencies to zero
@@ -67,7 +75,10 @@ class CliMTRad(EnergyBudget):
         #  (vertical axis is reversed, and needs specific humidity in g/kg)
         self.r(p=np.flipud(self.lev), ps=1000., T=np.flipud(self.Tatm),
                Ts=self.Ts, q=np.flipud(self.q)*1000., flus=self.flux_from_sfc,
-               cldf=self.cldf, clwp=self.clwp)
+               cldf=self.cldf, clwp=self.clwp, co2=self.absorber_vmr['CO2'])
+        # For some reason this is giving nans if I pass arguments for other absorbers
+               #n2o=self.absorber_vmr['N2O'], ch4=self.absorber_vmr['CH4'],
+               #cfc11=self.absorber_vmr['CFC11'], cfc12=self.absorber_vmr['CFC12'])
         # some DIAGNOSTICS (translating from the CliMT conventions)
         self.flux_to_space = -self.r.LwToa
         self.flux_to_sfc = self.flux_from_sfc + self.r.LwSrf
