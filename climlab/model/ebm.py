@@ -32,13 +32,15 @@ class EBM(EnergyBudget):
                  a2=0.078,
                  ai=0.62,
                  timestep=const.seconds_per_year/90.,
+                 T_init_0 = 12.,
+                 T_init_P2 = -40.,
                  **kwargs):
         super(EBM, self).__init__(timestep=timestep, **kwargs)
         if not self.domains and not self.state:  # no state vars or domains yet
             sfc = domain.zonal_mean_surface(num_lat=num_lat,
                                             water_depth=water_depth)
             lat = sfc.axes['lat'].points
-            initial = 12. - 40. * legendre.P2(np.sin(np.deg2rad(lat)))
+            initial = T_init_0 + T_init_P2 * legendre.P2(np.sin(np.deg2rad(lat)))
             self.set_state('Ts', Field(initial, domain=sfc))
         self.param['S0'] = S0
         self.param['A'] = A
