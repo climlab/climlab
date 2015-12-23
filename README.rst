@@ -14,7 +14,7 @@ Author
 
 Installation
 ----------------
-``python setup.py``
+``python setup.py install``
 
     or, if you are developing new code
 
