@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 def readme():
     with open('README.rst') as f:
@@ -23,7 +23,7 @@ setup(name='climlab',
       author='Brian E. J. Rose',
       author_email='brose@albany.edu',
       license='MIT',
-      packages=['climlab'],
+      packages=find_packages(),
       install_requires=[
           'numpy',
           'scipy',
