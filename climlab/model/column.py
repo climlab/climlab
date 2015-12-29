@@ -107,11 +107,11 @@ class GreyRadiationModel(TimeDependentProcess):
     # This process has to handle the coupling between insolation and column radiation
     def _compute(self):
         # Do the coupling
-        self.SW.flux_from_space = self.insolation.insolation
-        self.SW.albedo_sfc = self.surface.albedo_sfc
-        self.surface.LW_from_atm = self.LW.flux_to_sfc
-        self.surface.SW_from_atm = self.SW.flux_to_sfc
-        self.LW.flux_from_sfc = self.surface.LW_to_atm
+        self.subprocess['SW'].flux_from_space = self.subprocess['insolation'].insolation
+        self.subprocess['SW'].albedo_sfc = self.subprocess['surface'].albedo_sfc
+        self.subprocess['surface'].LW_from_atm = self.subprocess['LW'].flux_to_sfc
+        self.subprocess['surface'].SW_from_atm = self.subprocess['SW'].flux_to_sfc
+        self.subprocess['LW'].flux_from_sfc = self.subprocess['surface'].LW_to_atm
         # set diagnostics
         self.do_diagnostics()
         # no tendencies for the parent process
@@ -122,23 +122,27 @@ class GreyRadiationModel(TimeDependentProcess):
 
     def do_diagnostics(self):
         '''Set all the diagnostics from long and shortwave radiation.'''
-        self.OLR = self.LW.flux_to_space
-        self.LW_down_sfc = self.LW.flux_to_sfc
-        self.LW_up_sfc = self.surface.LW_to_atm
-        self.LW_absorbed_sfc = self.surface.LW_from_atm - self.surface.LW_to_atm
-        self.LW_absorbed_atm = self.LW.absorbed
-        self.LW_emission = self.LW.emission
+        self.OLR = self.subprocess['LW'].flux_to_space
+        self.LW_down_sfc = self.subprocess['LW'].flux_to_sfc
+        self.LW_up_sfc = self.subprocess['surface'].LW_to_atm
+        self.LW_absorbed_sfc = (self.subprocess['surface'].LW_from_atm -
+                                self.subprocess['surface'].LW_to_atm)
+        self.LW_absorbed_atm = self.subprocess['LW'].absorbed
+        self.LW_emission = self.subprocess['LW'].emission
             #  contributions to OLR from surface and atm. levels
             #self.diagnostics['OLR_sfc'] = self.flux['sfc2space']
             #self.diagnostics['OLR_atm'] = self.flux['atm2space']
-        self.ASR = self.SW.flux_from_space - self.SW.flux_to_space
-        self.SW_absorbed_sfc = self.surface.SW_from_atm - self.surface.SW_to_atm
-        self.SW_absorbed_atm = self.SW.absorbed
-        self.SW_down_sfc = self.SW.flux_to_sfc
-        self.SW_up_sfc = self.SW.flux_from_sfc
-        self.SW_up_TOA = self.SW.flux_to_space
-        self.SW_down_TOA = self.SW.flux_from_space
-        self.planetary_albedo = self.SW.flux_to_space / self.SW.flux_from_space
+        self.ASR = (self.subprocess['SW'].flux_from_space -
+                    self.subprocess['SW'].flux_to_space)
+        self.SW_absorbed_sfc = (self.subprocess['surface'].SW_from_atm -
+                                self.subprocess['surface'].SW_to_atm)
+        self.SW_absorbed_atm = self.subprocess['SW'].absorbed
+        self.SW_down_sfc = self.subprocess['SW'].flux_to_sfc
+        self.SW_up_sfc = self.subprocess['SW'].flux_from_sfc
+        self.SW_up_TOA = self.subprocess['SW'].flux_to_space
+        self.SW_down_TOA = self.subprocess['SW'].flux_from_space
+        self.planetary_albedo = (self.subprocess['SW'].flux_to_space /
+                                 self.subprocess['SW'].flux_from_space)
 
 
 def initial_state(num_lev, num_lat, lev, lat, water_depth):
@@ -181,7 +185,7 @@ class BandRCModel(RadiativeConvectiveModel):
         #  (though in this sense it is actually diagnostic...)
         newinput = ['q']
         self.add_input(newinput)
-        self.q = self.H2O.q
+        self.q = self.subprocess['H2O'].q
 
         #  initialize radiatively active gas inventories
         self.absorber_vmr = {}
