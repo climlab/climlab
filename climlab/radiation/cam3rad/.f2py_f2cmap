@@ -1,0 +1,3 @@
+# This is needed for f2py to deal with custom data types
+#  defined in RRTM code
+dict(real = dict(rb="double", r8="double"))
