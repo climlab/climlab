@@ -14,6 +14,8 @@ class GreyGas(Radiation):
     By default emissivity = absorptivity.
     Subclasses can override this is necessary (e.g. for shortwave model).
 
+    FIX THIS documentation......  out of date
+
     The following boundary values need to be specified by user or parent process:
     - albedo_sfc (default is zero)
     - flux_from_space
@@ -28,12 +30,13 @@ class GreyGas(Radiation):
     - flux_to_space
     -  plus a bunch of others!!
     '''
-    def __init__(self, absorptivity=None, reflectivity=None,
-                 albedo_sfc=0, **kwargs):
+    def __init__(self, absorptivity=None, reflectivity=None, emissivity_sfc=1.,
+                 albedo_sfc=0., **kwargs):
         super(GreyGas, self).__init__(**kwargs)
         newinput = ['reflectivity',
                     'absorptivity',
-                    'albedo_sfc']
+                    'emissivity_sfc',
+                    'albedo_sfc',]
         self.add_input(newinput)
         if reflectivity is None:
             reflectivity = np.zeros_like(self.Tatm)
@@ -41,13 +44,16 @@ class GreyGas(Radiation):
             absorptivity = np.zeros_like(self.Tatm)
         self.absorptivity = absorptivity
         self.reflectivity = reflectivity
-        self.albedo_sfc = albedo_sfc*np.ones_like(self.Ts)
+        self.emissivity_sfc = emissivity_sfc * np.ones_like(self.Ts)
+        self.albedo_sfc = albedo_sfc * np.ones_like(self.Ts)
         newdiags = ['emission',
+                    'emission_sfc',
                     'flux_reflected_up',]
         self.add_diagnostics(newdiags)
         #  THESE ARE NOT INPUT! THEY ARE DIAGNOSTICS
         #  But it is helpful to initialize them to zero
         self.emission = 0. * self.Tatm
+        self.emission_sfc = 0. * self.Ts
         self.flux_reflected_up = 0. * self.Ts
 
     @property
@@ -105,35 +111,62 @@ class GreyGas(Radiation):
                                     axis=axis)
         #self.input['reflectivity'] = value
 
+    def _compute_emission_sfc(self):
+        return self.emissivity_sfc * blackbody_emission(self.Ts)
+
     def _compute_emission(self):
         return self.emissivity * blackbody_emission(self.Tatm)
 
-    def _compute_radiative_heating(self):
+    def _compute_fluxes(self):
+        ''' All fluxes are band by band'''
         self.emission = self._compute_emission()
+        self.emission_sfc = self._compute_emission_sfc()
+        fromspace = self._from_space()
+        self.flux_down = self.trans.flux_down(fromspace, self.emission)
+        self.flux_reflected_up = self.trans.flux_reflected_up(self.flux_down, self.albedo_sfc)
+        # this ensure same dimensions as other fields
+        self.flux_to_sfc = self.flux_down[..., 0, np.newaxis]
+        self.flux_from_sfc = (self.emission_sfc +
+                              self.flux_reflected_up[..., 0, np.newaxis])
+        self.flux_up = self.trans.flux_up(self.flux_from_sfc,
+                            self.emission + self.flux_reflected_up[...,1:])
+        self.flux_net = self.flux_up - self.flux_down
+        # absorbed radiation (flux convergence) in W / m**2 (per band)
+        self.absorbed = -np.diff(self.flux_net, axis=-1)
+        self.absorbed_total = np.sum(self.absorbed, axis=-1)
+        self.flux_to_space = self._compute_flux_top()
+
+    def _compute_flux_top(self):
+        bandflux = self.flux_up[..., -1, np.newaxis]
+        return self._join_channels(bandflux)
+
+    def _flux_convergence_atm(self):
+        return self.absorbed
+
+    def _flux_convergence_sfc(self):
+        return ( self.flux_to_sfc - self.flux_from_sfc )
+
+    def _compute_radiative_heating(self):
+        self._compute_fluxes()
+        self.heating_rate['Tatm'] = self._join_channels(self.absorbed)
+        self.heating_rate['Ts'] = self._join_channels( self.flux_to_sfc -
+                                                       self.flux_from_sfc )
+
+    def _from_space(self):
         try:
             fromspace = self.flux_from_space
-
         except:
             fromspace = np.zeros_like(self.Ts)
+        return self._split_channels(fromspace)
 
-        self.flux_down = self.trans.flux_down(fromspace, self.emission)
-        self.flux_reflected_up = self.trans.flux_reflected_up(self.flux_down,
-                                                              self.albedo_sfc)
-        # this ensure same dimensions as other fields
-        flux_down_sfc = self.flux_down[..., 0, np.newaxis]
-        flux_up_bottom = (self.flux_from_sfc +
-                          self.flux_reflected_up[..., 0, np.newaxis])
-        self.flux_up = self.trans.flux_up(flux_up_bottom,
-                                          self.emission +
-                                          self.flux_reflected_up[...,1:])
-        self.flux_net = self.flux_up - self.flux_down
-        flux_up_top = self.flux_up[..., -1, np.newaxis]
-        # absorbed radiation (flux convergence) in W / m**2
-        self.absorbed = -np.diff(self.flux_net)
-        self.absorbed_total = np.sum(self.absorbed)
-        self.heating_rate['Tatm'] = self.absorbed
-        self.flux_to_sfc = flux_down_sfc
-        self.flux_to_space = flux_up_top
+    def _split_channels(self, flux):
+        '''Single channel for Grey Gas model.'''
+        return flux
+
+    def _join_channels(self, flux):
+        '''Single channel for Grey Gas model.'''
+        return flux
+
 
     def flux_components_top(self):
         '''Compute the contributions to the outgoing flux to space due to
@@ -173,6 +206,10 @@ class GreyGas(Radiation):
 
 class GreyGasSW(GreyGas):
     '''Emissivity is always set to zero for shortwave classes.'''
+    def __init__(self, albedo_sfc=0.33, emissivity_sfc=0., **kwargs):
+        super(GreyGasSW, self).__init__(albedo_sfc=albedo_sfc,
+                                        emissivity_sfc=emissivity_sfc,
+                                        **kwargs)
     @property
     def emissivity(self):
         # This ensures that emissivity is always zero for shortwave classes

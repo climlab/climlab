@@ -91,6 +91,11 @@ class NbandRadiation(GreyGas):
         dom = domain.Atmosphere(axes=axes)
         self.absorptivity = field.Field(absorptivity, domain=dom)
 
+    def _compute_emission_sfc(self):
+        #  need to split the total emission across the bands
+        total_emission = super(NbandRadiation, self)._compute_emission_sfc()
+        return self._split_channels(total_emission)
+
     def _compute_emission(self):
         #  need to split the total emission across the bands
         total_emission = super(NbandRadiation, self)._compute_emission()
@@ -103,43 +108,21 @@ class NbandRadiation(GreyGas):
         #  need to recompute transmissivities each time because
         # water vapor is changing
         self._compute_absorptivity()
-        self.emission = self._compute_emission()
-        try:
-            fromspace = self._split_channels(self.flux_from_space)
-        except:
-            fromspace = self._split_channels(np.zeros_like(self.Ts))
-        #  in this code the assumption is that vertical axis is axis=-1 (last)
-        #  The band axis is axis=0, which is provided by _split_channels
-        self.flux_down = self.trans.flux_down(fromspace, self.emission)
-        # this ensure same dimensions as other fields
-        flux_down_sfc = self.flux_down[..., 0, np.newaxis]
-        #flux_down_sfc = self.flux_down[..., 0]
-        self.flux_to_sfc = np.sum(flux_down_sfc, axis=0)
-
-        flux_from_sfc = self._split_channels(self.flux_from_sfc)
-        flux_up_bottom = flux_from_sfc + self.albedo_sfc*flux_down_sfc
-        self.flux_up = self.trans.flux_up(flux_up_bottom, self.emission)
-        self.flux_net = self.flux_up - self.flux_down
-        flux_up_top = self.flux_up[..., -1, np.newaxis]
-        # absorbed radiation (flux convergence) in W / m**2
-        self.absorbed = -np.diff(self.flux_net, axis=-1)
-        self.absorbed_total = np.sum(self.absorbed)
-        self.heating_rate['Tatm'] = np.sum(self.absorbed, axis=0)
-        self.flux_to_space = np.sum(flux_up_top, axis=0)
+        super(NbandRadiation, self)._compute_radiative_heating()
 
     def _split_channels(self, flux):
-        #return (self.band_fraction*flux)[..., np.newaxis]
         split = np.outer(self.band_fraction, flux)
         # make sure there's a singleton dimension at the last axis (level)
-        #if np.size(split, axis=-1) is not 1:
-        # To avoid problem on Windows, which uses type long for array dimensions
         if np.size(split, axis=-1) != 1:
             split = split[..., np.newaxis]
         return split
 
+    def _join_channels(self, flux):
+        return np.sum(flux, axis=0)
+
 
 class ThreeBandSW(NbandRadiation):
-    def __init__(self, **kwargs):
+    def __init__(self, emissivity_sfc=0., **kwargs):
         '''A three-band mdoel for shortwave radiation.
 
         The spectral decomposition used here is largely based on the
@@ -152,7 +135,7 @@ class ThreeBandSW(NbandRadiation):
             channel 1 is Chappuis band (27%, 450 - 800 nm)
             channel 2 is remaining radiation (72%)
         '''
-        super(ThreeBandSW, self).__init__(**kwargs)
+        super(ThreeBandSW, self).__init__(emissivity_sfc=emissivity_sfc, **kwargs)
         #   fraction of the total solar flux in each band:
         self.band_fraction = np.array([0.01, 0.27, 0.72])
         if 'CO2' not in self.absorber_vmr:
@@ -189,7 +172,7 @@ class FourBandSW(NbandRadiation):
     #  this is probably a better way to do it... distinguishes between
     #  visible band with no absorption and near-infrared with weak H2O absorption
     #   But this needs some tuning and better documentation
-    def __init__(self, **kwargs):
+    def __init__(self, emissivity_sfc=0., **kwargs):
         '''A four-band mdoel for shortwave radiation.
 
         The spectral decomposition used here is largely based on the
@@ -203,7 +186,7 @@ class FourBandSW(NbandRadiation):
             channel 2 is Chappuis band (27%, 500 - 700 nm)
             channel 3 is near-infrared (53%, > 700 nm)
         '''
-        super(FourBandSW, self).__init__(**kwargs)
+        super(FourBandSW, self).__init__(emissivity_sfc=emissivity_sfc, **kwargs)
         #   fraction of the total solar flux in each band:
         self.band_fraction = np.array([0.06, 0.14, 0.27, 0.53])
         if 'CO2' not in self.absorber_vmr:
