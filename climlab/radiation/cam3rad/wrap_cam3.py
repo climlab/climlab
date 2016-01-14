@@ -112,7 +112,9 @@ class cam3_radiation(object):
         else:
             print 'Sorry, compiler %s not supported' % compiler
 
-        cppflags = '-DPLEV=%i -DIM=%i -DJM=%i -DKM=%i' % (self.KM,self.IM,self.JM,self.KM)
+        #cppflags = '-DPLEV=%i -DIM=%i -DJM=%i -DKM=%i' % (self.KM,self.IM,self.JM,self.KM)
+        # only the vertical dimension needs to be set by pre-processor
+        cppflags = '-DPLEV=%i' %self.KM
 
         def getSources(dir, source_file_name='sources_in_order_of_compilation'):
             #Gets list of source files for extensions
