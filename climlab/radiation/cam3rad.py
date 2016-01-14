@@ -153,24 +153,29 @@ class CAM3Radiation(Radiation):
                             Sources += glob.glob(os.path.join(ww[0],pattern))
             return Sources
 
-        def buildNeeded(target,src):
+        def buildNeeded(src):
             #Checks if source code is newer than extension, so extension needs to be rebuilt
-            #  Will need to modify this to check for grid dimensions!
             #target = os.path.join('lib/climt',target)
-            if not os.path.exists(target):
+            try:
+                import _cam3_radiation
+            except:
+                return True
+            #  Rebuild if number of vertical levels has changed.
+            if (_cam3_radiation.get_nlev() != self.KM):
                 return True
             for file in src:
-                if newer(file,target):
+                if newer(file, '_cam3_radiation.so'):
                     return True
             print 'Extension %s is up to date' % os.path.basename(target)
             return False
 
         src = getSources(dir)
-        target = '_%s.so' % name
+        #target = '_%s.so' % name
+        target = '_cam3_radiation.so'
         driver = glob.glob(os.path.join(dir,'Driver.f*'))[0]
         f77flags = '"%s %s"' % (cppflags,f77flags)
         f90flags = '"%s %s"' % (cppflags,f90flags)
-        if buildNeeded(target,src):
+        if buildNeeded(src):
             print '\n Building %s ... \n' % os.path.basename(target)
             # generate signature file
             if os.path.exists(os.path.join(dir, 'sources_signature_file')):
