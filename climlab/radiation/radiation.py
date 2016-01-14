@@ -62,3 +62,17 @@ class Radiation(EnergyBudget):
     def _compute_heating_rates(self):
         '''Compute energy flux convergences to get heating rates in W / m**2.'''
         self._compute_radiative_heating()
+
+
+class RadiationLW(Radiation):
+    def __init__(self, emissivity_sfc=1., albedo_sfc=0., **kwargs):
+        super(RadiationLW, self).__init__(emissivity_sfc=emissivity_sfc,
+                                          albedo_sfc=albedo_sfc,
+                                          **kwargs)
+
+
+class RadiationSW(Radiation):
+    def __init__(self, emissivity_sfc=0., albedo_sfc=1., **kwargs):
+        super(RadiationLW, self).__init__(emissivity_sfc=emissivity_sfc,
+                                          albedo_sfc=albedo_sfc,
+                                          **kwargs)
