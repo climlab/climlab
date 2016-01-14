@@ -3,4 +3,5 @@ from insolation import FixedInsolation, P2Insolation, AnnualMeanInsolation, Dail
 from radiation import Radiation
 #from three_band import ThreeBandSW
 from nband import NbandRadiation, ThreeBandSW
-from water_vapor import ManabeWaterVapor 
+from water_vapor import ManabeWaterVapor
+from cam3rad import CAM3Radiation
