@@ -4,7 +4,7 @@ climlab wrap of the CAM3 radiation code
 
 We need to do this more cleanly.
 There should be an object like cam3wrap
-that handles all the conversion between the two apis. 
+that handles all the conversion between the two apis.
 '''
 import numpy as np
 from climlab import constants as const
@@ -17,7 +17,22 @@ import netCDF4 as nc
 
 class CAM3Radiation(Radiation):
     def __init__(self, **kwargs):
-        super(CAM3Radiation, self).__init__(**kwargs)
+        super(CAM3Radiation, self).__init__(absorber_vmr={'CO2':380.}, **kwargs)
+        ##  a dictionary of absorbing gases, in volumetric mixing ratios
+        #  each item should have dimensions of self.Tatm
+        #  Can be passed as input argument
+        # Absorbing gases in ppmv
+        try: self.co2 = absorber_vmr['CO2']
+        except: self.co2 = 380.
+        try: self.n2o = absorber_vmr['N2O']
+        except: self.n2o = 1.E-9
+        try: self.ch4 = absorber_vmr['CH4']
+        except: self.ch4 = 1.E-9
+        try: self.cfc11 = absorber_vmr['CFC11']
+        except: self.cfc11 = 1.E-9
+        try: self.cfc12 = absorber_vmr['CFC12']
+        except: self.cfc12 = 1.E-9
+
         self.KM = self.lev.size
         try:
             self.JM = self.lat.size
@@ -46,7 +61,7 @@ class CAM3Radiation(Radiation):
         #self.p = np.transpose(np.resize(lev,self.shape3D[::-1]))
         self.p = self.lev
         self.dp = np.zeros_like(self.p) - 99. # set as missing
-        self.q = 1.e-5*np.ones_like(self.p)
+        self.q = 1.e-5*np.ones_like(self.p)  # Driver.f90 expect q in g/kg???
         self.o3 = np.zeros_like(self.p) + 1.E-9
         # Cloud frac
         self.cldf = np.zeros_like(self.p)
@@ -67,12 +82,6 @@ class CAM3Radiation(Radiation):
         self.zen = 0.5
         # Insolation
         self.solin = 341.5 * np.ones_like(self.Ts)
-        # Absorbing gases in ppmv
-        self.co2 = 380.
-        self.n2o = 1.E-9
-        self.ch4 = 1.E-9
-        self.cfc11 = 1.E-9
-        self.cfc12 = 1.E-9
         # physical constants
         self.g = const.g
         self.Cpd = const.cp
