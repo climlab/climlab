@@ -31,7 +31,7 @@ from climlab.process.time_dependent_process import TimeDependentProcess
 from climlab.domain import domain
 from climlab.domain.field import Field
 from climlab.radiation.insolation import FixedInsolation
-from climlab.radiation.radiation import Radiation, RadiationSW
+from climlab.radiation.greygas import GreyGas, GreyGasSW
 from climlab.convection.convadj import ConvectiveAdjustment
 from climlab.surface.surface_radiation import SurfaceRadiation
 from climlab.radiation.nband import ThreeBandSW, FourBandLW, FourBandSW
@@ -72,9 +72,9 @@ class GreyRadiationModel(TimeDependentProcess):
         absorbLW = compute_layer_absorptivity(self.param['abs_coeff'], dp)
         absorbLW = Field(np.tile(absorbLW, sfc.shape), domain=atm)
         absorbSW = np.zeros_like(absorbLW)
-        longwave = Radiation(state=self.state, absorptivity=absorbLW,
+        longwave = GreyGas(state=self.state, absorptivity=absorbLW,
                              albedo_sfc=0)
-        shortwave = RadiationSW(state=self.state, absorptivity=absorbSW,
+        shortwave = GreyGasSW(state=self.state, absorptivity=absorbSW,
                                 albedo_sfc=self.param['albedo_sfc'])
         # sub-model for insolation ... here we just set constant Q
         thisQ = self.param['Q']*np.ones_like(self.Ts)

@@ -1,11 +1,11 @@
 import numpy as np
-from climlab.radiation.radiation import Radiation
+from climlab.radiation.greygas import GreyGas
 from climlab import constants as const
 from climlab.domain import domain, axis, field
 from copy import copy
 
 
-class NbandRadiation(Radiation):
+class NbandRadiation(GreyGas):
     '''Process for radiative transfer.
     Solves the discretized Schwarschild two-stream equations
     with the spectrum divided into N spectral bands.
