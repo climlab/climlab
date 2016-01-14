@@ -116,9 +116,9 @@ class CAM3Radiation(Radiation):
 
     def _build_extension(self):
         name = 'cam3_radiation'
-        #  Need to make this relative...
-        #dir = os.path.join('src','radiation', 'cam3')
-        dir = '/Users/Brian/climlab/src/radiation/cam3'
+        #  Need to make this more robust...
+        thisdir = os.path.dirname(__file__)
+        dir = thisdir + '/../../src/radiation/cam3'
         # figure out which compiler we're goint to use
         compiler = fcompiler.get_default_fcompiler()
         # set some fortran compiler-dependent flags
@@ -202,9 +202,8 @@ class CAM3Radiation(Radiation):
     def _init_extension(self):
         import _cam3_radiation
         # Initialise abs/ems.
-        #AbsEmsDataFile = os.path.join(dir,'data/abs_ems_factors_fastvx.c030508.nc')
-        #AbsEmsDataFile = os.path.join('cam3rad', 'data', 'abs_ems_factors_fastvx.c030508.nc')
-        AbsEmsDataFile = '/Users/Brian/climlab/climlab/data/cam3rad/abs_ems_factors_fastvx.c030508.nc'
+        dir = os.path.dirname(__file__) + '/../data/cam3rad'
+        AbsEmsDataFile = os.path.join(dir, 'abs_ems_factors_fastvx.c030508.nc')
         #  Open the absorption data file
         data = nc.Dataset(AbsEmsDataFile)
         #  The fortran module that holds the data
