@@ -1,5 +1,10 @@
 '''
 climlab wrap of the CAM3 radiation code
+
+
+We need to do this more cleanly.
+There should be an object like cam3wrap
+that handles all the conversion between the two apis. 
 '''
 import numpy as np
 from climlab import constants as const
@@ -219,3 +224,31 @@ class CAM3Radiation(Radiation):
         for field in ['ah2onw', 'eh2onw', 'ah2ow', 'ln_ah2ow', 'cn_ah2ow', 'ln_eh2ow', 'cn_eh2ow']:
             setattr(mod, field, data.variables[field][:].T)
         self.extension = _cam3_radiation
+
+
+class CAM3Radiation_LW(CAM3Radiation):
+    def __init__(self, **kwargs):
+        super(CAM3Radiation_LW, self).__init__(**kwargs)
+        self.do_sw = 0  # '1=do, 0=do not compute SW'
+        self.do_lw = 1  # '1=do, 0=do not compute LW'
+        newdiags = ['OLR']
+        self.add_diagnostics(newdiags)
+
+    def _compute_radiative_heating(self):
+        super(CAM3Radiation_LW, self)._compute_radiative_heating()
+        #  Set some diagnostics
+        self.OLR = self._cam3_to_climlab(self.Output['LwToa'])
+
+
+class CAM3Radiation_SW(CAM3Radiation):
+    def __init__(self, **kwargs):
+        super(CAM3Radiation_LW, self).__init__(**kwargs)
+        self.do_sw = 1  # '1=do, 0=do not compute SW'
+        self.do_lw = 0  # '1=do, 0=do not compute LW'
+        newdiags = ['ASR']
+        self.add_diagnostics(newdiags)
+
+    def _compute_radiative_heating(self):
+        super(CAM3Radiation_SW, self)._compute_radiative_heating()
+        #  Set some diagnostics
+        self.ASR = self._cam3_to_climlab(self.Output['LwToa'])
