@@ -1,5 +1,9 @@
 # Compiled python modules.
 *.pyc
+# Compiled fortran extensions
+*.so
+# f2py signature files
+*.pyf
 
 # Setuptools distribution folder.
 /dist/
