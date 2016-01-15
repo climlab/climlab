@@ -4,6 +4,7 @@
 !  remove argument dt
 !   remove output Tinc
 !  Change units of outputs qrl, qrs, Tdot from J/kg/day to J/kg/s or W/kg
+!  pass cosine of zenith angle rather than angle itself
 
 subroutine driver(  &
      km,   &
@@ -26,7 +27,7 @@ subroutine driver(  &
      aldir,   &
      asdif,   &
      asdir,   &
-     zen,   &
+     coszen,   &
      scon,   &
      flus,   &
      r_liq,   &
@@ -62,7 +63,7 @@ subroutine driver(  &
   real*8, intent(in) :: aldir(jm,im)
   real*8, intent(in) :: asdif(jm,im)
   real*8, intent(in) :: asdir(jm,im)
-  real*8, intent(in) :: zen(jm,im)
+  real*8, intent(in) :: coszen(jm,im)
   real*8, intent(in) :: scon(jm,im)
   real*8, intent(in) :: flus(jm,im)
   real*8, intent(in) :: cldf(km,jm,im)
@@ -119,7 +120,7 @@ subroutine driver(  &
              aldir(j,i),  &
              asdif(j,i),  &
              asdir(j,i),  &
-             zen(j,i),  &
+             coszen(j,i),  &
              scon(j,i),  &
              flus(j,i),  &
              cldf(1,j,i),  &

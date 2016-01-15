@@ -6,10 +6,10 @@ from distutils.dep_util import newer
 import netCDF4 as nc
 
 
-ToExtension = ['do_sw','do_lw','p','dp','ps','Tatm','Ts','q','o3','cldf','clwp','ciwp',
-                               'in_cld','aldif','aldir','asdif','asdir','zen','solin','flus','r_liq','r_ice',
-                               'co2','n2o','ch4','cfc11','cfc12','g','Cpd','epsilon','stebol']
-                               
+ToExtension = ['do_sw','do_lw','p','dp','ps','Tatm','Ts','q','O3','cldf','clwp','ciwp',
+                               'in_cld','aldif','aldir','asdif','asdir','cosZen','insolation','flus','r_liq','r_ice',
+                               'CO2','N2O','CH4','CFC11','CFC12','g','Cpd','epsilon','stebol']
+
 FromExtension = ['TdotRad','SrfRadFlx','swhr','lwhr','swflx','lwflx','SwToaCf',
                                'SwSrfCf','LwToaCf','LwSrfCf','LwToa','LwSrf','SwToa','SwSrf','lwuflx','lwdflx']
 
@@ -107,8 +107,8 @@ def _build_extension(KM):
             raise StandardError('+++ Compilation failed')
         # delete signature file
         subprocess.call('rm -f _%s.pyf' % name, shell=True)
-        # Move shared object file to pydir
-        subprocess.call('mv %s %s'%(target,pydir), shell=True)
+        # Copy shared object file to pydir
+        subprocess.call('cp %s %s'%(target,pydir), shell=True)
     #  Switch back to original working directory
     os.chdir(here)
 

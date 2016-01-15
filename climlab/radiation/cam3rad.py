@@ -13,22 +13,40 @@ import _cam3_interface
 
 
 class CAM3Radiation(Radiation):
-    def __init__(self, **kwargs):
-        super(CAM3Radiation, self).__init__(absorber_vmr={'CO2':380.}, **kwargs)
-        ##  a dictionary of absorbing gases, in volumetric mixing ratios
-        #  each item should have dimensions of self.Tatm
-        #  Can be passed as input argument
-        # Absorbing gases in ppmv
-        try: self.co2 = absorber_vmr['CO2']
-        except: self.co2 = 380.
-        try: self.n2o = absorber_vmr['N2O']
-        except: self.n2o = 1.E-9
-        try: self.ch4 = absorber_vmr['CH4']
-        except: self.ch4 = 1.E-9
-        try: self.cfc11 = absorber_vmr['CFC11']
-        except: self.cfc11 = 1.E-9
-        try: self.cfc12 = absorber_vmr['CFC12']
-        except: self.cfc12 = 1.E-9
+    def __init__(self,
+                 CO2=380.,
+                 N2O=1.E-9,
+                 CH4=1.E-9,
+                 CFC11=1.E-9,
+                 CFC12=1.E-9,
+                 O3=1.E-9,
+                 **kwargs):
+        super(CAM3Radiation, self).__init__(**kwargs)
+        newinput = ['q',
+                    'CO2',
+                    'N2O',
+                    'CH4',
+                    'CFC11',
+                    'CFC12',
+                    'O3',
+                    'cldf',
+                    'clwp',
+                    'ciwp',
+                    'r_liq',
+                    'r_ice',
+                    'asdir',
+                    'asdif',
+                    'aldir',
+                    'aldif',
+                    'cosZen',
+                    'insolation']
+        self.add_input(newinput)
+        # well-mixed absorbing gases in ppmv (scalars)
+        self.CO2 = CO2
+        self.N2O = N2O
+        self.CH4 = CH4
+        self.CFC11 = CFC11
+        self.CFC12 = CFC12
 
         self.KM = self.lev.size
         try:
@@ -41,11 +59,6 @@ class CAM3Radiation(Radiation):
             self.IM = 1
         _cam3_interface._build_extension(self.KM)
         _cam3_interface._init_extension(self)
-        self.ToExtension    = ['do_sw','do_lw','p','dp','ps','Tatm','Ts','q','o3','cldf','clwp','ciwp',
-                               'in_cld','aldif','aldir','asdif','asdir','zen','solin','flus','r_liq','r_ice',
-                               'co2','n2o','ch4','cfc11','cfc12','g','Cpd','epsilon','stebol']
-        self.FromExtension  = ['TdotRad','SrfRadFlx','swhr','lwhr','swflx','lwflx','SwToaCf',
-                               'SwSrfCf','LwToaCf','LwSrfCf','LwToa','LwSrf','SwToa','SwSrf','lwuflx','lwdflx']
         self.do_sw = 1  # '1=do, 0=do not compute SW'
         self.do_lw = 1  # '1=do, 0=do not compute LW'
         self.in_cld = 0 # '1=in-cloud, 0=grid avg cloud water path'
@@ -57,8 +70,10 @@ class CAM3Radiation(Radiation):
         #self.p = np.transpose(np.resize(lev,self.shape3D[::-1]))
         self.p = self.lev
         self.dp = np.zeros_like(self.p) - 99. # set as missing
+        #  Specific humidity in kg/kg
         self.q = 1.e-8*np.ones_like(self.p)  # Driver.f90 expect q in kg/kg
-        self.o3 = np.zeros_like(self.p) + 1.E-9
+        self.O3 = np.ones_like(self.p) * O3
+
         # Cloud frac
         self.cldf = np.zeros_like(self.p)
         # Cloud water path
@@ -74,10 +89,9 @@ class CAM3Radiation(Radiation):
         self.asdif = np.zeros_like(self.Ts) + 0.07
         self.aldir = np.zeros_like(self.Ts) + 0.07
         self.aldif = np.zeros_like(self.Ts) + 0.07
-        # Solar zenith angle
-        self.zen = 0.5
+        self.cosZen = 1.  # cosine of the average zenith angle
         # Insolation
-        self.solin = 341.5 * np.ones_like(self.Ts)
+        self.insolation = 341.5 * np.ones_like(self.Ts)
         # physical constants
         self.g = const.g
         self.Cpd = const.cp
@@ -102,14 +116,14 @@ class CAM3Radiation(Radiation):
         # List of arguments to be passed to extension
         #args = [ getattr(self,key) for key in self.ToExtension ]
         args = []
-        for key in self.ToExtension:
+        for key in _cam3_interface.ToExtension:
             value = getattr(self, key)
             if np.isscalar(value):
                 args.append(value)
             else:
                 args.append(self._climlab_to_cam3(value))
         OutputValues = self.extension.driver(*args)
-        Output = dict( zip(self.FromExtension, OutputValues ))
+        Output = dict( zip(_cam3_interface.FromExtension, OutputValues ))
         self.Output = Output
         #for name, value in Output.iteritems():
         #    setattr(self, name, value)

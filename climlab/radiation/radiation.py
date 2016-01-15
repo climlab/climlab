@@ -17,8 +17,6 @@ Diagnostics (minimum)
 - absorbed_total
 '''
 import numpy as np
-from climlab.utils.thermo import blackbody_emission
-from climlab.radiation.transmissivity import Transmissivity
 from climlab.process.energy_budget import EnergyBudget
 
 

@@ -2,6 +2,7 @@
 !   Taking this driver code directly from CliMT
 !   Original author:  Rodrigo Caballero
 !  change units of q from g/kg to kg/kg
+!   pass cosine of zenith angle rather than angle itself
 
 ! This is a driver code for CAM3 radiation written for CliMT; it replaces the
 ! analogous driver found in Zender's CCM3 CRM
@@ -23,7 +24,7 @@ subroutine crm(  &
      aldir,  &
      asdif,  &
      asdir,  &
-     zen,  &
+     coszrs,  &
      solin_in,  &
      flus,  &
      cldf,  &
@@ -83,7 +84,9 @@ subroutine crm(  &
   real(r8), intent(in) ::  aldir(pcols)
   real(r8), intent(in) ::  asdif(pcols)
   real(r8), intent(in) ::  asdir(pcols)
-  real(r8), intent(in) ::  zen
+  !real(r8), intent(in) ::  zen
+  !  driver now expects cosine of zenith angle (climlab)
+  real(r8), intent(in) ::  coszrs(pcols)
   real(r8), intent(in) ::  solin_in
   real(r8), intent(in) ::  flus
   real(r8), intent(in) ::  cldf(pver)
@@ -149,7 +152,7 @@ subroutine crm(  &
   real(r8) :: pmxrgn(pverp) ! Maximum pressure for each max overlapped region
   integer  :: nmxrgn(pcols)       ! Number of maximally overlapped regions
   real(r8) :: eccf  ! eccentricity factor
-  real(r8) :: coszrs(pcols)  ! cosine zenith angle
+  !real(r8) :: coszrs(pcols)  ! cosine zenith angle
   real(r8) :: lwupcgs(pcols)  ! upward surface LW flux (CGS)
   real(r8) :: aerosol(pver,naer_all) ! aerosol mass mix ratio
   real(r8) :: esat(pver)  ! sat vapour press
@@ -215,7 +218,8 @@ subroutine crm(  &
      lwupcgs = flus * 1.e3
   endif
   solincgs = solin_in * 1.e3 ! MKS -> CGS
-  coszrs = cos(zen*abs(acos(-1.))/180.) ! zenith angle specified by user
+  !driver now expects cosine of zenith angle (climlab)
+  !coszrs = cos(zen*abs(acos(-1.))/180.) ! zenith angle specified by user
   eccf = 1.    ! eccen factor already in solin
   aerosol = 1.e-16 ! aerosols disabled in CliMT
   do k=1,pver
