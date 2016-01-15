@@ -52,7 +52,9 @@ def _build_extension(KM):
     here = os.getcwd()
     pydir = os.path.dirname(__file__)
     srcdir = pydir + '/../../src/radiation/cam3'
+    #  need to change to srcdir so f2py sees the .f2py_f2cmap file
     os.chdir(srcdir)
+    srcdir = os.getcwd()
     # figure out which compiler we're goint to use
     compiler = fcompiler.get_default_fcompiler()
     # set some fortran compiler-dependent flags
@@ -78,7 +80,8 @@ def _build_extension(KM):
     driver = glob.glob(os.path.join(srcdir,'Driver.f*'))[0]
     f77flags = '"%s %s"' % (cppflags,f77flags)
     f90flags = '"%s %s"' % (cppflags,f90flags)
-    if buildNeeded(src, KM):
+    #if buildNeeded(src, KM):
+    if True:
         print '\n Building %s ... \n' % os.path.basename(target)
         # generate signature file
         if os.path.exists(os.path.join(srcdir, 'sources_signature_file')):
