@@ -157,7 +157,7 @@ def initial_state(num_lev, num_lat, lev, lat, water_depth):
                                             lat=lat)
     num_lev = atm.lev.num_points
     Ts = Field(288.*np.ones(sfc.shape), domain=sfc)
-    Tinitial = np.tile(np.linspace(288.-10., 200., num_lev), sfc.shape)
+    Tinitial = np.tile(np.linspace(200., 288.-10., num_lev), sfc.shape)
     Tatm = Field(Tinitial, domain=atm)
     state = {'Ts': Ts, 'Tatm': Tatm}
     return state

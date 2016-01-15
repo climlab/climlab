@@ -84,7 +84,8 @@ class Transmissivity(object):
         self.Tup = Tup
         self.Tdown = Tdown
 
-    def flux_down(self, fluxDownTop, emission=None):
+    #def flux_down(self, fluxDownTop, emission=None):
+    def flux_up(self, fluxUpBottom, emission=None):
         '''Compute downwelling radiative flux at interfaces between layers.
 
         Inputs:
@@ -96,16 +97,18 @@ class Transmissivity(object):
             element 0 is the flux down to the surface.'''
         if emission is None:
             emission = np.zeros_like(self.absorptivity)
-        E = np.concatenate((emission, np.atleast_1d(fluxDownTop)), axis=-1)
+        E = np.concatenate((emission, np.atleast_1d(fluxUpBottom)), axis=-1)
         #  dot product (matrix multiplication) along last axes
-        return np.squeeze(matrix_multiply(self.Tdown, E[..., np.newaxis]))
+        return np.squeeze(matrix_multiply(self.Tup, E[..., np.newaxis]))
 
     def flux_reflected_up(self, fluxDown, albedo_sfc=0.):
-        reflectivity = np.concatenate((np.atleast_1d(albedo_sfc),
-                                       self.reflectivity), axis=-1)
+        #reflectivity = np.concatenate((np.atleast_1d(albedo_sfc),
+        #                               self.reflectivity), axis=-1)
+        reflectivity = np.concatenate((self.reflectivity, np.atleast_1d(albedo_sfc)), axis=-1)
         return reflectivity*fluxDown
 
-    def flux_up(self, fluxUpBottom, emission=None):
+    #def flux_up(self, fluxUpBottom, emission=None):
+    def flux_down(self, fluxDownTop, emission=None):
         '''Compute upwelling radiative flux at interfaces between layers.
 
         Inputs:
@@ -117,9 +120,9 @@ class Transmissivity(object):
             element N is the flux up to space.'''
         if emission is None:
             emission = np.zeros_like(self.absorptivity)
-        E = np.concatenate((np.atleast_1d(fluxUpBottom),emission), axis=-1)
+        E = np.concatenate((np.atleast_1d(fluxDownTop),emission), axis=-1)
         #  dot product (matrix multiplication) along last axes
-        return np.squeeze(matrix_multiply(self.Tup, E[..., np.newaxis]))
+        return np.squeeze(matrix_multiply(self.Tdown, E[..., np.newaxis]))
 #
 #def compute_T(transmissivity):
 #    # fully vectorized version
@@ -152,9 +155,12 @@ def compute_T_vectorized(transmissivity):
     #  use a custom version instead, below
     #  Performance is BETTER with numpy 1.9
     A = tril(B,k=-1) + tri
-    Tup = tril(np.cumprod(A, axis=-2))
+    #Tup = tril(np.cumprod(A, axis=-2))
+    ##  transpose over last two axes
+    #Tdown = np.rollaxis(Tup, -1, -2)
+    Tdown = tril(np.cumprod(A, axis=-2))
     #  transpose over last two axes
-    Tdown = np.rollaxis(Tup, -1, -2)
+    Tup = np.rollaxis(Tdown, -1, -2)
     return Tup, Tdown
 
 
