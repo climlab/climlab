@@ -69,17 +69,17 @@ class CAM3Radiation(Radiation):
         self.p = self.lev
         self.dp = np.zeros_like(self.p) - 99. # set as missing
         #  Specific humidity in kg/kg
-        self.q = 1.e-8*np.ones_like(self.p)  # Driver.f90 expect q in kg/kg
-        self.O3 = np.ones_like(self.p) * O3
+        self.q = 1.e-8*np.ones_like(self.Tatm)  # Driver.f90 expect q in kg/kg
+        self.O3 = np.ones_like(self.Tatm) * O3
 
         # Cloud frac
-        self.cldf = np.zeros_like(self.p)
+        self.cldf = np.zeros_like(self.Tatm)
         # Cloud water path
-        self.clwp = np.zeros_like(self.p)
-        self.ciwp = np.zeros_like(self.p)
+        self.clwp = np.zeros_like(self.Tatm)
+        self.ciwp = np.zeros_like(self.Tatm)
         # Effective radius cloud drops
-        self.r_liq = np.zeros_like(self.p) + 10.
-        self.r_ice = np.zeros_like(self.p) + 30.
+        self.r_liq = np.zeros_like(self.Tatm) + 10.
+        self.r_ice = np.zeros_like(self.Tatm) + 30.
         # Surface upwelling LW
         self.flus = np.zeros_like(self.Ts) - 99. # set to missing as default
         # Albedos
@@ -87,7 +87,7 @@ class CAM3Radiation(Radiation):
         self.asdif = np.zeros_like(self.Ts) + 0.07
         self.aldir = np.zeros_like(self.Ts) + 0.07
         self.aldif = np.zeros_like(self.Ts) + 0.07
-        self.cosZen = 1.  # cosine of the average zenith angle
+        self.cosZen = np.zeros_like(self.Ts) + 1.  # cosine of the average zenith angle
         # Insolation
         self.insolation = 341.5 * np.ones_like(self.Ts)
         # physical constants
@@ -102,14 +102,39 @@ class CAM3Radiation(Radiation):
 
     def _climlab_to_cam3(self, field):
         '''Prepare field wit proper dimension order.
-        CAM3 code expects 3D arrays with (KM, JM, IM)
-        and 2D arrays with (JM, IM).'''
-        #   THIS NEEDS TO BE GENERALIZED TO MULTIPLE DIMS
-        return np.rollaxis(np.atleast_3d(field),1)
+        CAM3 code expects 3D arrays with (KM, JM, 1)
+        and 2D arrays with (JM, 1).
+
+        climlab grid dimensions are any of:
+            - (KM,)
+            - (JM, KM)
+
+        (longitude dimension IM not yet implemented).'''
+        if np.isscalar(field):
+            return field
+        #  Check to see if column vector needs to be replicated over latitude
+        elif self.JM > 1:
+            if (field.shape == (self.KM,)):
+                return np.tile(field[...,np.newaxis], self.JM)
+            else:
+                return np.squeeze(np.transpose(field))[..., np.newaxis]
+        else:  #  1D vertical model
+            return field[..., np.newaxis, np.newaxis]
 
     def _cam3_to_climlab(self, field):
-        #   THIS NEEDS TO BE GENERALIZED TO MULTIPLE DIMS
-        return np.squeeze(field)
+        ''' Output is either (KM, JM, 1) or (JM, 1).
+        Transform this to...
+            - (KM,) or (1,)  if JM==1
+            - (KM, JM) or (JM, 1)   if JM>1
+
+        (longitude dimension IM not yet implemented).'''
+        if self.JM > 1:
+            if len(field.shape)==2:
+                return field
+            elif len(field.shape)==3:
+                return np.squeeze(np.transpose(field))
+        else:
+            return np.squeeze(field) 
 
     def _compute_radiative_heating(self):
         # List of arguments to be passed to extension

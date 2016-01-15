@@ -87,7 +87,7 @@ subroutine driver(  &
   real*8, intent(in) :: cpair
   real*8, intent(in) :: epsilo
   real*8, intent(in) :: stebol
-!f2py intent(in,hide)  km,jm,im
+  !f2py intent(in,hide)  km,jm,im
 
 ! Output
   real*8, intent(out) :: tdot(km,jm,im)

@@ -72,9 +72,9 @@ def _build_extension(KM,JM,IM):
     else:
         print 'Sorry, compiler %s not supported' % compiler
 
-    cppflags = '-DPLEV=%i -DIM=%i -DJM=%i -DKM=%i' % (KM,IM,JM,KM)
+    #cppflags = '-DPLEV=%i -DIM=%i -DJM=%i -DKM=%i' % (KM,IM,JM,KM)
     # only the vertical dimension needs to be set by pre-processor
-    #cppflags = '-DPLEV=%i' %KM
+    cppflags = '-DPLEV=%i' %KM
 
     src = getSources(srcdir)
     target = '_%s.so' % name
@@ -111,7 +111,7 @@ def _build_extension(KM,JM,IM):
         if subprocess.call(F2pyCommand, shell=True) > 0:
             raise StandardError('+++ Compilation failed')
         # delete signature file
-        subprocess.call('rm -f _%s.pyf' % name, shell=True)
+        #subprocess.call('rm -f _%s.pyf' % name, shell=True)
         # Copy shared object file to pydir
         #subprocess.call('cp %s %s'%(target,pydir), shell=True)
         subprocess.call('cp %s ../../../climlab/radiation/' %target, shell=True)
