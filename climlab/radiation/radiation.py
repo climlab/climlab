@@ -20,8 +20,8 @@ class Radiation(EnergyBudget):
             reflectivity = np.zeros_like(self.Tatm)
         if absorptivity is None:
             absorptivity = np.zeros_like(self.Tatm)
-        self.absorptivity = absorptivity
-        self.reflectivity = reflectivity
+        self.absorptivity = np.asarray(absorptivity)
+        self.reflectivity = np.asarray(reflectivity)
         self.albedo_sfc = albedo_sfc*np.ones_like(self.Ts)
         self.flux_from_space = np.zeros_like(self.Ts)
         self.flux_to_sfc = np.zeros_like(self.Ts)
@@ -88,22 +88,22 @@ class Radiation(EnergyBudget):
                                     axis=axis)
 
     def compute_emission(self):
-        return self.emissivity * blackbody_emission(self.Tatm)
+        return self.emissivity * blackbody_emission(np.asarray(self.Tatm))
 
     def radiative_heating(self):
         self.emission = self.compute_emission()
         try:
-            fromspace = self.flux_from_space
+            fromspace = np.asarray(self.flux_from_space)
 
         except:
-            fromspace = np.zeros_like(self.Ts)
+            fromspace = np.zeros_like(np.asarray(self.Ts))
 
         self.flux_down = self.trans.flux_down(fromspace, self.emission)
         self.flux_reflected_up = \
-            self.trans.flux_reflected_up(self.flux_down, self.albedo_sfc)
+            self.trans.flux_reflected_up(self.flux_down, np.asarray(self.albedo_sfc))
         # this ensure same dimensions as other fields
         flux_down_sfc = self.flux_down[..., 0, np.newaxis]
-        flux_up_bottom = (self.flux_from_sfc +
+        flux_up_bottom = (np.asarray(self.flux_from_sfc) +
                           self.flux_reflected_up[..., 0, np.newaxis])
         self.flux_up = self.trans.flux_up(flux_up_bottom,
                                 self.emission+self.flux_reflected_up[...,1:])
