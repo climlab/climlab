@@ -6,12 +6,14 @@ from distutils.dep_util import newer
 import netCDF4 as nc
 
 
-ToExtension = ['do_sw','do_lw','p','dp','ps','Tatm','Ts','q','O3','cldf','clwp','ciwp',
-                               'in_cld','aldif','aldir','asdif','asdir','cosZen','insolation','flus','r_liq','r_ice',
-                               'CO2','N2O','CH4','CFC11','CFC12','g','Cpd','epsilon','stebol']
+ToExtension = ['do_sw','do_lw','p','dp','ps','Tatm','Ts','q','O3','cldf','clwp',
+               'ciwp', 'in_cld','aldif','aldir','asdif','asdir','cosZen',
+               'insolation','flus','r_liq','r_ice','CO2','N2O','CH4','CFC11',
+               'CFC12','g','Cpd','epsilon','stebol']
 
 FromExtension = ['TdotRad','SrfRadFlx','swhr','lwhr','swflx','lwflx','SwToaCf',
-                               'SwSrfCf','LwToaCf','LwSrfCf','LwToa','LwSrf','SwToa','SwSrf','lwuflx','lwdflx']
+                 'SwSrfCf','LwToaCf','LwSrfCf','LwToa','LwSrf','SwToa','SwSrf',
+                 'lwuflx','lwdflx']
 
 
 def getSources(dir, source_file_name='sources_in_order_of_compilation'):
@@ -46,7 +48,7 @@ def buildNeeded(src, KM):
     return False
 
 
-def _build_extension(KM):
+def _build_extension(KM,JM,IM):
     name = 'cam3_radiation'
     #  Temporarily move to the source directory
     here = os.getcwd()
@@ -70,9 +72,9 @@ def _build_extension(KM):
     else:
         print 'Sorry, compiler %s not supported' % compiler
 
-    #cppflags = '-DPLEV=%i -DIM=%i -DJM=%i -DKM=%i' % (self.KM,self.IM,self.JM,self.KM)
+    cppflags = '-DPLEV=%i -DIM=%i -DJM=%i -DKM=%i' % (KM,IM,JM,KM)
     # only the vertical dimension needs to be set by pre-processor
-    cppflags = '-DPLEV=%i' %KM
+    #cppflags = '-DPLEV=%i' %KM
 
     src = getSources(srcdir)
     target = '_%s.so' % name
@@ -111,7 +113,8 @@ def _build_extension(KM):
         # delete signature file
         subprocess.call('rm -f _%s.pyf' % name, shell=True)
         # Copy shared object file to pydir
-        subprocess.call('cp %s %s'%(target,pydir), shell=True)
+        #subprocess.call('cp %s %s'%(target,pydir), shell=True)
+        subprocess.call('cp %s ../../../climlab/radiation/' %target, shell=True)
     #  Switch back to original working directory
     os.chdir(here)
 

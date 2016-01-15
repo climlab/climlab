@@ -57,8 +57,6 @@ class CAM3Radiation(Radiation):
             self.IM = self.lon.size
         except:
             self.IM = 1
-        _cam3_interface._build_extension(self.KM)
-        _cam3_interface._init_extension(self)
         self.do_sw = 1  # '1=do, 0=do not compute SW'
         self.do_lw = 1  # '1=do, 0=do not compute LW'
         self.in_cld = 0 # '1=in-cloud, 0=grid avg cloud water path'
@@ -98,19 +96,20 @@ class CAM3Radiation(Radiation):
         self.epsilon = const.Rd / const.Rv
         self.stebol = const.sigma
 
+        _cam3_interface._build_extension(self.KM, self.JM, self.IM)
+        _cam3_interface._init_extension(self)
+
+
     def _climlab_to_cam3(self, field):
         '''Prepare field wit proper dimension order.
         CAM3 code expects 3D arrays with (KM, JM, IM)
         and 2D arrays with (JM, IM).'''
         #   THIS NEEDS TO BE GENERALIZED TO MULTIPLE DIMS
-        return np.rollaxis(np.atleast_3d(np.flipud(field)),1)
+        return np.rollaxis(np.atleast_3d(field),1)
 
     def _cam3_to_climlab(self, field):
         #   THIS NEEDS TO BE GENERALIZED TO MULTIPLE DIMS
-        try:
-            return np.flipud(np.squeeze(field))
-        except:
-            return np.squeeze(field)
+        return np.squeeze(field)
 
     def _compute_radiative_heating(self):
         # List of arguments to be passed to extension
@@ -129,13 +128,12 @@ class CAM3Radiation(Radiation):
         #    setattr(self, name, value)
         #  SrfRadFlx is net downward flux at surface
         self.heating_rate['Ts'] = self._cam3_to_climlab(Output['SrfRadFlx'])
-        # lwhr and swhr are heating rates in J/kg/day from climt interface to CAM3
+        # lwhr and swhr are heating rates in W/kg
         #  (qrl and qrs in CAM3 code)
         #  Need to set to W/m2
         Catm = self.Tatm.domain.heat_capacity
-        self.heating_rate['Tatm'] = (self._cam3_to_climlab(Output['TdotRad']) /
-                                     const.seconds_per_day *
-                                     Catm / const.cp)
+        self.heating_rate['Tatm'] = (self._cam3_to_climlab(Output['TdotRad']) *
+                                     (Catm / const.cp))
 
 
 class CAM3Radiation_LW(CAM3Radiation):
