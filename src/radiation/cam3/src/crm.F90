@@ -1,3 +1,6 @@
+!  climlab
+!   Taking this driver code directly from CliMT
+!   Original author:  Rodrigo Caballero
 
 ! This is a driver code for CAM3 radiation written for CliMT; it replaces the
 ! analogous driver found in Zender's CCM3 CRM

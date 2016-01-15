@@ -1,5 +1,4 @@
-"""column.py
-
+'''
 Object-oriented code for radiative-convective models with grey-gas radiation.
 
 Code developed by Brian Rose, University at Albany
@@ -24,14 +23,14 @@ col.add_subprocess('insolation', Q)
 
 This model is now a single column with seasonally varying insolation
 calculated for 45N.
-"""
+'''
 import numpy as np
 from climlab import constants as const
 from climlab.process.time_dependent_process import TimeDependentProcess
 from climlab.domain import domain
 from climlab.domain.field import Field
 from climlab.radiation.insolation import FixedInsolation
-from climlab.radiation.radiation import Radiation, RadiationSW
+from climlab.radiation.greygas import GreyGas, GreyGasSW
 from climlab.convection.convadj import ConvectiveAdjustment
 from climlab.surface.surface_radiation import SurfaceRadiation
 from climlab.radiation.nband import ThreeBandSW, FourBandLW, FourBandSW
@@ -72,19 +71,19 @@ class GreyRadiationModel(TimeDependentProcess):
         absorbLW = compute_layer_absorptivity(self.param['abs_coeff'], dp)
         absorbLW = Field(np.tile(absorbLW, sfc.shape), domain=atm)
         absorbSW = np.zeros_like(absorbLW)
-        longwave = Radiation(state=self.state, absorptivity=absorbLW,
+        longwave = GreyGas(state=self.state, absorptivity=absorbLW,
                              albedo_sfc=0)
-        shortwave = RadiationSW(state=self.state, absorptivity=absorbSW,
+        shortwave = GreyGasSW(state=self.state, absorptivity=absorbSW,
                                 albedo_sfc=self.param['albedo_sfc'])
         # sub-model for insolation ... here we just set constant Q
         thisQ = self.param['Q']*np.ones_like(self.Ts)
         Q = FixedInsolation(S0=thisQ, domain=sfc, **self.param)
         #  surface sub-model
-        surface = SurfaceRadiation(state=self.state, **self.param)
+        #surface = SurfaceRadiation(state=self.state, **self.param)
         self.add_subprocess('LW', longwave)
         self.add_subprocess('SW', shortwave)
         self.add_subprocess('insolation', Q)
-        self.add_subprocess('surface', surface)
+        #self.add_subprocess('surface', surface)
 
         newdiags = ['OLR',
                     'LW_down_sfc',
@@ -108,10 +107,10 @@ class GreyRadiationModel(TimeDependentProcess):
     def _compute(self):
         # Do the coupling
         self.subprocess['SW'].flux_from_space = self.subprocess['insolation'].insolation
-        self.subprocess['SW'].albedo_sfc = self.subprocess['surface'].albedo_sfc
-        self.subprocess['surface'].LW_from_atm = self.subprocess['LW'].flux_to_sfc
-        self.subprocess['surface'].SW_from_atm = self.subprocess['SW'].flux_to_sfc
-        self.subprocess['LW'].flux_from_sfc = self.subprocess['surface'].LW_to_atm
+        #self.subprocess['SW'].albedo_sfc = self.subprocess['surface'].albedo_sfc
+        #self.subprocess['surface'].LW_from_atm = self.subprocess['LW'].flux_to_sfc
+        #self.subprocess['surface'].SW_from_atm = self.subprocess['SW'].flux_to_sfc
+        #self.subprocess['LW'].flux_from_sfc = self.subprocess['surface'].LW_to_atm
         # set diagnostics
         self.do_diagnostics()
         # no tendencies for the parent process
@@ -124,9 +123,9 @@ class GreyRadiationModel(TimeDependentProcess):
         '''Set all the diagnostics from long and shortwave radiation.'''
         self.OLR = self.subprocess['LW'].flux_to_space
         self.LW_down_sfc = self.subprocess['LW'].flux_to_sfc
-        self.LW_up_sfc = self.subprocess['surface'].LW_to_atm
-        self.LW_absorbed_sfc = (self.subprocess['surface'].LW_from_atm -
-                                self.subprocess['surface'].LW_to_atm)
+        #self.LW_up_sfc = self.subprocess['surface'].LW_to_atm
+        #self.LW_absorbed_sfc = (self.subprocess['surface'].LW_from_atm -
+        #                        self.subprocess['surface'].LW_to_atm)
         self.LW_absorbed_atm = self.subprocess['LW'].absorbed
         self.LW_emission = self.subprocess['LW'].emission
             #  contributions to OLR from surface and atm. levels
@@ -134,8 +133,8 @@ class GreyRadiationModel(TimeDependentProcess):
             #self.diagnostics['OLR_atm'] = self.flux['atm2space']
         self.ASR = (self.subprocess['SW'].flux_from_space -
                     self.subprocess['SW'].flux_to_space)
-        self.SW_absorbed_sfc = (self.subprocess['surface'].SW_from_atm -
-                                self.subprocess['surface'].SW_to_atm)
+        #self.SW_absorbed_sfc = (self.subprocess['surface'].SW_from_atm -
+        #                            self.subprocess['surface'].SW_to_atm)
         self.SW_absorbed_atm = self.subprocess['SW'].absorbed
         self.SW_down_sfc = self.subprocess['SW'].flux_to_sfc
         self.SW_up_sfc = self.subprocess['SW'].flux_from_sfc
@@ -199,6 +198,7 @@ class BandRCModel(RadiativeConvectiveModel):
                               albedo_sfc=0.)
         shortwave = ThreeBandSW(state=self.state,
                                 absorber_vmr=self.absorber_vmr,
+                                emissivity_sfc=0.,
                                 albedo_sfc=self.param['albedo_sfc'])
         self.add_subprocess('LW', longwave)
         self.add_subprocess('SW', shortwave)
