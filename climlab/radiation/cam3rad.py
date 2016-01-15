@@ -15,6 +15,37 @@ from distutils.dep_util import newer
 import netCDF4 as nc
 
 
+def getSources(dir, source_file_name='sources_in_order_of_compilation'):
+    #Gets list of source files for extensions
+    SrcFile = os.path.join(dir, source_file_name)
+    if os.path.exists(SrcFile):
+        Sources = open(SrcFile).readlines()
+        Sources = [os.path.join(dir,s[:-1]) for s in Sources]
+    else:
+        Sources = []
+        w = os.walk(dir)
+        for ww in w:
+            if 'ignore' not in ww[0]:
+                for pattern in ['*.f','*.F','*.f90','*.F90']:
+                    Sources += glob.glob(os.path.join(ww[0],pattern))
+    return Sources
+
+def buildNeeded(src, KM):
+    #Checks if source code is newer than extension, so extension needs to be rebuilt
+    try:
+        import _cam3_radiation
+    except:
+        return True
+    #  Rebuild if number of vertical levels has changed.
+    if (_cam3_radiation.get_nlev() != KM):
+        return True
+    for file in src:
+        if newer(file, '_cam3_radiation.so'):
+            return True
+    print 'Extension _cam3_radiation is up to date'
+    return False
+
+
 class CAM3Radiation(Radiation):
     def __init__(self, **kwargs):
         super(CAM3Radiation, self).__init__(absorber_vmr={'CO2':380.}, **kwargs)
@@ -46,9 +77,8 @@ class CAM3Radiation(Radiation):
         self._init_extension()
         self.ToExtension    = ['do_sw','do_lw','p','dp','ps','Tatm','Ts','q','o3','cldf','clwp','ciwp',
                                'in_cld','aldif','aldir','asdif','asdir','zen','solin','flus','r_liq','r_ice',
-                               'co2','n2o','ch4','cfc11','cfc12','g','Cpd',
-                               'epsilon','stebol','dt']
-        self.FromExtension  = ['Tinc','TdotRad','SrfRadFlx','swhr','lwhr','swflx','lwflx','SwToaCf',
+                               'co2','n2o','ch4','cfc11','cfc12','g','Cpd','epsilon','stebol']
+        self.FromExtension  = ['TdotRad','SrfRadFlx','swhr','lwhr','swflx','lwflx','SwToaCf',
                                'SwSrfCf','LwToaCf','LwSrfCf','LwToa','LwSrf','SwToa','SwSrf','lwuflx','lwdflx']
         self.do_sw = 1  # '1=do, 0=do not compute SW'
         self.do_lw = 1  # '1=do, 0=do not compute LW'
@@ -61,7 +91,7 @@ class CAM3Radiation(Radiation):
         #self.p = np.transpose(np.resize(lev,self.shape3D[::-1]))
         self.p = self.lev
         self.dp = np.zeros_like(self.p) - 99. # set as missing
-        self.q = 1.e-5*np.ones_like(self.p)  # Driver.f90 expect q in g/kg???
+        self.q = 1.e-8*np.ones_like(self.p)  # Driver.f90 expect q in kg/kg
         self.o3 = np.zeros_like(self.p) + 1.E-9
         # Cloud frac
         self.cldf = np.zeros_like(self.p)
@@ -87,7 +117,6 @@ class CAM3Radiation(Radiation):
         self.Cpd = const.cp
         self.epsilon = const.Rd / const.Rv
         self.stebol = const.sigma
-        self.dt = self.timestep
 
     def _climlab_to_cam3(self, field):
         '''Prepare field wit proper dimension order.
@@ -130,9 +159,11 @@ class CAM3Radiation(Radiation):
 
     def _build_extension(self):
         name = 'cam3_radiation'
-        #  Need to make this more robust...
-        thisdir = os.path.dirname(__file__)
-        dir = thisdir + '/../../src/radiation/cam3'
+        #  Temporarily move to the source directory
+        here = os.getcwd()
+        pydir = os.path.dirname(__file__)
+        srcdir = pydir + '/../../src/radiation/cam3'
+        os.chdir(srcdir)
         # figure out which compiler we're goint to use
         compiler = fcompiler.get_default_fcompiler()
         # set some fortran compiler-dependent flags
@@ -152,48 +183,17 @@ class CAM3Radiation(Radiation):
         # only the vertical dimension needs to be set by pre-processor
         cppflags = '-DPLEV=%i' %self.KM
 
-        def getSources(dir, source_file_name='sources_in_order_of_compilation'):
-            #Gets list of source files for extensions
-            SrcFile = os.path.join(dir, source_file_name)
-            if os.path.exists(SrcFile):
-                Sources = open(SrcFile).readlines()
-                Sources = [os.path.join(dir,s[:-1]) for s in Sources]
-            else:
-                Sources = []
-                w = os.walk(dir)
-                for ww in w:
-                    if 'ignore' not in ww[0]:
-                        for pattern in ['*.f','*.F','*.f90','*.F90']:
-                            Sources += glob.glob(os.path.join(ww[0],pattern))
-            return Sources
-
-        def buildNeeded(src):
-            #Checks if source code is newer than extension, so extension needs to be rebuilt
-            #target = os.path.join('lib/climt',target)
-            try:
-                import _cam3_radiation
-            except:
-                return True
-            #  Rebuild if number of vertical levels has changed.
-            if (_cam3_radiation.get_nlev() != self.KM):
-                return True
-            for file in src:
-                if newer(file, '_cam3_radiation.so'):
-                    return True
-            print 'Extension %s is up to date' % os.path.basename(target)
-            return False
-
-        src = getSources(dir)
-        #target = '_%s.so' % name
-        target = '_cam3_radiation.so'
-        driver = glob.glob(os.path.join(dir,'Driver.f*'))[0]
+        src = getSources(srcdir)
+        target = '_%s.so' % name
+        #target = '_cam3_radiation.so'
+        driver = glob.glob(os.path.join(srcdir,'Driver.f*'))[0]
         f77flags = '"%s %s"' % (cppflags,f77flags)
         f90flags = '"%s %s"' % (cppflags,f90flags)
-        if buildNeeded(src):
+        if buildNeeded(src, self.KM):
             print '\n Building %s ... \n' % os.path.basename(target)
             # generate signature file
-            if os.path.exists(os.path.join(dir, 'sources_signature_file')):
-                src_pyf = getSources(dir, source_file_name='sources_signature_file')
+            if os.path.exists(os.path.join(srcdir, 'sources_signature_file')):
+                src_pyf = getSources(srcdir, source_file_name='sources_signature_file')
                 src_pyf_str = string.join(src_pyf)
             else:
                 src_pyf_str = driver
@@ -205,7 +205,7 @@ class CAM3Radiation(Radiation):
             F2pyCommand.append('--fcompiler=%s --noopt' % compiler)
             #F2pyCommand.append('-I%s' % dir)
             #F2pyCommand.append('-I%s' % os.path.join(dir,'include'))
-            F2pyCommand.append('-I%s' % os.path.join(dir,'src'))
+            F2pyCommand.append('-I%s' % os.path.join(srcdir,'src'))
             #F2pyCommand.append('-I%s' % os.path.join(dir,'src','include'))
             F2pyCommand.append('--f77flags=%s' % f77flags)
             F2pyCommand.append('--f90flags=%s' % f90flags)
@@ -216,13 +216,19 @@ class CAM3Radiation(Radiation):
             print F2pyCommand
             if subprocess.call(F2pyCommand, shell=True) > 0:
                 raise StandardError('+++ Compilation failed')
+            # delete signature file
             subprocess.call('rm -f _%s.pyf' % name, shell=True)
+            # Move shared object file to pydir
+            subprocess.call('mv %s %s'%(target,pydir), shell=True)
+        #  Switch back to original working directory
+        os.chdir(here)
+
 
     def _init_extension(self):
         import _cam3_radiation
         # Initialise abs/ems.
-        dir = os.path.dirname(__file__) + '/../data/cam3rad'
-        AbsEmsDataFile = os.path.join(dir, 'abs_ems_factors_fastvx.c030508.nc')
+        datadir = os.path.dirname(__file__) + '/../data/cam3rad'
+        AbsEmsDataFile = os.path.join(datadir, 'abs_ems_factors_fastvx.c030508.nc')
         #  Open the absorption data file
         data = nc.Dataset(AbsEmsDataFile)
         #  The fortran module that holds the data

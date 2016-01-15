@@ -1,6 +1,7 @@
 !  climlab
 !   Taking this driver code directly from CliMT
 !   Original author:  Rodrigo Caballero
+!  change units of q from g/kg to kg/kg
 
 ! This is a driver code for CAM3 radiation written for CliMT; it replaces the
 ! analogous driver found in Zender's CCM3 CRM
@@ -228,7 +229,8 @@ subroutine crm(  &
         print*,'qneg!',k
         q(k)=1.e-16
      else
-        q(k) = q_in(k) * 1.e-3 ! g/kg -> kg/kg
+        !q(k) = q_in(k) * 1.e-3 ! g/kg -> kg/kg
+        q(k) = q_in(k)  ! both in kg/kg
      end if
   enddo
  ! -- define interface pressures and convert units
