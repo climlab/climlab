@@ -125,19 +125,19 @@ class GreyGas(Radiation):
         self.flux_down = self.trans.flux_down(fromspace, self.emission)
         self.flux_reflected_up = self.trans.flux_reflected_up(self.flux_down, self.albedo_sfc)
         # this ensure same dimensions as other fields
-        self.flux_to_sfc = self.flux_down[..., 0, np.newaxis]
+        self.flux_to_sfc = self.flux_down[..., -1, np.newaxis]
         self.flux_from_sfc = (self.emission_sfc +
-                              self.flux_reflected_up[..., 0, np.newaxis])
+                              self.flux_reflected_up[..., -1, np.newaxis])
         self.flux_up = self.trans.flux_up(self.flux_from_sfc,
-                            self.emission + self.flux_reflected_up[...,1:])
+                            self.emission + self.flux_reflected_up[...,0:-1])
         self.flux_net = self.flux_up - self.flux_down
         # absorbed radiation (flux convergence) in W / m**2 (per band)
-        self.absorbed = -np.diff(self.flux_net, axis=-1)
+        self.absorbed = np.diff(self.flux_net, axis=-1)
         self.absorbed_total = np.sum(self.absorbed, axis=-1)
         self.flux_to_space = self._compute_flux_top()
 
     def _compute_flux_top(self):
-        bandflux = self.flux_up[..., -1, np.newaxis]
+        bandflux = self.flux_up[..., 0, np.newaxis]
         return self._join_channels(bandflux)
 
     def _flux_convergence_atm(self):
@@ -168,6 +168,7 @@ class GreyGas(Radiation):
         return flux
 
 
+#####  These routines may need fixing with flipped vertical grid...
     def flux_components_top(self):
         '''Compute the contributions to the outgoing flux to space due to
         emissions from each level and the surface.'''

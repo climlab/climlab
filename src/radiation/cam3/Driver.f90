@@ -1,3 +1,11 @@
+!  climlab
+!   adapting the CliMT CAM3 driver
+!  change units of q from g/kg to kg/kg
+!  remove argument dt
+!   remove output Tinc
+!  Change units of outputs qrl, qrs, Tdot from J/kg/day to J/kg/s or W/kg
+!  pass cosine of zenith angle rather than angle itself
+
 subroutine driver(  &
      km,   &
      jm,   &
@@ -19,7 +27,7 @@ subroutine driver(  &
      aldir,   &
      asdif,   &
      asdir,   &
-     zen,   &
+     coszen,   &
      scon,   &
      flus,   &
      r_liq,   &
@@ -33,8 +41,6 @@ subroutine driver(  &
      cpair,   &
      epsilo,   &
      stebol,   &
-     dt,   &
-     tinc,   &
      tdot,   &
      srfflx,   &
      qrs,   &
@@ -57,7 +63,7 @@ subroutine driver(  &
   real*8, intent(in) :: aldir(jm,im)
   real*8, intent(in) :: asdif(jm,im)
   real*8, intent(in) :: asdir(jm,im)
-  real*8, intent(in) :: zen(jm,im)
+  real*8, intent(in) :: coszen(jm,im)
   real*8, intent(in) :: scon(jm,im)
   real*8, intent(in) :: flus(jm,im)
   real*8, intent(in) :: cldf(km,jm,im)
@@ -81,11 +87,9 @@ subroutine driver(  &
   real*8, intent(in) :: cpair
   real*8, intent(in) :: epsilo
   real*8, intent(in) :: stebol
-  real*8, intent(in) :: dt
-!f2py intent(in,hide)  km,jm,im
+  !f2py intent(in,hide)  km,jm,im
 
 ! Output
-  real*8, intent(out) :: tinc(km,jm,im)
   real*8, intent(out) :: tdot(km,jm,im)
   real*8, intent(out) :: qrs(km,jm,im)
   real*8, intent(out) :: qrl(km,jm,im)
@@ -116,7 +120,7 @@ subroutine driver(  &
              aldir(j,i),  &
              asdif(j,i),  &
              asdir(j,i),  &
-             zen(j,i),  &
+             coszen(j,i),  &
              scon(j,i),  &
              flus(j,i),  &
              cldf(1,j,i),  &
@@ -167,12 +171,17 @@ subroutine driver(  &
   enddo
 
   tdot   = qrs + qrl
-  tinc   = 2.*dt*tdot
-  qrs = qrs * 86400.
-  qrl = qrl * 86400.
-  tdot = tdot * 86400.
+  !tinc   = 2.*dt*tdot
+  !qrs = qrs * 86400.
+  !qrl = qrl * 86400.
+  !tdot = tdot * 86400.
 
 end subroutine driver
+
+
+
+
+
 
 integer function get_nlev()
 

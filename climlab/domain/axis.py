@@ -89,9 +89,11 @@ class Axis(object):
         self.num_points = num_points
         self.units = defaultUnits[axis_type]
         # pressure axis should decrease from surface to TOA
-        if axis_type is 'lev':
-            points = np.flipud(points)
-            bounds = np.flipud(bounds)
+        #  NO! Now define the lowest (near-to-surface) element as lev[-1]
+        #   and the nearest to space as lev[0]
+        #if axis_type is 'lev':
+        #    points = np.flipud(points)
+        #    bounds = np.flipud(bounds)
         self.points = points
         self.bounds = bounds
         self.delta = np.abs(np.diff(self.bounds))

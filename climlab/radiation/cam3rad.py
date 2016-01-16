@@ -9,29 +9,44 @@ that handles all the conversion between the two apis.
 import numpy as np
 from climlab import constants as const
 from climlab.radiation.radiation import Radiation
-import os, sys, subprocess, glob, string
-from numpy.distutils import fcompiler
-from distutils.dep_util import newer
-import netCDF4 as nc
+import _cam3_interface
 
 
 class CAM3Radiation(Radiation):
-    def __init__(self, **kwargs):
-        super(CAM3Radiation, self).__init__(absorber_vmr={'CO2':380.}, **kwargs)
-        ##  a dictionary of absorbing gases, in volumetric mixing ratios
-        #  each item should have dimensions of self.Tatm
-        #  Can be passed as input argument
-        # Absorbing gases in ppmv
-        try: self.co2 = absorber_vmr['CO2']
-        except: self.co2 = 380.
-        try: self.n2o = absorber_vmr['N2O']
-        except: self.n2o = 1.E-9
-        try: self.ch4 = absorber_vmr['CH4']
-        except: self.ch4 = 1.E-9
-        try: self.cfc11 = absorber_vmr['CFC11']
-        except: self.cfc11 = 1.E-9
-        try: self.cfc12 = absorber_vmr['CFC12']
-        except: self.cfc12 = 1.E-9
+    def __init__(self,
+                 CO2=380.,
+                 N2O=1.E-9,
+                 CH4=1.E-9,
+                 CFC11=1.E-9,
+                 CFC12=1.E-9,
+                 O3=1.E-9,
+                 **kwargs):
+        super(CAM3Radiation, self).__init__(**kwargs)
+        newinput = ['q',
+                    'CO2',
+                    'N2O',
+                    'CH4',
+                    'CFC11',
+                    'CFC12',
+                    'O3',
+                    'cldf',
+                    'clwp',
+                    'ciwp',
+                    'r_liq',
+                    'r_ice',
+                    'asdir',
+                    'asdif',
+                    'aldir',
+                    'aldif',
+                    'cosZen',
+                    'insolation']
+        self.add_input(newinput)
+        # well-mixed absorbing gases in ppmv (scalars)
+        self.CO2 = CO2
+        self.N2O = N2O
+        self.CH4 = CH4
+        self.CFC11 = CFC11
+        self.CFC12 = CFC12
 
         self.KM = self.lev.size
         try:
@@ -42,14 +57,6 @@ class CAM3Radiation(Radiation):
             self.IM = self.lon.size
         except:
             self.IM = 1
-        self._build_extension()
-        self._init_extension()
-        self.ToExtension    = ['do_sw','do_lw','p','dp','ps','Tatm','Ts','q','o3','cldf','clwp','ciwp',
-                               'in_cld','aldif','aldir','asdif','asdir','zen','solin','flus','r_liq','r_ice',
-                               'co2','n2o','ch4','cfc11','cfc12','g','Cpd',
-                               'epsilon','stebol','dt']
-        self.FromExtension  = ['Tinc','TdotRad','SrfRadFlx','swhr','lwhr','swflx','lwflx','SwToaCf',
-                               'SwSrfCf','LwToaCf','LwSrfCf','LwToa','LwSrf','SwToa','SwSrf','lwuflx','lwdflx']
         self.do_sw = 1  # '1=do, 0=do not compute SW'
         self.do_lw = 1  # '1=do, 0=do not compute LW'
         self.in_cld = 0 # '1=in-cloud, 0=grid avg cloud water path'
@@ -61,16 +68,18 @@ class CAM3Radiation(Radiation):
         #self.p = np.transpose(np.resize(lev,self.shape3D[::-1]))
         self.p = self.lev
         self.dp = np.zeros_like(self.p) - 99. # set as missing
-        self.q = 1.e-5*np.ones_like(self.p)  # Driver.f90 expect q in g/kg???
-        self.o3 = np.zeros_like(self.p) + 1.E-9
+        #  Specific humidity in kg/kg
+        self.q = 1.e-8*np.ones_like(self.Tatm)  # Driver.f90 expect q in kg/kg
+        self.O3 = np.ones_like(self.Tatm) * O3
+
         # Cloud frac
-        self.cldf = np.zeros_like(self.p)
+        self.cldf = np.zeros_like(self.Tatm)
         # Cloud water path
-        self.clwp = np.zeros_like(self.p)
-        self.ciwp = np.zeros_like(self.p)
+        self.clwp = np.zeros_like(self.Tatm)
+        self.ciwp = np.zeros_like(self.Tatm)
         # Effective radius cloud drops
-        self.r_liq = np.zeros_like(self.p) + 10.
-        self.r_ice = np.zeros_like(self.p) + 30.
+        self.r_liq = np.zeros_like(self.Tatm) + 10.
+        self.r_ice = np.zeros_like(self.Tatm) + 30.
         # Surface upwelling LW
         self.flus = np.zeros_like(self.Ts) - 99. # set to missing as default
         # Albedos
@@ -78,161 +87,78 @@ class CAM3Radiation(Radiation):
         self.asdif = np.zeros_like(self.Ts) + 0.07
         self.aldir = np.zeros_like(self.Ts) + 0.07
         self.aldif = np.zeros_like(self.Ts) + 0.07
-        # Solar zenith angle
-        self.zen = 0.5
+        self.cosZen = np.zeros_like(self.Ts) + 1.  # cosine of the average zenith angle
         # Insolation
-        self.solin = 341.5 * np.ones_like(self.Ts)
+        self.insolation = 341.5 * np.ones_like(self.Ts)
         # physical constants
         self.g = const.g
         self.Cpd = const.cp
         self.epsilon = const.Rd / const.Rv
         self.stebol = const.sigma
-        self.dt = self.timestep
+
+        _cam3_interface._build_extension(self.KM, self.JM, self.IM)
+        _cam3_interface._init_extension(self)
+
 
     def _climlab_to_cam3(self, field):
         '''Prepare field wit proper dimension order.
-        CAM3 code expects 3D arrays with (KM, JM, IM)
-        and 2D arrays with (JM, IM).'''
-        #   THIS NEEDS TO BE GENERALIZED TO MULTIPLE DIMS
-        return np.rollaxis(np.atleast_3d(np.flipud(field)),1)
+        CAM3 code expects 3D arrays with (KM, JM, 1)
+        and 2D arrays with (JM, 1).
+
+        climlab grid dimensions are any of:
+            - (KM,)
+            - (JM, KM)
+
+        (longitude dimension IM not yet implemented).'''
+        if np.isscalar(field):
+            return field
+        #  Check to see if column vector needs to be replicated over latitude
+        elif self.JM > 1:
+            if (field.shape == (self.KM,)):
+                return np.tile(field[...,np.newaxis], self.JM)
+            else:
+                return np.squeeze(np.transpose(field))[..., np.newaxis]
+        else:  #  1D vertical model
+            return field[..., np.newaxis, np.newaxis]
 
     def _cam3_to_climlab(self, field):
-        #   THIS NEEDS TO BE GENERALIZED TO MULTIPLE DIMS
-        try:
-            return np.flipud(np.squeeze(field))
-        except:
-            return np.squeeze(field)
+        ''' Output is either (KM, JM, 1) or (JM, 1).
+        Transform this to...
+            - (KM,) or (1,)  if JM==1
+            - (KM, JM) or (JM, 1)   if JM>1
+
+        (longitude dimension IM not yet implemented).'''
+        if self.JM > 1:
+            if len(field.shape)==2:
+                return field
+            elif len(field.shape)==3:
+                return np.squeeze(np.transpose(field))
+        else:
+            return np.squeeze(field) 
 
     def _compute_radiative_heating(self):
         # List of arguments to be passed to extension
         #args = [ getattr(self,key) for key in self.ToExtension ]
         args = []
-        for key in self.ToExtension:
+        for key in _cam3_interface.ToExtension:
             value = getattr(self, key)
             if np.isscalar(value):
                 args.append(value)
             else:
                 args.append(self._climlab_to_cam3(value))
         OutputValues = self.extension.driver(*args)
-        Output = dict( zip(self.FromExtension, OutputValues ))
+        Output = dict( zip(_cam3_interface.FromExtension, OutputValues ))
         self.Output = Output
         #for name, value in Output.iteritems():
         #    setattr(self, name, value)
         #  SrfRadFlx is net downward flux at surface
         self.heating_rate['Ts'] = self._cam3_to_climlab(Output['SrfRadFlx'])
-        # lwhr and swhr are heating rates in J/kg/day from climt interface to CAM3
+        # lwhr and swhr are heating rates in W/kg
         #  (qrl and qrs in CAM3 code)
         #  Need to set to W/m2
         Catm = self.Tatm.domain.heat_capacity
-        self.heating_rate['Tatm'] = (self._cam3_to_climlab(Output['TdotRad']) /
-                                     const.seconds_per_day *
-                                     Catm / const.cp)
-
-    def _build_extension(self):
-        name = 'cam3_radiation'
-        #  Need to make this more robust...
-        thisdir = os.path.dirname(__file__)
-        dir = thisdir + '/../../src/radiation/cam3'
-        # figure out which compiler we're goint to use
-        compiler = fcompiler.get_default_fcompiler()
-        # set some fortran compiler-dependent flags
-        if compiler == 'gnu95':
-            f77flags='-ffixed-line-length-132 -fdefault-real-8'
-            f90flags='-fdefault-real-8 -fno-range-check -ffree-form'
-        elif compiler == 'intel' or compiler == 'intelem':
-            f77flags='-132 -r8'
-            f90flags='-132 -r8'
-        elif compiler == 'ibm':
-            f77flags='-qautodbl=dbl4 -qsuffix=f=f:cpp=F -qfixed=132'
-            f90flags='-qautodbl=dbl4 -qsuffix=f=f90:cpp=F90 -qfree=f90'
-        else:
-            print 'Sorry, compiler %s not supported' % compiler
-
-        #cppflags = '-DPLEV=%i -DIM=%i -DJM=%i -DKM=%i' % (self.KM,self.IM,self.JM,self.KM)
-        # only the vertical dimension needs to be set by pre-processor
-        cppflags = '-DPLEV=%i' %self.KM
-
-        def getSources(dir, source_file_name='sources_in_order_of_compilation'):
-            #Gets list of source files for extensions
-            SrcFile = os.path.join(dir, source_file_name)
-            if os.path.exists(SrcFile):
-                Sources = open(SrcFile).readlines()
-                Sources = [os.path.join(dir,s[:-1]) for s in Sources]
-            else:
-                Sources = []
-                w = os.walk(dir)
-                for ww in w:
-                    if 'ignore' not in ww[0]:
-                        for pattern in ['*.f','*.F','*.f90','*.F90']:
-                            Sources += glob.glob(os.path.join(ww[0],pattern))
-            return Sources
-
-        def buildNeeded(src):
-            #Checks if source code is newer than extension, so extension needs to be rebuilt
-            #target = os.path.join('lib/climt',target)
-            try:
-                import _cam3_radiation
-            except:
-                return True
-            #  Rebuild if number of vertical levels has changed.
-            if (_cam3_radiation.get_nlev() != self.KM):
-                return True
-            for file in src:
-                if newer(file, '_cam3_radiation.so'):
-                    return True
-            print 'Extension %s is up to date' % os.path.basename(target)
-            return False
-
-        src = getSources(dir)
-        #target = '_%s.so' % name
-        target = '_cam3_radiation.so'
-        driver = glob.glob(os.path.join(dir,'Driver.f*'))[0]
-        f77flags = '"%s %s"' % (cppflags,f77flags)
-        f90flags = '"%s %s"' % (cppflags,f90flags)
-        if buildNeeded(src):
-            print '\n Building %s ... \n' % os.path.basename(target)
-            # generate signature file
-            if os.path.exists(os.path.join(dir, 'sources_signature_file')):
-                src_pyf = getSources(dir, source_file_name='sources_signature_file')
-                src_pyf_str = string.join(src_pyf)
-            else:
-                src_pyf_str = driver
-            subprocess.call('f2py --quiet --overwrite-signature %s -m _%s -h _%s.pyf'%(src_pyf_str,name,name), shell=True)
-
-            # compile extension
-            F2pyCommand = []
-            F2pyCommand.append('f2py -c -m _%s' % name)
-            F2pyCommand.append('--fcompiler=%s --noopt' % compiler)
-            #F2pyCommand.append('-I%s' % dir)
-            #F2pyCommand.append('-I%s' % os.path.join(dir,'include'))
-            F2pyCommand.append('-I%s' % os.path.join(dir,'src'))
-            #F2pyCommand.append('-I%s' % os.path.join(dir,'src','include'))
-            F2pyCommand.append('--f77flags=%s' % f77flags)
-            F2pyCommand.append('--f90flags=%s' % f90flags)
-            F2pyCommand.append('_%s.pyf' % name)
-            F2pyCommand.append('%s' % string.join(src))
-            F2pyCommand.append('--quiet')
-            F2pyCommand = string.join(F2pyCommand)
-            print F2pyCommand
-            if subprocess.call(F2pyCommand, shell=True) > 0:
-                raise StandardError('+++ Compilation failed')
-            subprocess.call('rm -f _%s.pyf' % name, shell=True)
-
-    def _init_extension(self):
-        import _cam3_radiation
-        # Initialise abs/ems.
-        dir = os.path.dirname(__file__) + '/../data/cam3rad'
-        AbsEmsDataFile = os.path.join(dir, 'abs_ems_factors_fastvx.c030508.nc')
-        #  Open the absorption data file
-        data = nc.Dataset(AbsEmsDataFile)
-        #  The fortran module that holds the data
-        mod = _cam3_radiation.absems
-        #  initialize storage arrays
-        mod.initialize_radbuffer()
-        #  Populate storage arrays with values from netcdf file
-        for field in ['ah2onw', 'eh2onw', 'ah2ow', 'ln_ah2ow', 'cn_ah2ow', 'ln_eh2ow', 'cn_eh2ow']:
-            setattr(mod, field, data.variables[field][:].T)
-        self.extension = _cam3_radiation
+        self.heating_rate['Tatm'] = (self._cam3_to_climlab(Output['TdotRad']) *
+                                     (Catm / const.cp))
 
 
 class CAM3Radiation_LW(CAM3Radiation):
