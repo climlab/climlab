@@ -32,7 +32,8 @@ state.
     (as well as regular dict interface)
 - There will be a dictionary of named subprocesses `process.subprocess`
 - Each item in subprocess dict will itself be a `climlab.Process` object
-- Subprocesses should also be accessible as process attributes
+- For convenience with interactive work, each subprocess should be accessible
+as `process.subprocess.name` as well as `process.subprocess['name']`
 - `process.compute()` is a method that computes tendencies (d/dt)
     - returns a dictionary of tendencies for all state variables
     - keys for this dictionary are same as keys of state dictionary
@@ -52,7 +53,7 @@ state.
 appropriate `input`.
     - investigating an individual `process` (possibly with its own
     `subprocesses`) isolated from its parent needs to be as simple as doing:
-        - `newproc = climlab.process_like(procname.subprocname)`
+        - `newproc = climlab.process_like(procname.subprocess['subprocname'])`
         - `newproc.compute()`
         - anything in the `input` dictionary of `subprocname` will remain fixed
 
@@ -64,7 +65,7 @@ import time, copy
 import numpy as np
 from climlab.domain.field import Field
 from climlab.domain.domain import _Domain
-from climlab.utils import walk
+from climlab.utils import walk, attr_dict
 
 
 def _make_dict(arg, argtype):
@@ -119,7 +120,9 @@ class Process(object):
                                            time.localtime())
         # subprocess is a dictionary of any sub-processes
         if subprocess is None:
-            self.subprocess = {}
+            #self.subprocess = {}
+            # a dictionary whose items can be accessed as attributes
+            self.subprocess = attr_dict.AttrDict()
         else:
             self.add_subprocesses(subprocess)
 
@@ -143,7 +146,7 @@ class Process(object):
             self.subprocess.update({name: proc})
             self.has_process_type_list = False
             # make subprocess available as object attribute
-            setattr(self, name, proc)
+            #setattr(self, name, proc)
         else:
             raise ValueError('subprocess must be Process object')
 
@@ -153,7 +156,7 @@ class Process(object):
         self.subprocess.pop(name, None)
         self.has_process_type_list = False
         #  Since we made every subprocess an object attribute, we also remove
-        delattr(self, name)
+        #delattr(self, name)
 
     def set_state(self, name, value):
         if isinstance(value, Field):
