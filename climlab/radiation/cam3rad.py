@@ -170,6 +170,7 @@ class CAM3Radiation(Radiation):
         self.heating_rate['Ts'] = self._cam3_to_climlab(Output['SrfRadFlx'])
         # lwhr and swhr are heating rates in W/kg
         #  (qrl and qrs in CAM3 code)
+        #  TdotRad is the sum lwhr + swhr, also in W/kg
         #  Need to set to W/m2
         Catm = self.Tatm.domain.heat_capacity
         self.heating_rate['Tatm'] = (self._cam3_to_climlab(Output['TdotRad']) *
