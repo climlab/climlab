@@ -20,6 +20,13 @@ class CAM3Radiation(Radiation):
                  CFC11=1.E-9,
                  CFC12=1.E-9,
                  O3=1.E-9,
+                 q=None,
+                 cosZen=1.,
+                 insolation=const.S0/4.,
+                 asdir=0.07,
+                 asdif=0.07,
+                 aldir=0.07,
+                 aldif=0.07,
                  **kwargs):
         super(CAM3Radiation, self).__init__(**kwargs)
         newinput = ['q',
@@ -69,7 +76,10 @@ class CAM3Radiation(Radiation):
         self.p = self.lev
         self.dp = np.zeros_like(self.p) - 99. # set as missing
         #  Specific humidity in kg/kg
-        self.q = 1.e-8*np.ones_like(self.Tatm)  # Driver.f90 expect q in kg/kg
+        if q is None:
+            self.q = 1.e-8*np.ones_like(self.Tatm)  # Driver.f90 expect q in kg/kg
+        else:
+            self.q = q
         self.O3 = np.ones_like(self.Tatm) * O3
 
         # Cloud frac
@@ -83,13 +93,18 @@ class CAM3Radiation(Radiation):
         # Surface upwelling LW
         self.flus = np.zeros_like(self.Ts) - 99. # set to missing as default
         # Albedos
-        self.asdir = np.zeros_like(self.Ts) + 0.07
-        self.asdif = np.zeros_like(self.Ts) + 0.07
-        self.aldir = np.zeros_like(self.Ts) + 0.07
-        self.aldif = np.zeros_like(self.Ts) + 0.07
-        self.cosZen = np.zeros_like(self.Ts) + 1.  # cosine of the average zenith angle
-        # Insolation
-        self.insolation = 341.5 * np.ones_like(self.Ts)
+        #self.asdir = np.zeros_like(self.Ts) + 0.07
+        #self.asdif = np.zeros_like(self.Ts) + 0.07
+        #self.aldir = np.zeros_like(self.Ts) + 0.07
+        #self.aldif = np.zeros_like(self.Ts) + 0.07
+        self.asdir = np.zeros_like(self.Ts) + asdir
+        self.asdif = np.zeros_like(self.Ts) + asdif
+        self.aldir = np.zeros_like(self.Ts) + asdir
+        self.aldif = np.zeros_like(self.Ts) + asdif
+        # cosine of the average zenith angle
+        self.cosZen = np.zeros_like(self.Ts) + cosZen
+        # Insolation in W/m2
+        self.insolation = insolation
         # physical constants
         self.g = const.g
         self.Cpd = const.cp
@@ -134,7 +149,7 @@ class CAM3Radiation(Radiation):
             elif len(field.shape)==3:
                 return np.squeeze(np.transpose(field))
         else:
-            return np.squeeze(field) 
+            return np.squeeze(field)
 
     def _compute_radiative_heating(self):
         # List of arguments to be passed to extension
@@ -155,6 +170,7 @@ class CAM3Radiation(Radiation):
         self.heating_rate['Ts'] = self._cam3_to_climlab(Output['SrfRadFlx'])
         # lwhr and swhr are heating rates in W/kg
         #  (qrl and qrs in CAM3 code)
+        #  TdotRad is the sum lwhr + swhr, also in W/kg
         #  Need to set to W/m2
         Catm = self.Tatm.domain.heat_capacity
         self.heating_rate['Tatm'] = (self._cam3_to_climlab(Output['TdotRad']) *
