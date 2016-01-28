@@ -73,7 +73,7 @@ class GreyRadiationModel(TimeDependentProcess):
                                 albedo_sfc=self.param['albedo_sfc'])
         # sub-model for insolation ... here we just set constant Q
         thisQ = self.param['Q']*np.ones_like(self.Ts)
-        Q = FixedInsolation(S0=thisQ, domain=sfc, **self.param)
+        Q = FixedInsolation(S0=thisQ, domains=sfc, **self.param)
         #  surface sub-model
         #surface = SurfaceRadiation(state=self.state, **self.param)
         self.add_subprocess('LW', longwave)

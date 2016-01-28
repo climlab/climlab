@@ -8,6 +8,16 @@ from climlab.solar.insolation import daily_insolation
 # REVISE TO MAKE ALL OF THESE CALLABLE WITH NO ARGUMENTS.
 # SET SOME SENSIBLE DEFAULTS FOR DOMAINS
 
+#  the diagnostic self.insolation is set with correct dimensions at
+#  creation time. After that, make sure to always modify it though
+#  self.insolation[:] = ...
+#  so that links to the insolation in other processes will work
+
+#  REALLY NEED TO CHANGE THE WAY DIAGNOSTIC PROCESSES ARE CREATED
+#  CAN'T RELY ON NAMES OF DOMAINS
+#  should be easy to pass a state variable object or something with the right shape
+#  and have the process gracefully set the correct dimensions
+
 
 class _Insolation(DiagnosticProcess):
     '''Parent class for insolation processes.
@@ -18,9 +28,13 @@ class _Insolation(DiagnosticProcess):
     # CAUTION: changing self.param['S0'] will not work!
     def __init__(self, S0=const.S0, **kwargs):
         super(_Insolation, self).__init__(**kwargs)
+        #  initialize diagnostic with correct shape
+        try:
+            self.insolation = np.zeros(self.domains['sfc'].shape)
+        except:
+            self.insolation = np.zeros(self.domains['default'].shape)
         self.S0 = S0
         self.add_diagnostics(['insolation'])
-        self.insolation = self.S0
 
     @property
     def S0(self):
@@ -47,7 +61,8 @@ class FixedInsolation(_Insolation):
         super(FixedInsolation, self).__init__(S0=S0, **kwargs)
 
     def _compute_fixed(self):
-        self.insolation = self.S0
+        ins_adjustment = self.S0 - self.insolation
+        self.insolation += ins_adjustment
 
 
 class P2Insolation(_Insolation):
@@ -71,7 +86,7 @@ class P2Insolation(_Insolation):
             insolation = self.S0 / 4 * (1. + self.s2 * P2(np.sin(phi)))
             # make sure that the diagnostic has the correct field dimensions.
             dom = self.domains['default']
-            self.insolation = Field(insolation, domain=dom)
+            self.insolation[:] = Field(insolation, domain=dom)
         except:
             pass
 
@@ -108,17 +123,12 @@ class AnnualMeanInsolation(_Insolation):
             insolation = np.mean(temp_array, axis=1)
             # make sure that the diagnostic has the correct field dimensions.
             dom = self.domains['default']
-            self.insolation = Field(insolation, domain=dom)
+            self.insolation[:] = Field(insolation, domain=dom)
         except:
             pass
 
 
 class DailyInsolation(AnnualMeanInsolation):
-    def __init__(self, S0=const.S0, orb=const.orb_present, **kwargs):
-        super(DailyInsolation, self).__init__(S0=S0, orb=orb, **kwargs)
-        # initialize the insolation diagnostic
-        self._get_current_insolation()
-
     def _compute_fixed(self):
         try:
             self.insolation_array = self._daily_insolation_array()
@@ -132,4 +142,4 @@ class DailyInsolation(AnnualMeanInsolation):
         dom = self.domains['default']
         time_index = self.time['day_of_year_index']   # THIS ONLY WORKS IF self IS THE MASTER PROCESS
         insolation = insolation_array[..., time_index]
-        self.insolation = Field(insolation, domain=dom)
+        self.insolation[:] = Field(insolation, domain=dom)
