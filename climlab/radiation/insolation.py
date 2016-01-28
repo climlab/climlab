@@ -114,6 +114,10 @@ class AnnualMeanInsolation(_Insolation):
 
 
 class DailyInsolation(AnnualMeanInsolation):
+    def __init__(self, S0=const.S0, orb=const.orb_present, **kwargs):
+        super(DailyInsolation, self).__init__(S0=S0, orb=orb, **kwargs)
+        # initialize the insolation diagnostic
+        self._get_current_insolation()
 
     def _compute_fixed(self):
         try:
