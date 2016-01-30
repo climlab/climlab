@@ -104,7 +104,7 @@ class CAM3Radiation(Radiation):
         # cosine of the average zenith angle
         self.cosZen = np.zeros_like(self.Ts) + cosZen
         # Insolation in W/m2
-        self.insolation = insolation
+        self.insolation = np.zeros_like(self.Ts) + insolation
         # physical constants
         self.g = const.g
         self.Cpd = const.cp

@@ -82,8 +82,8 @@ def _build_extension(KM,JM,IM):
     driver = glob.glob(os.path.join(srcdir,'Driver.f*'))[0]
     f77flags = '"%s %s"' % (cppflags,f77flags)
     f90flags = '"%s %s"' % (cppflags,f90flags)
-    #if buildNeeded(src, KM):
-    if True:
+    if buildNeeded(src, KM):
+    #if True:
         print '\n Building %s ... \n' % os.path.basename(target)
         # generate signature file
         if os.path.exists(os.path.join(srcdir, 'sources_signature_file')):
