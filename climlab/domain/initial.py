@@ -2,6 +2,7 @@
 import numpy as np
 from climlab.domain import domain
 from climlab.domain.field import Field
+from climlab.utils.attr_dict import AttrDict
 
 
 def column_state(num_lev=30,
@@ -31,5 +32,7 @@ def column_state(num_lev=30,
     Ts = Field(288.*np.ones(sfc.shape), domain=sfc)
     Tinitial = np.tile(np.linspace(200., 288.-10., num_lev), sfc.shape)
     Tatm = Field(Tinitial, domain=atm)
-    state = {'Ts': Ts, 'Tatm': Tatm}
+    state = AttrDict()
+    state['Ts'] = Ts
+    state['Tatm'] = Tatm
     return state

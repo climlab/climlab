@@ -71,7 +71,7 @@ from climlab.utils import walk, attr_dict
 def _make_dict(arg, argtype):
     if arg is None:
         return {}
-    elif type(arg) is dict:
+    elif isinstance(arg, dict):
         return arg
     elif isinstance(arg, argtype):
         return {'default': arg}
@@ -102,7 +102,7 @@ class Process(object):
             sfc = zonal_mean_surface()
             self.domains.update({'default': sfc})
         # dictionary of state variables (all of type Field)
-        self.state = {}
+        self.state = attr_dict.AttrDict()
         states = _make_dict(state, Field)
         for name, value in states.iteritems():
             self.set_state(name, value)
