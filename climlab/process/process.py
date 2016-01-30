@@ -64,7 +64,7 @@ To do:
 import time, copy
 import numpy as np
 from climlab.domain.field import Field
-from climlab.domain.domain import _Domain
+from climlab.domain.domain import _Domain, zonal_mean_surface
 from climlab.utils import walk, attr_dict
 
 
@@ -97,6 +97,10 @@ class Process(object):
                  input=None, **kwargs):
         # dictionary of domains. Keys are the domain names
         self.domains = _make_dict(domains, _Domain)
+        #  If lat is given, create a simple domains
+        if lat is not None:
+            sfc = zonal_mean_surface()
+            self.domains.update({'default': sfc})
         # dictionary of state variables (all of type Field)
         self.state = {}
         states = _make_dict(state, Field)

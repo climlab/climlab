@@ -232,7 +232,7 @@ class TimeDependentProcess(Process):
                 # add any new diagnostics to the timeave dictionary
                 self.timeave.update(self.diagnostics)
                 for varname, value in self.timeave.iteritems():
-                    self.timeave[varname] = np.zeros_like(value)
+                    self.timeave[varname] = 0*value
             for varname in self.timeave.keys():
                 try:
                     self.timeave[varname] += self.state[varname]
