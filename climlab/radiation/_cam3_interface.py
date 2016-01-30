@@ -52,8 +52,8 @@ def _build_extension(KM,JM,IM):
     name = 'cam3_radiation'
     #  Temporarily move to the source directory
     here = os.getcwd()
-    pydir = os.path.dirname(__file__)
-    srcdir = pydir + '/../../src/radiation/cam3'
+    pydir = os.path.dirname(os.path.abspath(__file__))
+    srcdir = pydir + '/src/cam3'
     #  need to change to srcdir so f2py sees the .f2py_f2cmap file
     os.chdir(srcdir)
     srcdir = os.getcwd()
@@ -111,10 +111,9 @@ def _build_extension(KM,JM,IM):
         if subprocess.call(F2pyCommand, shell=True) > 0:
             raise StandardError('+++ Compilation failed')
         # delete signature file
-        #subprocess.call('rm -f _%s.pyf' % name, shell=True)
+        subprocess.call('rm -f _%s.pyf' % name, shell=True)
         # Copy shared object file to pydir
-        #subprocess.call('cp %s %s'%(target,pydir), shell=True)
-        subprocess.call('cp %s ../../../climlab/radiation/' %target, shell=True)
+        subprocess.call('cp %s %s'%(target, pydir), shell=True)
     #  Switch back to original working directory
     os.chdir(here)
 
