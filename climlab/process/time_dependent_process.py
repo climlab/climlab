@@ -109,11 +109,11 @@ class TimeDependentProcess(Process):
         #     for varname, tend in parent_tendencies.iteritems():
         #         tendencies[varname] += tend
         # self.tendencies = tendencies
-        # #  pass diagnostics up the process tree
-        # #  actually don't. This should be done explicitly by parent processes
-        # #   but only where it is meaningful.
-        # #for name, proc in self.subprocess.iteritems():
-        # #    self.diagnostics.update(proc.diagnostics)
+
+        #  pass diagnostics up the process tree
+        for name, proc in self.subprocess.iteritems():
+            #self.add_diagnostics(proc.diagnostics.keys())
+            self.diagnostics.update(proc.diagnostics)
 
     def _compute_type(self, proctype):
         '''Compute tendencies due to all subprocesses of given type.'''
@@ -250,7 +250,7 @@ class TimeDependentProcess(Process):
         '''Timestep the model forward a specified number of days.'''
         years = days / const.days_per_year
         self.integrate_years(years=years, verbose=verbose)
-        
+
     def integrate_converge(self, crit=1e-4, verbose=True):
         '''integrate until solution is converging
         param:  crit    - exit criteria for difference of iterated solutions
@@ -258,10 +258,9 @@ class TimeDependentProcess(Process):
         for varname, value in self.state.iteritems():
             value_old = copy.deepcopy(value)
             self.integrate_years(1,verbose=False)
-            while np.max(np.abs(value_old-value)) > crit : 
-                value_old = copy.deepcopy(value)                
-                self.integrate_years(1,verbose=False)              
-        if verbose == True:   
-            print("Total elapsed time is %s years." 
+            while np.max(np.abs(value_old-value)) > crit :
+                value_old = copy.deepcopy(value)
+                self.integrate_years(1,verbose=False)
+        if verbose == True:
+            print("Total elapsed time is %s years."
                   % str(self.time['days_elapsed']/const.days_per_year))
-            

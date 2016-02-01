@@ -111,20 +111,46 @@ class CAM3Radiation(Radiation):
         self.epsilon = const.Rd / const.Rv
         self.stebol = const.sigma
 
-        newdiags = ['OLR',
-                    'OLRcld'
-                    'ASR',
-                    'ASRcld'
-                   ]
-        self.add_diagnostics(newdiags)
         #  THESE ARE NOT INPUT! THEY ARE DIAGNOSTICS
         #  But it is helpful to initialize them to zero
         self.ASR = 0. * self.Ts
+        self.ASRcld = 0. * self.Ts
         self.OLR = 0. * self.Ts
+        self.OLRcld = 0. * self.Ts
+        # newdiags = ['OLR',
+        #             'OLRcld',
+        #             'ASR',
+        #             'ASRcld',
+        #            ]
+        # self.add_diagnostics(newdiags)
 
         _cam3_interface._build_extension(self.KM, self.JM, self.IM)
         _cam3_interface._init_extension(self)
 
+    @property
+    def ASR(self):
+        return self.diagnostics['ASR']
+    @ASR.setter
+    def ASR(self, value):
+        self.diagnostics['ASR'] = value
+    @property
+    def ASRcld(self):
+        return self.diagnostics['ASRcld']
+    @ASRcld.setter
+    def ASRcld(self, value):
+        self.diagnostics['ASRcld'] = value
+    @property
+    def OLR(self):
+        return self.diagnostics['OLR']
+    @OLR.setter
+    def OLR(self, value):
+        self.diagnostics['OLR'] = value
+    @property
+    def OLRcld(self):
+        return self.diagnostics['OLRcld']
+    @OLRcld.setter
+    def OLRcld(self, value):
+        self.diagnostics['OLRcld'] = value
 
     def _climlab_to_cam3(self, field):
         '''Prepare field wit proper dimension order.

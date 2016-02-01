@@ -111,7 +111,9 @@ class Process(object):
         # dictionary of diagnostic quantities
         #self.diagnostics = _make_dict(diagnostics, Field)
         #  basically a list of names of diagnostic variables
-        self._diag_vars = frozenset()
+        #self._diag_vars = frozenset()
+        #  GOing back to a simpler dictionary method for diagnostics
+        self.diagnostics = attr_dict.AttrDict()
         # dictionary of input quantities
         #self.input = _make_dict(input, Field)
         if input is None:
@@ -200,17 +202,19 @@ class Process(object):
         self.__setattr__(name, value)
 
     def add_diagnostics(self, diaglist):
-        '''Given a list of names of diagnostic variables, update the master list.'''
-        self._diag_vars = frozenset.union(self._diag_vars, diaglist)
+    #     '''Given a list of names of diagnostic variables, update the master list.'''
+    #     self._diag_vars = frozenset.union(self._diag_vars, diaglist)
+        for var in diaglist:
+            self.diagnostics[var] = self.__dict__[var]
 
     def add_input(self, inputlist):
         '''Given a list of names of input variables, update the master list.'''
         self._input_vars = frozenset.union(self._input_vars, inputlist)
 
-    @property
-    def diagnostics(self):
-        return { key:value for key, value in self.__dict__.items()
-                 if key in self._diag_vars }
+    # @property
+    # def diagnostics(self):
+    #     return { key:value for key, value in self.__dict__.items()
+    #              if key in self._diag_vars }
     @property
     def input(self):
         return { key:value for key, value in self.__dict__.items()

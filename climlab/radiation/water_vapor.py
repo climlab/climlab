@@ -25,10 +25,10 @@ class FixedRelativeHumidity(DiagnosticProcess):
         self.relative_humidity = relative_humidity
         self.qStrat = qStrat
         self.RH_profile = self.relative_humidity * np.ones_like(self.Tatm)
-        newdiags = ['q']
-        self.add_diagnostics(newdiags)
         #  go ahead and set the initial q based on initial temperature
         self.q = self.Tatm * 0.
+        newdiags = ['q']
+        self.add_diagnostics(newdiags)
         self._compute()
 
     def _compute(self):

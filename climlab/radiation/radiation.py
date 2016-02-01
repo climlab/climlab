@@ -37,12 +37,6 @@ class Radiation(EnergyBudget):
         newinput = ['flux_from_space',]
         self.add_input(newinput)
         self.flux_from_space = 0. * self.Ts
-        newdiags = ['flux_from_sfc',
-                    'flux_to_sfc',
-                    'flux_to_space',
-                    'absorbed',
-                    'absorbed_total']
-        self.add_diagnostics(newdiags)
         #  THESE ARE NOT INPUT! THEY ARE DIAGNOSTICS
         #  But it is helpful to initialize them to zero
         self.flux_from_sfc = 0. * self.Ts
@@ -50,6 +44,12 @@ class Radiation(EnergyBudget):
         self.flux_to_space = 0. * self.Ts
         self.absorbed = 0. * self.Tatm
         self.absorbed_total = 0. * self.Ts
+        newdiags = ['flux_from_sfc',
+                    'flux_to_sfc',
+                    'flux_to_space',
+                    'absorbed',
+                    'absorbed_total']
+        self.add_diagnostics(newdiags)
 
     def _compute_radiative_heating(self):
         '''Compute radiative fluxes and heating rates.
