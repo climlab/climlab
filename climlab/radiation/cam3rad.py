@@ -111,6 +111,17 @@ class CAM3Radiation(Radiation):
         self.epsilon = const.Rd / const.Rv
         self.stebol = const.sigma
 
+        newdiags = ['OLR',
+                    'OLRcld'
+                    'ASR',
+                    'ASRcld'
+                   ]
+        self.add_diagnostics(newdiags)
+        #  THESE ARE NOT INPUT! THEY ARE DIAGNOSTICS
+        #  But it is helpful to initialize them to zero
+        self.ASR = 0. * self.Ts
+        self.OLR = 0. * self.Ts
+
         _cam3_interface._build_extension(self.KM, self.JM, self.IM)
         _cam3_interface._init_extension(self)
 
@@ -175,6 +186,11 @@ class CAM3Radiation(Radiation):
         Catm = self.Tatm.domain.heat_capacity
         self.heating_rate['Tatm'] = (self._cam3_to_climlab(Output['TdotRad']) *
                                      (Catm / const.cp))
+        #  Set some diagnostics (minimal for now!)
+        self.OLR = -self._cam3_to_climlab(Output['LwToa'])
+        self.OLRcld = -self._cam3_to_climlab(Output['LwToaCf'])
+        self.ASR = self._cam3_to_climlab(Output['SwToa'])
+        self.ASRcld = self._cam3_to_climlab(Output['SwToaCf'])
 
 
 class CAM3Radiation_LW(CAM3Radiation):
@@ -182,13 +198,6 @@ class CAM3Radiation_LW(CAM3Radiation):
         super(CAM3Radiation_LW, self).__init__(**kwargs)
         self.do_sw = 0  # '1=do, 0=do not compute SW'
         self.do_lw = 1  # '1=do, 0=do not compute LW'
-        newdiags = ['OLR']
-        self.add_diagnostics(newdiags)
-
-    def _compute_radiative_heating(self):
-        super(CAM3Radiation_LW, self)._compute_radiative_heating()
-        #  Set some diagnostics
-        self.OLR = self._cam3_to_climlab(self.Output['LwToa'])
 
 
 class CAM3Radiation_SW(CAM3Radiation):
@@ -196,10 +205,3 @@ class CAM3Radiation_SW(CAM3Radiation):
         super(CAM3Radiation_LW, self).__init__(**kwargs)
         self.do_sw = 1  # '1=do, 0=do not compute SW'
         self.do_lw = 0  # '1=do, 0=do not compute LW'
-        newdiags = ['ASR']
-        self.add_diagnostics(newdiags)
-
-    def _compute_radiative_heating(self):
-        super(CAM3Radiation_SW, self)._compute_radiative_heating()
-        #  Set some diagnostics
-        self.ASR = self._cam3_to_climlab(self.Output['LwToa'])
