@@ -19,6 +19,8 @@ olr.step_forward()
 print olr.state
 '''
 from climlab.process.energy_budget import EnergyBudget
+from climlab.utils import constants as const
+import numpy as np
 
 
 class AplusBT(EnergyBudget):
@@ -53,5 +55,40 @@ class AplusBT(EnergyBudget):
     def _compute_heating_rates(self):
         '''Compute energy flux convergences to get heating rates in W / m**2.'''
         self._compute_emission()
+        for varname, value in self.state.iteritems():
+            self.heating_rate[varname] = -self.OLR
+
+
+class AplusBT_CO2(EnergyBudget):
+    '''longwave radiation module considering CO2 concentration
+    see Caldeira & Kasting [1992] for further reading.
+    
+    parameter:  CO2  - CO2 concentration in atmosphere (ppm)
+    
+    implemented by Moritz Kreuzer'''
+    def __init__(self, CO2=300, **kwargs):
+        super(AplusBT_CO2, self).__init__(**kwargs)
+        self.CO2 = CO2
+
+    @property
+    def CO2(self):
+        return self._CO2
+    @CO2.setter
+    def CO2(self, value):
+        self._CO2 = value
+        self.param['CO2'] = value
+    
+    def emission(self):
+        l = np.log(self.CO2/300.)
+        A = -326.400 + 9.16100*l - 3.16400*l**2 + 0.546800*l**3
+        B =    1.953 - 0.04866*l + 0.01309*l**2 - 0.002577*l**3
+        for varname, value in self.state.iteritems():
+            flux = A + B * (value + const.tempCtoK)
+            self.OLR = flux
+            self.diagnostics['OLR'] = self.OLR
+    
+    def _compute_heating_rates(self):
+        '''Compute energy flux convergences to get heating rates in W / m**2.'''
+        self.emission()
         for varname, value in self.state.iteritems():
             self.heating_rate[varname] = -self.OLR

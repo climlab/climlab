@@ -27,7 +27,7 @@ calculated for 45N.
 import numpy as np
 from climlab import constants as const
 from climlab.process.time_dependent_process import TimeDependentProcess
-from climlab.domain import domain
+from climlab.domain.initial import column_state
 from climlab.domain.field import Field
 from climlab.radiation.insolation import FixedInsolation
 from climlab.radiation.greygas import GreyGas, GreyGasSW
@@ -49,14 +49,10 @@ class GreyRadiationModel(TimeDependentProcess):
                  # absorption coefficient in m**2 / kg
                  abs_coeff=1.229E-4,
                  **kwargs):
-        if lat is not None:
-            num_lat = np.array(lat).size
-        if lev is not None:
-            num_lev = np.array(lev).size
         # Check to see if an initial state is already provided
         #  If not, make one
         if 'state' not in kwargs:
-            state = self.initial_state(num_lev, num_lat, lev, lat, water_depth)
+            state = column_state(num_lev, num_lat, lev, lat, water_depth)
             kwargs.update({'state': state})
         super(GreyRadiationModel, self).__init__(timestep=timestep, **kwargs)
         self.param['water_depth'] = water_depth
@@ -77,7 +73,7 @@ class GreyRadiationModel(TimeDependentProcess):
                                 albedo_sfc=self.param['albedo_sfc'])
         # sub-model for insolation ... here we just set constant Q
         thisQ = self.param['Q']*np.ones_like(self.Ts)
-        Q = FixedInsolation(S0=thisQ, domain=sfc, **self.param)
+        Q = FixedInsolation(S0=thisQ, domains=sfc, **self.param)
         #  surface sub-model
         #surface = SurfaceRadiation(state=self.state, **self.param)
         self.add_subprocess('LW', longwave)
@@ -99,9 +95,6 @@ class GreyRadiationModel(TimeDependentProcess):
                     'SW_down_TOA',
                     'planetary_albedo']
         self.add_diagnostics(newdiags)
-
-    def initial_state(self, num_lev, num_lat, lev, lat, water_depth):
-        return initial_state(num_lev, num_lat, lev, lat, water_depth)
 
     # This process has to handle the coupling between insolation and column radiation
     def _compute(self):
@@ -142,25 +135,6 @@ class GreyRadiationModel(TimeDependentProcess):
         self.SW_down_TOA = self.subprocess['SW'].flux_from_space
         self.planetary_albedo = (self.subprocess['SW'].flux_to_space /
                                  self.subprocess['SW'].flux_from_space)
-
-
-def initial_state(num_lev, num_lat, lev, lat, water_depth):
-    if num_lat is 1:
-        sfc, atm = domain.single_column(water_depth=water_depth,
-                                        num_lev=num_lev,
-                                        lev=lev)
-    else:
-        sfc, atm = domain.zonal_mean_column(water_depth=water_depth,
-                                            num_lev=num_lev,
-                                            lev=lev,
-                                            num_lat=num_lat,
-                                            lat=lat)
-    num_lev = atm.lev.num_points
-    Ts = Field(288.*np.ones(sfc.shape), domain=sfc)
-    Tinitial = np.tile(np.linspace(200., 288.-10., num_lev), sfc.shape)
-    Tatm = Field(Tinitial, domain=atm)
-    state = {'Ts': Ts, 'Tatm': Tatm}
-    return state
 
 
 class RadiativeConvectiveModel(GreyRadiationModel):
