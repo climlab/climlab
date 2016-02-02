@@ -204,18 +204,22 @@ class Process(object):
     # def add_diagnostics(self, diaglist):
     #     '''Given a list of names of diagnostic variables, update the master list.'''
     #     self._diag_vars = frozenset.union(self._diag_vars, diaglist)
-    #def _get_diagnostic(self, name):
-    #    return self.diagnostics[name]
-    #
-    #def _set_diagnostic(self, name, value):
-    #    self.diagnostics[name] = value
-    #
-    #def init_diagnostic(self, name, value):
-    #    #self.__setattr__('_set_'+name, lambda value: self.diagnostics[name]=value)
-    #    self.__setattr__('_set_'+name, Pass)
-    #    setattr(type(self), name,
-    #            property(self._get_diagnostic, self.__attr__['_set_'+name]))
-    #    self.__setattr__(name, value)
+
+    def init_diagnostic(self, name, value=0.):
+        '''Define a new diagnostic quantity called name
+        and initialize it with the given value.
+
+        quantity is accessible and settable in two ways:
+        - as a process attribute, i.e. proc.name
+        - as a member of the diagnostics dictionary, i.e. proc.diagnostics['name']
+        '''
+        def _diag_getter(self):
+            return self.diagnostics[name]
+        def _diag_setter(self, value):
+            self.diagnostics[name] = value
+        setattr(type(self), name,
+                property(fget=_diag_getter, fset=_diag_setter))
+        self.__setattr__(name, value)
 
     def add_input(self, inputlist):
         '''Given a list of names of input variables, update the master list.'''
