@@ -27,9 +27,14 @@ class FixedRelativeHumidity(DiagnosticProcess):
         self.RH_profile = self.relative_humidity * np.ones_like(self.Tatm)
         #  go ahead and set the initial q based on initial temperature
         self.q = self.Tatm * 0.
-        newdiags = ['q']
-        self.add_diagnostics(newdiags)
         self._compute()
+
+    @property
+    def q(self):
+        return self.diagnostics['q']
+    @q.setter
+    def q(self, value):
+        self.diagnostics['q'] = value
 
     def _compute(self):
         es = clausius_clapeyron(self.Tatm)

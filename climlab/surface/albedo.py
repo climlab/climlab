@@ -9,16 +9,14 @@ class ConstantAlbedo(DiagnosticProcess):
         '''Uniform prescribed albedo.'''
         super(ConstantAlbedo, self).__init__(**kwargs)
         self.albedo = albedo
-        newdiags = ['albedo',]
-        self.add_diagnostics(newdiags)
 
     @property
     def albedo(self):
-        return self._albedo
+        return self.diagnostics['albedo']
     @albedo.setter
     def albedo(self, value):
         dom = self.domains['default']
-        self._albedo = Field(value, domain=dom)
+        self.diagnostics['albedo'] = Field(value, domain=dom)
         self.param['albedo'] = value
 
 
@@ -28,8 +26,6 @@ class P2Albedo(DiagnosticProcess):
         super(P2Albedo, self).__init__(**kwargs)
         self.a0 = a0
         self.a2 = a2
-        newdiags = ['albedo',]
-        self.add_diagnostics(newdiags)
 
     @property
     def a0(self):
@@ -47,6 +43,13 @@ class P2Albedo(DiagnosticProcess):
         self._a2 = value
         self.param['a2'] = value
         self._compute_fixed()
+    @property
+    def albedo(self):
+        return self.diagnostics['albedo']
+    @albedo.setter
+    def albedo(self, value):
+        self.diagnostics['albedo'] = value
+
     def _compute_fixed(self):
         '''Recompute any fixed quantities after a change in parameters'''
         phi = np.deg2rad(self.lat)
@@ -68,6 +71,25 @@ class Iceline(DiagnosticProcess):
                     'ice',
                     'icelat']
         self.add_diagnostics(newdiags)
+
+    @property
+    def noice(self):
+        return self.diagnostics['noice']
+    @noice.setter
+    def noice(self, value):
+        self.diagnostics['noice'] = value
+    @property
+    def ice(self):
+        return self.diagnostics['ice']
+    @ice.setter
+    def ice(self, value):
+        self.diagnostics['ice'] = value
+    @property
+    def icelat(self):
+        return self.diagnostics['icelat']
+    @icelat.setter
+    def icelat(self, value):
+        self.diagnostics['icelat'] = value
 
     def find_icelines(self):
         Tf = self.param['Tf']
@@ -103,8 +125,13 @@ class StepFunctionAlbedo(DiagnosticProcess):
         self.add_subprocess('warm_albedo', P2Albedo(a0=a0, a2=a2, domains=sfc))
         self.add_subprocess('cold_albedo', ConstantAlbedo(albedo=ai, domains=sfc))
         self.topdown = False  # call subprocess compute methods first
-        newdiags = ['albedo',]
-        self.add_diagnostics(newdiags)
+
+    @property
+    def albedo(self):
+        return self.diagnostics['albedo']
+    @albedo.setter
+    def albedo(self, value):
+        self.diagnostics['albedo'] = value
 
     def _get_current_albedo(self):
         '''Simple step-function albedo based on ice line at temperature Tf.'''

@@ -30,6 +30,7 @@ class AplusBT(EnergyBudget):
         super(AplusBT, self).__init__(**kwargs)
         self.A = A
         self.B = B
+        self.OLR = 0. * self.Ts
         newdiags = ['OLR',]
         self.add_diagnostics(newdiags)
 
@@ -47,10 +48,16 @@ class AplusBT(EnergyBudget):
     def B(self, value):
         self._B = value
         self.param['B'] = value
+    @property
+    def OLR(self):
+        return self.diagnostics['OLR']
+    @OLR.setter
+    def OLR(self, value):
+        self.diagnostics['OLR'] = value
 
     def _compute_emission(self):
         for varname, value in self.state.iteritems():
-            self.OLR = self.A + self.B * value
+            self.OLR[:] = self.A + self.B * value
 
     def _compute_heating_rates(self):
         '''Compute energy flux convergences to get heating rates in W / m**2.'''
@@ -62,9 +69,9 @@ class AplusBT(EnergyBudget):
 class AplusBT_CO2(EnergyBudget):
     '''longwave radiation module considering CO2 concentration
     see Caldeira & Kasting [1992] for further reading.
-    
+
     parameter:  CO2  - CO2 concentration in atmosphere (ppm)
-    
+
     implemented by Moritz Kreuzer'''
     def __init__(self, CO2=300, **kwargs):
         super(AplusBT_CO2, self).__init__(**kwargs)
@@ -77,7 +84,7 @@ class AplusBT_CO2(EnergyBudget):
     def CO2(self, value):
         self._CO2 = value
         self.param['CO2'] = value
-    
+
     def emission(self):
         l = np.log(self.CO2/300.)
         A = -326.400 + 9.16100*l - 3.16400*l**2 + 0.546800*l**3
@@ -86,7 +93,7 @@ class AplusBT_CO2(EnergyBudget):
             flux = A + B * (value + const.tempCtoK)
             self.OLR = flux
             self.diagnostics['OLR'] = self.OLR
-    
+
     def _compute_heating_rates(self):
         '''Compute energy flux convergences to get heating rates in W / m**2.'''
         self.emission()

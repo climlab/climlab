@@ -44,12 +44,37 @@ class Radiation(EnergyBudget):
         self.flux_to_space = 0. * self.Ts
         self.absorbed = 0. * self.Tatm
         self.absorbed_total = 0. * self.Ts
-        newdiags = ['flux_from_sfc',
-                    'flux_to_sfc',
-                    'flux_to_space',
-                    'absorbed',
-                    'absorbed_total']
-        self.add_diagnostics(newdiags)
+
+    @property
+    def flux_from_sfc(self):
+        return self.diagnostics['flux_from_sfc']
+    @flux_from_sfc.setter
+    def flux_from_sfc(self, value):
+        self.diagnostics['flux_from_sfc']
+    @property
+    def flux_to_sfc(self):
+        return self.diagnostics['flux_to_sfc']
+    @flux_to_sfc.setter
+    def flux_to_sfc(self, value):
+        self.diagnostics['flux_to_sfc']
+    @property
+    def flux_to_space(self):
+        return self.diagnostics['flux_to_space']
+    @flux_to_space.setter
+    def flux_to_space(self, value):
+        self.diagnostics['flux_to_space']
+    @property
+    def absorbed(self):
+        return self.diagnostics['absorbed']
+    @absorbed.setter
+    def absorbed(self, value):
+        self.diagnostics['absorbed']
+    @property
+    def absorbed_total(self):
+        return self.diagnostics['absorbed_total']
+    @absorbed_total.setter
+    def absorbed_total(self, value):
+        self.diagnostics['absorbed_total']
 
     def _compute_radiative_heating(self):
         '''Compute radiative fluxes and heating rates.

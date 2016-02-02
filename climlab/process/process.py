@@ -192,7 +192,7 @@ class Process(object):
 
     def _set_field(self, field_type, name, value):
         '''Add a new field to a specified dictionary. The field is also added
-        as a process attribute. field_type can be 'input', 'diagnostic' '''
+        as a process attribute. field_type can be 'input', 'diagnostics' '''
         try:
             self.__getattribute__(field_type).update({name: value})
         except:
@@ -201,11 +201,21 @@ class Process(object):
         # setter method for that attribute
         self.__setattr__(name, value)
 
-    def add_diagnostics(self, diaglist):
+    # def add_diagnostics(self, diaglist):
     #     '''Given a list of names of diagnostic variables, update the master list.'''
     #     self._diag_vars = frozenset.union(self._diag_vars, diaglist)
-        for var in diaglist:
-            self.diagnostics[var] = self.__dict__[var]
+    #def _get_diagnostic(self, name):
+    #    return self.diagnostics[name]
+    #
+    #def _set_diagnostic(self, name, value):
+    #    self.diagnostics[name] = value
+    #
+    #def init_diagnostic(self, name, value):
+    #    #self.__setattr__('_set_'+name, lambda value: self.diagnostics[name]=value)
+    #    self.__setattr__('_set_'+name, Pass)
+    #    setattr(type(self), name,
+    #            property(self._get_diagnostic, self.__attr__['_set_'+name]))
+    #    self.__setattr__(name, value)
 
     def add_input(self, inputlist):
         '''Given a list of names of input variables, update the master list.'''
