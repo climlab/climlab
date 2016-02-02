@@ -18,7 +18,8 @@ class SurfaceFlux(EnergyBudget):
         '''Compute energy flux convergences to get heating rates in W/m2.'''
         self._compute_flux()
         self.heating_rate['Ts'] = -self._flux
-        self.heating_rate['Tatm'][..., 0, np.newaxis] = self._flux
+        # Modify only the lowest model level
+        self.heating_rate['Tatm'][..., -1, np.newaxis] = self._flux
 
 
 class SensibleHeatFlux(SurfaceFlux):
@@ -35,7 +36,8 @@ class SensibleHeatFlux(SurfaceFlux):
 
     def _compute_flux(self):
         # this ensure same dimensions as Ts
-        Ta = self.Tatm[..., 0, np.newaxis]
+        #  (and use only the lowest model level)
+        Ta = self.Tatm[..., -1, np.newaxis]
         Ts = self.Ts
         DeltaT = Ts - Ta
         #  air density
@@ -61,8 +63,8 @@ class LatentHeatFlux(SurfaceFlux):
     def _compute_flux(self):
         #  specific humidity at lowest model level
         #  assumes pressure is the last axis
-        q = self.q[..., 0, np.newaxis]
-        Ta = self.Tatm[..., 0, np.newaxis]
+        q = self.q[..., -1, np.newaxis]
+        Ta = self.Tatm[..., -1, np.newaxis]
         qs = qsat(self.Ts, const.ps)
         Deltaq = qs - q
         #  air density
