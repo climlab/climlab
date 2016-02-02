@@ -201,10 +201,6 @@ class Process(object):
         # setter method for that attribute
         self.__setattr__(name, value)
 
-    # def add_diagnostics(self, diaglist):
-    #     '''Given a list of names of diagnostic variables, update the master list.'''
-    #     self._diag_vars = frozenset.union(self._diag_vars, diaglist)
-
     def init_diagnostic(self, name, value=0.):
         '''Define a new diagnostic quantity called name
         and initialize it with the given value.

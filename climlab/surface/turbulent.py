@@ -27,13 +27,6 @@ class SensibleHeatFlux(SurfaceFlux):
         super(SensibleHeatFlux, self).__init__(Cd=Cd, **kwargs)
         self.init_diagnostic('SHF')
 
-    # @property
-    # def SHF(self):
-    #     return self.diagnostics['SHF']
-    # @SHF.setter
-    # def SHF(self, value):
-    #     self.diagnostics['SHF'] = value
-
     def _compute_flux(self):
         # this ensure same dimensions as Ts
         #  (and use only the lowest model level)
@@ -52,13 +45,6 @@ class LatentHeatFlux(SurfaceFlux):
     def __init__(self, Cd=3E-3, **kwargs):
         super(LatentHeatFlux, self).__init__(Cd=Cd, **kwargs)
         self.init_diagnostic('LHF')
-
-    # @property
-    # def LHF(self):
-    #     return self.diagnostics['LHF']
-    # @LHF.setter
-    # def LHF(self, value):
-    #     self.diagnostics['LHF'] = value
 
     def _compute_flux(self):
         #  specific humidity at lowest model level

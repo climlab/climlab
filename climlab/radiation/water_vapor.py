@@ -29,13 +29,6 @@ class FixedRelativeHumidity(DiagnosticProcess):
         self.init_diagnostic('q', 0.*self.Tatm)
         self._compute()
 
-    # @property
-    # def q(self):
-    #     return self.diagnostics['q']
-    # @q.setter
-    # def q(self, value):
-    #     self.diagnostics['q'] = value
-
     def _compute(self):
         es = clausius_clapeyron(self.Tatm)
         e = self.RH_profile * es

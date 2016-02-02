@@ -35,7 +35,6 @@ class _Insolation(DiagnosticProcess):
         except:
             self.insolation = np.zeros(self.domains['default'].shape)
         self.S0 = S0
-        #self.add_diagnostics(['insolation'])
 
     @property
     def S0(self):
@@ -45,12 +44,6 @@ class _Insolation(DiagnosticProcess):
         self._S0 = value
         self.param['S0'] = value
         self._compute_fixed()
-    # @property
-    # def insolation(self):
-    #     return self.diagnostics['insolation']
-    # @insolation.setter
-    # def insolation(self, value):
-    #     self.diagnostics['insolation'] = value
 
     def _compute_fixed(self):
         '''Recompute any fixed quantities after a change in parameters'''

@@ -31,9 +31,6 @@ class AplusBT(EnergyBudget):
         self.A = A
         self.B = B
         self.init_diagnostic('OLR', 0. * self.Ts)
-        #self.OLR = 0. * self.Ts
-        #newdiags = ['OLR',]
-        #self.add_diagnostics(newdiags)
 
     @property
     def A(self):
@@ -49,12 +46,6 @@ class AplusBT(EnergyBudget):
     def B(self, value):
         self._B = value
         self.param['B'] = value
-    # @property
-    # def OLR(self):
-    #     return self.diagnostics['OLR']
-    # @OLR.setter
-    # def OLR(self, value):
-    #     self.diagnostics['OLR'] = value
 
     def _compute_emission(self):
         for varname, value in self.state.iteritems():
