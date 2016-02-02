@@ -69,11 +69,12 @@ class Iceline(DiagnosticProcess):
     def __init__(self, Tf=-10., **kwargs):
         super(DiagnosticProcess, self).__init__(**kwargs)
         self.param['Tf'] = Tf
-        newdiags = ['noice',
-                    'ice',
-                    'icelat']
-        for name in newdiags:
-            self.init_diagnostic(name)
+        self.init_diagnostic('icelat')
+        #newdiags = ['noice',
+        #            'ice',
+        #            'icelat']
+        #for name in newdiags:
+        #    self.init_diagnostic(name)
         #self.add_diagnostics(newdiags)
 
     # @property

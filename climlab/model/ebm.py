@@ -145,6 +145,7 @@ class EBM_seasonal(EBM):
             # Remove unused parameters here for clarity
             _ = self.param.pop('ai')
             _ = self.param.pop('Tf')
+            self.remove_diagnostic('icelat')
             self.add_subprocess('albedo',
                             albedo.P2Albedo(domains=sfc, **self.param))
         else:

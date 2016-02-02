@@ -221,6 +221,12 @@ class Process(object):
                 property(fget=_diag_getter, fset=_diag_setter))
         self.__setattr__(name, value)
 
+    def remove_diagnostic(self, name):
+        '''Remove a diagnostic from the process.diagnostic dictionary
+        and also delete the associated process attribute.'''
+        _ = self.diagnostics.pop(name)
+        delattr(type(self), name)
+
     def add_input(self, inputlist):
         '''Given a list of names of input variables, update the master list.'''
         self._input_vars = frozenset.union(self._input_vars, inputlist)
