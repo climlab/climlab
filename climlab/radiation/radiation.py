@@ -37,44 +37,12 @@ class Radiation(EnergyBudget):
         newinput = ['flux_from_space',]
         self.add_input(newinput)
         self.flux_from_space = 0. * self.Ts
-        #  THESE ARE NOT INPUT! THEY ARE DIAGNOSTICS
-        #  But it is helpful to initialize them to zero
-        self.flux_from_sfc = 0. * self.Ts
-        self.flux_to_sfc = 0. * self.Ts
-        self.flux_to_space = 0. * self.Ts
-        self.absorbed = 0. * self.Tatm
-        self.absorbed_total = 0. * self.Ts
-
-    @property
-    def flux_from_sfc(self):
-        return self.diagnostics['flux_from_sfc']
-    @flux_from_sfc.setter
-    def flux_from_sfc(self, value):
-        self.diagnostics['flux_from_sfc']
-    @property
-    def flux_to_sfc(self):
-        return self.diagnostics['flux_to_sfc']
-    @flux_to_sfc.setter
-    def flux_to_sfc(self, value):
-        self.diagnostics['flux_to_sfc']
-    @property
-    def flux_to_space(self):
-        return self.diagnostics['flux_to_space']
-    @flux_to_space.setter
-    def flux_to_space(self, value):
-        self.diagnostics['flux_to_space']
-    @property
-    def absorbed(self):
-        return self.diagnostics['absorbed']
-    @absorbed.setter
-    def absorbed(self, value):
-        self.diagnostics['absorbed']
-    @property
-    def absorbed_total(self):
-        return self.diagnostics['absorbed_total']
-    @absorbed_total.setter
-    def absorbed_total(self, value):
-        self.diagnostics['absorbed_total']
+        #  initialize all diagnostics to zero
+        self.init_diagnostic('flux_from_sfc', 0. * self.Ts)
+        self.init_diagnostic('flux_to_sfc', 0. * self.Ts)
+        self.init_diagnostic('flux_to_space', 0. * self.Ts)
+        self.init_diagnostic('absorbed', 0. * self.Tatm)
+        self.init_diagnostic('absorbed_total', 0. * self.Ts)
 
     def _compute_radiative_heating(self):
         '''Compute radiative fluxes and heating rates.

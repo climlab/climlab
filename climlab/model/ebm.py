@@ -64,11 +64,15 @@ class EBM(EnergyBudget):
                                                              K=K,
                                                              **self.param))
         self.topdown = False  # call subprocess compute methods first
-        newdiags = ['OLR',
-                    'ASR',
-                    'net_radiation',
-                    'icelat']
-        self.add_diagnostics(newdiags)
+        # newdiags = ['OLR',
+        #             'ASR',
+        #             'net_radiation',
+        #             'icelat']
+        # self.add_diagnostics(newdiags)
+        self.init_diagnostic('OLR', 0.*self.Ts)
+        self.init_diagnostic('ASR', 0.*self.Ts)
+        self.init_diagnostic('net_radiation', 0.*self.Ts)
+        self.init_diagnostic('icelat', None)
 
 
     def _compute_heating_rates(self):

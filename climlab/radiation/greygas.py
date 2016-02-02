@@ -48,28 +48,31 @@ class GreyGas(Radiation):
         self.albedo_sfc = albedo_sfc * np.ones_like(self.Ts)
         #  THESE ARE NOT INPUT! THEY ARE DIAGNOSTICS
         #  But it is helpful to initialize them to zero
-        self.emission = 0. * self.Tatm
-        self.emission_sfc = 0. * self.Ts
-        self.flux_reflected_up = 0. * self.Ts
+        self.init_diagnostic('emission', 0. * self.Tatm)
+        self.init_diagnostic('emission_sfc', 0. * self.Ts)
+        self.init_diagnostic('flux_reflected_up')
+        #self.emission = 0. * self.Tatm
+        #self.emission_sfc = 0. * self.Ts
+        #self.flux_reflected_up = 0. * self.Ts
 
-    @property
-    def emission(self):
-        return self.diagnostics['emission']
-    @emission.setter
-    def emission(self, value):
-        self.diagnostics['emission'] = value
-    @property
-    def emission_sfc(self):
-        return self.diagnostics['emission_sfc']
-    @emission.setter
-    def emission_sfc(self, value):
-        self.diagnostics['emission_sfc'] = value
-    @property
-    def flux_reflected_up(self):
-        return self.diagnostics['flux_reflected_up']
-    @emission.setter
-    def flux_reflected_up(self, value):
-        self.diagnostics['flux_reflected_up'] = value
+    # @property
+    # def emission(self):
+    #     return self.diagnostics['emission']
+    # @emission.setter
+    # def emission(self, value):
+    #     self.diagnostics['emission'] = value
+    # @property
+    # def emission_sfc(self):
+    #     return self.diagnostics['emission_sfc']
+    # @emission.setter
+    # def emission_sfc(self, value):
+    #     self.diagnostics['emission_sfc'] = value
+    # @property
+    # def flux_reflected_up(self):
+    #     return self.diagnostics['flux_reflected_up']
+    # @emission.setter
+    # def flux_reflected_up(self, value):
+    #     self.diagnostics['flux_reflected_up'] = value
 
     @property
     def absorptivity(self):

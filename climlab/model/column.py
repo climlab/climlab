@@ -80,7 +80,6 @@ class GreyRadiationModel(TimeDependentProcess):
         self.add_subprocess('SW', shortwave)
         self.add_subprocess('insolation', Q)
         #self.add_subprocess('surface', surface)
-
         newdiags = ['OLR',
                     'LW_down_sfc',
                     'LW_up_sfc',
@@ -94,7 +93,9 @@ class GreyRadiationModel(TimeDependentProcess):
                     'SW_up_TOA',
                     'SW_down_TOA',
                     'planetary_albedo']
-        self.add_diagnostics(newdiags)
+        for name in newdiags:
+            self.init_diagnostic(name)
+        #self.add_diagnostics(newdiags)
 
     # This process has to handle the coupling between insolation and column radiation
     def _compute(self):

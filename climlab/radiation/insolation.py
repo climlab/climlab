@@ -29,6 +29,7 @@ class _Insolation(DiagnosticProcess):
     def __init__(self, S0=const.S0, **kwargs):
         super(_Insolation, self).__init__(**kwargs)
         #  initialize diagnostic with correct shape
+        self.init_diagnostic('insolation')
         try:
             self.insolation = np.zeros(self.domains['sfc'].shape)
         except:
@@ -44,12 +45,12 @@ class _Insolation(DiagnosticProcess):
         self._S0 = value
         self.param['S0'] = value
         self._compute_fixed()
-    @property
-    def insolation(self):
-        return self.diagnostics['insolation']
-    @insolation.setter
-    def insolation(self, value):
-        self.diagnostics['insolation'] = value
+    # @property
+    # def insolation(self):
+    #     return self.diagnostics['insolation']
+    # @insolation.setter
+    # def insolation(self, value):
+    #     self.diagnostics['insolation'] = value
 
     def _compute_fixed(self):
         '''Recompute any fixed quantities after a change in parameters'''

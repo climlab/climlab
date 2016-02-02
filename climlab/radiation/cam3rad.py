@@ -113,10 +113,14 @@ class CAM3Radiation(Radiation):
 
         #  THESE ARE NOT INPUT! THEY ARE DIAGNOSTICS
         #  But it is helpful to initialize them to zero
-        self.ASR = 0. * self.Ts
-        self.ASRcld = 0. * self.Ts
-        self.OLR = 0. * self.Ts
-        self.OLRcld = 0. * self.Ts
+        self.init_diagnostic('ASR', 0. * self.Ts)
+        self.init_diagnostic('ASRcld', 0. * self.Ts)
+        self.init_diagnostic('OLR', 0. * self.Ts)
+        self.init_diagnostic('OLRcld', 0. * self.Ts)
+        #self.ASR = 0. * self.Ts
+        #self.ASRcld = 0. * self.Ts
+        #self.OLR = 0. * self.Ts
+        #self.OLRcld = 0. * self.Ts
         # newdiags = ['OLR',
         #             'OLRcld',
         #             'ASR',
@@ -127,30 +131,30 @@ class CAM3Radiation(Radiation):
         _cam3_interface._build_extension(self.KM, self.JM, self.IM)
         _cam3_interface._init_extension(self)
 
-    @property
-    def ASR(self):
-        return self.diagnostics['ASR']
-    @ASR.setter
-    def ASR(self, value):
-        self.diagnostics['ASR'] = value
-    @property
-    def ASRcld(self):
-        return self.diagnostics['ASRcld']
-    @ASRcld.setter
-    def ASRcld(self, value):
-        self.diagnostics['ASRcld'] = value
-    @property
-    def OLR(self):
-        return self.diagnostics['OLR']
-    @OLR.setter
-    def OLR(self, value):
-        self.diagnostics['OLR'] = value
-    @property
-    def OLRcld(self):
-        return self.diagnostics['OLRcld']
-    @OLRcld.setter
-    def OLRcld(self, value):
-        self.diagnostics['OLRcld'] = value
+    # @property
+    # def ASR(self):
+    #     return self.diagnostics['ASR']
+    # @ASR.setter
+    # def ASR(self, value):
+    #     self.diagnostics['ASR'] = value
+    # @property
+    # def ASRcld(self):
+    #     return self.diagnostics['ASRcld']
+    # @ASRcld.setter
+    # def ASRcld(self, value):
+    #     self.diagnostics['ASRcld'] = value
+    # @property
+    # def OLR(self):
+    #     return self.diagnostics['OLR']
+    # @OLR.setter
+    # def OLR(self, value):
+    #     self.diagnostics['OLR'] = value
+    # @property
+    # def OLRcld(self):
+    #     return self.diagnostics['OLRcld']
+    # @OLRcld.setter
+    # def OLRcld(self, value):
+    #     self.diagnostics['OLRcld'] = value
 
     def _climlab_to_cam3(self, field):
         '''Prepare field wit proper dimension order.
