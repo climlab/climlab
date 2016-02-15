@@ -86,30 +86,6 @@ class TimeDependentProcess(Process):
                           tendencies_adjustment]:
             for name in tend_dict:
                 self.tendencies[name] += tend_dict[name]
-        #
-        #
-        # if (self.topdown and self.time_type is 'explicit'):
-        # 	 #  tendencies is dictionary with same names as state variables
-        #     tendencies = self._compute()
-        #     for name, proc in self.subprocess.iteritems():
-        #         proc.compute()
-        #         for varname, tend in proc.tendencies.iteritems():
-        #             tendencies[varname] += tend
-        # else:
-        # #  make a new dictionary to hold tendencies on state variables
-        #     tendencies = {}
-        #     for varname in self.state:
-        #         tendencies[varname] = 0. * self.state[varname]
-        #     for name, proc in self.subprocess.iteritems():
-        #         proc.compute()
-        #         for varname, tend in proc.tendencies.iteritems():
-        #             tendencies[varname] += tend
-		# 		#diagnostics.merge(diag_sub)
-        #     parent_tendencies = self._compute()
-        #     for varname, tend in parent_tendencies.iteritems():
-        #         tendencies[varname] += tend
-        # self.tendencies = tendencies
-
         #  pass diagnostics up the process tree
         for name, proc in self.subprocess.iteritems():
             #self.add_diagnostics(proc.diagnostics.keys())
@@ -155,39 +131,6 @@ class TimeDependentProcess(Process):
         # Update all time counters for this and all subprocesses in the tree
         for name, proc, level in walk_processes(self):
             proc._update_time()
-
-        # if not self.has_process_type_list:
-        #     self._build_process_type_list()
-        # # First compute all strictly diagnostic processes
-        # for proc in self.process_types['diagnostic']:
-        #     proc.compute()
-        # # Compute tendencies and diagnostics for all explicit processes
-        # for proc in self.process_types['explicit']:
-        #     proc.compute()
-        # # Update state variables using all explicit tendencies
-        # #  Tendencies are d/dt(state) -- so just multiply by timestep for forward time
-        # for proc in self.process_types['explicit']:
-        #     for varname in proc.state.keys():
-        #         try: proc.state[varname] += (proc.tendencies[varname] *
-        #                                      self.param['timestep'])
-        #         except: pass
-        # # Now compute all implicit processes -- matrix inversions
-        # for proc in self.process_types['implicit']:
-        #     proc.compute()
-        #     for varname in proc.state.keys():
-        #         try: proc.state[varname] += proc.adjustment[varname]
-        #         except: pass
-        # # Adjustment processes change the state instantaneously
-        # for proc in self.process_types['adjustment']:
-        #     proc.compute()
-        #     for varname, value in proc.state.iteritems():
-        #         #proc.set_state(varname, proc.adjusted_state[varname])
-        #         try: proc.state[varname] += proc.adjustment[varname]
-        #         except: pass
-        # # Gather all diagnostics
-        # for name, proc, level in walk_processes(self):
-        #     self.diagnostics.update(proc.diagnostics)
-        #     proc._update_time()
 
     def compute_diagnostics(self, num_iter=3):
         '''Compute all tendencies and diagnostics, but don't update model state.

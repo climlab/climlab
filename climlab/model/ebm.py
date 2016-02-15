@@ -67,14 +67,15 @@ class EBM(EnergyBudget):
         self.init_diagnostic('OLR', 0.*self.Ts)
         self.init_diagnostic('ASR', 0.*self.Ts)
         self.init_diagnostic('net_radiation', 0.*self.Ts)
+        self.init_diagnostic('albedo', 0.*self.Ts)
         self.init_diagnostic('icelat', None)
 
 
     def _compute_heating_rates(self):
         '''Compute energy flux convergences to get heating rates in W / m**2'''
         insolation = self.subprocess['insolation'].insolation
-        albedo = self.subprocess['albedo'].albedo
-        self.ASR = (1-albedo) * insolation
+        self.albedo = self.subprocess['albedo'].albedo
+        self.ASR = (1-self.albedo) * insolation
         self.OLR = self.subprocess['LW'].OLR
         self.net_radiation = self.ASR - self.OLR
         #  The part of the heating due just to shortwave

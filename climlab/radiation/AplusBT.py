@@ -9,9 +9,6 @@ Ts = climlab.Field(15., domain=sfc)
 s = {'Ts': Ts}
 olr = climlab.radiation.AplusBT(state=s)
 print olr
-#  OR, we can pass a single state variable
-olr = climlab.radiation.AplusBT(state=Ts)
-print olr
 # to compute tendencies and diagnostics
 olr.compute()
 #  or to actually update the temperature

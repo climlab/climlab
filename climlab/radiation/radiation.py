@@ -1,5 +1,5 @@
 '''
-Radiation is the base class for all climlab radiation modules
+Radiation is the base class climlab grey radiation and band modules
 
 Basic characteristics:
 
@@ -30,7 +30,9 @@ class Radiation(EnergyBudget):
     - flux_from_sfc
     - flux_to_sfc
     - flux_to_space
-    -  plus a bunch of others!!
+    - absorbed
+    - absorbed_total
+    (all in W/m2)
     '''
     def __init__(self, **kwargs):
         super(Radiation, self).__init__(**kwargs)

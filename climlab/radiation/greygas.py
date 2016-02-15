@@ -14,21 +14,25 @@ class GreyGas(Radiation):
     By default emissivity = absorptivity.
     Subclasses can override this is necessary (e.g. for shortwave model).
 
-    FIX THIS documentation......  out of date
-
-    The following boundary values need to be specified by user or parent process:
+    The following boundary and input values need to be specified by
+    user or parent process:
     - albedo_sfc (default is zero)
     - flux_from_space
-    - flux_from_sfc
     - absorptivity
     - reflectivity (default is zero)
     These are accessible (and settable) as process attributes
     Also stored in process.input dictionary
 
     The following values are computed are stored in the .diagnostics dictionary:
+    - flux_from_sfc
     - flux_to_sfc
     - flux_to_space
-    -  plus a bunch of others!!
+    - absorbed
+    - absorbed_total
+    - emission
+    - emission_sfc
+    - flux_reflected_up
+    (all in W/m2)
     '''
     def __init__(self, absorptivity=None, reflectivity=None, emissivity_sfc=1.,
                  albedo_sfc=0., **kwargs):

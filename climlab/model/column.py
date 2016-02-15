@@ -91,11 +91,12 @@ class GreyRadiationModel(TimeDependentProcess):
                     'planetary_albedo']
         for name in newdiags:
             self.init_diagnostic(name)
+        # This process has to handle the coupling between
+        # insolation and column radiation
+        self.subprocess['SW'].flux_from_space = \
+            self.subprocess['insolation'].diagnostics['insolation']
 
-    # This process has to handle the coupling between insolation and column radiation
     def _compute(self):
-        # Do the coupling
-        self.subprocess['SW'].flux_from_space = self.subprocess['insolation'].insolation
         # set diagnostics
         self.do_diagnostics()
         # no tendencies for the parent process

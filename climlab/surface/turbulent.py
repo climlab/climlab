@@ -35,7 +35,6 @@ class SensibleHeatFlux(SurfaceFlux):
         DeltaT = Ts - Ta
         #  air density
         rho = const.ps * const.mb_to_Pa / const.Rd / Ta
-        #  wind speed
         #  flux from bulk formula
         self._flux = const.cp * rho * self.Cd * self.U * DeltaT
         self.SHF = self._flux

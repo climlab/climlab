@@ -56,10 +56,6 @@ appropriate `input`.
         - `newproc = climlab.process_like(procname.subprocess['subprocname'])`
         - `newproc.compute()`
         - anything in the `input` dictionary of `subprocname` will remain fixed
-
-To do:
-- use OrderedDict to hold the subprocess dictionary
-    - order of execution can then be controled by position in dictionary
 '''
 import time, copy
 import numpy as np
@@ -109,10 +105,6 @@ class Process(object):
         # dictionary of model parameters
         self.param = kwargs
         # dictionary of diagnostic quantities
-        #self.diagnostics = _make_dict(diagnostics, Field)
-        #  basically a list of names of diagnostic variables
-        #self._diag_vars = frozenset()
-        #  GOing back to a simpler dictionary method for diagnostics
         self.diagnostics = attr_dict.AttrDict()
         # dictionary of input quantities
         #self.input = _make_dict(input, Field)

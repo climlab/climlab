@@ -1,10 +1,5 @@
 '''
 climlab wrap of the CAM3 radiation code
-
-
-We need to do this more cleanly.
-There should be an object like cam3wrap
-that handles all the conversion between the two apis.
 '''
 import numpy as np
 from climlab import constants as const
@@ -13,6 +8,44 @@ import _cam3_interface
 
 
 class CAM3Radiation(Radiation):
+    '''
+    climlab wrapper for the CAM3 radiation code.
+
+    Scalar input values:
+    - Well-mixed greenhouse gases in ppmv (all default to zero except CO2):
+        - CO2 (380.)
+        - N2O
+        - CH4
+        - CFC11
+        - CFC12
+    Input values with same dimension as Ts:
+        - cosZen (cosine of solar zenith angle, default = 1.)
+        - insolation (W/m2, default = const.S0/4)
+        - surface albedos (all default to 0.07):
+            - asdir (shortwave direct)
+            - asdif (shortwave diffuse)
+            - aldir (near-infrared, direct)
+            - aldif (near-infrared, diffuse)
+    Input values with same dimension as Tatm:
+        - O3 (ozone in ppmv)
+        - q (specific humidity in kg/kg)
+        - cldf (cloud fraction, default is zero)
+        - clwp (cloud liquid water path, default is zero)
+        - ciwp (cloud ice water path, default is zero)
+        - r_liq (liquid effective drop size, microns, default is 10.)
+        - r_ice (ice effective drop size, microns, default is 30.)
+
+    Diagnostics:
+        - ASR (absorbed solar radiation, W/m2)
+        - ASRcld (shortwave cloud radiative effect, all-sky - clear-sky flux, W/m2)
+        - OLR (outgoing longwave radiation, W/m2)
+        - OLRcld (longwave cloud radiative effect, all-sky - clear-sky flux, W/m2)
+
+    Many other quantities are available in a slightly different format
+    from the CAM3 wrapper, stored in self.Output.
+
+    See the code for examples of how to translate these quantities in climlab format.
+    '''
     def __init__(self,
                  CO2=380.,
                  N2O=1.E-9,
@@ -107,8 +140,7 @@ class CAM3Radiation(Radiation):
         self.epsilon = const.Rd / const.Rv
         self.stebol = const.sigma
 
-        #  THESE ARE NOT INPUT! THEY ARE DIAGNOSTICS
-        #  But it is helpful to initialize them to zero
+        # initialize diagnostics
         self.init_diagnostic('ASR', 0. * self.Ts)
         self.init_diagnostic('ASRcld', 0. * self.Ts)
         self.init_diagnostic('OLR', 0. * self.Ts)
