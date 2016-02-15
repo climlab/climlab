@@ -16,6 +16,7 @@ from climlab.radiation.AplusBT import AplusBT
 from climlab.radiation.insolation import P2Insolation, AnnualMeanInsolation, DailyInsolation
 from climlab.surface import albedo
 from climlab.dynamics.diffusion import MeridionalDiffusion
+from climlab.domain.initial import surface_state
 from scipy import integrate
 
 
@@ -32,16 +33,18 @@ class EBM(EnergyBudget):
                  a2=0.078,
                  ai=0.62,
                  timestep=const.seconds_per_year/90.,
-                 T_init_0 = 12.,
-                 T_init_P2 = -40.,
+                 T0 = 12.,  # initial temperature parameters
+                 T2 = -40.,  #  (2nd Legendre polynomial)
                  **kwargs):
+        # Check to see if an initial state is already provided
+        #  If not, make one
+        if 'state' not in kwargs:
+            state = surface_state(num_lat=num_lat, water_depth=water_depth,
+                                  T0=T0, T2=T2)
+            sfc = state.Ts.domain
+            kwargs.update({'state': state, 'domains':{'sfc':sfc}})
         super(EBM, self).__init__(timestep=timestep, **kwargs)
-        if not self.domains and not self.state:  # no state vars or domains yet
-            sfc = domain.zonal_mean_surface(num_lat=num_lat,
-                                            water_depth=water_depth)
-            lat = sfc.axes['lat'].points
-            initial = T_init_0 + T_init_P2 * legendre.P2(np.sin(np.deg2rad(lat)))
-            self.set_state('Ts', Field(initial, domain=sfc))
+        sfc = self.Ts.domain
         self.param['S0'] = S0
         self.param['A'] = A
         self.param['B'] = B
@@ -64,27 +67,38 @@ class EBM(EnergyBudget):
                                                              K=K,
                                                              **self.param))
         self.topdown = False  # call subprocess compute methods first
+        self.init_diagnostic('OLR', 0.*self.Ts)
+        self.init_diagnostic('ASR', 0.*self.Ts)
+        self.init_diagnostic('net_radiation', 0.*self.Ts)
+        self.init_diagnostic('albedo', 0.*self.Ts)
+        self.init_diagnostic('icelat', None)
+
 
     def _compute_heating_rates(self):
-        '''Compute energy flux convergences to get heating rates in W / m**2.
-        This method should be over-ridden by daughter classes.'''
-        insolation = self.subprocess['insolation'].diagnostics['insolation']
-        albedo = self.subprocess['albedo'].diagnostics['albedo']
-        ASR = (1-albedo) * insolation
-        self.heating_rate['Ts'] = ASR
-        self.diagnostics['ASR'] = ASR
-        self.diagnostics['net_radiation'] = (ASR -
-                                    self.subprocess['LW'].diagnostics['OLR'])
+        '''Compute energy flux convergences to get heating rates in W / m**2'''
+        insolation = self.subprocess['insolation'].insolation
+        self.albedo = self.subprocess['albedo'].albedo
+        self.ASR = (1-self.albedo) * insolation
+        self.OLR = self.subprocess['LW'].OLR
+        self.net_radiation = self.ASR - self.OLR
+        #  The part of the heating due just to shortwave
+        #  (longwave part is computed in subprocess)
+        self.heating_rate['Ts'] = self.ASR
+        # useful diagnostics
+        try:
+            self.icelat = self.subprocess['albedo'].subprocess['iceline'].icelat
+        except:
+            pass
 
     def global_mean_temperature(self):
         '''Convenience method to compute global mean surface temperature.'''
-        return global_mean(self.state['Ts'])
+        return global_mean(self.Ts)
 
     def inferred_heat_transport(self):
         '''Returns the inferred heat transport (in PW)
         by integrating the TOA energy imbalance from pole to pole.'''
         phi = np.deg2rad(self.lat)
-        energy_in = np.squeeze(self.diagnostics['net_radiation'])
+        energy_in = np.squeeze(self.net_radiation)
         return (1E-15 * 2 * np.math.pi * const.a**2 *
                 integrate.cumtrapz(np.cos(phi)*energy_in, x=phi, initial=0.))
 
@@ -130,6 +144,7 @@ class EBM_seasonal(EBM):
             # Remove unused parameters here for clarity
             _ = self.param.pop('ai')
             _ = self.param.pop('Tf')
+            self.remove_diagnostic('icelat')
             self.add_subprocess('albedo',
                             albedo.P2Albedo(domains=sfc, **self.param))
         else:
@@ -155,7 +170,7 @@ class EBM_annual(EBM_seasonal):
 
 
 #==============================================================================
-# 
+#
 # class _EBM(TimeDependentProcess):
 #     def __init__(self, num_points=90, K=0.555, **kwargs):
 #         # first create the model domains
@@ -187,7 +202,7 @@ class EBM_annual(EBM_seasonal):
 #         # self.make_insolation_array()  # now called from inside set_timestep()
 #         self.external_heat_source = np.zeros_like(self.phi)
 #         self.set_timestep()
-# 
+#
 #     def make_grid(self):
 #         '''Build the grid for the computation, evenly spaced in latitude.'''
 #         #   dlat will be our grid spacing
@@ -203,13 +218,13 @@ class EBM_annual(EBM_seasonal):
 #         self.dphi = np.deg2rad(self.dlat)
 #         self.phi = np.deg2rad(self.lat)
 #         self.phi_stag = np.deg2rad(self.lat_stag)
-# 
+#
 #     def set_timestep(self, num_steps_per_year=90):
 #         '''Change the timestep, given a number of steps per calendar year.'''
 #         super(_EBM, self).set_timestep(num_steps_per_year)
 #         self.set_water_depth()
 #         self.make_insolation_array()
-# 
+#
 #     def set_water_depth(self, water_depth=10.):
 #         '''Method for changing the water depth (heat capacity) with depth in m.
 #         Also recomputes the tridiagonal diffusion matrix.'''
@@ -222,7 +237,7 @@ class EBM_annual(EBM_seasonal):
 #         self.C = const.cw * const.rho_w * self.water_depth
 #         self.delta_time_over_C = self.timestep / self.C
 #         self.set_diffusivity(self.K)
-# 
+#
 #     def set_diffusivity(self, K=None):
 #         '''Method for changing the diffusivity, with K in W/m^2/degC.
 #         Recomputes the tridiagonal diffusion matrix.'''
@@ -233,7 +248,7 @@ class EBM_annual(EBM_seasonal):
 #                 ValueError("Diffusivity parameter K is not specified.")
 #         self.K = K
 #         self.diffTriDiag = self._make_diffusion_matrix()
-# 
+#
 #     def _make_diffusion_matrix(self):
 #         J = self.num_points
 #         # Ka = (const.cp * const.ps * const.mb_to_Pa / const.g / const.a**2 *
@@ -251,26 +266,26 @@ class EBM_annual(EBM_seasonal):
 #         diag[1, :] = 1 + Ka2
 #         diag[2, 0:J-1] = -Ka1[1:J]
 #         return diag
-# 
+#
 #     def compute_OLR(self):
 #         return self.A + self.B * self.T
-# 
+#
 #     def make_insolation_array(self):
 #         # will be overridden by daughter classes
 #         raise NotImplementedError("Subclasses of _EBM must implement a method for computing insolation.")
-# 
+#
 #     def compute_insolation(self):
 #         return self.insolation_array[:, self.day_of_year_index]
-# 
+#
 #     def compute_albedo(self):
 #         '''Simple step-function albedo based on ice line at temperature Tf.'''
 #         return np.where(self.T >= self.Tf, self.albedo_noice, self.albedo_ice)
-# 
+#
 #     def compute_radiation(self):
 #         self.ASR = (1 - self.compute_albedo()) * self.compute_insolation()
 #         self.OLR = self.compute_OLR()
 #         self.net_radiation = self.ASR - self.OLR
-# 
+#
 #     def step_forward(self):
 #         self.compute_radiation()
 #         #  updated temperature due to radiation:
@@ -281,41 +296,41 @@ class EBM_annual(EBM_seasonal):
 #         self.T = solve_banded((1, 1), self.diffTriDiag, Trad)
 #         self.positive_degree_days += self.compute_degree_days()
 #         super(_EBM, self).step_forward()
-# 
+#
 #     def compute_degree_days(self, threshold=0.):
 #         """Return temperature*time in degree-days,
 #         wherever temperature is above the threshold, otherwise zero."""
 #         return np.where(self.T > threshold, self.T * self.timestep /
 #                         const.seconds_per_day, np.zeros_like(self.T))
-# 
+#
 #     def do_new_calendar_year(self):
 #         """This function is called once at the end of every calendar year."""
 #         super(_EBM, self).do_new_calendar_year()
 #         self.previous_positive_degree_days = self.positive_degree_days
 #         self.positive_degree_days = np.zeros_like(self.phi)
-# 
+#
 #     def heat_transport(self):
 #         '''Returns instantaneous heat transport in units on PW,
 #         on the staggered grid.'''
 #         return self.diffusive_heat_transport()
-# 
+#
 #     def diffusive_heat_transport( self ):
 #         '''Compute instantaneous diffusive heat transport in units of PW, on the staggered grid.'''
-#         #return ( 1E-15 * -2 * np.math.pi * np.cos(self.phi_stag) * const.cp * const.ps * const.mb_to_Pa / const.g * self.K * 
+#         #return ( 1E-15 * -2 * np.math.pi * np.cos(self.phi_stag) * const.cp * const.ps * const.mb_to_Pa / const.g * self.K *
 #         #    np.append( np.append( 0., np.diff( self.T ) ), 0.) / self.dphi )
-#         return ( 1E-15 * -2 * np.math.pi * np.cos(self.phi_stag) * const.a**2 * self.K * 
+#         return ( 1E-15 * -2 * np.math.pi * np.cos(self.phi_stag) * const.a**2 * self.K *
 #             np.append( np.append( 0., np.diff( self.T ) ), 0.) / self.dphi )
-#     
+#
 #     def heat_transport_convergence( self ):
 #         '''Returns instantaneous convergence of heat transport in units of W / m^2.'''
 #         return ( -1./(2*np.math.pi*const.a**2*np.cos(self.phi)) * np.diff( 1.E15*self.heat_transport() )
 #             / np.diff(self.phi_stag) )
-#     
+#
 #     def inferred_heat_transport( self ):
 #         '''Returns the inferred heat transport (in PW) by integrating the TOA energy imbalance from pole to pole.'''
 #         return ( 1E-15 * 2 * np.math.pi * const.a**2 * integrate.cumtrapz( np.cos(self.phi)*self.net_radiation,
 #             x=self.phi, initial=0. ) )
-#             
+#
 #     def find_icelines( self ):
 #         '''Returns the instantaneous latitudes of any ice edges.'''
 #         # This probably won't work in cases with multiple ice lines per hemisphere!
@@ -330,12 +345,12 @@ class EBM_annual(EBM_seasonal):
 #             icelat1 = self.lat_stag[ iceindices[icelines]+1 ]
 #             icelat2 = self.lat_stag[ iceindices[icelines+1] ]
 #             return icelat1, icelat2
-# 
+#
 #     def global_mean( self, field ):
 #         '''Compute the area-weighted global mean of a vector field on the latitude grid.'''
-#       #return np.sum( field * np.cos( self.phi ) ) / np.sum( np.cos( self.phi ) )     
-#       return global_mean( field, self.phi ) 
-#   
+#       #return np.sum( field * np.cos( self.phi ) ) / np.sum( np.cos( self.phi ) )
+#       return global_mean( field, self.phi )
+#
 #   def global_mean_temperature( self ):
 #       '''Convenience method to compute global mean temperature.'''
 #       return self.global_mean( self.T )
@@ -350,30 +365,30 @@ class EBM_annual(EBM_seasonal):
 #     '''
 #     def __str__(self):
 #         return ( "Instance of EBM_landocean class with " +  str(self.num_points) + " latitude points." )
-#     
+#
 #     def __init__( self, num_points = 90 ):
 #         super(EBM_landocean,self).__init__( num_points )
 #         self.land_ocean_exchange_parameter = 1.0  # in W/m2/K
-# 
+#
 #         self.land = EBM_seasonal( num_points )
 #         self.land.make_insolation_array( self.orb )
 #         self.land.Tf = 0.
 #         self.land.set_timestep( timestep = self.timestep )
 #         self.land.set_water_depth( water_depth = 2. )
-#         
+#
 #         self.ocean = EBM_seasonal( num_points )
 #         self.ocean.make_insolation_array( self.orb )
 #         self.ocean.Tf = -2.
 #         self.ocean.set_timestep( timestep = self.timestep )
 #         self.ocean.set_water_depth( water_depth = 75. )
-# 
-#         self.land_fraction = 0.3 * np.ones_like( self.land.phi )        
+#
+#         self.land_fraction = 0.3 * np.ones_like( self.land.phi )
 #         self.C_ratio = self.land.water_depth / self.ocean.water_depth
 #         self.T = self.zonal_mean_temperature()
-#         
+#
 #     def zonal_mean_temperature( self ):
 #         return self.land.T * self.land_fraction + self.ocean.T * (1-self.land_fraction)
-# 
+#
 #     def step_forward( self ):
 #         #  note.. this simple implementation is possibly problematic
 #         # because the exchange should really occur simultaneously with radiation
@@ -385,7 +400,7 @@ class EBM_annual(EBM_seasonal):
 #         self.ocean.T -= self.exchange / (1-self.land_fraction) * self.ocean.delta_time_over_C
 #         self.T = self.zonal_mean_temperature()
 #         self.update_time()
-#     
+#
 #     #   This code should be more accurate, but it's ungainly and seems to produce just about the same result.
 #     #def step_forward( self ):
 #     #    self.exchange = (self.ocean.T - self.land.T) * self.land_ocean_exchange_parameter
@@ -401,7 +416,7 @@ class EBM_annual(EBM_seasonal):
 #     #    self.land.update_time()
 #     #    self.ocean.update_time()
 #     #    self.update_time()
-# 
+#
 #     def integrate_years(self, years=1.0, verbose=True ):
 #         #  Here we make sure that both sub-models have the current insolation.
 #         self.land.make_insolation_array( self.orb )
@@ -419,26 +434,25 @@ class EBM_annual(EBM_seasonal):
 #  (would require re-computing the diffusion operator at each timestep, probably somewhat slower)
 
 #==============================================================================
-# 
+#
 # class EBM_annual_moist( EBM_annual ):
 #     def __str__(self):
 #         return ( "Instance of EBM_annual_moist class with " +  str(self.num_points) + " latitude points  \n" +
 #           "and global mean temperature " + str(self.global_mean_temperature()) + " degrees C.")
-#     
+#
 #     def __init__( self, num_points = 90 ):
 #         _EBM.__init__( self, num_points )
 #         self.K0 = self.K  # constant
 #         self.Kperdegree = self.K0/20. # 5% increase per degree
 #         self.Tref = 15.
 #         self.set_diffusivity( K = self.compute_K() )
-#         
+#
 #     def compute_K(self):
 #         # formula to compute diffusivity, linear in global mean temperature
 #         return self.K0 + self.Kperdegree * (self.global_mean_temperature()-self.Tref)
-#         
+#
 #     def step_forward( self ):
 #         # set the diffusivity, depends on global mean temperature
 #         self.set_diffusivity( K = self.compute_K() )
 #         _EBM.step_forward(self)
 #==============================================================================
-        

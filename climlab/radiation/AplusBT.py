@@ -9,9 +9,6 @@ Ts = climlab.Field(15., domain=sfc)
 s = {'Ts': Ts}
 olr = climlab.radiation.AplusBT(state=s)
 print olr
-#  OR, we can pass a single state variable
-olr = climlab.radiation.AplusBT(state=Ts)
-print olr
 # to compute tendencies and diagnostics
 olr.compute()
 #  or to actually update the temperature
@@ -29,7 +26,8 @@ class AplusBT(EnergyBudget):
     def __init__(self, A=200., B=2., **kwargs):
         super(AplusBT, self).__init__(**kwargs)
         self.A = A
-        self.B = B        
+        self.B = B
+        self.init_diagnostic('OLR', 0. * self.Ts)
 
     @property
     def A(self):
@@ -45,16 +43,14 @@ class AplusBT(EnergyBudget):
     def B(self, value):
         self._B = value
         self.param['B'] = value
-    
-    def emission(self):
+
+    def _compute_emission(self):
         for varname, value in self.state.iteritems():
-            flux = self.A + self.B * value
-            self.OLR = flux
-            self.diagnostics['OLR'] = self.OLR
-    
+            self.OLR[:] = self.A + self.B * value
+
     def _compute_heating_rates(self):
         '''Compute energy flux convergences to get heating rates in W / m**2.'''
-        self.emission()
+        self._compute_emission()
         for varname, value in self.state.iteritems():
             self.heating_rate[varname] = -self.OLR
 
@@ -62,9 +58,9 @@ class AplusBT(EnergyBudget):
 class AplusBT_CO2(EnergyBudget):
     '''longwave radiation module considering CO2 concentration
     see Caldeira & Kasting [1992] for further reading.
-    
+
     parameter:  CO2  - CO2 concentration in atmosphere (ppm)
-    
+
     implemented by Moritz Kreuzer'''
     def __init__(self, CO2=300, **kwargs):
         super(AplusBT_CO2, self).__init__(**kwargs)
@@ -77,7 +73,7 @@ class AplusBT_CO2(EnergyBudget):
     def CO2(self, value):
         self._CO2 = value
         self.param['CO2'] = value
-    
+
     def emission(self):
         l = np.log(self.CO2/300.)
         A = -326.400 + 9.16100*l - 3.16400*l**2 + 0.546800*l**3
@@ -86,7 +82,7 @@ class AplusBT_CO2(EnergyBudget):
             flux = A + B * (value + const.tempCtoK)
             self.OLR = flux
             self.diagnostics['OLR'] = self.OLR
-    
+
     def _compute_heating_rates(self):
         '''Compute energy flux convergences to get heating rates in W / m**2.'''
         self.emission()

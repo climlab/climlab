@@ -1,20 +1,17 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Mar 10 09:35:48 2015
+'''
+Cloud parameterizations following
+Stephens, G. (1978): Radiation Profiles in Extended Water Clouds. II: Parameterization Schemes
+J. Atm. Sci. 35, 2123--2132
 
-@author: Brian
-"""
+
+w is cloud liquid water content in g/m3
+w =
+total vertical LWP in g/m2
+W = w * deltaz
+
+unfinished...
+'''
 import numpy as np
-
-#  Cloud parameterizations following
-#  Stephens, G. (1978): Radiation Profiles in Extended Water Clouds. II: Parameterization Schemes
-#  J. Atm. Sci. 35, 2123--2132
-
-
-#  w is cloud liquid water content in g/m3
-# w = 
-# total vertical LWP in g/m2
-# W = w * deltaz
 
 def compute_tauN(W):
     #  Stephens eq. 10
@@ -26,14 +23,14 @@ def compute_tauN(W):
     tauN1 = 10**log10_tauN1
     tauN2 = 10**log10_tauN2
     return tauN1, tauN2
-    
+
 # Just use the first band, non-absorbing
 def Reflection(tauN, coszen):
     #beta = compute_beta(tauN, coszen)
     # from table 2 of Stephens... beta does not vary much
-    beta = 0.065    
+    beta = 0.065
     return beta*tauN / coszen / (1+beta*tauN/coszen)
-    
+
 def compute_eps(W):
     #  absorption cross-section in m2/g
     a0down = 0.158
@@ -61,4 +58,3 @@ def compute_beta(tauN, coszen):
         for j in range(1,i+1):
             result += poly_beta1[n] * x**(i-j) * y**(j-i)
     return result
-    

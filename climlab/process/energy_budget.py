@@ -9,28 +9,30 @@ class EnergyBudget(TimeDependentProcess):
     with items corresponding to each state variable.'''
     def __init__(self, **kwargs):
         super(EnergyBudget, self).__init__(**kwargs)
-        self.process_type = 'explicit'
+        self.time_type = 'explicit'
         self.heating_rate = {}
 
     def _compute_heating_rates(self):
         '''Compute energy flux convergences to get heating rates in W / m**2.
         This method should be over-ridden by daughter classes.'''
         for varname in self.state.keys():
-            self.heating_rate[varname] = np.zeros_like(self.state[varname])
+            self.heating_rate[varname] = self.state[varname] * 0.
 
     def _temperature_tendencies(self):
         self._compute_heating_rates()
+        tendencies = {}
         for varname, value in self.state.iteritems():
             #C = self.state_domain[varname].heat_capacity
             C = value.domain.heat_capacity
             try:  # there may be state variables without heating rates
-                self.tendencies[varname] = (self.heating_rate[varname] / C)
+                tendencies[varname] = (self.heating_rate[varname] / C)
             except:
                 pass
+        return tendencies
 
-    def compute(self):
-        '''Update all diagnostic quantities using current model state.'''
-        self._temperature_tendencies()
+    def _compute(self):
+        tendencies = self._temperature_tendencies()
+        return tendencies
 
 
 class ExternalEnergySource(EnergyBudget):
@@ -40,7 +42,7 @@ class ExternalEnergySource(EnergyBudget):
     def __init__(self, **kwargs):
         super(ExternalEnergySource, self).__init__(**kwargs)
         for varname in self.state.keys():
-            self.heating_rate[varname] = np.zeros_like(self.state[varname])
+            self.heating_rate[varname] = self.state[varname] * 0.
 
     def _compute_heating_rates(self):
         pass
