@@ -16,6 +16,7 @@ from climlab.radiation.AplusBT import AplusBT
 from climlab.radiation.insolation import P2Insolation, AnnualMeanInsolation, DailyInsolation
 from climlab.surface import albedo
 from climlab.dynamics.diffusion import MeridionalDiffusion
+from climlab.domain.initial import surface_state
 from scipy import integrate
 
 
@@ -32,16 +33,17 @@ class EBM(EnergyBudget):
                  a2=0.078,
                  ai=0.62,
                  timestep=const.seconds_per_year/90.,
-                 T_init_0 = 12.,
-                 T_init_P2 = -40.,
+                 T0 = 12.,  # initial temperature parameters
+                 T2 = -40.,  #  (2nd Legendre polynomial)
                  **kwargs):
+        # Check to see if an initial state is already provided
+        #  If not, make one
+        if 'state' not in kwargs:
+            state = surface_state(num_lat=num_lat, water_depth=water_depth,
+                                  T0=T0, T2=T2)
+            sfc = state.Ts.domain
+            kwargs.update({'state': state, 'domains':{'sfc':sfc}})
         super(EBM, self).__init__(timestep=timestep, **kwargs)
-        if not self.domains and not self.state:  # no state vars or domains yet
-            sfc = domain.zonal_mean_surface(num_lat=num_lat,
-                                            water_depth=water_depth)
-            lat = sfc.axes['lat'].points
-            initial = T_init_0 + T_init_P2 * legendre.P2(np.sin(np.deg2rad(lat)))
-            self.set_state('Ts', Field(initial, domain=sfc))
         self.param['S0'] = S0
         self.param['A'] = A
         self.param['B'] = B
