@@ -166,6 +166,11 @@ class BandRCModel(RadiativeConvectiveModel):
                                 albedo_sfc=self.param['albedo_sfc'])
         self.add_subprocess('LW', longwave)
         self.add_subprocess('SW', shortwave)
+        # This process has to handle the coupling between
+        # insolation and column radiation
+        self.subprocess['SW'].flux_from_space = \
+            self.subprocess['insolation'].diagnostics['insolation']
+        
 
 def compute_layer_absorptivity(abs_coeff, dp):
     '''Compute layer absorptivity from a constant absorption coefficient.'''
