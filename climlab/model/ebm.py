@@ -44,6 +44,7 @@ class EBM(EnergyBudget):
             sfc = state.Ts.domain
             kwargs.update({'state': state, 'domains':{'sfc':sfc}})
         super(EBM, self).__init__(timestep=timestep, **kwargs)
+        sfc = self.Ts.domain
         self.param['S0'] = S0
         self.param['A'] = A
         self.param['B'] = B
