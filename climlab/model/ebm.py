@@ -8,6 +8,7 @@ from climlab.radiation.AplusBT import AplusBT
 from climlab.radiation.insolation import P2Insolation, AnnualMeanInsolation, DailyInsolation
 from climlab.surface import albedo
 from climlab.dynamics.diffusion import MeridionalDiffusion
+from climlab.domain.initial import surface_state
 from scipy import integrate
 
 
@@ -123,16 +124,18 @@ class EBM(EnergyBudget):
                  a2=0.078,
                  ai=0.62,
                  timestep=const.seconds_per_year/90.,
-                 T_init_0 = 12.,
-                 T_init_P2 = -40.,
+                 T0 = 12.,  # initial temperature parameters
+                 T2 = -40.,  #  (2nd Legendre polynomial)
                  **kwargs):
+        # Check to see if an initial state is already provided
+        #  If not, make one
+        if 'state' not in kwargs:
+            state = surface_state(num_lat=num_lat, water_depth=water_depth,
+                                  T0=T0, T2=T2)
+            sfc = state.Ts.domain
+            kwargs.update({'state': state, 'domains':{'sfc':sfc}})
         super(EBM, self).__init__(timestep=timestep, **kwargs)
-        if not self.domains and not self.state:  # no state vars or domains yet
-            sfc = domain.zonal_mean_surface(num_lat=num_lat,
-                                            water_depth=water_depth)
-            lat = sfc.axes['lat'].points
-            initial = T_init_0 + T_init_P2 * legendre.P2(np.sin(np.deg2rad(lat)))
-            self.set_state('Ts', Field(initial, domain=sfc))
+        sfc = self.Ts.domain
         self.param['S0'] = S0
         self.param['A'] = A
         self.param['B'] = B
@@ -155,11 +158,11 @@ class EBM(EnergyBudget):
                                                              K=K,
                                                              **self.param))
         self.topdown = False  # call subprocess compute methods first
-        newdiags = ['OLR',
-                    'ASR',
-                    'net_radiation',
-                    'icelat']
-        self.add_diagnostics(newdiags)
+        self.init_diagnostic('OLR', 0.*self.Ts)
+        self.init_diagnostic('ASR', 0.*self.Ts)
+        self.init_diagnostic('net_radiation', 0.*self.Ts)
+        self.init_diagnostic('albedo', 0.*self.Ts)
+        self.init_diagnostic('icelat', None)
 
 
     def _compute_heating_rates(self):
@@ -167,8 +170,8 @@ class EBM(EnergyBudget):
         
         """
         insolation = self.subprocess['insolation'].insolation
-        albedo = self.subprocess['albedo'].albedo
-        self.ASR = (1-albedo) * insolation
+        self.albedo = self.subprocess['albedo'].albedo
+        self.ASR = (1-self.albedo) * insolation
         self.OLR = self.subprocess['LW'].OLR
         self.net_radiation = self.ASR - self.OLR
         #  The part of the heating due just to shortwave
@@ -328,6 +331,7 @@ class EBM_seasonal(EBM):
             # Remove unused parameters here for clarity
             _ = self.param.pop('ai')
             _ = self.param.pop('Tf')
+            self.remove_diagnostic('icelat')
             self.add_subprocess('albedo',
                             albedo.P2Albedo(domains=sfc, **self.param))
         else:

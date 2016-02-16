@@ -59,10 +59,6 @@ appropriate `input`.
         - `newproc = climlab.process_like(procname.subprocess['subprocname'])`
         - `newproc.compute()`
         - anything in the `input` dictionary of `subprocname` will remain fixed
-
-To do:
-- use OrderedDict to hold the subprocess dictionary
-    - order of execution can then be controled by position in dictionary
 '''
 import time, copy
 import numpy as np
@@ -153,9 +149,7 @@ class Process(object):
         # dictionary of model parameters
         self.param = kwargs
         # dictionary of diagnostic quantities
-        #self.diagnostics = _make_dict(diagnostics, Field)
-        #  basically a list of names of diagnostic variables
-        self._diag_vars = frozenset()
+        self.diagnostics = attr_dict.AttrDict()
         # dictionary of input quantities
         #self.input = _make_dict(input, Field)
         if input is None:
@@ -278,7 +272,7 @@ class Process(object):
 
     def _set_field(self, field_type, name, value):
         '''Add a new field to a specified dictionary. The field is also added
-        as a process attribute. field_type can be 'input', 'diagnostic' '''
+        as a process attribute. field_type can be 'input', 'diagnostics' '''
         try:
             self.__getattribute__(field_type).update({name: value})
         except:
@@ -287,24 +281,52 @@ class Process(object):
         # setter method for that attribute
         self.__setattr__(name, value)
 
-    def add_diagnostics(self, diaglist):
-        """Updates the process's list of diagnostics.
-        
-        **Function-call argument** \n        
-        
-        :param diaglist:    list of names of diagnostic variables
-        :type diaglist:     list
+## REVIEW again - method deleted in v.0.3 ##
 
-        
-        **Object attributes** \n
-        
-        During method execution following object attribute is modified:
-        
-        :ivar frozenset _diag_vars:     extended by the list ``diaglist`` given as 
-                                        method argument
-                                        
-        """
-        self._diag_vars = frozenset.union(self._diag_vars, diaglist)
+   # def add_diagnostics(self, diaglist):
+   #     """Updates the process's list of diagnostics.
+   #     
+   #     **Function-call argument** \n        
+   #     
+   #     :param diaglist:    list of names of diagnostic variables
+   #     :type diaglist:     list
+   #
+   #     
+   #     **Object attributes** \n
+   #     
+   #     During method execution following object attribute is modified:
+   #     
+   #     :ivar frozenset _diag_vars:     extended by the list ``diaglist`` given as 
+   #                                     method argument
+   #                                     
+   #     """
+   #     self._diag_vars = frozenset.union(self._diag_vars, diaglist)
+    
+
+    def init_diagnostic(self, name, value=0.):
+        ''' REVIEW DOCSTRING - new method in v.03
+
+	Define a new diagnostic quantity called name
+        and initialize it with the given value.
+
+        quantity is accessible and settable in two ways:
+        - as a process attribute, i.e. proc.name
+        - as a member of the diagnostics dictionary, i.e. proc.diagnostics['name']
+        '''
+        def _diag_getter(self):
+            return self.diagnostics[name]
+        def _diag_setter(self, value):
+            self.diagnostics[name] = value
+        setattr(type(self), name,
+                property(fget=_diag_getter, fset=_diag_setter))
+        self.__setattr__(name, value)
+
+    def remove_diagnostic(self, name):
+        ''' REVIEW DOCSTRING - new method in v.03
+	Remove a diagnostic from the process.diagnostic dictionary
+        and also delete the associated process attribute.'''
+        _ = self.diagnostics.pop(name)
+        delattr(type(self), name)
 
     def add_input(self, inputlist):
         """Updates the process's list of inputs.
@@ -315,16 +337,16 @@ class Process(object):
         """
         self._input_vars = frozenset.union(self._input_vars, inputlist)
 
-    @property
-    def diagnostics(self):
-        """dictionary with all diagnostic variables
-        
-        :getter:    Returns the content of ``self._diag_vars``.
-        :type:      dict
-        
-        """
-        return { key:value for key, value in self.__dict__.items()
-                 if key in self._diag_vars }
+   # @property
+   # def diagnostics(self):
+   #     """dictionary with all diagnostic variables
+   #     
+   #     :getter:    Returns the content of ``self._diag_vars``.
+   #     :type:      dict
+   #     
+   #     """
+   #     return { key:value for key, value in self.__dict__.items()
+   #              if key in self._diag_vars }
     @property
     def input(self):
         """dictionary with all input variables

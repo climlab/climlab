@@ -18,23 +18,23 @@ class SurfaceFlux(EnergyBudget):
         '''Compute energy flux convergences to get heating rates in :math:`W/m^2`.'''
         self._compute_flux()
         self.heating_rate['Ts'] = -self._flux
-        self.heating_rate['Tatm'][..., 0, np.newaxis] = self._flux
+        # Modify only the lowest model level
+        self.heating_rate['Tatm'][..., -1, np.newaxis] = self._flux
 
 
 class SensibleHeatFlux(SurfaceFlux):
     def __init__(self, Cd=3E-3, **kwargs):
         super(SensibleHeatFlux, self).__init__(Cd=Cd, **kwargs)
-        newdiags = ['SHF',]
-        self.add_diagnostics(newdiags)
+        self.init_diagnostic('SHF')
 
     def _compute_flux(self):
         # this ensure same dimensions as Ts
-        Ta = self.Tatm[..., 0, np.newaxis]
+        #  (and use only the lowest model level)
+        Ta = self.Tatm[..., -1, np.newaxis]
         Ts = self.Ts
         DeltaT = Ts - Ta
         #  air density
         rho = const.ps * const.mb_to_Pa / const.Rd / Ta
-        #  wind speed
         #  flux from bulk formula
         self._flux = const.cp * rho * self.Cd * self.U * DeltaT
         self.SHF = self._flux
@@ -43,14 +43,13 @@ class SensibleHeatFlux(SurfaceFlux):
 class LatentHeatFlux(SurfaceFlux):
     def __init__(self, Cd=3E-3, **kwargs):
         super(LatentHeatFlux, self).__init__(Cd=Cd, **kwargs)
-        newdiags = ['LHF',]
-        self.add_diagnostics(newdiags)
+        self.init_diagnostic('LHF')
 
     def _compute_flux(self):
         #  specific humidity at lowest model level
         #  assumes pressure is the last axis
-        q = self.q[..., 0, np.newaxis]
-        Ta = self.Tatm[..., 0, np.newaxis]
+        q = self.q[..., -1, np.newaxis]
+        Ta = self.Tatm[..., -1, np.newaxis]
         qs = qsat(self.Ts, const.ps)
         Deltaq = qs - q
         #  air density

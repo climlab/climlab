@@ -53,12 +53,12 @@ class _Insolation(DiagnosticProcess):
     def __init__(self, S0=const.S0, **kwargs):
         super(_Insolation, self).__init__(**kwargs)
         #  initialize diagnostic with correct shape
+        self.init_diagnostic('insolation')
         try:
             self.insolation = np.zeros(self.domains['sfc'].shape)
         except:
             self.insolation = np.zeros(self.domains['default'].shape)
         self.S0 = S0
-        self.add_diagnostics(['insolation'])
 
     @property
     def S0(self):
@@ -122,8 +122,9 @@ class FixedInsolation(_Insolation):
         super(FixedInsolation, self).__init__(S0=S0, **kwargs)
 
     def _compute_fixed(self):
-        ins_adjustment = self.S0 - self.insolation
-        self.insolation += ins_adjustment
+        #ins_adjustment = self.S0 - self.insolation
+        #self.insolation += ins_adjustment
+        self.insolation[:] = self.S0
 
 
 class P2Insolation(_Insolation):  
@@ -181,6 +182,7 @@ class P2Insolation(_Insolation):
             insolation = self.S0 / 4 * (1. + self.s2 * P2(np.sin(phi)))
             # make sure that the diagnostic has the correct field dimensions.
             dom = self.domains['default']
+            #self.insolation = Field(insolation, domain=dom)
             self.insolation[:] = Field(insolation, domain=dom)
         except:
             pass

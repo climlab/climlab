@@ -18,7 +18,8 @@ class SurfaceRadiation(EnergyBudget):
         self.SW_from_atm = 0. * self.Ts
         newdiags = ['LW_to_atm',
                     'SW_to_atm']
-        self.add_diagnostics(newdiags)
+        for name in newdiags:
+            self.init_diagnostic(name)
         self.LW_to_atm = 0. * self.Ts
         self.SW_to_atm = 0. * self.Ts
         self.heating_rate['Tatm'] = np.zeros_like(self.Tatm)
