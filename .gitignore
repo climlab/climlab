@@ -2,6 +2,7 @@
 *.pyc
 # Compiled fortran extensions
 *.so
+*.so.dSYM
 # f2py signature files
 *.pyf
 

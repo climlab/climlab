@@ -14,21 +14,25 @@ class GreyGas(Radiation):
     By default emissivity = absorptivity.
     Subclasses can override this is necessary (e.g. for shortwave model).
 
-    FIX THIS documentation......  out of date
-
-    The following boundary values need to be specified by user or parent process:
+    The following boundary and input values need to be specified by
+    user or parent process:
     - albedo_sfc (default is zero)
     - flux_from_space
-    - flux_from_sfc
     - absorptivity
     - reflectivity (default is zero)
     These are accessible (and settable) as process attributes
     Also stored in process.input dictionary
 
     The following values are computed are stored in the .diagnostics dictionary:
+    - flux_from_sfc
     - flux_to_sfc
     - flux_to_space
-    -  plus a bunch of others!!
+    - absorbed
+    - absorbed_total
+    - emission
+    - emission_sfc
+    - flux_reflected_up
+    (all in W/m2)
     '''
     def __init__(self, absorptivity=None, reflectivity=None, emissivity_sfc=1.,
                  albedo_sfc=0., **kwargs):
@@ -46,15 +50,10 @@ class GreyGas(Radiation):
         self.reflectivity = reflectivity
         self.emissivity_sfc = emissivity_sfc * np.ones_like(self.Ts)
         self.albedo_sfc = albedo_sfc * np.ones_like(self.Ts)
-        newdiags = ['emission',
-                    'emission_sfc',
-                    'flux_reflected_up',]
-        self.add_diagnostics(newdiags)
-        #  THESE ARE NOT INPUT! THEY ARE DIAGNOSTICS
-        #  But it is helpful to initialize them to zero
-        self.emission = 0. * self.Tatm
-        self.emission_sfc = 0. * self.Ts
-        self.flux_reflected_up = 0. * self.Ts
+        #  Initialize diagnostics
+        self.init_diagnostic('emission', 0. * self.Tatm)
+        self.init_diagnostic('emission_sfc', 0. * self.Ts)
+        self.init_diagnostic('flux_reflected_up')
 
     @property
     def absorptivity(self):

@@ -74,8 +74,7 @@ class AplusBT(EnergyBudget):
         super(AplusBT, self).__init__(**kwargs)
         self.A = A
         self.B = B
-        newdiags = ['OLR',]
-        self.add_diagnostics(newdiags)
+        self.init_diagnostic('OLR', 0. * self.Ts)
 
     @property
     def A(self):
@@ -114,7 +113,7 @@ class AplusBT(EnergyBudget):
 
     def _compute_emission(self):
         for varname, value in self.state.iteritems():
-            self.OLR = self.A + self.B * value
+            self.OLR[:] = self.A + self.B * value
 
     def _compute_heating_rates(self):
         '''Compute energy flux convergences to get heating rates in :math:`W/m^2`,'''
@@ -189,7 +188,7 @@ class AplusBT_CO2(EnergyBudget):
     def CO2(self, value):
         self._CO2 = value
         self.param['CO2'] = value
-    
+
     def emission(self):
         """Calculates the Outgoing Longwave Radiation (OLR) of the AplusBT_CO2
         subprocess.
@@ -215,7 +214,7 @@ class AplusBT_CO2(EnergyBudget):
             flux = A + B * (value + const.tempCtoK)
             self.OLR = flux
             self.diagnostics['OLR'] = self.OLR
-    
+
     def _compute_heating_rates(self):
         """Computes energy flux convergences to get heating rates in :math:`W/m^2`."""
         self.emission()

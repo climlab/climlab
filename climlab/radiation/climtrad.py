@@ -64,7 +64,8 @@ class CliMTRad(EnergyBudget):
         self.flux_from_sfc = 0. * self.Ts
         newdiags = ['flux_to_sfc',
                     'flux_to_space',]
-        self.add_diagnostics(newdiags)
+        for name in newdiags:
+            self.init_diagnostic(name)
 
     def _temperature_tendencies(self):
         #  This will just set all tendencies to zero

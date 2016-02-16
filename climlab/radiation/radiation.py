@@ -1,5 +1,5 @@
 '''
-Radiation is the base class for all climlab radiation modules
+Radiation is the base class climlab grey radiation and band modules
 
 Basic characteristics:
 
@@ -30,26 +30,21 @@ class Radiation(EnergyBudget):
     - flux_from_sfc
     - flux_to_sfc
     - flux_to_space
-    -  plus a bunch of others!!
+    - absorbed
+    - absorbed_total
+    (all in W/m2)
     '''
     def __init__(self, **kwargs):
         super(Radiation, self).__init__(**kwargs)
         newinput = ['flux_from_space',]
         self.add_input(newinput)
         self.flux_from_space = 0. * self.Ts
-        newdiags = ['flux_from_sfc',
-                    'flux_to_sfc',
-                    'flux_to_space',
-                    'absorbed',
-                    'absorbed_total']
-        self.add_diagnostics(newdiags)
-        #  THESE ARE NOT INPUT! THEY ARE DIAGNOSTICS
-        #  But it is helpful to initialize them to zero
-        self.flux_from_sfc = 0. * self.Ts
-        self.flux_to_sfc = 0. * self.Ts
-        self.flux_to_space = 0. * self.Ts
-        self.absorbed = 0. * self.Tatm
-        self.absorbed_total = 0. * self.Ts
+        #  initialize all diagnostics to zero
+        self.init_diagnostic('flux_from_sfc', 0. * self.Ts)
+        self.init_diagnostic('flux_to_sfc', 0. * self.Ts)
+        self.init_diagnostic('flux_to_space', 0. * self.Ts)
+        self.init_diagnostic('absorbed', 0. * self.Tatm)
+        self.init_diagnostic('absorbed_total', 0. * self.Ts)
 
     def _compute_radiative_heating(self):
         '''Compute radiative fluxes and heating rates.
