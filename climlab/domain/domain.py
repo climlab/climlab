@@ -1,11 +1,49 @@
 #  new domain class
-#   every process should exist in the context of a domain
+#  every process should exist in the context of a domain
 
 from climlab.domain.axis import Axis
 from climlab.utils import heat_capacity
 
 
 class _Domain(object):
+    """Private parent class for domains.
+
+
+    
+    *more details about domains come here*
+    
+    
+    
+    **Initialization parameters** \n
+        
+    An instance of ``_Domain`` is initialized with the following 
+    arguments:
+    
+    :param axes:    Axis object or dictionary of Axis object where domain will
+                    be defined on.
+    :type axes:     dict or class:`climlab.domain.axis.Axis`
+    
+    
+    **Object attributes** \n
+    
+    Following object attributes are generated during initialization:
+        
+    :ivar str domain_type:      Set to ``'undefined'``.
+    :ivar dict axes:            A dictionary of the domains axes. Created by
+                                :func:`_make_axes_dict` called with input 
+                                argument ``axes``
+    :ivar int numdims:          Number of class:`~climlab.domain.Axis` objects
+                                in ``self.axes`` dictionary.
+    :ivar dict ax_index:        A dictionary of domain axes and their corresponding index
+                                in an ordered list of the axes with:        \n
+                                - ``'lev'`` or ``'depth'`` is last
+                                - ``'lat'`` is second last
+    :ivar tuple shape:          Number of points of all domain axes. Order in 
+                                tuple given by ``self.ax_index``.
+    :ivar array heat_capacity:  the domain's heat capacity over axis specified 
+                                in function call of :func:`set_heat_capacity`
+    
+    """
     def __str__(self):
         return ("climlab Domain object with domain_type=" + self.domain_type + " and shape=" +
                 str(self.shape))
@@ -56,10 +94,33 @@ class _Domain(object):
         self.set_heat_capacity()
 
     def set_heat_capacity(self):
+        """A dummy function to set the heat capacity of a domain.
+        
+        *Should be overridden by daugter classes.*
+        
+        """
         self.heat_capacity = None
         #  implemented by daughter classes
     
     def _make_axes_dict(self, axes):
+        """Makes an axes dictionary.
+        
+        .. note:: 
+        
+            In case the input is ``None``, the dictionary :code:`{'empty': None}`
+            is returned.
+        
+        **Function-call argument** \n        
+        
+        :param axes:    axes input 
+        :type axes:     dict or single instance of class:`~climlab.domain.Axis` object
+                        or ``None``
+        :raises: :exc:`ValueError`  if input is not an instance of Axis class 
+                                    or a dictionary of Axis objetcs
+        :returns: dictionary of input axes
+        :rtype: dict
+                                
+        """
         if type(axes) is dict:
             axdict = axes
         elif type(axes) is Axis:
@@ -74,61 +135,152 @@ class _Domain(object):
 
 
 class Atmosphere(_Domain):
+    """Class for the implementation of a Atmosphere Domain.
+    
+    **Object attributes** \n
+    
+    Additional to the parent class :class:`~climlab.domain.domain._Domain`
+    the following object attribute is modified during initialization:
+        
+    :ivar str domain_type:    is set to ``'atm'``
+    
+    """
     def __init__(self, **kwargs):
         super(Atmosphere, self).__init__(**kwargs)
         self.domain_type = 'atm'
 
     def set_heat_capacity(self):
+        """Sets the heat capacity of the Atmosphere Domain.
+        
+        Calls the utils heat capacity function 
+        :func:`~climlab.utils.heat_capacity.atmosphere` and gives the delta 
+        array of grid points of it's level axis
+        ``self.axes['lev'].delta`` as input.
+        
+        :ivar array heat_capacity:  the ocean domain's heat capacity over 
+                                    the ``'lev'`` Axis.
+        
+        """
         self.heat_capacity = heat_capacity.atmosphere(self.axes['lev'].delta)
 
 
 class Ocean(_Domain):
+    """Class for the implementation of an Ocean Domain.
+    
+    **Object attributes** \n
+    
+    Additional to the parent class :class:`~climlab.domain.domain._Domain`
+    the following object attribute is modified during initialization:
+        
+    :ivar str domain_type:    is set to ``'ocean'``
+    
+    """
     def __init__(self, **kwargs):
         super(Ocean, self).__init__(**kwargs)
         self.domain_type = 'ocean'
 
     def set_heat_capacity(self):
+        """Sets the heat capacity of the Ocean Domain.
+        
+        Calls the utils heat capacity function 
+        :func:`~climlab.utils.heat_capacity.ocean` and gives the delta 
+        array of grid points of it's depth axis
+        ``self.axes['depth'].delta`` as input.
+        
+        **Object attributes** \n
+        
+        During method execution following object attribute is modified:
+        
+        :ivar array heat_capacity:  the ocean domain's heat capacity over 
+                                    the ``'depth'`` Axis.
+        
+        """
         self.heat_capacity = heat_capacity.ocean(self.axes['depth'].delta)
 
 
 def make_slabocean_axis(num_points=1):
-    '''Convenience method to create a simple axis for a slab ocean.'''
+    """Convenience method to create a simple axis for a slab ocean.
+
+    **Function-call argument** \n        
+    
+    :param int num_points:    number of points for the slabocean Axis [default: 1]
+    :returns:               an Axis with ``axis_type='depth'`` and ``num_points=num_points``
+    :rtype:                 class:`climlab.domain.axis.Axis`
+    
+    """
     depthax = Axis(axis_type='depth', num_points=num_points)
     return depthax
 
 def make_slabatm_axis(num_points=1):
-    '''Convenience method to create a simple axis for a slab atmosphere.'''
+    """Convenience method to create a simple axis for a slab atmosphere.
+    
+    **Function-call argument** \n        
+    
+    :param int num_points:   number of points for the slabatmosphere Axis [default: 1]
+    :returns:               an Axis with ``axis_type='lev'`` and ``num_points=num_points``
+    :rtype:                 class:`climlab.domain.axis.Axis`
+    
+    """
     depthax = Axis(axis_type='lev', num_points=num_points)
     return depthax
 
 
 
 class SlabOcean(Ocean):
+    """A class to create a SlabOcean Domain by default.
+    
+    Initializes the parent :class:`Ocean` class for with a simple axis for a
+    Slab Ocean created by :func:`make_slabocean_axis` which has just 1 cell 
+    in depth by default.
+    
+    """
     def __init__(self, axes=make_slabocean_axis(), **kwargs):
         super(SlabOcean, self).__init__(axes=axes, **kwargs)
 
 class SlabAtmosphere(Atmosphere):
+    """A class to create a SlabAtmosphere Domain by default.
+    
+    Initializes the parent :class:`Atmosphere` class for with a simple axis for a
+    Slab Atmopshere created by :func:`make_slabatm_axis` which has just 1 cell 
+    in height by default.
+    
+    """
     def __init__(self, axes=make_slabatm_axis(), **kwargs):
         super(SlabAtmosphere, self).__init__(axes=axes, **kwargs)
     
     
 def single_column(num_lev=30, water_depth=1., lev=None, **kwargs):
-    '''Convenience method to create domains for a single column of atmosphere
-    overlying a slab of water.
+    """Creates domains for a single column of atmosphere overlying a slab of water.
     
-    num_lev is the number of pressure levels (evenly spaced from surface to TOA)
-    water_depth is the depth of the slab.
+    Can also pass a pressure array or pressure level axis object specified in ``lev``.
     
-    Returns a list of 2 Domain objects (slab ocean, atmosphere)
+    If argument ``lev`` is not ``None`` then function tries to build a level axis
+    and ``num_lev`` is ignored.    
     
-    Usage:
-    sfc, atm = domain.single_column()
-        or
-    sfc, atm = domain.single_column(num_lev=2, water_depth=10.)
-    print sfc, atm
+    **Function-call argument** \n        
     
-    Can also pass a pressure array or pressure level axis object
-    '''
+    :param int num_lev:         number of pressure levels
+                                (evenly spaced from surface to TOA) [default: 30]
+    :param float water_depth:   depth of the ocean slab [default: 1.]
+    :param lev:                 specification for height axis (optional)
+    :type lev:                  class:`climlab.domain.axis.Axis` or pressure array
+    :raises: :exc:`ValueError`  if `lev` is given but neither Axis 
+                                nor pressure array.
+    :returns:                   a list of 2 Domain objects (slab ocean, atmosphere)
+    :rtype:                     :py:class:`list` of :class:`SlabOcean`, :class:`SlabAtmosphere`
+
+    :Example:
+    
+        .. code::
+        
+            from climlab import domain
+            
+            sfc, atm = domain.single_column()
+            # or
+            sfc, atm = domain.single_column(num_lev=2, water_depth=10.)
+            print sfc, atm
+
+    """
     if lev is None:
         levax = Axis(axis_type='lev', num_points=num_lev)
     elif isinstance(lev, Axis):
@@ -145,6 +297,22 @@ def single_column(num_lev=30, water_depth=1., lev=None, **kwargs):
 
 
 def zonal_mean_surface(num_lat=90, water_depth=10., lat=None, **kwargs):
+    """Creates a Domain with one water cell and a latitude axis above.
+    
+    Domain has a single heat capacity according to the specified water depth.
+    
+    **Function-call argument** \n        
+    
+    :param int num_lat:         number of latitude points on the axis
+                                [default: 90]
+    :param float water_depth:   depth of the water cell (slab ocean) [default: 10.]
+    :param lat:                 specification for latitude axis (optional)
+    :type lat:                  class:`climlab.domain.axis.Axis` or latitude array
+    :raises: :exc:`ValueError`  if `lat` is given but neither Axis nor latitude array.
+    :returns:                   surface domain
+    :rtype:                     :class:`SlabOcean`
+
+    """
     if lat is None:
         latax = Axis(axis_type='lat', num_points=num_lat)
     elif isinstance(lat, Axis):
@@ -161,6 +329,31 @@ def zonal_mean_surface(num_lat=90, water_depth=10., lat=None, **kwargs):
 
 def zonal_mean_column(num_lat=90, num_lev=30, water_depth=10., lat=None, 
                       lev=None, **kwargs):
+    """Creates two Domains with one water cell, a latitude axis and 
+    a level/height axis.
+    
+        * SlabOcean:    one water cell and a latitude axis above 
+          (similar to :func:`zonal_mean_surface`)
+        * Atmosphere: a latitude axis and a level/height axis (two dimensional)
+        
+    
+    **Function-call argument** \n        
+    
+    :param int num_lat:         number of latitude points on the axis
+                                [default: 90]
+    :param int num_lev:         number of pressure levels
+                                (evenly spaced from surface to TOA) [default: 30]
+    :param float water_depth:   depth of the water cell (slab ocean) [default: 10.]
+    :param lat:                 specification for latitude axis (optional)
+    :type lat:                  class:`climlab.domain.axis.Axis` or latitude array
+    :param lev:                 specification for height axis (optional)
+    :type lev:                  class:`climlab.domain.axis.Axis` or pressure array
+    :raises: :exc:`ValueError`  if `lat` is given but neither Axis nor latitude array.
+    :raises: :exc:`ValueError`  if `lev` is given but neither Axis nor pressure array.
+    :returns:                   a list of 2 Domain objects (slab ocean, atmosphere)
+    :rtype:                     :py:class:`list` of :class:`SlabOcean`, :class:`Atmosphere`
+
+    """
     if lat is None:
         latax = Axis(axis_type='lat', num_points=num_lat)
     elif isinstance(lat, Axis):
@@ -187,7 +380,14 @@ def zonal_mean_column(num_lat=90, num_lev=30, water_depth=10., lat=None,
     return slab, atm
 
 def box_model_domain(num_points=2, **kwargs):
-    '''Create a box model domain (a single abstract axis).'''
+    """Creates a box model domain (a single abstract axis).
+    
+    :param int num_points:      number of boxes [default: 2]
+    :returns:                   Domain with single axis of type ``'abstract'`` 
+                                and ``self.domain_type = 'box'``
+    :rtype:                     :class:`_Domain`
+    
+    """
     ax = Axis(axis_type='abstract', num_points=num_points)
     boxes = _Domain(axes=ax, **kwargs)
     boxes.domain_type = 'box'

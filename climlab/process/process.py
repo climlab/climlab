@@ -1,19 +1,22 @@
 '''
 Principles of the new `climlab` API design:
 
-- `climlab.Process` object has several iterable dictionaries of named,
-gridded variables:
-    - `process.state`
-        - state variables, usually time-dependent
-    - `process.input`
-        - boundary conditions and other gridded quantities independent of the
-        `process`
-        - often set by a parent `process`
-    - `process.param`  (which are basically just scalar `input`)
-    - `process.tendencies`
-        - iterable `dict` of time-tendencies (d/dt) for each state variable
-    - `process.diagnostics`
-        - any quantity derived from current state
+    * `climlab.Process` object has several iterable dictionaries of named,
+      gridded variables:
+      
+        * `process.state`
+        
+            * state variables, usually time-dependent
+
+        - `process.input`
+            - boundary conditions and other gridded quantities independent of the
+            `process`
+            - often set by a parent `process`
+        - `process.param`  (which are basically just scalar `input`)
+        - `process.tendencies`
+            - iterable `dict` of time-tendencies (d/dt) for each state variable
+        - `process.diagnostics`
+            - any quantity derived from current state
 - The `process` is fully described by contents of `state`, `input` and `param`
 dictionaries. `tendencies` and `diagnostics` are always computable from current
 state.
@@ -79,10 +82,51 @@ def _make_dict(arg, argtype):
         raise ValueError('Problem with input type')
 
 
-class Process(object):
-    '''A generic parent class for all climlab process objects.
+class Process(object):    
+    """A generic parent class for all climlab process objects.
     Every process object has a set of state variables on a spatial grid.
-    '''
+
+    **Initialization parameters** \n
+        
+    An instance of ``Process`` is initialized with the following 
+    arguments *(for detailed information see Object attributes below)*:
+    
+    :param Field state: spatial state variable for the process. 
+                        Set to ``None`` if not specified.
+    :param domains:     domain(s) for the process
+    :type domains:      :class:`~climlab.domain.domain._Domain` or dict of 
+                        :class:`~climlab.domain.domain._Domain`
+    :param subprocess:  subprocess(es) of the process
+    :type subprocess:   :class:`~climlab.process.process.Process` or dict of 
+                        :class:`~climlab.process.process.Process`
+    :param lat:
+    :param lev:
+    :param num_lat:
+    :param num_levels:
+    :param dict input:  collection of input quantities
+    
+    **Object attributes** \n
+    
+    Additional to the parent class :class:`~climlab.process.process.Process`
+    following object attributes are generated during initialization:
+    
+    :ivar dict domains:     dictionary of process :class:`~climlab.domain.domain._Domain`s
+    :ivar dict state:       dictionary of process states 
+                            (of type :class:`~climlab.domain.field.Field`)
+    :ivar dict param:       dictionary of model parameters which are given
+                            through ``**kwargs`` 
+    :ivar frozenset _diag_vars:
+                            basically a list of names of diagnostic variables
+    :ivar dict _input_vars: collection of input quantities like boundary conditions
+                            and other gridded quantities
+    :ivar str creation_date:
+                            date and time when process was created
+    :ivar subprocess:       dictionary of suprocesses of the process
+    :vartype subprocess:    dict of :class:`~climlab.process.process.Process`    
+
+
+    """
+
     def __str__(self):
         str1 = 'climlab Process of type {0}. \n'.format(type(self))
         str1 += 'State variables and domain shapes: \n'
@@ -96,7 +140,7 @@ class Process(object):
                  lat=None, lev=None, num_lat=None, num_levels=None,
                  input=None, **kwargs):
         # dictionary of domains. Keys are the domain names
-        self.domains = _make_dict(domains, _Domain)
+        self.domains = _make_dict(domains, _Domain)       
         #  If lat is given, create a simple domains
         if lat is not None:
             sfc = zonal_mean_surface()
@@ -131,11 +175,16 @@ class Process(object):
             self.add_subprocesses(subprocess)
 
     def add_subprocesses(self, procdict):
-        '''Add a dictionary of subproceses to this process.
-        procdict is dictionary with process names as keys.
-
-        Can also pass a single process, which will be called \'default\'
-        '''
+        """Adds a dictionary of subproceses to this process.
+        
+        Calls :func:`add_subprocess` for every process given in the 
+        input-dictionary. It can also pass a single process, which will 
+        be given the name *default*.
+        
+        :param procdict:    a dictionary with process names as keys
+        :type procdict:     dict
+        
+        """
         if isinstance(procdict, Process):
             self.add_subprocess('default', procdict)
         else:
@@ -143,9 +192,15 @@ class Process(object):
                 self.add_subprocess(name, proc)
 
     def add_subprocess(self, name, proc):
-        '''Add a single subprocess to this process.
-        name: name of the subprocess (str)
-        proc: a Process object.'''
+        """Adds a single subprocess to this process.
+        
+        :param name:    name of the subprocess
+        :type name:     string
+        :param proc:    a Process object
+        :type proc:     process
+        :raises: :exc:  `ValueError` if ``proc`` is not a process
+        
+        """
         if isinstance(proc, Process):
             self.subprocess.update({name: proc})
             self.has_process_type_list = False
@@ -155,14 +210,47 @@ class Process(object):
             raise ValueError('subprocess must be Process object')
 
     def remove_subprocess(self, name):
-        '''Remove a single subprocess from this process.
-        name: name of the subprocess (str)'''
+        """Removes a single subprocess from this process.
+        
+        :param name:    name of the subprocess
+        :type name:     string
+        
+        """
         self.subprocess.pop(name, None)
         self.has_process_type_list = False
         #  Since we made every subprocess an object attribute, we also remove
         #delattr(self, name)
 
     def set_state(self, name, value):
+        """Sets the variable ``name`` to a new state ``value``. 
+        
+        :param string name:    name of the state
+        
+        :param value:   state variable
+        :type value:    :class:`~climlab.domain.field.Field` or *array*
+        
+        :raises: :exc:  `ValueError` if state variable ``value`` is not
+                        having a domain.
+        :raises: :exc:  `ValueError` if shape mismatch between existing 
+                        domain and new state variable.
+                        
+        :Example:   
+        
+            Resetting the surface temperature of an EBM to
+            :math:`-5 ^{\circ} \\textrm{C}` on all latitues:
+
+            .. code::
+                
+                import climlab
+                from climlab import Field
+                
+                model = climlab.EBM()
+                sfc = climlab.domain.zonal_mean_surface(num_lat=90, water_depth=10.)
+                lat = sfc.axes['lat'].points
+                initial = -5 * ones(size(lat))
+                model.set_state('Ts', Field(initial, domain=sfc))
+
+        """
         if isinstance(value, Field):
             # populate domains dictionary with domains from state variables
             self.domains.update({name: value.domain})
@@ -200,19 +288,54 @@ class Process(object):
         self.__setattr__(name, value)
 
     def add_diagnostics(self, diaglist):
-        '''Given a list of names of diagnostic variables, update the master list.'''
+        """Updates the process's list of diagnostics.
+        
+        **Function-call argument** \n        
+        
+        :param diaglist:    list of names of diagnostic variables
+        :type diaglist:     list
+
+        
+        **Object attributes** \n
+        
+        During method execution following object attribute is modified:
+        
+        :ivar frozenset _diag_vars:     extended by the list ``diaglist`` given as 
+                                        method argument
+                                        
+        """
         self._diag_vars = frozenset.union(self._diag_vars, diaglist)
 
     def add_input(self, inputlist):
-        '''Given a list of names of input variables, update the master list.'''
+        """Updates the process's list of inputs.
+        
+        :param inputlist:   list of names of input variables
+        :type inputlist:    list
+        
+        """
         self._input_vars = frozenset.union(self._input_vars, inputlist)
 
     @property
     def diagnostics(self):
+        """dictionary with all diagnostic variables
+        
+        :getter:    Returns the content of ``self._diag_vars``.
+        :type:      dict
+        
+        """
         return { key:value for key, value in self.__dict__.items()
                  if key in self._diag_vars }
     @property
     def input(self):
+        """dictionary with all input variables
+        
+        That can be boundary conditions and other gridded quantities 
+        independent of the `process`
+        
+        :getter:    Returns the content of ``self._input_vars``.
+        :type:      dict
+        
+        """
         return { key:value for key, value in self.__dict__.items()
                  if key in self._input_vars }
 
@@ -310,8 +433,16 @@ class Process(object):
 
 
 def process_like(proc):
-    '''Return a new process identical to the given process.
-    The creation date is updated.'''
+    """Copys the given process.
+    
+    The creation date is updated.    
+    
+    :param proc:    process
+    :type proc:     process
+    :return:        new process identical to the given process
+    :rtype:         process
+
+    """
     newproc = copy.deepcopy(proc)
     newproc.creation_date = time.strftime("%a, %d %b %Y %H:%M:%S %z",
                                           time.localtime())
@@ -319,7 +450,16 @@ def process_like(proc):
 
 
 def get_axes(process_or_domain):
-    '''Return a dictionary of all axes in a domain or dictionary of domains.'''
+    """Returns a dictionary of all Axis in a domain or dictionary of domains.
+    
+    :param process_or_domain:   a process or a domain object
+    :type process_or_domain:    :mod:`~climlab.process.process` or 
+                                :class:`~climlab.domain.domain._Domain`
+    :raises: :exc:              `TypeError` if input is not or not having a domain
+    :returns:                   dictionary of input's Axis
+    :rtype:                     dict
+       
+    """
     if isinstance(process_or_domain, Process):
         dom = process_or_domain.domains
     else:

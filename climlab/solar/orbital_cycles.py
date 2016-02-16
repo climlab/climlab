@@ -1,22 +1,25 @@
-'''Module for setting up long integrations of climlab processes
-over orbital cycles
+"""Module for setting up long integrations of climlab processes
+over orbital cycles.
 
-example usage:
+:Example:
 
-from climlab.model.ebm import EBM_seasonal
-from climlab.solar.orbital_cycles import OrbitalCycles
-from climlab.surface.albedo import StepFunctionAlbedo
-ebm = EBM_seasonal()
-print ebm
-#  add an albedo feedback
-albedo = StepFunctionAlbedo(state=ebm.state, **ebm.param)
-ebm.add_subprocess('albedo', albedo)
-#  start the integration
-#  run for 10,000 orbital years, but only 1,000 model years
-experiment = OrbitalCycles(ebm, kyear_start=-20, 
-                           kyear_stop=-10, orbital_year_factor=10.)
+    .. code::
 
-'''
+        from climlab.model.ebm import EBM_seasonal
+        from climlab.solar.orbital_cycles import OrbitalCycles
+        from climlab.surface.albedo import StepFunctionAlbedo
+        ebm = EBM_seasonal()
+        print ebm
+        
+        #  add an albedo feedback
+        albedo = StepFunctionAlbedo(state=ebm.state, **ebm.param)
+        ebm.add_subprocess('albedo', albedo)
+
+        #  start the integration
+        #  run for 10,000 orbital years, but only 1,000 model years
+        experiment = OrbitalCycles(ebm, kyear_start=-20, kyear_stop=-10, orbital_year_factor=10.)
+
+"""
 
 import numpy as np
 from climlab import constants as const
@@ -32,14 +35,85 @@ class OrbitalCycles:
                  segment_length_years=100.,
                  orbital_year_factor=1.,
                  verbose=True ):
-        """Automatically integrate a process through changes in orbital parameters.
+        """Automatically integrates a process through changes in orbital parameters.
         
-        model is an instance of climlab.time_dependent_process
+        The duration between integration start and end time is partitioned in 
+        time segments over which the orbital parameters are held constant.
+        The process is integrated over every time segment and the process state
+        ``Ts`` is stored for each segment. 
         
-        segment_length_years is the length of each integration with fixed orbital parameters.
-        orbital_year_factor is an optional speed-up to the orbital cycles.
-        """
+        The storage arrays are saving:
+            
+            * **current model state** at end of each segment
+            * **model state averaged** over last integrated year of each segment
+            * **global mean** of averaged model state over last integrated year 
+              of each segment
         
+        .. note::
+        
+            Input ``kyear`` is thousands of years after present.
+            For years before present, use ``kyear < 0``.
+
+            
+        **Initialization parameters** \n        
+        
+        :param model:                       a time dependent process
+        :type model:                        :class:`~climlab.process.time_dependent_process.TimeDependentProcess`        
+        :param float kyear_start:           integration start time.             \n
+                                            As time reference
+                                            is present, argument should be :math:`<0` 
+                                            for time before present.
+                                            
+                                                * *unit:* kiloyears        \n
+                                                * *default value:* ``-20.``
+
+        :param float kyear_stop:            integration stop time.             \n
+                                            As time reference
+                                            is present, argument should be :math:`\\le 0` 
+                                            for time before present.
+                                            
+                                                * *unit:* kiloyears        \n
+                                                * *default value:* ``0.``
+
+        :param float segment_length_years:  is the length of each integration with
+                                            fixed orbital parameters. (default: ``100.``)
+        :param float orbital_year_factor:   is an optional speed-up to the orbital cycles.
+                                            (default: ``1.``)
+        :param bool verbose:                prints product of calculation and
+                                            information about computation progress
+                                            if set to ``True`` (default).
+                                            
+        **Object attributes** \n
+        
+        Following object attributes are generated during initialization:
+                    
+        :ivar model:                        timedependent process to be integrated
+        :vartype model:                     :class:`~climlab.process.time_dependent_process.TimeDependentProcess`        
+        :ivar float kyear_start:            integration start time
+        :ivar float kyear_stop:             integration stop time
+        :ivar float segment_length_years:   length of each integration with
+                                            fixed orbital parameters
+        :ivar float orbital_year_factor:    speed-up factor  to the orbital cycles
+        :ivar bool verbose:                 print flag
+        :ivar int num_segments:             number of segments with fixed oribtal 
+                                            parameters, calculated through:
+                                            
+                                            .. math::
+                                                    
+                                                num_{seg} = \\frac{-(kyear_{start}-kyear_{stop})*1000}{seg_{length} * orb_{factor}}
+        
+        :ivar array T_segments_global:      storage for global mean temperature
+                                            for final year of each segment
+        :ivar array T_segments:             storage for actual temperature at end
+                                            of each segment
+        :ivar array T_segments_annual:      storage for timeaveraged temperature 
+                                            over last year of segment \n
+                                            dimension: (size(Ts), num_segments)
+        :ivar array orb_kyear:              integration start time of all segments
+        :ivar dict orb:                     orbital parameters for last integrated segment
+        
+        
+        """      
         self.model = model
         self.kyear_start = kyear_start
         self.kyear_stop = kyear_stop

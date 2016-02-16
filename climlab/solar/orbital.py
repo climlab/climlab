@@ -1,40 +1,45 @@
-"""orbital.py
+"""This module defines the class :class:`OrbitalTable` which holds orbital data,
+and includes a method :func:`~OrbitalTable.lookup_parameters` 
+which interpolates the orbital data for a specific year 
+(- works equally well for arrays of years).
 
-This module defines the class OrbitalTable which holds orbital data,
-and includes a method lookup_parameters() 
-which interpolates the orbital data for a specific year
-(works equally well for arrays of years)
-
-The base class OrbitalTable() is designed to work with 5 Myears of orbital data
-(eccentricity, obliquity, and longitude of perihelion) 
-from Berger and Loutre (1991).
+The base class :class:`OrbitalTable()` is designed to work with 5 Myears of orbital data
+(**eccentricity, obliquity, and longitude of perihelion**) from [Berger1991]_.
 
 Data will be read from the file orbit91, which was originally obtained from
 ftp://ftp.ncdc.noaa.gov/pub/data/paleo/insolation/
 If the file isn't found locally, the module will attempt to read it remotely
 from the above URL.
     
-A subclass LongOrbitalTable() works with La2004 orbital data for -51 to +21 Myears
-as calculated by Laskar et al. (2004)
-http://www.imcce.fr/Equipes/ASD/insola/earth/La2004/README.TXT
+A subclass :class:`LongOrbitalTable()` works with La2004 orbital data for 
+-51 to +21 Myears as calculated by [Laskar2004]_.
+See http://vo.imcce.fr/insola/earth/online/earth/La2004/README.TXT
 
-References: 
-Berger A. and Loutre M.F. (1991). Insolation values for the climate of
-    the last 10 million years. Quaternary Science Reviews, 10(4), 297-317.
-Berger A. (1978). Long-term variations of daily insolation and
-    Quaternary climatic changes. Journal of Atmospheric Science, 35(12),
-    2362-2367.
 """
 import numpy as np
 from scipy import interpolate
 import os
 
 class OrbitalTable:
-    '''Invoking OrbitalTable() will load 5 million years of orbital data
-    (from Berger and Loutre 1991) and compute linear interpolants.
-    The data can be accessed through the method 
-    OrbitalTable.lookup_parameters(kyear).
-    '''
+    """Invoking OrbitalTable() will load 5 million years of orbital data
+    from [Berger1991]_ and compute linear interpolants.
+    
+    The data can be accessed through the method :func:`lookup_parameters()`.
+     
+    
+    **Object attributes** \n
+    
+    Following object attributes are generated during initialization:
+        
+    :ivar array kyear:          time table with negative values are before present 
+                                (*unit:* kyears)                                
+    :ivar array ecc:            eccentricity over time (*unit:* dimensionless)
+    :ivar array long_peri:      longitude of perihelion (precession angle) (*unit:* degrees)
+    :ivar array obliquity:      obliquity angle (*unit:* degrees)
+    :ivar float kyear_min:      minimum value of time table (*unit:* kyears)
+    :ivar float kyear_max:      maximum value of time table (*unit:* kyears)
+    
+    """
     def __init__(self):
         self.kyear = None
         self.ecc = None
@@ -50,16 +55,27 @@ class OrbitalTable:
 
     def lookup_parameters( self, kyear = 0 ):
         """Look up orbital parameters for given kyear measured from present.
-        Input kyear is thousands of years after present.
-        For years before present, use kyear < 0.
         
-        Will handle scalar or vector input (for multiple years).
+        .. note::
+        
+            Input ``kyear`` is thousands of years after present.
+            For years before present, use ``kyear < 0``.
+            
+        **Function-call argument** \n        
+        
+        :param array kyear:     Time for which oribtal parameters should be given.     
+                                Will handle scalar or vector input (for multiple years).
     
-        Returns a three-member dictionary of orbital parameters: 
-            ecc = eccentricity (dimensionless)
-            long_peri = longitude of perihelion relative to vernal equinox (degrees)
-            obliquity = obliquity angle or axial tilt (degrees).
-        Each member is an array of same size as kyear.
+        :returns:               a three-member dictionary of orbital parameters: 
+                                
+                                    * ``'ecc'``: eccentricity (dimensionless)
+                                    * ``'long_peri'``: longitude of perihelion 
+                                      relative to vernal equinox (degrees)
+                                    * ``'obliquity'``: obliquity angle or axial tilt (degrees).
+                                
+                                Each member is an array of same size as kyear.
+        :rtype:                 dict                    
+        
         """
         #  linear interpolation:
         this_ecc = self.f_ecc(kyear)
@@ -125,14 +141,16 @@ class OrbitalTable:
 
 
 class LongOrbitalTable(OrbitalTable):
-    '''Invoking LongOrbitalTable() will load orbital parameter tables for -51 to +21 Myears
-    as calculated by Laskar et al. 2004
-    http://www.imcce.fr/Equipes/ASD/insola/earth/La2004/README.TXT
+    """Loads orbital parameter tables for -51 to +21 Myears.
     
-    Usage is identical to parent class OrbitalTable().
-    '''
+    Based on calculations by [Laskar2004]_
+        http://vo.imcce.fr/insola/earth/online/earth/La2004/README.TXT
+    
+    Usage is identical to parent class :class:`OrbitalTable()`.
+    
+    """
     def _get_data(self):
-        base_url = 'http://www.imcce.fr/Equipes/ASD/insola/earth/La2004/'
+        base_url = 'http://vo.imcce.fr/insola/earth/online/earth/La2004/'
         past_file = 'INSOLN.LA2004.BTL.ASC'
         future_file = 'INSOLP.LA2004.BTL.ASC'
     

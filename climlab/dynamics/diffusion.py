@@ -1,44 +1,3 @@
-'''Module for one-dimensional diffusion operators.
-
-Here is an example showing implementation of a vertical diffusion.
-Example shows that a subprocess can work on just a subset of the parent process
-state variables.
-
-import climlab
-from climlab.dynamics.diffusion import Diffusion
-c = climlab.GreyRadiationModel()
-K = 0.5
-d = Diffusion(K=K, state=c.state['Tatm'], **c.param)
-c.subprocess['diffusion'] = d
-print c.state
-print d.state
-c.step_forward()
-print c.state
-print d.state
-
-And here is an example of meridional diffusion of temperature
-as a stand-alone process:
-
-import numpy as np
-import climlab
-from climlab.dynamics.diffusion import MeridionalDiffusion
-from climlab.utils import legendre
-sfc = climlab.domain.zonal_mean_surface(num_lat=90, water_depth=10.)
-lat = sfc.lat.points
-initial = 12. - 40. * legendre.P2(np.sin(np.deg2rad(lat)))
-# make a copy of initial so that it remains unmodified
-Ts = climlab.Field(np.array(initial), domain=sfc)
-# thermal diffusivity in W/m**2/degC
-D = 0.55
-# meridional diffusivity in 1/s
-K = D / sfc.heat_capacity
-d = MeridionalDiffusion(state=Ts, K=K)
-d.integrate_years(1.)
-import matplotlib.pyplot as plt
-plt.plot(lat, initial, lat, Ts)
-'''
-
-
 import numpy as np
 from scipy.linalg import solve_banded
 from climlab.process.implicit import ImplicitProcess
@@ -46,20 +5,63 @@ from climlab.process.process import get_axes
 
 
 class Diffusion(ImplicitProcess):
-    '''Parent class for implicit diffusion modules.
-    Solves the 1D heat equation
-    dA/dt = d/dy( K * dA/dy )
+    """A parent class for one dimensional implicit diffusion modules.
+    
+    Solves the one dimensional heat equation
+    
+    .. math::
+    
+        \\frac{dT}{dt} = \\frac{d}{dy} \\left[ K \\cdot \\frac{dT}{dy} \\right]
 
-    The diffusivity K should be given in units of [length]**2 / time
+    :ivar K:                    the diffusivity parameter, for units see below.
+    :vartype K:                 float
+        
+    :ivar diffusion_axis:       axis on which the diffusion is occuring
+    :vartype diffusion_axis:    axis
+    
+    :ivar use_banded_solver:    input flag, whether to use 
+                                :py:func:`scipy.linalg.solve_banded`
+                                instead of :py:func:`numpy.linalg.solve`
+    :vartype use_banded_solver: boolean
+
+
+
+
+    The diffusivity :math:`K` should be given in units of 
+    :math:`\\frac{[\\textrm{length}]^2}{\\textrm{time}}`
     where length is the unit of the spatial axis
     on which the diffusion is occuring.
-
-    Input flag use_banded_solver sets whether to use
-    scipy.linalg.solve_banded
-    rather than the default
-    numpy.linalg.solve
-
-    banded solver is faster but only works for 1D diffusion.'''
+    
+    .. note::
+    
+        The banded solver :py:func:`scipy.linalg.solve_banded` is faster than 
+        :py:func:`numpy.linalg.solve` but only works for one dimensional diffusion.  
+    
+    
+    
+    :Example: 
+        
+        Here is an example showing implementation of a vertical diffusion.
+        It shows that a subprocess can work on just a subset of the parent process
+        state variables.
+    
+        .. code::
+            
+            import climlab
+            from climlab.dynamics.diffusion import Diffusion
+            
+            c = climlab.GreyRadiationModel()
+            K = 0.5
+            d = Diffusion(K=K, state = {'Tatm':c.state['Tatm']}, **c.param)
+            c.add_subprocess('diffusion',d)
+            
+            print c.state
+            print d.state
+            c.step_forward()
+            print c.state
+            print d.state
+    
+    """
     def __init__(self,
                  K=None,
                  diffusion_axis=None,
@@ -106,14 +108,25 @@ def _solve_implicit_banded(current, banded_matrix):
 
 
 class MeridionalDiffusion(Diffusion):
-    '''Meridional diffusion process.
+    """Meridional diffusion process.
     K in units of 1 / s.
-    '''
+    
+    
+        :Example:   
+        
+            Meridional Diffusion of temperature
+            as a stand-alone process:
+        
+            .. plot:: pyplots/meridional_diffusion_example.py
+               :include-source:
+       
+    """
     def __init__(self,
                  K=None,
                  **kwargs):
         super(MeridionalDiffusion, self).__init__(K=K,
                                                 diffusion_axis='lat', **kwargs)
+        # Conversion of delta from deg to rad in K_dimensionless 
         self.K_dimensionless *= 1./np.deg2rad(1.)**2
         for dom in self.domains.values():
             latax = dom.axes['lat']
@@ -122,9 +135,38 @@ class MeridionalDiffusion(Diffusion):
 
 
 def _make_diffusion_matrix(K, weight1=None, weight2=None):
-    '''K is array of dimensionless diffusivities at cell boundaries:
+    """Builds the the diffusion matrix.
+    
+    **Function-all argument** \n        
+        
+    :param array K:         list of names of diagnostic variables
+    :param array weight1:   
+    :param array weight2:
+
+    
+    **Object attributes** \n
+    
+    During method execution following object attribute is modified:
+    
+    :ivar list _diag_vars:  extended by the list ``diaglist`` given as 
+                            method argument
+        
+    
+    K is array of dimensionless diffusivities at cell boundaries:
         physical K (length**2 / time) / (delta length)**2 * (delta time)
-    '''
+        
+    .. math::
+    
+        M= \\left[ \\begin{array}{cccccc}
+        1+K^* & -K^* & 0 & 0 & ... & 0  \\\\
+        -K^* & 1+2K^* & -K^* & 0 & ... & 0 \\\\
+        0 & -K^* & 1+2K^* & -K^* &... & 0  \\\\
+          &  & \\ddots & \\ddots & \\ddots & \\\\
+        0 & 0 & ... & -K^* & 1+2K^* & -K^* \\\\
+        0 & 0 & ... & 0 & -K^* & 1+K^* \\\\
+        \\end{array} \\right]    
+        
+    """
     J = K.size - 1
     if weight1 is None:
         weight1 = np.ones_like(K)

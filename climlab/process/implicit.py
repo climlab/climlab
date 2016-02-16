@@ -2,7 +2,26 @@ from climlab.process.time_dependent_process import TimeDependentProcess
 
 
 class ImplicitProcess(TimeDependentProcess):
-    '''Parent class for modules that use implicit time discretization.'''
+    """A parent class for modules that use implicit time discretization.
+
+    During initialization following attributes are intitialized:
+
+    :ivar time_type:        is set to ``'implicit'``
+    :vartype time_type:     str
+    
+    :ivar adjustment:       the model state adjustments due to this implicit 
+                            subprocess                            
+    :vartype adjustment:    dict   
+    
+    Calculating the model state adjustments through solving the matrix problem 
+    already includes the multiplication with the timestep. The adjustment is
+    divided by the timestep to calculate the implicit subprocess tendencies,
+    which can be handeled by the 
+    :func:`~climlab.process.time_dependent_process.TimeDependentProcess.compute`
+    method of the parent 
+    :class:`~climlab.process.time_dependent_process.TimeDependentProcess` class.
+    
+    """
     def __init__(self, **kwargs):
         super(ImplicitProcess, self).__init__(**kwargs)
         self.time_type = 'implicit'

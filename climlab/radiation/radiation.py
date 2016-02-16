@@ -58,7 +58,7 @@ class Radiation(EnergyBudget):
         pass
 
     def _compute_heating_rates(self):
-        '''Compute energy flux convergences to get heating rates in W / m**2.'''
+        '''Compute energy flux convergences to get heating rates in :math:`W/m^2`.'''
         self._compute_radiative_heating()
 
 

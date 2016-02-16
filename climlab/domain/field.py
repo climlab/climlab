@@ -8,32 +8,61 @@
 
 import numpy as np
 
-'''test usage:
-import numpy as np
-A = np.linspace(0., 10., 30)
-d = domain.single_column()
-atm = d['atm']
-s = field.Field(A, domain=atm)
-print s
-print s.domain
-# can slice this and it preserves the domain
-#  a more full-featured implementation would have intelligent slicing
-#  like in iris
-s.shape == s.domain.shape
-s[:1].shape == s[:1].domain.shape
-#  But some things work very well. E.g. new field creation:
-s2 = np.zeros_like(s)
-print s2
-print s2.domain
-'''
-
 
 class Field(np.ndarray):
-    '''Custom class for climlab gridded quantities, called Field
-    This class behaves exactly like numpy.ndarray
-    but every object has an attribute called domain
-    which is the domain associated with that field (e.g. state variables).'''
+    """Custom class for climlab gridded quantities, called Field
+    
+    This class behaves exactly like :py:class:`numpy.ndarray`
+    but every object has an attribute called ``self.domain``
+    which is the domain associated with that field (e.g. state variables).
+    
+    **Initialization parameters** \n
+        
+    An instance of ``Field`` is initialized with the following 
+    arguments:
+    
+    :param array input_array:   the array which the Field object should be 
+                                initialized with
+    :param _Domain domain:      the domain associated with that field 
+                                (e.g. state variables)
+    
+    **Object attributes** \n
+    
+    Following object attribute is generated during initialization:
+        
+    :ivar _Domain domain:       the domain associated with that field 
+                                (e.g. state variables)
 
+
+    :Example:
+                            
+        .. code::
+            
+            import climlab
+            import numpy as np
+            from climlab import domain
+            from climlab.domain import field
+            
+            A = np.linspace(0., 10., 30)
+            sfc, atm = domain.single_column()
+            s = field.Field(A, domain=atm)
+
+            print s
+            print s.domain
+
+            # can slice this and it preserves the domain
+            #  a more full-featured implementation would have intelligent slicing
+            #  like in iris
+            s.shape == s.domain.shape
+            s[:1].shape == s[:1].domain.shape
+
+            #  But some things work very well. E.g. new field creation:
+            s2 = np.zeros_like(s)
+
+            print s2
+            print s2.domain    
+                            
+    """
     def __new__(cls, input_array, domain=None):
         # Input array is an already formed ndarray instance
         # We first cast to be our class type
@@ -87,7 +116,15 @@ class Field(np.ndarray):
 
 
 def global_mean(field):
-    '''Calculate global mean of a field with latitude dependence.'''
+    """Calculates the latitude weighted global mean of a field 
+    with latitude dependence.
+    
+    :param Field field: input field
+    :raises: :exc:`ValueError` if input field has no latitude axis
+    :return: latitude weighted global mean of the field
+    :rtype: float    
+    
+    """
     try:
         lat = field.domain.axes['lat'].points
     except:

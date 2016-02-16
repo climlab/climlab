@@ -1,5 +1,4 @@
-'''
-Object-oriented code for radiative-convective models with grey-gas radiation.
+"""Object-oriented code for radiative-convective models with grey-gas radiation.
 
 Code developed by Brian Rose, University at Albany
 brose@albany.edu
@@ -9,21 +8,32 @@ Thus the insolation is a prescribed constant.
 
 Here is an example to implement seasonal insolation at 45 degrees North
 
-import climlab
-#  create the column model object
-col = climlab.GreyRadiationModel()
-#  create a new latitude axis with a single point
-lat = climlab.domain.Axis(axis_type='lat', points=45.)
-#  add this new axis to the surface domain
-col.Ts.domain.axes['lat'] = lat
-#  create a new insolation process using this domain
-Q = climlab.radiation.insolation.DailyInsolation(domains=col.Ts.domain, **col.param)
-#  replace the fixed insolation subprocess in the column model
-col.add_subprocess('insolation', Q)
+    :Example:
+
+        .. code::
+        
+            import climlab
+            
+            #  create the column model object
+            col = climlab.GreyRadiationModel()
+
+            #  create a new latitude axis with a single point
+            lat = climlab.domain.Axis(axis_type='lat', points=45.)
+
+            #  add this new axis to the surface domain
+            col.Ts.domain.axes['lat'] = lat
+
+            #  create a new insolation process using this domain
+            Q = climlab.radiation.insolation.DailyInsolation(domains=col.Ts.domain, **col.param)
+
+            #  replace the fixed insolation subprocess in the column model
+            col.add_subprocess('insolation', Q)
+
 
 This model is now a single column with seasonally varying insolation
 calculated for 45N.
-'''
+
+"""
 import numpy as np
 from climlab import constants as const
 from climlab.process.time_dependent_process import TimeDependentProcess
