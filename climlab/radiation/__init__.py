@@ -6,4 +6,8 @@ from radiation import Radiation
 #from three_band import ThreeBandSW
 from nband import NbandRadiation, ThreeBandSW
 from water_vapor import ManabeWaterVapor
-from cam3rad import CAM3Radiation
+#  CAM3Radiation requires netCDF4
+try:
+    from cam3rad import CAM3Radiation
+except:
+    print 'CAM3Radiation module not available.'
