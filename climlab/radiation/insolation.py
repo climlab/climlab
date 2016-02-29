@@ -42,9 +42,19 @@ class _Insolation(DiagnosticProcess):
                             ``self.domains['sfc']`` or ``self.domains['default']``.
                             
     :ivar float S0:         initialized with given argument ``S0``
-    :ivar frozenset _diag_vars:  
-                            extended by string ``'insolation'``
+    :ivar dict diagnostics: key ``'insolation'`` initialized with value:
+                            :class:`~climlab.domain.field.Field` of zeros
+                            in size of ``self.domains['sfc']`` or
+                            ``self.domains['default']``
+    :ivar Field insolation: the subprocess attribute ``self.insolation`` is
+                            created with correct dimensions
+                            
+    .. note::
     
+        ``self.insolation`` should always be modified with 
+        ``self.insolation[:] = ...`` so that links to the insolation in other
+        processes will work.
+                            
     """
     # parameter S0 is now stored using a python property
     # can be changed through self.S0 = newvalue
@@ -97,9 +107,10 @@ class _Insolation(DiagnosticProcess):
         return {}
 
 class FixedInsolation(_Insolation):
-    """A class for fixed insolation.
+    """A class for fixed insolation at each point of latitude off the domain.
     
-    Defines a constant solar distribution for the whole domain.
+    The solar distribution for the whole domain is constant and specified by
+    a parameter.
     
     **Initialization parameters** \n
 
@@ -128,8 +139,8 @@ class FixedInsolation(_Insolation):
 
 
 class P2Insolation(_Insolation):  
-    """A class for parabolic solar distribution on basis of the second order
-    Legendre Polynomial.
+    """A class for parabolic solar distribution over the domain's latitude 
+    on the basis of the second order Legendre Polynomial.
     
     Calculates the latitude dependent solar distribution as
     
@@ -192,9 +203,10 @@ class P2Insolation(_Insolation):
 #  and astronomical formulas
 
 class AnnualMeanInsolation(_Insolation):
-    """A class for annual mean solar insolation.
+    """A class for latitudewise solar insolation averaged over a year.
     
-    This class computes the solar insolation on basis of orbital parameters and 
+    This class computes the solar insolation for each day of the year and 
+    latitude specified in the domain on the basis of orbital parameters and 
     astronomical formulas.
     
     Therefor it uses the method :func:`~climlab.solar.insolation.daily_insolation`.
@@ -291,7 +303,8 @@ class AnnualMeanInsolation(_Insolation):
 
 
 class DailyInsolation(AnnualMeanInsolation):
-    """A class for daily solar insolation.
+    """A class to compute latitudewise daily solar insolation for specific 
+    days of the year.
     
     This class computes the solar insolation on basis of orbital parameters and 
     astronomical formulas.

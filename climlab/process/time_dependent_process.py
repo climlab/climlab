@@ -102,12 +102,10 @@ class TimeDependentProcess(Process):
         """Calculates the timestep in unit seconds
         and calls the setter function of :func:`timestep`
         
-        :param timestep:            the amount of time over which 
-                                    :func:`step_forward` is integrating 
-                                    in unit seconds
-        :type timestep:             float
-        :param num_steps_per_year:  a number of steps per calendar year
-        :type num_steps_per_year:   float
+        :param float timestep:              the amount of time over which 
+                                            :func:`step_forward` is integrating 
+                                            in unit seconds
+        :param float num_steps_per_year:    a number of steps per calendar year
         
         If the parameter *num_steps_per_year* is specified and not ``None``, 
         the timestep is calculated accordingly and therefore the given input
@@ -125,7 +123,7 @@ class TimeDependentProcess(Process):
         
         The function first computes all diagnostic processes as they may effect
         all the other processes (such as change in solar distribution).
-        After all they don't produce any tendencies directly. Subsequently
+        After all the diagnostic processes don't produce any tendencies directly. Subsequently
         all tendencies and diagnostics for all explicit processes are computed.
         
         Tendencies due to implicit and adjustment processes need to be
@@ -143,7 +141,20 @@ class TimeDependentProcess(Process):
         Finally all calculated tendencies from all processes are collected 
         for each state, summed up and stored in the dictionary 
         ``self.tendencies``, which is an attribute of the time-dependent-process 
-        object for which the :func:`func` method has been called.
+        object for which the :func:`compute` method has been called.
+        
+        **Object attributes** \n
+        
+        During method execution following object attributes are modified:
+        
+        :ivar dict tendencies:  dictionary that holds tendencies for all states
+                                is calculated for current timestep through 
+                                adding up tendencies from explicit, implicit and
+                                adjustment processes.
+        :ivar dict diagnostics: process diagnostic dictionary is updated 
+                                by diagnostic dictionaries of subprocesses 
+                                after computation of tendencies.
+        
         """
         if not self.has_process_type_list:
             self._build_process_type_list()
@@ -185,9 +196,8 @@ class TimeDependentProcess(Process):
             self.diagnostics.update(proc.diagnostics)
 
     def _compute_type(self, proctype):
-        """Computes tendencies due to all subprocesses of given type ``'proctype'``.
-        
-        """
+        """Computes tendencies due to all subprocesses of given type 
+        ``'proctype'``."""
         tendencies = {}
         for varname in self.state:
             tendencies[varname] = 0. * self.state[varname]
@@ -260,7 +270,7 @@ class TimeDependentProcess(Process):
         Furthermore ``self.time['days_elapsed']`` and
         ``self.time['num_steps_per_year']`` are updated.
         
-        The function is called by the timestepping routines.
+        The function is called by the time stepping methods.
         
         """
         self.time['steps'] += 1
@@ -283,16 +293,14 @@ class TimeDependentProcess(Process):
     def integrate_years(self, years=1.0, verbose=True):
         """Integrates the model by a given number of years.
         
-        :param years: integration time for the model in years
-        :type years: float
-        
-        :param verbose: information whether model time details should be 
-                        printed.
-        :type verbose: boolean
+        :param float years:     integration time for the model in years        
+        :param bool verbose:    information whether model time details 
+                                should be printed.
         
         It calls :func:`step_forward` repetitively and calculates a time 
         averaged value over the integrated period for every model state and all
         diagnostics processes.
+        
         """
         days = years * const.days_per_year
         numsteps = int(self.time['num_steps_per_year'] * years)
@@ -334,12 +342,9 @@ class TimeDependentProcess(Process):
         It convertes the given number of days into years and calls 
         :func:`integrate_years`.
         
-        :param days: integration time for the model in days
-        :type years: float
-        
-        :param verbose: information whether model time details should be 
-                        printed.
-        :type verbose: boolean            
+        :param float days:  integration time for the model in days        
+        :param bool verbose:    information whether model time details 
+                                should be printed.
         
         """
         years = days / const.days_per_year
@@ -351,9 +356,8 @@ class TimeDependentProcess(Process):
         :param crit: exit criteria for difference of iterated solutions
         :type crit: float
         
-        :param verbose: information whether total elapsed time should be 
-                        printed.
-        :type verbose: boolean     
+        :param bool verbose:    information whether total elapsed time 
+                                should be printed.
         
         """
         # implemented by m-kreuzer

@@ -1,65 +1,68 @@
-'''
-Principles of the new `climlab` API design:
 
-    * `climlab.Process` object has several iterable dictionaries of named,
-      gridded variables:
-      
-        * `process.state`
-        
-            * state variables, usually time-dependent
+#==============================================================================
+# Principles of the new `climlab` API design:
+# 
+#     * `climlab.Process` object has several iterable dictionaries of named,
+#       gridded variables:
+#       
+#         * `process.state`
+#         
+#             * state variables, usually time-dependent
+# 
+#         - `process.input`
+#             - boundary conditions and other gridded quantities independent of the
+#             `process`
+#             - often set by a parent `process`
+#         - `process.param`  (which are basically just scalar `input`)
+#         - `process.tendencies`
+#             - iterable `dict` of time-tendencies (d/dt) for each state variable
+#         - `process.diagnostics`
+#             - any quantity derived from current state
+# - The `process` is fully described by contents of `state`, `input` and `param`
+# dictionaries. `tendencies` and `diagnostics` are always computable from current
+# state.
+# - `climlab` will remain (as much as possible) agnostic about the data formats
+#     - Variables within the dictionaries will behave as `numpy.ndarray` objects
+#     - Grid information and other domain details accessible as attributes
+#     of each variable
+#         - e.g. Tatm.lat
+#         - Shortcuts like `process.lat` will work where these are unambiguous
+# - Many variables will be accessible as process attributes `process.name`
+#     - this restricts to unique field names in the above dictionaries
+# - There may be other dictionaries that do have name conflicts
+#     - e.g. dictionary of tendencies, with same keys as `process.state`
+#     - These will *not* be accessible as `process.name`
+#     - but *will* be accessible as `process.dict_name.name`
+#     (as well as regular dict interface)
+# - There will be a dictionary of named subprocesses `process.subprocess`
+# - Each item in subprocess dict will itself be a `climlab.Process` object
+# - For convenience with interactive work, each subprocess should be accessible
+# as `process.subprocess.name` as well as `process.subprocess['name']`
+# - `process.compute()` is a method that computes tendencies (d/dt)
+#     - returns a dictionary of tendencies for all state variables
+#     - keys for this dictionary are same as keys of state dictionary
+#     - tendency dictionary is the total tendency including all subprocesses
+#     - method only computes d/dt, does not apply changes
+#     - thus method is relatively independent of numerical scheme
+#         - may need to make exception for implicit scheme?
+#     - method *will* update variables in `process.diagnostic`
+#         - will also *gather all diagnostics* from `subprocesses`
+# - `process.step_forward()` updates the state variables
+#     - calls `process.compute()` to get current tendencies
+#     - implements a particular time-stepping scheme
+#     - user interface is agnostic about numerical scheme
+# - `process.integrate_years()` etc will automate time-stepping
+#     - also computation of time-average diagnostics.
+# - Every `subprocess` should work independently of its parent `process` given
+# appropriate `input`.
+#     - investigating an individual `process` (possibly with its own
+#     `subprocesses`) isolated from its parent needs to be as simple as doing:
+#         - `newproc = climlab.process_like(procname.subprocess['subprocname'])`
+#
+#         - `newproc.compute()`
+#         - anything in the `input` dictionary of `subprocname` will remain fixed
+#==============================================================================
 
-        - `process.input`
-            - boundary conditions and other gridded quantities independent of the
-            `process`
-            - often set by a parent `process`
-        - `process.param`  (which are basically just scalar `input`)
-        - `process.tendencies`
-            - iterable `dict` of time-tendencies (d/dt) for each state variable
-        - `process.diagnostics`
-            - any quantity derived from current state
-- The `process` is fully described by contents of `state`, `input` and `param`
-dictionaries. `tendencies` and `diagnostics` are always computable from current
-state.
-- `climlab` will remain (as much as possible) agnostic about the data formats
-    - Variables within the dictionaries will behave as `numpy.ndarray` objects
-    - Grid information and other domain details accessible as attributes
-    of each variable
-        - e.g. Tatm.lat
-        - Shortcuts like `process.lat` will work where these are unambiguous
-- Many variables will be accessible as process attributes `process.name`
-    - this restricts to unique field names in the above dictionaries
-- There may be other dictionaries that do have name conflicts
-    - e.g. dictionary of tendencies, with same keys as `process.state`
-    - These will *not* be accessible as `process.name`
-    - but *will* be accessible as `process.dict_name.name`
-    (as well as regular dict interface)
-- There will be a dictionary of named subprocesses `process.subprocess`
-- Each item in subprocess dict will itself be a `climlab.Process` object
-- For convenience with interactive work, each subprocess should be accessible
-as `process.subprocess.name` as well as `process.subprocess['name']`
-- `process.compute()` is a method that computes tendencies (d/dt)
-    - returns a dictionary of tendencies for all state variables
-    - keys for this dictionary are same as keys of state dictionary
-    - tendency dictionary is the total tendency including all subprocesses
-    - method only computes d/dt, does not apply changes
-    - thus method is relatively independent of numerical scheme
-        - may need to make exception for implicit scheme?
-    - method *will* update variables in `process.diagnostic`
-        - will also *gather all diagnostics* from `subprocesses`
-- `process.step_forward()` updates the state variables
-    - calls `process.compute()` to get current tendencies
-    - implements a particular time-stepping scheme
-    - user interface is agnostic about numerical scheme
-- `process.integrate_years()` etc will automate time-stepping
-    - also computation of time-average diagnostics.
-- Every `subprocess` should work independently of its parent `process` given
-appropriate `input`.
-    - investigating an individual `process` (possibly with its own
-    `subprocesses`) isolated from its parent needs to be as simple as doing:
-        - `newproc = climlab.process_like(procname.subprocess['subprocname'])`
-        - `newproc.compute()`
-        - anything in the `input` dictionary of `subprocname` will remain fixed
-'''
 import time, copy
 import numpy as np
 from climlab.domain.field import Field
@@ -81,6 +84,9 @@ def _make_dict(arg, argtype):
 class Process(object):    
     """A generic parent class for all climlab process objects.
     Every process object has a set of state variables on a spatial grid.
+    
+    For more general information about `Processes` and their role in climlab,
+    see :ref:`process_architecture` section climlab-architecture.
 
     **Initialization parameters** \n
         
@@ -95,10 +101,11 @@ class Process(object):
     :param subprocess:  subprocess(es) of the process
     :type subprocess:   :class:`~climlab.process.process.Process` or dict of 
                         :class:`~climlab.process.process.Process`
-    :param lat:
-    :param lev:
-    :param num_lat:
-    :param num_levels:
+    :param array lat:   latitudinal points [optional]
+    :param lev:         altitudinal points [optional]
+    :param int num_lat: number of latitudional points [optional]    
+    :param int num_levels:
+                        number of altitudinal points [optional]
     :param dict input:  collection of input quantities
     
     **Object attributes** \n
@@ -111,8 +118,7 @@ class Process(object):
                             (of type :class:`~climlab.domain.field.Field`)
     :ivar dict param:       dictionary of model parameters which are given
                             through ``**kwargs`` 
-    :ivar frozenset _diag_vars:
-                            basically a list of names of diagnostic variables
+    :ivar dict diagnostics: a dictionary with all diagnostic variables
     :ivar dict _input_vars: collection of input quantities like boundary conditions
                             and other gridded quantities
     :ivar str creation_date:
@@ -218,15 +224,14 @@ class Process(object):
     def set_state(self, name, value):
         """Sets the variable ``name`` to a new state ``value``. 
         
-        :param string name:    name of the state
-        
+        :param string name:    name of the state        
         :param value:   state variable
-        :type value:    :class:`~climlab.domain.field.Field` or *array*
-        
-        :raises: :exc:  `ValueError` if state variable ``value`` is not
-                        having a domain.
-        :raises: :exc:  `ValueError` if shape mismatch between existing 
-                        domain and new state variable.
+        :type value:    :class:`~climlab.domain.field.Field` or *array*       
+        :raises: :exc:`ValueError`
+                        if state variable ``value`` is not having a domain.
+        :raises: :exc:`ValueError`
+                        if shape mismatch between existing domain and 
+                        new state variable.
                         
         :Example:   
         
@@ -271,8 +276,8 @@ class Process(object):
                     self.state_domain[name] = dom
 
     def _set_field(self, field_type, name, value):
-        '''Add a new field to a specified dictionary. The field is also added
-        as a process attribute. field_type can be 'input', 'diagnostics' '''
+        """Adds a new field to a specified dictionary. The field is also added
+        as a process attribute. field_type can be 'input', 'diagnostics' """
         try:
             self.__getattribute__(field_type).update({name: value})
         except:
@@ -281,7 +286,6 @@ class Process(object):
         # setter method for that attribute
         self.__setattr__(name, value)
 
-## REVIEW again - method deleted in v.0.3 ##
 
    # def add_diagnostics(self, diaglist):
    #     """Updates the process's list of diagnostics.
@@ -304,15 +308,20 @@ class Process(object):
     
 
     def init_diagnostic(self, name, value=0.):
-        ''' REVIEW DOCSTRING - new method in v.03
+        """Defines a new diagnostic quantity called ``name``
+        and initialize it with the given ``value``.
 
-	Define a new diagnostic quantity called name
-        and initialize it with the given value.
-
-        quantity is accessible and settable in two ways:
-        - as a process attribute, i.e. proc.name
-        - as a member of the diagnostics dictionary, i.e. proc.diagnostics['name']
-        '''
+        Quantity is accessible and settable in two ways:
+            
+            * as a process attribute, i.e. ``proc.name``
+            * as a member of the diagnostics dictionary, 
+              i.e. ``proc.diagnostics['name']``
+        
+        :param str name:        name of diagnostic quantity to be initialized
+        :param array value:     initial value for quantity - accepts also type
+                                float, int, etc. (*default*:``0.``)
+        
+        """
         def _diag_getter(self):
             return self.diagnostics[name]
         def _diag_setter(self, value):
@@ -322,9 +331,12 @@ class Process(object):
         self.__setattr__(name, value)
 
     def remove_diagnostic(self, name):
-        ''' REVIEW DOCSTRING - new method in v.03
-	Remove a diagnostic from the process.diagnostic dictionary
-        and also delete the associated process attribute.'''
+        """	Removes a diagnostic from the ``process.diagnostic`` dictionary
+        and also delete the associated process attribute.
+        
+        :param str name:    name of diagnostic quantity to be removed
+        
+        """        
         _ = self.diagnostics.pop(name)
         delattr(type(self), name)
 
@@ -365,6 +377,15 @@ class Process(object):
     # a single axis of that type in the process.
     @property
     def lat(self):
+        """Property of latitudinal points of the process.
+        
+        :getter:    Returns the points of axis ``'lat'`` if availible in the
+                    process's domains.
+        :type:      array
+        :raises: :exc:`ValueError`
+                    if no ``'lat'`` axis can be found.        
+        
+        """
         try:
             for domname, dom in self.domains.iteritems():
                 try:
@@ -374,9 +395,17 @@ class Process(object):
             return thislat
         except:
             raise ValueError('Can\'t resolve a lat axis.')
-
     @property
     def lat_bounds(self):
+        """Property of latitudinal bounds of the process.
+        
+        :getter:    Returns the bounds of axis ``'lat'`` if availible in the
+                    process's domains.
+        :type:      array
+        :raises: :exc:`ValueError`
+                    if no ``'lat'`` axis can be found.        
+        
+        """
         try:
             for domname, dom in self.domains.iteritems():
                 try:
@@ -388,6 +417,15 @@ class Process(object):
             raise ValueError('Can\'t resolve a lat axis.')
     @property
     def lon(self):
+        """Property of longitudinal points of the process.
+        
+        :getter:    Returns the points of axis ``'lon'`` if availible in the
+                    process's domains.
+        :type:      array
+        :raises: :exc:`ValueError`
+                    if no ``'lon'`` axis can be found.        
+        
+        """
         try:
             for domname, dom in self.domains.iteritems():
                 try:
@@ -399,6 +437,15 @@ class Process(object):
             raise ValueError('Can\'t resolve a lon axis.')
     @property
     def lon_bounds(self):
+        """Property of longitudinal bounds of the process.
+        
+        :getter:    Returns the bounds of axis ``'lon'`` if availible in the
+                    process's domains.
+        :type:      array
+        :raises: :exc:`ValueError`
+                    if no ``'lon'`` axis can be found.        
+        
+        """
         try:
             for domname, dom in self.domains.iteritems():
                 try:
@@ -410,6 +457,15 @@ class Process(object):
             raise ValueError('Can\'t resolve a lon axis.')
     @property
     def lev(self):
+        """Property of altitudinal points of the process.
+        
+        :getter:    Returns the points of axis ``'lev'`` if availible in the
+                    process's domains.
+        :type:      array
+        :raises: :exc:`ValueError`
+                    if no ``'lev'`` axis can be found.        
+        
+        """
         try:
             for domname, dom in self.domains.iteritems():
                 try:
@@ -421,6 +477,15 @@ class Process(object):
             raise ValueError('Can\'t resolve a lev axis.')
     @property
     def lev_bounds(self):
+        """Property of altitudinal bounds of the process.
+        
+        :getter:    Returns the bounds of axis ``'lev'`` if availible in the
+                    process's domains.
+        :type:      array
+        :raises: :exc:`ValueError`
+                    if no ``'lev'`` axis can be found.        
+        
+        """
         try:
             for domname, dom in self.domains.iteritems():
                 try:
@@ -432,6 +497,15 @@ class Process(object):
             raise ValueError('Can\'t resolve a lev axis.')
     @property
     def depth(self):
+        """Property of depth points of the process.
+        
+        :getter:    Returns the points of axis ``'depth'`` if availible in the
+                    process's domains.
+        :type:      array
+        :raises: :exc:`ValueError`
+                    if no ``'depth'`` axis can be found.        
+        
+        """
         try:
             for domname, dom in self.domains.iteritems():
                 try:
@@ -443,6 +517,15 @@ class Process(object):
             raise ValueError('Can\'t resolve a depth axis.')
     @property
     def depth_bounds(self):
+        """Property of depth bounds of the process.
+        
+        :getter:    Returns the bounds of axis ``'depth'`` if availible in the
+                    process's domains.
+        :type:      array
+        :raises: :exc:`ValueError`
+                    if no ``'depth'`` axis can be found.        
+        
+        """
         try:
             for domname, dom in self.domains.iteritems():
                 try:

@@ -8,7 +8,7 @@ def atmosphere(dp):
     
     .. math::
 
-        C_a = \\frac{c_p \\cdot dp \\cdot f_{\\textrm{mb_to_Pa}}}{g}
+        C_a = \\frac{c_p \\cdot dp \\cdot f_{\\textrm{mb-to-Pa}}}{g}
     
     where
     
@@ -18,7 +18,7 @@ def atmosphere(dp):
     :math:`C_a`                     *output*        :math:`\\textrm{J} / \\textrm{m}^2 / \\textrm{K}`      heat capacity for atmospheric cell
     :math:`c_p`                     :math:`1004.`   :math:`\\textrm{J} / \\textrm{kg} / \\textrm{K}`       specific heat at constant pressure for dry air
     :math:`dp`                      *input*         :math:`\\textrm{mb}`                                 pressure for atmospheric cell
-    :math:`f_{\\textrm{mb_to_Pa}}`   :math:`100`     :math:`\\textrm{Pa} / \\textrm{mb}`                   conversion factor from mb to Pa
+    :math:`f_{\\textrm{mb-to-Pa}}`   :math:`100`     :math:`\\textrm{Pa} / \\textrm{mb}`                   conversion factor from mb to Pa
     :math:`g`                       :math:`9.8`     :math:`\\textrm{m} / \\textrm{s}^2`                   gravitational acceleration
     ==============================  ==============  ==================================================  ===============================================
         

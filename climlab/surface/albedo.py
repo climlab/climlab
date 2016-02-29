@@ -5,9 +5,7 @@ from climlab.domain.field import Field
 
 
 class ConstantAlbedo(DiagnosticProcess):
-    """A class for constant albedo values.
-    
-    Defines constant albedo values for the whole domain.
+    """A class for constant albedo values at all spatial points of the domain.
     
     **Initialization parameters** \n
 
@@ -23,9 +21,7 @@ class ConstantAlbedo(DiagnosticProcess):
         
     :ivar Field albedo:             attribute to store the albedo value. 
                                     During initialization the 
-                                    :func:`albedo` setter is called.
-    :ivar frozenset _diag_vars:     extended by the list ``['albedo',]``
-    
+                                    :func:`albedo` setter is called.  
     
     """        
     def __init__(self, albedo=0.33, **kwargs):
@@ -35,21 +31,18 @@ class ConstantAlbedo(DiagnosticProcess):
 
     @property
     def albedo(self):
-<<<<<<< HEAD
         """Property of albedo value.
         
-        :getter:    Returns the albedo value which is stored in attribute 
-                    ``self._albedo``
-        :setter:    * sets albedo which is addressed as ``self._albedo`` to the new value
-                      through creating a Field on the basis of domain ``self.domain['default']``
+        :getter:    Returns the albedo value which is stored in diagnostic dict 
+                    ``self.diagnostic['albedo']``
+        :setter:    * sets albedo which is addressed as ``diagnostics['albedo']`` 
+                      to the new value through creating a Field on the basis 
+                      of domain ``self.domain['default']``
                     * updates the parameter dictionary ``self.param['albedo']``
         :type:      Field
         
         """
-        return self._albedo
-=======
         return self.diagnostics['albedo']
->>>>>>> d4af28f5850005aaa8fe1e17f0ae6182a4e25865
     @albedo.setter
     def albedo(self, value):
         dom = self.domains['default']
@@ -58,10 +51,8 @@ class ConstantAlbedo(DiagnosticProcess):
 
 
 class P2Albedo(DiagnosticProcess):
-    """A class for parabolic defined albedo values on basis of the second order
-    Legendre Polynomial.
-    
-    Defines parabolic shaped albedo values across the domain range.
+    """A class for parabolic distributed albedo values across the domain 
+    on basis of the second order Legendre Polynomial.
     
     Calculates the latitude dependent albedo values as
     
@@ -94,7 +85,10 @@ class P2Albedo(DiagnosticProcess):
     :ivar float a2:                 attribute to store the albedo parameter a2. 
                                     During initialization the 
                                     :func:`a2` setter is called.
-    :ivar frozenset _diag_vars:     extended by the list ``['albedo',]``
+    :ivar dict diagnostics:         key ``'albedo'`` initialized
+    :ivar Field albedo:             the subprocess attribute ``self.albedo`` is
+                                    created with correct dimensions 
+                                    (according to ``self.lat``)
     
     """    
 
@@ -177,9 +171,11 @@ class Iceline(DiagnosticProcess):
     :class:`~climlab.process.diagnostic.DiagnosticProcess`
     following object attributes are generated and updated during initialization:
         
-    :ivar dict param:               The parameter dictionary is updated with the 
-                                    input argument ``'Tf'``.
-    :ivar frozenset _diag_vars:     extended by the list ``['noice','ice','icelat']``
+    :ivar dict param:           The parameter dictionary is updated with the 
+                                input argument ``'Tf'``.
+    :ivar dict diagnostics:     key ``'icelat'`` initialized
+    :ivar array icelat:         the subprocess attribute ``self.icelat`` is
+                                created
     
 
     """    
@@ -204,6 +200,8 @@ class Iceline(DiagnosticProcess):
                                 :math:`T_s < T_f`
         :ivar array icelat:     an array with two elements indicating the 
                                 ice-edge latitudes
+        :ivar dict diagnostics: key ``'icelat'`` is updated according to object
+                                attribute ``self.icelat`` during modification
         
         
         """
@@ -263,7 +261,10 @@ class StepFunctionAlbedo(DiagnosticProcess):
                                     ``'a2'`` and ``'ai'``.  
     :ivar bool topdown:             is set to ``False`` to call subprocess
                                     compute method first
-    :ivar frozenset _diag_vars:     extended by the list ``['albedo',]``
+                        
+    :ivar dict diagnostics:         key ``'albedo'`` initialized
+    :ivar Field albedo:             the subprocess attribute ``self.albedo`` is
+                                    created
     
     """
     def __init__(self, Tf=-10., a0=0.3, a2=0.078, ai=0.62, **kwargs):

@@ -58,10 +58,14 @@ class Boltzmann(EnergyBudget):
     During initialization both arguments described above are created as object 
     attributes which calls their setter function (see below).
         
-    :ivar float eps:    calls the setter function of :func:`eps`
-    :ivar float tau:    calls the setter function of :func:`tau`
-    :ivar frozenset _diag_vars: 
-                        extended by string ``'OLR'``
+    :ivar float eps:            calls the setter function of :func:`eps`
+    :ivar float tau:            calls the setter function of :func:`tau`
+    :ivar dict diagnostics:     the subprocess's diagnostic dictionary 
+                                ``self.diagnostic`` is initialized 
+                                through calling 
+                                ``self.init_diagnostic('OLR', 0. * self.Ts)``
+    :ivar Field OLR:            the subprocess attribute ``self.OLR`` is
+                                created with correct dimensions
     
     """
     # implemented by m-kreuzer
@@ -69,8 +73,9 @@ class Boltzmann(EnergyBudget):
         super(Boltzmann, self).__init__(**kwargs)
         self.eps = eps
         self.tau = tau
-        newdiags = ['OLR',]
-        self.add_diagnostics(newdiags)
+        # newdiags = ['OLR',]
+        # self.add_diagnostics(newdiags)
+        self.init_diagnostic('OLR', 0. * self.Ts)
 
     @property
     def eps(self):
@@ -108,33 +113,43 @@ class Boltzmann(EnergyBudget):
         self._tau = value
         self.param['tau'] = value
     
-    def emission(self):
-        """Calculates the Outgoing Longwave Radiation (OLR) of the Boltzmann 
-        radiation subprocess.
-        
-        **Object attributes** \n
-        
-        During method execution following object attribute is modified:
-        
-        :ivar float OLR:            the described formula is calculated and the
-                                    result stored in the project attribute ``self.OLR``
-        :ivar dict diagnostics:     the same result is written in ``diagnostics`` 
-                                    dictionary with the key ``'OLR'``
-        
-        .. warning::
-        
-            This currently works only for a single state variable!
-            
-        """
+#    def emission(self):
+#        """Calculates the Outgoing Longwave Radiation (OLR) of the Boltzmann 
+#        radiation subprocess.
+#        
+#        **Object attributes** \n
+#        
+#        During method execution following object attribute is modified:
+#        
+#        :ivar float OLR:            the described formula is calculated and the
+#                                    result stored in the project attribute ``self.OLR``
+#        :ivar dict diagnostics:     the same result is written in ``diagnostics`` 
+#                                    dictionary with the key ``'OLR'``
+#        
+#        .. warning::
+#        
+#            This currently works only for a single state variable!
+#            
+#        """
+#        for varname, value in self.state.iteritems():
+#            flux = self.eps * self.tau * const.sigma * (value + const.tempCtoK)**4.
+#            self.OLR = flux
+#            self.diagnostics['OLR'] = self.OLR
+
+    def _compute_emission(self):
         for varname, value in self.state.iteritems():
             flux = self.eps * self.tau * const.sigma * (value + const.tempCtoK)**4.
-            self.OLR = flux
-            self.diagnostics['OLR'] = self.OLR
+            self.OLR[:] = flux
+
     
     def _compute_heating_rates(self):
         """Computes energy flux convergences to get heating rates in :math:`W/m^2`.
         
         """
-        self.emission()
+        self._compute_emission()
         for varname, value in self.state.iteritems():
             self.heating_rate[varname] = -self.OLR
+            
+            
+            
+            

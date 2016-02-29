@@ -13,31 +13,49 @@ class Diffusion(ImplicitProcess):
     
         \\frac{dT}{dt} = \\frac{d}{dy} \\left[ K \\cdot \\frac{dT}{dy} \\right]
 
-    :ivar K:                    the diffusivity parameter, for units see below.
-    :vartype K:                 float
-        
-    :ivar diffusion_axis:       axis on which the diffusion is occuring
-    :vartype diffusion_axis:    axis
-    
-    :ivar use_banded_solver:    input flag, whether to use 
-                                :py:func:`scipy.linalg.solve_banded`
-                                instead of :py:func:`numpy.linalg.solve`
-    :vartype use_banded_solver: boolean
+    **Initialization parameters** \n
 
-
-
-
-    The diffusivity :math:`K` should be given in units of 
-    :math:`\\frac{[\\textrm{length}]^2}{\\textrm{time}}`
-    where length is the unit of the spatial axis
-    on which the diffusion is occuring.
-    
+    :param float K:                 the diffusivity parameter in units of 
+                                    :math:`\\frac{[\\textrm{length}]^2}{\\textrm{time}}`
+                                    where length is the unit of the spatial axis
+                                    on which the diffusion is occuring.
+    :param str diffusion_axis:      dictionary key for axis on which the 
+                                    diffusion is occuring in process's domain
+                                    axes dictionary
+    :param bool use_banded_solver:  input flag, whether to use 
+                                    :py:func:`scipy.linalg.solve_banded`
+                                    instead of :py:func:`numpy.linalg.solve`
+                                    
     .. note::
     
         The banded solver :py:func:`scipy.linalg.solve_banded` is faster than 
         :py:func:`numpy.linalg.solve` but only works for one dimensional diffusion.  
+        
+    **Object attributes** \n
     
-    
+    Additional to the parent class 
+    :class:`~climlab.process.implicit.ImplicitProcess`
+    following object attributes are generated or modified during initialization:
+        
+    :ivar dict param:               parameter dictionary is extended by 
+                                    diffusivity parameter K (unit:
+                                    :math:`\\frac{[\\textrm{length}]^2}{\\textrm{time}}`)
+    :ivar bool use_banded_solver:   input flag specifying numerical solving 
+                                    method (given during initialization)
+    :ivar str diffusion_axis:       dictionary key for axis where diffusion 
+                                    is occuring: 
+                                    specified during initialization
+                                    or output of method 
+                                    :func:`_guess_diffusion_axis`
+    :ivar array K_dimensionless:    diffusion parameter K multiplied by the 
+                                    timestep and divided by mean of diffusion 
+                                    axis delta in the power of two. Array has 
+                                    the size of diffusion axis bounds.
+                                    :math:`K_{\\textrm{dimensionless}}[i]= K \\frac{\\Delta t}{ \\left(\\overline{\\Delta \\textrm{bounds}} \\right)^2}`
+    :ivar array diffTriDiag:        tridiagonal diffusion matrix made by
+                                    :func:`_make_diffusion_matrix()` with input
+                                    ``self.K_dimensionless``
+            
     
     :Example: 
         
@@ -83,6 +101,44 @@ class Diffusion(ImplicitProcess):
         self.diffTriDiag = _make_diffusion_matrix(self.K_dimensionless)
 
     def _implicit_solver(self):
+        """Invertes and solves the matrix problem for diffusion matrix 
+        and temperature T.
+        
+        The method is called by the 
+        :func:`~climlab.process.implicit.ImplicitProcess._compute()` function 
+        of the :class:`~climlab.process.implicit.ImplicitProcess` class and 
+        solves the matrix problem
+        
+        .. math::
+        
+            A \\cdot T_{\\textrm{new}} = T_{\\textrm{old}}
+        
+        for diffusion matrix A and corresponding temperatures. 
+        :math:`T_{\\textrm{old}}` is in this case the current state variable 
+        which already has been adjusted by the explicit processes. 
+        :math:`T_{\\textrm{new}}` is the new state of the variable. To
+        derive the temperature tendency of the diffusion process the adjustment 
+        has to be calculated and muliplied with the timestep which is done by
+        the :func:`~climlab.process.implicit.ImplicitProcess._compute()` 
+        function of the :class:`~climlab.process.implicit.ImplicitProcess` 
+        class.
+        
+        This method calculates the matrix inversion for every state variable
+        and calling either :func:`solve_implicit_banded()` or 
+        :py:func:`numpy.linalg.solve()` dependent on the flag 
+        ``self.use_banded_solver``.
+        
+        :ivar dict state:               method uses current state variables
+                                        but does not modify them
+        :ivar bool use_banded_solver:   input flag whether to use 
+                                        :func:`_solve_implicit_banded()` or 
+                                        :py:func:`numpy.linalg.solve()` to do 
+                                        the matrix inversion
+        :ivar array diffTriDiag:        the diffusion matrix which is given 
+                                        with the current state variable to 
+                                        the method solving the matrix problem
+                                        
+        """
         # Time-stepping the diffusion is just inverting this matrix problem:
         # self.T = np.linalg.solve( self.diffTriDiag, Trad )
         newstate = {}
@@ -96,6 +152,18 @@ class Diffusion(ImplicitProcess):
 
 
 def _solve_implicit_banded(current, banded_matrix):
+    """Uses a banded solver for matrix inversion of a tridiagonal matrix.
+    
+    Converts the complete listed tridiagonal matrix *(nxn)* into a three row 
+    matrix *(3xn)* and calls :py:func:`scipy.linalg.solve_banded()`.
+    
+    :param array current:           the current state of the variable for which
+                                    matrix inversion should be computed
+    :param array banded_matrix:     complete diffusion matrix (*dimension: nxn*)
+    :returns:                       output of :py:func:`scipy.linalg.solve_banded()`
+    :rtype:                         array
+    
+    """
     #  can improve performance by storing the banded form once and not
     #  recalculating it...
     #  but whatever
@@ -108,17 +176,55 @@ def _solve_implicit_banded(current, banded_matrix):
 
 
 class MeridionalDiffusion(Diffusion):
-    """Meridional diffusion process.
-    K in units of 1 / s.
+    """A parent class for Meridional diffusion processes.
     
+    Calculates the energy transport in a diffusion like process along the
+    temperature gradient:
+
+        .. math::
+        
+            H(\\varphi) = \\frac{D}{\\cos \\varphi}\\frac{\\partial}{\\partial \\varphi} \\left( \\cos\\varphi \\frac{\\partial T(\\varphi)}{\\partial \\varphi} \\right)
+     
+     
+     for an Energy Balance Model whose Energy Budget can be noted as:
+     
+     .. math::
+
+        C(\\varphi) \\frac{dT(\\varphi)}{dt} = R\\downarrow (\\varphi) - R\\uparrow (\\varphi) + H(\\varphi)
+        
+
     
-        :Example:   
+    **Initialization parameters** \n
         
-            Meridional Diffusion of temperature
-            as a stand-alone process:
+    An instance of ``MeridionalDiffusion`` is initialized with the following 
+    arguments:
+    
+    :param float K:     diffusion parameter in units of :math:`1/s`
+
+    **Object attributes** \n
+    
+    Additional to the parent class :class:`~climlab.dynamics.diffusion.Diffusion`
+    which is initialized with ``diffusion_axis='lat'``, following object 
+    attributes are modified during initialization:
         
-            .. plot:: pyplots/meridional_diffusion_example.py
-               :include-source:
+    :ivar array K_dimensionless:    As K_dimensionless has been computed like
+                                    :math:`K_{\\textrm{dimensionless}}= K \\frac{\\Delta t}{(\\Delta \\textrm{bounds})^2}`
+                                    with :math:`K` in units :math:`1/s`, 
+                                    the :math:`\\Delta (\\textrm{bounds})` have to
+                                    be converted from ``deg`` to ``rad`` to make 
+                                    the array actually dimensionless. 
+                                    This is done during initialiation. 
+    :ivar array diffTriDiag:        the diffusion matrix is recomputed with
+                                    appropriate weights for the meridional case
+                                    by :func:`_make_meridional_diffusion_matrix`
+              
+    :Example:   
+    
+        Meridional Diffusion of temperature
+        as a stand-alone process:
+    
+        .. plot:: pyplots/meridional_diffusion_example.py
+           :include-source:
        
     """
     def __init__(self,
@@ -135,38 +241,71 @@ class MeridionalDiffusion(Diffusion):
 
 
 def _make_diffusion_matrix(K, weight1=None, weight2=None):
-    """Builds the the diffusion matrix.
+    """Builds the general diffusion matrix with dimension nxn.
+
+    .. note::
+        
+        :math:`n`   = number of points of diffusion axis
+        :math:`n+1` = number of bounts of diffusion axis
+    
     
     **Function-all argument** \n        
         
-    :param array K:         list of names of diagnostic variables
-    :param array weight1:   
-    :param array weight2:
+    :param array K:         dimensionless diffusivities at cell boundaries
+                            *(size: 1xn+1)*
+    :param array weight1:   weight_1 *(size: 1xn+1)*
+    :param array weight2:   weight_2 *(size: 1xn)*
+    :returns:               completely listed tridiagonal diffusion matrix *(size: nxn)*
+    :rtype:                 array
 
+    .. note::
     
-    **Object attributes** \n
-    
-    During method execution following object attribute is modified:
-    
-    :ivar list _diag_vars:  extended by the list ``diaglist`` given as 
-                            method argument
+        The elements of array K are acutally dimensionless:
         
+        .. math::
+        
+            K[i] = K_{\\textrm{physical}}  \\frac{\\Delta t}{(\\Delta y)^2}
+            
+        where :math:`K_{\\textrm{physical}}` is in unit :math:`\\frac{\\textrm{length}^2}{\\textrm{time}}`
+         
     
-    K is array of dimensionless diffusivities at cell boundaries:
-        physical K (length**2 / time) / (delta length)**2 * (delta time)
+    The diffusion matrix is build like the following
         
     .. math::
-    
-        M= \\left[ \\begin{array}{cccccc}
-        1+K^* & -K^* & 0 & 0 & ... & 0  \\\\
-        -K^* & 1+2K^* & -K^* & 0 & ... & 0 \\\\
-        0 & -K^* & 1+2K^* & -K^* &... & 0  \\\\
+         
+        \\textrm{diffTriDiag}= 
+        \\left[ \\begin{array}{cccccc}
+        1+\\frac{w_{1,1} K_1 }{w_{2,0}} & -\\frac{w_{1,1} K_1}{w_{2,0}} & 0 &  & ... & 0  \\\\
+        -\\frac{w_{1,1} K_1}{w_{2,1}} & 1+\\frac{w_{1,1} K_1 + w_{1,2} K_2}{w_{2,1}} & -\\frac{w_{1,2} K_2}{w_{2,1}} & 0 & ... & 0 \\\\
+        0 & -\\frac{w_{1,2} K_2}{w_{2,2}}  & 1+\\frac{w_{1,2} K_2 + w_{1,3} K_3}{w_{2,2}} & -\\frac{w_{1,3} K_3}{w_{2,2}} &... & 0  \\\\
           &  & \\ddots & \\ddots & \\ddots & \\\\
-        0 & 0 & ... & -K^* & 1+2K^* & -K^* \\\\
-        0 & 0 & ... & 0 & -K^* & 1+K^* \\\\
-        \\end{array} \\right]    
-        
+        0 & 0 & ... & -\\frac{w_{1,n-2} K_{n-2}}{w_{2,n-2}}  & 1+\\frac{w_{1,n-2} K_{n-2} + w_{1,n-1} K_{n-1}}{w_{2,{n-2}}} & -\\frac{w_{1,n-1} K_{n-1}}{w_{2,{n-2}}} \\\\
+        0 & 0 & ... & 0 & -\\frac{w_{1,n-1} K_{n-1}}{w_{2,n-1}}  & 1+\\frac{w_{1,n-1} K_{n-1}}{w_{2,n-1}} \\\\
+        \\end{array} \\right] 
+
+    where 
+
+    .. math::    
+
+           \\begin{array}{lllllll}
+                K   &= [K_0,     &K_1,    &K_2,    &...,&K_{n-1},  &K_{n}] \\\\
+                w_1 &= [w_{1,0}, &w_{1,1},&w_{1,2},&...,&w_{1,n-1},&w_{1,n}] \\\\
+                w_2 &= [w_{2,0}, &w_{2,1},&w_{2,2},&...,&w_{2,n-1}]
+           \\end{array}    
     """
+    
+#           \\begin{eqnarray}
+#              y    & = & ax^2 + bx + c \\\\
+#              f(x) & = & x^2 + 2xy + y^2
+#           \\end{eqnarray}      
+    
+#    .. math::
+#    
+#        K   &= [K_0,        &K_1,        &K_2,        &...    ,    &K_{n-1},      &K_{n}] \\\\
+#        w_1 &= [w_{1,0},    &w_{1,1},    &w_{1,2},    &...    ,    &w_{1,n-1}, \\ &w_{1,n}] \\\\
+#        w_2 &= [w_{2,0}, \\ &w_{2,1}, \\ &w_{2,2}, \\ &... \\ , \\ &w_{2,n-1}]    &o \\\\
+#        
+#    """
     J = K.size - 1
     if weight1 is None:
         weight1 = np.ones_like(K)
@@ -190,6 +329,48 @@ def _make_diffusion_matrix(K, weight1=None, weight2=None):
 
 
 def _make_meridional_diffusion_matrix(K, lataxis):
+    """Calls :func:`_make_diffusion_matrix` with appropriate weights for 
+    the meridional diffusion case.
+    
+    :param array K:         dimensionless diffusivities at cell boundaries
+                            of diffusion axis ``lataxis``
+    :param axis lataxis:    latitude axis where diffusion is occuring
+
+    Weights are computed as the following:
+
+    .. math:: 
+
+        \\begin{array}{ll}
+            w_1 &= \\cos(\\textrm{bounds}) \\\\
+                &= \\left[ \\cos(b_0), \\cos(b_1), \\cos(b_2), \\ ... \\ , \\cos(b_{n-1}), \\cos(b_n) \\right] \\\\
+            w_2 &= \\cos(\\textrm{points}) \\\\
+                &= \\left[ \\cos(p_0), \\cos(p_1), \\cos(p_2), \\ ... \\ , \\cos(p_{n-1}) \\right]
+        \\end{array}
+        
+    when bounds and points from ``lataxis`` are written as
+    
+    .. math::
+
+        \\begin{array}{ll}    
+            \\textrm{bounds}   &= [b_0, b_1, b_2, \\ ... \\ , b_{n-1}, b_{n}] \\\\
+            \\textrm{points}   &= [p_0, p_1, p_2, \\ ... \\ , p_{n-1}]
+        \\end{array}
+        
+    Giving this input to :func:`_make_diffusion_matrix` results in a matrix like:
+    
+    .. math::
+        
+        \\textrm{diffTriDiag}= 
+        \\left[ \\begin{array}{cccccc}
+        1+\\frac{\\cos(b_1) K_1 }{\\cos(p_0)} & -\\frac{\\cos(b_1) K_1}{\\cos(p_0)} & 0 &  & ... & 0  \\\\
+        -\\frac{\\cos(b_1) K_1}{\\cos(p_1)} & 1+\\frac{\\cos(b_1) K_1 + \\cos(b_2) K_2}{\\cos(p_1)} & -\\frac{\\cos(b_2) K_2}{\\cos(b_1)} & 0 & ... & 0 \\\\
+        0 & -\\frac{\\cos(b_2) K_2}{\\cos(p_2)}  & 1+\\frac{\\cos(b_2) K_2 + \\cos(b_3) K_3}{\\cos(p_2)} & -\\frac{\\cos(b_3) K_3}{\\cos(p_2)} &... & 0  \\\\
+          &  & \\ddots & \\ddots & \\ddots & \\\\
+        0 & 0 & ... & -\\frac{\\cos(b_{n-2}) K_{n-2}}{\\cos(p_{n-2})}  & 1+\\frac{\\cos(b_{n-2}) K_{n-2} + \\cos(b_{n-1}) K_{n-1}}{\\cos(p_{n-2})} & -\\frac{\\cos(b_{n-1}) K_{n-1}}{\\cos(p_{n-2})} \\\\
+        0 & 0 & ... & 0 & -\\frac{\\cos(b_{n-1}) K_{n-1}}{\\cos(p_{n-1})}  & 1+\\frac{\\cos(b_{n-1}) K_{n-1}}{\\cos(p_{n-1})} \\\\
+        \\end{array} \\right] 
+
+    """       
     phi_stag = np.deg2rad(lataxis.bounds)
     phi = np.deg2rad(lataxis.points)
     weight1 = np.cos(phi_stag)
@@ -199,10 +380,21 @@ def _make_meridional_diffusion_matrix(K, lataxis):
 
 
 def _guess_diffusion_axis(process_or_domain):
-    '''Input: a process, domain or dictionary of domains.
-    If there is only one axis with length > 1 in the process or
-    set of domains, return the name of that axis.
-    Otherwise raise an error.'''
+    """Scans given process, domain or dictionary of domains for a diffusion axis
+    and returns appropriate name.
+    
+    In case only one axis with length > 1 in the process or set of domains 
+    exists, the name of that axis is returned. Otherwise an error is raised.
+    
+    :param process_or_domain:   input from where diffusion axis should be guessed
+    :type process_or_domain:    :class:`~climlab.process.process.Process`,
+                                :class:`~climlab.domain.domain._Domain` or
+                                :py:class:`dict` of domains
+    :raises: :exc:`ValueError` if more than one diffusion axis is possible.
+    :returns:                   name of the diffusion axis
+    :rtype:                     str
+    
+    """
     axes = get_axes(process_or_domain)
     diff_ax = {}
     for axname, ax in axes.iteritems():

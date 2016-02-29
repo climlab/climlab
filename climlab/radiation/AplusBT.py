@@ -34,11 +34,16 @@ class AplusBT(EnergyBudget):
     **Object attributes** \n
     
     Additional to the parent class :class:`~climlab.process.energy_budget.EnergyBudget`
-    following object attributes are generated during initialization:
+    following object attributes are generated or modified during initialization:
         
     :ivar float A:              calls the setter function of :func:`A`
     :ivar float B:              calls the setter function of :func:`B`
-    :ivar frozenset _diag_vars: extended by string ``'OLR'``
+    :ivar dict diagnostics:     key ``'OLR'`` initialized with value:
+                                :class:`~climlab.domain.field.Field` of zeros
+                                in size of ``self.Ts``
+    :ivar Field OLR:            the subprocess attribute ``self.OLR`` is
+                                created with correct dimensions
+    
 
     .. warning::
     
@@ -123,7 +128,7 @@ class AplusBT(EnergyBudget):
 
 
 class AplusBT_CO2(EnergyBudget):
-    """Linear longwave radiation module considering CO2 concentration
+    """Linear longwave radiation module considering CO2 concentration.
     
     This radiation subprocess is based in the idea to linearize the Outgoing 
     Longwave Radiation (OLR) emitted to space according to the surface temperature
@@ -161,15 +166,21 @@ class AplusBT_CO2(EnergyBudget):
     following object attributes are generated or updated during initialization:
         
     :ivar float CO2:                calls the setter function of :func:`CO2`
-    :ivar frozenset _diag_vars:     extended by string ``'OLR'``
+    :ivar dict diagnostics:         the subprocess's diagnostic dictionary 
+                                    ``self.diagnostic`` is initialized 
+                                    through calling 
+                                    ``self.init_diagnostic('OLR', 0. * self.Ts)``
+    :ivar Field OLR:                the subprocess attribute ``self.OLR`` is
+                                    created with correct dimensions
     
     """
     # implemented by m-kreuzer
     def __init__(self, CO2=300., **kwargs):
         super(AplusBT_CO2, self).__init__(**kwargs)
         self.CO2 = CO2
-        newdiags = ['OLR',]
-        self.add_diagnostics(newdiags)
+        #newdiags = ['OLR',]
+        #self.add_diagnostics(newdiags)
+        self.init_diagnostic('OLR', 0. * self.Ts)
 
     @property
     def CO2(self):
@@ -189,34 +200,41 @@ class AplusBT_CO2(EnergyBudget):
         self._CO2 = value
         self.param['CO2'] = value
 
-    def emission(self):
-        """Calculates the Outgoing Longwave Radiation (OLR) of the AplusBT_CO2
-        subprocess.
-        
-        **Object attributes** \n
-        
-        During method execution following object attribute is modified:
-        
-        :ivar float OLR:            the described formula is calculated and the
-                                    result stored in the project attribute ``self.OLR``
-        :ivar dict diagnostics:     the same result is written in ``diagnostics`` 
-                                    dictionary with the key ``'OLR'``
-        
-        .. warning::
-        
-            This method currently works only for a single state variable!
+#    def emission(self):
+#        """Calculates the Outgoing Longwave Radiation (OLR) of the AplusBT_CO2
+#        subprocess.
+#        
+#        **Object attributes** \n
+#        
+#        During method execution following object attribute is modified:
+#        
+#        :ivar float OLR:            the described formula is calculated and the
+#                                    result stored in the project attribute ``self.OLR``
+#        :ivar dict diagnostics:     the same result is written in ``diagnostics`` 
+#                                    dictionary with the key ``'OLR'``
+#        
+#        .. warning::
+#        
+#            This method currently works only for a single state variable!
+#            
+#        """
+#        l = np.log(self.CO2/300.)
+#        A = -326.400 + 9.16100*l - 3.16400*l**2 + 0.546800*l**3
+#        B =    1.953 - 0.04866*l + 0.01309*l**2 - 0.002577*l**3
+#        for varname, value in self.state.iteritems():
+#            flux = A + B * (value + const.tempCtoK)
+#            self.OLR = flux
+#            self.diagnostics['OLR'] = self.OLR
             
-        """
+    def _compute_emission(self):
         l = np.log(self.CO2/300.)
-        A = -326.400 + 9.16100*l - 3.16400*l**2 + 0.546800*l**3
-        B =    1.953 - 0.04866*l + 0.01309*l**2 - 0.002577*l**3
+        self.A = -326.400 + 9.16100*l - 3.16400*l**2 + 0.546800*l**3
+        self.B =    1.953 - 0.04866*l + 0.01309*l**2 - 0.002577*l**3        
         for varname, value in self.state.iteritems():
-            flux = A + B * (value + const.tempCtoK)
-            self.OLR = flux
-            self.diagnostics['OLR'] = self.OLR
+            self.OLR[:] = self.A + self.B * (value + const.tempCtoK)
 
     def _compute_heating_rates(self):
         """Computes energy flux convergences to get heating rates in :math:`W/m^2`."""
-        self.emission()
+        self._compute_emission()
         for varname, value in self.state.iteritems():
             self.heating_rate[varname] = -self.OLR

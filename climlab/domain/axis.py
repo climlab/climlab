@@ -11,6 +11,16 @@ axis_types = ['lev', 'lat', 'lon', 'depth', 'abstract']
 class Axis(object):
     """Creates a new climlab Axis object.
     
+    An :class:`~climlab.domain.axis.Axis` is an object where information of a
+    spacial dimension of a :class:`~climlab.domain.domain._Domain` are specified.
+
+    These include the `type` of the axis, the `number of points`, location of 
+    `points` and `bounds` on the spatial dimension, magnitude of bounds
+    differences `delta` as well as their `unit`.
+
+    The `axes` of a :class:`~climlab.domain.domain._Domain` are stored in the
+    dictionary axes, so they can be accessed through ``dom.axes`` if ``dom`` 
+    is an instance of :class:`~climlab.domain.domain._Domain`.
 
     
     **Initialization parameters** \n

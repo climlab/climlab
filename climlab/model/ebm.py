@@ -58,27 +58,34 @@ class EBM(EnergyBudget):
                                 - unit: meters                              \n
                                 - default value: ``10.0``
     :param float Tf:            freezing temperature                        \n
-                                - unit :math:`^{\circ} \\textrm{C}`                    \n
+                                - unit: :math:`^{\circ} \\textrm{C}`                    \n
                                 - default value: ``-10.0``
     :param float a0:            base value for planetary albedo parameterization
                                 :class:`~climlab.surface.albedo.StepFunctionAlbedo`
                                                                             \n
+                                - unit: dimensionless
                                 - default value: ``0.3``
     :param float a2:            parabolic value for planetary  albedo parameterization
                                 :class:`~climlab.surface.albedo.StepFunctionAlbedo`
                                                                             \n
+                                - unit: dimensionless
                                 - default value: ``0.078``
     :param float ai:            value for ice albedo paramerization in
                                 :class:`~climlab.surface.albedo.StepFunctionAlbedo`
                                                                             \n
+                                - unit: dimensionless
                                 - default value: ``0.62``
-    :param float timestep:      specifies the EBM's timestep
-    :param float T_init_0:      base value for initial temperature
-                                                                            \n
-                                - unit :math:`^{\circ} \\textrm{C}`                    \n
+    :param float timestep:      specifies the EBM's timestep                \n
+                                - unit: seconds
+                                - default value: (365.2422 * 24 * 60 * 60 ) / 90 \n
+                                  -> (90 timesteps per year)
+    :param float T0:            base value for initial temperature          \n
+                                - unit :math:`^{\circ} \\textrm{C}`         \n
                                 - default value: ``12``
-    :param float T_init_P2:     2nd Legendre polynomial value for initial temperature
-                                                                            \n
+    :param float T2:            factor for 2nd Legendre polynomial 
+                                :class:`~climlab.utils.legendre.P2` 
+                                to calculate initial temperature            \n
+                                - unit: dimensionless
                                 - default value: ``40``
     
     
@@ -107,8 +114,10 @@ class EBM(EnergyBudget):
                             methods first.
                             See also 
                             :class:`~climlab.process.time_dependent_process.TimeDependentProcess`.
-    :ivar list _diag_vars:  is updated with ``['OLR','ASR','net_radiation','icelat']``
-                            through :func:`~climlab.process.process.Process.add_diagnostics`.
+    :ivar dict diagnostics: is initialized with keys: ``'OLR'``, ``'ASR'``,
+                            ``'net_radiation'``, ``'albedo'`` and ``'icelat'``
+                            through 
+                            :func:`~climlab.process.process.Process.init_diagnostic`.
                             
     
     """
@@ -346,14 +355,14 @@ class EBM_annual(EBM_seasonal):
         
         The annual solar distribution is calculated through averaging the 
         :class:`~climlab.radiation.insolation.DailyInsolation` over time 
-        ehich has been used in used in the parent class
+        which has been used in used in the parent class
         :class:`~climlab.model.ebm.EBM_seasonal`. That is done by the subprocess
         :class:`~climlab.radiation.insolation.AnnualMeanInsolation` which is
         more realistic than the :class:`~climlab.radiation.insolation.P2Insolation`
         module used in the classical :class:`~climlab.model.ebm.EBM` class.
         
         According to the parent class :class:`~climlab.model.ebm.EBM_seasonal`
-        the model will not have an albedo feedback, if albedo ice parameter
+        the model will not have an ice-albedo feedback, if albedo ice parameter
         ``'ai'`` is not given. For details see there.
                 
         
