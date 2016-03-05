@@ -63,7 +63,7 @@ Currently, ``climlab`` has out-of-the-box support and documented examples for
 
 Example usage
 ------------------
-The directory ``climlab/courseware/`` contains a collection of IPython / Jupyter
+The directory ``climlab/courseware/`` contains a collection of Jupyter / IPython
 notebooks (*.ipynb) used for teaching some basics of climate science,
 and documenting use of the ``climlab`` package.
 These are self-describing, and should all run out-of-the-box once the package is installed, e.g:
