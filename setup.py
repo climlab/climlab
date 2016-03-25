@@ -39,6 +39,7 @@ setup(name='climlab',
       install_requires=[
           'numpy',
           'scipy',
+          'netCDF4',
       ],
       package_data={
         'climlab': ['data/cam3rad/abs_ems_factors_fastvx.c030508.nc'],

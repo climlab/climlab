@@ -1,6 +1,9 @@
 ================
 climlab
 ================
+
+|pypi| |Build Status| |coverage|
+
 ----------
  Python package for process-oriented climate modeling
 ----------
@@ -60,7 +63,7 @@ Currently, ``climlab`` has out-of-the-box support and documented examples for
 
 Example usage
 ------------------
-The directory ``climlab/courseware/`` contains a collection of IPython / Jupyter
+The directory ``climlab/courseware/`` contains a collection of Jupyter / IPython
 notebooks (*.ipynb) used for teaching some basics of climate science,
 and documenting use of the ``climlab`` package.
 These are self-describing, and should all run out-of-the-box once the package is installed, e.g:
@@ -99,3 +102,10 @@ License
 ---------------
 This code is freely available under the MIT license.
 See the accompanying LICENSE file.
+
+.. |pypi| image:: https://badge.fury.io/py/climlab.svg
+   :target: https://badge.fury.io/py/climlab
+.. |Build Status| image:: https://travis-ci.org/brian-rose/climlab.svg?branch=master
+    :target: https://travis-ci.org/brian-rose/climlab
+.. |coverage| image:: https://codecov.io/github/brian-rose/climlab/coverage.svg?branch=master
+   :target: https://codecov.io/github/brian-rose/climlab?branch=master
