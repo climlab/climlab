@@ -63,6 +63,8 @@ class CAM3Radiation(Radiation):
                  asdif=0.07,
                  aldir=0.07,
                  aldif=0.07,
+                 O3init = False,
+                 O3file = 'apeozone_cam3_5_54.nc',
                  **kwargs):
         super(CAM3Radiation, self).__init__(**kwargs)
         newinput = ['q',
@@ -151,6 +153,37 @@ class CAM3Radiation(Radiation):
         self.init_diagnostic('TdotRad', 0. * self.Tatm)
         self.init_diagnostic('TdotLW', 0. * self.Tatm)
         self.init_diagnostic('TdotSW', 0. * self.Tatm)
+
+        # automatic ozone data initialization
+        if O3init:
+            import netCDF4 as nc
+            import os
+            from scipy.interpolate import interp1d, interp2d
+            datadir = os.path.abspath(os.path.dirname(__file__) + '/../data/ozone')
+            O3filepath = os.path.join(datadir, O3file)
+            #  Open the ozone data file
+            print 'Getting ozone data from', O3filepath
+            O3data = nc.Dataset(O3filepath)
+            O3lev = O3data.variables['lev'][:]
+            O3lat = O3data.variables['lat'][:]
+            #  zonal and time average
+            O3zon = np.mean(O3data.variables['OZONE'], axis=(0,3))
+            O3global = np.average(O3zon, weights=np.cos(np.deg2rad(O3lat)), axis=1)
+            if self.O3.shape == self.lev.shape:
+                # 1D interpolation on pressure levels using global average data
+                f = interp1d(O3lev, O3global)
+                #  interpolate data to model levels
+                self.O3 = f(self.lev)
+            else:
+                #  Attempt 2D interpolation in pressure and latitude
+                f2d = interp2d(O3lat, O3lev, O3zon)
+                self.O3 = f2d(self.lat, self.lev).transpose()
+                try:
+                    f2d = interp2d(O3lat, O3lev, O3zon)
+                    self.O3 = f2d(self.lat, self.lev).transpose()
+                except:
+                    print 'Interpolation of ozone data failed.'
+                    print 'Reverting to default O3.'
 
         _cam3_interface._build_extension(self.KM, self.JM, self.IM)
         _cam3_interface._init_extension(self)
