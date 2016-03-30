@@ -27,7 +27,7 @@ class CAM3Radiation(Radiation):
             - aldir (near-infrared, direct)
             - aldif (near-infrared, diffuse)
     Input values with same dimension as Tatm:
-        - O3 (ozone in ppmv)
+        - O3 (ozone mass mixing ratio)
         - q (specific humidity in kg/kg)
         - cldf (cloud fraction, default is zero)
         - clwp (cloud liquid water path, default is zero)
@@ -40,6 +40,9 @@ class CAM3Radiation(Radiation):
         - ASRcld (shortwave cloud radiative effect, all-sky - clear-sky flux, W/m2)
         - OLR (outgoing longwave radiation, W/m2)
         - OLRcld (longwave cloud radiative effect, all-sky - clear-sky flux, W/m2)
+        - TdotRad (net radiative heating rate,  K / day)
+        - TdotLW  (longwave radiative heating rate, K / day)
+        - TdotSW  (shortwave radiative heating rate, K / day)
 
     Many other quantities are available in a slightly different format
     from the CAM3 wrapper, stored in self.Output.
@@ -145,6 +148,9 @@ class CAM3Radiation(Radiation):
         self.init_diagnostic('ASRcld', 0. * self.Ts)
         self.init_diagnostic('OLR', 0. * self.Ts)
         self.init_diagnostic('OLRcld', 0. * self.Ts)
+        self.init_diagnostic('TdotRad', 0. * self.Tatm)
+        self.init_diagnostic('TdotLW', 0. * self.Tatm)
+        self.init_diagnostic('TdotSW', 0. * self.Tatm)
 
         _cam3_interface._build_extension(self.KM, self.JM, self.IM)
         _cam3_interface._init_extension(self)
@@ -214,6 +220,11 @@ class CAM3Radiation(Radiation):
         self.OLRcld = -self._cam3_to_climlab(Output['LwToaCf'])
         self.ASR = self._cam3_to_climlab(Output['SwToa'])
         self.ASRcld = self._cam3_to_climlab(Output['SwToaCf'])
+        #  radiative heating rates in K / day
+        KperDayFactor = const.seconds_per_day / const.cp
+        self.TdotRad = self._cam3_to_climlab(Output['TdotRad']) * KperDayFactor
+        self.TdotLW = self._cam3_to_climlab(Output['lwhr']) * KperDayFactor
+        self.TdotSW = self._cam3_to_climlab(Output['swhr']) * KperDayFactor
 
 
 class CAM3Radiation_LW(CAM3Radiation):
