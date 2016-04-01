@@ -145,8 +145,14 @@ class Field(np.ndarray):
             #    dout._sharedmask = True
             #    # Note: Don't try to check for m.any(), that'll take too long
             # Update the domain information ... at least the heat capacity
-            dout.domain.heat_capacity = domain.heat_capacity[indx]
-            dout.domain.shape = dout.shape
+            if hasattr(domain, 'heat_capacity'):
+                # in some cases (but not others) we need to slice this
+                try:
+                    dout.domain.heat_capacity = domain.heat_capacity[indx]
+                except:
+                    pass  # preserve existing heat_capacity array
+            if hasattr(domain, 'shape'):
+                dout.domain.shape = dout.shape
         return dout
 
     # def __setitem__(self, indx, value):
