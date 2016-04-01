@@ -40,7 +40,9 @@ class ConvectiveAdjustment(TimeDependentProcess):
     def _compute(self):
         #lapse_rate = self.param['adj_lapse_rate']
         if self.adj_lapse_rate is None:
-            self.adjustment = self.state * 0.
+            #self.adjustment = self.state * 0.
+            self.adjustment['Ts'] = self.Ts * 0.
+            self.adjustment['Tatm'] = self.Tatm * 0.
         else:
             #  For now, let's assume that the vertical axis is the last axis
             unstable_Tatm = self.Tatm
