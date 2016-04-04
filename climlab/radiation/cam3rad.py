@@ -2,9 +2,12 @@
 climlab wrap of the CAM3 radiation code
 '''
 import numpy as np
+import netCDF4 as nc
 from climlab import constants as const
 from climlab.radiation.radiation import Radiation
 import _cam3_interface
+import os
+from scipy.interpolate import interp1d, interp2d
 
 
 class CAM3Radiation(Radiation):
@@ -65,6 +68,7 @@ class CAM3Radiation(Radiation):
                  aldif=0.07,
                  O3init = False,
                  O3file = 'apeozone_cam3_5_54.nc',
+                 extname='_cam3_radiation',
                  **kwargs):
         super(CAM3Radiation, self).__init__(**kwargs)
         newinput = ['q',
@@ -156,9 +160,6 @@ class CAM3Radiation(Radiation):
 
         # automatic ozone data initialization
         if O3init:
-            import netCDF4 as nc
-            import os
-            from scipy.interpolate import interp1d, interp2d
             datadir = os.path.abspath(os.path.dirname(__file__) + '/../data/ozone')
             O3filepath = os.path.join(datadir, O3file)
             #  Open the ozone data file
@@ -185,8 +186,12 @@ class CAM3Radiation(Radiation):
                     print 'Interpolation of ozone data failed.'
                     print 'Reverting to default O3.'
 
-        _cam3_interface._build_extension(self.KM, self.JM, self.IM)
-        _cam3_interface._init_extension(self)
+        #  Check to see if an extension object already exists.
+        #  Might need to change the name
+        extname = _cam3_interface._modify_extname(extname)
+        _cam3_interface._build_extension(KM=self.KM, JM=self.JM, IM=self.IM,
+            extname=extname)
+        _cam3_interface._init_extension(module=self, extname=extname)
 
     def _climlab_to_cam3(self, field):
         '''Prepare field wit proper dimension order.
