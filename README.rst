@@ -2,7 +2,7 @@
 climlab
 ================
 
-|pypi| |Build Status| |coverage|
+|pypi| |Build Status| |coverage| |DOI|
 
 ----------
  Python package for process-oriented climate modeling
@@ -109,3 +109,5 @@ See the accompanying LICENSE file.
     :target: https://travis-ci.org/brian-rose/climlab
 .. |coverage| image:: https://codecov.io/github/brian-rose/climlab/coverage.svg?branch=master
    :target: https://codecov.io/github/brian-rose/climlab?branch=master
+.. |DOI| image:: https://zenodo.org/badge/doi/10.5281/zenodo.48984.svg
+   :target: http://dx.doi.org/10.5281/zenodo.48984
