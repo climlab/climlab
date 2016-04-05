@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>climlab.radiation.water_vapor &mdash; climlab-0.2.13 0.2.13 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.2.13',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="climlab-0.2.13 0.2.13 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for climlab.radiation.water_vapor</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">climlab.process.diagnostic</span> <span class="kn">import</span> <span class="n">DiagnosticProcess</span>
+<span class="kn">from</span> <span class="nn">climlab</span> <span class="kn">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">const</span>
+<span class="kn">from</span> <span class="nn">climlab.utils.thermo</span> <span class="kn">import</span> <span class="n">clausius_clapeyron</span>
+
+
+<div class="viewcode-block" id="FixedRelativeHumidity"><a class="viewcode-back" href="../../../climlab.radiation.html#climlab.radiation.water_vapor.FixedRelativeHumidity">[docs]</a><span class="k">class</span> <span class="nc">FixedRelativeHumidity</span><span class="p">(</span><span class="n">DiagnosticProcess</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">relative_humidity</span><span class="o">=</span><span class="mf">0.77</span><span class="p">,</span> <span class="n">qStrat</span><span class="o">=</span><span class="mf">5.E-6</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Compute water vapor mixing ratio profile</span>
+<span class="sd">        Assuming constant relative humidity.</span>
+
+<span class="sd">        relative_humidity is the specified RH.</span>
+<span class="sd">        Same value is applied everywhere.</span>
+<span class="sd">        qStrat is the minimum specific humidity, ensuring that there is</span>
+<span class="sd">        some water vapor in the stratosphere.</span>
+
+<span class="sd">        The attribute RH_profile can be modified to set different</span>
+<span class="sd">        vertical profiles of relative humidity</span>
+<span class="sd">        (see daughter class ManabeWaterVapor() ).&#39;&#39;&#39;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FixedRelativeHumidity</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">newinput</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;relative_humidity&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;qStrat&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;RH_profile&#39;</span><span class="p">,]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_input</span><span class="p">(</span><span class="n">newinput</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">relative_humidity</span> <span class="o">=</span> <span class="n">relative_humidity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">qStrat</span> <span class="o">=</span> <span class="n">qStrat</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">RH_profile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">relative_humidity</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Tatm</span><span class="p">)</span>
+        <span class="n">newdiags</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;q&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_diagnostics</span><span class="p">(</span><span class="n">newdiags</span><span class="p">)</span>
+        <span class="c">#  go ahead and set the initial q based on initial temperature</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Tatm</span> <span class="o">*</span> <span class="mf">0.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_compute</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_compute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">es</span> <span class="o">=</span> <span class="n">clausius_clapeyron</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Tatm</span><span class="p">)</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">RH_profile</span> <span class="o">*</span> <span class="n">es</span>
+        <span class="c"># convert to specific humidity (assume dilute)</span>
+        <span class="n">qH2O</span> <span class="o">=</span> <span class="n">e</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">lev</span> <span class="o">*</span> <span class="n">const</span><span class="o">.</span><span class="n">Rd</span> <span class="o">/</span> <span class="n">const</span><span class="o">.</span><span class="n">Rv</span>
+        <span class="c">#  mixing ratio can&#39;t be smaller than qStrat</span>
+        <span class="c">#  (need some water in the stratosphere!)</span>
+        <span class="n">q</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">qStrat</span><span class="p">,</span> <span class="n">qH2O</span><span class="p">)</span>
+        <span class="c">#  Just set this directly here</span>
+        <span class="n">q_adjustment</span> <span class="o">=</span> <span class="n">q</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">q</span> <span class="o">+=</span> <span class="n">q_adjustment</span>
+        <span class="k">return</span> <span class="p">{}</span>
+
+
+</div>
+<div class="viewcode-block" id="ManabeWaterVapor"><a class="viewcode-back" href="../../../climlab.radiation.html#climlab.radiation.water_vapor.ManabeWaterVapor">[docs]</a><span class="k">class</span> <span class="nc">ManabeWaterVapor</span><span class="p">(</span><span class="n">FixedRelativeHumidity</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Compute water vapor mixing ratio profile following</span>
+<span class="sd">        Manabe and Wetherald JAS 1967</span>
+<span class="sd">        Fixed surface relative humidity and a specified fractional profile.</span>
+
+<span class="sd">        relative_humidity is the specified surface RH</span>
+<span class="sd">        qStrat is the minimum specific humidity, ensuring that there is</span>
+<span class="sd">        some water vapor in the stratosphere.&#39;&#39;&#39;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ManabeWaterVapor</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lev</span>
+        <span class="n">Q</span> <span class="o">=</span> <span class="n">p</span> <span class="o">/</span> <span class="n">const</span><span class="o">.</span><span class="n">ps</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">RH_profile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">relative_humidity</span> <span class="o">*</span> <span class="p">((</span><span class="n">Q</span> <span class="o">-</span> <span class="mf">0.02</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="mf">0.02</span><span class="p">))</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

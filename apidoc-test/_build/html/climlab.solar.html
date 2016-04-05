@@ -1,0 +1,283 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>climlab.solar package &mdash; climlab-0.2.13 0.2.13 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2.13',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="climlab-0.2.13 0.2.13 documentation" href="index.html" />
+    <link rel="up" title="climlab package" href="climlab.html" />
+    <link rel="next" title="climlab.surface package" href="climlab.surface.html" />
+    <link rel="prev" title="climlab.radiation package" href="climlab.radiation.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="climlab-solar-package">
+<h1>climlab.solar package<a class="headerlink" href="#climlab-solar-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-climlab.solar.insolation">
+<span id="climlab-solar-insolation-module"></span><h2>climlab.solar.insolation module<a class="headerlink" href="#module-climlab.solar.insolation" title="Permalink to this headline">¶</a></h2>
+<p>insolation.py</p>
+<p>This module contains general-purpose routines for computing incoming
+solar radiation at the top of the atmosphere.</p>
+<p>Currently, only daily average insolation is computed.</p>
+<p>Ported and modified from MATLAB code daily_insolation.m
+Original authors:</p>
+<blockquote>
+<div>Ian Eisenman and Peter Huybers, Harvard University, August 2006</div></blockquote>
+<p>Available online at <a class="reference external" href="http://eisenman.ucsd.edu/code/daily_insolation.m">http://eisenman.ucsd.edu/code/daily_insolation.m</a></p>
+<p>If using calendar days, solar longitude is found using an
+approximate solution to the differential equation representing conservation
+of angular momentum (Kepler&#8217;s Second Law).  Given the orbital parameters
+and solar longitude, daily average insolation is calculated exactly
+following Berger 1978.</p>
+<p>References:
+Berger A. and Loutre M.F. (1991). Insolation values for the climate of</p>
+<blockquote>
+<div>the last 10 million years. Quaternary Science Reviews, 10(4), 297-317.</div></blockquote>
+<dl class="docutils">
+<dt>Berger A. (1978). Long-term variations of daily insolation and</dt>
+<dd>Quaternary climatic changes. Journal of Atmospheric Science, 35(12),
+2362-2367.</dd>
+</dl>
+<dl class="function">
+<dt id="climlab.solar.insolation.daily_insolation">
+<code class="descclassname">climlab.solar.insolation.</code><code class="descname">daily_insolation</code><span class="sig-paren">(</span><em>lat</em>, <em>day</em>, <em>orb={'long_peri': 281.37</em>, <em>'ecc': 0.017236</em>, <em>'obliquity': 23.446}</em>, <em>S0=None</em>, <em>day_type=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/solar/insolation.html#daily_insolation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.solar.insolation.daily_insolation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute daily average insolation given latitude, time of year and orbital parameters.</p>
+<p>Orbital parameters can be computed for any time in the last 5 Myears with
+ecc,long_peri,obliquity = orbital.lookup_parameters(kyears)</p>
+<p>Inputs:
+lat:      Latitude in degrees (-90 to 90).
+day:      Indicator of time of year, by default day 1 is Jan 1.
+orb:    a dictionary with three members (as provided by orbital.py)</p>
+<blockquote>
+<div>ecc:      eccentricity (dimensionless)
+long_peri:    longitude of perihelion (precession angle) (degrees)
+obliquity:  obliquity angle (degrees)</div></blockquote>
+<p>S0:       Solar constant in W/m^2, will try to read from constants.py
+day_type: Convention for specifying time of year (+/- 1,2) [optional].</p>
+<blockquote>
+<div>day_type=1 (default): day input is calendar day (1-365.24), where day 1
+is January first.  The calendar is referenced to the vernal equinox
+which always occurs at day 80.
+day_type=2: day input is solar longitude (0-360 degrees). Solar
+longitude is the angle of the Earth&#8217;s orbit measured from spring
+equinox (21 March). Note that calendar days and solar longitude are
+not linearly related because, by Kepler&#8217;s Second Law, Earth&#8217;s
+angular velocity varies according to its distance from the sun.</div></blockquote>
+<p>Default values for orbital parameters are present-day</p>
+<p>Output:
+Fsw = Daily average solar radiation in W/m^2.</p>
+<p>Dimensions of output are (lat.size, day.size, ecc.size)</p>
+<p>Code is fully vectorized to handle array input for all arguments.
+Orbital arguments should all have the same sizes.
+This is automatic if computed from orbital.OrbitalTable.lookup_parameters()</p>
+<dl class="docutils">
+<dt>e.g. to compute the timeseries of insolation at 65N at summer solstice over the past 5 Myears</dt>
+<dd>from climlab.orbital import OrbitalTable
+table = OrbitalTable()
+years = np.linspace(0, 5000, 5001)
+orb = table.lookup_parameters( years )
+S65 = orbital.daily_insolation( 65, 172, orb )</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="climlab.solar.insolation.solar_longitude">
+<code class="descclassname">climlab.solar.insolation.</code><code class="descname">solar_longitude</code><span class="sig-paren">(</span><em>day</em>, <em>orb={'long_peri': 281.37</em>, <em>'ecc': 0.017236</em>, <em>'obliquity': 23.446}</em>, <em>days_per_year=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/solar/insolation.html#solar_longitude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.solar.insolation.solar_longitude" title="Permalink to this definition">¶</a></dt>
+<dd><p>Estimate solar longitude (lambda = 0 at spring equinox) from calendar day 
+using an approximation from Berger 1978 section 3.</p>
+<p>Works for both scalar and vector orbital parameters.</p>
+<p>Reads the length of the year from constants.py if available.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-climlab.solar.orbital">
+<span id="climlab-solar-orbital-module"></span><h2>climlab.solar.orbital module<a class="headerlink" href="#module-climlab.solar.orbital" title="Permalink to this headline">¶</a></h2>
+<p>orbital.py</p>
+<p>This module defines the class OrbitalTable which holds orbital data,
+and includes a method lookup_parameters() 
+which interpolates the orbital data for a specific year
+(works equally well for arrays of years)</p>
+<p>The base class OrbitalTable() is designed to work with 5 Myears of orbital data
+(eccentricity, obliquity, and longitude of perihelion) 
+from Berger and Loutre (1991).</p>
+<p>Data will be read from the file orbit91, which was originally obtained from
+<a class="reference external" href="ftp://ftp.ncdc.noaa.gov/pub/data/paleo/insolation/">ftp://ftp.ncdc.noaa.gov/pub/data/paleo/insolation/</a>
+If the file isn&#8217;t found locally, the module will attempt to read it remotely
+from the above URL.</p>
+<p>A subclass LongOrbitalTable() works with La2004 orbital data for -51 to +21 Myears
+as calculated by Laskar et al. (2004)
+<a class="reference external" href="http://www.imcce.fr/Equipes/ASD/insola/earth/La2004/README.TXT">http://www.imcce.fr/Equipes/ASD/insola/earth/La2004/README.TXT</a></p>
+<p>References: 
+Berger A. and Loutre M.F. (1991). Insolation values for the climate of</p>
+<blockquote>
+<div>the last 10 million years. Quaternary Science Reviews, 10(4), 297-317.</div></blockquote>
+<dl class="docutils">
+<dt>Berger A. (1978). Long-term variations of daily insolation and</dt>
+<dd>Quaternary climatic changes. Journal of Atmospheric Science, 35(12),
+2362-2367.</dd>
+</dl>
+<dl class="class">
+<dt id="climlab.solar.orbital.LongOrbitalTable">
+<em class="property">class </em><code class="descclassname">climlab.solar.orbital.</code><code class="descname">LongOrbitalTable</code><a class="reference internal" href="_modules/climlab/solar/orbital.html#LongOrbitalTable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.solar.orbital.LongOrbitalTable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#climlab.solar.orbital.OrbitalTable" title="climlab.solar.orbital.OrbitalTable"><code class="xref py py-class docutils literal"><span class="pre">climlab.solar.orbital.OrbitalTable</span></code></a></p>
+<p>Invoking LongOrbitalTable() will load orbital parameter tables for -51 to +21 Myears
+as calculated by Laskar et al. 2004
+<a class="reference external" href="http://www.imcce.fr/Equipes/ASD/insola/earth/La2004/README.TXT">http://www.imcce.fr/Equipes/ASD/insola/earth/La2004/README.TXT</a></p>
+<p>Usage is identical to parent class OrbitalTable().</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="climlab.solar.orbital.OrbitalTable">
+<em class="property">class </em><code class="descclassname">climlab.solar.orbital.</code><code class="descname">OrbitalTable</code><a class="reference internal" href="_modules/climlab/solar/orbital.html#OrbitalTable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.solar.orbital.OrbitalTable" title="Permalink to this definition">¶</a></dt>
+<dd><p>Invoking OrbitalTable() will load 5 million years of orbital data
+(from Berger and Loutre 1991) and compute linear interpolants.
+The data can be accessed through the method 
+OrbitalTable.lookup_parameters(kyear).</p>
+<dl class="method">
+<dt id="climlab.solar.orbital.OrbitalTable.lookup_parameters">
+<code class="descname">lookup_parameters</code><span class="sig-paren">(</span><em>kyear=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/solar/orbital.html#OrbitalTable.lookup_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.solar.orbital.OrbitalTable.lookup_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Look up orbital parameters for given kyear measured from present.
+Input kyear is thousands of years after present.
+For years before present, use kyear &lt; 0.</p>
+<p>Will handle scalar or vector input (for multiple years).</p>
+<dl class="docutils">
+<dt>Returns a three-member dictionary of orbital parameters: </dt>
+<dd>ecc = eccentricity (dimensionless)
+long_peri = longitude of perihelion relative to vernal equinox (degrees)
+obliquity = obliquity angle or axial tilt (degrees).</dd>
+</dl>
+<p>Each member is an array of same size as kyear.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-climlab.solar.orbital_cycles">
+<span id="climlab-solar-orbital-cycles-module"></span><h2>climlab.solar.orbital_cycles module<a class="headerlink" href="#module-climlab.solar.orbital_cycles" title="Permalink to this headline">¶</a></h2>
+<p>Module for setting up long integrations of climlab processes
+over orbital cycles</p>
+<p>example usage:</p>
+<p>from climlab.model.ebm import EBM_seasonal
+from climlab.solar.orbital_cycles import OrbitalCycles
+from climlab.surface.albedo import StepFunctionAlbedo
+ebm = EBM_seasonal()
+print ebm
+#  add an albedo feedback
+albedo = StepFunctionAlbedo(state=ebm.state, <a href="#id1"><span class="problematic" id="id2">**</span></a>ebm.param)
+ebm.add_subprocess(&#8216;albedo&#8217;, albedo)
+#  start the integration
+#  run for 10,000 orbital years, but only 1,000 model years
+experiment = OrbitalCycles(ebm, kyear_start=-20,</p>
+<blockquote>
+<div>kyear_stop=-10, orbital_year_factor=10.)</div></blockquote>
+<dl class="class">
+<dt id="climlab.solar.orbital_cycles.OrbitalCycles">
+<em class="property">class </em><code class="descclassname">climlab.solar.orbital_cycles.</code><code class="descname">OrbitalCycles</code><span class="sig-paren">(</span><em>model</em>, <em>kyear_start=-20.0</em>, <em>kyear_stop=0.0</em>, <em>segment_length_years=100.0</em>, <em>orbital_year_factor=1.0</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/solar/orbital_cycles.html#OrbitalCycles"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.solar.orbital_cycles.OrbitalCycles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-climlab.solar">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-climlab.solar" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">climlab.solar package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-climlab.solar.insolation">climlab.solar.insolation module</a></li>
+<li><a class="reference internal" href="#module-climlab.solar.orbital">climlab.solar.orbital module</a></li>
+<li><a class="reference internal" href="#module-climlab.solar.orbital_cycles">climlab.solar.orbital_cycles module</a></li>
+<li><a class="reference internal" href="#module-climlab.solar">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="climlab.html">climlab package</a><ul>
+      <li>Previous: <a href="climlab.radiation.html" title="previous chapter">climlab.radiation package</a></li>
+      <li>Next: <a href="climlab.surface.html" title="next chapter">climlab.surface package</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/climlab.solar.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+      |
+      <a href="_sources/climlab.solar.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

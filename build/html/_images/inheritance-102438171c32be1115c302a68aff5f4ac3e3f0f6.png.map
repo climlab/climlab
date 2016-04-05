@@ -1,0 +1,4 @@
+<map id="inheritance03cf696ba4" name="inheritance03cf696ba4">
+<area shape="rect" id="node1" href="#climlab.solar.orbital.LongOrbitalTable" title="Loads orbital parameter tables for &#45;51 to +21 Myears." alt="" coords="187,5,365,35"/>
+<area shape="rect" id="node2" href="#climlab.solar.orbital.OrbitalTable" title="Invoking OrbitalTable() will load 5 million years of orbital data" alt="" coords="6,5,138,35"/>
+</map>

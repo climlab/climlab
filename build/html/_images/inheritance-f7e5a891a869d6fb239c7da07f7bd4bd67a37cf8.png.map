@@ -1,0 +1,6 @@
+<map id="inheritanceb2bf61e8fc" name="inheritanceb2bf61e8fc">
+<area shape="rect" id="node1" href="climlab.model.html#climlab.model.ebm.EBM" target="_top" title="A parent class for all Energy&#45;Balance&#45;Model classes." alt="" coords="1042,3,1147,32"/>
+<area shape="rect" id="node2" href="climlab.process.html#climlab.process.energy_budget.EnergyBudget" target="_top" title="A parent class for explicit energy budget processes." alt="" coords="710,3,1004,32"/>
+<area shape="rect" id="node3" href="climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess" target="_top" title="A generic parent class for all time&#45;dependent processes." alt="" coords="205,3,672,32"/>
+<area shape="rect" id="node4" href="climlab.process.html#climlab.process.process.Process" target="_top" title="A generic parent class for all climlab process objects." alt="" coords="5,3,166,32"/>
+</map>

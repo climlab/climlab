@@ -1,0 +1,538 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>climlab.model.ebm &mdash; climlab-0.2.13 0.2.13 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.2.13',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="climlab-0.2.13 0.2.13 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for climlab.model.ebm</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;ebm.py</span>
+
+<span class="sd">Object-oriented code for diffusive energy balance models</span>
+
+<span class="sd">Code developed by Brian Rose, University at Albany</span>
+<span class="sd">brose@albany.edu</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">climlab</span> <span class="kn">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">const</span>
+<span class="kn">from</span> <span class="nn">climlab.domain.field</span> <span class="kn">import</span> <span class="n">Field</span><span class="p">,</span> <span class="n">global_mean</span>
+<span class="kn">from</span> <span class="nn">climlab.process.energy_budget</span> <span class="kn">import</span> <span class="n">EnergyBudget</span>
+<span class="kn">from</span> <span class="nn">climlab.utils</span> <span class="kn">import</span> <span class="n">legendre</span>
+<span class="kn">from</span> <span class="nn">climlab.domain</span> <span class="kn">import</span> <span class="n">domain</span>
+<span class="kn">from</span> <span class="nn">climlab.radiation.AplusBT</span> <span class="kn">import</span> <span class="n">AplusBT</span>
+<span class="kn">from</span> <span class="nn">climlab.radiation.insolation</span> <span class="kn">import</span> <span class="n">P2Insolation</span><span class="p">,</span> <span class="n">AnnualMeanInsolation</span><span class="p">,</span> <span class="n">DailyInsolation</span>
+<span class="kn">from</span> <span class="nn">climlab.surface</span> <span class="kn">import</span> <span class="n">albedo</span>
+<span class="kn">from</span> <span class="nn">climlab.dynamics.diffusion</span> <span class="kn">import</span> <span class="n">MeridionalDiffusion</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">integrate</span>
+
+
+<div class="viewcode-block" id="EBM"><a class="viewcode-back" href="../../../climlab.model.html#climlab.model.ebm.EBM">[docs]</a><span class="k">class</span> <span class="nc">EBM</span><span class="p">(</span><span class="n">EnergyBudget</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">num_lat</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>
+                 <span class="n">S0</span><span class="o">=</span><span class="n">const</span><span class="o">.</span><span class="n">S0</span><span class="p">,</span>
+                 <span class="n">A</span><span class="o">=</span><span class="mf">210.</span><span class="p">,</span>
+                 <span class="n">B</span><span class="o">=</span><span class="mf">2.</span><span class="p">,</span>
+                 <span class="n">D</span><span class="o">=</span><span class="mf">0.555</span><span class="p">,</span>  <span class="c"># in W / m^2 / degC, same as B</span>
+                 <span class="n">water_depth</span><span class="o">=</span><span class="mf">10.0</span><span class="p">,</span>
+                 <span class="n">Tf</span><span class="o">=-</span><span class="mf">10.</span><span class="p">,</span>
+                 <span class="n">a0</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+                 <span class="n">a2</span><span class="o">=</span><span class="mf">0.078</span><span class="p">,</span>
+                 <span class="n">ai</span><span class="o">=</span><span class="mf">0.62</span><span class="p">,</span>
+                 <span class="n">timestep</span><span class="o">=</span><span class="n">const</span><span class="o">.</span><span class="n">seconds_per_year</span><span class="o">/</span><span class="mf">90.</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">EBM</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">timestep</span><span class="o">=</span><span class="n">timestep</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">:</span>  <span class="c"># no state vars or domains yet</span>
+            <span class="n">sfc</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">zonal_mean_surface</span><span class="p">(</span><span class="n">num_lat</span><span class="o">=</span><span class="n">num_lat</span><span class="p">,</span>
+                                            <span class="n">water_depth</span><span class="o">=</span><span class="n">water_depth</span><span class="p">)</span>
+            <span class="n">lat</span> <span class="o">=</span> <span class="n">sfc</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="s">&#39;lat&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">points</span>
+            <span class="n">initial</span> <span class="o">=</span> <span class="mf">12.</span> <span class="o">-</span> <span class="mf">40.</span> <span class="o">*</span> <span class="n">legendre</span><span class="o">.</span><span class="n">P2</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">lat</span><span class="p">)))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="s">&#39;Ts&#39;</span><span class="p">,</span> <span class="n">Field</span><span class="p">(</span><span class="n">initial</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">sfc</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">[</span><span class="s">&#39;S0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">S0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">[</span><span class="s">&#39;A&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">A</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">[</span><span class="s">&#39;B&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">B</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">[</span><span class="s">&#39;D&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">D</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">[</span><span class="s">&#39;Tf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Tf</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">[</span><span class="s">&#39;water_depth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">water_depth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">[</span><span class="s">&#39;a0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">a0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">[</span><span class="s">&#39;a2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">a2</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">[</span><span class="s">&#39;ai&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ai</span>
+        <span class="c"># create sub-models</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_subprocess</span><span class="p">(</span><span class="s">&#39;LW&#39;</span><span class="p">,</span> <span class="n">AplusBT</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_subprocess</span><span class="p">(</span><span class="s">&#39;insolation&#39;</span><span class="p">,</span>
+                            <span class="n">P2Insolation</span><span class="p">(</span><span class="n">domains</span><span class="o">=</span><span class="n">sfc</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_subprocess</span><span class="p">(</span><span class="s">&#39;albedo&#39;</span><span class="p">,</span>
+                            <span class="n">albedo</span><span class="o">.</span><span class="n">StepFunctionAlbedo</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span>
+                                                      <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">))</span>
+        <span class="c"># diffusivity in units of 1/s</span>
+        <span class="n">K</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">[</span><span class="s">&#39;D&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="s">&#39;Ts&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">heat_capacity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_subprocess</span><span class="p">(</span><span class="s">&#39;diffusion&#39;</span><span class="p">,</span> <span class="n">MeridionalDiffusion</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span>
+                                                             <span class="n">K</span><span class="o">=</span><span class="n">K</span><span class="p">,</span>
+                                                             <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">topdown</span> <span class="o">=</span> <span class="bp">False</span>  <span class="c"># call subprocess compute methods first</span>
+        <span class="n">newdiags</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;OLR&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;ASR&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;net_radiation&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;icelat&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_diagnostics</span><span class="p">(</span><span class="n">newdiags</span><span class="p">)</span>
+
+
+    <span class="k">def</span> <span class="nf">_compute_heating_rates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Compute energy flux convergences to get heating rates in W / m**2&#39;&#39;&#39;</span>
+        <span class="n">insolation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subprocess</span><span class="p">[</span><span class="s">&#39;insolation&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">insolation</span>
+        <span class="n">albedo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subprocess</span><span class="p">[</span><span class="s">&#39;albedo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">albedo</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ASR</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">albedo</span><span class="p">)</span> <span class="o">*</span> <span class="n">insolation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">OLR</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subprocess</span><span class="p">[</span><span class="s">&#39;LW&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">OLR</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">net_radiation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ASR</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">OLR</span>
+        <span class="c">#  The part of the heating due just to shortwave</span>
+        <span class="c">#  (longwave part is computed in subprocess)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">heating_rate</span><span class="p">[</span><span class="s">&#39;Ts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ASR</span>
+        <span class="c"># useful diagnostics</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">icelat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">subprocess</span><span class="p">[</span><span class="s">&#39;albedo&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">subprocess</span><span class="p">[</span><span class="s">&#39;iceline&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">icelat</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+<div class="viewcode-block" id="EBM.global_mean_temperature"><a class="viewcode-back" href="../../../climlab.model.html#climlab.model.ebm.EBM.global_mean_temperature">[docs]</a>    <span class="k">def</span> <span class="nf">global_mean_temperature</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Convenience method to compute global mean surface temperature.&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="n">global_mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Ts</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="EBM.inferred_heat_transport"><a class="viewcode-back" href="../../../climlab.model.html#climlab.model.ebm.EBM.inferred_heat_transport">[docs]</a>    <span class="k">def</span> <span class="nf">inferred_heat_transport</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Returns the inferred heat transport (in PW)</span>
+<span class="sd">        by integrating the TOA energy imbalance from pole to pole.&#39;&#39;&#39;</span>
+        <span class="n">phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lat</span><span class="p">)</span>
+        <span class="n">energy_in</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">net_radiation</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mf">1E-15</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">const</span><span class="o">.</span><span class="n">a</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span>
+                <span class="n">integrate</span><span class="o">.</span><span class="n">cumtrapz</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="o">*</span><span class="n">energy_in</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">phi</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="mf">0.</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="EBM.heat_transport"><a class="viewcode-back" href="../../../climlab.model.html#climlab.model.ebm.EBM.heat_transport">[docs]</a>    <span class="k">def</span> <span class="nf">heat_transport</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Returns instantaneous heat transport in units on PW,</span>
+<span class="sd">        on the staggered grid.&#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">diffusive_heat_transport</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="EBM.diffusive_heat_transport"><a class="viewcode-back" href="../../../climlab.model.html#climlab.model.ebm.EBM.diffusive_heat_transport">[docs]</a>    <span class="k">def</span> <span class="nf">diffusive_heat_transport</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Compute instantaneous diffusive heat transport in units of PW</span>
+<span class="sd">        on the staggered grid.&#39;&#39;&#39;</span>
+        <span class="n">phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lat</span><span class="p">)</span>
+        <span class="n">phi_stag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lat_bounds</span><span class="p">)</span>
+        <span class="n">D</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">[</span><span class="s">&#39;D&#39;</span><span class="p">]</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Ts</span><span class="p">)</span>
+        <span class="n">dTdphi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+        <span class="n">dTdphi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dTdphi</span><span class="p">,</span> <span class="mf">0.</span><span class="p">)</span>
+        <span class="n">dTdphi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">dTdphi</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mf">1E-15</span><span class="o">*-</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi_stag</span><span class="p">)</span><span class="o">*</span><span class="n">const</span><span class="o">.</span><span class="n">a</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">D</span><span class="o">*</span><span class="n">dTdphi</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="EBM.heat_transport_convergence"><a class="viewcode-back" href="../../../climlab.model.html#climlab.model.ebm.EBM.heat_transport_convergence">[docs]</a>    <span class="k">def</span> <span class="nf">heat_transport_convergence</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Returns instantaneous convergence of heat transport</span>
+<span class="sd">        in units of W / m^2.&#39;&#39;&#39;</span>
+        <span class="n">phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lat</span><span class="p">)</span>
+        <span class="n">phi_stag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lat_bounds</span><span class="p">)</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="mf">1.E15</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">heat_transport</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">(</span><span class="o">-</span><span class="mf">1.</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">const</span><span class="o">.</span><span class="n">a</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">))</span> <span class="o">*</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">H</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">phi_stag</span><span class="p">))</span>
+
+</div></div>
+<div class="viewcode-block" id="EBM_seasonal"><a class="viewcode-back" href="../../../climlab.model.html#climlab.model.ebm.EBM_seasonal">[docs]</a><span class="k">class</span> <span class="nc">EBM_seasonal</span><span class="p">(</span><span class="n">EBM</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a0</span><span class="o">=</span><span class="mf">0.33</span><span class="p">,</span> <span class="n">a2</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">ai</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;This EBM uses realistic daily insolation.</span>
+<span class="sd">        If ai is not given, the model will not have an albedo feedback.&#39;&#39;&#39;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">EBM_seasonal</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">a0</span><span class="o">=</span><span class="n">a0</span><span class="p">,</span> <span class="n">a2</span><span class="o">=</span><span class="n">a2</span><span class="p">,</span> <span class="n">ai</span><span class="o">=</span><span class="n">ai</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">sfc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="s">&#39;Ts&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_subprocess</span><span class="p">(</span><span class="s">&#39;insolation&#39;</span><span class="p">,</span>
+                            <span class="n">DailyInsolation</span><span class="p">(</span><span class="n">domains</span><span class="o">=</span><span class="n">sfc</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">[</span><span class="s">&#39;a0&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">a0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">[</span><span class="s">&#39;a2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">a2</span>
+        <span class="k">if</span> <span class="n">ai</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="c"># No albedo feedback</span>
+            <span class="c"># Remove unused parameters here for clarity</span>
+            <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&#39;ai&#39;</span><span class="p">)</span>
+            <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">&#39;Tf&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_subprocess</span><span class="p">(</span><span class="s">&#39;albedo&#39;</span><span class="p">,</span>
+                            <span class="n">albedo</span><span class="o">.</span><span class="n">P2Albedo</span><span class="p">(</span><span class="n">domains</span><span class="o">=</span><span class="n">sfc</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">[</span><span class="s">&#39;ai&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ai</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_subprocess</span><span class="p">(</span><span class="s">&#39;albedo&#39;</span><span class="p">,</span>
+                    <span class="n">albedo</span><span class="o">.</span><span class="n">StepFunctionAlbedo</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">))</span>
+
+</div>
+<div class="viewcode-block" id="EBM_annual"><a class="viewcode-back" href="../../../climlab.model.html#climlab.model.ebm.EBM_annual">[docs]</a><span class="k">class</span> <span class="nc">EBM_annual</span><span class="p">(</span><span class="n">EBM_seasonal</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;This EBM uses realistic daily insolation.</span>
+<span class="sd">        If ai is not given, the model will not have an albedo feedback.&#39;&#39;&#39;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">EBM_annual</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">sfc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="s">&#39;Ts&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_subprocess</span><span class="p">(</span><span class="s">&#39;insolation&#39;</span><span class="p">,</span>
+                            <span class="n">AnnualMeanInsolation</span><span class="p">(</span><span class="n">domains</span><span class="o">=</span><span class="n">sfc</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">))</span>
+
+<span class="c"># an EBM that computes degree-days has an additional state variable.</span>
+<span class="c">#  Need to implement that</span>
+<span class="c">#  could make a good working example to document creating a new model class</span>
+
+
+
+
+<span class="c">#==============================================================================</span>
+<span class="c">#</span>
+<span class="c"># class _EBM(TimeDependentProcess):</span>
+<span class="c">#     def __init__(self, num_points=90, K=0.555, **kwargs):</span>
+<span class="c">#         # first create the model domains</span>
+<span class="c">#         doms = domain.zonal_mean_surface(num_points=num_points)</span>
+<span class="c">#         # initial surface temperature</span>
+<span class="c">#         lat = doms[&#39;sfc&#39;].grid[&#39;lat&#39;].points</span>
+<span class="c">#         initial = {}</span>
+<span class="c">#         initial[&#39;Ts&#39;] = 12. - 40. * legendre.P2(np.sin(np.deg2rad(lat)))</span>
+<span class="c">#          #  Create process data structures</span>
+<span class="c">#         super(_EBM, self).__init__(domains=doms, state=initial, **kwargs)</span>
+<span class="c">#         #  first set all parameters to sensible default values</span>
+<span class="c">#         #self.num_points = num_points</span>
+<span class="c">#         # self.K = 2.2E6  # in m^2 / s</span>
+<span class="c">#         self.K = 0.555  # in W / m^2 / degC, same as B</span>
+<span class="c">#         self.A = 210.</span>
+<span class="c">#         self.B = 2.</span>
+<span class="c">#         # self.water_depth =  10.0</span>
+<span class="c">#         self.Tf = 0.0</span>
+<span class="c">#         self.S0 = const.S0</span>
+<span class="c">#         self.make_grid()</span>
+<span class="c">#         # self.albedo_noice = 0.303 + 0.0779 * P2( np.sin( self.phi ) )</span>
+<span class="c">#         self.albedo_noice = 0.33 + 0.25 * legendre.P2(np.sin(self.phi))</span>
+<span class="c">#         # self.albedo_ice = 0.62 * np.ones_like( self.phi )</span>
+<span class="c">#         self.albedo_ice = self.albedo_noice  # default to no albedo feedback</span>
+<span class="c">#         self.T = 12. - 40. * legendre.P2(np.sin(self.phi))</span>
+<span class="c">#         #  A dictionary of the model state variables</span>
+<span class="c">#         self.state = {&#39;T&#39;: self.T}</span>
+<span class="c">#         self.positive_degree_days = np.zeros_like(self.phi)</span>
+<span class="c">#         # self.make_insolation_array()  # now called from inside set_timestep()</span>
+<span class="c">#         self.external_heat_source = np.zeros_like(self.phi)</span>
+<span class="c">#         self.set_timestep()</span>
+<span class="c">#</span>
+<span class="c">#     def make_grid(self):</span>
+<span class="c">#         &#39;&#39;&#39;Build the grid for the computation, evenly spaced in latitude.&#39;&#39;&#39;</span>
+<span class="c">#         #   dlat will be our grid spacing</span>
+<span class="c">#         #   lat will be our temperature grid:</span>
+<span class="c">#         #     an array with exactly num_points evenly spaced points</span>
+<span class="c">#         #   lat_stag will be a staggered grid with numpoints+1 points,</span>
+<span class="c">#         #     where the end points are the North and South poles</span>
+<span class="c">#         #  Then we convert these all to radians for the computation.</span>
+<span class="c">#         self.dlat = 180. / self.num_points</span>
+<span class="c">#         self.lat = np.linspace(-90. + self.dlat/2,</span>
+<span class="c">#                                90. - self.dlat/2, self.num_points)</span>
+<span class="c">#         self.lat_stag = np.linspace(-90., 90., self.num_points+1)</span>
+<span class="c">#         self.dphi = np.deg2rad(self.dlat)</span>
+<span class="c">#         self.phi = np.deg2rad(self.lat)</span>
+<span class="c">#         self.phi_stag = np.deg2rad(self.lat_stag)</span>
+<span class="c">#</span>
+<span class="c">#     def set_timestep(self, num_steps_per_year=90):</span>
+<span class="c">#         &#39;&#39;&#39;Change the timestep, given a number of steps per calendar year.&#39;&#39;&#39;</span>
+<span class="c">#         super(_EBM, self).set_timestep(num_steps_per_year)</span>
+<span class="c">#         self.set_water_depth()</span>
+<span class="c">#         self.make_insolation_array()</span>
+<span class="c">#</span>
+<span class="c">#     def set_water_depth(self, water_depth=10.):</span>
+<span class="c">#         &#39;&#39;&#39;Method for changing the water depth (heat capacity) with depth in m.</span>
+<span class="c">#         Also recomputes the tridiagonal diffusion matrix.&#39;&#39;&#39;</span>
+<span class="c">#         if water_depth is None:</span>
+<span class="c">#             try:</span>
+<span class="c">#                 water_depth = self.water_depth</span>
+<span class="c">#             except:</span>
+<span class="c">#                 ValueError(&quot;water_depth parameter is not specified.&quot;)</span>
+<span class="c">#         self.water_depth = water_depth</span>
+<span class="c">#         self.C = const.cw * const.rho_w * self.water_depth</span>
+<span class="c">#         self.delta_time_over_C = self.timestep / self.C</span>
+<span class="c">#         self.set_diffusivity(self.K)</span>
+<span class="c">#</span>
+<span class="c">#     def set_diffusivity(self, K=None):</span>
+<span class="c">#         &#39;&#39;&#39;Method for changing the diffusivity, with K in W/m^2/degC.</span>
+<span class="c">#         Recomputes the tridiagonal diffusion matrix.&#39;&#39;&#39;</span>
+<span class="c">#         if K is None:</span>
+<span class="c">#             try:</span>
+<span class="c">#                 K = self.K</span>
+<span class="c">#             except:</span>
+<span class="c">#                 ValueError(&quot;Diffusivity parameter K is not specified.&quot;)</span>
+<span class="c">#         self.K = K</span>
+<span class="c">#         self.diffTriDiag = self._make_diffusion_matrix()</span>
+<span class="c">#</span>
+<span class="c">#     def _make_diffusion_matrix(self):</span>
+<span class="c">#         J = self.num_points</span>
+<span class="c">#         # Ka = (const.cp * const.ps * const.mb_to_Pa / const.g / const.a**2 *</span>
+<span class="c">#         #        self.K * np.ones_like(self.phi_stag))</span>
+<span class="c">#         # cosKa = np.cos(self.phi_stag) * Ka</span>
+<span class="c">#         cosKa = np.cos(self.phi_stag) * self.K</span>
+<span class="c">#         Ka1 = (cosKa[0:J] / np.cos(self.phi) *</span>
+<span class="c">#                self.delta_time_over_C / self.dphi**2)</span>
+<span class="c">#         Ka3 = (cosKa[1:J+1] / np.cos(self.phi) *</span>
+<span class="c">#                self.delta_time_over_C / self.dphi**2)</span>
+<span class="c">#         Ka2 = np.insert(Ka1[1:J], 0, 0) + np.append(Ka3[0:J-1], 0)</span>
+<span class="c">#         #  Atmosphere tridiagonal matrix</span>
+<span class="c">#         diag = np.empty((3, J))</span>
+<span class="c">#         diag[0, 1:] = -Ka3[0:J-1]</span>
+<span class="c">#         diag[1, :] = 1 + Ka2</span>
+<span class="c">#         diag[2, 0:J-1] = -Ka1[1:J]</span>
+<span class="c">#         return diag</span>
+<span class="c">#</span>
+<span class="c">#     def compute_OLR(self):</span>
+<span class="c">#         return self.A + self.B * self.T</span>
+<span class="c">#</span>
+<span class="c">#     def make_insolation_array(self):</span>
+<span class="c">#         # will be overridden by daughter classes</span>
+<span class="c">#         raise NotImplementedError(&quot;Subclasses of _EBM must implement a method for computing insolation.&quot;)</span>
+<span class="c">#</span>
+<span class="c">#     def compute_insolation(self):</span>
+<span class="c">#         return self.insolation_array[:, self.day_of_year_index]</span>
+<span class="c">#</span>
+<span class="c">#     def compute_albedo(self):</span>
+<span class="c">#         &#39;&#39;&#39;Simple step-function albedo based on ice line at temperature Tf.&#39;&#39;&#39;</span>
+<span class="c">#         return np.where(self.T &gt;= self.Tf, self.albedo_noice, self.albedo_ice)</span>
+<span class="c">#</span>
+<span class="c">#     def compute_radiation(self):</span>
+<span class="c">#         self.ASR = (1 - self.compute_albedo()) * self.compute_insolation()</span>
+<span class="c">#         self.OLR = self.compute_OLR()</span>
+<span class="c">#         self.net_radiation = self.ASR - self.OLR</span>
+<span class="c">#</span>
+<span class="c">#     def step_forward(self):</span>
+<span class="c">#         self.compute_radiation()</span>
+<span class="c">#         #  updated temperature due to radiation:</span>
+<span class="c">#         Trad = (self.T + (self.net_radiation + self.external_heat_source) *</span>
+<span class="c">#                 self.delta_time_over_C)</span>
+<span class="c">#         # Time-stepping the diffusion is just inverting this matrix problem:</span>
+<span class="c">#         # self.T = np.linalg.solve( self.diffTriDiag, Trad )</span>
+<span class="c">#         self.T = solve_banded((1, 1), self.diffTriDiag, Trad)</span>
+<span class="c">#         self.positive_degree_days += self.compute_degree_days()</span>
+<span class="c">#         super(_EBM, self).step_forward()</span>
+<span class="c">#</span>
+<span class="c">#     def compute_degree_days(self, threshold=0.):</span>
+<span class="c">#         &quot;&quot;&quot;Return temperature*time in degree-days,</span>
+<span class="c">#         wherever temperature is above the threshold, otherwise zero.&quot;&quot;&quot;</span>
+<span class="c">#         return np.where(self.T &gt; threshold, self.T * self.timestep /</span>
+<span class="c">#                         const.seconds_per_day, np.zeros_like(self.T))</span>
+<span class="c">#</span>
+<span class="c">#     def do_new_calendar_year(self):</span>
+<span class="c">#         &quot;&quot;&quot;This function is called once at the end of every calendar year.&quot;&quot;&quot;</span>
+<span class="c">#         super(_EBM, self).do_new_calendar_year()</span>
+<span class="c">#         self.previous_positive_degree_days = self.positive_degree_days</span>
+<span class="c">#         self.positive_degree_days = np.zeros_like(self.phi)</span>
+<span class="c">#</span>
+<span class="c">#     def heat_transport(self):</span>
+<span class="c">#         &#39;&#39;&#39;Returns instantaneous heat transport in units on PW,</span>
+<span class="c">#         on the staggered grid.&#39;&#39;&#39;</span>
+<span class="c">#         return self.diffusive_heat_transport()</span>
+<span class="c">#</span>
+<span class="c">#     def diffusive_heat_transport( self ):</span>
+<span class="c">#         &#39;&#39;&#39;Compute instantaneous diffusive heat transport in units of PW, on the staggered grid.&#39;&#39;&#39;</span>
+<span class="c">#         #return ( 1E-15 * -2 * np.math.pi * np.cos(self.phi_stag) * const.cp * const.ps * const.mb_to_Pa / const.g * self.K *</span>
+<span class="c">#         #    np.append( np.append( 0., np.diff( self.T ) ), 0.) / self.dphi )</span>
+<span class="c">#         return ( 1E-15 * -2 * np.math.pi * np.cos(self.phi_stag) * const.a**2 * self.K *</span>
+<span class="c">#             np.append( np.append( 0., np.diff( self.T ) ), 0.) / self.dphi )</span>
+<span class="c">#</span>
+<span class="c">#     def heat_transport_convergence( self ):</span>
+<span class="c">#         &#39;&#39;&#39;Returns instantaneous convergence of heat transport in units of W / m^2.&#39;&#39;&#39;</span>
+<span class="c">#         return ( -1./(2*np.math.pi*const.a**2*np.cos(self.phi)) * np.diff( 1.E15*self.heat_transport() )</span>
+<span class="c">#             / np.diff(self.phi_stag) )</span>
+<span class="c">#</span>
+<span class="c">#     def inferred_heat_transport( self ):</span>
+<span class="c">#         &#39;&#39;&#39;Returns the inferred heat transport (in PW) by integrating the TOA energy imbalance from pole to pole.&#39;&#39;&#39;</span>
+<span class="c">#         return ( 1E-15 * 2 * np.math.pi * const.a**2 * integrate.cumtrapz( np.cos(self.phi)*self.net_radiation,</span>
+<span class="c">#             x=self.phi, initial=0. ) )</span>
+<span class="c">#</span>
+<span class="c">#     def find_icelines( self ):</span>
+<span class="c">#         &#39;&#39;&#39;Returns the instantaneous latitudes of any ice edges.&#39;&#39;&#39;</span>
+<span class="c">#         # This probably won&#39;t work in cases with multiple ice lines per hemisphere!</span>
+<span class="c">#         #  Revise!</span>
+<span class="c">#         iceindices = np.squeeze( np.where( self.T &lt; self.Tf ) )</span>
+<span class="c">#         if iceindices.size == 0:</span>
+<span class="c">#             return 90.</span>
+<span class="c">#         elif iceindices.size == self.lat.size:</span>
+<span class="c">#             return 0.</span>
+<span class="c">#         else:</span>
+<span class="c">#             icelines = np.squeeze( np.where( np.diff(iceindices)&gt;1) )</span>
+<span class="c">#             icelat1 = self.lat_stag[ iceindices[icelines]+1 ]</span>
+<span class="c">#             icelat2 = self.lat_stag[ iceindices[icelines+1] ]</span>
+<span class="c">#             return icelat1, icelat2</span>
+<span class="c">#</span>
+<span class="c">#     def global_mean( self, field ):</span>
+<span class="c">#         &#39;&#39;&#39;Compute the area-weighted global mean of a vector field on the latitude grid.&#39;&#39;&#39;</span>
+<span class="c">#       #return np.sum( field * np.cos( self.phi ) ) / np.sum( np.cos( self.phi ) )</span>
+<span class="c">#       return global_mean( field, self.phi )</span>
+<span class="c">#</span>
+<span class="c">#   def global_mean_temperature( self ):</span>
+<span class="c">#       &#39;&#39;&#39;Convenience method to compute global mean temperature.&#39;&#39;&#39;</span>
+<span class="c">#       return self.global_mean( self.T )</span>
+<span class="c">#==============================================================================</span>
+
+
+
+<span class="c">#==============================================================================</span>
+<span class="c"># class EBM_landocean( EBM_seasonal ):</span>
+<span class="c">#     &#39;&#39;&#39;A model with both land and ocean, based on North and Coakley (1979)</span>
+<span class="c">#     Essentially just invokes two different EBM_seasonal objects, one for ocean, one for land.</span>
+<span class="c">#     &#39;&#39;&#39;</span>
+<span class="c">#     def __str__(self):</span>
+<span class="c">#         return ( &quot;Instance of EBM_landocean class with &quot; +  str(self.num_points) + &quot; latitude points.&quot; )</span>
+<span class="c">#</span>
+<span class="c">#     def __init__( self, num_points = 90 ):</span>
+<span class="c">#         super(EBM_landocean,self).__init__( num_points )</span>
+<span class="c">#         self.land_ocean_exchange_parameter = 1.0  # in W/m2/K</span>
+<span class="c">#</span>
+<span class="c">#         self.land = EBM_seasonal( num_points )</span>
+<span class="c">#         self.land.make_insolation_array( self.orb )</span>
+<span class="c">#         self.land.Tf = 0.</span>
+<span class="c">#         self.land.set_timestep( timestep = self.timestep )</span>
+<span class="c">#         self.land.set_water_depth( water_depth = 2. )</span>
+<span class="c">#</span>
+<span class="c">#         self.ocean = EBM_seasonal( num_points )</span>
+<span class="c">#         self.ocean.make_insolation_array( self.orb )</span>
+<span class="c">#         self.ocean.Tf = -2.</span>
+<span class="c">#         self.ocean.set_timestep( timestep = self.timestep )</span>
+<span class="c">#         self.ocean.set_water_depth( water_depth = 75. )</span>
+<span class="c">#</span>
+<span class="c">#         self.land_fraction = 0.3 * np.ones_like( self.land.phi )</span>
+<span class="c">#         self.C_ratio = self.land.water_depth / self.ocean.water_depth</span>
+<span class="c">#         self.T = self.zonal_mean_temperature()</span>
+<span class="c">#</span>
+<span class="c">#     def zonal_mean_temperature( self ):</span>
+<span class="c">#         return self.land.T * self.land_fraction + self.ocean.T * (1-self.land_fraction)</span>
+<span class="c">#</span>
+<span class="c">#     def step_forward( self ):</span>
+<span class="c">#         #  note.. this simple implementation is possibly problematic</span>
+<span class="c">#         # because the exchange should really occur simultaneously with radiation</span>
+<span class="c">#         # and before the implicit heat diffusion</span>
+<span class="c">#         self.exchange = (self.ocean.T - self.land.T) * self.land_ocean_exchange_parameter</span>
+<span class="c">#         self.land.step_forward()</span>
+<span class="c">#         self.ocean.step_forward()</span>
+<span class="c">#         self.land.T += self.exchange / self.land_fraction * self.land.delta_time_over_C</span>
+<span class="c">#         self.ocean.T -= self.exchange / (1-self.land_fraction) * self.ocean.delta_time_over_C</span>
+<span class="c">#         self.T = self.zonal_mean_temperature()</span>
+<span class="c">#         self.update_time()</span>
+<span class="c">#</span>
+<span class="c">#     #   This code should be more accurate, but it&#39;s ungainly and seems to produce just about the same result.</span>
+<span class="c">#     #def step_forward( self ):</span>
+<span class="c">#     #    self.exchange = (self.ocean.T - self.land.T) * self.land_ocean_exchange_parameter</span>
+<span class="c">#     #    self.land.compute_radiation( )</span>
+<span class="c">#     #    self.ocean.compute_radiation( )</span>
+<span class="c">#     #    Trad_land = ( self.land.T + ( self.land.net_radiation + self.exchange / self.land_fraction )</span>
+<span class="c">#     #        * self.land.delta_time_over_C )</span>
+<span class="c">#     #    Trad_ocean = ( self.ocean.T + ( self.ocean.net_radiation - self.exchange / (1-self.land_fraction) )</span>
+<span class="c">#     #        * self.ocean.delta_time_over_C )</span>
+<span class="c">#     #    self.land.T = solve_banded((1,1), self.land.diffTriDiag, Trad_land )</span>
+<span class="c">#     #    self.ocean.T = solve_banded((1,1), self.ocean.diffTriDiag, Trad_ocean )</span>
+<span class="c">#     #    self.T = self.zonal_mean_temperature()</span>
+<span class="c">#     #    self.land.update_time()</span>
+<span class="c">#     #    self.ocean.update_time()</span>
+<span class="c">#     #    self.update_time()</span>
+<span class="c">#</span>
+<span class="c">#     def integrate_years(self, years=1.0, verbose=True ):</span>
+<span class="c">#         #  Here we make sure that both sub-models have the current insolation.</span>
+<span class="c">#         self.land.make_insolation_array( self.orb )</span>
+<span class="c">#         self.ocean.make_insolation_array( self.orb )</span>
+<span class="c">#        super(EBM_landocean,self).integrate_years( years, verbose )</span>
+<span class="c">#==============================================================================</span>
+
+
+<span class="c">#  To do:</span>
+<span class="c">#    -  use integrated positive degree days to calculate implicit ice sheet melt potential</span>
+<span class="c">#    - also use these to set up a version of the model with vegetation-albedo feedback</span>
+<span class="c">#   - Create option to have specified extra ocean heat transport in the ocean component</span>
+<span class="c">#   - Create a default land-fraction that looks more like reality for the land-ocean model</span>
+<span class="c">#    - add diffusion of moist static energy</span>
+<span class="c">#  (would require re-computing the diffusion operator at each timestep, probably somewhat slower)</span>
+
+<span class="c">#==============================================================================</span>
+<span class="c">#</span>
+<span class="c"># class EBM_annual_moist( EBM_annual ):</span>
+<span class="c">#     def __str__(self):</span>
+<span class="c">#         return ( &quot;Instance of EBM_annual_moist class with &quot; +  str(self.num_points) + &quot; latitude points  \n&quot; +</span>
+<span class="c">#           &quot;and global mean temperature &quot; + str(self.global_mean_temperature()) + &quot; degrees C.&quot;)</span>
+<span class="c">#</span>
+<span class="c">#     def __init__( self, num_points = 90 ):</span>
+<span class="c">#         _EBM.__init__( self, num_points )</span>
+<span class="c">#         self.K0 = self.K  # constant</span>
+<span class="c">#         self.Kperdegree = self.K0/20. # 5% increase per degree</span>
+<span class="c">#         self.Tref = 15.</span>
+<span class="c">#         self.set_diffusivity( K = self.compute_K() )</span>
+<span class="c">#</span>
+<span class="c">#     def compute_K(self):</span>
+<span class="c">#         # formula to compute diffusivity, linear in global mean temperature</span>
+<span class="c">#         return self.K0 + self.Kperdegree * (self.global_mean_temperature()-self.Tref)</span>
+<span class="c">#</span>
+<span class="c">#     def step_forward( self ):</span>
+<span class="c">#         # set the diffusivity, depends on global mean temperature</span>
+<span class="c">#         self.set_diffusivity( K = self.compute_K() )</span>
+<span class="c">#         _EBM.step_forward(self)</span>
+<span class="c">#==============================================================================</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

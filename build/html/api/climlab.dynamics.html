@@ -1,0 +1,795 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>climlab.dynamics package &mdash; climlab 0.3.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.3.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="climlab 0.3.0.1 documentation" href="../index.html" />
+    <link rel="up" title="Application Programming Interface" href="climlab.html" />
+    <link rel="next" title="climlab.model package" href="climlab.model.html" />
+    <link rel="prev" title="climlab.domain package" href="climlab.domain.html" /> 
+  </head>
+  <body role="document">
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../index.html"><img src="../_static/logo.png" border="0" alt="sampledoc"/></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="climlab.model.html" title="climlab.model package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="climlab.domain.html" title="climlab.domain package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../intro.html">home</a>|&nbsp;</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+        <!-- 
+	<li><a href="../contents.html">documentation </a> &raquo;</li>
+	-->
+
+          <li class="nav-item nav-item-1"><a href="climlab.html" accesskey="U">Application Programming Interface</a> &raquo;</li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../index.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../download.html">Download</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="climlab.html">Application Programming Interface</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="climlab.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="climlab.html#inheritance-diagram">Inheritance Diagram</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contact.html">Contact</a></li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/climlab.dynamics.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput > div,
+div.nbinput div[class^=highlight],
+div.nbinput div[class^=highlight] pre,
+div.nboutput,
+div.nboutput > div,
+div.nboutput div[class^=highlight],
+div.nboutput div[class^=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput > :first-child pre {
+    color: navy;
+}
+
+/* output prompt */
+div.nboutput > :first-child pre {
+    color: darkred;
+}
+
+/* all prompts */
+div.nbinput > :first-child[class^=highlight],
+div.nboutput > :first-child[class^=highlight],
+div.nboutput > :first-child {
+    min-width: 11ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+
+/* input/output area */
+div.nbinput > :nth-child(2)[class^=highlight],
+div.nboutput > :nth-child(2),
+div.nboutput > :nth-child(2)[class^=highlight] {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+}
+
+/* input area */
+div.nbinput > :nth-child(2)[class^=highlight] {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput  > :nth-child(2).stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansiblack { color: black; }
+.ansired { color: darkred; }
+.ansigreen { color: darkgreen; }
+.ansiyellow { color: #c4a000; }
+.ansiblue { color: darkblue; }
+.ansipurple { color: darkviolet; }
+.ansicyan { color: steelblue; }
+/* See https://github.com/jupyter/nbconvert/issues/174 */
+.ansigray { color: gray; }  /* nbconvert CSS */
+.ansigrey { color: gray; }  /* nbconvert HTML output */
+
+.ansibgblack { background-color: black; }
+.ansibgred { background-color: red; }
+.ansibggreen { background-color: green; }
+.ansibgyellow { background-color: yellow; }
+.ansibgblue { background-color: blue; }
+.ansibgpurple { background-color: magenta; }
+.ansibgcyan { background-color: cyan; }
+.ansibggray { background-color: gray; }
+
+.ansibold { font-weight: bold; }
+</style>
+<div class="section" id="climlab-dynamics-package">
+<h1>climlab.dynamics package<a class="headerlink" href="#climlab-dynamics-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="climlab-dynamics-budyko-transport-module">
+<h2>climlab.dynamics.budyko_transport module<a class="headerlink" href="#climlab-dynamics-budyko-transport-module" title="Permalink to this headline">¶</a></h2>
+<p class="graphviz">
+<img src="../_images/inheritance-46d43f2965dc6f6b7c046d9b92664f0a689b8a81.png" alt="Inheritance diagram of climlab.dynamics.budyko_transport" usemap="#inheritancecb150fb914" class="inheritance"/>
+<map id="inheritancecb150fb914" name="inheritancecb150fb914">
+<area shape="rect" id="node1" href="#climlab.dynamics.budyko_transport.BudykoTransport" target="_top" title="calculates the 1 dimensional heat transport as the difference " alt="" coords="633,5,810,35"/>
+<area shape="rect" id="node2" href="climlab.process.html#climlab.process.energy_budget.EnergyBudget" target="_top" title="A parent class for explicit energy budget processes." alt="" coords="430,5,583,35"/>
+<area shape="rect" id="node3" href="climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess" target="_top" title="A generic parent class for all time&#45;dependent processes." alt="" coords="144,5,381,35"/>
+<area shape="rect" id="node4" href="climlab.process.html#climlab.process.process.Process" target="_top" title="A generic parent class for all climlab process objects." alt="" coords="5,5,96,35"/>
+</map>
+</p>
+<span class="target" id="module-climlab.dynamics.budyko_transport"></span><dl class="class">
+<dt id="climlab.dynamics.budyko_transport.BudykoTransport">
+<em class="property">class </em><code class="descclassname">climlab.dynamics.budyko_transport.</code><code class="descname">BudykoTransport</code><span class="sig-paren">(</span><em>b=3.81</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/dynamics/budyko_transport.html#BudykoTransport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.dynamics.budyko_transport.BudykoTransport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="climlab.process.html#climlab.process.energy_budget.EnergyBudget" title="climlab.process.energy_budget.EnergyBudget"><code class="xref py py-class docutils literal"><span class="pre">climlab.process.energy_budget.EnergyBudget</span></code></a></p>
+<p>calculates the 1 dimensional heat transport as the difference 
+between the local temperature and the global mean temperature.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>b</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; <p>budyko transport parameter</p>
+<ul class="simple">
+<li>unit: <span class="math">\(\textrm{W} / \left( \textrm{m}^2 \ ^{\circ} \textrm{C} \right)\)</span></li>
+<li>default value: <code class="docutils literal"><span class="pre">3.81</span></code></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>As BudykoTransport is a <a class="reference internal" href="climlab.process.html#climlab.process.process.Process" title="climlab.process.process.Process"><code class="xref py py-class docutils literal"><span class="pre">Process</span></code></a> it needs
+a state do be defined on. See example for details.</p>
+<p><strong>Computation Details:</strong></p>
+<p>In a global Energy Balance Model</p>
+<div class="math">
+\[C \frac{dT}{dt} = R\downarrow - R\uparrow - H\]</div>
+<p>with model state <span class="math">\(T\)</span>, the energy transport term <span class="math">\(H\)</span> 
+can be described as</p>
+<div class="math">
+\[H = b [T - \bar{T}]\]</div>
+<p>where <span class="math">\(T\)</span> is a vector of the model temperature and <span class="math">\(\bar{T}\)</span>
+describes the mean value of <span class="math">\(T\)</span>.</p>
+<p>For further information see <a class="reference internal" href="../references.html#budyko1969" id="id1">[Budyko1969]</a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Example:</th><td class="field-body"><p class="first">Budyko Transport as a standalone process:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">climlab</span>
+<span class="kn">from</span> <span class="nn">climlab.dynamics.budyko_transport</span> <span class="kn">import</span> <span class="n">BudykoTransport</span>
+<span class="kn">from</span> <span class="nn">climlab</span> <span class="kn">import</span> <span class="n">domain</span>
+<span class="kn">from</span> <span class="nn">climlab.domain</span> <span class="kn">import</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">climlab.utils.legendre</span> <span class="kn">import</span> <span class="n">P2</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+
+<span class="c1"># create domain</span>
+<span class="n">sfc</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">zonal_mean_surface</span><span class="p">(</span><span class="n">num_lat</span> <span class="o">=</span> <span class="mi">36</span><span class="p">)</span>
+
+<span class="n">lat</span> <span class="o">=</span> <span class="n">sfc</span><span class="o">.</span><span class="n">lat</span><span class="o">.</span><span class="n">points</span>
+<span class="n">lat_rad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span>
+
+<span class="c1"># define initial temperature distribution</span>
+<span class="n">T0</span> <span class="o">=</span> <span class="mf">15.</span>
+<span class="n">T2</span> <span class="o">=</span> <span class="o">-</span><span class="mf">20.</span>
+<span class="n">Ts</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">T0</span> <span class="o">+</span> <span class="n">T2</span> <span class="o">*</span> <span class="n">P2</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">lat_rad</span><span class="p">)),</span> <span class="n">domain</span><span class="o">=</span><span class="n">sfc</span><span class="p">)</span>
+
+<span class="c1"># create BudykoTransport process</span>
+<span class="n">budyko_transp</span> <span class="o">=</span> <span class="n">BudykoTransport</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="n">Ts</span><span class="p">)</span>
+
+<span class="c1">### Integrate &amp; Plot ###</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">budyko_transp</span><span class="o">.</span><span class="n">default</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;day </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">i</span><span class="o">*</span><span class="mi">40</span><span class="p">))</span>
+    <span class="n">budyko_transp</span><span class="o">.</span><span class="n">integrate_days</span><span class="p">(</span><span class="mf">40.</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Standalone Budyko Transport&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;latitude&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span><span class="o">-</span><span class="mi">60</span><span class="p">,</span><span class="o">-</span><span class="mi">30</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">30</span><span class="p">,</span><span class="mi">60</span><span class="p">,</span><span class="mi">90</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;temperature (degC)&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;best&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>(<a class="reference external" href="../code_input_manual/example_budyko_transport.py">Source code</a>, <a class="reference external" href="../code_input_manual/example_budyko_transport.png">png</a>, <a class="reference external" href="../code_input_manual/example_budyko_transport.hires.png">hires.png</a>, <a class="reference external" href="../code_input_manual/example_budyko_transport.pdf">pdf</a>)</p>
+<div class="last figure">
+<img alt="../_images/example_budyko_transport.png" src="../_images/example_budyko_transport.png" />
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="climlab.dynamics.budyko_transport.BudykoTransport.b">
+<code class="descname">b</code><a class="headerlink" href="#climlab.dynamics.budyko_transport.BudykoTransport.b" title="Permalink to this definition">¶</a></dt>
+<dd><p>the budyko transport parameter in unit 
+<span class="math">\(\frac{\textrm{W}}{\textrm{m}^2 \textrm{K}}\)</span></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body">returns the budyko transport parameter</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Setter:</th><td class="field-body">sets the budyko transport parameter</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body">float</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="climlab-dynamics-diffusion-module">
+<h2>climlab.dynamics.diffusion module<a class="headerlink" href="#climlab-dynamics-diffusion-module" title="Permalink to this headline">¶</a></h2>
+<p class="graphviz">
+<img src="../_images/inheritance-cded6b3f121121958feda4f5f67eae46c1b4cd33.png" alt="Inheritance diagram of climlab.dynamics.diffusion" usemap="#inheritance7837723b8f" class="inheritance"/>
+<map id="inheritance7837723b8f" name="inheritance7837723b8f">
+<area shape="rect" id="node1" href="#climlab.dynamics.diffusion.Diffusion" target="_top" title="A parent class for one dimensional implicit diffusion modules." alt="" coords="635,5,739,35"/>
+<area shape="rect" id="node4" href="#climlab.dynamics.diffusion.MeridionalDiffusion" target="_top" title="A parent class for Meridional diffusion processes." alt="" coords="787,5,986,35"/>
+<area shape="rect" id="node2" href="climlab.process.html#climlab.process.implicit.ImplicitProcess" target="_top" title="A parent class for modules that use implicit time discretization." alt="" coords="429,5,587,35"/>
+<area shape="rect" id="node3" href="climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess" target="_top" title="A generic parent class for all time&#45;dependent processes." alt="" coords="144,5,381,35"/>
+<area shape="rect" id="node5" href="climlab.process.html#climlab.process.process.Process" target="_top" title="A generic parent class for all climlab process objects." alt="" coords="5,5,96,35"/>
+</map>
+</p>
+<span class="target" id="module-climlab.dynamics.diffusion"></span><dl class="class">
+<dt id="climlab.dynamics.diffusion.Diffusion">
+<em class="property">class </em><code class="descclassname">climlab.dynamics.diffusion.</code><code class="descname">Diffusion</code><span class="sig-paren">(</span><em>K=None</em>, <em>diffusion_axis=None</em>, <em>use_banded_solver=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/dynamics/diffusion.html#Diffusion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.dynamics.diffusion.Diffusion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="climlab.process.html#climlab.process.implicit.ImplicitProcess" title="climlab.process.implicit.ImplicitProcess"><code class="xref py py-class docutils literal"><span class="pre">climlab.process.implicit.ImplicitProcess</span></code></a></p>
+<p>A parent class for one dimensional implicit diffusion modules.</p>
+<p>Solves the one dimensional heat equation</p>
+<div class="math">
+\[\frac{dT}{dt} = \frac{d}{dy} \left[ K \cdot \frac{dT}{dy} \right]\]</div>
+<p><strong>Initialization parameters</strong></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>K</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; the diffusivity parameter in units of 
+<span class="math">\(\frac{[\textrm{length}]^2}{\textrm{time}}\)</span>
+where length is the unit of the spatial axis
+on which the diffusion is occuring.</li>
+<li><strong>diffusion_axis</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; dictionary key for axis on which the 
+diffusion is occuring in process&#8217;s domain
+axes dictionary</li>
+<li><strong>use_banded_solver</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; input flag, whether to use 
+<a class="reference external" href="http://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.solve_banded.html#scipy.linalg.solve_banded" title="(in SciPy v0.17.0)"><code class="xref py py-func docutils literal"><span class="pre">scipy.linalg.solve_banded()</span></code></a>
+instead of <a class="reference external" href="http://docs.scipy.org/doc/numpy/reference/generated/numpy.linalg.solve.html#numpy.linalg.solve" title="(in NumPy v1.10)"><code class="xref py py-func docutils literal"><span class="pre">numpy.linalg.solve()</span></code></a></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The banded solver <a class="reference external" href="http://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.solve_banded.html#scipy.linalg.solve_banded" title="(in SciPy v0.17.0)"><code class="xref py py-func docutils literal"><span class="pre">scipy.linalg.solve_banded()</span></code></a> is faster than 
+<a class="reference external" href="http://docs.scipy.org/doc/numpy/reference/generated/numpy.linalg.solve.html#numpy.linalg.solve" title="(in NumPy v1.10)"><code class="xref py py-func docutils literal"><span class="pre">numpy.linalg.solve()</span></code></a> but only works for one dimensional diffusion.</p>
+</div>
+<p><strong>Object attributes</strong></p>
+<p>Additional to the parent class 
+<a class="reference internal" href="climlab.process.html#climlab.process.implicit.ImplicitProcess" title="climlab.process.implicit.ImplicitProcess"><code class="xref py py-class docutils literal"><span class="pre">ImplicitProcess</span></code></a>
+following object attributes are generated or modified during initialization:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first simple">
+<li><strong>param</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; parameter dictionary is extended by 
+diffusivity parameter K (unit:
+<span class="math">\(\frac{[\textrm{length}]^2}{\textrm{time}}\)</span>)</li>
+<li><strong>use_banded_solver</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; input flag specifying numerical solving 
+method (given during initialization)</li>
+<li><strong>diffusion_axis</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; dictionary key for axis where diffusion 
+is occuring: 
+specified during initialization
+or output of method 
+<a class="reference internal" href="#climlab.dynamics.diffusion._guess_diffusion_axis" title="climlab.dynamics.diffusion._guess_diffusion_axis"><code class="xref py py-func docutils literal"><span class="pre">_guess_diffusion_axis()</span></code></a></li>
+<li><strong>K_dimensionless</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/array.html#module-array" title="(in Python v2.7)"><em>array</em></a>) &#8211; diffusion parameter K multiplied by the 
+timestep and divided by mean of diffusion 
+axis delta in the power of two. Array has 
+the size of diffusion axis bounds.
+<span class="math">\(K_{\textrm{dimensionless}}[i]= K \frac{\Delta t}{ \left(\overline{\Delta \textrm{bounds}} \right)^2}\)</span></li>
+<li><strong>diffTriDiag</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/array.html#module-array" title="(in Python v2.7)"><em>array</em></a>) &#8211; tridiagonal diffusion matrix made by
+<a class="reference internal" href="#climlab.dynamics.diffusion._make_diffusion_matrix" title="climlab.dynamics.diffusion._make_diffusion_matrix"><code class="xref py py-func docutils literal"><span class="pre">_make_diffusion_matrix()</span></code></a> with input
+<code class="docutils literal"><span class="pre">self.K_dimensionless</span></code></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Example:</th><td class="field-body"><p class="first">Here is an example showing implementation of a vertical diffusion.
+It shows that a subprocess can work on just a subset of the parent process
+state variables.</p>
+<blockquote class="last">
+<div><div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">climlab</span>
+<span class="kn">from</span> <span class="nn">climlab.dynamics.diffusion</span> <span class="kn">import</span> <span class="n">Diffusion</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+
+<span class="n">c</span> <span class="o">=</span> <span class="n">climlab</span><span class="o">.</span><span class="n">GreyRadiationModel</span><span class="p">()</span>
+<span class="n">K</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">Diffusion</span><span class="p">(</span><span class="n">K</span><span class="o">=</span><span class="n">K</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Tatm&#39;</span><span class="p">:</span><span class="n">c</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s1">&#39;Tatm&#39;</span><span class="p">]},</span> <span class="o">**</span><span class="n">c</span><span class="o">.</span><span class="n">param</span><span class="p">)</span>
+
+<span class="n">c</span><span class="o">.</span><span class="n">add_subprocess</span><span class="p">(</span><span class="s1">&#39;diffusion&#39;</span><span class="p">,</span><span class="n">d</span><span class="p">)</span>
+
+<span class="c1">### Integrate &amp; Plot ###</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">lev</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s1">&#39;Tatm&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;step 0&#39;</span><span class="p">)</span>
+<span class="n">c</span><span class="o">.</span><span class="n">step_forward</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">lev</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="s1">&#39;Tatm&#39;</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;step 1&#39;</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">invert_xaxis</span><span class="p">()</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Diffusion subprocess&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;level (mb)&#39;</span><span class="p">)</span>
+<span class="c1">#ax.set_xticks([])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;temperature (K)&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;best&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>(<a class="reference external" href="../code_input_manual/example_diffusion.py">Source code</a>, <a class="reference external" href="../code_input_manual/example_diffusion.png">png</a>, <a class="reference external" href="../code_input_manual/example_diffusion.hires.png">hires.png</a>, <a class="reference external" href="../code_input_manual/example_diffusion.pdf">pdf</a>)</p>
+<div class="figure">
+<img alt="../_images/example_diffusion.png" src="../_images/example_diffusion.png" />
+</div>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="climlab.dynamics.diffusion.Diffusion._implicit_solver">
+<code class="descname">_implicit_solver</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/dynamics/diffusion.html#Diffusion._implicit_solver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.dynamics.diffusion.Diffusion._implicit_solver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Invertes and solves the matrix problem for diffusion matrix 
+and temperature T.</p>
+<p>The method is called by the 
+<a class="reference internal" href="climlab.process.html#climlab.process.implicit.ImplicitProcess._compute" title="climlab.process.implicit.ImplicitProcess._compute"><code class="xref py py-func docutils literal"><span class="pre">_compute()</span></code></a> function 
+of the <a class="reference internal" href="climlab.process.html#climlab.process.implicit.ImplicitProcess" title="climlab.process.implicit.ImplicitProcess"><code class="xref py py-class docutils literal"><span class="pre">ImplicitProcess</span></code></a> class and 
+solves the matrix problem</p>
+<div class="math">
+\[A \cdot T_{\textrm{new}} = T_{\textrm{old}}\]</div>
+<p>for diffusion matrix A and corresponding temperatures. 
+<span class="math">\(T_{\textrm{old}}\)</span> is in this case the current state variable 
+which already has been adjusted by the explicit processes. 
+<span class="math">\(T_{\textrm{new}}\)</span> is the new state of the variable. To
+derive the temperature tendency of the diffusion process the adjustment 
+has to be calculated and muliplied with the timestep which is done by
+the <a class="reference internal" href="climlab.process.html#climlab.process.implicit.ImplicitProcess._compute" title="climlab.process.implicit.ImplicitProcess._compute"><code class="xref py py-func docutils literal"><span class="pre">_compute()</span></code></a> 
+function of the <a class="reference internal" href="climlab.process.html#climlab.process.implicit.ImplicitProcess" title="climlab.process.implicit.ImplicitProcess"><code class="xref py py-class docutils literal"><span class="pre">ImplicitProcess</span></code></a> 
+class.</p>
+<p>This method calculates the matrix inversion for every state variable
+and calling either <code class="xref py py-func docutils literal"><span class="pre">solve_implicit_banded()</span></code> or 
+<a class="reference external" href="http://docs.scipy.org/doc/numpy/reference/generated/numpy.linalg.solve.html#numpy.linalg.solve" title="(in NumPy v1.10)"><code class="xref py py-func docutils literal"><span class="pre">numpy.linalg.solve()</span></code></a> dependent on the flag 
+<code class="docutils literal"><span class="pre">self.use_banded_solver</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>state</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; method uses current state variables
+but does not modify them</li>
+<li><strong>use_banded_solver</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; input flag whether to use 
+<a class="reference internal" href="#climlab.dynamics.diffusion._solve_implicit_banded" title="climlab.dynamics.diffusion._solve_implicit_banded"><code class="xref py py-func docutils literal"><span class="pre">_solve_implicit_banded()</span></code></a> or 
+<a class="reference external" href="http://docs.scipy.org/doc/numpy/reference/generated/numpy.linalg.solve.html#numpy.linalg.solve" title="(in NumPy v1.10)"><code class="xref py py-func docutils literal"><span class="pre">numpy.linalg.solve()</span></code></a> to do 
+the matrix inversion</li>
+<li><strong>diffTriDiag</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/array.html#module-array" title="(in Python v2.7)"><em>array</em></a>) &#8211; the diffusion matrix which is given 
+with the current state variable to 
+the method solving the matrix problem</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="climlab.dynamics.diffusion.MeridionalDiffusion">
+<em class="property">class </em><code class="descclassname">climlab.dynamics.diffusion.</code><code class="descname">MeridionalDiffusion</code><span class="sig-paren">(</span><em>K=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/dynamics/diffusion.html#MeridionalDiffusion"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.dynamics.diffusion.MeridionalDiffusion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#climlab.dynamics.diffusion.Diffusion" title="climlab.dynamics.diffusion.Diffusion"><code class="xref py py-class docutils literal"><span class="pre">climlab.dynamics.diffusion.Diffusion</span></code></a></p>
+<p>A parent class for Meridional diffusion processes.</p>
+<p>Calculates the energy transport in a diffusion like process along the
+temperature gradient:</p>
+<blockquote>
+<div><blockquote>
+<div><div class="math">
+\[H(\varphi) = \frac{D}{\cos \varphi}\frac{\partial}{\partial \varphi} \left( \cos\varphi \frac{\partial T(\varphi)}{\partial \varphi} \right)\]</div>
+</div></blockquote>
+<p>for an Energy Balance Model whose Energy Budget can be noted as:</p>
+<div class="math">
+\[C(\varphi) \frac{dT(\varphi)}{dt} = R\downarrow (\varphi) - R\uparrow (\varphi) + H(\varphi)\]</div>
+</div></blockquote>
+<p><strong>Initialization parameters</strong></p>
+<p>An instance of <code class="docutils literal"><span class="pre">MeridionalDiffusion</span></code> is initialized with the following 
+arguments:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>K</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; diffusion parameter in units of <span class="math">\(1/s\)</span></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Object attributes</strong></p>
+<p>Additional to the parent class <a class="reference internal" href="#climlab.dynamics.diffusion.Diffusion" title="climlab.dynamics.diffusion.Diffusion"><code class="xref py py-class docutils literal"><span class="pre">Diffusion</span></code></a>
+which is initialized with <code class="docutils literal"><span class="pre">diffusion_axis='lat'</span></code>, following object 
+attributes are modified during initialization:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first simple">
+<li><strong>K_dimensionless</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/array.html#module-array" title="(in Python v2.7)"><em>array</em></a>) &#8211; As K_dimensionless has been computed like
+<span class="math">\(K_{\textrm{dimensionless}}= K \frac{\Delta t}{(\Delta \textrm{bounds})^2}\)</span>
+with <span class="math">\(K\)</span> in units <span class="math">\(1/s\)</span>, 
+the <span class="math">\(\Delta (\textrm{bounds})\)</span> have to
+be converted from <code class="docutils literal"><span class="pre">deg</span></code> to <code class="docutils literal"><span class="pre">rad</span></code> to make 
+the array actually dimensionless. 
+This is done during initialiation.</li>
+<li><strong>diffTriDiag</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/array.html#module-array" title="(in Python v2.7)"><em>array</em></a>) &#8211; the diffusion matrix is recomputed with
+appropriate weights for the meridional case
+by <a class="reference internal" href="#climlab.dynamics.diffusion._make_meridional_diffusion_matrix" title="climlab.dynamics.diffusion._make_meridional_diffusion_matrix"><code class="xref py py-func docutils literal"><span class="pre">_make_meridional_diffusion_matrix()</span></code></a></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Example:</th><td class="field-body"><p class="first">Meridional Diffusion of temperature
+as a stand-alone process:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">climlab</span>
+<span class="kn">from</span> <span class="nn">climlab.dynamics.diffusion</span> <span class="kn">import</span> <span class="n">MeridionalDiffusion</span>
+<span class="kn">from</span> <span class="nn">climlab.utils</span> <span class="kn">import</span> <span class="n">legendre</span>
+
+<span class="n">sfc</span> <span class="o">=</span> <span class="n">climlab</span><span class="o">.</span><span class="n">domain</span><span class="o">.</span><span class="n">zonal_mean_surface</span><span class="p">(</span><span class="n">num_lat</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">water_depth</span><span class="o">=</span><span class="mf">10.</span><span class="p">)</span>
+<span class="n">lat</span> <span class="o">=</span> <span class="n">sfc</span><span class="o">.</span><span class="n">lat</span><span class="o">.</span><span class="n">points</span>
+<span class="n">initial</span> <span class="o">=</span> <span class="mf">12.</span> <span class="o">-</span> <span class="mf">40.</span> <span class="o">*</span> <span class="n">legendre</span><span class="o">.</span><span class="n">P2</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">lat</span><span class="p">)))</span>
+
+<span class="c1"># make a copy of initial so that it remains unmodified</span>
+<span class="n">Ts</span> <span class="o">=</span> <span class="n">climlab</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">initial</span><span class="p">),</span> <span class="n">domain</span><span class="o">=</span><span class="n">sfc</span><span class="p">)</span>
+
+<span class="c1"># thermal diffusivity in W/m**2/degC</span>
+<span class="n">D</span> <span class="o">=</span> <span class="mf">0.55</span>
+
+<span class="c1"># meridional diffusivity in 1/s</span>
+<span class="n">K</span> <span class="o">=</span> <span class="n">D</span> <span class="o">/</span> <span class="n">sfc</span><span class="o">.</span><span class="n">heat_capacity</span>
+<span class="n">d</span> <span class="o">=</span> <span class="n">MeridionalDiffusion</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="n">Ts</span><span class="p">,</span> <span class="n">K</span><span class="o">=</span><span class="n">K</span><span class="p">)</span>
+
+<span class="n">d</span><span class="o">.</span><span class="n">integrate_years</span><span class="p">(</span><span class="mf">1.</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Example for Meridional Diffusion&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;latitude&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span><span class="o">-</span><span class="mi">60</span><span class="p">,</span><span class="o">-</span><span class="mi">30</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">30</span><span class="p">,</span><span class="mi">60</span><span class="p">,</span><span class="mi">90</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;temperature (degC)&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">initial</span><span class="p">,</span> 	<span class="n">label</span><span class="o">=</span><span class="s1">&#39;initial&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">Ts</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Ts (1yr)&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;best&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>(<a class="reference external" href="../code_input_manual/example_meridional_diffusion.py">Source code</a>, <a class="reference external" href="../code_input_manual/example_meridional_diffusion.png">png</a>, <a class="reference external" href="../code_input_manual/example_meridional_diffusion.hires.png">hires.png</a>, <a class="reference external" href="../code_input_manual/example_meridional_diffusion.pdf">pdf</a>)</p>
+<div class="last figure">
+<img alt="../_images/example_meridional_diffusion.png" src="../_images/example_meridional_diffusion.png" />
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="climlab.dynamics.diffusion._guess_diffusion_axis">
+<code class="descclassname">climlab.dynamics.diffusion.</code><code class="descname">_guess_diffusion_axis</code><span class="sig-paren">(</span><em>process_or_domain</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/dynamics/diffusion.html#_guess_diffusion_axis"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.dynamics.diffusion._guess_diffusion_axis" title="Permalink to this definition">¶</a></dt>
+<dd><p>Scans given process, domain or dictionary of domains for a diffusion axis
+and returns appropriate name.</p>
+<p>In case only one axis with length &gt; 1 in the process or set of domains 
+exists, the name of that axis is returned. Otherwise an error is raised.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>process_or_domain</strong> (<a class="reference internal" href="climlab.process.html#climlab.process.process.Process" title="climlab.process.process.Process"><code class="xref py py-class docutils literal"><span class="pre">Process</span></code></a>,
+<a class="reference internal" href="climlab.domain.html#climlab.domain.domain._Domain" title="climlab.domain.domain._Domain"><code class="xref py py-class docutils literal"><span class="pre">_Domain</span></code></a> or
+<a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a> of domains) &#8211; input from where diffusion axis should be guessed</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code> if more than one diffusion axis is possible.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">name of the diffusion axis</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="climlab.dynamics.diffusion._make_diffusion_matrix">
+<code class="descclassname">climlab.dynamics.diffusion.</code><code class="descname">_make_diffusion_matrix</code><span class="sig-paren">(</span><em>K</em>, <em>weight1=None</em>, <em>weight2=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/dynamics/diffusion.html#_make_diffusion_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.dynamics.diffusion._make_diffusion_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Builds the general diffusion matrix with dimension nxn.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><span class="math">\(n\)</span>   = number of points of diffusion axis
+<span class="math">\(n+1\)</span> = number of bounts of diffusion axis</p>
+</div>
+<p><strong>Function-all argument</strong></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>K</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/array.html#module-array" title="(in Python v2.7)"><em>array</em></a>) &#8211; dimensionless diffusivities at cell boundaries
+<em>(size: 1xn+1)</em></li>
+<li><strong>weight1</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/array.html#module-array" title="(in Python v2.7)"><em>array</em></a>) &#8211; weight_1 <em>(size: 1xn+1)</em></li>
+<li><strong>weight2</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/array.html#module-array" title="(in Python v2.7)"><em>array</em></a>) &#8211; weight_2 <em>(size: 1xn)</em></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">completely listed tridiagonal diffusion matrix <em>(size: nxn)</em></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/2.7/library/array.html#module-array" title="(in Python v2.7)">array</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>The elements of array K are acutally dimensionless:</p>
+<div class="math">
+\[K[i] = K_{\textrm{physical}}  \frac{\Delta t}{(\Delta y)^2}\]</div>
+<p class="last">where <span class="math">\(K_{\textrm{physical}}\)</span> is in unit <span class="math">\(\frac{\textrm{length}^2}{\textrm{time}}\)</span></p>
+</div>
+<p>The diffusion matrix is build like the following</p>
+<div class="math">
+\[\begin{split}\textrm{diffTriDiag}= 
+\left[ \begin{array}{cccccc}
+1+\frac{w_{1,1} K_1 }{w_{2,0}} &amp; -\frac{w_{1,1} K_1}{w_{2,0}} &amp; 0 &amp;  &amp; ... &amp; 0  \\
+-\frac{w_{1,1} K_1}{w_{2,1}} &amp; 1+\frac{w_{1,1} K_1 + w_{1,2} K_2}{w_{2,1}} &amp; -\frac{w_{1,2} K_2}{w_{2,1}} &amp; 0 &amp; ... &amp; 0 \\
+0 &amp; -\frac{w_{1,2} K_2}{w_{2,2}}  &amp; 1+\frac{w_{1,2} K_2 + w_{1,3} K_3}{w_{2,2}} &amp; -\frac{w_{1,3} K_3}{w_{2,2}} &amp;... &amp; 0  \\
+  &amp;  &amp; \ddots &amp; \ddots &amp; \ddots &amp; \\
+0 &amp; 0 &amp; ... &amp; -\frac{w_{1,n-2} K_{n-2}}{w_{2,n-2}}  &amp; 1+\frac{w_{1,n-2} K_{n-2} + w_{1,n-1} K_{n-1}}{w_{2,{n-2}}} &amp; -\frac{w_{1,n-1} K_{n-1}}{w_{2,{n-2}}} \\
+0 &amp; 0 &amp; ... &amp; 0 &amp; -\frac{w_{1,n-1} K_{n-1}}{w_{2,n-1}}  &amp; 1+\frac{w_{1,n-1} K_{n-1}}{w_{2,n-1}} \\
+\end{array} \right] \end{split}\]</div>
+<p>where</p>
+<div class="math">
+\[\begin{split}\begin{array}{lllllll}
+     K   &amp;= [K_0,     &amp;K_1,    &amp;K_2,    &amp;...,&amp;K_{n-1},  &amp;K_{n}] \\
+     w_1 &amp;= [w_{1,0}, &amp;w_{1,1},&amp;w_{1,2},&amp;...,&amp;w_{1,n-1},&amp;w_{1,n}] \\
+     w_2 &amp;= [w_{2,0}, &amp;w_{2,1},&amp;w_{2,2},&amp;...,&amp;w_{2,n-1}]
+\end{array}    \end{split}\]</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="climlab.dynamics.diffusion._make_meridional_diffusion_matrix">
+<code class="descclassname">climlab.dynamics.diffusion.</code><code class="descname">_make_meridional_diffusion_matrix</code><span class="sig-paren">(</span><em>K</em>, <em>lataxis</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/dynamics/diffusion.html#_make_meridional_diffusion_matrix"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.dynamics.diffusion._make_meridional_diffusion_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls <a class="reference internal" href="#climlab.dynamics.diffusion._make_diffusion_matrix" title="climlab.dynamics.diffusion._make_diffusion_matrix"><code class="xref py py-func docutils literal"><span class="pre">_make_diffusion_matrix()</span></code></a> with appropriate weights for 
+the meridional diffusion case.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>K</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/array.html#module-array" title="(in Python v2.7)"><em>array</em></a>) &#8211; dimensionless diffusivities at cell boundaries
+of diffusion axis <code class="docutils literal"><span class="pre">lataxis</span></code></li>
+<li><strong>lataxis</strong> (<a class="reference internal" href="climlab.domain.html#module-climlab.domain.axis" title="climlab.domain.axis"><em>axis</em></a>) &#8211; latitude axis where diffusion is occuring</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Weights are computed as the following:</p>
+<div class="math">
+\[\begin{split}\begin{array}{ll}
+    w_1 &amp;= \cos(\textrm{bounds}) \\
+        &amp;= \left[ \cos(b_0), \cos(b_1), \cos(b_2), \ ... \ , \cos(b_{n-1}), \cos(b_n) \right] \\
+    w_2 &amp;= \cos(\textrm{points}) \\
+        &amp;= \left[ \cos(p_0), \cos(p_1), \cos(p_2), \ ... \ , \cos(p_{n-1}) \right]
+\end{array}\end{split}\]</div>
+<p>when bounds and points from <code class="docutils literal"><span class="pre">lataxis</span></code> are written as</p>
+<div class="math">
+\[\begin{split}\begin{array}{ll}    
+    \textrm{bounds}   &amp;= [b_0, b_1, b_2, \ ... \ , b_{n-1}, b_{n}] \\
+    \textrm{points}   &amp;= [p_0, p_1, p_2, \ ... \ , p_{n-1}]
+\end{array}\end{split}\]</div>
+<p>Giving this input to <a class="reference internal" href="#climlab.dynamics.diffusion._make_diffusion_matrix" title="climlab.dynamics.diffusion._make_diffusion_matrix"><code class="xref py py-func docutils literal"><span class="pre">_make_diffusion_matrix()</span></code></a> results in a matrix like:</p>
+<div class="math">
+\[\begin{split}\textrm{diffTriDiag}= 
+\left[ \begin{array}{cccccc}
+1+\frac{\cos(b_1) K_1 }{\cos(p_0)} &amp; -\frac{\cos(b_1) K_1}{\cos(p_0)} &amp; 0 &amp;  &amp; ... &amp; 0  \\
+-\frac{\cos(b_1) K_1}{\cos(p_1)} &amp; 1+\frac{\cos(b_1) K_1 + \cos(b_2) K_2}{\cos(p_1)} &amp; -\frac{\cos(b_2) K_2}{\cos(b_1)} &amp; 0 &amp; ... &amp; 0 \\
+0 &amp; -\frac{\cos(b_2) K_2}{\cos(p_2)}  &amp; 1+\frac{\cos(b_2) K_2 + \cos(b_3) K_3}{\cos(p_2)} &amp; -\frac{\cos(b_3) K_3}{\cos(p_2)} &amp;... &amp; 0  \\
+  &amp;  &amp; \ddots &amp; \ddots &amp; \ddots &amp; \\
+0 &amp; 0 &amp; ... &amp; -\frac{\cos(b_{n-2}) K_{n-2}}{\cos(p_{n-2})}  &amp; 1+\frac{\cos(b_{n-2}) K_{n-2} + \cos(b_{n-1}) K_{n-1}}{\cos(p_{n-2})} &amp; -\frac{\cos(b_{n-1}) K_{n-1}}{\cos(p_{n-2})} \\
+0 &amp; 0 &amp; ... &amp; 0 &amp; -\frac{\cos(b_{n-1}) K_{n-1}}{\cos(p_{n-1})}  &amp; 1+\frac{\cos(b_{n-1}) K_{n-1}}{\cos(p_{n-1})} \\
+\end{array} \right] \end{split}\]</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="climlab.dynamics.diffusion._solve_implicit_banded">
+<code class="descclassname">climlab.dynamics.diffusion.</code><code class="descname">_solve_implicit_banded</code><span class="sig-paren">(</span><em>current</em>, <em>banded_matrix</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/dynamics/diffusion.html#_solve_implicit_banded"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.dynamics.diffusion._solve_implicit_banded" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses a banded solver for matrix inversion of a tridiagonal matrix.</p>
+<p>Converts the complete listed tridiagonal matrix <em>(nxn)</em> into a three row 
+matrix <em>(3xn)</em> and calls <a class="reference external" href="http://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.solve_banded.html#scipy.linalg.solve_banded" title="(in SciPy v0.17.0)"><code class="xref py py-func docutils literal"><span class="pre">scipy.linalg.solve_banded()</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>current</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/array.html#module-array" title="(in Python v2.7)"><em>array</em></a>) &#8211; the current state of the variable for which
+matrix inversion should be computed</li>
+<li><strong>banded_matrix</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/array.html#module-array" title="(in Python v2.7)"><em>array</em></a>) &#8211; complete diffusion matrix (<em>dimension: nxn</em>)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">output of <a class="reference external" href="http://docs.scipy.org/doc/scipy/reference/generated/scipy.linalg.solve_banded.html#scipy.linalg.solve_banded" title="(in SciPy v0.17.0)"><code class="xref py py-func docutils literal"><span class="pre">scipy.linalg.solve_banded()</span></code></a></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/2.7/library/array.html#module-array" title="(in Python v2.7)">array</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="climlab.model.html" title="climlab.model package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="climlab.domain.html" title="climlab.domain package"
+             >previous</a> |</li>
+        <li><a href="../intro.html">home</a>|&nbsp;</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+        <!-- 
+	<li><a href="../contents.html">documentation </a> &raquo;</li>
+	-->
+
+          <li class="nav-item nav-item-1"><a href="climlab.html" >Application Programming Interface</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016 (licensed under Creative Commons, see License), Moritz Kreuzer.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+    </div>
+  </body>
+</html>

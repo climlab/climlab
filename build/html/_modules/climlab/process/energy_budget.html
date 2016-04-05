@@ -1,0 +1,381 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>climlab.process.energy_budget &mdash; climlab 0.3.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.3.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="climlab 0.3.0.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body role="document">
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../../index.html"><img src="../../../_static/logo.png" border="0" alt="sampledoc"/></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../intro.html">home</a>|&nbsp;</li>
+        <li><a href="../../../search.html">search</a>|&nbsp;</li>
+        <!-- 
+	<li><a href="../../../contents.html">documentation </a> &raquo;</li>
+	-->
+
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../../index.html">Table Of Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../download.html">Download</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/climlab.html">Application Programming Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contact.html">Contact</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput > div,
+div.nbinput div[class^=highlight],
+div.nbinput div[class^=highlight] pre,
+div.nboutput,
+div.nboutput > div,
+div.nboutput div[class^=highlight],
+div.nboutput div[class^=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput > :first-child pre {
+    color: navy;
+}
+
+/* output prompt */
+div.nboutput > :first-child pre {
+    color: darkred;
+}
+
+/* all prompts */
+div.nbinput > :first-child[class^=highlight],
+div.nboutput > :first-child[class^=highlight],
+div.nboutput > :first-child {
+    min-width: 11ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+
+/* input/output area */
+div.nbinput > :nth-child(2)[class^=highlight],
+div.nboutput > :nth-child(2),
+div.nboutput > :nth-child(2)[class^=highlight] {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+}
+
+/* input area */
+div.nbinput > :nth-child(2)[class^=highlight] {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput  > :nth-child(2).stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansiblack { color: black; }
+.ansired { color: darkred; }
+.ansigreen { color: darkgreen; }
+.ansiyellow { color: #c4a000; }
+.ansiblue { color: darkblue; }
+.ansipurple { color: darkviolet; }
+.ansicyan { color: steelblue; }
+/* See https://github.com/jupyter/nbconvert/issues/174 */
+.ansigray { color: gray; }  /* nbconvert CSS */
+.ansigrey { color: gray; }  /* nbconvert HTML output */
+
+.ansibgblack { background-color: black; }
+.ansibgred { background-color: red; }
+.ansibggreen { background-color: green; }
+.ansibgyellow { background-color: yellow; }
+.ansibgblue { background-color: blue; }
+.ansibgpurple { background-color: magenta; }
+.ansibgcyan { background-color: cyan; }
+.ansibggray { background-color: gray; }
+
+.ansibold { font-weight: bold; }
+</style>
+<h1>Source code for climlab.process.energy_budget</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">climlab.process.time_dependent_process</span> <span class="kn">import</span> <span class="n">TimeDependentProcess</span>
+
+
+<div class="viewcode-block" id="EnergyBudget"><a class="viewcode-back" href="../../../api/climlab.process.html#climlab.process.energy_budget.EnergyBudget">[docs]</a><span class="k">class</span> <span class="nc">EnergyBudget</span><span class="p">(</span><span class="n">TimeDependentProcess</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A parent class for explicit energy budget processes.</span>
+<span class="sd">    </span>
+<span class="sd">    This class solves equations that include a heat capacitiy term like</span>
+<span class="sd">    :math:`C \\frac{dT}{dt} = \\textrm{flux convergence}`</span>
+<span class="sd">    </span>
+<span class="sd">    In an Energy Balance Model with model state :math:`T` this equation </span>
+<span class="sd">    will look like this:</span>
+<span class="sd">    </span>
+<span class="sd">    .. math::</span>
+<span class="sd">    </span>
+<span class="sd">        C \\frac{dT}{dt} = R\downarrow - R\uparrow - H  \n</span>
+<span class="sd">        \\frac{dT}{dt} = \\frac{R\downarrow}{C} - \\frac{R\uparrow}{C} - \\frac{H}{C}</span>
+
+<span class="sd">    Every EnergyBudget object has a ``heating_rate`` dictionary with items </span>
+<span class="sd">    corresponding to each state variable. The heating rate accounts the actual </span>
+<span class="sd">    heating of a subprocess, namely the contribution to the energy budget </span>
+<span class="sd">    of :math:`R\\downarrow, R\\uparrow` and :math:`H` in this case.</span>
+<span class="sd">    The temperature tendencies for each subprocess are then calculated </span>
+<span class="sd">    through dividing the heating rate by the heat capacitiy :math:`C`.</span>
+<span class="sd">    </span>
+<span class="sd">    **Initialization parameters** \n</span>
+<span class="sd">        </span>
+<span class="sd">    An instance of ``EnergyBudget`` is initialized with the forwarded </span>
+<span class="sd">    keyword arguments ``**kwargs`` of the corresponding children classes.</span>
+<span class="sd">    </span>
+<span class="sd">    **Object attributes** \n</span>
+<span class="sd">    </span>
+<span class="sd">    Additional to the parent class </span>
+<span class="sd">    :class:`~climlab.process.timedependentprocess.TimeDependentProcess`</span>
+<span class="sd">    following object attributes are generated or modified during initialization:</span>
+<span class="sd">    </span>
+<span class="sd">    :ivar str time_type:        is set to ``&#39;explicit&#39;``</span>
+<span class="sd">    :ivar dict heating_rate:    energy share for given subprocess in unit </span>
+<span class="sd">                                :math:`\\textrm{W}/ \\textrm{m}^2` stored </span>
+<span class="sd">                                in a dictionary sorted by model states</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>    
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">EnergyBudget</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_type</span> <span class="o">=</span> <span class="s1">&#39;explicit&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">heating_rate</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">_compute_heating_rates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Computes energy flux convergences to get heating rates in unit</span>
+<span class="sd">        :math:`\\textrm{W}/ \\textrm{m}^2`.</span>
+<span class="sd">        </span>
+<span class="sd">        This method should be over-ridden by daughter classes.</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">varname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">heating_rate</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.</span>
+
+    <span class="k">def</span> <span class="nf">_temperature_tendencies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_compute_heating_rates</span><span class="p">()</span>
+        <span class="n">tendencies</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">varname</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="c1">#C = self.state_domain[varname].heat_capacity</span>
+            <span class="n">C</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">domain</span><span class="o">.</span><span class="n">heat_capacity</span>
+            <span class="k">try</span><span class="p">:</span>  <span class="c1"># there may be state variables without heating rates</span>
+                <span class="n">tendencies</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">heating_rate</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span> <span class="o">/</span> <span class="n">C</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="k">return</span> <span class="n">tendencies</span>
+
+    <span class="k">def</span> <span class="nf">_compute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">tendencies</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_temperature_tendencies</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">tendencies</span>
+
+</div>
+<div class="viewcode-block" id="ExternalEnergySource"><a class="viewcode-back" href="../../../api/climlab.process.html#climlab.process.energy_budget.ExternalEnergySource">[docs]</a><span class="k">class</span> <span class="nc">ExternalEnergySource</span><span class="p">(</span><span class="n">EnergyBudget</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A fixed energy source or sink to be specified by the user.</span>
+<span class="sd">        </span>
+<span class="sd">    **Object attributes** \n</span>
+<span class="sd">    </span>
+<span class="sd">    Additional to the parent class :class:`~climlab.process.energy_budget.EnergyBudget`</span>
+<span class="sd">    the following object attribute is modified during initialization:</span>
+<span class="sd">    </span>
+<span class="sd">    :ivar dict heating_rate:    energy share dictionary for this subprocess</span>
+<span class="sd">                                is set to zero for every model state.</span>
+<span class="sd">                                </span>
+<span class="sd">    After initialization the user should modify the fields in the </span>
+<span class="sd">    ``heating_rate`` dictionary, which contain heating rates in </span>
+<span class="sd">    unit :math:`\\textrm{W}/ \\textrm{m}^2` for all state variables.</span>
+<span class="sd">    </span>
+<span class="sd">    :Example:</span>
+
+<span class="sd">        Creating an Energy Balance Model with a uniform external energy source</span>
+<span class="sd">        of :math:`10 \\ \\textrm{W}/ \\textrm{m}^2` for all latitudes::</span>
+<span class="sd">    </span>
+<span class="sd">            &gt;&gt;&gt; import climlab</span>
+<span class="sd">            &gt;&gt;&gt; from climlab.process.energy_budget import ExternalEnergySource</span>
+<span class="sd">            &gt;&gt;&gt; import numpy as np</span>
+
+<span class="sd">            &gt;&gt;&gt; # create model &amp; external energy subprocess</span>
+<span class="sd">            &gt;&gt;&gt; model = climlab.EBM(num_lat=36)</span>
+<span class="sd">            &gt;&gt;&gt; ext_en = ExternalEnergySource(state= model.state,**model.param)</span>
+
+<span class="sd">            &gt;&gt;&gt; # modify external energy rate</span>
+<span class="sd">            &gt;&gt;&gt; ext_en.heating_rate.keys()</span>
+<span class="sd">            [&#39;Ts&#39;]</span>
+
+<span class="sd">            &gt;&gt;&gt; np.squeeze(ext_en.heating_rate[&#39;Ts&#39;])</span>
+<span class="sd">            Field([-0., -0., -0., -0., -0., -0., -0., -0., -0.,  0.,  0.,  0.,  0.,</span>
+<span class="sd">                    0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,</span>
+<span class="sd">                    0., -0., -0., -0., -0., -0., -0., -0., -0., -0.])</span>
+<span class="sd">            </span>
+<span class="sd">            &gt;&gt;&gt; ext_en.heating_rate[&#39;Ts&#39;][:]=10</span>
+
+<span class="sd">            &gt;&gt;&gt; np.squeeze(ext_en.heating_rate[&#39;Ts&#39;])</span>
+<span class="sd">            Field([ 10.,  10.,  10.,  10.,  10.,  10.,  10.,  10.,  10.,  10.,  10.,</span>
+<span class="sd">                    10.,  10.,  10.,  10.,  10.,  10.,  10.,  10.,  10.,  10.,  10.,</span>
+<span class="sd">                    10.,  10.,  10.,  10.,  10.,  10.,  10.,  10.,  10.,  10.,  10.,</span>
+<span class="sd">                    10.,  10.,  10.])</span>
+<span class="sd">            </span>
+<span class="sd">            &gt;&gt;&gt; # add subprocess to model</span>
+<span class="sd">            &gt;&gt;&gt; model.add_subprocess(&#39;ext_energy&#39;,ext_en)</span>
+<span class="sd">            </span>
+<span class="sd">            &gt;&gt;&gt; print model</span>
+<span class="sd">            climlab Process of type &lt;class &#39;climlab.model.ebm.EBM&#39;&gt;. </span>
+<span class="sd">            State variables and domain shapes: </span>
+<span class="sd">              Ts: (36, 1) </span>
+<span class="sd">            The subprocess tree: </span>
+<span class="sd">            top: &lt;class &#39;climlab.model.ebm.EBM&#39;&gt;</span>
+<span class="sd">               diffusion: &lt;class &#39;climlab.dynamics.diffusion.MeridionalDiffusion&#39;&gt;</span>
+<span class="sd">               LW: &lt;class &#39;climlab.radiation.AplusBT.AplusBT&#39;&gt;</span>
+<span class="sd">               ext_energy: &lt;class &#39;climlab.process.energy_budget.ExternalEnergySource&#39;&gt;</span>
+<span class="sd">               albedo: &lt;class &#39;climlab.surface.albedo.StepFunctionAlbedo&#39;&gt;</span>
+<span class="sd">                  iceline: &lt;class &#39;climlab.surface.albedo.Iceline&#39;&gt;</span>
+<span class="sd">                  cold_albedo: &lt;class &#39;climlab.surface.albedo.ConstantAlbedo&#39;&gt;</span>
+<span class="sd">                  warm_albedo: &lt;class &#39;climlab.surface.albedo.P2Albedo&#39;&gt;</span>
+<span class="sd">               insolation: &lt;class &#39;climlab.radiation.insolation.P2Insolation&#39;&gt;</span>
+<span class="sd">                    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ExternalEnergySource</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">varname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">heating_rate</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span> <span class="o">*</span> <span class="mf">0.</span>
+
+    <span class="k">def</span> <span class="nf">_compute_heating_rates</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../intro.html">home</a>|&nbsp;</li>
+        <li><a href="../../../search.html">search</a>|&nbsp;</li>
+        <!-- 
+	<li><a href="../../../contents.html">documentation </a> &raquo;</li>
+	-->
+
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016 (licensed under Creative Commons, see License), Moritz Kreuzer.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+    </div>
+  </body>
+</html>

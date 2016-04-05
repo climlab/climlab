@@ -1,0 +1,254 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>climlab.solar.orbital &mdash; climlab-0.2.13 0.2.13 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.2.13',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="climlab-0.2.13 0.2.13 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for climlab.solar.orbital</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;orbital.py</span>
+
+<span class="sd">This module defines the class OrbitalTable which holds orbital data,</span>
+<span class="sd">and includes a method lookup_parameters() </span>
+<span class="sd">which interpolates the orbital data for a specific year</span>
+<span class="sd">(works equally well for arrays of years)</span>
+
+<span class="sd">The base class OrbitalTable() is designed to work with 5 Myears of orbital data</span>
+<span class="sd">(eccentricity, obliquity, and longitude of perihelion) </span>
+<span class="sd">from Berger and Loutre (1991).</span>
+
+<span class="sd">Data will be read from the file orbit91, which was originally obtained from</span>
+<span class="sd">ftp://ftp.ncdc.noaa.gov/pub/data/paleo/insolation/</span>
+<span class="sd">If the file isn&#39;t found locally, the module will attempt to read it remotely</span>
+<span class="sd">from the above URL.</span>
+<span class="sd">    </span>
+<span class="sd">A subclass LongOrbitalTable() works with La2004 orbital data for -51 to +21 Myears</span>
+<span class="sd">as calculated by Laskar et al. (2004)</span>
+<span class="sd">http://www.imcce.fr/Equipes/ASD/insola/earth/La2004/README.TXT</span>
+
+<span class="sd">References: </span>
+<span class="sd">Berger A. and Loutre M.F. (1991). Insolation values for the climate of</span>
+<span class="sd">    the last 10 million years. Quaternary Science Reviews, 10(4), 297-317.</span>
+<span class="sd">Berger A. (1978). Long-term variations of daily insolation and</span>
+<span class="sd">    Quaternary climatic changes. Journal of Atmospheric Science, 35(12),</span>
+<span class="sd">    2362-2367.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">interpolate</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<div class="viewcode-block" id="OrbitalTable"><a class="viewcode-back" href="../../../climlab.solar.html#climlab.solar.orbital.OrbitalTable">[docs]</a><span class="k">class</span> <span class="nc">OrbitalTable</span><span class="p">:</span>
+    <span class="sd">&#39;&#39;&#39;Invoking OrbitalTable() will load 5 million years of orbital data</span>
+<span class="sd">    (from Berger and Loutre 1991) and compute linear interpolants.</span>
+<span class="sd">    The data can be accessed through the method </span>
+<span class="sd">    OrbitalTable.lookup_parameters(kyear).</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kyear</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ecc</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">long_peri</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obliquity</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="c">#  call a method that reads data from a file and populates the arrays</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_get_data</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_compute_interpolants</span><span class="p">()</span>
+        <span class="c"># find and store min and max years. lookup_parameters should throw an exception</span>
+        <span class="c"># if you ask for something outside this range -- not yet implemented.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kyear_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kyear</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kyear_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kyear</span><span class="p">)</span>
+
+<div class="viewcode-block" id="OrbitalTable.lookup_parameters"><a class="viewcode-back" href="../../../climlab.solar.html#climlab.solar.orbital.OrbitalTable.lookup_parameters">[docs]</a>    <span class="k">def</span> <span class="nf">lookup_parameters</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">kyear</span> <span class="o">=</span> <span class="mi">0</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Look up orbital parameters for given kyear measured from present.</span>
+<span class="sd">        Input kyear is thousands of years after present.</span>
+<span class="sd">        For years before present, use kyear &lt; 0.</span>
+<span class="sd">        </span>
+<span class="sd">        Will handle scalar or vector input (for multiple years).</span>
+<span class="sd">    </span>
+<span class="sd">        Returns a three-member dictionary of orbital parameters: </span>
+<span class="sd">            ecc = eccentricity (dimensionless)</span>
+<span class="sd">            long_peri = longitude of perihelion relative to vernal equinox (degrees)</span>
+<span class="sd">            obliquity = obliquity angle or axial tilt (degrees).</span>
+<span class="sd">        Each member is an array of same size as kyear.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c">#  linear interpolation:</span>
+        <span class="n">this_ecc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_ecc</span><span class="p">(</span><span class="n">kyear</span><span class="p">)</span>
+        <span class="n">this_obliquity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_obliquity</span><span class="p">(</span><span class="n">kyear</span><span class="p">)</span>
+        <span class="n">this_long_peri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">f_long_peri</span><span class="p">(</span><span class="n">kyear</span><span class="p">)</span>
+        <span class="c">#  convert long_peri to an angle (in degrees) between 0 and 360</span>
+        <span class="n">long_peri_converted</span> <span class="o">=</span> <span class="n">this_long_peri</span> <span class="o">%</span> <span class="mf">360.</span>   
+        <span class="c"># Build a dictionary of all the parameters</span>
+        <span class="n">orb</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;ecc&#39;</span><span class="p">:</span><span class="n">this_ecc</span><span class="p">,</span> <span class="s">&#39;long_peri&#39;</span><span class="p">:</span><span class="n">long_peri_converted</span><span class="p">,</span> <span class="s">&#39;obliquity&#39;</span><span class="p">:</span><span class="n">this_obliquity</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">orb</span>
+</div>
+    <span class="k">def</span> <span class="nf">_get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">past_file</span> <span class="o">=</span> <span class="s">&#39;orbit91&#39;</span>
+        <span class="n">base_url</span> <span class="o">=</span> <span class="s">&#39;ftp://ftp.ncdc.noaa.gov/pub/data/paleo/insolation/&#39;</span>
+        <span class="c">#  This gives the full path to the data file, assuming it&#39;s in the same directory</span>
+        <span class="n">local_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">)</span>
+        <span class="n">fullfilename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="n">past_file</span><span class="p">)</span>
+
+        <span class="n">num_lines_past</span> <span class="o">=</span> <span class="mi">5001</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kyear</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">(</span><span class="n">num_lines_past</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ecc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kyear</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">long_peri</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kyear</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obliquity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kyear</span><span class="p">)</span>
+
+        <span class="c">#  This gives the full path to the data file, assuming it&#39;s in the same directory</span>
+        <span class="n">fullfilename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">__file__</span><span class="p">),</span> <span class="n">past_file</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">record</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">fullfilename</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span>
+            <span class="k">print</span> <span class="s">&#39;Loading Berger and Loutre (1991) orbital parameter data from file &#39;</span> <span class="o">+</span> <span class="n">fullfilename</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&#39;Failed to load orbital locally, trying to access it via remote ftp.&#39;</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">import</span> <span class="nn">urllib2</span>
+                <span class="n">record</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span> <span class="n">base_url</span> <span class="o">+</span> <span class="n">past_file</span> <span class="p">)</span>
+                <span class="k">print</span> <span class="s">&#39;Accessing Berger and Loutre (1991) orbital data from &#39;</span> <span class="o">+</span> <span class="n">base_url</span>
+                <span class="k">print</span> <span class="s">&#39;Reading file &#39;</span> <span class="o">+</span> <span class="n">past_file</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">StandardError</span><span class="p">(</span><span class="s">&#39;Failed to load the data via remote ftp.&#39;</span><span class="p">)</span>
+    
+        <span class="c">#  loop through each line of the file, read it into numpy array</span>
+        <span class="c">#  skip first three lines of header</span>
+        <span class="n">toskip</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">toskip</span><span class="p">):</span>
+            <span class="n">record</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">index</span><span class="p">,</span><span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">record</span><span class="p">):</span>
+            <span class="n">str1</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>  <span class="c"># remove newline character</span>
+            <span class="n">thisdata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">str1</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&#39; &#39;</span><span class="p">)</span>
+            <span class="c"># ignore after the 4th column</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">kyear</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">thisdata</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">ecc</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">thisdata</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">long_peri</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">thisdata</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">obliquity</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">thisdata</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">record</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    
+    <span class="k">def</span> <span class="nf">_compute_interpolants</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># add 180 degrees to long_peri (see lambda definition, Berger 1978 Appendix)</span>
+        <span class="n">long_peri0rad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">long_peri</span> <span class="o">+</span> <span class="mf">180.</span><span class="p">)</span> 
+        <span class="n">long_peri0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">unwrap</span><span class="p">(</span> <span class="n">long_peri0rad</span> <span class="p">)</span> <span class="p">)</span> <span class="c"># remove discontinuities (360 degree jumps)</span>
+        <span class="c">#  calculate linear interpolants</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f_ecc</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kyear</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ecc</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f_long_peri</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kyear</span><span class="p">,</span> <span class="n">long_peri0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f_obliquity</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">interp1d</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kyear</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">obliquity</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="LongOrbitalTable"><a class="viewcode-back" href="../../../climlab.solar.html#climlab.solar.orbital.LongOrbitalTable">[docs]</a><span class="k">class</span> <span class="nc">LongOrbitalTable</span><span class="p">(</span><span class="n">OrbitalTable</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Invoking LongOrbitalTable() will load orbital parameter tables for -51 to +21 Myears</span>
+<span class="sd">    as calculated by Laskar et al. 2004</span>
+<span class="sd">    http://www.imcce.fr/Equipes/ASD/insola/earth/La2004/README.TXT</span>
+<span class="sd">    </span>
+<span class="sd">    Usage is identical to parent class OrbitalTable().</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">_get_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">base_url</span> <span class="o">=</span> <span class="s">&#39;http://www.imcce.fr/Equipes/ASD/insola/earth/La2004/&#39;</span>
+        <span class="n">past_file</span> <span class="o">=</span> <span class="s">&#39;INSOLN.LA2004.BTL.ASC&#39;</span>
+        <span class="n">future_file</span> <span class="o">=</span> <span class="s">&#39;INSOLP.LA2004.BTL.ASC&#39;</span>
+    
+        <span class="n">num_lines_past</span> <span class="o">=</span> <span class="mi">51001</span>
+        <span class="n">num_lines_future</span> <span class="o">=</span> <span class="mi">21001</span>
+        <span class="n">num_columns</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="n">data_past</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">num_lines_past</span><span class="p">,</span><span class="n">num_columns</span><span class="p">))</span>
+        <span class="n">data_future</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="n">num_lines_future</span><span class="p">,</span> <span class="n">num_columns</span><span class="p">))</span>
+    
+        <span class="k">print</span> <span class="s">&#39;Attempting to access La2004 orbital data from &#39;</span> <span class="o">+</span> <span class="n">base_url</span>
+        <span class="c">#  loop through each line of the file, read it into numpy array</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="n">filename</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">((</span><span class="n">data_past</span><span class="p">,</span><span class="n">data_future</span><span class="p">),</span> 
+                            <span class="p">(</span><span class="n">past_file</span><span class="p">,</span><span class="n">future_file</span><span class="p">)):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">import</span> <span class="nn">urllib2</span>
+                <span class="k">print</span> <span class="s">&#39;Reading file &#39;</span> <span class="o">+</span> <span class="n">filename</span>
+                <span class="n">record</span> <span class="o">=</span> <span class="n">urllib2</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span> <span class="n">base_url</span> <span class="o">+</span> <span class="n">filename</span> <span class="p">)</span>
+                <span class="k">for</span> <span class="n">index</span><span class="p">,</span><span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">record</span><span class="p">):</span>
+                    <span class="n">str1</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>  <span class="c"># remove newline character</span>
+                    <span class="n">str2</span> <span class="o">=</span> <span class="n">str1</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;D&#39;</span><span class="p">,</span><span class="s">&#39;E&#39;</span><span class="p">)</span>  <span class="c"># put string into numpy format</span>
+                    <span class="n">data</span><span class="p">[</span><span class="n">index</span><span class="p">,:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">str2</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s">&#39; &#39;</span><span class="p">)</span>
+                <span class="n">record</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">StandardError</span><span class="p">(</span><span class="s">&#39;Failed to access file &#39;</span> <span class="o">+</span> <span class="n">filename</span> <span class="p">)</span>
+    
+        <span class="c">#  need to flip it so the data runs from past to present</span>
+        <span class="n">data_past</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">data_past</span><span class="p">)</span>
+        <span class="c"># and expunge the first line of the future data because it repeats year 0</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">data_past</span><span class="p">,</span><span class="n">data_future</span><span class="p">[</span><span class="mi">1</span><span class="p">:,:]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kyear</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ecc</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">obliquity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span><span class="mi">2</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">long_peri</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span><span class="mi">3</span><span class="p">])</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

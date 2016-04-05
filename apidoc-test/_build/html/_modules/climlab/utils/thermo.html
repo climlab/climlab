@@ -1,0 +1,247 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>climlab.utils.thermo &mdash; climlab-0.2.13 0.2.13 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.2.13',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="climlab-0.2.13 0.2.13 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for climlab.utils.thermo</h1><div class="highlight"><pre>
+<span class="sd">&#39;&#39;&#39;thermo.py</span>
+
+<span class="sd">A collection of function definitions to handle common</span>
+<span class="sd">thermodynamic calculations for the atmosphere.</span>
+
+<span class="sd">Code developed by Brian Rose, University at Albany</span>
+<span class="sd">brose@albany.edu</span>
+<span class="sd">in support of the class ATM/ENV 415: Climate Laboratory</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">climlab</span> <span class="kn">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">const</span>
+
+
+<div class="viewcode-block" id="potential_temperature"><a class="viewcode-back" href="../../../climlab.utils.html#climlab.utils.thermo.potential_temperature">[docs]</a><span class="k">def</span> <span class="nf">potential_temperature</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">p</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute potential temperature for an air parcel.</span>
+<span class="sd">    </span>
+<span class="sd">    Input:  T is temperature in Kelvin</span>
+<span class="sd">            p is pressure in mb or hPa</span>
+<span class="sd">    Output: potential temperature in Kelvin.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">theta</span> <span class="o">=</span> <span class="n">T</span><span class="o">*</span><span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">ps</span><span class="o">/</span><span class="n">p</span><span class="p">)</span><span class="o">**</span><span class="n">const</span><span class="o">.</span><span class="n">kappa</span>
+    <span class="k">return</span> <span class="n">theta</span>
+</div>
+<div class="viewcode-block" id="theta"><a class="viewcode-back" href="../../../climlab.utils.html#climlab.utils.thermo.theta">[docs]</a><span class="k">def</span> <span class="nf">theta</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">p</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Convenience method, identical to thermo.potential_temperature(T,p).&#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">potential_temperature</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">p</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="temperature_from_potential"><a class="viewcode-back" href="../../../climlab.utils.html#climlab.utils.thermo.temperature_from_potential">[docs]</a><span class="k">def</span> <span class="nf">temperature_from_potential</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span><span class="n">p</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert potential temperature to in-situ temperature.</span>
+<span class="sd">    </span>
+<span class="sd">    Input:  theta is potential temperature in Kelvin</span>
+<span class="sd">            p is pressure in mb or hPa</span>
+<span class="sd">    Output: absolute temperature in Kelvin.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">T</span> <span class="o">=</span> <span class="n">theta</span><span class="o">/</span><span class="p">((</span><span class="n">const</span><span class="o">.</span><span class="n">ps</span><span class="o">/</span><span class="n">p</span><span class="p">)</span><span class="o">**</span><span class="n">const</span><span class="o">.</span><span class="n">kappa</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">T</span>
+
+</div>
+<div class="viewcode-block" id="T"><a class="viewcode-back" href="../../../climlab.utils.html#climlab.utils.thermo.T">[docs]</a><span class="k">def</span> <span class="nf">T</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span><span class="n">p</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Convenience method, identical to thermo.temperature_from_potential(theta,p).&#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">temperature_from_potential</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span><span class="n">p</span><span class="p">)</span>
+    
+</div>
+<div class="viewcode-block" id="clausius_clapeyron"><a class="viewcode-back" href="../../../climlab.utils.html#climlab.utils.thermo.clausius_clapeyron">[docs]</a><span class="k">def</span> <span class="nf">clausius_clapeyron</span><span class="p">(</span><span class="n">T</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute saturation vapor pressure as function of temperature T.</span>
+<span class="sd">    </span>
+<span class="sd">    Input: T is temperature in Kelvin</span>
+<span class="sd">    Output: saturation vapor pressure in mb or hPa</span>
+<span class="sd">    </span>
+<span class="sd">    Formula from Rogers and Yau &quot;A Short Course in Cloud Physics&quot; (Pergammon Press), p. 16</span>
+<span class="sd">    claimed to be accurate to within 0.1% between -30degC and 35 degC</span>
+<span class="sd">    Based on the paper by Bolton (1980, Monthly Weather Review).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">Tcel</span> <span class="o">=</span> <span class="n">T</span> <span class="o">-</span> <span class="n">const</span><span class="o">.</span><span class="n">tempCtoK</span>
+    <span class="n">es</span> <span class="o">=</span> <span class="mf">6.112</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mf">17.67</span><span class="o">*</span><span class="n">Tcel</span><span class="o">/</span><span class="p">(</span><span class="n">Tcel</span><span class="o">+</span><span class="mf">243.5</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">es</span>
+
+</div>
+<div class="viewcode-block" id="qsat"><a class="viewcode-back" href="../../../climlab.utils.html#climlab.utils.thermo.qsat">[docs]</a><span class="k">def</span> <span class="nf">qsat</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">p</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute saturation specific humidity as function of temperature and pressure.</span>
+
+<span class="sd">    Input:  T is temperature in Kelvin</span>
+<span class="sd">            p is pressure in hPa or mb</span>
+<span class="sd">    Output: saturation specific humidity (dimensionless).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">eps</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">Rd</span> <span class="o">/</span> <span class="n">const</span><span class="o">.</span><span class="n">Rv</span>
+    <span class="n">es</span> <span class="o">=</span> <span class="n">clausius_clapeyron</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">eps</span> <span class="o">*</span> <span class="n">es</span> <span class="o">/</span> <span class="p">(</span><span class="n">p</span> <span class="o">-</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">eps</span><span class="p">)</span> <span class="o">*</span> <span class="n">es</span> <span class="p">)</span>
+    <span class="k">return</span> <span class="n">q</span>
+
+</div>
+<div class="viewcode-block" id="pseudoadiabat"><a class="viewcode-back" href="../../../climlab.utils.html#climlab.utils.thermo.pseudoadiabat">[docs]</a><span class="k">def</span> <span class="nf">pseudoadiabat</span><span class="p">(</span><span class="n">T</span><span class="p">,</span><span class="n">p</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compute the local slope of the pseudoadiabat at given temperature and pressure</span>
+<span class="sd">    </span>
+<span class="sd">    Inputs:   p is pressure in hPa or mb</span>
+<span class="sd">              T is local temperature in Kelvin</span>
+<span class="sd">    Output:   dT/dp, the rate of temperature change for pseudoadiabatic ascent</span>
+<span class="sd">              </span>
+<span class="sd">    the pseudoadiabat describes changes in temperature and pressure for an air </span>
+<span class="sd">    parcel at saturation assuming instantaneous rain-out of the super-saturated water</span>
+<span class="sd">    </span>
+<span class="sd">    Formula from Raymond Pierrehumbert, &quot;Principles of Planetary Climate&quot; </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">esoverp</span> <span class="o">=</span> <span class="n">clausius_clapeyron</span><span class="p">(</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="n">p</span>
+    <span class="n">Tcel</span> <span class="o">=</span> <span class="n">T</span> <span class="o">-</span> <span class="n">const</span><span class="o">.</span><span class="n">tempCtoK</span>
+    <span class="n">L</span> <span class="o">=</span> <span class="p">(</span><span class="mf">2.501</span> <span class="o">-</span> <span class="mf">0.00237</span> <span class="o">*</span> <span class="n">Tcel</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1.E6</span>   <span class="c"># Accurate form of latent heat of vaporization in J/kg</span>
+    <span class="n">ratio</span> <span class="o">=</span> <span class="n">L</span> <span class="o">/</span> <span class="n">T</span> <span class="o">/</span> <span class="n">const</span><span class="o">.</span><span class="n">Rv</span>
+    <span class="n">dTdp</span> <span class="o">=</span> <span class="p">(</span><span class="n">T</span> <span class="o">/</span> <span class="n">p</span> <span class="o">*</span> <span class="n">const</span><span class="o">.</span><span class="n">kappa</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">esoverp</span> <span class="o">*</span> <span class="n">ratio</span><span class="p">)</span> <span class="o">/</span> 
+        <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">const</span><span class="o">.</span><span class="n">kappa</span> <span class="o">*</span> <span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">cpv</span> <span class="o">/</span> <span class="n">const</span><span class="o">.</span><span class="n">Rv</span> <span class="o">+</span> <span class="p">(</span><span class="n">ratio</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">ratio</span><span class="p">)</span> <span class="o">*</span> <span class="n">esoverp</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">dTdp</span>
+
+</div>
+<div class="viewcode-block" id="estimated_inversion_strength"><a class="viewcode-back" href="../../../climlab.utils.html#climlab.utils.thermo.estimated_inversion_strength">[docs]</a><span class="k">def</span> <span class="nf">estimated_inversion_strength</span><span class="p">(</span><span class="n">T0</span><span class="p">,</span><span class="n">T700</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Compute the &quot;estimated inversion strength&quot;, T0 is surface temp, T700 is temp at 700 hPa, both in K.</span>
+<span class="sd">    Following Wood and Bretherton, J. Climate 2006.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    
+    <span class="n">RH</span> <span class="o">=</span> <span class="mf">0.8</span>
+    <span class="n">T850</span> <span class="o">=</span> <span class="p">(</span><span class="n">T0</span><span class="o">+</span><span class="n">T700</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">;</span>
+    <span class="n">LCL</span> <span class="o">=</span> <span class="p">(</span><span class="mi">20</span> <span class="o">+</span> <span class="p">(</span><span class="n">T0</span><span class="o">-</span><span class="n">const</span><span class="o">.</span><span class="n">tempCtoK</span><span class="p">)</span><span class="o">/</span><span class="mi">5</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">RH</span><span class="p">)</span>  <span class="c"># approximate formula... could do this more accurately.</span>
+    <span class="n">LTS</span> <span class="o">=</span> <span class="n">potential_temperature</span><span class="p">(</span><span class="n">T700</span><span class="p">,</span> <span class="mi">700</span><span class="p">)</span> <span class="o">-</span> <span class="n">T0</span>  <span class="c"># Lower Tropospheric Stability (theta700 - theta0)</span>
+    <span class="n">Gammam</span> <span class="o">=</span> <span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">g</span><span class="o">/</span><span class="n">const</span><span class="o">.</span><span class="n">cp</span><span class="o">*</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">const</span><span class="o">.</span><span class="n">Lhvap</span><span class="o">*</span><span class="n">qsat</span><span class="p">(</span><span class="n">T850</span><span class="p">,</span><span class="mi">850</span><span class="p">)</span> <span class="o">/</span> 
+              <span class="n">const</span><span class="o">.</span><span class="n">Rd</span> <span class="o">/</span> <span class="n">T850</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">const</span><span class="o">.</span><span class="n">Lhvap</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">qsat</span><span class="p">(</span><span class="n">T850</span><span class="p">,</span><span class="mi">850</span><span class="p">)</span><span class="o">/</span>
+              <span class="n">const</span><span class="o">.</span><span class="n">cp</span><span class="o">/</span><span class="n">const</span><span class="o">.</span><span class="n">Rv</span><span class="o">/</span><span class="n">T850</span><span class="o">**</span><span class="mi">2</span><span class="p">)))</span>
+    <span class="n">z700</span> <span class="o">=</span> <span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">Rd</span><span class="o">*</span><span class="n">T0</span><span class="o">/</span><span class="n">const</span><span class="o">.</span><span class="n">g</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1000</span><span class="o">/</span><span class="mi">700</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">LTS</span> <span class="o">-</span> <span class="n">Gammam</span><span class="o">*</span><span class="p">(</span><span class="n">z700</span> <span class="o">-</span> <span class="n">LCL</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="EIS"><a class="viewcode-back" href="../../../climlab.utils.html#climlab.utils.thermo.EIS">[docs]</a><span class="k">def</span> <span class="nf">EIS</span><span class="p">(</span><span class="n">T0</span><span class="p">,</span><span class="n">T700</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Convenience method, identical to thermo.estimated_inversion_strength(T0,T700)&#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">estimated_inversion_strength</span><span class="p">(</span><span class="n">T0</span><span class="p">,</span><span class="n">T700</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="blackbody_emission"><a class="viewcode-back" href="../../../climlab.utils.html#climlab.utils.thermo.blackbody_emission">[docs]</a><span class="k">def</span> <span class="nf">blackbody_emission</span><span class="p">(</span><span class="n">T</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Blackbody radiation following the Stefan-Boltzmann law.&#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">const</span><span class="o">.</span><span class="n">sigma</span> <span class="o">*</span> <span class="n">T</span><span class="o">**</span><span class="mi">4</span>
+</div>
+<div class="viewcode-block" id="Planck_frequency"><a class="viewcode-back" href="../../../climlab.utils.html#climlab.utils.thermo.Planck_frequency">[docs]</a><span class="k">def</span> <span class="nf">Planck_frequency</span><span class="p">(</span><span class="n">nu</span><span class="p">,</span> <span class="n">T</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;The Planck function B(nu,T):</span>
+<span class="sd">    the flux density for blackbody radiation in frequency space</span>
+<span class="sd">    nu is frequency in 1/s</span>
+<span class="sd">    T is temperature in Kelvin</span>
+<span class="sd">    </span>
+<span class="sd">    Formula from Raymond Pierrehumbert, &quot;Principles of Planetary Climate&quot; </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">hPlanck</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">c_light</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">kBoltzmann</span>
+    <span class="k">return</span> <span class="mi">2</span><span class="o">*</span><span class="n">h</span><span class="o">*</span><span class="n">nu</span><span class="o">**</span><span class="mi">3</span><span class="o">/</span><span class="n">c</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">h</span><span class="o">*</span><span class="n">nu</span><span class="o">/</span><span class="n">k</span><span class="o">/</span><span class="n">T</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    </div>
+<div class="viewcode-block" id="Planck_wavenumber"><a class="viewcode-back" href="../../../climlab.utils.html#climlab.utils.thermo.Planck_wavenumber">[docs]</a><span class="k">def</span> <span class="nf">Planck_wavenumber</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">T</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;The Planck function (flux density for blackbody radition)</span>
+<span class="sd">    in wavenumber space</span>
+<span class="sd">    n is wavenumber in 1/cm</span>
+<span class="sd">    T is temperature in Kelvin</span>
+<span class="sd">    </span>
+<span class="sd">    Formula from Raymond Pierrehumbert, &quot;Principles of Planetary Climate&quot; </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">c_light</span>
+    <span class="c"># convert to mks units</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="n">n</span><span class="o">*</span><span class="mf">100.</span>
+    <span class="k">return</span> <span class="n">c</span> <span class="o">*</span> <span class="n">Planck_frequency</span><span class="p">(</span><span class="n">n</span><span class="o">*</span><span class="n">c</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Planck_wavelength"><a class="viewcode-back" href="../../../climlab.utils.html#climlab.utils.thermo.Planck_wavelength">[docs]</a><span class="k">def</span> <span class="nf">Planck_wavelength</span><span class="p">(</span><span class="n">l</span><span class="p">,</span> <span class="n">T</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;The Planck function (flux density for blackbody radiation)</span>
+<span class="sd">    in wavelength space</span>
+<span class="sd">    l is wavelength in meters</span>
+<span class="sd">    T is temperature in Kelvin</span>
+<span class="sd">    </span>
+<span class="sd">    Formula from Raymond Pierrehumbert, &quot;Principles of Planetary Climate&quot; </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">hPlanck</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">c_light</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">kBoltzmann</span>
+    <span class="n">u</span> <span class="o">=</span> <span class="n">h</span><span class="o">*</span><span class="n">c</span><span class="o">/</span><span class="n">l</span><span class="o">/</span><span class="n">k</span><span class="o">/</span><span class="n">T</span>
+    <span class="k">return</span> <span class="mi">2</span><span class="o">*</span><span class="n">k</span><span class="o">**</span><span class="mi">5</span><span class="o">*</span><span class="n">T</span><span class="o">**</span><span class="mi">5</span><span class="o">/</span><span class="n">h</span><span class="o">**</span><span class="mi">4</span><span class="o">/</span><span class="n">c</span><span class="o">**</span><span class="mi">3</span><span class="o">*</span><span class="n">u</span><span class="o">**</span><span class="mi">5</span><span class="o">/</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">u</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,1271 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>climlab.radiation package &mdash; climlab 0.3.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.3.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="climlab 0.3.0.1 documentation" href="../index.html" />
+    <link rel="up" title="Application Programming Interface" href="climlab.html" />
+    <link rel="next" title="climlab.solar package" href="climlab.solar.html" />
+    <link rel="prev" title="climlab.process package" href="climlab.process.html" /> 
+  </head>
+  <body role="document">
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../index.html"><img src="../_static/logo.png" border="0" alt="sampledoc"/></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="climlab.solar.html" title="climlab.solar package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="climlab.process.html" title="climlab.process package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../intro.html">home</a>|&nbsp;</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+        <!-- 
+	<li><a href="../contents.html">documentation </a> &raquo;</li>
+	-->
+
+          <li class="nav-item nav-item-1"><a href="climlab.html" accesskey="U">Application Programming Interface</a> &raquo;</li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../index.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../download.html">Download</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="climlab.html">Application Programming Interface</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="climlab.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="climlab.html#inheritance-diagram">Inheritance Diagram</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contact.html">Contact</a></li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/climlab.radiation.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput > div,
+div.nbinput div[class^=highlight],
+div.nbinput div[class^=highlight] pre,
+div.nboutput,
+div.nboutput > div,
+div.nboutput div[class^=highlight],
+div.nboutput div[class^=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput > :first-child pre {
+    color: navy;
+}
+
+/* output prompt */
+div.nboutput > :first-child pre {
+    color: darkred;
+}
+
+/* all prompts */
+div.nbinput > :first-child[class^=highlight],
+div.nboutput > :first-child[class^=highlight],
+div.nboutput > :first-child {
+    min-width: 11ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+
+/* input/output area */
+div.nbinput > :nth-child(2)[class^=highlight],
+div.nboutput > :nth-child(2),
+div.nboutput > :nth-child(2)[class^=highlight] {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+}
+
+/* input area */
+div.nbinput > :nth-child(2)[class^=highlight] {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput  > :nth-child(2).stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansiblack { color: black; }
+.ansired { color: darkred; }
+.ansigreen { color: darkgreen; }
+.ansiyellow { color: #c4a000; }
+.ansiblue { color: darkblue; }
+.ansipurple { color: darkviolet; }
+.ansicyan { color: steelblue; }
+/* See https://github.com/jupyter/nbconvert/issues/174 */
+.ansigray { color: gray; }  /* nbconvert CSS */
+.ansigrey { color: gray; }  /* nbconvert HTML output */
+
+.ansibgblack { background-color: black; }
+.ansibgred { background-color: red; }
+.ansibggreen { background-color: green; }
+.ansibgyellow { background-color: yellow; }
+.ansibgblue { background-color: blue; }
+.ansibgpurple { background-color: magenta; }
+.ansibgcyan { background-color: cyan; }
+.ansibggray { background-color: gray; }
+
+.ansibold { font-weight: bold; }
+</style>
+<div class="section" id="climlab-radiation-package">
+<h1>climlab.radiation package<a class="headerlink" href="#climlab-radiation-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="climlab-radiation-aplusbt-module">
+<h2>climlab.radiation.AplusBT module<a class="headerlink" href="#climlab-radiation-aplusbt-module" title="Permalink to this headline">¶</a></h2>
+<p class="graphviz">
+<img src="../_images/inheritance-7761f69dd3694fe9f8a60524514896898b9e7d02.png" alt="Inheritance diagram of climlab.radiation.AplusBT" usemap="#inheritance2878b3a7d8" class="inheritance"/>
+<map id="inheritance2878b3a7d8" name="inheritance2878b3a7d8">
+<area shape="rect" id="node1" href="#climlab.radiation.AplusBT.AplusBT" target="_top" title="The simplest linear longwave radiation module." alt="" coords="657,5,754,35"/>
+<area shape="rect" id="node2" href="climlab.process.html#climlab.process.energy_budget.EnergyBudget" target="_top" title="A parent class for explicit energy budget processes." alt="" coords="430,33,583,63"/>
+<area shape="rect" id="node3" href="#climlab.radiation.AplusBT.AplusBT_CO2" target="_top" title="Linear longwave radiation module considering CO2 concentration." alt="" coords="632,59,779,90"/>
+<area shape="rect" id="node4" href="climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess" target="_top" title="A generic parent class for all time&#45;dependent processes." alt="" coords="144,33,381,63"/>
+<area shape="rect" id="node5" href="climlab.process.html#climlab.process.process.Process" target="_top" title="A generic parent class for all climlab process objects." alt="" coords="5,33,96,63"/>
+</map>
+</p>
+<span class="target" id="module-climlab.radiation.AplusBT"></span><dl class="class">
+<dt id="climlab.radiation.AplusBT.AplusBT">
+<em class="property">class </em><code class="descclassname">climlab.radiation.AplusBT.</code><code class="descname">AplusBT</code><span class="sig-paren">(</span><em>A=200.0</em>, <em>B=2.0</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/radiation/AplusBT.html#AplusBT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.AplusBT.AplusBT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="climlab.process.html#climlab.process.energy_budget.EnergyBudget" title="climlab.process.energy_budget.EnergyBudget"><code class="xref py py-class docutils literal"><span class="pre">climlab.process.energy_budget.EnergyBudget</span></code></a></p>
+<p>The simplest linear longwave radiation module.</p>
+<p>Calculates the Outgoing Longwave Radation (OLR) <span class="math">\(R\uparrow\)</span> as</p>
+<div class="math">
+\[R\uparrow = A + B \cdot T\]</div>
+<p>where <span class="math">\(T\)</span> is the state variable.</p>
+<p>Should be invoked with a single temperature state variable only.</p>
+<p><strong>Initialization parameters</strong></p>
+<p>An instance of <code class="docutils literal"><span class="pre">AplusBT</span></code> is initialized with the following 
+arguments:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>A</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; <p>parameter for linear OLR parameterization</p>
+<ul>
+<li>unit: <span class="math">\(\frac{\textrm{W}}
+{\textrm{m}^2}\)</span></li>
+<li>default value: <code class="docutils literal"><span class="pre">200.0</span></code></li>
+</ul>
+</li>
+<li><strong>B</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; <p>parameter for linear OLR parameterization</p>
+<ul>
+<li>unit: <span class="math">\(\frac{\textrm{W}}
+{\textrm{m}^2 \ ^{\circ} \textrm{C}}\)</span></li>
+<li>default value: <code class="docutils literal"><span class="pre">2.0</span></code></li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Object attributes</strong></p>
+<p>Additional to the parent class <a class="reference internal" href="climlab.process.html#climlab.process.energy_budget.EnergyBudget" title="climlab.process.energy_budget.EnergyBudget"><code class="xref py py-class docutils literal"><span class="pre">EnergyBudget</span></code></a>
+following object attributes are generated or modified during initialization:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="#climlab.radiation.AplusBT.AplusBT.A" title="climlab.radiation.AplusBT.AplusBT.A"><strong>A</strong></a> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; calls the setter function of <a class="reference internal" href="#climlab.radiation.AplusBT.AplusBT.A" title="climlab.radiation.AplusBT.AplusBT.A"><code class="xref py py-func docutils literal"><span class="pre">A()</span></code></a></li>
+<li><a class="reference internal" href="#climlab.radiation.AplusBT.AplusBT.B" title="climlab.radiation.AplusBT.AplusBT.B"><strong>B</strong></a> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; calls the setter function of <a class="reference internal" href="#climlab.radiation.AplusBT.AplusBT.B" title="climlab.radiation.AplusBT.AplusBT.B"><code class="xref py py-func docutils literal"><span class="pre">B()</span></code></a></li>
+<li><strong>diagnostics</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; key <code class="docutils literal"><span class="pre">'OLR'</span></code> initialized with value:
+<a class="reference internal" href="climlab.domain.html#climlab.domain.field.Field" title="climlab.domain.field.Field"><code class="xref py py-class docutils literal"><span class="pre">Field</span></code></a> of zeros
+in size of <code class="docutils literal"><span class="pre">self.Ts</span></code></li>
+<li><strong>OLR</strong> (<a class="reference internal" href="climlab.domain.html#climlab.domain.field.Field" title="climlab.domain.field.Field"><em>Field</em></a>) &#8211; the subprocess attribute <code class="docutils literal"><span class="pre">self.OLR</span></code> is
+created with correct dimensions</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">This module currently works only for a single state variable!</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Example:</th><td class="field-body"><p class="first">Simple linear radiation module (stand alone):</p>
+<div class="last highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">climlab</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># create a column atmosphere and scalar surface</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sfc</span><span class="p">,</span> <span class="n">atm</span> <span class="o">=</span> <span class="n">climlab</span><span class="o">.</span><span class="n">domain</span><span class="o">.</span><span class="n">single_column</span><span class="p">()</span>  
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Create a state variable</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">Ts</span> <span class="o">=</span> <span class="n">climlab</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="mf">15.</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">sfc</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Make a dictionary of state variables</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Ts&#39;</span><span class="p">:</span> <span class="n">Ts</span><span class="p">}</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># create process</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">olr</span> <span class="o">=</span> <span class="n">climlab</span><span class="o">.</span><span class="n">radiation</span><span class="o">.</span><span class="n">AplusBT</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="n">s</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">olr</span>
+<span class="go">climlab Process of type &lt;class &#39;climlab.radiation.AplusBT.AplusBT&#39;&gt;. </span>
+<span class="go">State variables and domain shapes: </span>
+<span class="go">  Ts: (1,) </span>
+<span class="go">The subprocess tree: </span>
+<span class="go">top: &lt;class &#39;climlab.radiation.AplusBT.AplusBT&#39;&gt;</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># to compute tendencies and diagnostics</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">olr</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1">#  or to actually update the temperature</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">olr</span><span class="o">.</span><span class="n">step_forward</span><span class="p">()</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">olr</span><span class="o">.</span><span class="n">state</span>
+<span class="go">{&#39;Ts&#39;: Field([ 5.69123176])}</span>
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="climlab.radiation.AplusBT.AplusBT.A">
+<code class="descname">A</code><a class="headerlink" href="#climlab.radiation.AplusBT.AplusBT.A" title="Permalink to this definition">¶</a></dt>
+<dd><p>Property of AplusBT parameter A.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body"><p class="first">Returns the parameter A which is stored in attribute 
+<code class="docutils literal"><span class="pre">self._A</span></code></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Setter:</th><td class="field-body"><ul class="first simple">
+<li>sets parameter A which is addressed as <code class="docutils literal"><span class="pre">self._A</span></code>
+to the new value</li>
+<li>updates the parameter dictionary <code class="docutils literal"><span class="pre">self.param['A']</span></code></li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><p class="first">float</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Example:</th><td class="field-body"><div class="first last highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">climlab</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">climlab</span><span class="o">.</span><span class="n">EBM</span><span class="p">()</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># getter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">subprocess</span><span class="p">[</span><span class="s1">&#39;LW&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">A</span>
+<span class="go">210.0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># setter</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">subprocess</span><span class="p">[</span><span class="s1">&#39;LW&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="mi">220</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># getter again                </span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">subprocess</span><span class="p">[</span><span class="s1">&#39;LW&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">A</span>
+<span class="go">220</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># subprocess parameter dictionary</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">subprocess</span><span class="p">[</span><span class="s1">&#39;LW&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">param</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">]</span>
+<span class="go">220</span>
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="climlab.radiation.AplusBT.AplusBT.B">
+<code class="descname">B</code><a class="headerlink" href="#climlab.radiation.AplusBT.AplusBT.B" title="Permalink to this definition">¶</a></dt>
+<dd><p>Property of AplusBT parameter B.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body"><p class="first">Returns the parameter B which is stored in attribute 
+<code class="docutils literal"><span class="pre">self._B</span></code></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Setter:</th><td class="field-body"><ul class="first simple">
+<li>sets parameter B which is addressed as <code class="docutils literal"><span class="pre">self._B</span></code>
+to the new value</li>
+<li>updates the parameter dictionary <code class="docutils literal"><span class="pre">self.param['B']</span></code></li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><p class="first last">float</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="climlab.radiation.AplusBT.AplusBT_CO2">
+<em class="property">class </em><code class="descclassname">climlab.radiation.AplusBT.</code><code class="descname">AplusBT_CO2</code><span class="sig-paren">(</span><em>CO2=300.0</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/radiation/AplusBT.html#AplusBT_CO2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.AplusBT.AplusBT_CO2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="climlab.process.html#climlab.process.energy_budget.EnergyBudget" title="climlab.process.energy_budget.EnergyBudget"><code class="xref py py-class docutils literal"><span class="pre">climlab.process.energy_budget.EnergyBudget</span></code></a></p>
+<p>Linear longwave radiation module considering CO2 concentration.</p>
+<p>This radiation subprocess is based in the idea to linearize the Outgoing 
+Longwave Radiation (OLR) emitted to space according to the surface temperature
+(see <a class="reference internal" href="#climlab.radiation.AplusBT.AplusBT" title="climlab.radiation.AplusBT.AplusBT"><code class="xref py py-class docutils literal"><span class="pre">AplusBT</span></code></a>).</p>
+<p>To consider a the change of the greenhouse effect through range of
+<span class="math">\(CO_2\)</span> in the atmosphere, the parameters A and B are computed like
+the following:</p>
+<div class="math">
+\[A(c) = -326.4 + 9.161 c - 3.164 c^2 + 0.5468 c^3            \]\[B(c) =  1.953 - 0.04866 c + 0.01309 c^2 - 0.002577 c^3\]</div>
+<p>where <span class="math">\(c=\log \frac{p}{300}\)</span> and <span class="math">\(p\)</span> represents 
+the concentration of <span class="math">\(CO_2\)</span> in the atmosphere.</p>
+<p>For further reading see <a class="reference internal" href="../references.html#caldeirakasting1992" id="id1">[CaldeiraKasting1992]</a>.</p>
+<p><strong>Initialization parameters</strong></p>
+<p>An instance of <code class="docutils literal"><span class="pre">AplusBT_CO2</span></code> is initialized with the following 
+argument:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>CO2</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; <p>The concentration of <span class="math">\(CO_2\)</span> in the atmosphere.
+Referred to as <span class="math">\(p\)</span> in the above given formulas.</p>
+<ul class="simple">
+<li>unit: <span class="math">\(\textrm{ppm}\)</span> (parts per million)</li>
+<li>default value: <code class="docutils literal"><span class="pre">300.0</span></code></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Object attributes</strong></p>
+<p>Additional to the parent class <a class="reference internal" href="climlab.process.html#climlab.process.energy_budget.EnergyBudget" title="climlab.process.energy_budget.EnergyBudget"><code class="xref py py-class docutils literal"><span class="pre">EnergyBudget</span></code></a>
+following object attributes are generated or updated during initialization:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first simple">
+<li><a class="reference internal" href="#climlab.radiation.AplusBT.AplusBT_CO2.CO2" title="climlab.radiation.AplusBT.AplusBT_CO2.CO2"><strong>CO2</strong></a> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; calls the setter function of <a class="reference internal" href="#climlab.radiation.AplusBT.AplusBT_CO2.CO2" title="climlab.radiation.AplusBT.AplusBT_CO2.CO2"><code class="xref py py-func docutils literal"><span class="pre">CO2()</span></code></a></li>
+<li><strong>diagnostics</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; the subprocess&#8217;s diagnostic dictionary 
+<code class="docutils literal"><span class="pre">self.diagnostic</span></code> is initialized 
+through calling 
+<code class="docutils literal"><span class="pre">self.init_diagnostic('OLR',</span> <span class="pre">0.</span> <span class="pre">*</span> <span class="pre">self.Ts)</span></code></li>
+<li><strong>OLR</strong> (<a class="reference internal" href="climlab.domain.html#climlab.domain.field.Field" title="climlab.domain.field.Field"><em>Field</em></a>) &#8211; the subprocess attribute <code class="docutils literal"><span class="pre">self.OLR</span></code> is
+created with correct dimensions</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Example:</th><td class="field-body"><p class="first">Replacing an the regular AplusBT subprocess in an energy balance model:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">climlab</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">climlab.radiation.AplusBT</span> <span class="kn">import</span> <span class="n">AplusBT_CO2</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># creating EBM model</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">climlab</span><span class="o">.</span><span class="n">EBM</span><span class="p">()</span>
+<span class="go">            </span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">model</span>
+</pre></div>
+</div>
+<div class="highlight-none"><div class="highlight"><pre><span></span>climlab Process of type &lt;class &#39;climlab.model.ebm.EBM&#39;&gt;. 
+State variables and domain shapes: 
+  Ts: (90, 1) 
+The subprocess tree: 
+top: &lt;class &#39;climlab.model.ebm.EBM&#39;&gt;
+   diffusion: &lt;class &#39;climlab.dynamics.diffusion.MeridionalDiffusion&#39;&gt;
+<span class="hll">   LW: &lt;class &#39;climlab.radiation.AplusBT.AplusBT&#39;&gt;
+</span>   albedo: &lt;class &#39;climlab.surface.albedo.StepFunctionAlbedo&#39;&gt;
+      iceline: &lt;class &#39;climlab.surface.albedo.Iceline&#39;&gt;
+      cold_albedo: &lt;class &#39;climlab.surface.albedo.ConstantAlbedo&#39;&gt;
+      warm_albedo: &lt;class &#39;climlab.surface.albedo.P2Albedo&#39;&gt;
+   insolation: &lt;class &#39;climlab.radiation.insolation.P2Insolation&#39;&gt;
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1">#  creating and adding albedo feedback subprocess</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">LW_CO2</span> <span class="o">=</span> <span class="n">AplusBT_CO2</span><span class="p">(</span><span class="n">CO2</span><span class="o">=</span><span class="mi">400</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="o">**</span><span class="n">model</span><span class="o">.</span><span class="n">param</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># overwriting old &#39;LW&#39; subprocess with same name  </span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">add_subprocess</span><span class="p">(</span><span class="s1">&#39;LW&#39;</span><span class="p">,</span> <span class="n">LW_CO2</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">model</span>
+</pre></div>
+</div>
+<div class="last highlight-none"><div class="highlight"><pre><span></span>climlab Process of type &lt;class &#39;climlab.model.ebm.EBM&#39;&gt;. 
+State variables and domain shapes: 
+  Ts: (90, 1) 
+The subprocess tree: 
+top: &lt;class &#39;climlab.model.ebm.EBM&#39;&gt;
+   diffusion: &lt;class &#39;climlab.dynamics.diffusion.MeridionalDiffusion&#39;&gt;
+<span class="hll">   LW: &lt;class &#39;climlab.radiation.AplusBT.AplusBT_CO2&#39;&gt;
+</span>   albedo: &lt;class &#39;climlab.surface.albedo.StepFunctionAlbedo&#39;&gt;
+      iceline: &lt;class &#39;climlab.surface.albedo.Iceline&#39;&gt;
+      cold_albedo: &lt;class &#39;climlab.surface.albedo.ConstantAlbedo&#39;&gt;
+      warm_albedo: &lt;class &#39;climlab.surface.albedo.P2Albedo&#39;&gt;
+   insolation: &lt;class &#39;climlab.radiation.insolation.P2Insolation&#39;&gt;
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="climlab.radiation.AplusBT.AplusBT_CO2.CO2">
+<code class="descname">CO2</code><a class="headerlink" href="#climlab.radiation.AplusBT.AplusBT_CO2.CO2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Property of AplusBT_CO2 parameter CO2.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body"><p class="first">Returns the CO2 concentration which is stored in attribute 
+<code class="docutils literal"><span class="pre">self._CO2</span></code></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Setter:</th><td class="field-body"><ul class="first simple">
+<li>sets the CO2 concentration which is addressed as <code class="docutils literal"><span class="pre">self._CO2</span></code>
+to the new value</li>
+<li>updates the parameter dictionary <code class="docutils literal"><span class="pre">self.param['CO2']</span></code></li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><p class="first last">float</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="climlab-radiation-boltzmann-module">
+<h2>climlab.radiation.Boltzmann module<a class="headerlink" href="#climlab-radiation-boltzmann-module" title="Permalink to this headline">¶</a></h2>
+<p class="graphviz">
+<img src="../_images/inheritance-af9a8ab30f6718de5f3b2789d0bb7900eae97934.png" alt="Inheritance diagram of climlab.radiation.Boltzmann" usemap="#inheritanced6752ff870" class="inheritance"/>
+<map id="inheritanced6752ff870" name="inheritanced6752ff870">
+<area shape="rect" id="node1" href="#climlab.radiation.Boltzmann.Boltzmann" target="_top" title="A class for black body radiation." alt="" coords="632,5,755,35"/>
+<area shape="rect" id="node2" href="climlab.process.html#climlab.process.energy_budget.EnergyBudget" target="_top" title="A parent class for explicit energy budget processes." alt="" coords="430,5,583,35"/>
+<area shape="rect" id="node3" href="climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess" target="_top" title="A generic parent class for all time&#45;dependent processes." alt="" coords="144,5,381,35"/>
+<area shape="rect" id="node4" href="climlab.process.html#climlab.process.process.Process" target="_top" title="A generic parent class for all climlab process objects." alt="" coords="5,5,96,35"/>
+</map>
+</p>
+<span class="target" id="module-climlab.radiation.Boltzmann"></span><dl class="class">
+<dt id="climlab.radiation.Boltzmann.Boltzmann">
+<em class="property">class </em><code class="descclassname">climlab.radiation.Boltzmann.</code><code class="descname">Boltzmann</code><span class="sig-paren">(</span><em>eps=0.65</em>, <em>tau=0.95</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/radiation/Boltzmann.html#Boltzmann"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.Boltzmann.Boltzmann" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="climlab.process.html#climlab.process.energy_budget.EnergyBudget" title="climlab.process.energy_budget.EnergyBudget"><code class="xref py py-class docutils literal"><span class="pre">climlab.process.energy_budget.EnergyBudget</span></code></a></p>
+<p>A class for black body radiation.</p>
+<p>Implements a radiation subprocess which computes longwave radiation
+with the Stefan-Boltzmann law for black/grey body radiation.</p>
+<p>According to the Stefan Boltzmann law the total power radiated from an 
+object with surface area <span class="math">\(A\)</span> and temperature <span class="math">\(T\)</span> (in unit Kelvin)
+can be written as</p>
+<div class="math">
+\[P = A \varepsilon \sigma T^4\]</div>
+<p>where <span class="math">\(\varepsilon\)</span> is the emissivity of the body.</p>
+<p>As the <a class="reference internal" href="climlab.process.html#climlab.process.energy_budget.EnergyBudget" title="climlab.process.energy_budget.EnergyBudget"><code class="xref py py-class docutils literal"><span class="pre">EnergyBudget</span></code></a> of the 
+Energy Balance Model is accounted in unit <span class="math">\(\textrm{energy} / \textrm{area}\)</span>
+(<span class="math">\(\textrm{W}/ \textrm{m}^2\)</span>)
+the energy budget equation looks like this:</p>
+<div class="math">
+\[C \frac{dT}{dt} = R\downarrow - R\uparrow - H  \]</div>
+<p>The <a class="reference internal" href="#climlab.radiation.Boltzmann.Boltzmann" title="climlab.radiation.Boltzmann.Boltzmann"><code class="xref py py-class docutils literal"><span class="pre">Boltzmann</span></code></a> radiation subprocess represents the outgoing radiation
+<span class="math">\(R\uparrow\)</span> which then can be written as</p>
+<div class="math">
+\[R\uparrow = \varepsilon \sigma T^4\]</div>
+<p>with state variable <span class="math">\(T\)</span>.</p>
+<p><strong>Initialization parameters</strong></p>
+<p>An instance of <code class="docutils literal"><span class="pre">Boltzmann</span></code> is initialized with the following 
+arguments:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>eps</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; <p>emissivity of the planet&#8217;s surface which is the
+effectiveness in emitting energy as thermal radiation</p>
+<ul>
+<li>unit: dimensionless</li>
+<li>default value: <code class="docutils literal"><span class="pre">0.65</span></code></li>
+</ul>
+</li>
+<li><strong>tau</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; <p>transmissivity of the planet&#8217;s atmosphere which is the 
+effectiveness in transmitting the longwave radiation
+emitted from the surface</p>
+<ul>
+<li>unit: dimensionless</li>
+<li>default value: <code class="docutils literal"><span class="pre">0.95</span></code></li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Object attributes</strong></p>
+<p>During initialization both arguments described above are created as object 
+attributes which calls their setter function (see below).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first simple">
+<li><a class="reference internal" href="#climlab.radiation.Boltzmann.Boltzmann.eps" title="climlab.radiation.Boltzmann.Boltzmann.eps"><strong>eps</strong></a> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; calls the setter function of <a class="reference internal" href="#climlab.radiation.Boltzmann.Boltzmann.eps" title="climlab.radiation.Boltzmann.Boltzmann.eps"><code class="xref py py-func docutils literal"><span class="pre">eps()</span></code></a></li>
+<li><a class="reference internal" href="#climlab.radiation.Boltzmann.Boltzmann.tau" title="climlab.radiation.Boltzmann.Boltzmann.tau"><strong>tau</strong></a> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; calls the setter function of <a class="reference internal" href="#climlab.radiation.Boltzmann.Boltzmann.tau" title="climlab.radiation.Boltzmann.Boltzmann.tau"><code class="xref py py-func docutils literal"><span class="pre">tau()</span></code></a></li>
+<li><strong>diagnostics</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; the subprocess&#8217;s diagnostic dictionary 
+<code class="docutils literal"><span class="pre">self.diagnostic</span></code> is initialized 
+through calling 
+<code class="docutils literal"><span class="pre">self.init_diagnostic('OLR',</span> <span class="pre">0.</span> <span class="pre">*</span> <span class="pre">self.Ts)</span></code></li>
+<li><strong>OLR</strong> (<a class="reference internal" href="climlab.domain.html#climlab.domain.field.Field" title="climlab.domain.field.Field"><em>Field</em></a>) &#8211; the subprocess attribute <code class="docutils literal"><span class="pre">self.OLR</span></code> is
+created with correct dimensions</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Example:</th><td class="field-body"><p class="first">Replacing an the regular AplusBT subprocess in an energy balance model:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">climlab</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">climlab.radiation.Boltzmann</span> <span class="kn">import</span> <span class="n">Boltzmann</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># creating EBM model</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">climlab</span><span class="o">.</span><span class="n">EBM</span><span class="p">()</span>
+<span class="go">            </span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">model</span>
+</pre></div>
+</div>
+<div class="highlight-none"><div class="highlight"><pre><span></span>climlab Process of type &lt;class &#39;climlab.model.ebm.EBM&#39;&gt;. 
+State variables and domain shapes: 
+  Ts: (90, 1) 
+The subprocess tree: 
+top: &lt;class &#39;climlab.model.ebm.EBM&#39;&gt;
+   diffusion: &lt;class &#39;climlab.dynamics.diffusion.MeridionalDiffusion&#39;&gt;
+<span class="hll">   LW: &lt;class &#39;climlab.radiation.AplusBT.AplusBT&#39;&gt;
+</span>   albedo: &lt;class &#39;climlab.surface.albedo.StepFunctionAlbedo&#39;&gt;
+      iceline: &lt;class &#39;climlab.surface.albedo.Iceline&#39;&gt;
+      cold_albedo: &lt;class &#39;climlab.surface.albedo.ConstantAlbedo&#39;&gt;
+      warm_albedo: &lt;class &#39;climlab.surface.albedo.P2Albedo&#39;&gt;
+   insolation: &lt;class &#39;climlab.radiation.insolation.P2Insolation&#39;&gt;
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1">#  creating and adding albedo feedback subprocess</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">LW_boltz</span> <span class="o">=</span> <span class="n">Boltzmann</span><span class="p">(</span><span class="n">eps</span><span class="o">=</span><span class="mf">0.69</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mf">0.98</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="o">**</span><span class="n">model</span><span class="o">.</span><span class="n">param</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># overwriting old &#39;LW&#39; subprocess with same name            </span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">add_subprocess</span><span class="p">(</span><span class="s1">&#39;LW&#39;</span><span class="p">,</span> <span class="n">LW_boltz</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">model</span>
+</pre></div>
+</div>
+<div class="last highlight-none"><div class="highlight"><pre><span></span>climlab Process of type &lt;class &#39;climlab.model.ebm.EBM&#39;&gt;. 
+State variables and domain shapes: 
+  Ts: (90, 1) 
+The subprocess tree: 
+top: &lt;class &#39;climlab.model.ebm.EBM&#39;&gt;
+   diffusion: &lt;class &#39;climlab.dynamics.diffusion.MeridionalDiffusion&#39;&gt;
+<span class="hll">   LW: &lt;class &#39;climlab.radiation.Boltzmann.Boltzmann&#39;&gt;
+</span>   albedo: &lt;class &#39;climlab.surface.albedo.StepFunctionAlbedo&#39;&gt;
+      iceline: &lt;class &#39;climlab.surface.albedo.Iceline&#39;&gt;
+      cold_albedo: &lt;class &#39;climlab.surface.albedo.ConstantAlbedo&#39;&gt;
+      warm_albedo: &lt;class &#39;climlab.surface.albedo.P2Albedo&#39;&gt;
+   insolation: &lt;class &#39;climlab.radiation.insolation.P2Insolation&#39;&gt;
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="climlab.radiation.Boltzmann.Boltzmann.eps">
+<code class="descname">eps</code><a class="headerlink" href="#climlab.radiation.Boltzmann.Boltzmann.eps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Property of emissivity parameter.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body"><p class="first">Returns the albedo value which is stored in attribute 
+<code class="docutils literal"><span class="pre">self._eps</span></code></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Setter:</th><td class="field-body"><ul class="first simple">
+<li>sets the emissivity which is addressed as <code class="docutils literal"><span class="pre">self._eps</span></code>
+to the new value</li>
+<li>updates the parameter dictionary <code class="docutils literal"><span class="pre">self.param['eps']</span></code></li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><p class="first last">float</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="climlab.radiation.Boltzmann.Boltzmann.tau">
+<code class="descname">tau</code><a class="headerlink" href="#climlab.radiation.Boltzmann.Boltzmann.tau" title="Permalink to this definition">¶</a></dt>
+<dd><p>Property of the transmissivity parameter.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body"><p class="first">Returns the albedo value which is stored in attribute 
+<code class="docutils literal"><span class="pre">self._tau</span></code></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Setter:</th><td class="field-body"><ul class="first simple">
+<li>sets the emissivity which is addressed as <code class="docutils literal"><span class="pre">self._tau</span></code>
+to the new value</li>
+<li>updates the parameter dictionary <code class="docutils literal"><span class="pre">self.param['tau']</span></code></li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><p class="first last">float</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="climlab-radiation-insolation-module">
+<h2>climlab.radiation.insolation module<a class="headerlink" href="#climlab-radiation-insolation-module" title="Permalink to this headline">¶</a></h2>
+<p class="graphviz">
+<img src="../_images/inheritance-8625bfe4911499ad326bea9e6c642ea23b75feda.png" alt="Inheritance diagram of climlab.radiation.insolation" usemap="#inheritance1026093583" class="inheritance"/>
+<map id="inheritance1026093583" name="inheritance1026093583">
+<area shape="rect" id="node1" href="#climlab.radiation.insolation.AnnualMeanInsolation" target="_top" title="A class for latitudewise solar insolation averaged over a year." alt="" coords="835,6,1061,37"/>
+<area shape="rect" id="node3" href="#climlab.radiation.insolation.DailyInsolation" target="_top" title="A class to compute latitudewise daily solar insolation for specific " alt="" coords="1110,6,1269,37"/>
+<area shape="rect" id="node2" href="#climlab.radiation.insolation._Insolation" target="_top" title="A private parent class for insolation processes." alt="" coords="664,61,787,91"/>
+<area shape="rect" id="node6" href="#climlab.radiation.insolation.FixedInsolation" target="_top" title="A class for fixed insolation at each point of latitude off the domain." alt="" coords="869,61,1027,91"/>
+<area shape="rect" id="node7" href="#climlab.radiation.insolation.P2Insolation" target="_top" title="A class for parabolic solar distribution over the domain&#39;s latitude " alt="" coords="880,115,1016,146"/>
+<area shape="rect" id="node4" href="climlab.process.html#climlab.process.diagnostic.DiagnosticProcess" target="_top" title="A parent class for all processes that are strictly diagnostic, namely" alt="" coords="429,61,616,91"/>
+<area shape="rect" id="node5" href="climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess" target="_top" title="A generic parent class for all time&#45;dependent processes." alt="" coords="144,61,381,91"/>
+<area shape="rect" id="node8" href="climlab.process.html#climlab.process.process.Process" target="_top" title="A generic parent class for all climlab process objects." alt="" coords="5,61,96,91"/>
+</map>
+</p>
+<span class="target" id="module-climlab.radiation.insolation"></span><dl class="class">
+<dt id="climlab.radiation.insolation.AnnualMeanInsolation">
+<em class="property">class </em><code class="descclassname">climlab.radiation.insolation.</code><code class="descname">AnnualMeanInsolation</code><span class="sig-paren">(</span><em>S0=1365.2</em>, <em>orb={'long_peri': 281.37</em>, <em>'ecc': 0.017236</em>, <em>'obliquity': 23.446}</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/radiation/insolation.html#AnnualMeanInsolation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.insolation.AnnualMeanInsolation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#climlab.radiation.insolation._Insolation" title="climlab.radiation.insolation._Insolation"><code class="xref py py-class docutils literal"><span class="pre">climlab.radiation.insolation._Insolation</span></code></a></p>
+<p>A class for latitudewise solar insolation averaged over a year.</p>
+<p>This class computes the solar insolation for each day of the year and 
+latitude specified in the domain on the basis of orbital parameters and 
+astronomical formulas.</p>
+<p>Therefor it uses the method <a class="reference internal" href="climlab.solar.html#climlab.solar.insolation.daily_insolation" title="climlab.solar.insolation.daily_insolation"><code class="xref py py-func docutils literal"><span class="pre">daily_insolation()</span></code></a>.
+For details how the solar distribution is dependend on orbital parameters 
+see there.</p>
+<p>The mean over the year is calculated from data given by
+<a class="reference internal" href="climlab.solar.html#climlab.solar.insolation.daily_insolation" title="climlab.solar.insolation.daily_insolation"><code class="xref py py-func docutils literal"><span class="pre">daily_insolation()</span></code></a> and stored in the 
+object&#8217;s attribute <code class="docutils literal"><span class="pre">self.insolation</span></code></p>
+<p><strong>Initialization parameters</strong></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>S0</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; <p>solar constant</p>
+<ul>
+<li>unit: <span class="math">\(\frac{\textrm{W}}{\textrm{m}^2}\)</span></li>
+<li>default value: <code class="docutils literal"><span class="pre">1365.2</span></code></li>
+</ul>
+</li>
+<li><strong>orb</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; <p>a dictionary with three orbital parameters (as provided by 
+<a class="reference internal" href="climlab.solar.html#climlab.solar.orbital.OrbitalTable" title="climlab.solar.orbital.OrbitalTable"><code class="xref py py-class docutils literal"><span class="pre">OrbitalTable</span></code></a>):</p>
+<ul>
+<li><code class="docutils literal"><span class="pre">'ecc'</span></code> - eccentricity<blockquote>
+<div><ul>
+<li>unit: dimensionless</li>
+<li>default value: <code class="docutils literal"><span class="pre">0.017236</span></code></li>
+</ul>
+</div></blockquote>
+</li>
+<li><code class="docutils literal"><span class="pre">'long_peri'</span></code> - longitude of perihelion (precession angle)<blockquote>
+<div><ul>
+<li>unit: degrees</li>
+<li>default value: <code class="docutils literal"><span class="pre">281.37</span></code></li>
+</ul>
+</div></blockquote>
+</li>
+<li><code class="docutils literal"><span class="pre">'obliquity'</span></code> - obliquity angle<blockquote>
+<div><ul>
+<li>unit: degrees</li>
+<li>default value: <code class="docutils literal"><span class="pre">23.446</span></code></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Object attributes</strong></p>
+<p>Additional to the parent class <a class="reference internal" href="#climlab.radiation.insolation._Insolation" title="climlab.radiation.insolation._Insolation"><code class="xref py py-class docutils literal"><span class="pre">_Insolation</span></code></a>
+following object attributes are generated and updated during initialization:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first simple">
+<li><a class="reference internal" href="#module-climlab.radiation.insolation" title="climlab.radiation.insolation"><strong>insolation</strong></a> (<a class="reference internal" href="climlab.domain.html#climlab.domain.field.Field" title="climlab.domain.field.Field"><em>Field</em></a>) &#8211; the solar distribution is calculated as a Field on 
+the basis of the <code class="docutils literal"><span class="pre">self.domains['default']</span></code> domain
+and stored in the attribute <code class="docutils literal"><span class="pre">self.insolation</span></code>.</li>
+<li><a class="reference internal" href="#climlab.radiation.insolation.AnnualMeanInsolation.orb" title="climlab.radiation.insolation.AnnualMeanInsolation.orb"><strong>orb</strong></a> (<a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; initialized with given argument <code class="docutils literal"><span class="pre">orb</span></code></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Example:</th><td class="field-body"><p class="first">Create regular EBM and replace standard insolation subprocess by 
+<code class="xref py py-class docutils literal"><span class="pre">AnnualMeanInsolation</span></code>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">climlab</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">climlab.radiation</span> <span class="kn">import</span> <span class="n">AnnualMeanInsolation</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># model creation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">climlab</span><span class="o">.</span><span class="n">EBM</span><span class="p">()</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">model</span>
+</pre></div>
+</div>
+<div class="highlight-none"><div class="highlight"><pre><span></span>climlab Process of type &lt;class &#39;climlab.model.ebm.EBM&#39;&gt;. 
+State variables and domain shapes: 
+  Ts: (90, 1) 
+The subprocess tree: 
+top: &lt;class &#39;climlab.model.ebm.EBM&#39;&gt;
+   diffusion: &lt;class &#39;climlab.dynamics.diffusion.MeridionalDiffusion&#39;&gt;
+   LW: &lt;class &#39;climlab.radiation.AplusBT.AplusBT&#39;&gt;
+   albedo: &lt;class &#39;climlab.surface.albedo.StepFunctionAlbedo&#39;&gt;
+      iceline: &lt;class &#39;climlab.surface.albedo.Iceline&#39;&gt;
+      cold_albedo: &lt;class &#39;climlab.surface.albedo.ConstantAlbedo&#39;&gt;
+      warm_albedo: &lt;class &#39;climlab.surface.albedo.P2Albedo&#39;&gt;
+<span class="hll">   insolation: &lt;class &#39;climlab.radiation.insolation.P2Insolation&#39;&gt;
+</span></pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># catch model domain for subprocess creation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sfc</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="s1">&#39;Ts&#39;</span><span class="p">]</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># create AnnualMeanInsolation subprocess </span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">new_insol</span> <span class="o">=</span> <span class="n">AnnualMeanInsolation</span><span class="p">(</span><span class="n">domains</span><span class="o">=</span><span class="n">sfc</span><span class="p">,</span> <span class="o">**</span><span class="n">model</span><span class="o">.</span><span class="n">param</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># add it to the model</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">add_subprocess</span><span class="p">(</span><span class="s1">&#39;insolation&#39;</span><span class="p">,</span><span class="n">new_insol</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">model</span>
+</pre></div>
+</div>
+<div class="last highlight-none"><div class="highlight"><pre><span></span>climlab Process of type &lt;class &#39;climlab.model.ebm.EBM&#39;&gt;. 
+State variables and domain shapes: 
+  Ts: (90, 1) 
+The subprocess tree: 
+top: &lt;class &#39;climlab.model.ebm.EBM&#39;&gt;
+   diffusion: &lt;class &#39;climlab.dynamics.diffusion.MeridionalDiffusion&#39;&gt;
+   LW: &lt;class &#39;climlab.radiation.AplusBT.AplusBT&#39;&gt;
+   albedo: &lt;class &#39;climlab.surface.albedo.StepFunctionAlbedo&#39;&gt;
+      iceline: &lt;class &#39;climlab.surface.albedo.Iceline&#39;&gt;
+      cold_albedo: &lt;class &#39;climlab.surface.albedo.ConstantAlbedo&#39;&gt;
+      warm_albedo: &lt;class &#39;climlab.surface.albedo.P2Albedo&#39;&gt;
+<span class="hll">   insolation: &lt;class &#39;climlab.radiation.insolation.AnnualMeanInsolation&#39;&gt;
+</span></pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="climlab.radiation.insolation.AnnualMeanInsolation.orb">
+<code class="descname">orb</code><a class="headerlink" href="#climlab.radiation.insolation.AnnualMeanInsolation.orb" title="Permalink to this definition">¶</a></dt>
+<dd><p>Property of dictionary for orbital parameters.</p>
+<p>orb contains: (for more information see <a class="reference internal" href="climlab.solar.html#climlab.solar.orbital.OrbitalTable" title="climlab.solar.orbital.OrbitalTable"><code class="xref py py-class docutils literal"><span class="pre">OrbitalTable</span></code></a>)</p>
+<ul class="simple">
+<li><code class="docutils literal"><span class="pre">'ecc'</span></code> - eccentricity [unit: dimensionless]</li>
+<li><code class="docutils literal"><span class="pre">'long_peri'</span></code> - longitude of perihelion (precession angle) [unit: degrees]</li>
+<li><code class="docutils literal"><span class="pre">'obliquity'</span></code> - obliquity angle [unit: degrees]</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body"><p class="first">Returns the orbital dictionary which is stored in attribute 
+<code class="docutils literal"><span class="pre">self._orb</span></code>.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Setter:</th><td class="field-body"><ul class="first simple">
+<li>sets orb which is addressed as <code class="docutils literal"><span class="pre">self._orb</span></code> to the new value</li>
+<li>updates the parameter dictionary <code class="docutils literal"><span class="pre">self.param['orb']</span></code> and</li>
+<li>calls method <code class="xref py py-func docutils literal"><span class="pre">_compute_fixed()</span></code></li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><p class="first last">dict</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="climlab.radiation.insolation.DailyInsolation">
+<em class="property">class </em><code class="descclassname">climlab.radiation.insolation.</code><code class="descname">DailyInsolation</code><span class="sig-paren">(</span><em>S0=1365.2</em>, <em>orb={'long_peri': 281.37</em>, <em>'ecc': 0.017236</em>, <em>'obliquity': 23.446}</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/radiation/insolation.html#DailyInsolation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.insolation.DailyInsolation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#climlab.radiation.insolation.AnnualMeanInsolation" title="climlab.radiation.insolation.AnnualMeanInsolation"><code class="xref py py-class docutils literal"><span class="pre">climlab.radiation.insolation.AnnualMeanInsolation</span></code></a></p>
+<p>A class to compute latitudewise daily solar insolation for specific 
+days of the year.</p>
+<p>This class computes the solar insolation on basis of orbital parameters and 
+astronomical formulas.</p>
+<p>Therefor it uses the method <a class="reference internal" href="climlab.solar.html#climlab.solar.insolation.daily_insolation" title="climlab.solar.insolation.daily_insolation"><code class="xref py py-func docutils literal"><span class="pre">daily_insolation()</span></code></a>.
+For details how the solar distribution is dependend on orbital parameters 
+see there.</p>
+<p><strong>Initialization parameters</strong></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>S0</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; <p>solar constant</p>
+<ul>
+<li>unit: <span class="math">\(\frac{\textrm{W}}{\textrm{m}^2}\)</span></li>
+<li>default value: <code class="docutils literal"><span class="pre">1365.2</span></code></li>
+</ul>
+</li>
+<li><strong>orb</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; <p>a dictionary with orbital parameters:</p>
+<ul>
+<li><code class="docutils literal"><span class="pre">'ecc'</span></code> - eccentricity<blockquote>
+<div><ul>
+<li>unit: dimensionless</li>
+<li>default value: <code class="docutils literal"><span class="pre">0.017236</span></code></li>
+</ul>
+</div></blockquote>
+</li>
+<li><code class="docutils literal"><span class="pre">'long_peri'</span></code> - longitude of perihelion (precession angle)<blockquote>
+<div><ul>
+<li>unit: degrees</li>
+<li>default value: <code class="docutils literal"><span class="pre">281.37</span></code></li>
+</ul>
+</div></blockquote>
+</li>
+<li><code class="docutils literal"><span class="pre">'obliquity'</span></code> - obliquity angle<blockquote>
+<div><ul>
+<li>unit: degrees</li>
+<li>default value: <code class="docutils literal"><span class="pre">23.446</span></code></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Object attributes</strong></p>
+<p>Additional to the parent class <a class="reference internal" href="#climlab.radiation.insolation._Insolation" title="climlab.radiation.insolation._Insolation"><code class="xref py py-class docutils literal"><span class="pre">_Insolation</span></code></a>
+following object attributes are generated and updated during initialization:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first simple">
+<li><a class="reference internal" href="#module-climlab.radiation.insolation" title="climlab.radiation.insolation"><strong>insolation</strong></a> (<a class="reference internal" href="climlab.domain.html#climlab.domain.field.Field" title="climlab.domain.field.Field"><em>Field</em></a>) &#8211; the solar distribution is calculated as a Field on 
+the basis of the <code class="docutils literal"><span class="pre">self.domains['default']</span></code> domain
+and stored in the attribute <code class="docutils literal"><span class="pre">self.insolation</span></code>.</li>
+<li><a class="reference internal" href="#climlab.radiation.insolation.AnnualMeanInsolation.orb" title="climlab.radiation.insolation.AnnualMeanInsolation.orb"><strong>orb</strong></a> (<a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; initialized with given argument <code class="docutils literal"><span class="pre">orb</span></code></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Example:</th><td class="field-body"><p class="first">Create regular EBM and replace standard insolation subprocess by 
+<code class="xref py py-class docutils literal"><span class="pre">DailyInsolation</span></code>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">climlab</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">climlab.radiation</span> <span class="kn">import</span> <span class="n">DailyInsolation</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># model creation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">climlab</span><span class="o">.</span><span class="n">EBM</span><span class="p">()</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">model</span>
+</pre></div>
+</div>
+<div class="highlight-none"><div class="highlight"><pre><span></span>climlab Process of type &lt;class &#39;climlab.model.ebm.EBM&#39;&gt;. 
+State variables and domain shapes: 
+  Ts: (90, 1) 
+The subprocess tree: 
+top: &lt;class &#39;climlab.model.ebm.EBM&#39;&gt;
+   diffusion: &lt;class &#39;climlab.dynamics.diffusion.MeridionalDiffusion&#39;&gt;
+   LW: &lt;class &#39;climlab.radiation.AplusBT.AplusBT&#39;&gt;
+   albedo: &lt;class &#39;climlab.surface.albedo.StepFunctionAlbedo&#39;&gt;
+      iceline: &lt;class &#39;climlab.surface.albedo.Iceline&#39;&gt;
+      cold_albedo: &lt;class &#39;climlab.surface.albedo.ConstantAlbedo&#39;&gt;
+      warm_albedo: &lt;class &#39;climlab.surface.albedo.P2Albedo&#39;&gt;
+<span class="hll">   insolation: &lt;class &#39;climlab.radiation.insolation.P2Insolation&#39;&gt;
+</span></pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># catch model domain for subprocess creation</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sfc</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="s1">&#39;Ts&#39;</span><span class="p">]</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># create DailyInsolation subprocess and add it to the model</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">add_subprocess</span><span class="p">(</span><span class="s1">&#39;insolation&#39;</span><span class="p">,</span><span class="n">DailyInsolation</span><span class="p">(</span><span class="n">domains</span><span class="o">=</span><span class="n">sfc</span><span class="p">,</span> <span class="o">**</span><span class="n">model</span><span class="o">.</span><span class="n">param</span><span class="p">))</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">model</span>
+</pre></div>
+</div>
+<div class="last highlight-none"><div class="highlight"><pre><span></span>climlab Process of type &lt;class &#39;climlab.model.ebm.EBM&#39;&gt;. 
+State variables and domain shapes: 
+  Ts: (90, 1) 
+The subprocess tree: 
+top: &lt;class &#39;climlab.model.ebm.EBM&#39;&gt;
+   diffusion: &lt;class &#39;climlab.dynamics.diffusion.MeridionalDiffusion&#39;&gt;
+   LW: &lt;class &#39;climlab.radiation.AplusBT.AplusBT&#39;&gt;
+   albedo: &lt;class &#39;climlab.surface.albedo.StepFunctionAlbedo&#39;&gt;
+      iceline: &lt;class &#39;climlab.surface.albedo.Iceline&#39;&gt;
+      cold_albedo: &lt;class &#39;climlab.surface.albedo.ConstantAlbedo&#39;&gt;
+      warm_albedo: &lt;class &#39;climlab.surface.albedo.P2Albedo&#39;&gt;
+<span class="hll">   insolation: &lt;class &#39;climlab.radiation.insolation.DailyInsolation&#39;&gt;
+</span></pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="climlab.radiation.insolation.FixedInsolation">
+<em class="property">class </em><code class="descclassname">climlab.radiation.insolation.</code><code class="descname">FixedInsolation</code><span class="sig-paren">(</span><em>S0=341.3</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/radiation/insolation.html#FixedInsolation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.insolation.FixedInsolation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#climlab.radiation.insolation._Insolation" title="climlab.radiation.insolation._Insolation"><code class="xref py py-class docutils literal"><span class="pre">climlab.radiation.insolation._Insolation</span></code></a></p>
+<p>A class for fixed insolation at each point of latitude off the domain.</p>
+<p>The solar distribution for the whole domain is constant and specified by
+a parameter.</p>
+<p><strong>Initialization parameters</strong></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>S0</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; <p>solar constant</p>
+<ul class="simple">
+<li>unit: <span class="math">\(\frac{\textrm{W}}{\textrm{m}^2}\)</span></li>
+<li>default value: <code class="docutils literal"><span class="pre">const.S0/4</span> <span class="pre">=</span> <span class="pre">341.2</span></code></li>
+</ul>
+</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Example:</th><td class="field-body"><div class="first last highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">climlab</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">climlab.radiation.insolation</span> <span class="kn">import</span> <span class="n">FixedInsolation</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">climlab</span><span class="o">.</span><span class="n">EBM</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sfc</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">Ts</span><span class="o">.</span><span class="n">domain</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fixed_ins</span> <span class="o">=</span> <span class="n">FixedInsolation</span><span class="p">(</span><span class="n">S0</span><span class="o">=</span><span class="mf">340.0</span><span class="p">,</span> <span class="n">domains</span><span class="o">=</span><span class="n">sfc</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">fixed_ins</span>
+<span class="go">climlab Process of type &lt;class &#39;climlab.radiation.insolation.FixedInsolation&#39;&gt;. </span>
+<span class="go">State variables and domain shapes: </span>
+<span class="go">The subprocess tree: </span>
+<span class="go">top: &lt;class &#39;climlab.radiation.insolation.FixedInsolation&#39;&gt;</span>
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="climlab.radiation.insolation.P2Insolation">
+<em class="property">class </em><code class="descclassname">climlab.radiation.insolation.</code><code class="descname">P2Insolation</code><span class="sig-paren">(</span><em>S0=1365.2</em>, <em>s2=-0.48</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/radiation/insolation.html#P2Insolation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.insolation.P2Insolation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#climlab.radiation.insolation._Insolation" title="climlab.radiation.insolation._Insolation"><code class="xref py py-class docutils literal"><span class="pre">climlab.radiation.insolation._Insolation</span></code></a></p>
+<p>A class for parabolic solar distribution over the domain&#8217;s latitude 
+on the basis of the second order Legendre Polynomial.</p>
+<p>Calculates the latitude dependent solar distribution as</p>
+<div class="math">
+\[S(\varphi) = \frac{S_0}{4} \left( 1 + s_2 P_2(x) \right)\]</div>
+<p>where <span class="math">\(P_2(x) = \frac{1}{2} (3x^2 - 1)\)</span> is the second order Legendre Polynomial
+and <span class="math">\(x=sin(\varphi)\)</span>.</p>
+<p><strong>Initialization parameters</strong></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>S0</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; <p>solar constant</p>
+<ul>
+<li>unit: <span class="math">\(\frac{\textrm{W}}{\textrm{m}^2}\)</span></li>
+<li>default value: <code class="docutils literal"><span class="pre">1365.2</span></code></li>
+</ul>
+</li>
+<li><strong>s2</strong> (<em>floar</em>) &#8211; <p>factor for second legendre polynominal term</p>
+<ul>
+<li>default value: <code class="docutils literal"><span class="pre">-0.48</span></code></li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Example:</th><td class="field-body"><div class="first last highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">climlab</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">climlab.radiation.insolation</span> <span class="kn">import</span> <span class="n">P2Insolation</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">climlab</span><span class="o">.</span><span class="n">EBM</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sfc</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">Ts</span><span class="o">.</span><span class="n">domain</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">p2_ins</span> <span class="o">=</span> <span class="n">P2Insolation</span><span class="p">(</span><span class="n">S0</span><span class="o">=</span><span class="mf">340.0</span><span class="p">,</span> <span class="n">s2</span><span class="o">=-</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">domains</span><span class="o">=</span><span class="n">sfc</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">p2_ins</span>
+<span class="go">climlab Process of type &lt;class &#39;climlab.radiation.insolation.P2Insolation&#39;&gt;. </span>
+<span class="go">State variables and domain shapes: </span>
+<span class="go">The subprocess tree: </span>
+<span class="go">top: &lt;class &#39;climlab.radiation.insolation.P2Insolation&#39;&gt;    </span>
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="climlab.radiation.insolation.P2Insolation.s2">
+<code class="descname">s2</code><a class="headerlink" href="#climlab.radiation.insolation.P2Insolation.s2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Property of second legendre polynomial factor s2.</p>
+<p>s2 in following equation:</p>
+<div class="math">
+\[S(\varphi) = \frac{S_0}{4} \left( 1 + s_2 P_2(x) \right)\]</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body"><p class="first">Returns the s2 parameter which is stored in attribute <code class="docutils literal"><span class="pre">self._s2</span></code>.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Setter:</th><td class="field-body"><ul class="first simple">
+<li>sets s2 which is addressed as <code class="docutils literal"><span class="pre">self._S0</span></code> to the new value</li>
+<li>updates the parameter dictionary <code class="docutils literal"><span class="pre">self.param['s2']</span></code> and</li>
+<li>calls method <code class="xref py py-func docutils literal"><span class="pre">_compute_fixed()</span></code></li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><p class="first last">float</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="climlab.radiation.insolation._Insolation">
+<em class="property">class </em><code class="descclassname">climlab.radiation.insolation.</code><code class="descname">_Insolation</code><span class="sig-paren">(</span><em>S0=1365.2</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/radiation/insolation.html#_Insolation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.insolation._Insolation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="climlab.process.html#climlab.process.diagnostic.DiagnosticProcess" title="climlab.process.diagnostic.DiagnosticProcess"><code class="xref py py-class docutils literal"><span class="pre">climlab.process.diagnostic.DiagnosticProcess</span></code></a></p>
+<p>A private parent class for insolation processes.</p>
+<p>Calling compute() will update self.insolation with current values.</p>
+<p><strong>Initialization parameters</strong></p>
+<p>An instance of <code class="docutils literal"><span class="pre">_Insolation</span></code> is initialized with the following 
+arguments <em>(for detailed information see Object attributes below)</em>:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>S0</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; <p>solar constant</p>
+<ul class="simple">
+<li>unit: <span class="math">\(\frac{\textrm{W}}{\textrm{m}^2}\)</span></li>
+<li>default value: <code class="docutils literal"><span class="pre">1365.2</span></code></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Object attributes</strong></p>
+<p>Additional to the parent class <a class="reference internal" href="climlab.process.html#climlab.process.diagnostic.DiagnosticProcess" title="climlab.process.diagnostic.DiagnosticProcess"><code class="xref py py-class docutils literal"><span class="pre">DiagnosticProcess</span></code></a>
+following object attributes are generated and updated during initialization:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference internal" href="#module-climlab.radiation.insolation" title="climlab.radiation.insolation"><strong>insolation</strong></a> (<a class="reference internal" href="climlab.domain.html#climlab.domain.field.Field" title="climlab.domain.field.Field"><em>Field</em></a>) &#8211; the array is initialized with zeros of the size of
+<code class="docutils literal"><span class="pre">self.domains['sfc']</span></code> or <code class="docutils literal"><span class="pre">self.domains['default']</span></code>.</li>
+<li><a class="reference internal" href="#climlab.radiation.insolation._Insolation.S0" title="climlab.radiation.insolation._Insolation.S0"><strong>S0</strong></a> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; initialized with given argument <code class="docutils literal"><span class="pre">S0</span></code></li>
+<li><strong>diagnostics</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; key <code class="docutils literal"><span class="pre">'insolation'</span></code> initialized with value:
+<a class="reference internal" href="climlab.domain.html#climlab.domain.field.Field" title="climlab.domain.field.Field"><code class="xref py py-class docutils literal"><span class="pre">Field</span></code></a> of zeros
+in size of <code class="docutils literal"><span class="pre">self.domains['sfc']</span></code> or
+<code class="docutils literal"><span class="pre">self.domains['default']</span></code></li>
+<li><a class="reference internal" href="#module-climlab.radiation.insolation" title="climlab.radiation.insolation"><strong>insolation</strong></a> &#8211; the subprocess attribute <code class="docutils literal"><span class="pre">self.insolation</span></code> is
+created with correct dimensions</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><code class="docutils literal"><span class="pre">self.insolation</span></code> should always be modified with 
+<code class="docutils literal"><span class="pre">self.insolation[:]</span> <span class="pre">=</span> <span class="pre">...</span></code> so that links to the insolation in other
+processes will work.</p>
+</div>
+<dl class="attribute">
+<dt id="climlab.radiation.insolation._Insolation.S0">
+<code class="descname">S0</code><a class="headerlink" href="#climlab.radiation.insolation._Insolation.S0" title="Permalink to this definition">¶</a></dt>
+<dd><p>Property of solar constant S0.</p>
+<p>The parameter S0 is stored using a python property and can be changed through 
+<code class="docutils literal"><span class="pre">self.S0</span> <span class="pre">=</span> <span class="pre">newvalue</span></code> which will also update the parameter dictionary.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">changing <code class="docutils literal"><span class="pre">self.param['S0']</span></code> will not work!</p>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Getter:</th><td class="field-body"><p class="first">Returns the S0 parameter which is stored in attribute <code class="docutils literal"><span class="pre">self._S0</span></code>.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Setter:</th><td class="field-body"><ul class="first simple">
+<li>sets S0 which is addressed as <code class="docutils literal"><span class="pre">self._S0</span></code> to the new value</li>
+<li>updates the parameter dictionary <code class="docutils literal"><span class="pre">self.param['S0']</span></code> and</li>
+<li>calls method <code class="xref py py-func docutils literal"><span class="pre">_compute_fixed()</span></code></li>
+</ul>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Type:</th><td class="field-body"><p class="first last">float</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="climlab.solar.html" title="climlab.solar package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="climlab.process.html" title="climlab.process package"
+             >previous</a> |</li>
+        <li><a href="../intro.html">home</a>|&nbsp;</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+        <!-- 
+	<li><a href="../contents.html">documentation </a> &raquo;</li>
+	-->
+
+          <li class="nav-item nav-item-1"><a href="climlab.html" >Application Programming Interface</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016 (licensed under Creative Commons, see License), Moritz Kreuzer.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+    </div>
+  </body>
+</html>

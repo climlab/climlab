@@ -1,0 +1,508 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>climlab.radiation package &mdash; climlab-0.2.13 0.2.13 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2.13',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="climlab-0.2.13 0.2.13 documentation" href="index.html" />
+    <link rel="up" title="climlab package" href="climlab.html" />
+    <link rel="next" title="climlab.solar package" href="climlab.solar.html" />
+    <link rel="prev" title="climlab.process package" href="climlab.process.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="climlab-radiation-package">
+<h1>climlab.radiation package<a class="headerlink" href="#climlab-radiation-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-climlab.radiation.AplusBT">
+<span id="climlab-radiation-aplusbt-module"></span><h2>climlab.radiation.AplusBT module<a class="headerlink" href="#module-climlab.radiation.AplusBT" title="Permalink to this headline">¶</a></h2>
+<p>Simple linear radiation module.
+Usage example:</p>
+<p>import climlab
+sfc, atm = climlab.domain.single_column()  # creates a column atmosphere and scalar surface
+# Create a state variable
+Ts = climlab.Field(15., domain=sfc)
+# Make a dictionary of state variables
+s = {&#8216;Ts&#8217;: Ts}
+olr = climlab.radiation.AplusBT(state=s)
+print olr
+#  OR, we can pass a single state variable
+olr = climlab.radiation.AplusBT(state=Ts)
+print olr
+# to compute tendencies and diagnostics
+olr.compute()
+#  or to actually update the temperature
+olr.step_forward()
+print olr.state</p>
+<dl class="class">
+<dt id="climlab.radiation.AplusBT.AplusBT">
+<em class="property">class </em><code class="descclassname">climlab.radiation.AplusBT.</code><code class="descname">AplusBT</code><span class="sig-paren">(</span><em>A=200.0</em>, <em>B=2.0</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/radiation/AplusBT.html#AplusBT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.AplusBT.AplusBT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="climlab.process.html#climlab.process.energy_budget.EnergyBudget" title="climlab.process.energy_budget.EnergyBudget"><code class="xref py py-class docutils literal"><span class="pre">climlab.process.energy_budget.EnergyBudget</span></code></a></p>
+<p>The simplest linear longwave radiation module.
+Should be invoked with a single temperature state variable.</p>
+<dl class="attribute">
+<dt id="climlab.radiation.AplusBT.AplusBT.A">
+<code class="descname">A</code><a class="headerlink" href="#climlab.radiation.AplusBT.AplusBT.A" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="climlab.radiation.AplusBT.AplusBT.B">
+<code class="descname">B</code><a class="headerlink" href="#climlab.radiation.AplusBT.AplusBT.B" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="climlab-radiation-boltzmann-module">
+<h2>climlab.radiation.Boltzmann module<a class="headerlink" href="#climlab-radiation-boltzmann-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="climlab-radiation-climtrad-module">
+<h2>climlab.radiation.climtrad module<a class="headerlink" href="#climlab-radiation-climtrad-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-climlab.radiation.cloud">
+<span id="climlab-radiation-cloud-module"></span><h2>climlab.radiation.cloud module<a class="headerlink" href="#module-climlab.radiation.cloud" title="Permalink to this headline">¶</a></h2>
+<p>Created on Tue Mar 10 09:35:48 2015</p>
+<p>&#64;author: Brian</p>
+<dl class="function">
+<dt id="climlab.radiation.cloud.Reflection">
+<code class="descclassname">climlab.radiation.cloud.</code><code class="descname">Reflection</code><span class="sig-paren">(</span><em>tauN</em>, <em>coszen</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/radiation/cloud.html#Reflection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.cloud.Reflection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="climlab.radiation.cloud.compute_beta">
+<code class="descclassname">climlab.radiation.cloud.</code><code class="descname">compute_beta</code><span class="sig-paren">(</span><em>tauN</em>, <em>coszen</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/radiation/cloud.html#compute_beta"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.cloud.compute_beta" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="climlab.radiation.cloud.compute_eps">
+<code class="descclassname">climlab.radiation.cloud.</code><code class="descname">compute_eps</code><span class="sig-paren">(</span><em>W</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/radiation/cloud.html#compute_eps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.cloud.compute_eps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="climlab.radiation.cloud.compute_tauN">
+<code class="descclassname">climlab.radiation.cloud.</code><code class="descname">compute_tauN</code><span class="sig-paren">(</span><em>W</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/radiation/cloud.html#compute_tauN"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.cloud.compute_tauN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-climlab.radiation.insolation">
+<span id="climlab-radiation-insolation-module"></span><h2>climlab.radiation.insolation module<a class="headerlink" href="#module-climlab.radiation.insolation" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="climlab.radiation.insolation.AnnualMeanInsolation">
+<em class="property">class </em><code class="descclassname">climlab.radiation.insolation.</code><code class="descname">AnnualMeanInsolation</code><span class="sig-paren">(</span><em>S0=1365.2</em>, <em>orb={'long_peri': 281.37</em>, <em>'ecc': 0.017236</em>, <em>'obliquity': 23.446}</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/radiation/insolation.html#AnnualMeanInsolation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.insolation.AnnualMeanInsolation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">climlab.radiation.insolation._Insolation</span></code></p>
+<dl class="attribute">
+<dt id="climlab.radiation.insolation.AnnualMeanInsolation.orb">
+<code class="descname">orb</code><a class="headerlink" href="#climlab.radiation.insolation.AnnualMeanInsolation.orb" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="climlab.radiation.insolation.DailyInsolation">
+<em class="property">class </em><code class="descclassname">climlab.radiation.insolation.</code><code class="descname">DailyInsolation</code><span class="sig-paren">(</span><em>S0=1365.2</em>, <em>orb={'long_peri': 281.37</em>, <em>'ecc': 0.017236</em>, <em>'obliquity': 23.446}</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/radiation/insolation.html#DailyInsolation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.insolation.DailyInsolation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#climlab.radiation.insolation.AnnualMeanInsolation" title="climlab.radiation.insolation.AnnualMeanInsolation"><code class="xref py py-class docutils literal"><span class="pre">climlab.radiation.insolation.AnnualMeanInsolation</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="climlab.radiation.insolation.FixedInsolation">
+<em class="property">class </em><code class="descclassname">climlab.radiation.insolation.</code><code class="descname">FixedInsolation</code><span class="sig-paren">(</span><em>S0=341.3</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/radiation/insolation.html#FixedInsolation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.insolation.FixedInsolation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">climlab.radiation.insolation._Insolation</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="climlab.radiation.insolation.P2Insolation">
+<em class="property">class </em><code class="descclassname">climlab.radiation.insolation.</code><code class="descname">P2Insolation</code><span class="sig-paren">(</span><em>S0=1365.2</em>, <em>s2=-0.48</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/radiation/insolation.html#P2Insolation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.insolation.P2Insolation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">climlab.radiation.insolation._Insolation</span></code></p>
+<dl class="attribute">
+<dt id="climlab.radiation.insolation.P2Insolation.s2">
+<code class="descname">s2</code><a class="headerlink" href="#climlab.radiation.insolation.P2Insolation.s2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-climlab.radiation.nband">
+<span id="climlab-radiation-nband-module"></span><h2>climlab.radiation.nband module<a class="headerlink" href="#module-climlab.radiation.nband" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="climlab.radiation.nband.FourBandLW">
+<em class="property">class </em><code class="descclassname">climlab.radiation.nband.</code><code class="descname">FourBandLW</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/radiation/nband.html#FourBandLW"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.nband.FourBandLW" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#climlab.radiation.nband.NbandRadiation" title="climlab.radiation.nband.NbandRadiation"><code class="xref py py-class docutils literal"><span class="pre">climlab.radiation.nband.NbandRadiation</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="climlab.radiation.nband.FourBandSW">
+<em class="property">class </em><code class="descclassname">climlab.radiation.nband.</code><code class="descname">FourBandSW</code><span class="sig-paren">(</span><em>emissivity_sfc=0.0</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/radiation/nband.html#FourBandSW"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.nband.FourBandSW" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#climlab.radiation.nband.NbandRadiation" title="climlab.radiation.nband.NbandRadiation"><code class="xref py py-class docutils literal"><span class="pre">climlab.radiation.nband.NbandRadiation</span></code></a></p>
+<dl class="attribute">
+<dt id="climlab.radiation.nband.FourBandSW.emissivity">
+<code class="descname">emissivity</code><a class="headerlink" href="#climlab.radiation.nband.FourBandSW.emissivity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="climlab.radiation.nband.NbandRadiation">
+<em class="property">class </em><code class="descclassname">climlab.radiation.nband.</code><code class="descname">NbandRadiation</code><span class="sig-paren">(</span><em>absorber_vmr=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/radiation/nband.html#NbandRadiation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.nband.NbandRadiation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">climlab.radiation.greygas.GreyGas</span></code></p>
+<p>Process for radiative transfer.
+Solves the discretized Schwarschild two-stream equations
+with the spectrum divided into N spectral bands.</p>
+<dl class="docutils">
+<dt>Every NbandRadiation object has an attribute</dt>
+<dd>self.band_fraction</dd>
+</dl>
+<p>with sum(self.band_fraction) == 1
+that gives the fraction of the total beam in each band</p>
+<dl class="docutils">
+<dt>Also a dictionary</dt>
+<dd>self.absorber_vmr</dd>
+</dl>
+<p>that gives the volumetric mixing ratio of every absorbing gas
+on the same grid as temperature</p>
+<dl class="docutils">
+<dt>and a dictionary</dt>
+<dd>self.absorption_cross_section</dd>
+</dl>
+<p>that gives the absorption cross-section per unit mass for each gas
+in every spectral band</p>
+<dl class="attribute">
+<dt id="climlab.radiation.nband.NbandRadiation.band_fraction">
+<code class="descname">band_fraction</code><a class="headerlink" href="#climlab.radiation.nband.NbandRadiation.band_fraction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="climlab.radiation.nband.SPEEDY_band_fraction">
+<code class="descclassname">climlab.radiation.nband.</code><code class="descname">SPEEDY_band_fraction</code><span class="sig-paren">(</span><em>T</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/radiation/nband.html#SPEEDY_band_fraction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.nband.SPEEDY_band_fraction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Python / numpy implementation of the formula used by SPEEDY and MITgcm
+to partition longwave emissions into 4 spectral bands.</p>
+<p>Input: temperature in Kelvin</p>
+<p>returns: a four-element array of band fraction</p>
+<p>Reproducing here the FORTRAN code from MITgcm/pkg/aim_v23/phy_radiat.F</p>
+<blockquote>
+<div><blockquote>
+<div><p>EPS3=0.95 _d 0</p>
+<dl class="docutils">
+<dt>DO JTEMP=200,320</dt>
+<dd>FBAND(JTEMP,0)= EPSLW
+FBAND(JTEMP,2)= 0.148 _d 0 - 3.0 _d -6 <a href="#id1"><span class="problematic" id="id2">*</span></a>(JTEMP-247)**2
+FBAND(JTEMP,3)=(0.375 _d 0 - 5.5 _d -6 <a href="#id3"><span class="problematic" id="id4">*</span></a>(JTEMP-282)**2)*EPS3
+FBAND(JTEMP,4)= 0.314 _d 0 + 1.0 _d -5 <a href="#id5"><span class="problematic" id="id6">*</span></a>(JTEMP-315)**2
+FBAND(JTEMP,1)= 1. _d 0 -(FBAND(JTEMP,0)+FBAND(JTEMP,2)</dd>
+</dl>
+</div></blockquote>
+<dl class="docutils">
+<dt>&amp;                           +FBAND(JTEMP,3)+FBAND(JTEMP,4))</dt>
+<dd><p class="first">ENDDO</p>
+<dl class="docutils">
+<dt>DO JB=0,NBAND</dt>
+<dd><dl class="first docutils">
+<dt>DO JTEMP=lwTemp1,199</dt>
+<dd>FBAND(JTEMP,JB)=FBAND(200,JB)</dd>
+</dl>
+<p>ENDDO
+DO JTEMP=321,lwTemp2</p>
+<blockquote>
+<div>FBAND(JTEMP,JB)=FBAND(320,JB)</div></blockquote>
+<p class="last">ENDDO</p>
+</dd>
+</dl>
+<p class="last">ENDDO</p>
+</dd>
+</dl>
+</div></blockquote>
+</dd></dl>
+
+<dl class="class">
+<dt id="climlab.radiation.nband.ThreeBandSW">
+<em class="property">class </em><code class="descclassname">climlab.radiation.nband.</code><code class="descname">ThreeBandSW</code><span class="sig-paren">(</span><em>emissivity_sfc=0.0</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/radiation/nband.html#ThreeBandSW"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.nband.ThreeBandSW" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#climlab.radiation.nband.NbandRadiation" title="climlab.radiation.nband.NbandRadiation"><code class="xref py py-class docutils literal"><span class="pre">climlab.radiation.nband.NbandRadiation</span></code></a></p>
+<dl class="attribute">
+<dt id="climlab.radiation.nband.ThreeBandSW.emissivity">
+<code class="descname">emissivity</code><a class="headerlink" href="#climlab.radiation.nband.ThreeBandSW.emissivity" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-climlab.radiation.radiation">
+<span id="climlab-radiation-radiation-module"></span><h2>climlab.radiation.radiation module<a class="headerlink" href="#module-climlab.radiation.radiation" title="Permalink to this headline">¶</a></h2>
+<p>Radiation is the base class for all climlab radiation modules</p>
+<p>Basic characteristics:</p>
+<p>State:
+- Ts (surface radiative temperature)
+- Tatm (air temperature)</p>
+<p>Input (specified or provided by parent process):
+- flux_from_space</p>
+<p>Diagnostics (minimum)
+- flux_to_sfc
+- flux_to_space
+- absorbed
+- absorbed_total</p>
+<dl class="class">
+<dt id="climlab.radiation.radiation.Radiation">
+<em class="property">class </em><code class="descclassname">climlab.radiation.radiation.</code><code class="descname">Radiation</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/radiation/radiation.html#Radiation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.radiation.Radiation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="climlab.process.html#climlab.process.energy_budget.EnergyBudget" title="climlab.process.energy_budget.EnergyBudget"><code class="xref py py-class docutils literal"><span class="pre">climlab.process.energy_budget.EnergyBudget</span></code></a></p>
+<p>Base class for radiation models.</p>
+<p>The following boundary values need to be specified by user or parent process:
+- flux_from_space</p>
+<p>The following values are computed are stored in the .diagnostics dictionary:
+- flux_from_sfc
+- flux_to_sfc
+- flux_to_space
+-  plus a bunch of others!!</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="climlab.radiation.radiation.RadiationLW">
+<em class="property">class </em><code class="descclassname">climlab.radiation.radiation.</code><code class="descname">RadiationLW</code><span class="sig-paren">(</span><em>emissivity_sfc=1.0</em>, <em>albedo_sfc=0.0</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/radiation/radiation.html#RadiationLW"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.radiation.RadiationLW" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#climlab.radiation.radiation.Radiation" title="climlab.radiation.radiation.Radiation"><code class="xref py py-class docutils literal"><span class="pre">climlab.radiation.radiation.Radiation</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="climlab.radiation.radiation.RadiationSW">
+<em class="property">class </em><code class="descclassname">climlab.radiation.radiation.</code><code class="descname">RadiationSW</code><span class="sig-paren">(</span><em>emissivity_sfc=0.0</em>, <em>albedo_sfc=1.0</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/radiation/radiation.html#RadiationSW"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.radiation.RadiationSW" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#climlab.radiation.radiation.Radiation" title="climlab.radiation.radiation.Radiation"><code class="xref py py-class docutils literal"><span class="pre">climlab.radiation.radiation.Radiation</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-climlab.radiation.transmissivity">
+<span id="climlab-radiation-transmissivity-module"></span><h2>climlab.radiation.transmissivity module<a class="headerlink" href="#module-climlab.radiation.transmissivity" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="climlab.radiation.transmissivity.Transmissivity">
+<em class="property">class </em><code class="descclassname">climlab.radiation.transmissivity.</code><code class="descname">Transmissivity</code><span class="sig-paren">(</span><em>absorptivity</em>, <em>reflectivity=None</em>, <em>axis=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/radiation/transmissivity.html#Transmissivity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.transmissivity.Transmissivity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Class for calculating and store transmissivity between levels,
+and computing radiative fluxes between levels.</p>
+<p>Input: numpy array of absorptivities.
+It is assumed that the last dimension is vertical levels.</p>
+<dl class="docutils">
+<dt>Attributes: (all stored as numpy arrays):</dt>
+<dd>N: number of levels
+absorptivity: level absorptivity (N)
+transmissivity: level transmissivity (N)
+Tup: transmissivity matrix for upwelling beam (N+1, N+1)
+Tdown: transmissivity matrix for downwelling beam (N+1, N+1)</dd>
+</dl>
+<p>Example for N = 3 atmospheric layers:</p>
+<dl class="docutils">
+<dt>tau is a vector of transmissivities</dt>
+<dd>tau = [1, tau0, tau1, tau2]</dd>
+<dt>A is a matrix</dt>
+<dd><dl class="first last docutils">
+<dt>A = [[   1,    1,    1,    1],</dt>
+<dd>[tau0,    1,    1,    1],
+[tau1, tau1,    1,    1],
+[tau2, tau2, tau2,    1]]</dd>
+</dl>
+</dd>
+<dt>We then take the cumulative product along columns,</dt>
+<dd>and finally take the lower triangle of the result to get</dd>
+<dt>Tup = [[             1,         0,    0,  0],</dt>
+<dd>[          tau0,         1,    0,  0],
+[     tau1*tau0,      tau1,    1,  0],
+[tau2*tau1*tau0, tau2*tau1, tau2,  1]]</dd>
+</dl>
+<p>and Tdown = transpose(Tup)</p>
+<dl class="docutils">
+<dt>Construct an emission vector for the downwelling beam:</dt>
+<dd>Edown = [E0, E1, E2, fromspace]</dd>
+<dt>Now we can get the downwelling beam by matrix multiplication:</dt>
+<dd>D = Tdown * Edown</dd>
+</dl>
+<p>For the upwelling beam, we start by adding the reflected part
+at the surface to the surface emissions:</p>
+<blockquote>
+<div>Eup = [emit_sfc + albedo_sfc*D[0], E0, E1, E2]</div></blockquote>
+<dl class="docutils">
+<dt>So that the upwelling flux is</dt>
+<dd>U = Tup * Eup</dd>
+<dt>The total flux, positive up is thus</dt>
+<dd>F = U - D</dd>
+</dl>
+<p>The absorbed radiation at the surface is then -F[0]
+The absorbed radiation in the atmosphere is the flux convergence:</p>
+<blockquote>
+<div>-diff(F)</div></blockquote>
+<dl class="method">
+<dt id="climlab.radiation.transmissivity.Transmissivity.flux_down">
+<code class="descname">flux_down</code><span class="sig-paren">(</span><em>fluxDownTop</em>, <em>emission=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/radiation/transmissivity.html#Transmissivity.flux_down"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.transmissivity.Transmissivity.flux_down" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute upwelling radiative flux at interfaces between layers.</p>
+<dl class="docutils">
+<dt>Inputs:</dt>
+<dd><p class="first">fluxUpBottom: flux up from bottom
+emission: emission from atmospheric levels (N)</p>
+<blockquote class="last">
+<div>defaults to zero if not given</div></blockquote>
+</dd>
+<dt>Returns:</dt>
+<dd>vector of upwelling radiative flux between levels (N+1)
+element N is the flux up to space.</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="climlab.radiation.transmissivity.Transmissivity.flux_reflected_up">
+<code class="descname">flux_reflected_up</code><span class="sig-paren">(</span><em>fluxDown</em>, <em>albedo_sfc=0.0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/radiation/transmissivity.html#Transmissivity.flux_reflected_up"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.transmissivity.Transmissivity.flux_reflected_up" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="climlab.radiation.transmissivity.Transmissivity.flux_up">
+<code class="descname">flux_up</code><span class="sig-paren">(</span><em>fluxUpBottom</em>, <em>emission=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/radiation/transmissivity.html#Transmissivity.flux_up"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.transmissivity.Transmissivity.flux_up" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute downwelling radiative flux at interfaces between layers.</p>
+<dl class="docutils">
+<dt>Inputs:</dt>
+<dd><p class="first">fluxDownTop: flux down at top
+emission: emission from atmospheric levels (N)</p>
+<blockquote class="last">
+<div>defaults to zero if not given</div></blockquote>
+</dd>
+<dt>Returns:</dt>
+<dd>vector of downwelling radiative flux between levels (N+1)
+element 0 is the flux down to the surface.</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="climlab.radiation.transmissivity.compute_T_vectorized">
+<code class="descclassname">climlab.radiation.transmissivity.</code><code class="descname">compute_T_vectorized</code><span class="sig-paren">(</span><em>transmissivity</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/radiation/transmissivity.html#compute_T_vectorized"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.transmissivity.compute_T_vectorized" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="climlab.radiation.transmissivity.tril">
+<code class="descclassname">climlab.radiation.transmissivity.</code><code class="descname">tril</code><span class="sig-paren">(</span><em>array</em>, <em>k=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/radiation/transmissivity.html#tril"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.transmissivity.tril" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lower triangle of an array.
+Return a copy of an array with elements above the k-th diagonal zeroed.
+Need a multi-dimensional version here because numpy.tril does not
+broadcast for numpy verison &lt; 1.9.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-climlab.radiation.water_vapor">
+<span id="climlab-radiation-water-vapor-module"></span><h2>climlab.radiation.water_vapor module<a class="headerlink" href="#module-climlab.radiation.water_vapor" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="climlab.radiation.water_vapor.FixedRelativeHumidity">
+<em class="property">class </em><code class="descclassname">climlab.radiation.water_vapor.</code><code class="descname">FixedRelativeHumidity</code><span class="sig-paren">(</span><em>relative_humidity=0.77</em>, <em>qStrat=5e-06</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/radiation/water_vapor.html#FixedRelativeHumidity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.water_vapor.FixedRelativeHumidity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="climlab.process.html#climlab.process.diagnostic.DiagnosticProcess" title="climlab.process.diagnostic.DiagnosticProcess"><code class="xref py py-class docutils literal"><span class="pre">climlab.process.diagnostic.DiagnosticProcess</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="climlab.radiation.water_vapor.ManabeWaterVapor">
+<em class="property">class </em><code class="descclassname">climlab.radiation.water_vapor.</code><code class="descname">ManabeWaterVapor</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/radiation/water_vapor.html#ManabeWaterVapor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.radiation.water_vapor.ManabeWaterVapor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#climlab.radiation.water_vapor.FixedRelativeHumidity" title="climlab.radiation.water_vapor.FixedRelativeHumidity"><code class="xref py py-class docutils literal"><span class="pre">climlab.radiation.water_vapor.FixedRelativeHumidity</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-climlab.radiation">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-climlab.radiation" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">climlab.radiation package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-climlab.radiation.AplusBT">climlab.radiation.AplusBT module</a></li>
+<li><a class="reference internal" href="#climlab-radiation-boltzmann-module">climlab.radiation.Boltzmann module</a></li>
+<li><a class="reference internal" href="#climlab-radiation-climtrad-module">climlab.radiation.climtrad module</a></li>
+<li><a class="reference internal" href="#module-climlab.radiation.cloud">climlab.radiation.cloud module</a></li>
+<li><a class="reference internal" href="#module-climlab.radiation.insolation">climlab.radiation.insolation module</a></li>
+<li><a class="reference internal" href="#module-climlab.radiation.nband">climlab.radiation.nband module</a></li>
+<li><a class="reference internal" href="#module-climlab.radiation.radiation">climlab.radiation.radiation module</a></li>
+<li><a class="reference internal" href="#module-climlab.radiation.transmissivity">climlab.radiation.transmissivity module</a></li>
+<li><a class="reference internal" href="#module-climlab.radiation.water_vapor">climlab.radiation.water_vapor module</a></li>
+<li><a class="reference internal" href="#module-climlab.radiation">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="climlab.html">climlab package</a><ul>
+      <li>Previous: <a href="climlab.process.html" title="previous chapter">climlab.process package</a></li>
+      <li>Next: <a href="climlab.solar.html" title="next chapter">climlab.solar package</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/climlab.radiation.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+      |
+      <a href="_sources/climlab.radiation.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

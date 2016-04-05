@@ -1,0 +1,258 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>climlab.process.time_dependent_process &mdash; climlab-0.2.13 0.2.13 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.2.13',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="climlab-0.2.13 0.2.13 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for climlab.process.time_dependent_process</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">from</span> <span class="nn">climlab</span> <span class="kn">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">const</span>
+<span class="kn">from</span> <span class="nn">climlab.process.process</span> <span class="kn">import</span> <span class="n">Process</span>
+<span class="kn">from</span> <span class="nn">climlab.utils.walk</span> <span class="kn">import</span> <span class="n">walk_processes</span>
+
+
+<div class="viewcode-block" id="TimeDependentProcess"><a class="viewcode-back" href="../../../climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess">[docs]</a><span class="k">class</span> <span class="nc">TimeDependentProcess</span><span class="p">(</span><span class="n">Process</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;A generic parent class for all time-dependent processes.&#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">time_type</span><span class="o">=</span><span class="s">&#39;explicit&#39;</span><span class="p">,</span> <span class="n">timestep</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">topdown</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c"># Create the state dataset</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">TimeDependentProcess</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tendencies</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timeave</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">timestep</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_timestep</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_timestep</span><span class="p">(</span><span class="n">timestep</span><span class="o">=</span><span class="n">timestep</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time_type</span> <span class="o">=</span> <span class="n">time_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">topdown</span> <span class="o">=</span> <span class="n">topdown</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">has_process_type_list</span> <span class="o">=</span> <span class="bp">False</span>
+
+<div class="viewcode-block" id="TimeDependentProcess.set_timestep"><a class="viewcode-back" href="../../../climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess.set_timestep">[docs]</a>    <span class="k">def</span> <span class="nf">set_timestep</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timestep</span><span class="o">=</span><span class="n">const</span><span class="o">.</span><span class="n">seconds_per_day</span><span class="p">,</span> <span class="n">num_steps_per_year</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Change the timestep.</span>
+<span class="sd">        Input is either timestep in seconds,</span>
+<span class="sd">        or</span>
+<span class="sd">        num_steps_per_year: a number of steps per calendar year.&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">num_steps_per_year</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">timestep</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">seconds_per_year</span> <span class="o">/</span> <span class="n">num_steps_per_year</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">num_steps_per_year</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">seconds_per_year</span> <span class="o">/</span> <span class="n">timestep</span>
+        <span class="c"># Need a more sensible approach for annual cycle stuff</span>
+        <span class="n">timestep_days</span> <span class="o">=</span> <span class="n">timestep</span> <span class="o">/</span> <span class="n">const</span><span class="o">.</span><span class="n">seconds_per_day</span>
+        <span class="n">days_of_year</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mf">0.</span><span class="p">,</span> <span class="n">const</span><span class="o">.</span><span class="n">days_per_year</span><span class="p">,</span> <span class="n">timestep_days</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;timestep&#39;</span><span class="p">:</span> <span class="n">timestep</span><span class="p">,</span>
+                     <span class="s">&#39;num_steps_per_year&#39;</span><span class="p">:</span> <span class="n">num_steps_per_year</span><span class="p">,</span>
+                     <span class="s">&#39;day_of_year_index&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                     <span class="s">&#39;steps&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                     <span class="s">&#39;days_elapsed&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                     <span class="s">&#39;years_elapsed&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                     <span class="s">&#39;days_of_year&#39;</span><span class="p">:</span> <span class="n">days_of_year</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">[</span><span class="s">&#39;timestep&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timestep</span>
+</div>
+<div class="viewcode-block" id="TimeDependentProcess.compute"><a class="viewcode-back" href="../../../climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess.compute">[docs]</a>    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;By default, the tendency is zero.&#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">varname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tendencies</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">varname</span><span class="p">])</span>
+</div>
+    <span class="k">def</span> <span class="nf">_build_process_type_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Generate lists of processes organized by process type</span>
+<span class="sd">        Currently, this can be &#39;diagnostic&#39;, &#39;explicit&#39;, &#39;implicit&#39;, or &#39;adjustment&#39;.&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_types</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;diagnostic&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s">&#39;explicit&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s">&#39;implicit&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s">&#39;adjustment&#39;</span><span class="p">:</span> <span class="p">[]}</span>        
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">proc</span><span class="p">,</span> <span class="n">level</span> <span class="ow">in</span> <span class="n">walk_processes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">topdown</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">topdown</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">process_types</span><span class="p">[</span><span class="n">proc</span><span class="o">.</span><span class="n">time_type</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">proc</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">has_process_type_list</span> <span class="o">=</span> <span class="bp">True</span>
+        
+<div class="viewcode-block" id="TimeDependentProcess.step_forward"><a class="viewcode-back" href="../../../climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess.step_forward">[docs]</a>    <span class="k">def</span> <span class="nf">step_forward</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;new oop climlab... just loop through processes</span>
+<span class="sd">        and add up the tendencies&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_process_type_list</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_build_process_type_list</span><span class="p">()</span>
+        <span class="c"># First compute all strictly diagnostic processes</span>
+        <span class="k">for</span> <span class="n">proc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_types</span><span class="p">[</span><span class="s">&#39;diagnostic&#39;</span><span class="p">]:</span>
+            <span class="n">proc</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+        <span class="c"># Compute tendencies and diagnostics for all explicit processes</span>
+        <span class="k">for</span> <span class="n">proc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_types</span><span class="p">[</span><span class="s">&#39;explicit&#39;</span><span class="p">]:</span>
+            <span class="n">proc</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+        <span class="c"># Update state variables using all explicit tendencies</span>
+        <span class="c">#  Tendencies are d/dt(state) -- so just multiply by timestep for forward time</span>
+        <span class="k">for</span> <span class="n">proc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_types</span><span class="p">[</span><span class="s">&#39;explicit&#39;</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">varname</span> <span class="ow">in</span> <span class="n">proc</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">try</span><span class="p">:</span> <span class="n">proc</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span> <span class="o">+=</span> <span class="p">(</span><span class="n">proc</span><span class="o">.</span><span class="n">tendencies</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span> <span class="o">*</span>
+                                             <span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">[</span><span class="s">&#39;timestep&#39;</span><span class="p">])</span>
+                <span class="k">except</span><span class="p">:</span> <span class="k">pass</span>
+        <span class="c"># Now compute all implicit processes -- matrix inversions</span>
+        <span class="k">for</span> <span class="n">proc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_types</span><span class="p">[</span><span class="s">&#39;implicit&#39;</span><span class="p">]:</span>
+            <span class="n">proc</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">varname</span> <span class="ow">in</span> <span class="n">proc</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">try</span><span class="p">:</span> <span class="n">proc</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span> <span class="o">+=</span> <span class="n">proc</span><span class="o">.</span><span class="n">adjustment</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span>
+                <span class="k">except</span><span class="p">:</span> <span class="k">pass</span>
+        <span class="c"># Adjustment processes change the state instantaneously</span>
+        <span class="k">for</span> <span class="n">proc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">process_types</span><span class="p">[</span><span class="s">&#39;adjustment&#39;</span><span class="p">]:</span>
+            <span class="n">proc</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">varname</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">proc</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="c">#proc.set_state(varname, proc.adjusted_state[varname])</span>
+                <span class="k">try</span><span class="p">:</span> <span class="n">proc</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span> <span class="o">+=</span> <span class="n">proc</span><span class="o">.</span><span class="n">adjustment</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span>
+                <span class="k">except</span><span class="p">:</span> <span class="k">pass</span>
+        <span class="c"># Gather all diagnostics</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">proc</span><span class="p">,</span> <span class="n">level</span> <span class="ow">in</span> <span class="n">walk_processes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">diagnostics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">proc</span><span class="o">.</span><span class="n">diagnostics</span><span class="p">)</span>
+            <span class="n">proc</span><span class="o">.</span><span class="n">_update_time</span><span class="p">()</span>
+</div>
+<div class="viewcode-block" id="TimeDependentProcess.compute_diagnostics"><a class="viewcode-back" href="../../../climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess.compute_diagnostics">[docs]</a>    <span class="k">def</span> <span class="nf">compute_diagnostics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_iter</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Compute all tendencies and diagnostics, but don&#39;t update model state.</span>
+<span class="sd">        By default it will call step_forward() 3 times to make sure all</span>
+<span class="sd">        subprocess coupling is accounted for. The number of iterations can</span>
+<span class="sd">        be changed with the input argument.&#39;&#39;&#39;</span>
+        <span class="c">#  This might create a time problem because it updates the time counter...</span>
+        <span class="n">this_state</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_iter</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">step_forward</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">name</span><span class="p">][:]</span> <span class="o">=</span> <span class="n">this_state</span><span class="p">[</span><span class="n">name</span><span class="p">][:]</span>
+</div>
+    <span class="k">def</span> <span class="nf">_update_time</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Increment the timestep counter by one.</span>
+<span class="sd">        This function is called by the timestepping routines.&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="s">&#39;steps&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="c"># time in days since beginning</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="s">&#39;days_elapsed&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="s">&#39;timestep&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">const</span><span class="o">.</span><span class="n">seconds_per_day</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="s">&#39;day_of_year_index&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="s">&#39;num_steps_per_year&#39;</span><span class="p">]</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_do_new_calendar_year</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="s">&#39;day_of_year_index&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">_do_new_calendar_year</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;This function is called once at the end of every calendar year.&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="s">&#39;day_of_year_index&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c"># back to Jan. 1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="s">&#39;years_elapsed&#39;</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<div class="viewcode-block" id="TimeDependentProcess.integrate_years"><a class="viewcode-back" href="../../../climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess.integrate_years">[docs]</a>    <span class="k">def</span> <span class="nf">integrate_years</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">years</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Timestep the model forward a specified number of years.&#39;&#39;&#39;</span>
+        <span class="n">days</span> <span class="o">=</span> <span class="n">years</span> <span class="o">*</span> <span class="n">const</span><span class="o">.</span><span class="n">days_per_year</span>
+        <span class="n">numsteps</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="s">&#39;num_steps_per_year&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">years</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Integrating for &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">numsteps</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; steps, &quot;</span>
+                  <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">days</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; days, or &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">years</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; years.&quot;</span><span class="p">)</span>
+        <span class="c">#  begin time loop</span>
+        <span class="k">for</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numsteps</span><span class="p">):</span>
+            <span class="c"># Compute the timestep</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">step_forward</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c"># on first step only...</span>
+                <span class="c">#  This implements a generic time-averaging feature</span>
+                <span class="c"># using the list of model state variables</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">timeave</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="c"># add any new diagnostics to the timeave dictionary</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">timeave</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">diagnostics</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">varname</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeave</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">timeave</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">varname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeave</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">timeave</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">timeave</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">diagnostics</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span>
+                    <span class="k">except</span><span class="p">:</span> <span class="k">pass</span>
+        <span class="k">for</span> <span class="n">varname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">timeave</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">timeave</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span> <span class="o">/=</span> <span class="n">numsteps</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Total elapsed time is </span><span class="si">%s</span><span class="s"> years.&quot;</span> 
+                  <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="s">&#39;days_elapsed&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">const</span><span class="o">.</span><span class="n">days_per_year</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="TimeDependentProcess.integrate_days"><a class="viewcode-back" href="../../../climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess.integrate_days">[docs]</a>    <span class="k">def</span> <span class="nf">integrate_days</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">days</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Timestep the model forward a specified number of days.&#39;&#39;&#39;</span>
+        <span class="n">years</span> <span class="o">=</span> <span class="n">days</span> <span class="o">/</span> <span class="n">const</span><span class="o">.</span><span class="n">days_per_year</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">integrate_years</span><span class="p">(</span><span class="n">years</span><span class="o">=</span><span class="n">years</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+        </div>
+<div class="viewcode-block" id="TimeDependentProcess.integrate_converge"><a class="viewcode-back" href="../../../climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess.integrate_converge">[docs]</a>    <span class="k">def</span> <span class="nf">integrate_converge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crit</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;integrate until solution is converging</span>
+<span class="sd">        param:  crit    - exit criteria for difference of iterated solutions</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">for</span> <span class="n">varname</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="n">value_old</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">integrate_years</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="k">while</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">value_old</span><span class="o">-</span><span class="n">value</span><span class="p">))</span> <span class="o">&gt;</span> <span class="n">crit</span> <span class="p">:</span> 
+                <span class="n">value_old</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>                
+                <span class="bp">self</span><span class="o">.</span><span class="n">integrate_years</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>              
+        <span class="k">if</span> <span class="n">verbose</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>   
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Total elapsed time is </span><span class="si">%s</span><span class="s"> years.&quot;</span> 
+                  <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">time</span><span class="p">[</span><span class="s">&#39;days_elapsed&#39;</span><span class="p">]</span><span class="o">/</span><span class="n">const</span><span class="o">.</span><span class="n">days_per_year</span><span class="p">))</span>
+            </div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

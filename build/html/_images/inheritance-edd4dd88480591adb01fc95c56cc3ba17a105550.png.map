@@ -1,0 +1,30 @@
+<map id="inheritance1bfc448eab" name="inheritance1bfc448eab">
+<area shape="rect" id="node1" href="climlab.radiation.html#climlab.radiation.insolation.AnnualMeanInsolation" target="_top" title="A class for latitudewise solar insolation averaged over a year." alt="" coords="405,241,489,255"/>
+<area shape="rect" id="node9" href="climlab.radiation.html#climlab.radiation.insolation.DailyInsolation" target="_top" title="A class to compute latitudewise daily solar insolation for specific " alt="" coords="514,241,573,255"/>
+<area shape="rect" id="node2" href="climlab.radiation.html#climlab.radiation.insolation._Insolation" target="_top" title="A private parent class for insolation processes." alt="" coords="314,267,361,280"/>
+<area shape="rect" id="node14" href="climlab.radiation.html#climlab.radiation.insolation.FixedInsolation" target="_top" title="A class for fixed insolation at each point of latitude off the domain." alt="" coords="417,267,477,280"/>
+<area shape="rect" id="node21" href="climlab.radiation.html#climlab.radiation.insolation.P2Insolation" target="_top" title="A class for parabolic solar distribution over the domain&#39;s latitude " alt="" coords="421,292,472,306"/>
+<area shape="rect" id="node3" href="climlab.radiation.html#climlab.radiation.AplusBT.AplusBT" target="_top" title="The simplest linear longwave radiation module." alt="" coords="319,139,357,152"/>
+<area shape="rect" id="node4" href="climlab.process.html#climlab.process.energy_budget.EnergyBudget" target="_top" title="A parent class for explicit energy budget processes." alt="" coords="206,203,264,217"/>
+<area shape="rect" id="node5" href="climlab.radiation.html#climlab.radiation.AplusBT.AplusBT_CO2" target="_top" title="Linear longwave radiation module considering CO2 concentration." alt="" coords="310,165,365,178"/>
+<area shape="rect" id="node11" href="climlab.process.html#climlab.process.energy_budget.ExternalEnergySource" target="_top" title="A fixed energy source or sink to be specified by the user." alt="" coords="296,190,380,203"/>
+<area shape="rect" id="node23" href="climlab.radiation.html#climlab.radiation.radiation.Radiation" target="_top" title="Base class for radiation models." alt="" coords="317,216,359,229"/>
+<area shape="rect" id="node27" href="climlab.surface.html#climlab.surface.surface_radiation.SurfaceRadiation" target="_top" title="SurfaceRadiation" alt="" coords="304,241,372,255"/>
+<area shape="rect" id="node6" href="climlab.domain.html#climlab.domain.axis.Axis" target="_top" title="Creates a new climlab Axis object." alt="" coords="12,189,49,202"/>
+<area shape="rect" id="node7" href="climlab.surface.html#climlab.surface.albedo.ConstantAlbedo" target="_top" title="A class for constant albedo values at all spatial points of the domain." alt="" coords="306,292,370,306"/>
+<area shape="rect" id="node8" href="climlab.process.html#climlab.process.diagnostic.DiagnosticProcess" target="_top" title="A parent class for all processes that are strictly diagnostic, namely" alt="" coords="199,305,271,318"/>
+<area shape="rect" id="node15" href="climlab.surface.html#climlab.surface.albedo.Iceline" target="_top" title="A class for an Iceline subprocess." alt="" coords="319,318,356,331"/>
+<area shape="rect" id="node20" href="climlab.surface.html#climlab.surface.albedo.P2Albedo" target="_top" title="A class for parabolic distributed albedo values across the domain " alt="" coords="316,344,359,357"/>
+<area shape="rect" id="node26" href="climlab.surface.html#climlab.surface.albedo.StepFunctionAlbedo" target="_top" title="A step function albedo suprocess." alt="" coords="299,369,376,382"/>
+<area shape="rect" id="node10" href="climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess" target="_top" title="A generic parent class for all time&#45;dependent processes." alt="" coords="83,305,174,318"/>
+<area shape="rect" id="node16" href="climlab.process.html#climlab.process.implicit.ImplicitProcess" target="_top" title="A parent class for modules that use implicit time discretization." alt="" coords="204,330,265,344"/>
+<area shape="rect" id="node12" href="climlab.domain.html#climlab.domain.field.Field" target="_top" title="Custom class for climlab gridded quantities, called Field" alt="" coords="110,118,147,132"/>
+<area shape="rect" id="node13" title="ndarray(shape, dtype=float, buffer=None, offset=0," alt="" coords="12,118,49,132"/>
+<area shape="rect" id="node17" href="climlab.solar.html#climlab.solar.orbital.LongOrbitalTable" target="_top" title="Loads orbital parameter tables for &#45;51 to +21 Myears." alt="" coords="96,87,161,100"/>
+<area shape="rect" id="node18" href="climlab.solar.html#climlab.solar.orbital.OrbitalTable" target="_top" title="Invoking OrbitalTable() will load 5 million years of orbital data" alt="" coords="6,87,55,100"/>
+<area shape="rect" id="node19" href="climlab.solar.html#climlab.solar.orbital_cycles.OrbitalCycles" target="_top" title="OrbitalCycles" alt="" coords="3,39,58,52"/>
+<area shape="rect" id="node22" href="climlab.process.html#climlab.process.process.Process" target="_top" title="A generic parent class for all climlab process objects." alt="" coords="12,305,49,318"/>
+<area shape="rect" id="node24" href="climlab.radiation.html#climlab.radiation.radiation.RadiationLW" target="_top" title="RadiationLW" alt="" coords="421,190,472,203"/>
+<area shape="rect" id="node25" href="climlab.radiation.html#climlab.radiation.radiation.RadiationSW" target="_top" title="RadiationSW" alt="" coords="421,216,473,229"/>
+<area shape="rect" id="node28" href="climlab.domain.html#climlab.domain.domain._Domain" target="_top" title="Private parent class for `Domains`." alt="" coords="10,2,51,16"/>
+</map>

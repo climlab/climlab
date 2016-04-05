@@ -1,0 +1,244 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>climlab.model package &mdash; climlab-0.2.13 0.2.13 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2.13',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="climlab-0.2.13 0.2.13 documentation" href="index.html" />
+    <link rel="up" title="climlab package" href="climlab.html" />
+    <link rel="next" title="climlab.process package" href="climlab.process.html" />
+    <link rel="prev" title="climlab.dynamics package" href="climlab.dynamics.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="climlab-model-package">
+<h1>climlab.model package<a class="headerlink" href="#climlab-model-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-climlab.model.column">
+<span id="climlab-model-column-module"></span><h2>climlab.model.column module<a class="headerlink" href="#module-climlab.model.column" title="Permalink to this headline">¶</a></h2>
+<p>Object-oriented code for radiative-convective models with grey-gas radiation.</p>
+<p>Code developed by Brian Rose, University at Albany
+<a class="reference external" href="mailto:brose&#37;&#52;&#48;albany&#46;edu">brose<span>&#64;</span>albany<span>&#46;</span>edu</a></p>
+<p>Note that the column models by default represent global, time averages.
+Thus the insolation is a prescribed constant.</p>
+<p>Here is an example to implement seasonal insolation at 45 degrees North</p>
+<p>import climlab
+#  create the column model object
+col = climlab.GreyRadiationModel()
+#  create a new latitude axis with a single point
+lat = climlab.domain.Axis(axis_type=&#8217;lat&#8217;, points=45.)
+#  add this new axis to the surface domain
+col.Ts.domain.axes[&#8216;lat&#8217;] = lat
+#  create a new insolation process using this domain
+Q = climlab.radiation.insolation.DailyInsolation(domains=col.Ts.domain, <a href="#id1"><span class="problematic" id="id2">**</span></a>col.param)
+#  replace the fixed insolation subprocess in the column model
+col.add_subprocess(&#8216;insolation&#8217;, Q)</p>
+<p>This model is now a single column with seasonally varying insolation
+calculated for 45N.</p>
+<dl class="class">
+<dt id="climlab.model.column.BandRCModel">
+<em class="property">class </em><code class="descclassname">climlab.model.column.</code><code class="descname">BandRCModel</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/model/column.html#BandRCModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.model.column.BandRCModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#climlab.model.column.RadiativeConvectiveModel" title="climlab.model.column.RadiativeConvectiveModel"><code class="xref py py-class docutils literal"><span class="pre">climlab.model.column.RadiativeConvectiveModel</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="climlab.model.column.GreyRadiationModel">
+<em class="property">class </em><code class="descclassname">climlab.model.column.</code><code class="descname">GreyRadiationModel</code><span class="sig-paren">(</span><em>num_lev=30</em>, <em>num_lat=1</em>, <em>lev=None</em>, <em>lat=None</em>, <em>water_depth=1.0</em>, <em>albedo_sfc=0.299</em>, <em>timestep=86400.0</em>, <em>Q=341.3</em>, <em>abs_coeff=0.0001229</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/model/column.html#GreyRadiationModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.model.column.GreyRadiationModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess" title="climlab.process.time_dependent_process.TimeDependentProcess"><code class="xref py py-class docutils literal"><span class="pre">climlab.process.time_dependent_process.TimeDependentProcess</span></code></a></p>
+<dl class="method">
+<dt id="climlab.model.column.GreyRadiationModel.do_diagnostics">
+<code class="descname">do_diagnostics</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/model/column.html#GreyRadiationModel.do_diagnostics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.model.column.GreyRadiationModel.do_diagnostics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set all the diagnostics from long and shortwave radiation.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="climlab.model.column.GreyRadiationModel.initial_state">
+<code class="descname">initial_state</code><span class="sig-paren">(</span><em>num_lev</em>, <em>num_lat</em>, <em>lev</em>, <em>lat</em>, <em>water_depth</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/model/column.html#GreyRadiationModel.initial_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.model.column.GreyRadiationModel.initial_state" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="climlab.model.column.RadiativeConvectiveModel">
+<em class="property">class </em><code class="descclassname">climlab.model.column.</code><code class="descname">RadiativeConvectiveModel</code><span class="sig-paren">(</span><em>adj_lapse_rate=6.5</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/model/column.html#RadiativeConvectiveModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.model.column.RadiativeConvectiveModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#climlab.model.column.GreyRadiationModel" title="climlab.model.column.GreyRadiationModel"><code class="xref py py-class docutils literal"><span class="pre">climlab.model.column.GreyRadiationModel</span></code></a></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="climlab.model.column.compute_layer_absorptivity">
+<code class="descclassname">climlab.model.column.</code><code class="descname">compute_layer_absorptivity</code><span class="sig-paren">(</span><em>abs_coeff</em>, <em>dp</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/model/column.html#compute_layer_absorptivity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.model.column.compute_layer_absorptivity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute layer absorptivity from a constant absorption coefficient.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="climlab.model.column.initial_state">
+<code class="descclassname">climlab.model.column.</code><code class="descname">initial_state</code><span class="sig-paren">(</span><em>num_lev</em>, <em>num_lat</em>, <em>lev</em>, <em>lat</em>, <em>water_depth</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/model/column.html#initial_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.model.column.initial_state" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-climlab.model.ebm">
+<span id="climlab-model-ebm-module"></span><h2>climlab.model.ebm module<a class="headerlink" href="#module-climlab.model.ebm" title="Permalink to this headline">¶</a></h2>
+<p>ebm.py</p>
+<p>Object-oriented code for diffusive energy balance models</p>
+<p>Code developed by Brian Rose, University at Albany
+<a class="reference external" href="mailto:brose&#37;&#52;&#48;albany&#46;edu">brose<span>&#64;</span>albany<span>&#46;</span>edu</a></p>
+<dl class="class">
+<dt id="climlab.model.ebm.EBM">
+<em class="property">class </em><code class="descclassname">climlab.model.ebm.</code><code class="descname">EBM</code><span class="sig-paren">(</span><em>num_lat=90</em>, <em>S0=1365.2</em>, <em>A=210.0</em>, <em>B=2.0</em>, <em>D=0.555</em>, <em>water_depth=10.0</em>, <em>Tf=-10.0</em>, <em>a0=0.3</em>, <em>a2=0.078</em>, <em>ai=0.62</em>, <em>timestep=350632.51200000005</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/model/ebm.html#EBM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.model.ebm.EBM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="climlab.process.html#climlab.process.energy_budget.EnergyBudget" title="climlab.process.energy_budget.EnergyBudget"><code class="xref py py-class docutils literal"><span class="pre">climlab.process.energy_budget.EnergyBudget</span></code></a></p>
+<dl class="method">
+<dt id="climlab.model.ebm.EBM.diffusive_heat_transport">
+<code class="descname">diffusive_heat_transport</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/model/ebm.html#EBM.diffusive_heat_transport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.model.ebm.EBM.diffusive_heat_transport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute instantaneous diffusive heat transport in units of PW
+on the staggered grid.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="climlab.model.ebm.EBM.global_mean_temperature">
+<code class="descname">global_mean_temperature</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/model/ebm.html#EBM.global_mean_temperature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.model.ebm.EBM.global_mean_temperature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convenience method to compute global mean surface temperature.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="climlab.model.ebm.EBM.heat_transport">
+<code class="descname">heat_transport</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/model/ebm.html#EBM.heat_transport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.model.ebm.EBM.heat_transport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns instantaneous heat transport in units on PW,
+on the staggered grid.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="climlab.model.ebm.EBM.heat_transport_convergence">
+<code class="descname">heat_transport_convergence</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/model/ebm.html#EBM.heat_transport_convergence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.model.ebm.EBM.heat_transport_convergence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns instantaneous convergence of heat transport
+in units of W / m^2.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="climlab.model.ebm.EBM.inferred_heat_transport">
+<code class="descname">inferred_heat_transport</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/model/ebm.html#EBM.inferred_heat_transport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.model.ebm.EBM.inferred_heat_transport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the inferred heat transport (in PW)
+by integrating the TOA energy imbalance from pole to pole.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="climlab.model.ebm.EBM_annual">
+<em class="property">class </em><code class="descclassname">climlab.model.ebm.</code><code class="descname">EBM_annual</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/model/ebm.html#EBM_annual"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.model.ebm.EBM_annual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#climlab.model.ebm.EBM_seasonal" title="climlab.model.ebm.EBM_seasonal"><code class="xref py py-class docutils literal"><span class="pre">climlab.model.ebm.EBM_seasonal</span></code></a></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="climlab.model.ebm.EBM_seasonal">
+<em class="property">class </em><code class="descclassname">climlab.model.ebm.</code><code class="descname">EBM_seasonal</code><span class="sig-paren">(</span><em>a0=0.33</em>, <em>a2=0.25</em>, <em>ai=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/model/ebm.html#EBM_seasonal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.model.ebm.EBM_seasonal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#climlab.model.ebm.EBM" title="climlab.model.ebm.EBM"><code class="xref py py-class docutils literal"><span class="pre">climlab.model.ebm.EBM</span></code></a></p>
+</dd></dl>
+
+</div>
+<div class="section" id="climlab-model-stommelbox-module">
+<h2>climlab.model.stommelbox module<a class="headerlink" href="#climlab-model-stommelbox-module" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-climlab.model">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-climlab.model" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">climlab.model package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-climlab.model.column">climlab.model.column module</a></li>
+<li><a class="reference internal" href="#module-climlab.model.ebm">climlab.model.ebm module</a></li>
+<li><a class="reference internal" href="#climlab-model-stommelbox-module">climlab.model.stommelbox module</a></li>
+<li><a class="reference internal" href="#module-climlab.model">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="climlab.html">climlab package</a><ul>
+      <li>Previous: <a href="climlab.dynamics.html" title="previous chapter">climlab.dynamics package</a></li>
+      <li>Next: <a href="climlab.process.html" title="next chapter">climlab.process package</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/climlab.model.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+      |
+      <a href="_sources/climlab.model.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

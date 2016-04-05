@@ -1,0 +1,5 @@
+<map id="inheritanced1ece0e8d8" name="inheritanced1ece0e8d8">
+<area shape="rect" id="node1" href="#climlab.utils.attr_dict.AttrDict" title="Constructs a :py:class:`dict` object with attribute access to data." alt="" coords="25,59,121,90"/>
+<area shape="rect" id="node2" href="#climlab.utils.attr_dict.OrderedAttrDict" title="Constructs an :py:class:`~collections.OrderedDict` object with attribute access to data." alt="" coords="189,5,360,35"/>
+<area shape="rect" id="node3" title="Dictionary that remembers insertion order" alt="" coords="6,5,141,35"/>
+</map>

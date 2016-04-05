@@ -1,0 +1,334 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>climlab.process package &mdash; climlab-0.2.13 0.2.13 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.2.13',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="climlab-0.2.13 0.2.13 documentation" href="index.html" />
+    <link rel="up" title="climlab package" href="climlab.html" />
+    <link rel="next" title="climlab.radiation package" href="climlab.radiation.html" />
+    <link rel="prev" title="climlab.model package" href="climlab.model.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="climlab-process-package">
+<h1>climlab.process package<a class="headerlink" href="#climlab-process-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-climlab.process.diagnostic">
+<span id="climlab-process-diagnostic-module"></span><h2>climlab.process.diagnostic module<a class="headerlink" href="#module-climlab.process.diagnostic" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="climlab.process.diagnostic.DiagnosticProcess">
+<em class="property">class </em><code class="descclassname">climlab.process.diagnostic.</code><code class="descname">DiagnosticProcess</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/process/diagnostic.html#DiagnosticProcess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.process.diagnostic.DiagnosticProcess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#climlab.process.time_dependent_process.TimeDependentProcess" title="climlab.process.time_dependent_process.TimeDependentProcess"><code class="xref py py-class docutils literal"><span class="pre">climlab.process.time_dependent_process.TimeDependentProcess</span></code></a></p>
+<p>parent class for all processes that are strictly diagnostic,
+i.e. no time dependence.</p>
+<dl class="method">
+<dt id="climlab.process.diagnostic.DiagnosticProcess.compute">
+<code class="descname">compute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/process/diagnostic.html#DiagnosticProcess.compute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.process.diagnostic.DiagnosticProcess.compute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update all diagnostic quantities using current model state.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-climlab.process.energy_budget">
+<span id="climlab-process-energy-budget-module"></span><h2>climlab.process.energy_budget module<a class="headerlink" href="#module-climlab.process.energy_budget" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="climlab.process.energy_budget.EnergyBudget">
+<em class="property">class </em><code class="descclassname">climlab.process.energy_budget.</code><code class="descname">EnergyBudget</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/process/energy_budget.html#EnergyBudget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.process.energy_budget.EnergyBudget" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#climlab.process.time_dependent_process.TimeDependentProcess" title="climlab.process.time_dependent_process.TimeDependentProcess"><code class="xref py py-class docutils literal"><span class="pre">climlab.process.time_dependent_process.TimeDependentProcess</span></code></a></p>
+<p>Parent class for explicit energy budget processes.
+Solves equations like C dT/dt = (flux convergence)
+Every EnergyBudget object has a heat_capacity dictionary
+with items corresponding to each state variable.</p>
+<dl class="method">
+<dt id="climlab.process.energy_budget.EnergyBudget.compute">
+<code class="descname">compute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/process/energy_budget.html#EnergyBudget.compute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.process.energy_budget.EnergyBudget.compute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update all diagnostic quantities using current model state.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="climlab.process.energy_budget.ExternalEnergySource">
+<em class="property">class </em><code class="descclassname">climlab.process.energy_budget.</code><code class="descname">ExternalEnergySource</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/process/energy_budget.html#ExternalEnergySource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.process.energy_budget.ExternalEnergySource" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#climlab.process.energy_budget.EnergyBudget" title="climlab.process.energy_budget.EnergyBudget"><code class="xref py py-class docutils literal"><span class="pre">climlab.process.energy_budget.EnergyBudget</span></code></a></p>
+<p>A fixed energy source or sink to be specified by the user.
+The user should modify the fields in the heating_rate dictionary,
+which contain heating rates in W / m**2 for all state variables.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-climlab.process.implicit">
+<span id="climlab-process-implicit-module"></span><h2>climlab.process.implicit module<a class="headerlink" href="#module-climlab.process.implicit" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="climlab.process.implicit.ImplicitProcess">
+<em class="property">class </em><code class="descclassname">climlab.process.implicit.</code><code class="descname">ImplicitProcess</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/process/implicit.html#ImplicitProcess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.process.implicit.ImplicitProcess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#climlab.process.time_dependent_process.TimeDependentProcess" title="climlab.process.time_dependent_process.TimeDependentProcess"><code class="xref py py-class docutils literal"><span class="pre">climlab.process.time_dependent_process.TimeDependentProcess</span></code></a></p>
+<p>Parent class for modules that use implicit time discretization.</p>
+<dl class="method">
+<dt id="climlab.process.implicit.ImplicitProcess.compute">
+<code class="descname">compute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/process/implicit.html#ImplicitProcess.compute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.process.implicit.ImplicitProcess.compute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-climlab.process.process">
+<span id="climlab-process-process-module"></span><h2>climlab.process.process module<a class="headerlink" href="#module-climlab.process.process" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="climlab.process.process.Process">
+<em class="property">class </em><code class="descclassname">climlab.process.process.</code><code class="descname">Process</code><span class="sig-paren">(</span><em>state=None</em>, <em>domains=None</em>, <em>subprocess=None</em>, <em>lat=None</em>, <em>lev=None</em>, <em>num_lat=None</em>, <em>num_levels=None</em>, <em>diagnostics=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/process/process.html#Process"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.process.process.Process" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>A generic parent class for all climlab process objects.
+Every process object has a set of state variables on a spatial grid.</p>
+<dl class="method">
+<dt id="climlab.process.process.Process.add_subprocess">
+<code class="descname">add_subprocess</code><span class="sig-paren">(</span><em>name</em>, <em>proc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/process/process.html#Process.add_subprocess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.process.process.Process.add_subprocess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a single subprocess to this process.
+name: name of the subprocess (str)
+proc: a Process object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="climlab.process.process.Process.add_subprocesses">
+<code class="descname">add_subprocesses</code><span class="sig-paren">(</span><em>procdict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/process/process.html#Process.add_subprocesses"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.process.process.Process.add_subprocesses" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a dictionary of subproceses to this process.
+procdict is dictionary with process names as keys.</p>
+<p>Can also pass a single process, which will be called &#8216;default&#8217;</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="climlab.process.process.Process.depth">
+<code class="descname">depth</code><a class="headerlink" href="#climlab.process.process.Process.depth" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="climlab.process.process.Process.depth_bounds">
+<code class="descname">depth_bounds</code><a class="headerlink" href="#climlab.process.process.Process.depth_bounds" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="climlab.process.process.Process.lat">
+<code class="descname">lat</code><a class="headerlink" href="#climlab.process.process.Process.lat" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="climlab.process.process.Process.lat_bounds">
+<code class="descname">lat_bounds</code><a class="headerlink" href="#climlab.process.process.Process.lat_bounds" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="climlab.process.process.Process.lev">
+<code class="descname">lev</code><a class="headerlink" href="#climlab.process.process.Process.lev" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="climlab.process.process.Process.lev_bounds">
+<code class="descname">lev_bounds</code><a class="headerlink" href="#climlab.process.process.Process.lev_bounds" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="climlab.process.process.Process.lon">
+<code class="descname">lon</code><a class="headerlink" href="#climlab.process.process.Process.lon" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="climlab.process.process.Process.lon_bounds">
+<code class="descname">lon_bounds</code><a class="headerlink" href="#climlab.process.process.Process.lon_bounds" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="climlab.process.process.Process.remove_subprocess">
+<code class="descname">remove_subprocess</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/process/process.html#Process.remove_subprocess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.process.process.Process.remove_subprocess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove a single subprocess from this process.
+name: name of the subprocess (str)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="climlab.process.process.Process.set_state">
+<code class="descname">set_state</code><span class="sig-paren">(</span><em>name</em>, <em>value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/process/process.html#Process.set_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.process.process.Process.set_state" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="climlab.process.process.get_axes">
+<code class="descclassname">climlab.process.process.</code><code class="descname">get_axes</code><span class="sig-paren">(</span><em>process_or_domain</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/process/process.html#get_axes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.process.process.get_axes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a dictionary of all axes in a domain or dictionary of domains.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="climlab.process.process.process_like">
+<code class="descclassname">climlab.process.process.</code><code class="descname">process_like</code><span class="sig-paren">(</span><em>proc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/process/process.html#process_like"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.process.process.process_like" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a new process identical to the given process.
+The creation date is updated.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-climlab.process.time_dependent_process">
+<span id="climlab-process-time-dependent-process-module"></span><h2>climlab.process.time_dependent_process module<a class="headerlink" href="#module-climlab.process.time_dependent_process" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="climlab.process.time_dependent_process.TimeDependentProcess">
+<em class="property">class </em><code class="descclassname">climlab.process.time_dependent_process.</code><code class="descname">TimeDependentProcess</code><span class="sig-paren">(</span><em>time_type='explicit'</em>, <em>timestep=None</em>, <em>topdown=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/process/time_dependent_process.html#TimeDependentProcess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.process.time_dependent_process.TimeDependentProcess" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#climlab.process.process.Process" title="climlab.process.process.Process"><code class="xref py py-class docutils literal"><span class="pre">climlab.process.process.Process</span></code></a></p>
+<p>A generic parent class for all time-dependent processes.</p>
+<dl class="method">
+<dt id="climlab.process.time_dependent_process.TimeDependentProcess.compute">
+<code class="descname">compute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/process/time_dependent_process.html#TimeDependentProcess.compute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.process.time_dependent_process.TimeDependentProcess.compute" title="Permalink to this definition">¶</a></dt>
+<dd><p>By default, the tendency is zero.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="climlab.process.time_dependent_process.TimeDependentProcess.compute_diagnostics">
+<code class="descname">compute_diagnostics</code><span class="sig-paren">(</span><em>num_iter=3</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/process/time_dependent_process.html#TimeDependentProcess.compute_diagnostics"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.process.time_dependent_process.TimeDependentProcess.compute_diagnostics" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute all tendencies and diagnostics, but don&#8217;t update model state.
+By default it will call step_forward() 3 times to make sure all
+subprocess coupling is accounted for. The number of iterations can
+be changed with the input argument.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="climlab.process.time_dependent_process.TimeDependentProcess.integrate_converge">
+<code class="descname">integrate_converge</code><span class="sig-paren">(</span><em>crit=0.0001</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/process/time_dependent_process.html#TimeDependentProcess.integrate_converge"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.process.time_dependent_process.TimeDependentProcess.integrate_converge" title="Permalink to this definition">¶</a></dt>
+<dd><p>integrate until solution is converging
+param:  crit    - exit criteria for difference of iterated solutions</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="climlab.process.time_dependent_process.TimeDependentProcess.integrate_days">
+<code class="descname">integrate_days</code><span class="sig-paren">(</span><em>days=1.0</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/process/time_dependent_process.html#TimeDependentProcess.integrate_days"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.process.time_dependent_process.TimeDependentProcess.integrate_days" title="Permalink to this definition">¶</a></dt>
+<dd><p>Timestep the model forward a specified number of days.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="climlab.process.time_dependent_process.TimeDependentProcess.integrate_years">
+<code class="descname">integrate_years</code><span class="sig-paren">(</span><em>years=1.0</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/process/time_dependent_process.html#TimeDependentProcess.integrate_years"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.process.time_dependent_process.TimeDependentProcess.integrate_years" title="Permalink to this definition">¶</a></dt>
+<dd><p>Timestep the model forward a specified number of years.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="climlab.process.time_dependent_process.TimeDependentProcess.set_timestep">
+<code class="descname">set_timestep</code><span class="sig-paren">(</span><em>timestep=86400.0</em>, <em>num_steps_per_year=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/process/time_dependent_process.html#TimeDependentProcess.set_timestep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.process.time_dependent_process.TimeDependentProcess.set_timestep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change the timestep.
+Input is either timestep in seconds,
+or
+num_steps_per_year: a number of steps per calendar year.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="climlab.process.time_dependent_process.TimeDependentProcess.step_forward">
+<code class="descname">step_forward</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/climlab/process/time_dependent_process.html#TimeDependentProcess.step_forward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.process.time_dependent_process.TimeDependentProcess.step_forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>new oop climlab... just loop through processes
+and add up the tendencies</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-climlab.process">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-climlab.process" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">climlab.process package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-climlab.process.diagnostic">climlab.process.diagnostic module</a></li>
+<li><a class="reference internal" href="#module-climlab.process.energy_budget">climlab.process.energy_budget module</a></li>
+<li><a class="reference internal" href="#module-climlab.process.implicit">climlab.process.implicit module</a></li>
+<li><a class="reference internal" href="#module-climlab.process.process">climlab.process.process module</a></li>
+<li><a class="reference internal" href="#module-climlab.process.time_dependent_process">climlab.process.time_dependent_process module</a></li>
+<li><a class="reference internal" href="#module-climlab.process">Module contents</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  <li><a href="climlab.html">climlab package</a><ul>
+      <li>Previous: <a href="climlab.model.html" title="previous chapter">climlab.model package</a></li>
+      <li>Next: <a href="climlab.radiation.html" title="next chapter">climlab.radiation package</a></li>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/climlab.process.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+      |
+      <a href="_sources/climlab.process.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

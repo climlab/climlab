@@ -1,0 +1,405 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>climlab.radiation.nband &mdash; climlab-0.2.13 0.2.13 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.2.13',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="climlab-0.2.13 0.2.13 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for climlab.radiation.nband</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">climlab.radiation.greygas</span> <span class="kn">import</span> <span class="n">GreyGas</span>
+<span class="kn">from</span> <span class="nn">climlab</span> <span class="kn">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">const</span>
+<span class="kn">from</span> <span class="nn">climlab.domain</span> <span class="kn">import</span> <span class="n">domain</span><span class="p">,</span> <span class="n">axis</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">copy</span>
+
+
+<div class="viewcode-block" id="NbandRadiation"><a class="viewcode-back" href="../../../climlab.radiation.html#climlab.radiation.nband.NbandRadiation">[docs]</a><span class="k">class</span> <span class="nc">NbandRadiation</span><span class="p">(</span><span class="n">GreyGas</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Process for radiative transfer.</span>
+<span class="sd">    Solves the discretized Schwarschild two-stream equations</span>
+<span class="sd">    with the spectrum divided into N spectral bands.</span>
+
+<span class="sd">    Every NbandRadiation object has an attribute</span>
+<span class="sd">        self.band_fraction</span>
+<span class="sd">    with sum(self.band_fraction) == 1</span>
+<span class="sd">    that gives the fraction of the total beam in each band</span>
+
+<span class="sd">    Also a dictionary</span>
+<span class="sd">        self.absorber_vmr</span>
+<span class="sd">    that gives the volumetric mixing ratio of every absorbing gas</span>
+<span class="sd">    on the same grid as temperature</span>
+
+<span class="sd">    and a dictionary</span>
+<span class="sd">        self.absorption_cross_section</span>
+<span class="sd">    that gives the absorption cross-section per unit mass for each gas</span>
+<span class="sd">    in every spectral band</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">absorber_vmr</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">NbandRadiation</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">newinput</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;band_fraction&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;absorber_vmr&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;absorption_cross_section&#39;</span><span class="p">,</span>
+                    <span class="s">&#39;cosZen&#39;</span><span class="p">,]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_input</span><span class="p">(</span><span class="n">newinput</span><span class="p">)</span>
+        <span class="c"># this should be overridden by daughter classes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">band_fraction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="mf">1.</span><span class="p">)</span>
+        <span class="c">##  a dictionary of absorbing gases, in volumetric mixing ratios</span>
+        <span class="c">#  each item should have dimensions of self.Tatm</span>
+        <span class="c">#  Can be passed as input argument</span>
+        <span class="k">if</span> <span class="n">absorber_vmr</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">absorber_vmr</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">absorber_vmr</span> <span class="o">=</span> <span class="n">absorber_vmr</span>
+        <span class="c"># a dictionary of absorption cross-sections in m**2 / kg</span>
+        <span class="c"># each item should have dimension...  (num_channels, 1)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">absorption_cross_section</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cosZen</span> <span class="o">=</span> <span class="mf">1.</span>  <span class="c"># cosine of the average zenith angle</span>
+        <span class="n">dp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">Tatm</span><span class="o">.</span><span class="n">domain</span><span class="o">.</span><span class="n">lev</span><span class="o">.</span><span class="n">delta</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mass_per_layer</span> <span class="o">=</span> <span class="n">dp</span> <span class="o">*</span> <span class="n">const</span><span class="o">.</span><span class="n">mb_to_Pa</span> <span class="o">/</span> <span class="n">const</span><span class="o">.</span><span class="n">g</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">albedo_sfc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">band_fraction</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">albedo_sfc</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">band_fraction</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_band_fraction</span>
+    <span class="nd">@band_fraction.setter</span>
+    <span class="k">def</span> <span class="nf">band_fraction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_channels</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">size</span>
+        <span class="c"># abstract axis for channels</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">axis</span><span class="o">.</span><span class="n">Axis</span><span class="p">(</span><span class="n">num_points</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">num_channels</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel_ax</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;channel&#39;</span><span class="p">:</span> <span class="n">ax</span><span class="p">}</span>
+        <span class="n">dom</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">_Domain</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">channel_ax</span><span class="p">)</span>
+        <span class="c">#   fraction of the total solar flux in each band:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_band_fraction</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">dom</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_compute_optical_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># this will cause a problem for a model without CO2</span>
+        <span class="n">tau</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">absorber_vmr</span><span class="p">[</span><span class="s">&#39;CO2&#39;</span><span class="p">]</span><span class="o">*</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">absorption_cross_section</span><span class="p">[</span><span class="s">&#39;CO2&#39;</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">gas</span><span class="p">,</span> <span class="n">vmr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">absorber_vmr</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="c"># convert to mass of absorber per unit total mass</span>
+            <span class="k">if</span> <span class="n">gas</span> <span class="ow">is</span> <span class="s">&#39;H2O&#39;</span><span class="p">:</span>  <span class="c"># H2O is stored as specific humidity, not VMR</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="n">vmr</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="n">vmr</span> <span class="o">/</span> <span class="p">(</span><span class="mf">1.</span><span class="o">+</span><span class="n">vmr</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c"># if this gas isn&#39;t present in absorption dictionary</span>
+                <span class="c"># the assumption is that there is no absorption!</span>
+                <span class="n">kappa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">absorption_cross_section</span><span class="p">[</span><span class="n">gas</span><span class="p">]</span>
+                <span class="n">tau</span> <span class="o">+=</span> <span class="n">q</span> <span class="o">*</span> <span class="n">kappa</span>
+            <span class="k">except</span><span class="p">:</span> <span class="k">pass</span>
+        <span class="n">tau</span> <span class="o">*=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mass_per_layer</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">cosZen</span>
+        <span class="k">return</span> <span class="n">tau</span>
+
+    <span class="k">def</span> <span class="nf">_compute_absorptivity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c">#  assume that the water vapor etc is current</span>
+        <span class="n">optical_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_optical_path</span><span class="p">()</span>
+        <span class="c">#  account for finite layer depth</span>
+        <span class="n">absorptivity</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">optical_path</span><span class="p">)</span>
+        <span class="n">axes</span> <span class="o">=</span> <span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Tatm</span><span class="o">.</span><span class="n">domain</span><span class="o">.</span><span class="n">axes</span><span class="p">)</span>
+        <span class="c"># add these to the dictionary of axes</span>
+        <span class="n">axes</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">channel_ax</span><span class="p">)</span>
+        <span class="n">dom</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">Atmosphere</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="n">axes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">absorptivity</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">Field</span><span class="p">(</span><span class="n">absorptivity</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">dom</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_compute_emission_sfc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c">#  need to split the total emission across the bands</span>
+        <span class="n">total_emission</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">NbandRadiation</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_compute_emission_sfc</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_split_channels</span><span class="p">(</span><span class="n">total_emission</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_compute_emission</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c">#  need to split the total emission across the bands</span>
+        <span class="n">total_emission</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">NbandRadiation</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_compute_emission</span><span class="p">()</span>
+        <span class="n">band_fraction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">band_fraction</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Tatm</span><span class="o">.</span><span class="n">domain</span><span class="o">.</span><span class="n">numdims</span><span class="p">):</span>
+            <span class="n">band_fraction</span> <span class="o">=</span> <span class="n">band_fraction</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">total_emission</span> <span class="o">*</span> <span class="n">band_fraction</span>
+
+    <span class="k">def</span> <span class="nf">_compute_radiative_heating</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c">#  need to recompute transmissivities each time because</span>
+        <span class="c"># water vapor is changing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_compute_absorptivity</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">NbandRadiation</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_compute_radiative_heating</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_split_channels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flux</span><span class="p">):</span>
+        <span class="n">split</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">outer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">band_fraction</span><span class="p">,</span> <span class="n">flux</span><span class="p">)</span>
+        <span class="c"># make sure there&#39;s a singleton dimension at the last axis (level)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">split</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">split</span> <span class="o">=</span> <span class="n">split</span><span class="p">[</span><span class="o">...</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">split</span>
+
+    <span class="k">def</span> <span class="nf">_join_channels</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flux</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">flux</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="ThreeBandSW"><a class="viewcode-back" href="../../../climlab.radiation.html#climlab.radiation.nband.ThreeBandSW">[docs]</a><span class="k">class</span> <span class="nc">ThreeBandSW</span><span class="p">(</span><span class="n">NbandRadiation</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">emissivity_sfc</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;A three-band mdoel for shortwave radiation.</span>
+
+<span class="sd">        The spectral decomposition used here is largely based on the</span>
+<span class="sd">        &quot;Moist Radiative-Convective Model&quot; by Aarnout van Delden, Utrecht University</span>
+<span class="sd">        a.j.vandelden@uu.nl</span>
+<span class="sd">        http://www.staff.science.uu.nl/~delde102/RCM.htm</span>
+
+<span class="sd">        Three SW channels:</span>
+<span class="sd">            channel 0 is Hartley and Huggins band (UV, 1%, 200 - 340 nm)</span>
+<span class="sd">            channel 1 is Chappuis band (27%, 450 - 800 nm)</span>
+<span class="sd">            channel 2 is remaining radiation (72%)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ThreeBandSW</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">emissivity_sfc</span><span class="o">=</span><span class="n">emissivity_sfc</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c">#   fraction of the total solar flux in each band:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">band_fraction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.27</span><span class="p">,</span> <span class="mf">0.72</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s">&#39;CO2&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">absorber_vmr</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">absorber_vmr</span><span class="p">[</span><span class="s">&#39;CO2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">380.E-6</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Tatm</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s">&#39;O3&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">absorber_vmr</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">absorber_vmr</span><span class="p">[</span><span class="s">&#39;O3&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Tatm</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s">&#39;H2O&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">absorber_vmr</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">absorber_vmr</span><span class="p">[</span><span class="s">&#39;H2O&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span>
+        <span class="c">##  absorption cross-sections in m**2 / kg</span>
+        <span class="n">O3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">200.E-24</span><span class="p">,</span> <span class="mf">0.285E-24</span><span class="p">,</span> <span class="mf">0.</span><span class="p">])</span> <span class="o">*</span> <span class="n">const</span><span class="o">.</span><span class="n">Rd</span> <span class="o">/</span> <span class="n">const</span><span class="o">.</span><span class="n">kBoltzmann</span>
+        <span class="c">#self.absorption_cross_section[&#39;O3&#39;] = np.reshape(O3,</span>
+        <span class="c">#    (self.num_channels, 1))</span>
+        <span class="c">#H2O = np.array([0.002, 0.002, 0.002])</span>
+        <span class="n">H2O</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Tatm</span><span class="o">.</span><span class="n">domain</span><span class="o">.</span><span class="n">numdims</span><span class="p">):</span>
+            <span class="n">H2O</span> <span class="o">=</span> <span class="n">H2O</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+            <span class="n">O3</span> <span class="o">=</span> <span class="n">O3</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">absorption_cross_section</span><span class="p">[</span><span class="s">&#39;O3&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">O3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">absorption_cross_section</span><span class="p">[</span><span class="s">&#39;H2O&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">H2O</span>
+        <span class="c">#self.absorption_cross_section[&#39;H2O&#39;] = np.reshape(H2O,</span>
+        <span class="c">#    (self.num_channels, 1))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">absorption_cross_section</span><span class="p">[</span><span class="s">&#39;CO2&#39;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">absorption_cross_section</span><span class="p">[</span><span class="s">&#39;O3&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cosZen</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c"># cosine of the average solar zenith angle</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">emissivity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># This ensures that emissivity is always zero for shortwave classes</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">absorptivity</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="FourBandSW"><a class="viewcode-back" href="../../../climlab.radiation.html#climlab.radiation.nband.FourBandSW">[docs]</a><span class="k">class</span> <span class="nc">FourBandSW</span><span class="p">(</span><span class="n">NbandRadiation</span><span class="p">):</span>
+    <span class="c">#  The most recent RMCM program uses a four-channel SW model</span>
+    <span class="c">#  this is probably a better way to do it... distinguishes between</span>
+    <span class="c">#  visible band with no absorption and near-infrared with weak H2O absorption</span>
+    <span class="c">#   But this needs some tuning and better documentation</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">emissivity_sfc</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;A four-band mdoel for shortwave radiation.</span>
+
+<span class="sd">        The spectral decomposition used here is largely based on the</span>
+<span class="sd">        &quot;Moist Radiative-Convective Model&quot; by Aarnout van Delden, Utrecht University</span>
+<span class="sd">        a.j.vandelden@uu.nl</span>
+<span class="sd">        http://www.staff.science.uu.nl/~delde102/RCM.htm</span>
+
+<span class="sd">        Four SW channels:</span>
+<span class="sd">            channel 0 is Hartley and Huggins band (UV, 6%, &lt;340 nm)</span>
+<span class="sd">            channel 1 is part of visible with no O3 absorption (14%, 340 - 500 nm)</span>
+<span class="sd">            channel 2 is Chappuis band (27%, 500 - 700 nm)</span>
+<span class="sd">            channel 3 is near-infrared (53%, &gt; 700 nm)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FourBandSW</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">emissivity_sfc</span><span class="o">=</span><span class="n">emissivity_sfc</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c">#   fraction of the total solar flux in each band:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">band_fraction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.06</span><span class="p">,</span> <span class="mf">0.14</span><span class="p">,</span> <span class="mf">0.27</span><span class="p">,</span> <span class="mf">0.53</span><span class="p">])</span>
+        <span class="k">if</span> <span class="s">&#39;CO2&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">absorber_vmr</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">absorber_vmr</span><span class="p">[</span><span class="s">&#39;CO2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">380.E-6</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Tatm</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s">&#39;O3&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">absorber_vmr</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">absorber_vmr</span><span class="p">[</span><span class="s">&#39;O3&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Tatm</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s">&#39;H2O&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">absorber_vmr</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">absorber_vmr</span><span class="p">[</span><span class="s">&#39;H2O&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span>
+        <span class="c">##  absorption cross-sections in m**2 / kg</span>
+        <span class="n">O3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">200.E-24</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.285E-24</span><span class="p">,</span> <span class="mf">0.</span><span class="p">])</span> <span class="o">*</span> <span class="n">const</span><span class="o">.</span><span class="n">Rd</span> <span class="o">/</span> <span class="n">const</span><span class="o">.</span><span class="n">kBoltzmann</span>
+        <span class="c">#self.absorption_cross_section[&#39;O3&#39;] = np.reshape(O3,</span>
+        <span class="c">#    (self.num_channels, 1))</span>
+        <span class="n">H2O</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.0012</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Tatm</span><span class="o">.</span><span class="n">domain</span><span class="o">.</span><span class="n">numdims</span><span class="p">):</span>
+            <span class="n">H2O</span> <span class="o">=</span> <span class="n">H2O</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+            <span class="n">O3</span> <span class="o">=</span> <span class="n">O3</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">absorption_cross_section</span><span class="p">[</span><span class="s">&#39;O3&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">O3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">absorption_cross_section</span><span class="p">[</span><span class="s">&#39;H2O&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">H2O</span>
+        <span class="c">#self.absorption_cross_section[&#39;H2O&#39;] = np.reshape(H2O,</span>
+        <span class="c">#    (self.num_channels, 1))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">absorption_cross_section</span><span class="p">[</span><span class="s">&#39;CO2&#39;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">absorption_cross_section</span><span class="p">[</span><span class="s">&#39;O3&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cosZen</span> <span class="o">=</span> <span class="mf">0.5</span>  <span class="c"># cosine of the average solar zenith angle</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">emissivity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c"># This ensures that emissivity is always zero for shortwave classes</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">absorptivity</span><span class="p">)</span>
+
+
+</div>
+<div class="viewcode-block" id="FourBandLW"><a class="viewcode-back" href="../../../climlab.radiation.html#climlab.radiation.nband.FourBandLW">[docs]</a><span class="k">class</span> <span class="nc">FourBandLW</span><span class="p">(</span><span class="n">NbandRadiation</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Closely following SPEEDY / MITgcm longwave model</span>
+<span class="sd">        band 0 is window region (between 8.5 and 11 microns)</span>
+<span class="sd">        band 1 is CO2 channel (the band of strong absorption by CO2 around 15 microns)</span>
+<span class="sd">        band 2 is weak H2O channel (aggregation of spectral regions with weak to moderate absorption by H2O)</span>
+<span class="sd">        band 3 is strong H2O channel (aggregation of regions with strong absorption by H2O)</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">FourBandLW</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c">#  SPEEDY uses an approximation to the Planck function</span>
+        <span class="c">#  and the band fraction for every emission is calculated from</span>
+        <span class="c">#  its current temperature</span>
+        <span class="c">#  Here for simoplicity we&#39;ll just set an average band_fraction</span>
+        <span class="c">#  and hold it fixed</span>
+        <span class="n">Tarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">30</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span> <span class="o">+</span> <span class="mf">273.15</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">band_fraction</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">SPEEDY_band_fraction</span><span class="p">(</span><span class="n">Tarray</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c"># defaults from MITgcm/aim:</span>
+        <span class="c"># these are layer absorptivities per dp = 10^5 Pa</span>
+        <span class="c"># the water vapor terms are expressed for dq = 1 g/kg</span>
+        <span class="n">ABLWIN</span> <span class="o">=</span> <span class="mf">0.7</span>
+        <span class="n">ABLCO2</span> <span class="o">=</span> <span class="mf">4.0</span>
+        <span class="n">ABLWV1</span> <span class="o">=</span> <span class="mf">0.7</span>
+        <span class="n">ABLWV2</span> <span class="o">=</span> <span class="mf">50.0</span>
+        <span class="c">#  I&#39;m going to assume that the absorption in window region is by O3.</span>
+        <span class="c">#   not sure if this makes any sense... maybe it should be zero</span>
+        <span class="n">O3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">ABLWIN</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">])</span> <span class="o">/</span> <span class="mf">1E5</span> <span class="o">*</span> <span class="n">const</span><span class="o">.</span><span class="n">g</span> <span class="o">/</span> <span class="mf">5E-6</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">absorption_cross_section</span><span class="p">[</span><span class="s">&#39;O3&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">O3</span><span class="p">,</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_channels</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+        <span class="c"># the CO2 mixing ratio for which SPEEDY / MITgcm is tuned...</span>
+        <span class="c">#   not clear what this number should be</span>
+        <span class="n">AIMCO2</span> <span class="o">=</span> <span class="mf">380E-6</span>
+        <span class="n">CO2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="n">ABLCO2</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">])</span> <span class="o">/</span> <span class="mf">1E5</span> <span class="o">*</span> <span class="n">const</span><span class="o">.</span><span class="n">g</span> <span class="o">/</span> <span class="n">AIMCO2</span>
+        <span class="c">#self.absorption_cross_section[&#39;CO2&#39;] = np.reshape(CO2,</span>
+        <span class="c">#    (self.num_channels, 1))</span>
+        <span class="c"># Need to multiply by 1E3 for H2O fields because we use kg/kg for mixing ratio</span>
+        <span class="n">H2O</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="n">ABLWV1</span><span class="p">,</span> <span class="n">ABLWV2</span><span class="p">])</span> <span class="o">/</span> <span class="mf">1E5</span> <span class="o">*</span> <span class="n">const</span><span class="o">.</span><span class="n">g</span> <span class="o">*</span> <span class="mf">1E3</span>
+        <span class="c">#self.absorption_cross_section[&#39;H2O&#39;] = np.reshape(H2O,</span>
+        <span class="c">#    (self.num_channels, 1))</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Tatm</span><span class="o">.</span><span class="n">domain</span><span class="o">.</span><span class="n">numdims</span><span class="p">):</span>
+            <span class="n">CO2</span> <span class="o">=</span> <span class="n">CO2</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+            <span class="n">O3</span> <span class="o">=</span> <span class="n">O3</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+            <span class="n">H2O</span> <span class="o">=</span> <span class="n">H2O</span><span class="p">[:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">absorption_cross_section</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s">&#39;CO2&#39;</span><span class="p">:</span> <span class="n">CO2</span><span class="p">,</span> <span class="s">&#39;H2O&#39;</span><span class="p">:</span> <span class="n">H2O</span><span class="p">,</span> <span class="s">&#39;O3&#39;</span><span class="p">:</span> <span class="n">O3</span><span class="p">})</span>
+        <span class="k">if</span> <span class="s">&#39;CO2&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">absorber_vmr</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">absorber_vmr</span><span class="p">[</span><span class="s">&#39;CO2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">380.E-6</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Tatm</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s">&#39;O3&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">absorber_vmr</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">absorber_vmr</span><span class="p">[</span><span class="s">&#39;O3&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Tatm</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s">&#39;H2O&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">absorber_vmr</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">absorber_vmr</span><span class="p">[</span><span class="s">&#39;H2O&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">q</span>
+
+</div>
+<div class="viewcode-block" id="SPEEDY_band_fraction"><a class="viewcode-back" href="../../../climlab.radiation.html#climlab.radiation.nband.SPEEDY_band_fraction">[docs]</a><span class="k">def</span> <span class="nf">SPEEDY_band_fraction</span><span class="p">(</span><span class="n">T</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Python / numpy implementation of the formula used by SPEEDY and MITgcm</span>
+<span class="sd">    to partition longwave emissions into 4 spectral bands.</span>
+
+<span class="sd">    Input: temperature in Kelvin</span>
+
+<span class="sd">    returns: a four-element array of band fraction</span>
+
+<span class="sd">    Reproducing here the FORTRAN code from MITgcm/pkg/aim_v23/phy_radiat.F</span>
+
+
+<span class="sd">	      EPS3=0.95 _d 0</span>
+
+<span class="sd">	      DO JTEMP=200,320</span>
+<span class="sd">	        FBAND(JTEMP,0)= EPSLW</span>
+<span class="sd">	        FBAND(JTEMP,2)= 0.148 _d 0 - 3.0 _d -6 *(JTEMP-247)**2</span>
+<span class="sd">	        FBAND(JTEMP,3)=(0.375 _d 0 - 5.5 _d -6 *(JTEMP-282)**2)*EPS3</span>
+<span class="sd">	        FBAND(JTEMP,4)= 0.314 _d 0 + 1.0 _d -5 *(JTEMP-315)**2</span>
+<span class="sd">	        FBAND(JTEMP,1)= 1. _d 0 -(FBAND(JTEMP,0)+FBAND(JTEMP,2)</span>
+<span class="sd">	     &amp;                           +FBAND(JTEMP,3)+FBAND(JTEMP,4))</span>
+<span class="sd">	      ENDDO</span>
+
+<span class="sd">	      DO JB=0,NBAND</span>
+<span class="sd">	        DO JTEMP=lwTemp1,199</span>
+<span class="sd">	          FBAND(JTEMP,JB)=FBAND(200,JB)</span>
+<span class="sd">	        ENDDO</span>
+<span class="sd">	        DO JTEMP=321,lwTemp2</span>
+<span class="sd">	          FBAND(JTEMP,JB)=FBAND(320,JB)</span>
+<span class="sd">	        ENDDO</span>
+<span class="sd">	      ENDDO</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="c"># EPSLW is the fraction of longwave emission that goes directly to space</span>
+    <span class="c">#  It is set to zero by default in MITgcm code. We won&#39;t use it here.</span>
+    <span class="n">Tarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+    <span class="n">Tarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">Tarray</span><span class="p">,</span> <span class="mf">230.</span><span class="p">)</span>
+    <span class="n">Tarray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">Tarray</span><span class="p">,</span> <span class="mf">200.</span><span class="p">)</span>
+    <span class="n">num_band</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="n">num_band</span><span class="p">]</span>
+    <span class="n">dims</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">Tarray</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">FBAND</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span>
+
+    <span class="n">EPS2</span><span class="o">=</span><span class="mf">0.95</span>
+    <span class="n">FBAND</span><span class="p">[</span><span class="mi">1</span><span class="p">,:]</span> <span class="o">=</span> <span class="mf">0.148</span> <span class="o">-</span> <span class="mf">3.0E-6</span> <span class="o">*</span><span class="p">(</span><span class="n">T</span><span class="o">-</span><span class="mf">247.</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">FBAND</span><span class="p">[</span><span class="mi">2</span><span class="p">,:]</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.375</span> <span class="o">-</span> <span class="mf">5.5E-6</span> <span class="o">*</span><span class="p">(</span><span class="n">T</span><span class="o">-</span><span class="mf">282.</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">EPS2</span>
+    <span class="n">FBAND</span><span class="p">[</span><span class="mi">3</span><span class="p">,:]</span> <span class="o">=</span> <span class="mf">0.314</span> <span class="o">+</span> <span class="mf">1.0E-5</span> <span class="o">*</span><span class="p">(</span><span class="n">T</span><span class="o">-</span><span class="mf">315.</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+    <span class="n">FBAND</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span> <span class="o">=</span> <span class="mf">1.</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">FBAND</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">FBAND</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

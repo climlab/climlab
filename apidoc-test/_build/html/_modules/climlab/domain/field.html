@@ -1,0 +1,186 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>climlab.domain.field &mdash; climlab-0.2.13 0.2.13 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.2.13',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="climlab-0.2.13 0.2.13 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for climlab.domain.field</h1><div class="highlight"><pre>
+<span class="c">#  Trying a new data model for state variables and domains:</span>
+<span class="c">#  Create a new sub-class of numpy.ndarray</span>
+<span class="c">#  that has as an attribute the domain itself</span>
+
+<span class="c"># Following a tutorial on subclassing ndarray here:</span>
+<span class="c">#</span>
+<span class="c"># http://docs.scipy.org/doc/numpy/user/basics.subclassing.html</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="sd">&#39;&#39;&#39;test usage:</span>
+<span class="sd">import numpy as np</span>
+<span class="sd">A = np.linspace(0., 10., 30)</span>
+<span class="sd">d = domain.single_column()</span>
+<span class="sd">atm = d[&#39;atm&#39;]</span>
+<span class="sd">s = field.Field(A, domain=atm)</span>
+<span class="sd">print s</span>
+<span class="sd">print s.domain</span>
+<span class="sd"># can slice this and it preserves the domain</span>
+<span class="sd">#  a more full-featured implementation would have intelligent slicing</span>
+<span class="sd">#  like in iris</span>
+<span class="sd">s.shape == s.domain.shape</span>
+<span class="sd">s[:1].shape == s[:1].domain.shape</span>
+<span class="sd">#  But some things work very well. E.g. new field creation:</span>
+<span class="sd">s2 = np.zeros_like(s)</span>
+<span class="sd">print s2</span>
+<span class="sd">print s2.domain</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+
+<div class="viewcode-block" id="Field"><a class="viewcode-back" href="../../../climlab.domain.html#climlab.domain.field.Field">[docs]</a><span class="k">class</span> <span class="nc">Field</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Custom class for climlab gridded quantities, called Field</span>
+<span class="sd">    This class behaves exactly like numpy.ndarray</span>
+<span class="sd">    but every object has an attribute called domain</span>
+<span class="sd">    which is the domain associated with that field (e.g. state variables).&#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__new__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">input_array</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="c"># Input array is an already formed ndarray instance</span>
+        <span class="c"># We first cast to be our class type</span>
+        <span class="c">#obj = np.asarray(input_array).view(cls)</span>
+        <span class="c"># This should ensure that shape is (1,) for scalar input        </span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">input_array</span><span class="p">)</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">cls</span><span class="p">)</span>
+        <span class="c"># add the new attribute to the created instance</span>
+        <span class="c">#  do some checking for correct dimensions</span>
+        <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">domain</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="n">domain</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">obj</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">atleast_2d</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">domain</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+                    <span class="n">obj</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="n">domain</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;input_array and domain have different shapes.&#39;</span><span class="p">)</span>
+            
+        <span class="c">#  would be nice to have some automatic domain creation here if none given</span>
+            
+        <span class="c"># Finally, we must return the newly created object:</span>
+        <span class="k">return</span> <span class="n">obj</span>
+
+    <span class="k">def</span> <span class="nf">__array_finalize__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="c"># ``self`` is a new object resulting from</span>
+        <span class="c"># ndarray.__new__(Field, ...), therefore it only has</span>
+        <span class="c"># attributes that the ndarray.__new__ constructor gave it -</span>
+        <span class="c"># i.e. those of a standard ndarray.</span>
+        <span class="c">#</span>
+        <span class="c"># We could have got to the ndarray.__new__ call in 3 ways:</span>
+        <span class="c"># From an explicit constructor - e.g. Field():</span>
+        <span class="c">#    obj is None</span>
+        <span class="c">#    (we&#39;re in the middle of the Field.__new__</span>
+        <span class="c">#    constructor, and self.domain will be set when we return to</span>
+        <span class="c">#    Field.__new__)</span>
+        <span class="k">if</span> <span class="n">obj</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span> <span class="k">return</span>
+        <span class="c"># From view casting - e.g arr.view(Field):</span>
+        <span class="c">#    obj is arr</span>
+        <span class="c">#    (type(obj) can be Field)</span>
+        <span class="c"># From new-from-template - e.g statearr[:3]</span>
+        <span class="c">#    type(obj) is Field</span>
+        <span class="c">#</span>
+        <span class="c"># Note that it is here, rather than in the __new__ method,</span>
+        <span class="c"># that we set the default value for &#39;domain&#39;, because this</span>
+        <span class="c"># method sees all creation of default objects - with the</span>
+        <span class="c"># Field.__new__ constructor, but also with</span>
+        <span class="c"># arr.view(Field).</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s">&#39;domain&#39;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="c"># We do not need to return anything</span>
+
+</div>
+<div class="viewcode-block" id="global_mean"><a class="viewcode-back" href="../../../climlab.domain.html#climlab.domain.field.global_mean">[docs]</a><span class="k">def</span> <span class="nf">global_mean</span><span class="p">(</span><span class="n">field</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Calculate global mean of a field with latitude dependence.&#39;&#39;&#39;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">lat</span> <span class="o">=</span> <span class="n">field</span><span class="o">.</span><span class="n">domain</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="s">&#39;lat&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">points</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;No latitude axis in input field.&#39;</span><span class="p">)</span>
+    <span class="n">lat_radians</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_global_mean</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(),</span> <span class="n">lat_radians</span><span class="p">)</span>
+
+</div>
+<span class="k">def</span> <span class="nf">_global_mean</span><span class="p">(</span><span class="n">array</span><span class="p">,</span> <span class="n">lat_radians</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">array</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat_radians</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">lat_radians</span><span class="p">))</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

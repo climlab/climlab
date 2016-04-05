@@ -1,0 +1,629 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>climlab.dynamics.diffusion &mdash; climlab 0.3.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.3.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="climlab 0.3.0.1 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body role="document">
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../../index.html"><img src="../../../_static/logo.png" border="0" alt="sampledoc"/></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../intro.html">home</a>|&nbsp;</li>
+        <li><a href="../../../search.html">search</a>|&nbsp;</li>
+        <!-- 
+	<li><a href="../../../contents.html">documentation </a> &raquo;</li>
+	-->
+
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../../index.html">Table Of Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../download.html">Download</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/climlab.html">Application Programming Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contact.html">Contact</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput > div,
+div.nbinput div[class^=highlight],
+div.nbinput div[class^=highlight] pre,
+div.nboutput,
+div.nboutput > div,
+div.nboutput div[class^=highlight],
+div.nboutput div[class^=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput > :first-child pre {
+    color: navy;
+}
+
+/* output prompt */
+div.nboutput > :first-child pre {
+    color: darkred;
+}
+
+/* all prompts */
+div.nbinput > :first-child[class^=highlight],
+div.nboutput > :first-child[class^=highlight],
+div.nboutput > :first-child {
+    min-width: 11ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+
+/* input/output area */
+div.nbinput > :nth-child(2)[class^=highlight],
+div.nboutput > :nth-child(2),
+div.nboutput > :nth-child(2)[class^=highlight] {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+}
+
+/* input area */
+div.nbinput > :nth-child(2)[class^=highlight] {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput  > :nth-child(2).stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansiblack { color: black; }
+.ansired { color: darkred; }
+.ansigreen { color: darkgreen; }
+.ansiyellow { color: #c4a000; }
+.ansiblue { color: darkblue; }
+.ansipurple { color: darkviolet; }
+.ansicyan { color: steelblue; }
+/* See https://github.com/jupyter/nbconvert/issues/174 */
+.ansigray { color: gray; }  /* nbconvert CSS */
+.ansigrey { color: gray; }  /* nbconvert HTML output */
+
+.ansibgblack { background-color: black; }
+.ansibgred { background-color: red; }
+.ansibggreen { background-color: green; }
+.ansibgyellow { background-color: yellow; }
+.ansibgblue { background-color: blue; }
+.ansibgpurple { background-color: magenta; }
+.ansibgcyan { background-color: cyan; }
+.ansibggray { background-color: gray; }
+
+.ansibold { font-weight: bold; }
+</style>
+<h1>Source code for climlab.dynamics.diffusion</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.linalg</span> <span class="kn">import</span> <span class="n">solve_banded</span>
+<span class="kn">from</span> <span class="nn">climlab.process.implicit</span> <span class="kn">import</span> <span class="n">ImplicitProcess</span>
+<span class="kn">from</span> <span class="nn">climlab.process.process</span> <span class="kn">import</span> <span class="n">get_axes</span>
+
+
+<div class="viewcode-block" id="Diffusion"><a class="viewcode-back" href="../../../api/climlab.dynamics.html#climlab.dynamics.diffusion.Diffusion">[docs]</a><span class="k">class</span> <span class="nc">Diffusion</span><span class="p">(</span><span class="n">ImplicitProcess</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A parent class for one dimensional implicit diffusion modules.</span>
+<span class="sd">    </span>
+<span class="sd">    Solves the one dimensional heat equation</span>
+<span class="sd">    </span>
+<span class="sd">    .. math::</span>
+<span class="sd">    </span>
+<span class="sd">        \\frac{dT}{dt} = \\frac{d}{dy} \\left[ K \\cdot \\frac{dT}{dy} \\right]</span>
+
+<span class="sd">    **Initialization parameters** \n</span>
+
+<span class="sd">    :param float K:                 the diffusivity parameter in units of </span>
+<span class="sd">                                    :math:`\\frac{[\\textrm{length}]^2}{\\textrm{time}}`</span>
+<span class="sd">                                    where length is the unit of the spatial axis</span>
+<span class="sd">                                    on which the diffusion is occuring.</span>
+<span class="sd">    :param str diffusion_axis:      dictionary key for axis on which the </span>
+<span class="sd">                                    diffusion is occuring in process&#39;s domain</span>
+<span class="sd">                                    axes dictionary</span>
+<span class="sd">    :param bool use_banded_solver:  input flag, whether to use </span>
+<span class="sd">                                    :py:func:`scipy.linalg.solve_banded`</span>
+<span class="sd">                                    instead of :py:func:`numpy.linalg.solve`</span>
+<span class="sd">                                    </span>
+<span class="sd">    .. note::</span>
+<span class="sd">    </span>
+<span class="sd">        The banded solver :py:func:`scipy.linalg.solve_banded` is faster than </span>
+<span class="sd">        :py:func:`numpy.linalg.solve` but only works for one dimensional diffusion.  </span>
+<span class="sd">        </span>
+<span class="sd">    **Object attributes** \n</span>
+<span class="sd">    </span>
+<span class="sd">    Additional to the parent class </span>
+<span class="sd">    :class:`~climlab.process.implicit.ImplicitProcess`</span>
+<span class="sd">    following object attributes are generated or modified during initialization:</span>
+<span class="sd">        </span>
+<span class="sd">    :ivar dict param:               parameter dictionary is extended by </span>
+<span class="sd">                                    diffusivity parameter K (unit:</span>
+<span class="sd">                                    :math:`\\frac{[\\textrm{length}]^2}{\\textrm{time}}`)</span>
+<span class="sd">    :ivar bool use_banded_solver:   input flag specifying numerical solving </span>
+<span class="sd">                                    method (given during initialization)</span>
+<span class="sd">    :ivar str diffusion_axis:       dictionary key for axis where diffusion </span>
+<span class="sd">                                    is occuring: </span>
+<span class="sd">                                    specified during initialization</span>
+<span class="sd">                                    or output of method </span>
+<span class="sd">                                    :func:`_guess_diffusion_axis`</span>
+<span class="sd">    :ivar array K_dimensionless:    diffusion parameter K multiplied by the </span>
+<span class="sd">                                    timestep and divided by mean of diffusion </span>
+<span class="sd">                                    axis delta in the power of two. Array has </span>
+<span class="sd">                                    the size of diffusion axis bounds.</span>
+<span class="sd">                                    :math:`K_{\\textrm{dimensionless}}[i]= K \\frac{\\Delta t}{ \\left(\\overline{\\Delta \\textrm{bounds}} \\right)^2}`</span>
+<span class="sd">    :ivar array diffTriDiag:        tridiagonal diffusion matrix made by</span>
+<span class="sd">                                    :func:`_make_diffusion_matrix()` with input</span>
+<span class="sd">                                    ``self.K_dimensionless``</span>
+<span class="sd">            </span>
+<span class="sd">    </span>
+<span class="sd">    :Example: </span>
+<span class="sd">        </span>
+<span class="sd">        Here is an example showing implementation of a vertical diffusion.</span>
+<span class="sd">        It shows that a subprocess can work on just a subset of the parent process</span>
+<span class="sd">        state variables.</span>
+<span class="sd">               </span>
+<span class="sd">            .. plot:: code_input_manual/example_diffusion.py</span>
+<span class="sd">               :include-source:</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">K</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">diffusion_axis</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">use_banded_solver</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Diffusion</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">[</span><span class="s1">&#39;K&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">K</span>  <span class="c1"># Diffusivity in units of [length]**2 / time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_banded_solver</span> <span class="o">=</span> <span class="n">use_banded_solver</span>
+        <span class="k">if</span> <span class="n">diffusion_axis</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">diffusion_axis</span> <span class="o">=</span> <span class="n">_guess_diffusion_axis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">diffusion_axis</span> <span class="o">=</span> <span class="n">diffusion_axis</span>
+        <span class="c1"># This currently only works with evenly spaced points</span>
+        <span class="k">for</span> <span class="n">dom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dom</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">diffusion_axis</span><span class="p">]</span><span class="o">.</span><span class="n">delta</span><span class="p">)</span>
+            <span class="n">bounds</span> <span class="o">=</span> <span class="n">dom</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">diffusion_axis</span><span class="p">]</span><span class="o">.</span><span class="n">bounds</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">K_dimensionless</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">[</span><span class="s1">&#39;K&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span> <span class="o">*</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">[</span><span class="s1">&#39;timestep&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">delta</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diffTriDiag</span> <span class="o">=</span> <span class="n">_make_diffusion_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">K_dimensionless</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Diffusion._implicit_solver"><a class="viewcode-back" href="../../../api/climlab.dynamics.html#climlab.dynamics.diffusion.Diffusion._implicit_solver">[docs]</a>    <span class="k">def</span> <span class="nf">_implicit_solver</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Invertes and solves the matrix problem for diffusion matrix </span>
+<span class="sd">        and temperature T.</span>
+<span class="sd">        </span>
+<span class="sd">        The method is called by the </span>
+<span class="sd">        :func:`~climlab.process.implicit.ImplicitProcess._compute()` function </span>
+<span class="sd">        of the :class:`~climlab.process.implicit.ImplicitProcess` class and </span>
+<span class="sd">        solves the matrix problem</span>
+<span class="sd">        </span>
+<span class="sd">        .. math::</span>
+<span class="sd">        </span>
+<span class="sd">            A \\cdot T_{\\textrm{new}} = T_{\\textrm{old}}</span>
+<span class="sd">        </span>
+<span class="sd">        for diffusion matrix A and corresponding temperatures. </span>
+<span class="sd">        :math:`T_{\\textrm{old}}` is in this case the current state variable </span>
+<span class="sd">        which already has been adjusted by the explicit processes. </span>
+<span class="sd">        :math:`T_{\\textrm{new}}` is the new state of the variable. To</span>
+<span class="sd">        derive the temperature tendency of the diffusion process the adjustment </span>
+<span class="sd">        has to be calculated and muliplied with the timestep which is done by</span>
+<span class="sd">        the :func:`~climlab.process.implicit.ImplicitProcess._compute()` </span>
+<span class="sd">        function of the :class:`~climlab.process.implicit.ImplicitProcess` </span>
+<span class="sd">        class.</span>
+<span class="sd">        </span>
+<span class="sd">        This method calculates the matrix inversion for every state variable</span>
+<span class="sd">        and calling either :func:`solve_implicit_banded()` or </span>
+<span class="sd">        :py:func:`numpy.linalg.solve()` dependent on the flag </span>
+<span class="sd">        ``self.use_banded_solver``.</span>
+<span class="sd">        </span>
+<span class="sd">        :ivar dict state:               method uses current state variables</span>
+<span class="sd">                                        but does not modify them</span>
+<span class="sd">        :ivar bool use_banded_solver:   input flag whether to use </span>
+<span class="sd">                                        :func:`_solve_implicit_banded()` or </span>
+<span class="sd">                                        :py:func:`numpy.linalg.solve()` to do </span>
+<span class="sd">                                        the matrix inversion</span>
+<span class="sd">        :ivar array diffTriDiag:        the diffusion matrix which is given </span>
+<span class="sd">                                        with the current state variable to </span>
+<span class="sd">                                        the method solving the matrix problem</span>
+<span class="sd">                                        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Time-stepping the diffusion is just inverting this matrix problem:</span>
+        <span class="c1"># self.T = np.linalg.solve( self.diffTriDiag, Trad )</span>
+        <span class="n">newstate</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">varname</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_banded_solver</span><span class="p">:</span>
+                <span class="n">newvar</span> <span class="o">=</span> <span class="n">_solve_implicit_banded</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">diffTriDiag</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">newvar</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">diffTriDiag</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+            <span class="n">newstate</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span> <span class="o">=</span> <span class="n">newvar</span>
+        <span class="k">return</span> <span class="n">newstate</span>
+
+</div></div>
+<div class="viewcode-block" id="_solve_implicit_banded"><a class="viewcode-back" href="../../../api/climlab.dynamics.html#climlab.dynamics.diffusion._solve_implicit_banded">[docs]</a><span class="k">def</span> <span class="nf">_solve_implicit_banded</span><span class="p">(</span><span class="n">current</span><span class="p">,</span> <span class="n">banded_matrix</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Uses a banded solver for matrix inversion of a tridiagonal matrix.</span>
+<span class="sd">    </span>
+<span class="sd">    Converts the complete listed tridiagonal matrix *(nxn)* into a three row </span>
+<span class="sd">    matrix *(3xn)* and calls :py:func:`scipy.linalg.solve_banded()`.</span>
+<span class="sd">    </span>
+<span class="sd">    :param array current:           the current state of the variable for which</span>
+<span class="sd">                                    matrix inversion should be computed</span>
+<span class="sd">    :param array banded_matrix:     complete diffusion matrix (*dimension: nxn*)</span>
+<span class="sd">    :returns:                       output of :py:func:`scipy.linalg.solve_banded()`</span>
+<span class="sd">    :rtype:                         array</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#  can improve performance by storing the banded form once and not</span>
+    <span class="c1">#  recalculating it...</span>
+    <span class="c1">#  but whatever</span>
+    <span class="n">J</span> <span class="o">=</span> <span class="n">banded_matrix</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">diag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="n">J</span><span class="p">))</span>
+    <span class="n">diag</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">banded_matrix</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">diag</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">banded_matrix</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">diag</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">banded_matrix</span><span class="p">,</span> <span class="n">k</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">solve_banded</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">diag</span><span class="p">,</span> <span class="n">current</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="MeridionalDiffusion"><a class="viewcode-back" href="../../../api/climlab.dynamics.html#climlab.dynamics.diffusion.MeridionalDiffusion">[docs]</a><span class="k">class</span> <span class="nc">MeridionalDiffusion</span><span class="p">(</span><span class="n">Diffusion</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A parent class for Meridional diffusion processes.</span>
+<span class="sd">    </span>
+<span class="sd">    Calculates the energy transport in a diffusion like process along the</span>
+<span class="sd">    temperature gradient:</span>
+
+<span class="sd">        .. math::</span>
+<span class="sd">        </span>
+<span class="sd">            H(\\varphi) = \\frac{D}{\\cos \\varphi}\\frac{\\partial}{\\partial \\varphi} \\left( \\cos\\varphi \\frac{\\partial T(\\varphi)}{\\partial \\varphi} \\right)</span>
+<span class="sd">     </span>
+<span class="sd">     </span>
+<span class="sd">     for an Energy Balance Model whose Energy Budget can be noted as:</span>
+<span class="sd">     </span>
+<span class="sd">     .. math::</span>
+
+<span class="sd">        C(\\varphi) \\frac{dT(\\varphi)}{dt} = R\\downarrow (\\varphi) - R\\uparrow (\\varphi) + H(\\varphi)</span>
+<span class="sd">        </span>
+
+<span class="sd">    </span>
+<span class="sd">    **Initialization parameters** \n</span>
+<span class="sd">        </span>
+<span class="sd">    An instance of ``MeridionalDiffusion`` is initialized with the following </span>
+<span class="sd">    arguments:</span>
+<span class="sd">    </span>
+<span class="sd">    :param float K:     diffusion parameter in units of :math:`1/s`</span>
+
+<span class="sd">    **Object attributes** \n</span>
+<span class="sd">    </span>
+<span class="sd">    Additional to the parent class :class:`~climlab.dynamics.diffusion.Diffusion`</span>
+<span class="sd">    which is initialized with ``diffusion_axis=&#39;lat&#39;``, following object </span>
+<span class="sd">    attributes are modified during initialization:</span>
+<span class="sd">        </span>
+<span class="sd">    :ivar array K_dimensionless:    As K_dimensionless has been computed like</span>
+<span class="sd">                                    :math:`K_{\\textrm{dimensionless}}= K \\frac{\\Delta t}{(\\Delta \\textrm{bounds})^2}`</span>
+<span class="sd">                                    with :math:`K` in units :math:`1/s`, </span>
+<span class="sd">                                    the :math:`\\Delta (\\textrm{bounds})` have to</span>
+<span class="sd">                                    be converted from ``deg`` to ``rad`` to make </span>
+<span class="sd">                                    the array actually dimensionless. </span>
+<span class="sd">                                    This is done during initialiation. </span>
+<span class="sd">    :ivar array diffTriDiag:        the diffusion matrix is recomputed with</span>
+<span class="sd">                                    appropriate weights for the meridional case</span>
+<span class="sd">                                    by :func:`_make_meridional_diffusion_matrix`</span>
+<span class="sd">              </span>
+<span class="sd">    :Example:   </span>
+<span class="sd">    </span>
+<span class="sd">        Meridional Diffusion of temperature</span>
+<span class="sd">        as a stand-alone process:</span>
+<span class="sd">    </span>
+<span class="sd">        .. plot:: code_input_manual/example_meridional_diffusion.py</span>
+<span class="sd">           :include-source:</span>
+<span class="sd">       </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">K</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">MeridionalDiffusion</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">K</span><span class="o">=</span><span class="n">K</span><span class="p">,</span>
+                                                <span class="n">diffusion_axis</span><span class="o">=</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="c1"># Conversion of delta from deg to rad in K_dimensionless </span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">K_dimensionless</span> <span class="o">*=</span> <span class="mf">1.</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="mf">1.</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+        <span class="k">for</span> <span class="n">dom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">latax</span> <span class="o">=</span> <span class="n">dom</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diffTriDiag</span> <span class="o">=</span> \
+            <span class="n">_make_meridional_diffusion_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">K_dimensionless</span><span class="p">,</span> <span class="n">latax</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="_make_diffusion_matrix"><a class="viewcode-back" href="../../../api/climlab.dynamics.html#climlab.dynamics.diffusion._make_diffusion_matrix">[docs]</a><span class="k">def</span> <span class="nf">_make_diffusion_matrix</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">weight1</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">weight2</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Builds the general diffusion matrix with dimension nxn.</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">        </span>
+<span class="sd">        :math:`n`   = number of points of diffusion axis</span>
+<span class="sd">        :math:`n+1` = number of bounts of diffusion axis</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+<span class="sd">    **Function-all argument** \n        </span>
+<span class="sd">        </span>
+<span class="sd">    :param array K:         dimensionless diffusivities at cell boundaries</span>
+<span class="sd">                            *(size: 1xn+1)*</span>
+<span class="sd">    :param array weight1:   weight_1 *(size: 1xn+1)*</span>
+<span class="sd">    :param array weight2:   weight_2 *(size: 1xn)*</span>
+<span class="sd">    :returns:               completely listed tridiagonal diffusion matrix *(size: nxn)*</span>
+<span class="sd">    :rtype:                 array</span>
+
+<span class="sd">    .. note::</span>
+<span class="sd">    </span>
+<span class="sd">        The elements of array K are acutally dimensionless:</span>
+<span class="sd">        </span>
+<span class="sd">        .. math::</span>
+<span class="sd">        </span>
+<span class="sd">            K[i] = K_{\\textrm{physical}}  \\frac{\\Delta t}{(\\Delta y)^2}</span>
+<span class="sd">            </span>
+<span class="sd">        where :math:`K_{\\textrm{physical}}` is in unit :math:`\\frac{\\textrm{length}^2}{\\textrm{time}}`</span>
+<span class="sd">         </span>
+<span class="sd">    </span>
+<span class="sd">    The diffusion matrix is build like the following</span>
+<span class="sd">        </span>
+<span class="sd">    .. math::</span>
+<span class="sd">         </span>
+<span class="sd">        \\textrm{diffTriDiag}= </span>
+<span class="sd">        \\left[ \\begin{array}{cccccc}</span>
+<span class="sd">        1+\\frac{w_{1,1} K_1 }{w_{2,0}} &amp; -\\frac{w_{1,1} K_1}{w_{2,0}} &amp; 0 &amp;  &amp; ... &amp; 0  \\\\</span>
+<span class="sd">        -\\frac{w_{1,1} K_1}{w_{2,1}} &amp; 1+\\frac{w_{1,1} K_1 + w_{1,2} K_2}{w_{2,1}} &amp; -\\frac{w_{1,2} K_2}{w_{2,1}} &amp; 0 &amp; ... &amp; 0 \\\\</span>
+<span class="sd">        0 &amp; -\\frac{w_{1,2} K_2}{w_{2,2}}  &amp; 1+\\frac{w_{1,2} K_2 + w_{1,3} K_3}{w_{2,2}} &amp; -\\frac{w_{1,3} K_3}{w_{2,2}} &amp;... &amp; 0  \\\\</span>
+<span class="sd">          &amp;  &amp; \\ddots &amp; \\ddots &amp; \\ddots &amp; \\\\</span>
+<span class="sd">        0 &amp; 0 &amp; ... &amp; -\\frac{w_{1,n-2} K_{n-2}}{w_{2,n-2}}  &amp; 1+\\frac{w_{1,n-2} K_{n-2} + w_{1,n-1} K_{n-1}}{w_{2,{n-2}}} &amp; -\\frac{w_{1,n-1} K_{n-1}}{w_{2,{n-2}}} \\\\</span>
+<span class="sd">        0 &amp; 0 &amp; ... &amp; 0 &amp; -\\frac{w_{1,n-1} K_{n-1}}{w_{2,n-1}}  &amp; 1+\\frac{w_{1,n-1} K_{n-1}}{w_{2,n-1}} \\\\</span>
+<span class="sd">        \\end{array} \\right] </span>
+
+<span class="sd">    where </span>
+
+<span class="sd">    .. math::    </span>
+
+<span class="sd">           \\begin{array}{lllllll}</span>
+<span class="sd">                K   &amp;= [K_0,     &amp;K_1,    &amp;K_2,    &amp;...,&amp;K_{n-1},  &amp;K_{n}] \\\\</span>
+<span class="sd">                w_1 &amp;= [w_{1,0}, &amp;w_{1,1},&amp;w_{1,2},&amp;...,&amp;w_{1,n-1},&amp;w_{1,n}] \\\\</span>
+<span class="sd">                w_2 &amp;= [w_{2,0}, &amp;w_{2,1},&amp;w_{2,2},&amp;...,&amp;w_{2,n-1}]</span>
+<span class="sd">           \\end{array}    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+<span class="c1">#           \\begin{eqnarray}</span>
+<span class="c1">#              y    &amp; = &amp; ax^2 + bx + c \\\\</span>
+<span class="c1">#              f(x) &amp; = &amp; x^2 + 2xy + y^2</span>
+<span class="c1">#           \\end{eqnarray}      </span>
+    
+<span class="c1">#    .. math::</span>
+<span class="c1">#    </span>
+<span class="c1">#        K   &amp;= [K_0,        &amp;K_1,        &amp;K_2,        &amp;...    ,    &amp;K_{n-1},      &amp;K_{n}] \\\\</span>
+<span class="c1">#        w_1 &amp;= [w_{1,0},    &amp;w_{1,1},    &amp;w_{1,2},    &amp;...    ,    &amp;w_{1,n-1}, \\ &amp;w_{1,n}] \\\\</span>
+<span class="c1">#        w_2 &amp;= [w_{2,0}, \\ &amp;w_{2,1}, \\ &amp;w_{2,2}, \\ &amp;... \\ , \\ &amp;w_{2,n-1}]    &amp;o \\\\</span>
+<span class="c1">#        </span>
+<span class="c1">#    &quot;&quot;&quot;</span>
+    <span class="n">J</span> <span class="o">=</span> <span class="n">K</span><span class="o">.</span><span class="n">size</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">weight1</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">weight1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">K</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">weight2</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">weight2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">J</span><span class="p">)</span>
+    <span class="n">weightedK</span> <span class="o">=</span> <span class="n">weight1</span> <span class="o">*</span> <span class="n">K</span>
+    <span class="n">Ka1</span> <span class="o">=</span> <span class="n">weightedK</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">J</span><span class="p">]</span> <span class="o">/</span> <span class="n">weight2</span>
+    <span class="n">Ka3</span> <span class="o">=</span> <span class="n">weightedK</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">J</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">/</span> <span class="n">weight2</span>
+    <span class="n">Ka2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">Ka1</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">J</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Ka3</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">J</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="c1">#  Atmosphere tridiagonal matrix</span>
+    <span class="c1">#  this code makes a 3xN matrix, suitable for use with solve_banded</span>
+    <span class="c1">#diag = np.empty((3, J))</span>
+    <span class="c1">#diag[0, 1:] = -Ka3[0:J-1]</span>
+    <span class="c1">#diag[1, :] = 1 + Ka2</span>
+    <span class="c1">#diag[2, 0:J-1] = -Ka1[1:J]</span>
+    <span class="c1">#  Build the full banded matrix instead</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">Ka2</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span>
+         <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="o">-</span><span class="n">Ka3</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">J</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span>
+         <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="o">-</span><span class="n">Ka1</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">J</span><span class="p">],</span> <span class="n">k</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">A</span>
+
+</div>
+<div class="viewcode-block" id="_make_meridional_diffusion_matrix"><a class="viewcode-back" href="../../../api/climlab.dynamics.html#climlab.dynamics.diffusion._make_meridional_diffusion_matrix">[docs]</a><span class="k">def</span> <span class="nf">_make_meridional_diffusion_matrix</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">lataxis</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Calls :func:`_make_diffusion_matrix` with appropriate weights for </span>
+<span class="sd">    the meridional diffusion case.</span>
+<span class="sd">    </span>
+<span class="sd">    :param array K:         dimensionless diffusivities at cell boundaries</span>
+<span class="sd">                            of diffusion axis ``lataxis``</span>
+<span class="sd">    :param axis lataxis:    latitude axis where diffusion is occuring</span>
+
+<span class="sd">    Weights are computed as the following:</span>
+
+<span class="sd">    .. math:: </span>
+
+<span class="sd">        \\begin{array}{ll}</span>
+<span class="sd">            w_1 &amp;= \\cos(\\textrm{bounds}) \\\\</span>
+<span class="sd">                &amp;= \\left[ \\cos(b_0), \\cos(b_1), \\cos(b_2), \\ ... \\ , \\cos(b_{n-1}), \\cos(b_n) \\right] \\\\</span>
+<span class="sd">            w_2 &amp;= \\cos(\\textrm{points}) \\\\</span>
+<span class="sd">                &amp;= \\left[ \\cos(p_0), \\cos(p_1), \\cos(p_2), \\ ... \\ , \\cos(p_{n-1}) \\right]</span>
+<span class="sd">        \\end{array}</span>
+<span class="sd">        </span>
+<span class="sd">    when bounds and points from ``lataxis`` are written as</span>
+<span class="sd">    </span>
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \\begin{array}{ll}    </span>
+<span class="sd">            \\textrm{bounds}   &amp;= [b_0, b_1, b_2, \\ ... \\ , b_{n-1}, b_{n}] \\\\</span>
+<span class="sd">            \\textrm{points}   &amp;= [p_0, p_1, p_2, \\ ... \\ , p_{n-1}]</span>
+<span class="sd">        \\end{array}</span>
+<span class="sd">        </span>
+<span class="sd">    Giving this input to :func:`_make_diffusion_matrix` results in a matrix like:</span>
+<span class="sd">    </span>
+<span class="sd">    .. math::</span>
+<span class="sd">        </span>
+<span class="sd">        \\textrm{diffTriDiag}= </span>
+<span class="sd">        \\left[ \\begin{array}{cccccc}</span>
+<span class="sd">        1+\\frac{\\cos(b_1) K_1 }{\\cos(p_0)} &amp; -\\frac{\\cos(b_1) K_1}{\\cos(p_0)} &amp; 0 &amp;  &amp; ... &amp; 0  \\\\</span>
+<span class="sd">        -\\frac{\\cos(b_1) K_1}{\\cos(p_1)} &amp; 1+\\frac{\\cos(b_1) K_1 + \\cos(b_2) K_2}{\\cos(p_1)} &amp; -\\frac{\\cos(b_2) K_2}{\\cos(b_1)} &amp; 0 &amp; ... &amp; 0 \\\\</span>
+<span class="sd">        0 &amp; -\\frac{\\cos(b_2) K_2}{\\cos(p_2)}  &amp; 1+\\frac{\\cos(b_2) K_2 + \\cos(b_3) K_3}{\\cos(p_2)} &amp; -\\frac{\\cos(b_3) K_3}{\\cos(p_2)} &amp;... &amp; 0  \\\\</span>
+<span class="sd">          &amp;  &amp; \\ddots &amp; \\ddots &amp; \\ddots &amp; \\\\</span>
+<span class="sd">        0 &amp; 0 &amp; ... &amp; -\\frac{\\cos(b_{n-2}) K_{n-2}}{\\cos(p_{n-2})}  &amp; 1+\\frac{\\cos(b_{n-2}) K_{n-2} + \\cos(b_{n-1}) K_{n-1}}{\\cos(p_{n-2})} &amp; -\\frac{\\cos(b_{n-1}) K_{n-1}}{\\cos(p_{n-2})} \\\\</span>
+<span class="sd">        0 &amp; 0 &amp; ... &amp; 0 &amp; -\\frac{\\cos(b_{n-1}) K_{n-1}}{\\cos(p_{n-1})}  &amp; 1+\\frac{\\cos(b_{n-1}) K_{n-1}}{\\cos(p_{n-1})} \\\\</span>
+<span class="sd">        \\end{array} \\right] </span>
+
+<span class="sd">    &quot;&quot;&quot;</span>       
+    <span class="n">phi_stag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">lataxis</span><span class="o">.</span><span class="n">bounds</span><span class="p">)</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">lataxis</span><span class="o">.</span><span class="n">points</span><span class="p">)</span>
+    <span class="n">weight1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi_stag</span><span class="p">)</span>
+    <span class="n">weight2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
+    <span class="n">diag</span> <span class="o">=</span> <span class="n">_make_diffusion_matrix</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">weight1</span><span class="p">,</span> <span class="n">weight2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">diag</span>
+
+</div>
+<div class="viewcode-block" id="_guess_diffusion_axis"><a class="viewcode-back" href="../../../api/climlab.dynamics.html#climlab.dynamics.diffusion._guess_diffusion_axis">[docs]</a><span class="k">def</span> <span class="nf">_guess_diffusion_axis</span><span class="p">(</span><span class="n">process_or_domain</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Scans given process, domain or dictionary of domains for a diffusion axis</span>
+<span class="sd">    and returns appropriate name.</span>
+<span class="sd">    </span>
+<span class="sd">    In case only one axis with length &gt; 1 in the process or set of domains </span>
+<span class="sd">    exists, the name of that axis is returned. Otherwise an error is raised.</span>
+<span class="sd">    </span>
+<span class="sd">    :param process_or_domain:   input from where diffusion axis should be guessed</span>
+<span class="sd">    :type process_or_domain:    :class:`~climlab.process.process.Process`,</span>
+<span class="sd">                                :class:`~climlab.domain.domain._Domain` or</span>
+<span class="sd">                                :py:class:`dict` of domains</span>
+<span class="sd">    :raises: :exc:`ValueError` if more than one diffusion axis is possible.</span>
+<span class="sd">    :returns:                   name of the diffusion axis</span>
+<span class="sd">    :rtype:                     str</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">axes</span> <span class="o">=</span> <span class="n">get_axes</span><span class="p">(</span><span class="n">process_or_domain</span><span class="p">)</span>
+    <span class="n">diff_ax</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">axname</span><span class="p">,</span> <span class="n">ax</span> <span class="ow">in</span> <span class="n">axes</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">ax</span><span class="o">.</span><span class="n">num_points</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">diff_ax</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">axname</span><span class="p">:</span> <span class="n">ax</span><span class="p">})</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">diff_ax</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">diff_ax</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;More than one possible diffusion axis.&#39;</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../intro.html">home</a>|&nbsp;</li>
+        <li><a href="../../../search.html">search</a>|&nbsp;</li>
+        <!-- 
+	<li><a href="../../../contents.html">documentation </a> &raquo;</li>
+	-->
+
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016 (licensed under Creative Commons, see License), Moritz Kreuzer.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+    </div>
+  </body>
+</html>

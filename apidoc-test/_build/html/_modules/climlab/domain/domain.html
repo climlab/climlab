@@ -1,0 +1,281 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>climlab.domain.domain &mdash; climlab-0.2.13 0.2.13 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.2.13',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="climlab-0.2.13 0.2.13 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for climlab.domain.domain</h1><div class="highlight"><pre>
+<span class="c">#  new domain class</span>
+<span class="c">#   every process should exist in the context of a domain</span>
+
+<span class="kn">from</span> <span class="nn">climlab.domain.axis</span> <span class="kn">import</span> <span class="n">Axis</span>
+<span class="kn">from</span> <span class="nn">climlab.utils</span> <span class="kn">import</span> <span class="n">heat_capacity</span>
+
+
+<span class="k">class</span> <span class="nc">_Domain</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s">&quot;climlab Domain object with domain_type=&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">domain_type</span> <span class="o">+</span> <span class="s">&quot; and shape=&quot;</span> <span class="o">+</span>
+                <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">shape</span><span class="p">))</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">domain_type</span> <span class="o">=</span> <span class="s">&#39;undefined&#39;</span>
+        <span class="c"># self.axes should be a dictionary of axes</span>
+        <span class="c"># make it possible to give just a single axis:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_axes_dict</span><span class="p">(</span><span class="n">axes</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">numdims</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">shape</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">axcount</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">axindex</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c">#  ordered list of axes</span>
+        <span class="c">#  lev OR depth is last</span>
+        <span class="c">#  lat is second-last</span>
+        <span class="n">add_lev</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">add_depth</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">add_lat</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="n">axlist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="k">if</span> <span class="s">&#39;lev&#39;</span> <span class="ow">in</span> <span class="n">axlist</span><span class="p">:</span>
+            <span class="n">axlist</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s">&#39;lev&#39;</span><span class="p">)</span>
+            <span class="n">add_lev</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">elif</span> <span class="s">&#39;depth&#39;</span> <span class="ow">in</span> <span class="n">axlist</span><span class="p">:</span>
+            <span class="n">axlist</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s">&#39;depth&#39;</span><span class="p">)</span>
+            <span class="n">add_depth</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">if</span> <span class="s">&#39;lat&#39;</span> <span class="ow">in</span> <span class="n">axlist</span><span class="p">:</span>
+            <span class="n">axlist</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s">&#39;lat&#39;</span><span class="p">)</span>
+            <span class="n">add_lat</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">axlist2</span> <span class="o">=</span> <span class="n">axlist</span><span class="p">[:]</span>
+        <span class="k">if</span> <span class="n">add_lat</span><span class="p">:</span>
+            <span class="n">axlist2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;lat&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">add_depth</span><span class="p">:</span>
+            <span class="n">axlist2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;depth&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">add_lev</span><span class="p">:</span>
+            <span class="n">axlist2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;lev&#39;</span><span class="p">)</span>
+        <span class="c">#for axType, ax in self.axes.iteritems():        </span>
+        <span class="k">for</span> <span class="n">axType</span> <span class="ow">in</span> <span class="n">axlist2</span><span class="p">:</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="n">axType</span><span class="p">]</span>
+            <span class="n">shape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">num_points</span><span class="p">)</span>
+            <span class="c">#  can access axes as object attributes</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axType</span><span class="p">,</span> <span class="n">ax</span><span class="p">)</span>
+            <span class="c">#</span>
+            <span class="n">axindex</span><span class="p">[</span><span class="n">axType</span><span class="p">]</span> <span class="o">=</span> <span class="n">axcount</span>
+            <span class="n">axcount</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axis_index</span> <span class="o">=</span> <span class="n">axindex</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_heat_capacity</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">set_heat_capacity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">heat_capacity</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="c">#  implemented by daughter classes</span>
+    
+    <span class="k">def</span> <span class="nf">_make_axes_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axes</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">axes</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">dict</span><span class="p">:</span>
+            <span class="n">axdict</span> <span class="o">=</span> <span class="n">axes</span>
+        <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">axes</span><span class="p">)</span> <span class="ow">is</span> <span class="n">Axis</span><span class="p">:</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span>
+            <span class="n">axdict</span> <span class="o">=</span> <span class="p">{</span><span class="n">ax</span><span class="o">.</span><span class="n">axis_type</span><span class="p">:</span> <span class="n">ax</span><span class="p">}</span>
+        <span class="k">elif</span> <span class="n">axes</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">axdict</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;empty&#39;</span><span class="p">:</span> <span class="bp">None</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;axes needs to be Axis object or dictionary of Axis object&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">axdict</span>
+
+
+
+<div class="viewcode-block" id="Atmosphere"><a class="viewcode-back" href="../../../climlab.domain.html#climlab.domain.domain.Atmosphere">[docs]</a><span class="k">class</span> <span class="nc">Atmosphere</span><span class="p">(</span><span class="n">_Domain</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Atmosphere</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">domain_type</span> <span class="o">=</span> <span class="s">&#39;atm&#39;</span>
+
+<div class="viewcode-block" id="Atmosphere.set_heat_capacity"><a class="viewcode-back" href="../../../climlab.domain.html#climlab.domain.domain.Atmosphere.set_heat_capacity">[docs]</a>    <span class="k">def</span> <span class="nf">set_heat_capacity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">heat_capacity</span> <span class="o">=</span> <span class="n">heat_capacity</span><span class="o">.</span><span class="n">atmosphere</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="s">&#39;lev&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">delta</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="Ocean"><a class="viewcode-back" href="../../../climlab.domain.html#climlab.domain.domain.Ocean">[docs]</a><span class="k">class</span> <span class="nc">Ocean</span><span class="p">(</span><span class="n">_Domain</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Ocean</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">domain_type</span> <span class="o">=</span> <span class="s">&#39;ocean&#39;</span>
+
+<div class="viewcode-block" id="Ocean.set_heat_capacity"><a class="viewcode-back" href="../../../climlab.domain.html#climlab.domain.domain.Ocean.set_heat_capacity">[docs]</a>    <span class="k">def</span> <span class="nf">set_heat_capacity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">heat_capacity</span> <span class="o">=</span> <span class="n">heat_capacity</span><span class="o">.</span><span class="n">ocean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="s">&#39;depth&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">delta</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="make_slabocean_axis"><a class="viewcode-back" href="../../../climlab.domain.html#climlab.domain.domain.make_slabocean_axis">[docs]</a><span class="k">def</span> <span class="nf">make_slabocean_axis</span><span class="p">(</span><span class="n">num_points</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Convenience method to create a simple axis for a slab ocean.&#39;&#39;&#39;</span>
+    <span class="n">depthax</span> <span class="o">=</span> <span class="n">Axis</span><span class="p">(</span><span class="n">axis_type</span><span class="o">=</span><span class="s">&#39;depth&#39;</span><span class="p">,</span> <span class="n">num_points</span><span class="o">=</span><span class="n">num_points</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">depthax</span>
+</div>
+<div class="viewcode-block" id="make_slabatm_axis"><a class="viewcode-back" href="../../../climlab.domain.html#climlab.domain.domain.make_slabatm_axis">[docs]</a><span class="k">def</span> <span class="nf">make_slabatm_axis</span><span class="p">(</span><span class="n">num_points</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Convenience method to create a simple axis for a slab atmosphere.&#39;&#39;&#39;</span>
+    <span class="n">depthax</span> <span class="o">=</span> <span class="n">Axis</span><span class="p">(</span><span class="n">axis_type</span><span class="o">=</span><span class="s">&#39;lev&#39;</span><span class="p">,</span> <span class="n">num_points</span><span class="o">=</span><span class="n">num_points</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">depthax</span>
+
+
+</div>
+<div class="viewcode-block" id="SlabOcean"><a class="viewcode-back" href="../../../climlab.domain.html#climlab.domain.domain.SlabOcean">[docs]</a><span class="k">class</span> <span class="nc">SlabOcean</span><span class="p">(</span><span class="n">Ocean</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">make_slabocean_axis</span><span class="p">(),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SlabOcean</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="n">axes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="SlabAtmosphere"><a class="viewcode-back" href="../../../climlab.domain.html#climlab.domain.domain.SlabAtmosphere">[docs]</a><span class="k">class</span> <span class="nc">SlabAtmosphere</span><span class="p">(</span><span class="n">Atmosphere</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="n">make_slabatm_axis</span><span class="p">(),</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SlabAtmosphere</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="n">axes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    
+    </div>
+<div class="viewcode-block" id="single_column"><a class="viewcode-back" href="../../../climlab.domain.html#climlab.domain.domain.single_column">[docs]</a><span class="k">def</span> <span class="nf">single_column</span><span class="p">(</span><span class="n">num_lev</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">water_depth</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">lev</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Convenience method to create domains for a single column of atmosphere</span>
+<span class="sd">    overlying a slab of water.</span>
+<span class="sd">    </span>
+<span class="sd">    num_lev is the number of pressure levels (evenly spaced from surface to TOA)</span>
+<span class="sd">    water_depth is the depth of the slab.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns a list of 2 Domain objects (slab ocean, atmosphere)</span>
+<span class="sd">    </span>
+<span class="sd">    Usage:</span>
+<span class="sd">    sfc, atm = domain.single_column()</span>
+<span class="sd">        or</span>
+<span class="sd">    sfc, atm = domain.single_column(num_lev=2, water_depth=10.)</span>
+<span class="sd">    print sfc, atm</span>
+<span class="sd">    </span>
+<span class="sd">    Can also pass a pressure array or pressure level axis object</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="n">lev</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">levax</span> <span class="o">=</span> <span class="n">Axis</span><span class="p">(</span><span class="n">axis_type</span><span class="o">=</span><span class="s">&#39;lev&#39;</span><span class="p">,</span> <span class="n">num_points</span><span class="o">=</span><span class="n">num_lev</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lev</span><span class="p">,</span> <span class="n">Axis</span><span class="p">):</span>
+        <span class="n">levax</span> <span class="o">=</span> <span class="n">lev</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">levax</span> <span class="o">=</span> <span class="n">Axis</span><span class="p">(</span><span class="n">axis_type</span><span class="o">=</span><span class="s">&#39;lev&#39;</span><span class="p">,</span> <span class="n">points</span><span class="o">=</span><span class="n">lev</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;lev must be Axis object or pressure array&#39;</span><span class="p">)</span>
+    <span class="n">depthax</span> <span class="o">=</span> <span class="n">Axis</span><span class="p">(</span><span class="n">axis_type</span><span class="o">=</span><span class="s">&#39;depth&#39;</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">[</span><span class="n">water_depth</span><span class="p">,</span> <span class="mf">0.</span><span class="p">])</span>
+    <span class="n">slab</span> <span class="o">=</span> <span class="n">SlabOcean</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="n">depthax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">atm</span> <span class="o">=</span> <span class="n">Atmosphere</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="n">levax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">slab</span><span class="p">,</span> <span class="n">atm</span>
+
+</div>
+<div class="viewcode-block" id="zonal_mean_surface"><a class="viewcode-back" href="../../../climlab.domain.html#climlab.domain.domain.zonal_mean_surface">[docs]</a><span class="k">def</span> <span class="nf">zonal_mean_surface</span><span class="p">(</span><span class="n">num_lat</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">water_depth</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">lat</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">lat</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">latax</span> <span class="o">=</span> <span class="n">Axis</span><span class="p">(</span><span class="n">axis_type</span><span class="o">=</span><span class="s">&#39;lat&#39;</span><span class="p">,</span> <span class="n">num_points</span><span class="o">=</span><span class="n">num_lat</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">Axis</span><span class="p">):</span>
+        <span class="n">latax</span> <span class="o">=</span> <span class="n">lat</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">latax</span> <span class="o">=</span> <span class="n">Axis</span><span class="p">(</span><span class="n">axis_type</span><span class="o">=</span><span class="s">&#39;lat&#39;</span><span class="p">,</span> <span class="n">points</span><span class="o">=</span><span class="n">lat</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;lat must be Axis object or latitude array&#39;</span><span class="p">)</span>
+    <span class="n">depthax</span> <span class="o">=</span> <span class="n">Axis</span><span class="p">(</span><span class="n">axis_type</span><span class="o">=</span><span class="s">&#39;depth&#39;</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">[</span><span class="n">water_depth</span><span class="p">,</span> <span class="mf">0.</span><span class="p">])</span>
+    <span class="n">axes</span> <span class="o">=</span> <span class="p">{</span><span class="s">&#39;depth&#39;</span><span class="p">:</span> <span class="n">depthax</span><span class="p">,</span> <span class="s">&#39;lat&#39;</span><span class="p">:</span> <span class="n">latax</span><span class="p">}</span>
+    <span class="n">slab</span> <span class="o">=</span> <span class="n">SlabOcean</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="n">axes</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">slab</span>
+</div>
+<div class="viewcode-block" id="zonal_mean_column"><a class="viewcode-back" href="../../../climlab.domain.html#climlab.domain.domain.zonal_mean_column">[docs]</a><span class="k">def</span> <span class="nf">zonal_mean_column</span><span class="p">(</span><span class="n">num_lat</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">num_lev</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">water_depth</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">lat</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> 
+                      <span class="n">lev</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">lat</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">latax</span> <span class="o">=</span> <span class="n">Axis</span><span class="p">(</span><span class="n">axis_type</span><span class="o">=</span><span class="s">&#39;lat&#39;</span><span class="p">,</span> <span class="n">num_points</span><span class="o">=</span><span class="n">num_lat</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">Axis</span><span class="p">):</span>
+        <span class="n">latax</span> <span class="o">=</span> <span class="n">lat</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">latax</span> <span class="o">=</span> <span class="n">Axis</span><span class="p">(</span><span class="n">axis_type</span><span class="o">=</span><span class="s">&#39;lat&#39;</span><span class="p">,</span> <span class="n">points</span><span class="o">=</span><span class="n">lat</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;lat must be Axis object or latitude array&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">lev</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">levax</span> <span class="o">=</span> <span class="n">Axis</span><span class="p">(</span><span class="n">axis_type</span><span class="o">=</span><span class="s">&#39;lev&#39;</span><span class="p">,</span> <span class="n">num_points</span><span class="o">=</span><span class="n">num_lev</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">lev</span><span class="p">,</span> <span class="n">Axis</span><span class="p">):</span>
+        <span class="n">levax</span> <span class="o">=</span> <span class="n">lev</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">levax</span> <span class="o">=</span> <span class="n">Axis</span><span class="p">(</span><span class="n">axis_type</span><span class="o">=</span><span class="s">&#39;lev&#39;</span><span class="p">,</span> <span class="n">points</span><span class="o">=</span><span class="n">lev</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;lev must be Axis object or pressure array&#39;</span><span class="p">)</span>
+
+    <span class="n">depthax</span> <span class="o">=</span> <span class="n">Axis</span><span class="p">(</span><span class="n">axis_type</span><span class="o">=</span><span class="s">&#39;depth&#39;</span><span class="p">,</span> <span class="n">bounds</span><span class="o">=</span><span class="p">[</span><span class="n">water_depth</span><span class="p">,</span> <span class="mf">0.</span><span class="p">])</span>
+    <span class="c">#axes = {&#39;depth&#39;: depthax, &#39;lat&#39;: latax, &#39;lev&#39;: levax}</span>
+    <span class="n">slab</span> <span class="o">=</span> <span class="n">SlabOcean</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;lat&#39;</span><span class="p">:</span><span class="n">latax</span><span class="p">,</span> <span class="s">&#39;depth&#39;</span><span class="p">:</span><span class="n">depthax</span><span class="p">},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">atm</span> <span class="o">=</span> <span class="n">Atmosphere</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;lat&#39;</span><span class="p">:</span><span class="n">latax</span><span class="p">,</span> <span class="s">&#39;lev&#39;</span><span class="p">:</span><span class="n">levax</span><span class="p">},</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">slab</span><span class="p">,</span> <span class="n">atm</span>
+</div>
+<div class="viewcode-block" id="box_model_domain"><a class="viewcode-back" href="../../../climlab.domain.html#climlab.domain.domain.box_model_domain">[docs]</a><span class="k">def</span> <span class="nf">box_model_domain</span><span class="p">(</span><span class="n">num_points</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Create a box model domain (a single abstract axis).&#39;&#39;&#39;</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">Axis</span><span class="p">(</span><span class="n">axis_type</span><span class="o">=</span><span class="s">&#39;abstract&#39;</span><span class="p">,</span> <span class="n">num_points</span><span class="o">=</span><span class="n">num_points</span><span class="p">)</span>
+    <span class="n">boxes</span> <span class="o">=</span> <span class="n">_Domain</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="n">boxes</span><span class="o">.</span><span class="n">domain_type</span> <span class="o">=</span> <span class="s">&#39;box&#39;</span>
+    <span class="k">return</span> <span class="n">boxes</span>
+    </div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

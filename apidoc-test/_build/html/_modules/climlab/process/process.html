@@ -1,0 +1,342 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>climlab.process.process &mdash; climlab-0.2.13 0.2.13 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.2.13',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="top" title="climlab-0.2.13 0.2.13 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for climlab.process.process</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">time</span><span class="o">,</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">climlab.domain.field</span> <span class="kn">import</span> <span class="n">Field</span>
+<span class="kn">from</span> <span class="nn">climlab.domain.domain</span> <span class="kn">import</span> <span class="n">_Domain</span>
+<span class="kn">from</span> <span class="nn">climlab.utils</span> <span class="kn">import</span> <span class="n">walk</span>
+
+<span class="c">#  New organizing principle:</span>
+<span class="c">#  processes are free to use object attributes to store whatever useful fields</span>
+<span class="c"># the need. If later revisions require some special action to occur upon </span>
+<span class="c"># getting or setting the attribute, we can always implement a property to </span>
+<span class="c"># make that happen with no change in the API</span>
+<span class="c">#</span>
+<span class="c">#  the diagnostics dictionary will instead be used expressly for the purpose </span>
+<span class="c"># of passing fields up the process tree!</span>
+<span class="c">#  so will often only be set by a parent process (and given a name that is</span>
+<span class="c">#  appropriate from teh point of view of the parent process)</span>
+<span class="c">#</span>
+<span class="c">#  e.g. radiation fields in N-band models... currently would not be labeled</span>
+<span class="c"># in a way that lets the user know which process it came from</span>
+
+<span class="c"># TO DO:</span>
+<span class="c">#  go through every process code file</span>
+<span class="c">#  and implement process parameters as attributes, or as properties with</span>
+<span class="c">#  setter functions if necessary</span>
+<span class="c">#  it should always be possible to quickly and easily change a process </span>
+<span class="c">#  parameter without messing anything up.</span>
+<span class="c">#</span>
+<span class="c">#  ALSO rationalize the use of diagnostics in all process code</span>
+<span class="c">#  as described above. Diagnostics are to be used FOR QUANTITIES THAT ARE TO</span>
+<span class="c">#  BE TIME AVERAGED or quantities that are of interest to parent processes.</span>
+<span class="c">#  It might often be left up to the parent process whether to make a diagnostic</span>
+<span class="c">#</span>
+<span class="c">#  FINALLY we should implement a time_average list that controls which state</span>
+<span class="c"># variables and diagnostics are to be time averaged by the master process.</span>
+<span class="c">#  It should default to the complete list, which is the current behavior.</span>
+<span class="c">#</span>
+
+
+<span class="k">def</span> <span class="nf">_make_dict</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">argtype</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">arg</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{}</span>
+    <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">arg</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">argtype</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s">&#39;default&#39;</span><span class="p">:</span> <span class="n">arg</span><span class="p">}</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Problem with input type&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Process"><a class="viewcode-back" href="../../../climlab.process.html#climlab.process.process.Process">[docs]</a><span class="k">class</span> <span class="nc">Process</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;A generic parent class for all climlab process objects.</span>
+<span class="sd">    Every process object has a set of state variables on a spatial grid.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">str1</span> <span class="o">=</span> <span class="s">&#39;climlab Process of type {0}. </span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+        <span class="n">str1</span> <span class="o">+=</span> <span class="s">&#39;State variables and domain shapes: </span><span class="se">\n</span><span class="s">&#39;</span>
+        <span class="k">for</span> <span class="n">varname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">str1</span> <span class="o">+=</span> <span class="s">&#39;  {0}: {1} </span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">varname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        <span class="n">str1</span> <span class="o">+=</span> <span class="s">&#39;The subprocess tree: </span><span class="se">\n</span><span class="s">&#39;</span>
+        <span class="n">str1</span> <span class="o">+=</span> <span class="n">walk</span><span class="o">.</span><span class="n">process_tree</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">str1</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">domains</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">subprocess</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">lat</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">lev</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">num_lat</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">num_levels</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">diagnostics</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c"># dictionary of domains. Keys are the domain names</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">domains</span> <span class="o">=</span> <span class="n">_make_dict</span><span class="p">(</span><span class="n">domains</span><span class="p">,</span> <span class="n">_Domain</span><span class="p">)</span>
+        <span class="c"># dictionary of state variables (all of type Field)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">states</span> <span class="o">=</span> <span class="n">_make_dict</span><span class="p">(</span><span class="n">state</span><span class="p">,</span> <span class="n">Field</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">states</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="c"># dictionary of model parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">param</span> <span class="o">=</span> <span class="n">kwargs</span>
+        <span class="c"># dictionary of diagnostic quantities</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">diagnostics</span> <span class="o">=</span> <span class="n">_make_dict</span><span class="p">(</span><span class="n">diagnostics</span><span class="p">,</span> <span class="n">Field</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">creation_date</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;%a, </span><span class="si">%d</span><span class="s"> %b %Y %H:%M:%S %z&quot;</span><span class="p">,</span>
+                                           <span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">())</span>
+        <span class="c"># subprocess is a dictionary of any sub-processes</span>
+        <span class="k">if</span> <span class="n">subprocess</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">subprocess</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_subprocesses</span><span class="p">(</span><span class="n">subprocess</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Process.add_subprocesses"><a class="viewcode-back" href="../../../climlab.process.html#climlab.process.process.Process.add_subprocesses">[docs]</a>    <span class="k">def</span> <span class="nf">add_subprocesses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">procdict</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Add a dictionary of subproceses to this process.</span>
+<span class="sd">        procdict is dictionary with process names as keys.</span>
+
+<span class="sd">        Can also pass a single process, which will be called \&#39;default\&#39;</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">procdict</span><span class="p">,</span> <span class="n">Process</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_subprocess</span><span class="p">(</span><span class="s">&#39;default&#39;</span><span class="p">,</span> <span class="n">procdict</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">proc</span> <span class="ow">in</span> <span class="n">procdict</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_subprocess</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">proc</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Process.add_subprocess"><a class="viewcode-back" href="../../../climlab.process.html#climlab.process.process.Process.add_subprocess">[docs]</a>    <span class="k">def</span> <span class="nf">add_subprocess</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">proc</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Add a single subprocess to this process.</span>
+<span class="sd">        name: name of the subprocess (str)</span>
+<span class="sd">        proc: a Process object.&#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">proc</span><span class="p">,</span> <span class="n">Process</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">subprocess</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">name</span><span class="p">:</span> <span class="n">proc</span><span class="p">})</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">has_process_type_list</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;subprocess must be Process object&#39;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Process.remove_subprocess"><a class="viewcode-back" href="../../../climlab.process.html#climlab.process.process.Process.remove_subprocess">[docs]</a>    <span class="k">def</span> <span class="nf">remove_subprocess</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Remove a single subprocess from this process.</span>
+<span class="sd">        name: name of the subprocess (str)&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">subprocess</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">has_process_type_list</span> <span class="o">=</span> <span class="bp">False</span>
+</div>
+<div class="viewcode-block" id="Process.set_state"><a class="viewcode-back" href="../../../climlab.process.html#climlab.process.process.Process.set_state">[docs]</a>    <span class="k">def</span> <span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Field</span><span class="p">):</span>
+            <span class="c"># populate domains dictionary with domains from state variables</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="n">name</span><span class="p">:</span> <span class="n">value</span><span class="o">.</span><span class="n">domain</span><span class="p">})</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">thisdom</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">domain</span>
+                <span class="n">domshape</span> <span class="o">=</span> <span class="n">thisdom</span><span class="o">.</span><span class="n">shape</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;State variable needs a domain.&#39;</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">atleast_1d</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">domshape</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">thisdom</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Shape mismatch between existing domain and new state variable.&#39;</span><span class="p">)</span>
+        <span class="c"># set the state dictionary</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">_guess_state_domains</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">domname</span><span class="p">,</span> <span class="n">dom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">dom</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+                    <span class="c"># same shape, assume it&#39;s the right domain</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">state_domain</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">dom</span>
+
+    <span class="c"># Some handy shortcuts... only really make sense when there is only</span>
+    <span class="c"># a single axis of that type in the process.</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">lat</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">domname</span><span class="p">,</span> <span class="n">dom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">thislat</span> <span class="o">=</span> <span class="n">dom</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="s">&#39;lat&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">points</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">pass</span>
+            <span class="k">return</span> <span class="n">thislat</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Can</span><span class="se">\&#39;</span><span class="s">t resolve a lat axis.&#39;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">lat_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">domname</span><span class="p">,</span> <span class="n">dom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">thislat</span> <span class="o">=</span> <span class="n">dom</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="s">&#39;lat&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">bounds</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">pass</span>
+            <span class="k">return</span> <span class="n">thislat</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Can</span><span class="se">\&#39;</span><span class="s">t resolve a lat axis.&#39;</span><span class="p">)</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">lon</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">domname</span><span class="p">,</span> <span class="n">dom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">thislon</span> <span class="o">=</span> <span class="n">dom</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="s">&#39;lon&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">points</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">pass</span>
+            <span class="k">return</span> <span class="n">thislon</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Can</span><span class="se">\&#39;</span><span class="s">t resolve a lon axis.&#39;</span><span class="p">)</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">lon_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">domname</span><span class="p">,</span> <span class="n">dom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">thislon</span> <span class="o">=</span> <span class="n">dom</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="s">&#39;lon&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">bounds</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">pass</span>
+            <span class="k">return</span> <span class="n">thislon</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Can</span><span class="se">\&#39;</span><span class="s">t resolve a lon axis.&#39;</span><span class="p">)</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">lev</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">domname</span><span class="p">,</span> <span class="n">dom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">thislev</span> <span class="o">=</span> <span class="n">dom</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="s">&#39;lev&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">points</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">pass</span>
+            <span class="k">return</span> <span class="n">thislev</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Can</span><span class="se">\&#39;</span><span class="s">t resolve a lev axis.&#39;</span><span class="p">)</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">lev_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">domname</span><span class="p">,</span> <span class="n">dom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">thislev</span> <span class="o">=</span> <span class="n">dom</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="s">&#39;lev&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">bounds</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">pass</span>
+            <span class="k">return</span> <span class="n">thislev</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Can</span><span class="se">\&#39;</span><span class="s">t resolve a lev axis.&#39;</span><span class="p">)</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">depth</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">domname</span><span class="p">,</span> <span class="n">dom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">thisdepth</span> <span class="o">=</span> <span class="n">dom</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="s">&#39;depth&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">points</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">pass</span>
+            <span class="k">return</span> <span class="n">thisdepth</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Can</span><span class="se">\&#39;</span><span class="s">t resolve a depth axis.&#39;</span><span class="p">)</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">depth_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">domname</span><span class="p">,</span> <span class="n">dom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">thisdepth</span> <span class="o">=</span> <span class="n">dom</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="s">&#39;depth&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">bounds</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">pass</span>
+            <span class="k">return</span> <span class="n">thisdepth</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s">&#39;Can</span><span class="se">\&#39;</span><span class="s">t resolve a depth axis.&#39;</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="process_like"><a class="viewcode-back" href="../../../climlab.process.html#climlab.process.process.process_like">[docs]</a><span class="k">def</span> <span class="nf">process_like</span><span class="p">(</span><span class="n">proc</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Return a new process identical to the given process.</span>
+<span class="sd">    The creation date is updated.&#39;&#39;&#39;</span>
+    <span class="n">newproc</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">proc</span><span class="p">)</span>
+    <span class="n">newproc</span><span class="o">.</span><span class="n">creation_date</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;%a, </span><span class="si">%d</span><span class="s"> %b %Y %H:%M:%S %z&quot;</span><span class="p">,</span>
+                                          <span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">newproc</span>
+
+</div>
+<div class="viewcode-block" id="get_axes"><a class="viewcode-back" href="../../../climlab.process.html#climlab.process.process.get_axes">[docs]</a><span class="k">def</span> <span class="nf">get_axes</span><span class="p">(</span><span class="n">process_or_domain</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Return a dictionary of all axes in a domain or dictionary of domains.&#39;&#39;&#39;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">process_or_domain</span><span class="p">,</span> <span class="n">Process</span><span class="p">):</span>
+        <span class="n">dom</span> <span class="o">=</span> <span class="n">process_or_domain</span><span class="o">.</span><span class="n">domains</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">dom</span> <span class="o">=</span> <span class="n">process_or_domain</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dom</span><span class="p">,</span> <span class="n">_Domain</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">dom</span><span class="o">.</span><span class="n">axes</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dom</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">axes</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">thisdom</span> <span class="ow">in</span> <span class="n">dom</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">thisdom</span><span class="p">,</span> <span class="n">_Domain</span><span class="p">)</span>
+            <span class="n">axes</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">thisdom</span><span class="o">.</span><span class="n">axes</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">axes</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s">&#39;dom must be a domain or dictionary of domains.&#39;</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2016, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.6</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

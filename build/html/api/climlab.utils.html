@@ -1,0 +1,716 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>climlab.utils package &mdash; climlab 0.3.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.3.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="climlab 0.3.0.1 documentation" href="../index.html" />
+    <link rel="up" title="Application Programming Interface" href="climlab.html" />
+    <link rel="next" title="References" href="../references.html" />
+    <link rel="prev" title="climlab.surface package" href="climlab.surface.html" /> 
+  </head>
+  <body role="document">
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../index.html"><img src="../_static/logo.png" border="0" alt="sampledoc"/></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../references.html" title="References"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="climlab.surface.html" title="climlab.surface package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../intro.html">home</a>|&nbsp;</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+        <!-- 
+	<li><a href="../contents.html">documentation </a> &raquo;</li>
+	-->
+
+          <li class="nav-item nav-item-1"><a href="climlab.html" accesskey="U">Application Programming Interface</a> &raquo;</li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../index.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../download.html">Download</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="climlab.html">Application Programming Interface</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="climlab.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="climlab.html#inheritance-diagram">Inheritance Diagram</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contact.html">Contact</a></li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/climlab.utils.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput > div,
+div.nbinput div[class^=highlight],
+div.nbinput div[class^=highlight] pre,
+div.nboutput,
+div.nboutput > div,
+div.nboutput div[class^=highlight],
+div.nboutput div[class^=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput > :first-child pre {
+    color: navy;
+}
+
+/* output prompt */
+div.nboutput > :first-child pre {
+    color: darkred;
+}
+
+/* all prompts */
+div.nbinput > :first-child[class^=highlight],
+div.nboutput > :first-child[class^=highlight],
+div.nboutput > :first-child {
+    min-width: 11ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+
+/* input/output area */
+div.nbinput > :nth-child(2)[class^=highlight],
+div.nboutput > :nth-child(2),
+div.nboutput > :nth-child(2)[class^=highlight] {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+}
+
+/* input area */
+div.nbinput > :nth-child(2)[class^=highlight] {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput  > :nth-child(2).stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansiblack { color: black; }
+.ansired { color: darkred; }
+.ansigreen { color: darkgreen; }
+.ansiyellow { color: #c4a000; }
+.ansiblue { color: darkblue; }
+.ansipurple { color: darkviolet; }
+.ansicyan { color: steelblue; }
+/* See https://github.com/jupyter/nbconvert/issues/174 */
+.ansigray { color: gray; }  /* nbconvert CSS */
+.ansigrey { color: gray; }  /* nbconvert HTML output */
+
+.ansibgblack { background-color: black; }
+.ansibgred { background-color: red; }
+.ansibggreen { background-color: green; }
+.ansibgyellow { background-color: yellow; }
+.ansibgblue { background-color: blue; }
+.ansibgpurple { background-color: magenta; }
+.ansibgcyan { background-color: cyan; }
+.ansibggray { background-color: gray; }
+
+.ansibold { font-weight: bold; }
+</style>
+<div class="section" id="climlab-utils-package">
+<h1>climlab.utils package<a class="headerlink" href="#climlab-utils-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="climlab-utils-attr-dict-module">
+<h2>climlab.utils.attr_dict module<a class="headerlink" href="#climlab-utils-attr-dict-module" title="Permalink to this headline">¶</a></h2>
+<p class="graphviz">
+<img src="../_images/inheritance-03e88173d5fbac52968882a7f224bb05f584ca79.png" alt="Inheritance diagram of climlab.utils.attr_dict" usemap="#inheritanced1ece0e8d8" class="inheritance"/>
+<map id="inheritanced1ece0e8d8" name="inheritanced1ece0e8d8">
+<area shape="rect" id="node1" href="#climlab.utils.attr_dict.AttrDict" target="_top" title="Constructs a :py:class:`dict` object with attribute access to data." alt="" coords="25,59,121,90"/>
+<area shape="rect" id="node2" href="#climlab.utils.attr_dict.OrderedAttrDict" target="_top" title="Constructs an :py:class:`~collections.OrderedDict` object with attribute access to data." alt="" coords="189,5,360,35"/>
+<area shape="rect" id="node3" title="Dictionary that remembers insertion order" alt="" coords="6,5,141,35"/>
+</map>
+</p>
+<span class="target" id="module-climlab.utils.attr_dict"></span><dl class="class">
+<dt id="climlab.utils.attr_dict.AttrDict">
+<em class="property">class </em><code class="descclassname">climlab.utils.attr_dict.</code><code class="descname">AttrDict</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/utils/attr_dict.html#AttrDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.utils.attr_dict.AttrDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a></p>
+<p>Constructs a <a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a> object with attribute access to data.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="climlab.utils.attr_dict.OrderedAttrDict">
+<em class="property">class </em><code class="descclassname">climlab.utils.attr_dict.</code><code class="descname">OrderedAttrDict</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/utils/attr_dict.html#OrderedAttrDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.utils.attr_dict.OrderedAttrDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="http://docs.python.org/2.7/library/collections.html#collections.OrderedDict" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">collections.OrderedDict</span></code></a></p>
+<p>Constructs an <a class="reference external" href="http://docs.python.org/2.7/library/collections.html#collections.OrderedDict" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">OrderedDict</span></code></a> object with attribute access to data.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-climlab.utils.constants">
+<span id="climlab-utils-constants-module"></span><h2>climlab.utils.constants module<a class="headerlink" href="#module-climlab.utils.constants" title="Permalink to this headline">¶</a></h2>
+<p>Contains a collection of physical constants for the atmosphere and ocean.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="mf">6.373E6</span>      <span class="c1"># Radius of Earth (m)</span>
+<span class="n">Lhvap</span> <span class="o">=</span> <span class="mf">2.5E6</span>    <span class="c1"># Latent heat of vaporization (J / kg)</span>
+<span class="n">Lhsub</span> <span class="o">=</span> <span class="mf">2.834E6</span>   <span class="c1"># Latent heat of sublimation (J / kg)</span>
+<span class="n">Lhfus</span> <span class="o">=</span> <span class="n">Lhsub</span> <span class="o">-</span> <span class="n">Lhvap</span>  <span class="c1"># Latent heat of fusion (J / kg)</span>
+<span class="n">cp</span> <span class="o">=</span> <span class="mf">1004.</span>     <span class="c1"># specific heat at constant pressure for dry air (J / kg / K)</span>
+<span class="n">Rd</span> <span class="o">=</span> <span class="mf">287.</span>         <span class="c1"># gas constant for dry air (J / kg / K)</span>
+<span class="n">kappa</span> <span class="o">=</span> <span class="n">Rd</span> <span class="o">/</span> <span class="n">cp</span>
+<span class="n">Rv</span> <span class="o">=</span> <span class="mf">461.5</span>       <span class="c1"># gas constant for water vapor (J / kg / K)</span>
+<span class="n">cpv</span> <span class="o">=</span> <span class="mf">1875.</span>   <span class="c1"># specific heat at constant pressure for water vapor (J / kg / K)</span>
+<span class="n">Omega</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mf">24.</span> <span class="o">/</span> <span class="mf">3600.</span>  <span class="c1"># Earth&#39;s rotation rate, (s**(-1))</span>
+<span class="n">g</span> <span class="o">=</span> <span class="mf">9.8</span>          <span class="c1"># gravitational acceleration (m / s**2)</span>
+<span class="n">kBoltzmann</span> <span class="o">=</span> <span class="mf">1.3806488E-23</span>  <span class="c1"># the Boltzmann constant (J / K)</span>
+<span class="n">c_light</span> <span class="o">=</span> <span class="mf">2.99792458E8</span>   <span class="c1"># speed of light (m/s)</span>
+<span class="n">hPlanck</span> <span class="o">=</span> <span class="mf">6.62606957E-34</span>  <span class="c1"># Planck&#39;s constant (J s)</span>
+<span class="c1"># sigma = 5.67E-8  # Stefan-Boltzmann constant (W / m**2 / K**4)</span>
+<span class="c1">#  sigma derived from fundamental constants</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">**</span><span class="mi">5</span> <span class="o">*</span> <span class="n">kBoltzmann</span><span class="o">**</span><span class="mi">4</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">15</span> <span class="o">*</span> <span class="n">c_light</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">hPlanck</span><span class="o">**</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="n">S0</span> <span class="o">=</span> <span class="mf">1365.2</span>       <span class="c1"># solar constant (W / m**2)</span>
+<span class="c1"># value is consistent with Trenberth and Fasullo, Surveys of Geophysics 2012</span>
+
+<span class="n">ps</span> <span class="o">=</span> <span class="mf">1000.</span>       <span class="c1"># approximate surface pressure (mb or hPa)</span>
+
+<span class="n">rho_w</span> <span class="o">=</span> <span class="mf">1000.</span>    <span class="c1"># density of water (kg / m**3)</span>
+<span class="n">cw</span> <span class="o">=</span> <span class="mf">4181.3</span>      <span class="c1"># specific heat of liquid water (J / kg / K)</span>
+
+<span class="n">tempCtoK</span> <span class="o">=</span> <span class="mf">273.15</span>   <span class="c1"># 0degC in Kelvin</span>
+<span class="n">tempKtoC</span> <span class="o">=</span> <span class="o">-</span><span class="n">tempCtoK</span>  <span class="c1"># 0 K in degC</span>
+<span class="n">mb_to_Pa</span> <span class="o">=</span> <span class="mf">100.</span>  <span class="c1"># conversion factor from mb to Pa</span>
+
+<span class="c1">#  Some useful time conversion factors</span>
+<span class="n">seconds_per_minute</span> <span class="o">=</span> <span class="mf">60.</span>
+<span class="n">minutes_per_hour</span> <span class="o">=</span> <span class="mf">60.</span>
+<span class="n">hours_per_day</span> <span class="o">=</span> <span class="mf">24.</span>
+
+<span class="c1"># the length of the &quot;tropical year&quot; -- time between vernal equinoxes</span>
+<span class="c1"># This value is consistent with Berger (1978)</span>
+<span class="c1"># &quot;Long-Term Variations of Daily Insolation and Quaternary Climatic Changes&quot;</span>
+<span class="n">days_per_year</span> <span class="o">=</span> <span class="mf">365.2422</span>
+<span class="n">seconds_per_hour</span> <span class="o">=</span> <span class="n">minutes_per_hour</span> <span class="o">*</span> <span class="n">seconds_per_minute</span>
+<span class="n">minutes_per_day</span> <span class="o">=</span> <span class="n">hours_per_day</span> <span class="o">*</span> <span class="n">minutes_per_hour</span>
+<span class="n">seconds_per_day</span> <span class="o">=</span> <span class="n">hours_per_day</span> <span class="o">*</span> <span class="n">seconds_per_hour</span>
+<span class="n">seconds_per_year</span> <span class="o">=</span> <span class="n">seconds_per_day</span> <span class="o">*</span> <span class="n">days_per_year</span>
+<span class="n">minutes_per_year</span> <span class="o">=</span> <span class="n">seconds_per_year</span> <span class="o">/</span> <span class="n">seconds_per_minute</span>
+<span class="n">hours_per_year</span> <span class="o">=</span> <span class="n">seconds_per_year</span> <span class="o">/</span> <span class="n">seconds_per_hour</span>
+<span class="c1">#  average lenghts of months based on dividing the year into 12 equal parts</span>
+<span class="n">months_per_year</span> <span class="o">=</span> <span class="mf">12.</span>
+<span class="n">seconds_per_month</span> <span class="o">=</span> <span class="n">seconds_per_year</span> <span class="o">/</span> <span class="n">months_per_year</span>
+<span class="n">minutes_per_month</span> <span class="o">=</span> <span class="n">minutes_per_year</span> <span class="o">/</span> <span class="n">months_per_year</span>
+<span class="n">hours_per_month</span> <span class="o">=</span> <span class="n">hours_per_year</span> <span class="o">/</span> <span class="n">months_per_year</span>
+<span class="n">days_per_month</span> <span class="o">=</span> <span class="n">days_per_year</span> <span class="o">/</span> <span class="n">months_per_year</span>
+
+<span class="n">area_earth</span> <span class="o">=</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">a</span><span class="o">**</span><span class="mi">2</span>
+
+<span class="c1"># present-day orbital parameters, in the same format generated by orbital.py</span>
+<span class="n">orb_present</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ecc&#39;</span><span class="p">:</span> <span class="mf">0.017236</span><span class="p">,</span> <span class="s1">&#39;long_peri&#39;</span><span class="p">:</span> <span class="mf">281.37</span><span class="p">,</span> <span class="s1">&#39;obliquity&#39;</span><span class="p">:</span> <span class="mf">23.446</span><span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="module-climlab.utils.heat_capacity">
+<span id="climlab-utils-heat-capacity-module"></span><h2>climlab.utils.heat_capacity module<a class="headerlink" href="#module-climlab.utils.heat_capacity" title="Permalink to this headline">¶</a></h2>
+<p>Routines for calculating heat capacities for grid boxes.</p>
+<dl class="function">
+<dt id="climlab.utils.heat_capacity.atmosphere">
+<code class="descclassname">climlab.utils.heat_capacity.</code><code class="descname">atmosphere</code><span class="sig-paren">(</span><em>dp</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/utils/heat_capacity.html#atmosphere"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.utils.heat_capacity.atmosphere" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns heat capacity of a unit area of atmosphere, in units J /m**2 / K.</p>
+<div class="math">
+\[C_a = \frac{c_p \cdot dp \cdot f_{\textrm{mb-to-Pa}}}{g}\]</div>
+<p>where</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="21%" />
+<col width="10%" />
+<col width="35%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">variable</th>
+<th class="head">value</th>
+<th class="head">unit</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><span class="math">\(C_a\)</span></td>
+<td><em>output</em></td>
+<td><span class="math">\(\textrm{J} / \textrm{m}^2 / \textrm{K}\)</span></td>
+<td>heat capacity for atmospheric cell</td>
+</tr>
+<tr class="row-odd"><td><span class="math">\(c_p\)</span></td>
+<td><span class="math">\(1004.\)</span></td>
+<td><span class="math">\(\textrm{J} / \textrm{kg} / \textrm{K}\)</span></td>
+<td>specific heat at constant pressure for dry air</td>
+</tr>
+<tr class="row-even"><td><span class="math">\(dp\)</span></td>
+<td><em>input</em></td>
+<td><span class="math">\(\textrm{mb}\)</span></td>
+<td>pressure for atmospheric cell</td>
+</tr>
+<tr class="row-odd"><td><span class="math">\(f_{\textrm{mb-to-Pa}}\)</span></td>
+<td><span class="math">\(100\)</span></td>
+<td><span class="math">\(\textrm{Pa} / \textrm{mb}\)</span></td>
+<td>conversion factor from mb to Pa</td>
+</tr>
+<tr class="row-even"><td><span class="math">\(g\)</span></td>
+<td><span class="math">\(9.8\)</span></td>
+<td><span class="math">\(\textrm{m} / \textrm{s}^2\)</span></td>
+<td>gravitational acceleration</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Function-call argument</strong></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dp</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/array.html#module-array" title="(in Python v2.7)"><em>array</em></a>) &#8211; pressure intervals (<em>unit:</em> mb)</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the heat capacity for atmosphere cells correspoding to
+pressure input (<em>unit:</em> J /m**2 / K)</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="http://docs.python.org/2.7/library/array.html#module-array" title="(in Python v2.7)">array</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Example:</th><td class="field-body"><p class="first">Calculate atmospheric heat capacity for pressure intervals of 
+1, 10, 100 mb:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">climlab.utils</span> <span class="kn">import</span> <span class="n">heat_capacity</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pressure_interval</span> <span class="o">=</span> <span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">100</span><span class="p">])</span> <span class="c1"># in mb</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">heat_capacity</span><span class="o">.</span><span class="n">atmosphere</span><span class="p">(</span><span class="n">pressure_interval</span><span class="p">)</span> <span class="c1"># in J /m**2 / K</span>
+<span class="go">array([   10244.89795918,   102448.97959184,  1024489.79591837])            </span>
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="climlab.utils.heat_capacity.ocean">
+<code class="descclassname">climlab.utils.heat_capacity.</code><code class="descname">ocean</code><span class="sig-paren">(</span><em>dz</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/utils/heat_capacity.html#ocean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.utils.heat_capacity.ocean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns heat capacity of a unit area of water, in units J /m**2 / K.</p>
+<div class="math">
+\[C_o = \rho_w \cdot c_w \cdot dz\]</div>
+<p>where</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="23%" />
+<col width="11%" />
+<col width="39%" />
+<col width="27%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">variable</th>
+<th class="head">value</th>
+<th class="head">unit</th>
+<th class="head">description</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td><span class="math">\(C_o\)</span></td>
+<td><em>output</em></td>
+<td><span class="math">\(\textrm{J} / \textrm{m}^2 / \textrm{K}\)</span></td>
+<td>heat capacity for oceanic cell</td>
+</tr>
+<tr class="row-odd"><td><span class="math">\(c_w\)</span></td>
+<td><span class="math">\(4181.3\)</span></td>
+<td><span class="math">\(\textrm{J} / \textrm{kg} / \textrm{K}\)</span></td>
+<td>specific heat of liquid water</td>
+</tr>
+<tr class="row-even"><td><span class="math">\(dz\)</span></td>
+<td><em>input</em></td>
+<td><span class="math">\(\textrm{m}\)</span></td>
+<td>water depth of oceanic cell</td>
+</tr>
+<tr class="row-odd"><td><span class="math">\(\rho_w\)</span></td>
+<td><span class="math">\(1000.\)</span></td>
+<td><span class="math">\(\textrm{kg} / \textrm{m}^3\)</span></td>
+<td>density of water</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Function-call argument</strong></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>dz</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/array.html#module-array" title="(in Python v2.7)"><em>array</em></a>) &#8211; water depth of ocean cells (<em>unit:</em> m)</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">the heat capacity for ocean cells correspoding to
+depth input (<em>unit:</em> J /m**2 / K)</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="http://docs.python.org/2.7/library/array.html#module-array" title="(in Python v2.7)">array</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Example:</th><td class="field-body"><p class="first">Calculate atmospheric heat capacity for pressure intervals of 
+1, 10, 100 m:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">climlab.utils</span> <span class="kn">import</span> <span class="n">heat_capacity</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pressure_interval</span> <span class="o">=</span> <span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">100</span><span class="p">])</span> <span class="c1"># in m</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">heat_capacity</span><span class="o">.</span><span class="n">ocean</span><span class="p">(</span><span class="n">pressure_interval</span><span class="p">)</span> <span class="c1"># in J /m**2 / K</span>
+<span class="go">array([  4.18130000e+06,   4.18130000e+07,   4.18130000e+08])           </span>
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="climlab.utils.heat_capacity.slab_ocean">
+<code class="descclassname">climlab.utils.heat_capacity.</code><code class="descname">slab_ocean</code><span class="sig-paren">(</span><em>water_depth</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/utils/heat_capacity.html#slab_ocean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.utils.heat_capacity.slab_ocean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns heat capacity of a unit area slab of water, in units of J / m**2 / K.</p>
+<p>Takes input argument <code class="docutils literal"><span class="pre">water_depth</span></code> and calls <a class="reference internal" href="#climlab.utils.heat_capacity.ocean" title="climlab.utils.heat_capacity.ocean"><code class="xref py py-func docutils literal"><span class="pre">ocean()</span></code></a></p>
+<p><strong>Function-call argument</strong></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>float</strong> &#8211; water depth of slab ocean (<em>unit:</em> m)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">the heat capacity for slab ocean cell (<em>unit:</em> J / m**2 / K)</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)">float</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-climlab.utils.legendre">
+<span id="climlab-utils-legendre-module"></span><h2>climlab.utils.legendre module<a class="headerlink" href="#module-climlab.utils.legendre" title="Permalink to this headline">¶</a></h2>
+<p>Can calculate the first several Legendre polynomials, along with 
+(some of) their first derivatives.</p>
+<dl class="function">
+<dt id="climlab.utils.legendre.P0">
+<code class="descclassname">climlab.utils.legendre.</code><code class="descname">P0</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/utils/legendre.html#P0"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.utils.legendre.P0" title="Permalink to this definition">¶</a></dt>
+<dd><div class="math">
+\[P_0 (x) = 1\]</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="climlab.utils.legendre.P1">
+<code class="descclassname">climlab.utils.legendre.</code><code class="descname">P1</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/utils/legendre.html#P1"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.utils.legendre.P1" title="Permalink to this definition">¶</a></dt>
+<dd><div class="math">
+\[P_1 (x) = 1\]</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="climlab.utils.legendre.P2">
+<code class="descclassname">climlab.utils.legendre.</code><code class="descname">P2</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/utils/legendre.html#P2"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.utils.legendre.P2" title="Permalink to this definition">¶</a></dt>
+<dd><p>The second Legendre polynomial.</p>
+<div class="math">
+\[P_2(x) = \frac{1}{2} (3x^2 - 1)\]</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="climlab.utils.legendre.Pn">
+<code class="descclassname">climlab.utils.legendre.</code><code class="descname">Pn</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/utils/legendre.html#Pn"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.utils.legendre.Pn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate Legendre polyomials P0 to P28 and returns them 
+in a dictionary <code class="docutils literal"><span class="pre">Pn</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>x</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; argument to calculate Legendre polynomials</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return Pn:</th><td class="field-body">dictionary which contains order of Legendre polynomials
+(from 0 to 28) as keys and the corresponding evaluation
+of Legendre polynomials as values.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="climlab.utils.legendre.Pnprime">
+<code class="descclassname">climlab.utils.legendre.</code><code class="descname">Pnprime</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/utils/legendre.html#Pnprime"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.utils.legendre.Pnprime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates first derivatives of Legendre polynomials and returns them 
+in a dictionary <code class="docutils literal"><span class="pre">Pnprime</span></code>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>x</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; argument to calculate first derivate of Legendre polynomials</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return Pn:</th><td class="field-body">dictionary which contains order of Legendre polynomials
+(from 0 to 4 and even numbers until 14) as keys and 
+the corresponding evaluation of first derivative of 
+Legendre polynomials as values.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-climlab.utils.walk">
+<span id="climlab-utils-walk-module"></span><h2>climlab.utils.walk module<a class="headerlink" href="#module-climlab.utils.walk" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="climlab.utils.walk.process_tree">
+<code class="descclassname">climlab.utils.walk.</code><code class="descname">process_tree</code><span class="sig-paren">(</span><em>top</em>, <em>name='top'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/utils/walk.html#process_tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.utils.walk.process_tree" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a string representation of the process tree for process top.</p>
+<p>This method uses the <a class="reference internal" href="#climlab.utils.walk.walk_processes" title="climlab.utils.walk.walk_processes"><code class="xref py py-func docutils literal"><span class="pre">walk_processes()</span></code></a> method to create the process tree.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>top</strong> (<a class="reference internal" href="climlab.process.html#climlab.process.process.Process" title="climlab.process.process.Process"><code class="xref py py-class docutils literal"><span class="pre">Process</span></code></a>) &#8211; top process for which process tree string should be 
+created</li>
+<li><strong>name</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of top process</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">string representation of the process tree</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="http://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)">str</a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Example:</th><td class="field-body"><div class="first last highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">climlab</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">climlab.utils</span> <span class="kn">import</span> <span class="n">walk</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">climlab</span><span class="o">.</span><span class="n">EBM</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">proc_tree_str</span> <span class="o">=</span> <span class="n">walk</span><span class="o">.</span><span class="n">process_tree</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;model&#39;</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">proc_tree_str</span>
+<span class="go">model: &lt;class &#39;climlab.model.ebm.EBM&#39;&gt;</span>
+<span class="go">   diffusion: &lt;class &#39;climlab.dynamics.diffusion.MeridionalDiffusion&#39;&gt;</span>
+<span class="go">   LW: &lt;class &#39;climlab.radiation.AplusBT.AplusBT&#39;&gt;</span>
+<span class="go">   albedo: &lt;class &#39;climlab.surface.albedo.StepFunctionAlbedo&#39;&gt;</span>
+<span class="go">      iceline: &lt;class &#39;climlab.surface.albedo.Iceline&#39;&gt;</span>
+<span class="go">      cold_albedo: &lt;class &#39;climlab.surface.albedo.ConstantAlbedo&#39;&gt;</span>
+<span class="go">      warm_albedo: &lt;class &#39;climlab.surface.albedo.P2Albedo&#39;&gt;</span>
+<span class="go">   insolation: &lt;class &#39;climlab.radiation.insolation.P2Insolation&#39;&gt;</span>
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="climlab.utils.walk.walk_processes">
+<code class="descclassname">climlab.utils.walk.</code><code class="descname">walk_processes</code><span class="sig-paren">(</span><em>top</em>, <em>topname='top'</em>, <em>topdown=True</em>, <em>ignoreFlag=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/utils/walk.html#walk_processes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.utils.walk.walk_processes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generator for recursive tree of climlab processes</p>
+<p>Starts walking from climlab process <code class="docutils literal"><span class="pre">top</span></code> and generates a complete 
+list of all processes and sub-processes that are managed from <code class="docutils literal"><span class="pre">top</span></code> process.
+<code class="docutils literal"><span class="pre">level</span></code> indicades the rank of specific process in the process hierarchy:</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<ul class="last">
+<li><dl class="first docutils">
+<dt>level 0: <code class="docutils literal"><span class="pre">top</span></code> process</dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt>level 1: sub-processes of <code class="docutils literal"><span class="pre">top</span></code> process</dt>
+<dd><ul class="first last simple">
+<li>level 2: sub-sub-processes of <code class="docutils literal"><span class="pre">top</span></code> process (=subprocesses of level 1 processes)</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div>
+<p>The method is based on os.walk().</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>top</strong> (<a class="reference internal" href="climlab.process.html#climlab.process.process.Process" title="climlab.process.process.Process"><code class="xref py py-class docutils literal"><span class="pre">Process</span></code></a>) &#8211; top process from where walking should start</li>
+<li><strong>topname</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of top process</li>
+<li><strong>topdown</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; whether geneterate <em>process_types</em> in regular or 
+in reverse order.
+Set to <code class="docutils literal"><span class="pre">True</span></code> by default.</li>
+<li><strong>ignoreFlag</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; whether <code class="docutils literal"><span class="pre">topdown</span></code> flag should be ignored or not</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">name (str), proc (process), level (int)</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Example:</th><td class="field-body"><div class="first last highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">climlab</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">climlab.utils</span> <span class="kn">import</span> <span class="n">walk</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">climlab</span><span class="o">.</span><span class="n">EBM</span><span class="p">()</span>
+<span class="go">            </span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">proc</span><span class="p">,</span> <span class="n">top_proc</span> <span class="ow">in</span> <span class="n">walk</span><span class="o">.</span><span class="n">walk_processes</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="n">name</span>
+<span class="gp">... </span>
+<span class="go">top</span>
+<span class="go">diffusion</span>
+<span class="go">LW</span>
+<span class="go">iceline</span>
+<span class="go">cold_albedo</span>
+<span class="go">warm_albedo</span>
+<span class="go">albedo</span>
+<span class="go">insolation</span>
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="../references.html" title="References"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="climlab.surface.html" title="climlab.surface package"
+             >previous</a> |</li>
+        <li><a href="../intro.html">home</a>|&nbsp;</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+        <!-- 
+	<li><a href="../contents.html">documentation </a> &raquo;</li>
+	-->
+
+          <li class="nav-item nav-item-1"><a href="climlab.html" >Application Programming Interface</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016 (licensed under Creative Commons, see License), Moritz Kreuzer.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+    </div>
+  </body>
+</html>
