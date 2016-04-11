@@ -202,8 +202,8 @@ class TimeDependentProcess(Process):
         for varname in self.state:
             tendencies[varname] = 0. * self.state[varname]
         for proc in self.process_types[proctype]:
-            proctend = proc._compute()
-            for varname, tend in proctend.iteritems():
+            proc.tendencies = proc._compute()
+            for varname, tend in proc.tendencies.iteritems():
                 tendencies[varname] += tend
         return tendencies
 

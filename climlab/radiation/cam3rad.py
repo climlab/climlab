@@ -2,9 +2,12 @@
 climlab wrap of the CAM3 radiation code
 '''
 import numpy as np
+import netCDF4 as nc
 from climlab import constants as const
 from climlab.radiation.radiation import Radiation
 import _cam3_interface
+import os
+from scipy.interpolate import interp1d, interp2d
 
 
 class CAM3Radiation(Radiation):
@@ -27,7 +30,7 @@ class CAM3Radiation(Radiation):
             - aldir (near-infrared, direct)
             - aldif (near-infrared, diffuse)
     Input values with same dimension as Tatm:
-        - O3 (ozone in ppmv)
+        - O3 (ozone mass mixing ratio)
         - q (specific humidity in kg/kg)
         - cldf (cloud fraction, default is zero)
         - clwp (cloud liquid water path, default is zero)
@@ -40,6 +43,9 @@ class CAM3Radiation(Radiation):
         - ASRcld (shortwave cloud radiative effect, all-sky - clear-sky flux, W/m2)
         - OLR (outgoing longwave radiation, W/m2)
         - OLRcld (longwave cloud radiative effect, all-sky - clear-sky flux, W/m2)
+        - TdotRad (net radiative heating rate,  K / day)
+        - TdotLW  (longwave radiative heating rate, K / day)
+        - TdotSW  (shortwave radiative heating rate, K / day)
 
     Many other quantities are available in a slightly different format
     from the CAM3 wrapper, stored in self.Output.
@@ -60,6 +66,9 @@ class CAM3Radiation(Radiation):
                  asdif=0.07,
                  aldir=0.07,
                  aldif=0.07,
+                 O3init = False,
+                 O3file = 'apeozone_cam3_5_54.nc',
+                 extname='_cam3_radiation',
                  **kwargs):
         super(CAM3Radiation, self).__init__(**kwargs)
         newinput = ['q',
@@ -145,9 +154,44 @@ class CAM3Radiation(Radiation):
         self.init_diagnostic('ASRcld', 0. * self.Ts)
         self.init_diagnostic('OLR', 0. * self.Ts)
         self.init_diagnostic('OLRcld', 0. * self.Ts)
+        self.init_diagnostic('TdotRad', 0. * self.Tatm)
+        self.init_diagnostic('TdotLW', 0. * self.Tatm)
+        self.init_diagnostic('TdotSW', 0. * self.Tatm)
 
-        _cam3_interface._build_extension(self.KM, self.JM, self.IM)
-        _cam3_interface._init_extension(self)
+        # automatic ozone data initialization
+        if O3init:
+            datadir = os.path.abspath(os.path.dirname(__file__) + '/../data/ozone')
+            O3filepath = os.path.join(datadir, O3file)
+            #  Open the ozone data file
+            print 'Getting ozone data from', O3filepath
+            O3data = nc.Dataset(O3filepath)
+            O3lev = O3data.variables['lev'][:]
+            O3lat = O3data.variables['lat'][:]
+            #  zonal and time average
+            O3zon = np.mean(O3data.variables['OZONE'], axis=(0,3))
+            O3global = np.average(O3zon, weights=np.cos(np.deg2rad(O3lat)), axis=1)
+            if self.O3.shape == self.lev.shape:
+                # 1D interpolation on pressure levels using global average data
+                f = interp1d(O3lev, O3global)
+                #  interpolate data to model levels
+                self.O3 = f(self.lev)
+            else:
+                #  Attempt 2D interpolation in pressure and latitude
+                f2d = interp2d(O3lat, O3lev, O3zon)
+                self.O3 = f2d(self.lat, self.lev).transpose()
+                try:
+                    f2d = interp2d(O3lat, O3lev, O3zon)
+                    self.O3 = f2d(self.lat, self.lev).transpose()
+                except:
+                    print 'Interpolation of ozone data failed.'
+                    print 'Reverting to default O3.'
+
+        #  Check to see if an extension object already exists.
+        #  Might need to change the name
+        extname = _cam3_interface._modify_extname(extname)
+        _cam3_interface._build_extension(KM=self.KM, JM=self.JM, IM=self.IM,
+            extname=extname)
+        _cam3_interface._init_extension(module=self, extname=extname)
 
     def _climlab_to_cam3(self, field):
         '''Prepare field wit proper dimension order.
@@ -214,6 +258,11 @@ class CAM3Radiation(Radiation):
         self.OLRcld = -self._cam3_to_climlab(Output['LwToaCf'])
         self.ASR = self._cam3_to_climlab(Output['SwToa'])
         self.ASRcld = self._cam3_to_climlab(Output['SwToaCf'])
+        #  radiative heating rates in K / day
+        KperDayFactor = const.seconds_per_day / const.cp
+        self.TdotRad = self._cam3_to_climlab(Output['TdotRad']) * KperDayFactor
+        self.TdotLW = self._cam3_to_climlab(Output['lwhr']) * KperDayFactor
+        self.TdotSW = self._cam3_to_climlab(Output['swhr']) * KperDayFactor
 
 
 class CAM3Radiation_LW(CAM3Radiation):

@@ -219,6 +219,15 @@ class Iceline(DiagnosticProcess):
         else:  # there is some ice edge
             # Taking np.diff of a boolean array gives True at the boundaries between True and False
             boundary_indices = np.where(np.diff(self.ice.squeeze()))[0] + 1
+            # check for asymmetry case: [-90,x] or [x,90]
+            #  -> boundary_indices hold only one value for icelat
+            if boundary_indices.size == 1:   
+                if self.ice[0] == True:   # case: [x,90]
+                    # extend indice array by missing value for northpole
+                    boundary_indices = np.append(boundary_indices, self.ice.size)
+                elif  self.ice[-1] == True:   # case: [-90,x]
+                    # extend indice array by missing value for northpole
+                    boundary_indices = np.insert(boundary_indices,0 ,0)
             self.icelat = lat_bounds[boundary_indices]  # an array of boundary latitudes
 
     def _compute(self):
