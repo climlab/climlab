@@ -29,6 +29,17 @@ def atmosphere(dp):
                         pressure input (*unit:* J /m**2 / K)
     :rtype:             array
     
+    :Example:
+    
+        Calculate atmospheric heat capacity for pressure intervals of 
+        1, 10, 100 mb::
+        
+            >>> from climlab.utils import heat_capacity
+            
+            >>> pressure_interval = array([1,10,100]) # in mb
+            >>> heat_capacity.atmosphere(pressure_interval) # in J /m**2 / K
+            array([   10244.89795918,   102448.97959184,  1024489.79591837])            
+    
     """
     return const.cp * dp * const.mb_to_Pa / const.g
 
@@ -57,7 +68,18 @@ def ocean(dz):
     :returns:           the heat capacity for ocean cells correspoding to
                         depth input (*unit:* J /m**2 / K)
     :rtype:             array
+  
+    :Example:
     
+        Calculate atmospheric heat capacity for pressure intervals of 
+        1, 10, 100 m::
+        
+            >>> from climlab.utils import heat_capacity
+            
+            >>> pressure_interval = array([1,10,100]) # in m
+            >>> heat_capacity.ocean(pressure_interval) # in J /m**2 / K
+            array([  4.18130000e+06,   4.18130000e+07,   4.18130000e+08])           
+      
     """
     return const.rho_w * const.cw * dz
 

@@ -113,7 +113,7 @@ class Process(object):
     Additional to the parent class :class:`~climlab.process.process.Process`
     following object attributes are generated during initialization:
     
-    :ivar dict domains:     dictionary of process :class:`~climlab.domain.domain._Domain`s
+    :ivar dict domains:     dictionary of process :class:`~climlab.domain.domain._Domain`
     :ivar dict state:       dictionary of process states 
                             (of type :class:`~climlab.domain.field.Field`)
     :ivar dict param:       dictionary of model parameters which are given
@@ -125,7 +125,6 @@ class Process(object):
                             date and time when process was created
     :ivar subprocess:       dictionary of suprocesses of the process
     :vartype subprocess:    dict of :class:`~climlab.process.process.Process`    
-
 
     """
 
@@ -194,12 +193,62 @@ class Process(object):
     def add_subprocess(self, name, proc):
         """Adds a single subprocess to this process.
         
-        :param name:    name of the subprocess
-        :type name:     string
-        :param proc:    a Process object
-        :type proc:     process
-        :raises: :exc:  `ValueError` if ``proc`` is not a process
+        :param string name:     name of the subprocess
+        :param proc:            a Process object
+        :type proc:             :class:`~climlab.process.process.Process`
+        :raises: :exc:`ValueError` 
+                                if ``proc`` is not a process
         
+        :Example:
+        
+            Replacing an albedo subprocess through adding a subprocess with 
+            same name::
+            
+                >>> from climlab.model.ebm import EBM_seasonal
+                >>> from climlab.surface.albedo import StepFunctionAlbedo
+                
+                >>> # creating EBM model
+                >>> ebm_s = EBM_seasonal()
+                
+                >>> print ebm_s
+                
+            .. code-block:: none
+                :emphasize-lines: 8
+                
+                climlab Process of type <class 'climlab.model.ebm.EBM_seasonal'>. 
+                State variables and domain shapes: 
+                  Ts: (90, 1) 
+                The subprocess tree: 
+                top: <class 'climlab.model.ebm.EBM_seasonal'>
+                   diffusion: <class 'climlab.dynamics.diffusion.MeridionalDiffusion'>
+                   LW: <class 'climlab.radiation.AplusBT.AplusBT'>
+                   albedo: <class 'climlab.surface.albedo.P2Albedo'>
+                   insolation: <class 'climlab.radiation.insolation.DailyInsolation'>
+            
+            ::
+            
+                >>> #  creating and adding albedo feedback subprocess
+                >>> step_albedo = StepFunctionAlbedo(state=ebm_s.state, **ebm_s.param)
+                >>> ebm_s.add_subprocess('albedo', step_albedo)
+                >>> 
+                >>> print ebm_s
+                
+            .. code-block:: none
+                :emphasize-lines: 8
+                
+                climlab Process of type <class 'climlab.model.ebm.EBM_seasonal'>. 
+                State variables and domain shapes: 
+                  Ts: (90, 1) 
+                The subprocess tree: 
+                top: <class 'climlab.model.ebm.EBM_seasonal'>
+                   diffusion: <class 'climlab.dynamics.diffusion.MeridionalDiffusion'>
+                   LW: <class 'climlab.radiation.AplusBT.AplusBT'>
+                   albedo: <class 'climlab.surface.albedo.StepFunctionAlbedo'>
+                      iceline: <class 'climlab.surface.albedo.Iceline'>
+                      cold_albedo: <class 'climlab.surface.albedo.ConstantAlbedo'>
+                      warm_albedo: <class 'climlab.surface.albedo.P2Albedo'>
+                   insolation: <class 'climlab.radiation.insolation.DailyInsolation'>
+
         """
         if isinstance(proc, Process):
             self.subprocess.update({name: proc})
@@ -212,9 +261,41 @@ class Process(object):
     def remove_subprocess(self, name):
         """Removes a single subprocess from this process.
         
-        :param name:    name of the subprocess
-        :type name:     string
+        :param string name:     name of the subprocess
         
+        :Example:
+        
+            Remove albedo subprocess from energy balance model::
+                    
+                >>> import climlab
+                >>> model = climlab.EBM()
+                
+                >>> print model
+                climlab Process of type <class 'climlab.model.ebm.EBM'>. 
+                State variables and domain shapes: 
+                  Ts: (90, 1) 
+                The subprocess tree: 
+                top: <class 'climlab.model.ebm.EBM'>
+                   diffusion: <class 'climlab.dynamics.diffusion.MeridionalDiffusion'>
+                   LW: <class 'climlab.radiation.AplusBT.AplusBT'>
+                   albedo: <class 'climlab.surface.albedo.StepFunctionAlbedo'>
+                      iceline: <class 'climlab.surface.albedo.Iceline'>
+                      cold_albedo: <class 'climlab.surface.albedo.ConstantAlbedo'>
+                      warm_albedo: <class 'climlab.surface.albedo.P2Albedo'>
+                   insolation: <class 'climlab.radiation.insolation.P2Insolation'>
+                
+                >>> model.remove_subprocess('albedo')
+                
+                >>> print model
+                climlab Process of type <class 'climlab.model.ebm.EBM'>. 
+                State variables and domain shapes: 
+                  Ts: (90, 1) 
+                The subprocess tree: 
+                top: <class 'climlab.model.ebm.EBM'>
+                   diffusion: <class 'climlab.dynamics.diffusion.MeridionalDiffusion'>
+                   LW: <class 'climlab.radiation.AplusBT.AplusBT'>
+                   insolation: <class 'climlab.radiation.insolation.P2Insolation'>
+                
         """
         self.subprocess.pop(name, None)
         self.has_process_type_list = False
@@ -224,30 +305,35 @@ class Process(object):
     def set_state(self, name, value):
         """Sets the variable ``name`` to a new state ``value``. 
         
-        :param string name:    name of the state        
-        :param value:   state variable
-        :type value:    :class:`~climlab.domain.field.Field` or *array*       
+        :param string name:     name of the state        
+        :param value:           state variable
+        :type value:            :class:`~climlab.domain.field.Field` or *array*       
         :raises: :exc:`ValueError`
-                        if state variable ``value`` is not having a domain.
+                                if state variable ``value`` is not having a domain.
         :raises: :exc:`ValueError`
-                        if shape mismatch between existing domain and 
-                        new state variable.
+                                if shape mismatch between existing domain and 
+                                new state variable.
                         
         :Example:   
         
             Resetting the surface temperature of an EBM to
-            :math:`-5 ^{\circ} \\textrm{C}` on all latitues:
-
-            .. code::
+            :math:`-5 ^{\circ} \\textrm{C}` on all latitues::
                 
-                import climlab
-                from climlab import Field
+                >>> import climlab
+                >>> from climlab import Field
+                >>> import numpy as np
                 
-                model = climlab.EBM()
-                sfc = climlab.domain.zonal_mean_surface(num_lat=90, water_depth=10.)
-                lat = sfc.axes['lat'].points
-                initial = -5 * ones(size(lat))
-                model.set_state('Ts', Field(initial, domain=sfc))
+                >>> # setup model
+                >>> model = climlab.EBM(num_lat=36)
+                
+                >>> # create new temperature distribution
+                >>> initial = -5 * ones(size(model.lat))
+                >>> model.set_state('Ts', Field(initial, domain=model.domains['Ts']))
+                
+                >>> np.squeeze(model.Ts)
+                Field([-5., -5., -5., -5., -5., -5., -5., -5., -5., -5., -5., -5., -5.,
+                       -5., -5., -5., -5., -5., -5., -5., -5., -5., -5., -5., -5., -5.,
+                       -5., -5., -5., -5., -5., -5., -5., -5., -5., -5.])
 
         """
         if isinstance(value, Field):
@@ -321,6 +407,22 @@ class Process(object):
         :param array value:     initial value for quantity - accepts also type
                                 float, int, etc. (*default*:``0.``)
         
+        :Example:
+        
+            Add a diagnostic CO2 variable to an energy balance model::
+            
+                >>> import climlab
+                >>> model = climlab.EBM()
+                
+                >>> # initialize CO2 variable with value 280 ppm
+                >>> model.init_diagnostic('CO2',280)
+                
+                >>> # access variable directly or through diagnostic dictionary
+                >>> model.CO2
+                280
+                >>> model.diagnostics.keys()
+                ['ASR', 'CO2', 'net_radiation', 'icelat', 'OLR', 'albedo']
+
         """
         def _diag_getter(self):
             return self.diagnostics[name]
@@ -336,6 +438,24 @@ class Process(object):
         
         :param str name:    name of diagnostic quantity to be removed
         
+        :Example:
+        
+            Remove diagnostic variable 'icelat' from energy balance model::
+                    
+                >>> import climlab
+                >>> model = climlab.EBM()
+                
+                >>> # display all diagnostic variables
+                >>> model.diagnostics.keys()
+                ['ASR', 'OLR', 'net_radiation', 'albedo', 'icelat']
+                
+                >>> model.remove_diagnostic('icelat')
+                >>> model.diagnostics.keys()
+                ['ASR', 'OLR', 'net_radiation', 'albedo']
+                
+                >>> # Watch out for subprocesses that may still want 
+                >>>  # to access the diagnostic 'icelat' variable !!!
+                        
         """        
         _ = self.diagnostics.pop(name)
         delattr(type(self), name)
@@ -343,8 +463,7 @@ class Process(object):
     def add_input(self, inputlist):
         """Updates the process's list of inputs.
         
-        :param inputlist:   list of names of input variables
-        :type inputlist:    list
+        :param list inputlist:   list of names of input variables
         
         """
         self._input_vars = frozenset.union(self._input_vars, inputlist)
@@ -543,9 +662,29 @@ def process_like(proc):
     The creation date is updated.    
     
     :param proc:    process
-    :type proc:     process
+    :type proc:     :class:`~climlab.process.process.Process`
     :return:        new process identical to the given process
-    :rtype:         process
+    :rtype:         :class:`~climlab.process.process.Process`
+
+    :Example:
+    
+        ::
+
+            >>> import climlab
+            >>> from climlab.process.process import process_like
+            
+            >>> model = climlab.EBM()
+            >>> model.subprocess.keys()
+            ['diffusion', 'LW', 'albedo', 'insolation']
+            
+            >>> albedo = model.subprocess['albedo']
+            >>> albedo_copy = process_like(albedo)
+             
+            >>> albedo.creation_date
+            'Thu, 24 Mar 2016 01:32:25 +0000'
+            
+            >>> albedo_copy.creation_date
+            'Thu, 24 Mar 2016 01:33:29 +0000'              
 
     """
     newproc = copy.deepcopy(proc)
@@ -558,12 +697,25 @@ def get_axes(process_or_domain):
     """Returns a dictionary of all Axis in a domain or dictionary of domains.
     
     :param process_or_domain:   a process or a domain object
-    :type process_or_domain:    :mod:`~climlab.process.process` or 
+    :type process_or_domain:    :class:`~climlab.process.process.Process` or 
                                 :class:`~climlab.domain.domain._Domain`
     :raises: :exc:              `TypeError` if input is not or not having a domain
     :returns:                   dictionary of input's Axis
     :rtype:                     dict
        
+    :Example:
+    
+        ::
+        
+            >>> import climlab
+            >>> from climlab.process.process import get_axes
+            
+            >>> model = climlab.EBM()
+            
+            >>> get_axes(model)
+            {'lat': <climlab.domain.axis.Axis object at 0x7ff13b9dd2d0>,
+             'depth': <climlab.domain.axis.Axis object at 0x7ff13b9dd310>}
+     
     """
     if isinstance(process_or_domain, Process):
         dom = process_or_domain.domains

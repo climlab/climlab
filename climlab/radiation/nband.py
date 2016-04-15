@@ -280,7 +280,7 @@ def SPEEDY_band_fraction(T):
 
     Reproducing here the FORTRAN code from MITgcm/pkg/aim_v23/phy_radiat.F
 
-    .. code::
+    .. code-block:: fortran
     
     	      EPS3=0.95 _d 0
        

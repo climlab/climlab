@@ -23,44 +23,63 @@ class Field(np.ndarray):
     
     :param array input_array:   the array which the Field object should be 
                                 initialized with
-    :param _Domain domain:      the domain associated with that field 
+    :param domain:              the domain associated with that field 
                                 (e.g. state variables)
+    :type domain:               :class:`~climlab.domain.domain._Domain`
     
     **Object attributes** \n
     
     Following object attribute is generated during initialization:
         
-    :ivar _Domain domain:       the domain associated with that field 
+    :var domain:               the domain associated with that field 
                                 (e.g. state variables)
-
+    :vartype domain:            :class:`~climlab.domain.domain._Domain`
+    
 
     :Example:
                             
-        .. code::
+        ::
             
-            import climlab
-            import numpy as np
-            from climlab import domain
-            from climlab.domain import field
+            >>> import climlab
+            >>> import numpy as np
+            >>> from climlab import domain
+            >>> from climlab.domain import field
             
-            A = np.linspace(0., 10., 30)
-            sfc, atm = domain.single_column()
-            s = field.Field(A, domain=atm)
-
-            print s
-            print s.domain
-
-            # can slice this and it preserves the domain
-            #  a more full-featured implementation would have intelligent slicing
-            #  like in iris
-            s.shape == s.domain.shape
-            s[:1].shape == s[:1].domain.shape
-
-            #  But some things work very well. E.g. new field creation:
-            s2 = np.zeros_like(s)
-
-            print s2
-            print s2.domain    
+            >>> # distribution of state
+            >>> distr = np.linspace(0., 10., 30)
+            >>> # domain creation
+            >>> sfc, atm = domain.single_column()
+            >>> # build state of type Field
+            >>> s = field.Field(distr, domain=atm)
+            
+            >>> print s
+            [  0.           0.34482759   0.68965517   1.03448276   1.37931034
+               1.72413793   2.06896552   2.4137931    2.75862069   3.10344828
+               3.44827586   3.79310345   4.13793103   4.48275862   4.82758621
+               5.17241379   5.51724138   5.86206897   6.20689655   6.55172414
+               6.89655172   7.24137931   7.5862069    7.93103448   8.27586207
+               8.62068966   8.96551724   9.31034483   9.65517241  10.        ]
+               
+            >>> print s.domain
+            climlab Domain object with domain_type=atm and shape=(30,)
+            
+            >>> # can slice this and it preserves the domain
+            >>> #  a more full-featured implementation would have intelligent
+            >>> #  slicing like in iris
+            >>> s.shape == s.domain.shape
+            True
+            >>> s[:1].shape == s[:1].domain.shape
+            False
+            
+            >>> #  But some things work very well. E.g. new field creation:
+            >>> s2 = np.zeros_like(s)
+            
+            >>> print s2
+            [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.
+              0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.]
+              
+            >>> print s2.domain  
+            climlab Domain object with domain_type=atm and shape=(30,)  
                             
     """
     def __new__(cls, input_array, domain=None):
@@ -286,6 +305,18 @@ def global_mean(field):
     :raises: :exc:`ValueError` if input field has no latitude axis
     :return: latitude weighted global mean of the field
     :rtype: float    
+    
+    :Example:
+
+        initial global mean temperature of EBM model::
+        
+            >>> import climlab
+            >>> from climlab.domain.field import global_mean
+            
+            >>> model = climlab.EBM()
+
+            >>> global_mean(model.Ts)
+            Field(11.997968598413685)
     
     """
     try:

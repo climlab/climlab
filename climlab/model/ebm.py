@@ -119,6 +119,19 @@ class EBM(EnergyBudget):
                             through 
                             :func:`~climlab.process.process.Process.init_diagnostic`.
                             
+    :Example:
+    
+        Creation and integration of the preconfigured Energy Balance Model::
+        
+            >>> import climlab
+            >>> model = climlab.EBM()
+
+            >>> model.integrate_years(2.)
+            Integrating for 180 steps, 730.4844 days, or 2.0 years.
+            Total elapsed time is 2.0 years.
+            
+        For more information how to use the EBM class, see the :ref:`Tutorial` 
+        chapter.
     
     """
     def __init__(self,
@@ -199,6 +212,16 @@ class EBM(EnergyBudget):
         for the object attriute ``Ts`` which calculates the latitude weighted
         global mean of a field.
         
+        :Example:
+
+            Calculating the global mean temperature of initial EBM temperature::
+            
+                >>> import climlab
+                >>> model = climlab.EBM(T0=14., T2=-25)
+                
+                >>> model.global_mean_temperature()
+                Field(13.99873037400856)
+        
         """
         return global_mean(self.Ts)
 
@@ -218,6 +241,11 @@ class EBM(EnergyBudget):
         :return: total heat transport on the latitude grid in unit :math:`\\textrm{PW}`
         :rtype: array of size ``np.size(self.lat_lat)``
         
+        :Example: 
+        
+            .. plot:: code_input_manual/example_EBM_inferred_heat_transport.py
+                :include-source:
+                
         """
         phi = np.deg2rad(self.lat)
         energy_in = np.squeeze(self.net_radiation)
@@ -226,7 +254,13 @@ class EBM(EnergyBudget):
 
     def heat_transport(self):
         """Returns instantaneous heat transport in unit :math:`\\textrm{PW}`
-        on the staggered grid (bounds) through calling :func:`diffusive_heat_transport`.
+        on the staggered grid (bounds) through callinaag :func:`diffusive_heat_transport`.
+
+        :Example: 
+        
+            .. plot:: code_input_manual/example_EBM_heat_transport.py
+                :include-source:
+        
         """
         return self.diffusive_heat_transport()
 
@@ -263,6 +297,11 @@ class EBM(EnergyBudget):
         which is the convergence of energy transport into each latitude band,
         namely the difference between what's coming in and what's going out.
         
+        :Example: 
+        
+            .. plot:: code_input_manual/example_EBM_heat_transport_convergence.py
+                :include-source:
+            
         """
         phi = np.deg2rad(self.lat)
         phi_stag = np.deg2rad(self.lat_bounds)
@@ -327,7 +366,13 @@ class EBM_seasonal(EBM):
                                 :class:`~climlab.surface.albedo.StepFunctionAlbedo` 
                                 (which basically has been there before but now is 
                                 updated with the new albedo parameter values).
+        :Example: 
             
+            The annual distribution of solar insolation:
+        
+            .. plot:: code_input_manual/example_EBM_seasonal.py
+                :include-source:
+                        
         """
         super(EBM_seasonal, self).__init__(a0=a0, a2=a2, ai=ai, **kwargs)
         sfc = self.domains['Ts']
@@ -373,6 +418,29 @@ class EBM_annual(EBM_seasonal):
         :ivar dict subprocess:  suprocess ``'insolation'`` is overwritten by
                                 :class:`~climlab.radiation.insolation.AnnualMeanInsolation`
                                 
+        :Example:
+        
+            The :class:`~climlab.model.ebm.EBM_annual` class uses a different 
+            insolation subprocess than the :class:`~climlab.model.ebm.EBM` class::
+               
+                >>> import climlab
+                >>> model_annual = climlab.EBM_annual()
+                
+                >>> print model_annual
+                
+            .. code-block:: none
+               :emphasize-lines: 9
+                
+                climlab Process of type <class 'climlab.model.ebm.EBM_annual'>. 
+                State variables and domain shapes: 
+                  Ts: (90, 1) 
+                The subprocess tree: 
+                top: <class 'climlab.model.ebm.EBM_annual'>
+                   diffusion: <class 'climlab.dynamics.diffusion.MeridionalDiffusion'>
+                   LW: <class 'climlab.radiation.AplusBT.AplusBT'>
+                   albedo: <class 'climlab.surface.albedo.P2Albedo'>
+                   insolation: <class 'climlab.radiation.insolation.AnnualMeanInsolation'>
+            
         """        
         super(EBM_annual, self).__init__(**kwargs)
         sfc = self.domains['Ts']

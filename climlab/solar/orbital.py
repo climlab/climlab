@@ -4,7 +4,7 @@ which interpolates the orbital data for a specific year
 (- works equally well for arrays of years).
 
 The base class :class:`OrbitalTable()` is designed to work with 5 Myears of orbital data
-(**eccentricity, obliquity, and longitude of perihelion**) from [Berger1991]_.
+(**eccentricity, obliquity, and longitude of perihelion**) from :cite:`Berger_1991`.
 
 Data will be read from the file orbit91, which was originally obtained from
 ftp://ftp.ncdc.noaa.gov/pub/data/paleo/insolation/
@@ -12,7 +12,7 @@ If the file isn't found locally, the module will attempt to read it remotely
 from the above URL.
     
 A subclass :class:`LongOrbitalTable()` works with La2004 orbital data for 
--51 to +21 Myears as calculated by [Laskar2004]_.
+-51 to +21 Myears as calculated by :cite:`Laskar_2004`.
 See http://vo.imcce.fr/insola/earth/online/earth/La2004/README.TXT
 
 """
@@ -22,7 +22,7 @@ import os
 
 class OrbitalTable:
     """Invoking OrbitalTable() will load 5 million years of orbital data
-    from [Berger1991]_ and compute linear interpolants.
+    from :cite:`Berger_1991` and compute linear interpolants.
     
     The data can be accessed through the method :func:`lookup_parameters()`.
      
@@ -143,7 +143,7 @@ class OrbitalTable:
 class LongOrbitalTable(OrbitalTable):
     """Loads orbital parameter tables for -51 to +21 Myears.
     
-    Based on calculations by [Laskar2004]_
+    Based on calculations by :cite:`Laskar_2004`
         http://vo.imcce.fr/insola/earth/online/earth/La2004/README.TXT
     
     Usage is identical to parent class :class:`OrbitalTable()`.

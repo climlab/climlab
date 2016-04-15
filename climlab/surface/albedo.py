@@ -22,6 +22,21 @@ class ConstantAlbedo(DiagnosticProcess):
     :ivar Field albedo:             attribute to store the albedo value. 
                                     During initialization the 
                                     :func:`albedo` setter is called.  
+
+    :Example: 
+    
+        Creation of a constant albedo subprocess on basis of an EBM domain::
+        
+            >>> import climlab
+            >>> from climlab.surface.albedo import ConstantAlbedo
+            
+            >>> # model creation
+            >>> model = climlab.EBM()
+
+            >>> sfc = model.domains['Ts']            
+            
+            >>> # subprocess creation
+            >>> const_alb = ConstantAlbedo(albedo=0.3, domains=sfc, **model.param)
     
     """        
     def __init__(self, albedo=0.33, **kwargs):
@@ -89,6 +104,29 @@ class P2Albedo(DiagnosticProcess):
     :ivar Field albedo:             the subprocess attribute ``self.albedo`` is
                                     created with correct dimensions 
                                     (according to ``self.lat``)
+    
+    :Example: 
+    
+        Creation of a parabolic albedo subprocess on basis of an EBM domain::
+        
+            >>> import climlab
+            >>> from climlab.surface.albedo import P2Albedo
+            
+            >>> # model creation
+            >>> model = climlab.EBM()
+            
+            >>> # modify a0 and a2 values in model parameter dictionary
+            >>> model.param['a0']=0.35
+            >>> model.param['a2']= 0.10
+            
+            >>> # subprocess creation
+            >>> p2_alb = P2Albedo(domains=model.domains['Ts'], **model.param)
+            
+            >>> p2_alb.a0
+            0.33
+            >>> p2_alb.a2
+            0.1
+       
     
     """    
 
@@ -218,7 +256,16 @@ class Iceline(DiagnosticProcess):
             self.icelat = np.array([-90., 90.])
         else:  # there is some ice edge
             # Taking np.diff of a boolean array gives True at the boundaries between True and False
-            boundary_indices = np.where(np.diff(self.ice.squeeze()))[0] + 1
+            boundary_indices = np.where(np.diff(self.ice.squeeze()))[0]+1
+            # check for asymmetry case: [-90,x] or [x,90]
+            #  -> boundary_indices hold only one value for icelat
+            if boundary_indices.size == 1:   
+                if self.ice[0] == True:   # case: [x,90]
+                    # extend indice array by missing value for northpole
+                    boundary_indices = np.append(boundary_indices, self.ice.size)
+                elif  self.ice[-1] == True:   # case: [-90,x]
+                    # extend indice array by missing value for northpole
+                    boundary_indices = np.insert(boundary_indices,0 ,0)
             # check for asymmetry case: [-90,x] or [x,90]
             #  -> boundary_indices hold only one value for icelat
             if boundary_indices.size == 1:   
@@ -240,6 +287,7 @@ class StepFunctionAlbedo(DiagnosticProcess):
     
     This class itself defines three subprocesses that are created during 
     initialization:
+    
         * ``'iceline'`` - :class:`Iceline`
         * ``'warm_albedo'`` - :class:`P2Albedo`
         * ``'cold_albedo'`` - :class:`ConstantAlbedo`
@@ -269,12 +317,32 @@ class StepFunctionAlbedo(DiagnosticProcess):
                                     arguments, namely ``'Tf'``, ``'a0'``, 
                                     ``'a2'`` and ``'ai'``.  
     :ivar bool topdown:             is set to ``False`` to call subprocess
-                                    compute method first
-                        
+                                    compute method first              
     :ivar dict diagnostics:         key ``'albedo'`` initialized
     :ivar Field albedo:             the subprocess attribute ``self.albedo`` is
                                     created
     
+    :Example:
+
+        Creation of a step albedo subprocess on basis of an EBM domain::
+        
+            >>> import climlab
+            >>> from climlab.surface.albedo import StepFunctionAlbedo
+            >>> 
+            >>> model = climlab.EBM(a0=0.29, a2=0.1, ai=0.65, Tf=-2)
+            >>> 
+            >>> step_alb = StepFunctionAlbedo(state= model.state, **model.param)
+            >>> 
+            >>> print step_alb
+            climlab Process of type <class 'climlab.surface.albedo.StepFunctionAlbedo'>. 
+            State variables and domain shapes: 
+              Ts: (90, 1) 
+            The subprocess tree: 
+            top: <class 'climlab.surface.albedo.StepFunctionAlbedo'>
+               iceline: <class 'climlab.surface.albedo.Iceline'>
+               cold_albedo: <class 'climlab.surface.albedo.ConstantAlbedo'>
+               warm_albedo: <class 'climlab.surface.albedo.P2Albedo'>
+
     """
     def __init__(self, Tf=-10., a0=0.3, a2=0.078, ai=0.62, **kwargs):
         super(DiagnosticProcess, self).__init__(**kwargs)

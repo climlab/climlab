@@ -74,13 +74,7 @@ class EnergyBudget(TimeDependentProcess):
 
 class ExternalEnergySource(EnergyBudget):
     """A fixed energy source or sink to be specified by the user.
-    
-    **Initialization parameters** \n
         
-    An instance of ``ExternalEnergySource`` is initialized with the forwarded 
-    keyword arguments ``**kwargs`` of hypthetical corresponding children classes
-    (which are not existing in this case).
-    
     **Object attributes** \n
     
     Additional to the parent class :class:`~climlab.process.energy_budget.EnergyBudget`
@@ -93,6 +87,54 @@ class ExternalEnergySource(EnergyBudget):
     ``heating_rate`` dictionary, which contain heating rates in 
     unit :math:`\\textrm{W}/ \\textrm{m}^2` for all state variables.
     
+    :Example:
+
+        Creating an Energy Balance Model with a uniform external energy source
+        of :math:`10 \\ \\textrm{W}/ \\textrm{m}^2` for all latitudes::
+    
+            >>> import climlab
+            >>> from climlab.process.energy_budget import ExternalEnergySource
+            >>> import numpy as np
+
+            >>> # create model & external energy subprocess
+            >>> model = climlab.EBM(num_lat=36)
+            >>> ext_en = ExternalEnergySource(state= model.state,**model.param)
+
+            >>> # modify external energy rate
+            >>> ext_en.heating_rate.keys()
+            ['Ts']
+
+            >>> np.squeeze(ext_en.heating_rate['Ts'])
+            Field([-0., -0., -0., -0., -0., -0., -0., -0., -0.,  0.,  0.,  0.,  0.,
+                    0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+                    0., -0., -0., -0., -0., -0., -0., -0., -0., -0.])
+            
+            >>> ext_en.heating_rate['Ts'][:]=10
+
+            >>> np.squeeze(ext_en.heating_rate['Ts'])
+            Field([ 10.,  10.,  10.,  10.,  10.,  10.,  10.,  10.,  10.,  10.,  10.,
+                    10.,  10.,  10.,  10.,  10.,  10.,  10.,  10.,  10.,  10.,  10.,
+                    10.,  10.,  10.,  10.,  10.,  10.,  10.,  10.,  10.,  10.,  10.,
+                    10.,  10.,  10.])
+            
+            >>> # add subprocess to model
+            >>> model.add_subprocess('ext_energy',ext_en)
+            
+            >>> print model
+            climlab Process of type <class 'climlab.model.ebm.EBM'>. 
+            State variables and domain shapes: 
+              Ts: (36, 1) 
+            The subprocess tree: 
+            top: <class 'climlab.model.ebm.EBM'>
+               diffusion: <class 'climlab.dynamics.diffusion.MeridionalDiffusion'>
+               LW: <class 'climlab.radiation.AplusBT.AplusBT'>
+               ext_energy: <class 'climlab.process.energy_budget.ExternalEnergySource'>
+               albedo: <class 'climlab.surface.albedo.StepFunctionAlbedo'>
+                  iceline: <class 'climlab.surface.albedo.Iceline'>
+                  cold_albedo: <class 'climlab.surface.albedo.ConstantAlbedo'>
+                  warm_albedo: <class 'climlab.surface.albedo.P2Albedo'>
+               insolation: <class 'climlab.radiation.insolation.P2Insolation'>
+                    
     """
     def __init__(self, **kwargs):
         super(ExternalEnergySource, self).__init__(**kwargs)

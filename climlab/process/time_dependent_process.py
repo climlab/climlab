@@ -120,28 +120,33 @@ class TimeDependentProcess(Process):
     def compute(self):
         """Computes the tendencies for all state variables given current state 
         and specified input.
-        
-        The function first computes all diagnostic processes as they may effect
-        all the other processes (such as change in solar distribution).
-        After all the diagnostic processes don't produce any tendencies directly. Subsequently
-        all tendencies and diagnostics for all explicit processes are computed.
+  
+        The function first computes all diagnostic processes. They don't produce 
+        any tendencies directly but they may effect the other processes (such as
+        change in solar distribution). Subsequently, all tendencies and 
+        diagnostics for all explicit processes are computed.
         
         Tendencies due to implicit and adjustment processes need to be
         calculated from a state that is already adjusted after explicit 
-        alteration. So the explicit tendencies are applied to the states 
-        temporarily. Now all tendencies from implicit processes are calculated 
-        through matrix inversions and same like the explicit tendencies applied
-        to the states temporarily. Subsequently all instantaneous adjustments 
-        are computed.
+        alteration. For that reason the explicit tendencies are applied to the 
+        states temporarily. Now all tendencies from implicit processes are 
+        calculated by matrix inversions and similar to the explicit tendencies,
+        the implicit ones are applied to the states temporarily. Subsequently,
+        all instantaneous adjustments are computed.
         
-        Then the changes made to the states from explicit and implicit 
-        processes are removed again as this :func:`compute` function is
-        supposed to calculate only tendencies and not applying them to the states.
+        Then the changes that were made to the states from explicit and implicit 
+        processes are removed again as this 
+        :class:`~climlab.process.time_dependent_process.TimeDependentProcess.compute()`
+        function is supposed to calculate only tendencies and not apply them 
+        to the states.
         
-        Finally all calculated tendencies from all processes are collected 
+        Finally, all calculated tendencies from all processes are collected 
         for each state, summed up and stored in the dictionary 
         ``self.tendencies``, which is an attribute of the time-dependent-process 
-        object for which the :func:`compute` method has been called.
+        object, for which the 
+        :class:`~climlab.process.time_dependent_process.TimeDependentProcess.compute()`
+        method has been called.
+        
         
         **Object attributes** \n
         
@@ -243,6 +248,24 @@ class TimeDependentProcess(Process):
         process states. Multiplied with the timestep and added up to the state
         variables is updating all model states.
         
+        :Example:
+            
+            ::
+            
+                >>> import climlab
+                >>> model = climlab.EBM()
+                
+                >>> # checking time step counter
+                >>> model.time['steps']
+                0
+
+                >>> # stepping the model forward
+                >>> model.step_forward()
+                
+                >>> # step counter increased
+                >>> model.time['steps']
+                1
+        
         """
         self.compute()
         #  Total tendency is applied as an explicit forward timestep
@@ -300,6 +323,24 @@ class TimeDependentProcess(Process):
         It calls :func:`step_forward` repetitively and calculates a time 
         averaged value over the integrated period for every model state and all
         diagnostics processes.
+
+        :Example:
+        
+            ::
+            
+                >>> import climlab
+                >>> model = climlab.EBM()
+                
+                >>> model.global_mean_temperature()
+                Field(11.997968598413685)
+                
+                >>> model.integrate_years(2.)
+                Integrating for 180 steps, 730.4844 days, or 2.0 years.
+                Total elapsed time is 2.0 years.
+                                                
+                >>> model.global_mean_temperature()
+                Field(13.531055349437258)
+                
         
         """
         days = years * const.days_per_year
@@ -346,6 +387,23 @@ class TimeDependentProcess(Process):
         :param bool verbose:    information whether model time details 
                                 should be printed.
         
+        :Example:
+        
+            ::
+            
+                >>> import climlab
+                >>> model = climlab.EBM()
+                
+                >>> model.global_mean_temperature()
+                Field(11.997968598413685)
+                
+                >>> model.integrate_days(80.)
+                Integrating for 19 steps, 80.0 days, or 0.219032740466 years.
+                Total elapsed time is 0.211111111111 years.
+                                
+                >>> model.global_mean_temperature()
+                Field(11.873680783355553)
+                
         """
         years = days / const.days_per_year
         self.integrate_years(years=years, verbose=verbose)
@@ -359,6 +417,22 @@ class TimeDependentProcess(Process):
         :param bool verbose:    information whether total elapsed time 
                                 should be printed.
         
+        :Example:
+        
+            ::
+            
+                >>> import climlab
+                >>> model = climlab.EBM()
+                
+                >>> model.global_mean_temperature()
+                Field(11.997968598413685)
+                
+                >>> model.integrate_converge()
+                Total elapsed time is 10.0 years.
+                
+                >>> model.global_mean_temperature()
+                Field(14.288155406577301)
+            
         """
         # implemented by m-kreuzer
         for varname, value in self.state.iteritems():

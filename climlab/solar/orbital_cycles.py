@@ -1,26 +1,3 @@
-"""Module for setting up long integrations of climlab processes
-over orbital cycles.
-
-:Example:
-
-    .. code::
-
-        from climlab.model.ebm import EBM_seasonal
-        from climlab.solar.orbital_cycles import OrbitalCycles
-        from climlab.surface.albedo import StepFunctionAlbedo
-        ebm = EBM_seasonal()
-        print ebm
-        
-        #  add an albedo feedback
-        albedo = StepFunctionAlbedo(state=ebm.state, **ebm.param)
-        ebm.add_subprocess('albedo', albedo)
-
-        #  start the integration
-        #  run for 10,000 orbital years, but only 1,000 model years
-        experiment = OrbitalCycles(ebm, kyear_start=-20, kyear_stop=-10, orbital_year_factor=10.)
-
-"""
-
 import numpy as np
 from climlab import constants as const
 from climlab.solar.orbital import OrbitalTable
@@ -36,6 +13,9 @@ class OrbitalCycles:
                  orbital_year_factor=1.,
                  verbose=True ):
         """Automatically integrates a process through changes in orbital parameters.
+        
+        OrbitalCycles is a module for setting up long integrations of climlab 
+        processes over orbital cycles.        
         
         The duration between integration start and end time is partitioned in 
         time segments over which the orbital parameters are held constant.
@@ -112,7 +92,25 @@ class OrbitalCycles:
         :ivar array orb_kyear:              integration start time of all segments
         :ivar dict orb:                     orbital parameters for last integrated segment
         
+        :Example:
         
+            Integration of an energy balance model for 10,000 years with 
+            corresponding orbital parameters::
+        
+                from climlab.model.ebm import EBM_seasonal
+                from climlab.solar.orbital_cycles import OrbitalCycles
+                from climlab.surface.albedo import StepFunctionAlbedo
+                ebm = EBM_seasonal()
+                print ebm
+                
+                #  add an albedo feedback
+                albedo = StepFunctionAlbedo(state=ebm.state, **ebm.param)
+                ebm.add_subprocess('albedo', albedo)
+        
+                #  start the integration
+                #  run for 10,000 orbital years, but only 1,000 model years
+                experiment = OrbitalCycles(ebm, kyear_start=-20, kyear_stop=-10, orbital_year_factor=10.)
+                
         """      
         self.model = model
         self.kyear_start = kyear_start

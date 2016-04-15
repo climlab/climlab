@@ -39,8 +39,7 @@ class _Insolation(DiagnosticProcess):
     following object attributes are generated and updated during initialization:
         
     :ivar array insolation: the array is initialized with zeros of the size of
-                            ``self.domains['sfc']`` or ``self.domains['default']``.
-                            
+                            ``self.domains['sfc']`` or ``self.domains['default']``.                      
     :ivar float S0:         initialized with given argument ``S0``
     :ivar dict diagnostics: key ``'insolation'`` initialized with value:
                             :class:`~climlab.domain.field.Field` of zeros
@@ -120,14 +119,22 @@ class FixedInsolation(_Insolation):
     
     :Example:
         
-        .. code::
+        ::
 
-            import climlab
+            >>> import climlab
+            >>> from climlab.radiation.insolation import FixedInsolation
+
+            >>> model = climlab.EBM()
+            >>> sfc = model.Ts.domain
+
+            >>> fixed_ins = FixedInsolation(S0=340.0, domains=sfc)
             
-            model = climlab.EBM()
-            sfc = model.Ts.domain
-            fixed_ins = climlab.radiation.insolation.FixedInsolation(S0=340.0, domains=sfc)
-    
+            >>> print fixed_ins
+            climlab Process of type <class 'climlab.radiation.insolation.FixedInsolation'>. 
+            State variables and domain shapes: 
+            The subprocess tree: 
+            top: <class 'climlab.radiation.insolation.FixedInsolation'>
+
     """
     def __init__(self, S0=const.S0/4, **kwargs):
         super(FixedInsolation, self).__init__(S0=S0, **kwargs)
@@ -156,7 +163,27 @@ class P2Insolation(_Insolation):
     :param float S0:        solar constant                              \n
                             - unit: :math:`\\frac{\\textrm{W}}{\\textrm{m}^2}`   \n
                             - default value: ``1365.2``     
-    :param floar s2:        factor for second legendre polynominal term
+    :param floar s2:        factor for second legendre polynominal term \n
+                            - default value: ``-0.48``
+
+    :Example:
+        
+        ::
+
+            >>> import climlab
+            >>> from climlab.radiation.insolation import P2Insolation
+
+            >>> model = climlab.EBM()
+            >>> sfc = model.Ts.domain
+
+            >>> p2_ins = P2Insolation(S0=340.0, s2=-0.5, domains=sfc)
+            
+            >>> print p2_ins
+            climlab Process of type <class 'climlab.radiation.insolation.P2Insolation'>. 
+            State variables and domain shapes: 
+            The subprocess tree: 
+            top: <class 'climlab.radiation.insolation.P2Insolation'>    
+            
     """
     def __init__(self, S0=const.S0, s2=-0.48, **kwargs):
         super(P2Insolation, self).__init__(S0=S0, **kwargs)
@@ -246,12 +273,71 @@ class AnnualMeanInsolation(_Insolation):
     Additional to the parent class :class:`~climlab.radiation.insolation._Insolation`
     following object attributes are generated and updated during initialization:
         
-    :ivar Field insolation: the solar distribution is calculated as a Field on 
+    :ivar insolation:       the solar distribution is calculated as a Field on 
                             the basis of the ``self.domains['default']`` domain
                             and stored in the attribute ``self.insolation``.
+    :vartype insolation:    Field
                             
     :ivar dict orb:         initialized with given argument ``orb``
     
+    :Example:
+
+        Create regular EBM and replace standard insolation subprocess by 
+        :class:`~climlab.radation.AnnualMeanInsolation`::
+        
+            >>> import climlab
+            >>> from climlab.radiation import AnnualMeanInsolation
+            
+            >>> # model creation
+            >>> model = climlab.EBM()
+            
+            >>> print model
+            
+        .. code-block:: none
+            :emphasize-lines: 12
+    
+            climlab Process of type <class 'climlab.model.ebm.EBM'>. 
+            State variables and domain shapes: 
+              Ts: (90, 1) 
+            The subprocess tree: 
+            top: <class 'climlab.model.ebm.EBM'>
+               diffusion: <class 'climlab.dynamics.diffusion.MeridionalDiffusion'>
+               LW: <class 'climlab.radiation.AplusBT.AplusBT'>
+               albedo: <class 'climlab.surface.albedo.StepFunctionAlbedo'>
+                  iceline: <class 'climlab.surface.albedo.Iceline'>
+                  cold_albedo: <class 'climlab.surface.albedo.ConstantAlbedo'>
+                  warm_albedo: <class 'climlab.surface.albedo.P2Albedo'>
+               insolation: <class 'climlab.radiation.insolation.P2Insolation'>
+
+        ::
+        
+            >>> # catch model domain for subprocess creation
+            >>> sfc = model.domains['Ts']
+            
+            >>> # create AnnualMeanInsolation subprocess 
+            >>> new_insol = AnnualMeanInsolation(domains=sfc, **model.param)
+            
+            >>> # add it to the model
+            >>> model.add_subprocess('insolation',new_insol)
+            
+            >>> print model
+        
+        .. code-block:: none
+            :emphasize-lines: 12
+            
+            climlab Process of type <class 'climlab.model.ebm.EBM'>. 
+            State variables and domain shapes: 
+              Ts: (90, 1) 
+            The subprocess tree: 
+            top: <class 'climlab.model.ebm.EBM'>
+               diffusion: <class 'climlab.dynamics.diffusion.MeridionalDiffusion'>
+               LW: <class 'climlab.radiation.AplusBT.AplusBT'>
+               albedo: <class 'climlab.surface.albedo.StepFunctionAlbedo'>
+                  iceline: <class 'climlab.surface.albedo.Iceline'>
+                  cold_albedo: <class 'climlab.surface.albedo.ConstantAlbedo'>
+                  warm_albedo: <class 'climlab.surface.albedo.P2Albedo'>
+               insolation: <class 'climlab.radiation.insolation.AnnualMeanInsolation'>
+                  
     """           
     def __init__(self, S0=const.S0, orb=const.orb_present, **kwargs):
         super(AnnualMeanInsolation, self).__init__(S0=S0, **kwargs)
@@ -346,6 +432,62 @@ class DailyInsolation(AnnualMeanInsolation):
                             and stored in the attribute ``self.insolation``.
                             
     :ivar dict orb:         initialized with given argument ``orb``
+    
+    
+    :Example:
+
+        Create regular EBM and replace standard insolation subprocess by 
+        :class:`~climlab.radation.DailyInsolation`::
+        
+            >>> import climlab
+            >>> from climlab.radiation import DailyInsolation
+            
+            >>> # model creation
+            >>> model = climlab.EBM()
+            
+            >>> print model
+            
+        .. code-block:: none
+            :emphasize-lines: 12
+    
+            climlab Process of type <class 'climlab.model.ebm.EBM'>. 
+            State variables and domain shapes: 
+              Ts: (90, 1) 
+            The subprocess tree: 
+            top: <class 'climlab.model.ebm.EBM'>
+               diffusion: <class 'climlab.dynamics.diffusion.MeridionalDiffusion'>
+               LW: <class 'climlab.radiation.AplusBT.AplusBT'>
+               albedo: <class 'climlab.surface.albedo.StepFunctionAlbedo'>
+                  iceline: <class 'climlab.surface.albedo.Iceline'>
+                  cold_albedo: <class 'climlab.surface.albedo.ConstantAlbedo'>
+                  warm_albedo: <class 'climlab.surface.albedo.P2Albedo'>
+               insolation: <class 'climlab.radiation.insolation.P2Insolation'>
+
+        ::
+        
+            >>> # catch model domain for subprocess creation
+            >>> sfc = model.domains['Ts']
+            
+            >>> # create DailyInsolation subprocess and add it to the model
+            >>> model.add_subprocess('insolation',DailyInsolation(domains=sfc, **model.param))
+            
+            >>> print model
+        
+        .. code-block:: none
+            :emphasize-lines: 12
+            
+            climlab Process of type <class 'climlab.model.ebm.EBM'>. 
+            State variables and domain shapes: 
+              Ts: (90, 1) 
+            The subprocess tree: 
+            top: <class 'climlab.model.ebm.EBM'>
+               diffusion: <class 'climlab.dynamics.diffusion.MeridionalDiffusion'>
+               LW: <class 'climlab.radiation.AplusBT.AplusBT'>
+               albedo: <class 'climlab.surface.albedo.StepFunctionAlbedo'>
+                  iceline: <class 'climlab.surface.albedo.Iceline'>
+                  cold_albedo: <class 'climlab.surface.albedo.ConstantAlbedo'>
+                  warm_albedo: <class 'climlab.surface.albedo.P2Albedo'>
+               insolation: <class 'climlab.radiation.insolation.DailyInsolation'>
     
     """          
     

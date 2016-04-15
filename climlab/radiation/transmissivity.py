@@ -7,7 +7,7 @@ Testing multi-dimensional column radiation
 
 :Example:
 
-    .. code::
+    .. code-block:: python
     
         import numpy as np
         import climlab

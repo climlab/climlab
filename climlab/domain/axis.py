@@ -62,20 +62,30 @@ class Axis(object):
 
     **Axis Types** \n
     
-    Inputs for the ``axis_type`` like ``'p'``, ``'press'``, ``'pressure'``, 
-    ``'P'``, ``'Pressure'`` and ``'Press'`` are refered to as ``'lev'``.
+    A couple of differing axis type strings are rendered to valid axis types.
+    Alternate forms are listed here:
     
-    ``'Latitude'`` and ``'latitude'`` are refered to as ``'lat'``.
+    * ``'lev'``
+        * ``'p'``
+        * ``'press'``
+        * ``'pressure'``
+        * ``'P'``
+        * ``'Pressure'``
+        * ``'Press'``
+    * ``'lat'``
+        * ``'Latitude'``
+        * ``'latitude'``
+    * ``'lon'``
+        * ``'Longitude'``
+        * ``'longitude'``
+    * ``'depth'``
+        * ``'Depth'``
+        * ``'waterDepth'``
+        * ``'water_depth'``
+        * ``'slab'``    
 
-    ``'Longitude'`` and ``'longitude'`` are refered to as ``'lon'``.
-        
-    And ``'depth'``, ``'Depth'``, ``'waterDepth'``, ``'water_depth'`` and
-    ``'slab'`` are refered to as ``'depth'``.
     
-    
-    The **default units** are:
-
-    .. code::
+    The **default units** are::
         
         defaultUnits = {'lev': 'mb',
                         'lat': 'degrees',
@@ -83,17 +93,42 @@ class Axis(object):
                         'depth': 'meters',
                         'abstract': 'none'}
     
-    If bounds are not given during initialization, **default end points** are used:
-    
-    .. code::
-        
+    If bounds are not given during initialization, **default end points** 
+    are used::
+
         defaultEndPoints = {'lev': (0., climlab.constants.ps),
                             'lat': (-90., 90.),
                             'lon': (0., 360.),
                             'depth': (0., 10.),
                             'abstract': (0, num_points)}
-    
+                                          
+    :Example: 
         
+        Creation of a standalone Axis::
+            
+            >>> import climlab
+            >>> ax = climlab.domain.Axis(axis_type='Latitude', num_points=36)
+            
+            >>> print ax
+            Axis of type lat with 36 points.
+
+            >>> ax.points
+            array([-87.5, -82.5, -77.5, -72.5, -67.5, -62.5, -57.5, -52.5, -47.5,
+                   -42.5, -37.5, -32.5, -27.5, -22.5, -17.5, -12.5,  -7.5,  -2.5,
+                     2.5,   7.5,  12.5,  17.5,  22.5,  27.5,  32.5,  37.5,  42.5,
+                    47.5,  52.5,  57.5,  62.5,  67.5,  72.5,  77.5,  82.5,  87.5])
+
+            >>> ax.bounds
+            array([-90., -85., -80., -75., -70., -65., -60., -55., -50., -45., -40.,
+                   -35., -30., -25., -20., -15., -10.,  -5.,   0.,   5.,  10.,  15.,
+                    20.,  25.,  30.,  35.,  40.,  45.,  50.,  55.,  60.,  65.,  70.,
+                    75.,  80.,  85.,  90.])
+
+            >>> ax.delta
+            array([ 5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,
+                    5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,
+                    5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.])   
+                
     """
     def __str__(self):
         return ("Axis of type " + self.axis_type + " with " +

@@ -16,7 +16,7 @@ If using calendar days, solar longitude is found using an
 approximate solution to the differential equation representing conservation
 of angular momentum (Kepler's Second Law).  Given the orbital parameters
 and solar longitude, daily average insolation is calculated exactly
-following [Berger1978]_. Further references: [Berger1991]_.
+following :cite:`Berger_1978`. Further references: :cite:`Berger_1991`.
 
 """
 
@@ -86,18 +86,26 @@ def daily_insolation(lat, day, orb=const.orb_present, S0=None, day_type=1):
 
     :Example: 
         to compute the timeseries of insolation at 65N at summer
-        solstice over the past 5 Myears
-        
-        .. code::
+        solstice over the past 5 Myears::
         
             from climlab.solar.orbital import OrbitalTable
             from climlab.solar.insolation import daily_insolation
             
+            # import orbital table
             table = OrbitalTable()
+            
+            # array with specified kyears 
             years = np.linspace(-5000, 0, 5001)
+
+            # orbital parameters for specified time
             orb = table.lookup_parameters( years )
+
+            # insolation values for past 5 Myears at 65N at summer solstice
             S65 = daily_insolation( 65, 172, orb )
             
+        For more information about computation of solar insolation see the
+        :ref:`Tutorial` chapter.
+        
      """
 
     # If input argument S0 is not given, use the standard Earth value
@@ -153,12 +161,12 @@ def daily_insolation(lat, day, orb=const.orb_present, S0=None, day_type=1):
 def solar_longitude( day, orb=const.orb_present, days_per_year = None ):
     """Estimates solar longitude from calendar day.
     
-    Method is using an approximation from [Berger1978]_ section 3
+    Method is using an approximation from :cite:`Berger_1978` section 3
     (lambda = 0 at spring equinox).
 
     **Function-call arguments** \n        
         
-    :param aray day:            Indicator of time of year.
+    :param array day:           Indicator of time of year.
     :param dict orb:            a dictionary with three members (as provided by 
                                 :class:`~climlab.solar.orbital.OrbitalTable`)
                                 
@@ -167,7 +175,8 @@ def solar_longitude( day, orb=const.orb_present, days_per_year = None ):
                                     * unit: dimensionless
                                     * default value: ``0.017236``
                                     
-                                * ``'long_peri'`` - longitude of perihelion (precession angle) 
+                                * ``'long_peri'`` - longitude of perihelion 
+                                  (precession angle) 
                                 
                                     * unit: degrees
                                     * default value: ``281.37``
@@ -176,14 +185,12 @@ def solar_longitude( day, orb=const.orb_present, days_per_year = None ):
                                 
                                     * unit: degrees
                                     * default value: ``23.446``
-    :param float days_per_year: number of days in a year (default: 365.2422).
-    
+    :param float days_per_year: number of days in a year (optional) 
+                                (default: 365.2422)
                                 Reads the length of the year from 
                                 :mod:`~climlab.utils.constants` if available.
-    
     :returns:                   solar longitude ``lambda_long``
-    
-                                Dimensions of output are ``( day.size, ecc.size )``                 
+                                in dimension``( day.size, ecc.size )``                 
     :rtype:                     array
     
     Works for both scalar and vector orbital parameters.  

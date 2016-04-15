@@ -62,22 +62,9 @@ class Diffusion(ImplicitProcess):
         Here is an example showing implementation of a vertical diffusion.
         It shows that a subprocess can work on just a subset of the parent process
         state variables.
-    
-        .. code::
-            
-            import climlab
-            from climlab.dynamics.diffusion import Diffusion
-            
-            c = climlab.GreyRadiationModel()
-            K = 0.5
-            d = Diffusion(K=K, state = {'Tatm':c.state['Tatm']}, **c.param)
-            c.add_subprocess('diffusion',d)
-            
-            print c.state
-            print d.state
-            c.step_forward()
-            print c.state
-            print d.state
+               
+            .. plot:: code_input_manual/example_diffusion.py
+               :include-source:
     
     """
     def __init__(self,
@@ -223,7 +210,7 @@ class MeridionalDiffusion(Diffusion):
         Meridional Diffusion of temperature
         as a stand-alone process:
     
-        .. plot:: pyplots/meridional_diffusion_example.py
+        .. plot:: code_input_manual/example_meridional_diffusion.py
            :include-source:
        
     """
@@ -275,12 +262,12 @@ def _make_diffusion_matrix(K, weight1=None, weight2=None):
          
         \\textrm{diffTriDiag}= 
         \\left[ \\begin{array}{cccccc}
-        1+\\frac{w_{1,1} K_1 }{w_{2,0}} & -\\frac{w_{1,1} K_1}{w_{2,0}} & 0 &  & ... & 0  \\\\
-        -\\frac{w_{1,1} K_1}{w_{2,1}} & 1+\\frac{w_{1,1} K_1 + w_{1,2} K_2}{w_{2,1}} & -\\frac{w_{1,2} K_2}{w_{2,1}} & 0 & ... & 0 \\\\
-        0 & -\\frac{w_{1,2} K_2}{w_{2,2}}  & 1+\\frac{w_{1,2} K_2 + w_{1,3} K_3}{w_{2,2}} & -\\frac{w_{1,3} K_3}{w_{2,2}} &... & 0  \\\\
+        1+\\frac{s_1 }{w_{2,0}} & -\\frac{s_1}{w_{2,0}} & 0 &  & ... & 0  \\\\
+        -\\frac{s_1}{w_{2,1}} & 1+\\frac{s_1 + s_2}{w_{2,1}} & -\\frac{s_2}{w_{2,1}} & 0 & ... & 0 \\\\
+        0 & -\\frac{s_2}{w_{2,2}}  & 1+\\frac{s_2 + s_3}{w_{2,2}} & -\\frac{s_3}{w_{2,2}} &... & 0  \\\\
           &  & \\ddots & \\ddots & \\ddots & \\\\
-        0 & 0 & ... & -\\frac{w_{1,n-2} K_{n-2}}{w_{2,n-2}}  & 1+\\frac{w_{1,n-2} K_{n-2} + w_{1,n-1} K_{n-1}}{w_{2,{n-2}}} & -\\frac{w_{1,n-1} K_{n-1}}{w_{2,{n-2}}} \\\\
-        0 & 0 & ... & 0 & -\\frac{w_{1,n-1} K_{n-1}}{w_{2,n-1}}  & 1+\\frac{w_{1,n-1} K_{n-1}}{w_{2,n-1}} \\\\
+        0 & 0 & ... & -\\frac{s_{n-2}}{w_{2,n-2}}  & 1+\\frac{s_{n-2} + s_{n-1}}{w_{2,{n-2}}} & -\\frac{s_{n-1}}{w_{2,{n-2}}} \\\\
+        0 & 0 & ... & 0 & -\\frac{s_{n-1}}{w_{2,n-1}}  & 1+\\frac{s_{n-1}}{w_{2,n-1}} \\\\
         \\end{array} \\right] 
 
     where 
@@ -292,6 +279,13 @@ def _make_diffusion_matrix(K, weight1=None, weight2=None):
                 w_1 &= [w_{1,0}, &w_{1,1},&w_{1,2},&...,&w_{1,n-1},&w_{1,n}] \\\\
                 w_2 &= [w_{2,0}, &w_{2,1},&w_{2,2},&...,&w_{2,n-1}]
            \\end{array}    
+
+    and following subsitute:
+    
+    .. math:: 
+    
+        s_i = w_{1,i} K_i        
+        
     """
     
 #           \\begin{eqnarray}
@@ -362,13 +356,19 @@ def _make_meridional_diffusion_matrix(K, lataxis):
         
         \\textrm{diffTriDiag}= 
         \\left[ \\begin{array}{cccccc}
-        1+\\frac{\\cos(b_1) K_1 }{\\cos(p_0)} & -\\frac{\\cos(b_1) K_1}{\\cos(p_0)} & 0 &  & ... & 0  \\\\
-        -\\frac{\\cos(b_1) K_1}{\\cos(p_1)} & 1+\\frac{\\cos(b_1) K_1 + \\cos(b_2) K_2}{\\cos(p_1)} & -\\frac{\\cos(b_2) K_2}{\\cos(b_1)} & 0 & ... & 0 \\\\
-        0 & -\\frac{\\cos(b_2) K_2}{\\cos(p_2)}  & 1+\\frac{\\cos(b_2) K_2 + \\cos(b_3) K_3}{\\cos(p_2)} & -\\frac{\\cos(b_3) K_3}{\\cos(p_2)} &... & 0  \\\\
+        1+\\frac{u_1 }{\\cos(p_0)} & -\\frac{u_1}{\\cos(p_0)} & 0 &  & ... & 0  \\\\
+        -\\frac{u_1}{\\cos(p_1)} & 1+\\frac{u_1 + u_2}{\\cos(p_1)} & -\\frac{u_2}{\\cos(b_1)} & 0 & ... & 0 \\\\
+        0 & -\\frac{u_2}{\\cos(p_2)}  & 1+\\frac{u_2 + u_3}{\\cos(p_2)} & -\\frac{u_3}{\\cos(p_2)} &... & 0  \\\\
           &  & \\ddots & \\ddots & \\ddots & \\\\
-        0 & 0 & ... & -\\frac{\\cos(b_{n-2}) K_{n-2}}{\\cos(p_{n-2})}  & 1+\\frac{\\cos(b_{n-2}) K_{n-2} + \\cos(b_{n-1}) K_{n-1}}{\\cos(p_{n-2})} & -\\frac{\\cos(b_{n-1}) K_{n-1}}{\\cos(p_{n-2})} \\\\
-        0 & 0 & ... & 0 & -\\frac{\\cos(b_{n-1}) K_{n-1}}{\\cos(p_{n-1})}  & 1+\\frac{\\cos(b_{n-1}) K_{n-1}}{\\cos(p_{n-1})} \\\\
+        0 & 0 & ... & -\\frac{u_{n-2}}{\\cos(p_{n-2})}  & 1+\\frac{u_{n-2} + u_{n-1}}{\\cos(p_{n-2})} & -\\frac{u_{n-1}}{\\cos(p_{n-2})} \\\\
+        0 & 0 & ... & 0 & -\\frac{u_{n-1}}{\\cos(p_{n-1})}  & 1+\\frac{u_{n-1}}{\\cos(p_{n-1})} \\\\
         \\end{array} \\right] 
+
+    with the substitue of:
+    
+    .. math::
+        
+        u_i = \\cos(b_i) K_i      
 
     """       
     phi_stag = np.deg2rad(lataxis.bounds)

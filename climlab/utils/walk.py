@@ -17,7 +17,8 @@ def walk_processes(top, topname='top', topdown=True, ignoreFlag=False):
 
     
     
-    :param process top:     top process from where walking should start
+    :param top:             top process from where walking should start
+    :type top:              :class:`~climlab.process.process.Process`
     :param str topname:     name of top process
     :param bool topdown:    whether geneterate *process_types* in regular or 
                             in reverse order.
@@ -28,15 +29,25 @@ def walk_processes(top, topname='top', topdown=True, ignoreFlag=False):
     
     :Example:
     
-        .. code::
+        ::
             
-            import climlab
+            >>> import climlab
+            >>> from climlab.utils import walk
             
-            model = climlab.EBM()
-            processes = []
-            for name, proc, top_proc in walk_processes(model):
-                processes.append(proc)
-    
+            >>> model = climlab.EBM()
+                        
+            >>> for name, proc, top_proc in walk.walk_processes(model):
+            ...     print name
+            ... 
+            top
+            diffusion
+            LW
+            iceline
+            cold_albedo
+            warm_albedo
+            albedo
+            insolation
+                
     """
     if not ignoreFlag:
         flag = topdown
@@ -63,23 +74,32 @@ def process_tree(top, name='top'):
 
     This method uses the :func:`walk_processes` method to create the process tree.
     
-    :param process top:     top process for which process tree string should be 
+    :param  top:            top process for which process tree string should be 
                             created
+    :type top:              :class:`~climlab.process.process.Process`                            
     :param str name:        name of top process
     :returns:               string representation of the process tree
     :rtype:                 str
     
     :Example:
     
-        .. code::
+        ::
             
-            import climlab
-            from climlab.utils.walk import process_tree            
-            
-            model = climlab.EBM()
-            proc_tree = process_tree(model, name='model')
-            
-            print proc_tree
+            >>> import climlab
+            >>> from climlab.utils import walk
+    
+            >>> model = climlab.EBM()
+            >>> proc_tree_str = walk.process_tree(model, name='model')
+
+            >>> print proc_tree_str
+            model: <class 'climlab.model.ebm.EBM'>
+               diffusion: <class 'climlab.dynamics.diffusion.MeridionalDiffusion'>
+               LW: <class 'climlab.radiation.AplusBT.AplusBT'>
+               albedo: <class 'climlab.surface.albedo.StepFunctionAlbedo'>
+                  iceline: <class 'climlab.surface.albedo.Iceline'>
+                  cold_albedo: <class 'climlab.surface.albedo.ConstantAlbedo'>
+                  warm_albedo: <class 'climlab.surface.albedo.P2Albedo'>
+               insolation: <class 'climlab.radiation.insolation.P2Insolation'>
                 
     """
     str1 = ''

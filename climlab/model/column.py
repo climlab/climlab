@@ -10,7 +10,7 @@ Here is an example to implement seasonal insolation at 45 degrees North
 
     :Example:
 
-        .. code::
+        .. code-block:: python
         
             import climlab
             

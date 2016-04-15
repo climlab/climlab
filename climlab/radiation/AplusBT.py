@@ -49,30 +49,39 @@ class AplusBT(EnergyBudget):
     
         This module currently works only for a single state variable!
         
-    :Example: Simple linear radiation module (stand alone):
+    :Example: 
+    
+        Simple linear radiation module (stand alone)::
 
-        .. code::
-        
-            import climlab
-            sfc, atm = climlab.domain.single_column()  # creates a column atmosphere and scalar surface
+            >>> import climlab
             
-            # Create a state variable
-            Ts = climlab.Field(15., domain=sfc)
-            # Make a dictionary of state variables
-            s = {'Ts': Ts}
-            olr = climlab.radiation.AplusBT(state=s)
-            print olr
+            >>> # create a column atmosphere and scalar surface
+            >>> sfc, atm = climlab.domain.single_column()  
             
-            # OR, we can pass a single state variable
-            olr = climlab.radiation.AplusBT(state=Ts)
-            print olr
+            >>> # Create a state variable
+            >>> Ts = climlab.Field(15., domain=sfc)
             
-            # to compute tendencies and diagnostics
-            olr.compute()
+            >>> # Make a dictionary of state variables
+            >>> s = {'Ts': Ts}
             
-            #  or to actually update the temperature
-            olr.step_forward()
-            print olr.state
+            >>> # create process
+            >>> olr = climlab.radiation.AplusBT(state=s)
+            
+            >>> print olr
+            climlab Process of type <class 'climlab.radiation.AplusBT.AplusBT'>. 
+            State variables and domain shapes: 
+              Ts: (1,) 
+            The subprocess tree: 
+            top: <class 'climlab.radiation.AplusBT.AplusBT'>
+            
+            >>> # to compute tendencies and diagnostics
+            >>> olr.compute()
+            
+            >>> #  or to actually update the temperature
+            >>> olr.step_forward()
+            
+            >>> print olr.state
+            {'Ts': Field([ 5.69123176])}
         
     """
     def __init__(self, A=200., B=2., **kwargs):
@@ -91,6 +100,26 @@ class AplusBT(EnergyBudget):
                       to the new value
                     * updates the parameter dictionary ``self.param['A']``
         :type:      float
+        
+        :Example:
+
+            ::
+            
+                >>> import climlab
+                >>> model = climlab.EBM()
+                
+                >>> # getter
+                >>> model.subprocess['LW'].A
+                210.0
+                >>> # setter
+                >>> model.subprocess['LW'].A = 220
+                >>> # getter again                
+                >>> model.subprocess['LW'].A
+                220
+
+                >>> # subprocess parameter dictionary
+                >>> model.subprocess['LW'].param['A']
+                220
         
         """
         return self._A
@@ -146,7 +175,7 @@ class AplusBT_CO2(EnergyBudget):
     where :math:`c=\\log \\frac{p}{300}` and :math:`p` represents 
     the concentration of :math:`CO_2` in the atmosphere.
     
-    For further reading see [CaldeiraKasting1992]_.
+    For further reading see :cite:`Caldeira_1992`.
     
     
     **Initialization parameters** \n
@@ -171,7 +200,61 @@ class AplusBT_CO2(EnergyBudget):
                                     through calling 
                                     ``self.init_diagnostic('OLR', 0. * self.Ts)``
     :ivar Field OLR:                the subprocess attribute ``self.OLR`` is
-                                    created with correct dimensions
+                                    created with correct dimensions 
+    
+    :Example:
+    
+        Replacing an the regular AplusBT subprocess in an energy balance model::
+        
+            >>> import climlab
+            >>> from climlab.radiation.AplusBT import AplusBT_CO2
+        
+            >>> # creating EBM model
+            >>> model = climlab.EBM()
+                        
+            >>> print model
+            
+        .. code-block:: none
+            :emphasize-lines: 7
+            
+            climlab Process of type <class 'climlab.model.ebm.EBM'>. 
+            State variables and domain shapes: 
+              Ts: (90, 1) 
+            The subprocess tree: 
+            top: <class 'climlab.model.ebm.EBM'>
+               diffusion: <class 'climlab.dynamics.diffusion.MeridionalDiffusion'>
+               LW: <class 'climlab.radiation.AplusBT.AplusBT'>
+               albedo: <class 'climlab.surface.albedo.StepFunctionAlbedo'>
+                  iceline: <class 'climlab.surface.albedo.Iceline'>
+                  cold_albedo: <class 'climlab.surface.albedo.ConstantAlbedo'>
+                  warm_albedo: <class 'climlab.surface.albedo.P2Albedo'>
+               insolation: <class 'climlab.radiation.insolation.P2Insolation'>
+        
+        ::
+        
+            >>> #  creating and adding albedo feedback subprocess
+            >>> LW_CO2 = AplusBT_CO2(CO2=400, state=model.state, **model.param)
+ 
+            >>> # overwriting old 'LW' subprocess with same name  
+            >>> model.add_subprocess('LW', LW_CO2)
+ 
+            >>> print model
+            
+        .. code-block:: none
+            :emphasize-lines: 7
+            
+            climlab Process of type <class 'climlab.model.ebm.EBM'>. 
+            State variables and domain shapes: 
+              Ts: (90, 1) 
+            The subprocess tree: 
+            top: <class 'climlab.model.ebm.EBM'>
+               diffusion: <class 'climlab.dynamics.diffusion.MeridionalDiffusion'>
+               LW: <class 'climlab.radiation.AplusBT.AplusBT_CO2'>
+               albedo: <class 'climlab.surface.albedo.StepFunctionAlbedo'>
+                  iceline: <class 'climlab.surface.albedo.Iceline'>
+                  cold_albedo: <class 'climlab.surface.albedo.ConstantAlbedo'>
+                  warm_albedo: <class 'climlab.surface.albedo.P2Albedo'>
+               insolation: <class 'climlab.radiation.insolation.P2Insolation'>
     
     """
     # implemented by m-kreuzer

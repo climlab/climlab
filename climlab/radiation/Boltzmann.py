@@ -67,6 +67,60 @@ class Boltzmann(EnergyBudget):
     :ivar Field OLR:            the subprocess attribute ``self.OLR`` is
                                 created with correct dimensions
     
+    :Example:
+    
+        Replacing an the regular AplusBT subprocess in an energy balance model::
+        
+            >>> import climlab
+            >>> from climlab.radiation.Boltzmann import Boltzmann
+        
+            >>> # creating EBM model
+            >>> model = climlab.EBM()
+                        
+            >>> print model
+            
+        .. code-block:: none
+            :emphasize-lines: 7
+            
+            climlab Process of type <class 'climlab.model.ebm.EBM'>. 
+            State variables and domain shapes: 
+              Ts: (90, 1) 
+            The subprocess tree: 
+            top: <class 'climlab.model.ebm.EBM'>
+               diffusion: <class 'climlab.dynamics.diffusion.MeridionalDiffusion'>
+               LW: <class 'climlab.radiation.AplusBT.AplusBT'>
+               albedo: <class 'climlab.surface.albedo.StepFunctionAlbedo'>
+                  iceline: <class 'climlab.surface.albedo.Iceline'>
+                  cold_albedo: <class 'climlab.surface.albedo.ConstantAlbedo'>
+                  warm_albedo: <class 'climlab.surface.albedo.P2Albedo'>
+               insolation: <class 'climlab.radiation.insolation.P2Insolation'>
+        
+        ::
+        
+            >>> #  creating and adding albedo feedback subprocess
+            >>> LW_boltz = Boltzmann(eps=0.69, tau=0.98, state=model.state, **model.param)
+            
+            >>> # overwriting old 'LW' subprocess with same name            
+            >>> model.add_subprocess('LW', LW_boltz)
+
+            >>> print model
+            
+        .. code-block:: none
+            :emphasize-lines: 7
+            
+            climlab Process of type <class 'climlab.model.ebm.EBM'>. 
+            State variables and domain shapes: 
+              Ts: (90, 1) 
+            The subprocess tree: 
+            top: <class 'climlab.model.ebm.EBM'>
+               diffusion: <class 'climlab.dynamics.diffusion.MeridionalDiffusion'>
+               LW: <class 'climlab.radiation.Boltzmann.Boltzmann'>
+               albedo: <class 'climlab.surface.albedo.StepFunctionAlbedo'>
+                  iceline: <class 'climlab.surface.albedo.Iceline'>
+                  cold_albedo: <class 'climlab.surface.albedo.ConstantAlbedo'>
+                  warm_albedo: <class 'climlab.surface.albedo.P2Albedo'>
+               insolation: <class 'climlab.radiation.insolation.P2Insolation'>
+        
     """
     # implemented by m-kreuzer
     def __init__(self, eps= 0.65, tau=0.95, **kwargs):
