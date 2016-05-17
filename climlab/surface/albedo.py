@@ -9,9 +9,7 @@ class ConstantAlbedo(DiagnosticProcess):
     
     **Initialization parameters** \n
 
-    :param float albedo:    albedo values                                   \n
-                            - unit: dimensionless                           \n
-                            - default value: ``0.33``
+    :param float albedo:    albedo values [default: 0.33]
                             
     **Object attributes** \n
     
@@ -80,13 +78,9 @@ class P2Albedo(DiagnosticProcess):
     
     **Initialization parameters** \n
 
-    :param float a0:    basic parameter for albedo function             \n
-                        - unit: dimensionless                           \n
-                        - default value: ``0.33``
-    :param float a2:    factor for second legendre polynominal term in albedo function
-                                                                        \n
-                        - unit: dimensionless                           \n
-                        - default value: ``0.25``
+    :param float a0:    basic parameter for albedo function [default: 0.33]
+    :param float a2:    factor for second legendre polynominal term in albedo 
+                        function [default: 0.25]
                             
     **Object attributes** \n
     
@@ -297,16 +291,11 @@ class StepFunctionAlbedo(DiagnosticProcess):
     :param float Tf:    freezing temperature for Iceline subprocess     \n
                         - unit: :math:`^{\circ} \\textrm{C}`            \n
                         - default value: ``-10``    
-    :param float a0:    basic parameter for P2Albedo subprocess         \n
-                        - unit: dimensionless                           \n
-                        - default value: ``0.3``
-    :param float a2:    factor for second legendre polynominal term in P2Albedo subprocess 
-                                                                        \n
-                        - unit: dimensionless                           \n
-                        - default value: ``0.078``
-    :param float ai:    ice albedo value for ConstantAlbedo subprocess  \n
-                        - unit: dimensionless                           \n
-                        - default value: ``0.62``
+    :param float a0:    basic parameter for P2Albedo subprocess [default: 0.3]
+    :param float a2:    factor for second legendre polynominal term in P2Albedo
+                        subprocess [default: 0.078]
+    :param float ai:    ice albedo value for ConstantAlbedo subprocess
+                        [default: 0.62]
                                                         
     Additional to the parent class 
     :class:`~climlab.process.diagnostic.DiagnosticProcess`

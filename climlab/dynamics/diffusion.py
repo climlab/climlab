@@ -25,6 +25,7 @@ class Diffusion(ImplicitProcess):
     :param bool use_banded_solver:  input flag, whether to use 
                                     :py:func:`scipy.linalg.solve_banded`
                                     instead of :py:func:`numpy.linalg.solve`
+                                    [default: False]
                                     
     .. note::
     

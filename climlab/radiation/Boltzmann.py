@@ -43,16 +43,11 @@ class Boltzmann(EnergyBudget):
     
     :param float eps:   emissivity of the planet's surface which is the
                         effectiveness in emitting energy as thermal radiation
-                                                                        \n
-                        - unit: dimensionless                           \n
-                        - default value: ``0.65``
+                        [default: 0.65]
     :param float tau:   transmissivity of the planet's atmosphere which is the 
                         effectiveness in transmitting the longwave radiation
-                        emitted from the surface
-                                                                        \n
-                        - unit: dimensionless                           \n
-                        - default value: ``0.95``
-    
+                        emitted from the surface [default: 0.95]
+            
     **Object attributes** \n
     
     During initialization both arguments described above are created as object 

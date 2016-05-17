@@ -101,11 +101,11 @@ class Process(object):
     :param subprocess:  subprocess(es) of the process
     :type subprocess:   :class:`~climlab.process.process.Process` or dict of 
                         :class:`~climlab.process.process.Process`
-    :param array lat:   latitudinal points [optional]
-    :param lev:         altitudinal points [optional]
-    :param int num_lat: number of latitudional points [optional]    
+    :param array lat:   latitudinal points (optional)
+    :param lev:         altitudinal points (optional)
+    :param int num_lat: number of latitudional points (optional) 
     :param int num_levels:
-                        number of altitudinal points [optional]
+                        number of altitudinal points (optional)
     :param dict input:  collection of input quantities
     
     **Object attributes** \n
@@ -405,7 +405,7 @@ class Process(object):
         
         :param str name:        name of diagnostic quantity to be initialized
         :param array value:     initial value for quantity - accepts also type
-                                float, int, etc. (*default*:``0.``)
+                                float, int, etc. [default: 0.]
         
         :Example:
         

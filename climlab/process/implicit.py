@@ -24,7 +24,7 @@ class ImplicitProcess(TimeDependentProcess):
         
         To calculate the new state the :func:`_implicit_solver()` method is 
         called for daughter classes. This however returns the new state of the 
-        variables, not just the tendencies. Therefore the adjustment is 
+        variables, not just the tendencies. Therefore, the adjustment is 
         calculated which is the difference between the new and the old state 
         and stored in the object's attribute adjustment.
         

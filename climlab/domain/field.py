@@ -10,7 +10,7 @@ import numpy as np
 
 
 class Field(np.ndarray):
-    """Custom class for climlab gridded quantities, called Field
+    """Custom class for climlab gridded quantities, called Field.
     
     This class behaves exactly like :py:class:`numpy.ndarray`
     but every object has an attribute called ``self.domain``

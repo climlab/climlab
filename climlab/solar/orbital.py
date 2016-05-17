@@ -32,7 +32,7 @@ class OrbitalTable:
     Following object attributes are generated during initialization:
         
     :ivar array kyear:          time table with negative values are before present 
-                                (*unit:* kyears)                                
+                                (*unit:* kyears)                              
     :ivar array ecc:            eccentricity over time (*unit:* dimensionless)
     :ivar array long_peri:      longitude of perihelion (precession angle) (*unit:* degrees)
     :ivar array obliquity:      obliquity angle (*unit:* degrees)
@@ -65,6 +65,7 @@ class OrbitalTable:
         
         :param array kyear:     Time for which oribtal parameters should be given.     
                                 Will handle scalar or vector input (for multiple years).
+                                [default: 0]
     
         :returns:               a three-member dictionary of orbital parameters: 
                                 

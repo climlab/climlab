@@ -17,11 +17,11 @@ class EBM(EnergyBudget):
 
     This class sets up a typical EnergyBalance Model with following subprocesses:
 
-    * Outgoing Longwave Radiation (OLR) parameterization through 
+    * Outgoing Longwave Radiation (OLR) parametrization through 
       :class:`~climlab.radiation.AplusBT.AplusBT`
-    * solar insolation paramterization through 
+    * solar insolation paramtrization through 
       :class:`~climlab.radiation.insolation.P2Insolation`
-    * albedo parameterization in dependence of temperature through
+    * albedo parametrization in dependence of temperature through
       :class:`~climlab.surface.albedo.StepFunctionAlbedo`
     * energy diffusion through 
       :class:`~climlab.dynamics.diffusion.MeridionalDiffusion`
@@ -39,11 +39,11 @@ class EBM(EnergyBudget):
     :param float S0:            solar constant                              \n
                                 - unit: :math:`\\frac{\\textrm{W}}{\\textrm{m}^2}`   \n
                                 - default value: ``1365.2``
-    :param float A:             parameter for linear OLR parameterization
+    :param float A:             parameter for linear OLR parametrization
                                 :class:`~climlab.radiation.AplusBT.AplusBT` \n
                                 - unit: :math:`\\frac{\\textrm{W}}{\\textrm{m}^2}`   \n
                                 - default value: ``210.0``
-    :param float B:             parameter for linear OLR parameterization
+    :param float B:             parameter for linear OLR parametrization
                                 :class:`~climlab.radiation.AplusBT.AplusBT` \n
                                 - unit: :math:`\\frac{\\textrm{W}}{\\textrm{m}^2 \\ ^{\circ} \\textrm{C}}`   \n
                                 - default value: ``2.0``
@@ -60,12 +60,12 @@ class EBM(EnergyBudget):
     :param float Tf:            freezing temperature                        \n
                                 - unit: :math:`^{\circ} \\textrm{C}`                    \n
                                 - default value: ``-10.0``
-    :param float a0:            base value for planetary albedo parameterization
+    :param float a0:            base value for planetary albedo parametrization
                                 :class:`~climlab.surface.albedo.StepFunctionAlbedo`
                                                                             \n
                                 - unit: dimensionless
                                 - default value: ``0.3``
-    :param float a2:            parabolic value for planetary  albedo parameterization
+    :param float a2:            parabolic value for planetary  albedo parametrization
                                 :class:`~climlab.surface.albedo.StepFunctionAlbedo`
                                                                             \n
                                 - unit: dimensionless
@@ -254,7 +254,8 @@ class EBM(EnergyBudget):
 
     def heat_transport(self):
         """Returns instantaneous heat transport in unit :math:`\\textrm{PW}`
-        on the staggered grid (bounds) through callinaag :func:`diffusive_heat_transport`.
+        on the staggered grid (bounds) through calling
+        :func:`diffusive_heat_transport`.
 
         :Example: 
         
@@ -327,18 +328,15 @@ class EBM_seasonal(EBM):
         An instance of ``EBM_seasonal`` is initialized with the following 
         arguments:
         
-        :param float a0:            base value for planetary albedo parameterization
+        :param float a0:            base value for planetary albedo parametrization
                                     :class:`~climlab.surface.albedo.StepFunctionAlbedo`
-                                                                                \n
-                                    - default value: ``0.33``
-        :param float a2:            parabolic value for planetary  albedo parameterization
+                                    [default: 0.33]
+        :param float a2:            parabolic value for planetary  albedo parametrization
                                     :class:`~climlab.surface.albedo.StepFunctionAlbedo`
-                                                                                \n
-                                    - default value: ``0.25``
+                                    [default: 0.25]
         :param float ai:            value for ice albedo paramerization in
                                     :class:`~climlab.surface.albedo.StepFunctionAlbedo`
-                                                                                \n
-                                    - default value: ``None``
+                                    (optional)
         
         
         **Object attributes** \n

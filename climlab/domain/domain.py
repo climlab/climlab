@@ -195,6 +195,10 @@ class Atmosphere(_Domain):
         array of grid points of it's level axis
         ``self.axes['lev'].delta`` as input.
         
+        **Object attributes** \n
+        
+        During method execution following object attribute is modified:
+        
         :ivar array heat_capacity:  the ocean domain's heat capacity over 
                                     the ``'lev'`` Axis.
         
@@ -322,7 +326,7 @@ def make_slabatm_axis(num_points=1):
 class SlabOcean(Ocean):
     """A class to create a SlabOcean Domain by default.
     
-    Initializes the parent :class:`Ocean` class for with a simple axis for a
+    Initializes the parent :class:`Ocean` class with a simple axis for a
     Slab Ocean created by :func:`make_slabocean_axis` which has just 1 cell 
     in depth by default.
     
@@ -349,7 +353,7 @@ class SlabOcean(Ocean):
 class SlabAtmosphere(Atmosphere):
     """A class to create a SlabAtmosphere Domain by default.
     
-    Initializes the parent :class:`Atmosphere` class for with a simple axis for a
+    Initializes the parent :class:`Atmosphere` class with a simple axis for a
     Slab Atmopshere created by :func:`make_slabatm_axis` which has just 1 cell 
     in height by default.
     

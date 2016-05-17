@@ -22,11 +22,11 @@ class AplusBT(EnergyBudget):
     An instance of ``AplusBT`` is initialized with the following 
     arguments:
     
-    :param float A:             parameter for linear OLR parameterization   \n
+    :param float A:             parameter for linear OLR parametrization   \n
                                 - unit: :math:`\\frac{\\textrm{W}}
                                   {\\textrm{m}^2}`                          \n
                                 - default value: ``200.0``
-    :param float B:             parameter for linear OLR parameterization   \n
+    :param float B:             parameter for linear OLR parametrization   \n
                                 - unit: :math:`\\frac{\\textrm{W}}
                                   {\\textrm{m}^2 \\ ^{\circ} \\textrm{C}}`  \n
                                 - default value: ``2.0``

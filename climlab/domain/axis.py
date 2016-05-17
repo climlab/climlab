@@ -28,8 +28,10 @@ class Axis(object):
     An instance of ``Axis`` is initialized with the following 
     arguments *(for detailed information see Object attributes below)*:
     
-    :param str axis_type:   information about the type of axis
+    :param str axis_type:   information about the type of axis 
+                            [default: 'abstract']
     :param int num_points:  number of points on axis
+                            [default: 10]
     :param array points:    array with specific points (optional)
     :param array bounds:    array with specific bounds between points (optional)
     :raises: :exc:`ValueError`

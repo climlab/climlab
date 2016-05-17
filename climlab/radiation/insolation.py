@@ -236,7 +236,7 @@ class AnnualMeanInsolation(_Insolation):
     latitude specified in the domain on the basis of orbital parameters and 
     astronomical formulas.
     
-    Therefor it uses the method :func:`~climlab.solar.insolation.daily_insolation`.
+    Therefore it uses the method :func:`~climlab.solar.insolation.daily_insolation`.
     For details how the solar distribution is dependend on orbital parameters 
     see there.
     
@@ -395,7 +395,7 @@ class DailyInsolation(AnnualMeanInsolation):
     This class computes the solar insolation on basis of orbital parameters and 
     astronomical formulas.
     
-    Therefor it uses the method :func:`~climlab.solar.insolation.daily_insolation`.
+    Therefore it uses the method :func:`~climlab.solar.insolation.daily_insolation`.
     For details how the solar distribution is dependend on orbital parameters 
     see there.
         

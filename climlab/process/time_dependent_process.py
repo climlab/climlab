@@ -17,12 +17,11 @@ class TimeDependentProcess(Process):
     An instance of ``TimeDependentProcess`` is initialized with the following 
     arguments *(for detailed information see Object attributes below)*:
     
-    :param float timestep:  specifies the timestep of the object
-    :param str time_type:   how time-dependent-process should be computed. 
-                            Set to ``'explicit'`` by default.            
+    :param float timestep:  specifies the timestep of the object (optional)
+    :param str time_type:   how time-dependent-process should be computed 
+                            [default: 'explicit']            
     :param bool topdown:    whether geneterate *process_types* in regular or 
-                            in reverse order.
-                            Set to ``True`` by default.  
+                            in reverse order [default: True] 
     
     **Object attributes** \n
     
@@ -53,9 +52,9 @@ class TimeDependentProcess(Process):
         * ``'timestep'``: see initialization parameter
         * ``'num_steps_per_year'``: see :func:`set_timestep` and :func:`timestep` for details
         * ``'day_of_year_index'``: counter how many steps have been integrated in current year
-        * ``'steps'``: counter how many steps have been integrated in total,
-        * ``'days_elapsed'``: time counter for days,
-        * ``'years_elapsed'``: time counter for years,
+        * ``'steps'``: counter how many steps have been integrated in total
+        * ``'days_elapsed'``: time counter for days
+        * ``'years_elapsed'``: time counter for years
         * ``'days_of_year'``: array which holds the number of numerical steps per year, expressed in days
 
     """
@@ -104,8 +103,9 @@ class TimeDependentProcess(Process):
         
         :param float timestep:              the amount of time over which 
                                             :func:`step_forward` is integrating 
-                                            in unit seconds
-        :param float num_steps_per_year:    a number of steps per calendar year
+                                            in unit seconds [default: 24*60*60]
+        :param float num_steps_per_year:    a number of steps per calendar year 
+                                            (optional)
         
         If the parameter *num_steps_per_year* is specified and not ``None``, 
         the timestep is calculated accordingly and therefore the given input
@@ -316,9 +316,10 @@ class TimeDependentProcess(Process):
     def integrate_years(self, years=1.0, verbose=True):
         """Integrates the model by a given number of years.
         
-        :param float years:     integration time for the model in years        
+        :param float years:     integration time for the model in years     
+                                [default: 1.0]
         :param bool verbose:    information whether model time details 
-                                should be printed.
+                                should be printed [default: True]
         
         It calls :func:`step_forward` repetitively and calculates a time 
         averaged value over the integrated period for every model state and all
@@ -383,9 +384,10 @@ class TimeDependentProcess(Process):
         It convertes the given number of days into years and calls 
         :func:`integrate_years`.
         
-        :param float days:  integration time for the model in days        
+        :param float days:      integration time for the model in days      
+                                [default: 1.0]
         :param bool verbose:    information whether model time details 
-                                should be printed.
+                                should be printed [default: True]
         
         :Example:
         
@@ -411,11 +413,11 @@ class TimeDependentProcess(Process):
     def integrate_converge(self, crit=1e-4, verbose=True):
         """Integrates the model until model states are converging.
         
-        :param crit: exit criteria for difference of iterated solutions
-        :type crit: float
-        
+        :param crit:            exit criteria for difference of iterated
+                                solutions [default: 0.0001]
+        :type crit:             float
         :param bool verbose:    information whether total elapsed time 
-                                should be printed.
+                                should be printed [default: True]
         
         :Example:
         

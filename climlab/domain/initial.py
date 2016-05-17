@@ -26,8 +26,10 @@ def column_state(num_lev=30,
     :param int num_lat:         number of latitude points on the axis
                                 [default: 1]
     :param lev:                 specification for height axis (optional)
-    :type lev:                  :class:`~climlab.domain.axis.Axis` or pressure array
+    :type lev:                  :class:`~climlab.domain.axis.Axis` 
+                                or pressure array
     :param array lat:           size of array determines dimension of latitude
+                                (optional)
     :param float water_depth:   *irrelevant*
     
     :returns:                   dictionary with two temperature 
@@ -83,7 +85,6 @@ def surface_state(num_lat=90,
                   water_depth=10.,
                   T0=12.,
                   T2=-40.):
-<<<<<<< .working
     """Sets up a state variable dictionary for a zonal-mean surface model
     (e.g. basic EBM). 
     
@@ -103,35 +104,7 @@ def surface_state(num_lat=90,
                                 :class:`~climlab.utils.legendre.P2` 
                                 to calculate initial temperature            \n
                                 - unit: dimensionless
-                                - default value: ``40``
-
-    :returns:                   dictionary with temperature 
-                                :class:`~climlab.domain.field.Field` 
-                                for surface mixed layer ``Ts``
-    :rtype:                     dict
-    
-    """
-=======
-    """Sets up a state variable dictionary for a zonal-mean surface model
-    (e.g. basic EBM). 
-    
-    Returns a single state variable `Ts`, the temperature of the surface 
-    mixed layer, initialized by a basic temperature and the second Legendre
-    polynomial.
-    
-    **Function-call arguments** \n        
-        
-    :param int num_lat:         number of latitude points on the axis
-                                [default: 90]
-    :param float water_depth:   *irrelevant*
-    :param float T0:            base value for initial temperature          \n
-                                - unit :math:`^{\circ} \\textrm{C}`         \n
-                                - default value: ``12``
-    :param float T2:            factor for 2nd Legendre polynomial 
-                                :class:`~climlab.utils.legendre.P2` 
-                                to calculate initial temperature            \n
-                                - unit: dimensionless
-                                - default value: ``40``
+                                - default value: ``-40``
 
     :returns:                   dictionary with temperature 
                                 :class:`~climlab.domain.field.Field` 
@@ -159,7 +132,6 @@ def surface_state(num_lat=90,
              -27.88584094]
     
     """
->>>>>>> .merge-right.r75
     sfc = domain.zonal_mean_surface(num_lat=num_lat,
                                     water_depth=water_depth)
     sinphi = np.sin(np.deg2rad(sfc.axes['lat'].points))

@@ -19,11 +19,11 @@ def walk_processes(top, topname='top', topdown=True, ignoreFlag=False):
     
     :param top:             top process from where walking should start
     :type top:              :class:`~climlab.process.process.Process`
-    :param str topname:     name of top process
+    :param str topname:     name of top process [default: 'top']
     :param bool topdown:    whether geneterate *process_types* in regular or 
-                            in reverse order.
-                            Set to ``True`` by default.    
+                            in reverse order [default: True]
     :param bool ignoreFlag: whether ``topdown`` flag should be ignored or not
+                            [default: False]
     :returns: name (str), proc (process), level (int)
 
     

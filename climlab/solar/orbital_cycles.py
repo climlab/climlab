@@ -56,12 +56,12 @@ class OrbitalCycles:
                                                 * *default value:* ``0.``
 
         :param float segment_length_years:  is the length of each integration with
-                                            fixed orbital parameters. (default: ``100.``)
+                                            fixed orbital parameters. [default: 100.]
         :param float orbital_year_factor:   is an optional speed-up to the orbital cycles.
-                                            (default: ``1.``)
+                                            [default: 1.]
         :param bool verbose:                prints product of calculation and
                                             information about computation progress
-                                            if set to ``True`` (default).
+                                            [default: True]
                                             
         **Object attributes** \n
         
@@ -109,7 +109,8 @@ class OrbitalCycles:
         
                 #  start the integration
                 #  run for 10,000 orbital years, but only 1,000 model years
-                experiment = OrbitalCycles(ebm, kyear_start=-20, kyear_stop=-10, orbital_year_factor=10.)
+                experiment = OrbitalCycles(ebm, kyear_start=-20, kyear_stop=-10, \
+                                                        orbital_year_factor=10.)
                 
         """      
         self.model = model
