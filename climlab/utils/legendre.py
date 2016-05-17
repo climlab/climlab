@@ -1,8 +1,17 @@
-'''The first several Legendre polynomials, along with 
-(some of) their first derivatives.'''
+"""Can calculate the first several Legendre polynomials, along with 
+(some of) their first derivatives."""
 
 def Pn(x):
-    '''Calculate lots of Legendre polyomials and return them in a dictionary.'''
+    """Calculate Legendre polyomials P0 to P28 and returns them 
+    in a dictionary ``Pn``.
+            
+    :param float x:     argument to calculate Legendre polynomials
+    :return Pn:         dictionary which contains order of Legendre polynomials
+                        (from 0 to 28) as keys and the corresponding evaluation
+                        of Legendre polynomials as values.
+    :rtype:             dict
+    
+    """
     Pn = {}
     Pn['0'] = P0(x)
     Pn['1'] = P1(x)
@@ -25,7 +34,17 @@ def Pn(x):
     return Pn
     
 def Pnprime(x):
-    '''First derivatives of Legendre polynomials.'''
+    """Calculates first derivatives of Legendre polynomials and returns them 
+    in a dictionary ``Pnprime``.
+    
+    :param float x:     argument to calculate first derivate of Legendre polynomials
+    :return Pn:         dictionary which contains order of Legendre polynomials
+                        (from 0 to 4 and even numbers until 14) as keys and 
+                        the corresponding evaluation of first derivative of 
+                        Legendre polynomials as values.
+    :rtype:             dict
+    
+    """
     Pnprime = {}
     Pnprime['0'] = 0
     Pnprime['1'] = P1prime(x)
@@ -40,12 +59,28 @@ def Pnprime(x):
     return Pnprime
 
 def P0( x ):
+    """
+    .. math::
+        P_0 (x) = 1
+    
+    """
     return 1.
 
 def P1( x ):
+    """
+    .. math::
+        P_1 (x) = 1
+    
+    """
     return x
 
 def P2( x ):
+    """The second Legendre polynomial.
+    
+    .. math::
+        P_2(x) = \\frac{1}{2} (3x^2 - 1)
+    
+    """
     '''The second Legendre polynomial.'''
     return (3. * x**2 - 1. ) / 2.
 

@@ -5,16 +5,19 @@ from numpy.core.umath_tests import matrix_multiply
 '''
 Testing multi-dimensional column radiation
 
-import numpy as np
-import climlab
-sfc, atm = climlab.domain.zonal_mean_column()
-absorb = np.ones(atm.shape)
-trans = climlab.radiation.transmissivity.Transmissivity(absorptivity=absorb,
-                                                        axis=1)
-fromspace = np.zeros(sfc.shape)
-emission = 200*np.ones(atm.shape)
-A = trans.flux_down(fluxDownTop=fromspace, emission=emission)
-A.shape
+:Example:
+
+    .. code-block:: python
+    
+        import numpy as np
+        import climlab
+        sfc, atm = climlab.domain.zonal_mean_column()
+        absorb = np.ones(atm.shape)
+        trans = climlab.radiation.transmissivity.Transmissivity(absorptivity=absorb,axis=1)
+        fromspace = np.zeros(sfc.shape)
+        emission = 200*np.ones(atm.shape)
+        A = trans.flux_down(fluxDownTop=fromspace, emission=emission)
+        A.shape
 
 '''
 
@@ -26,45 +29,73 @@ class Transmissivity(object):
     It is assumed that the last dimension is vertical levels.
 
     Attributes: (all stored as numpy arrays):
-        N: number of levels
-        absorptivity: level absorptivity (N)
-        transmissivity: level transmissivity (N)
-        Tup: transmissivity matrix for upwelling beam (N+1, N+1)
-        Tdown: transmissivity matrix for downwelling beam (N+1, N+1)
+    
+    * N: number of levels
+    * absorptivity: level absorptivity (N)
+    * transmissivity: level transmissivity (N)
+    * Tup: transmissivity matrix for upwelling beam (N+1, N+1)
+    * Tdown: transmissivity matrix for downwelling beam (N+1, N+1)
+    
 
     Example for N = 3 atmospheric layers:
 
     tau is a vector of transmissivities
-        tau = [1, tau0, tau1, tau2]
+    
+    .. math::
+        
+        \\tau = \\left[ 1, \\tau_0, \\tau_1, \\tau_2 \\right]
+        
     A is a matrix
-        A = [[   1,    1,    1,    1],
-             [tau0,    1,    1,    1],
-             [tau1, tau1,    1,    1],
-             [tau2, tau2, tau2,    1]]
+    
+    .. math::
+    
+        A= \\left[ \\begin{array}{cccc}
+        1       & 1         & 1         & 1         \\\\
+        \\tau_0 & 1         & 1         & 1         \\\\
+        \\tau_0 & \\tau_1   & 1         & 1         \\\\
+        \\tau_0 & \\tau_1   & \\tau_2   & 1         \\\\
+        \\end{array} \\right] 
+             
     We then take the cumulative product along columns,
-        and finally take the lower triangle of the result to get
-    Tup = [[             1,         0,    0,  0],
-           [          tau0,         1,    0,  0],
-           [     tau1*tau0,      tau1,    1,  0],
-           [tau2*tau1*tau0, tau2*tau1, tau2,  1]]
+    and finally take the lower triangle of the result to get
+
+    .. math::
+    
+        Tup= \\left[ \\begin{array}{cccc}
+                               1 &               0 &       0 &  0   \\\\ 
+                         \\tau_0 &               1 &       0 &  0   \\\\
+                 \\tau_1 \\tau_0 &         \\tau_1 &       1 &  0   \\\\
+        \\tau_2 \\tau_1 \\tau_00 & \\tau_2 \\tau_1 & \\tau_2 &  1   \\\\
+        \\end{array} \\right] 
 
     and Tdown = transpose(Tup)
 
     Construct an emission vector for the downwelling beam:
-        Edown = [E0, E1, E2, fromspace]
+    
+    Edown = [E0, E1, E2, fromspace]
+
     Now we can get the downwelling beam by matrix multiplication:
-        D = Tdown * Edown
+
+    D = Tdown * Edown
 
     For the upwelling beam, we start by adding the reflected part
     at the surface to the surface emissions:
-        Eup = [emit_sfc + albedo_sfc*D[0], E0, E1, E2]
+
+    Eup = [emit_sfc + albedo_sfc*D[0], E0, E1, E2]
+
     So that the upwelling flux is
-        U = Tup * Eup
+
+    U = Tup * Eup
+
     The total flux, positive up is thus
-        F = U - D
+
+    F = U - D
+
     The absorbed radiation at the surface is then -F[0]
     The absorbed radiation in the atmosphere is the flux convergence:
-        -diff(F)
+
+    -diff(F)
+
     '''
     #  quick hack to get some simple cloud albedo
     def __init__(self, absorptivity, reflectivity=None, axis=0):
@@ -89,12 +120,17 @@ class Transmissivity(object):
         '''Compute downwelling radiative flux at interfaces between layers.
 
         Inputs:
-            fluxDownTop: flux down at top
-            emission: emission from atmospheric levels (N)
-                defaults to zero if not given
+        
+            * fluxDownTop: flux down at top
+            * emission: emission from atmospheric levels (N)
+              defaults to zero if not given
+
         Returns:
-            vector of downwelling radiative flux between levels (N+1)
-            element 0 is the flux down to the surface.'''
+
+            * vector of downwelling radiative flux between levels (N+1)
+              element 0 is the flux down to the surface.
+
+        '''
         if emission is None:
             emission = np.zeros_like(self.absorptivity)
         E = np.concatenate((emission, np.atleast_1d(fluxUpBottom)), axis=-1)
@@ -112,12 +148,16 @@ class Transmissivity(object):
         '''Compute upwelling radiative flux at interfaces between layers.
 
         Inputs:
-            fluxUpBottom: flux up from bottom
-            emission: emission from atmospheric levels (N)
-                defaults to zero if not given
+        
+            * fluxUpBottom: flux up from bottom
+            * emission: emission from atmospheric levels (N)
+              defaults to zero if not given
+              
         Returns:
-            vector of upwelling radiative flux between levels (N+1)
-            element N is the flux up to space.'''
+            * vector of upwelling radiative flux between levels (N+1)
+              element N is the flux up to space.
+        
+        '''
         if emission is None:
             emission = np.zeros_like(self.absorptivity)
         E = np.concatenate((np.atleast_1d(fluxDownTop),emission), axis=-1)

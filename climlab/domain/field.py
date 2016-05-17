@@ -8,32 +8,80 @@
 
 import numpy as np
 
-'''test usage:
-import numpy as np
-A = np.linspace(0., 10., 30)
-d = domain.single_column()
-atm = d['atm']
-s = field.Field(A, domain=atm)
-print s
-print s.domain
-# can slice this and it preserves the domain
-#  a more full-featured implementation would have intelligent slicing
-#  like in iris
-s.shape == s.domain.shape
-s[:1].shape == s[:1].domain.shape
-#  But some things work very well. E.g. new field creation:
-s2 = np.zeros_like(s)
-print s2
-print s2.domain
-'''
-
 
 class Field(np.ndarray):
-    '''Custom class for climlab gridded quantities, called Field
-    This class behaves exactly like numpy.ndarray
-    but every object has an attribute called domain
-    which is the domain associated with that field (e.g. state variables).'''
+    """Custom class for climlab gridded quantities, called Field.
+    
+    This class behaves exactly like :py:class:`numpy.ndarray`
+    but every object has an attribute called ``self.domain``
+    which is the domain associated with that field (e.g. state variables).
+    
+    **Initialization parameters** \n
+        
+    An instance of ``Field`` is initialized with the following 
+    arguments:
+    
+    :param array input_array:   the array which the Field object should be 
+                                initialized with
+    :param domain:              the domain associated with that field 
+                                (e.g. state variables)
+    :type domain:               :class:`~climlab.domain.domain._Domain`
+    
+    **Object attributes** \n
+    
+    Following object attribute is generated during initialization:
+        
+    :var domain:               the domain associated with that field 
+                                (e.g. state variables)
+    :vartype domain:            :class:`~climlab.domain.domain._Domain`
+    
 
+    :Example:
+                            
+        ::
+            
+            >>> import climlab
+            >>> import numpy as np
+            >>> from climlab import domain
+            >>> from climlab.domain import field
+            
+            >>> # distribution of state
+            >>> distr = np.linspace(0., 10., 30)
+            >>> # domain creation
+            >>> sfc, atm = domain.single_column()
+            >>> # build state of type Field
+            >>> s = field.Field(distr, domain=atm)
+            
+            >>> print s
+            [  0.           0.34482759   0.68965517   1.03448276   1.37931034
+               1.72413793   2.06896552   2.4137931    2.75862069   3.10344828
+               3.44827586   3.79310345   4.13793103   4.48275862   4.82758621
+               5.17241379   5.51724138   5.86206897   6.20689655   6.55172414
+               6.89655172   7.24137931   7.5862069    7.93103448   8.27586207
+               8.62068966   8.96551724   9.31034483   9.65517241  10.        ]
+               
+            >>> print s.domain
+            climlab Domain object with domain_type=atm and shape=(30,)
+            
+            >>> # can slice this and it preserves the domain
+            >>> #  a more full-featured implementation would have intelligent
+            >>> #  slicing like in iris
+            >>> s.shape == s.domain.shape
+            True
+            >>> s[:1].shape == s[:1].domain.shape
+            False
+            
+            >>> #  But some things work very well. E.g. new field creation:
+            >>> s2 = np.zeros_like(s)
+            
+            >>> print s2
+            [ 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.
+              0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.]
+              
+            >>> print s2.domain  
+            climlab Domain object with domain_type=atm and shape=(30,)  
+                            
+    """
     def __new__(cls, input_array, domain=None):
         # Input array is an already formed ndarray instance
         # We first cast to be our class type
@@ -250,7 +298,27 @@ class Field(np.ndarray):
 
 
 def global_mean(field):
-    '''Calculate global mean of a field with latitude dependence.'''
+    """Calculates the latitude weighted global mean of a field 
+    with latitude dependence.
+    
+    :param Field field: input field
+    :raises: :exc:`ValueError` if input field has no latitude axis
+    :return: latitude weighted global mean of the field
+    :rtype: float    
+    
+    :Example:
+
+        initial global mean temperature of EBM model::
+        
+            >>> import climlab
+            >>> from climlab.domain.field import global_mean
+            
+            >>> model = climlab.EBM()
+
+            >>> global_mean(model.Ts)
+            Field(11.997968598413685)
+    
+    """
     try:
         lat = field.domain.axes['lat'].points
     except:

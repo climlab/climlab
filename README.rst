@@ -45,7 +45,7 @@ numerically intensive processes implemented in Fortran code (specifically the
 CAM3 radiation module). These require a Fortran compiler on your system,
 but otherwise have no other library dependencies.  ``climlab`` uses a compile-on-demand
 strategy. The compiler is invoked automatically as necessary when a new process
-in created by the user.
+is created by the user.
 
 Currently, ``climlab`` has out-of-the-box support and documented examples for
 

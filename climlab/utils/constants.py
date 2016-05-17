@@ -1,11 +1,14 @@
-'''constants.py
+# constants.py
 
-A collection of physical constants for the atmosphere and ocean.
+#Part of the climlab package
+#Brian Rose, University at Albany
+#brose@albany.edu
 
-Part of the climlab package
-Brian Rose, University at Albany
-brose@albany.edu
-'''
+"""Contains a collection of physical constants for the atmosphere and ocean.
+
+    .. literalinclude:: ../code_input_manual/constants.py
+    
+"""
 
 import numpy as np
 
