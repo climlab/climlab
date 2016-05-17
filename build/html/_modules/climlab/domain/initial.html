@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>climlab.domain.initial &mdash; climlab 0.3.0.1 documentation</title>
+    <title>climlab.domain.initial &mdash; climlab 0.3.2 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.3.0.1',
+        VERSION:     '0.3.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="climlab 0.3.0.1 documentation" href="../../../index.html" />
+    <link rel="top" title="climlab 0.3.2 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -231,8 +231,10 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">    :param int num_lat:         number of latitude points on the axis</span>
 <span class="sd">                                [default: 1]</span>
 <span class="sd">    :param lev:                 specification for height axis (optional)</span>
-<span class="sd">    :type lev:                  :class:`~climlab.domain.axis.Axis` or pressure array</span>
+<span class="sd">    :type lev:                  :class:`~climlab.domain.axis.Axis` </span>
+<span class="sd">                                or pressure array</span>
 <span class="sd">    :param array lat:           size of array determines dimension of latitude</span>
+<span class="sd">                                (optional)</span>
 <span class="sd">    :param float water_depth:   *irrelevant*</span>
 <span class="sd">    </span>
 <span class="sd">    :returns:                   dictionary with two temperature </span>
@@ -281,9 +283,9 @@ div.nboutput  > :nth-child(2).stderr {
     <span class="n">state</span> <span class="o">=</span> <span class="n">AttrDict</span><span class="p">()</span>
     <span class="n">state</span><span class="p">[</span><span class="s1">&#39;Ts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Ts</span>
     <span class="n">state</span><span class="p">[</span><span class="s1">&#39;Tatm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Tatm</span>
-    <span class="k">return</span> <span class="n">state</span>
+    <span class="k">return</span> <span class="n">state</span></div>
 
-</div>
+
 <div class="viewcode-block" id="surface_state"><a class="viewcode-back" href="../../../api/climlab.domain.html#climlab.domain.initial.surface_state">[docs]</a><span class="k">def</span> <span class="nf">surface_state</span><span class="p">(</span><span class="n">num_lat</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>
                   <span class="n">water_depth</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span>
                   <span class="n">T0</span><span class="o">=</span><span class="mf">12.</span><span class="p">,</span>
@@ -307,7 +309,7 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">                                :class:`~climlab.utils.legendre.P2` </span>
 <span class="sd">                                to calculate initial temperature            \n</span>
 <span class="sd">                                - unit: dimensionless</span>
-<span class="sd">                                - default value: ``40``</span>
+<span class="sd">                                - default value: ``-40``</span>
 
 <span class="sd">    :returns:                   dictionary with temperature </span>
 <span class="sd">                                :class:`~climlab.domain.field.Field` </span>
@@ -369,7 +371,7 @@ div.nboutput  > :nth-child(2).stderr {
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2016 (licensed under Creative Commons, see License), Moritz Kreuzer.
+        &copy; Copyright 2016 (licensed under MIT License), Moritz Kreuzer &amp; Brian Rose.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>

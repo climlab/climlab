@@ -1,6 +1,10 @@
 Application Programming Interface
 =================================
 
+This chapter documents the source code of the ``climlab`` package. The focus is on the methods and functions that the user invokes while using the package. Nevertheless also the underlying code of the ``climlab`` architecture has been documented for a comprehensive understanding and traceability.
+
+Until now only the Energy Balance Model revelent parts of ``climlab`` have been covered.
+
 .. automodule:: climlab
 
 Subpackages

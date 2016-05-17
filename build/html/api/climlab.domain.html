@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>climlab.domain package &mdash; climlab 0.3.0.1 documentation</title>
+    <title>climlab.domain package &mdash; climlab 0.3.2 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3.0.1',
+        VERSION:     '0.3.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="climlab 0.3.0.1 documentation" href="../index.html" />
+    <link rel="top" title="climlab 0.3.2 documentation" href="../index.html" />
     <link rel="up" title="Application Programming Interface" href="climlab.html" />
     <link rel="next" title="climlab.dynamics package" href="climlab.dynamics.html" />
     <link rel="prev" title="Application Programming Interface" href="climlab.html" /> 
@@ -252,8 +252,10 @@ arguments <em>(for detailed information see Object attributes below)</em>:</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>axis_type</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; information about the type of axis</li>
-<li><strong>num_points</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of points on axis</li>
+<li><strong>axis_type</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; information about the type of axis 
+[default: &#8216;abstract&#8217;]</li>
+<li><strong>num_points</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of points on axis
+[default: 10]</li>
 <li><strong>points</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/array.html#module-array" title="(in Python v2.7)"><em>array</em></a>) &#8211; array with specific points (optional)</li>
 <li><strong>bounds</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/array.html#module-array" title="(in Python v2.7)"><em>array</em></a>) &#8211; array with specific bounds between points (optional)</li>
 </ul>
@@ -458,6 +460,8 @@ the following object attribute is modified during initialization:</p>
 <a class="reference internal" href="climlab.utils.html#climlab.utils.heat_capacity.atmosphere" title="climlab.utils.heat_capacity.atmosphere"><code class="xref py py-func docutils literal"><span class="pre">atmosphere()</span></code></a> and gives the delta 
 array of grid points of it&#8217;s level axis
 <code class="docutils literal"><span class="pre">self.axes['lev'].delta</span></code> as input.</p>
+<p><strong>Object attributes</strong></p>
+<p>During method execution following object attribute is modified:</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -533,7 +537,7 @@ the <code class="docutils literal"><span class="pre">'depth'</span></code> Axis.
 <em class="property">class </em><code class="descclassname">climlab.domain.domain.</code><code class="descname">SlabAtmosphere</code><span class="sig-paren">(</span><em>axes=&lt;climlab.domain.axis.Axis object&gt;</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/domain/domain.html#SlabAtmosphere"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.domain.domain.SlabAtmosphere" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#climlab.domain.domain.Atmosphere" title="climlab.domain.domain.Atmosphere"><code class="xref py py-class docutils literal"><span class="pre">climlab.domain.domain.Atmosphere</span></code></a></p>
 <p>A class to create a SlabAtmosphere Domain by default.</p>
-<p>Initializes the parent <a class="reference internal" href="#climlab.domain.domain.Atmosphere" title="climlab.domain.domain.Atmosphere"><code class="xref py py-class docutils literal"><span class="pre">Atmosphere</span></code></a> class for with a simple axis for a
+<p>Initializes the parent <a class="reference internal" href="#climlab.domain.domain.Atmosphere" title="climlab.domain.domain.Atmosphere"><code class="xref py py-class docutils literal"><span class="pre">Atmosphere</span></code></a> class with a simple axis for a
 Slab Atmopshere created by <a class="reference internal" href="#climlab.domain.domain.make_slabatm_axis" title="climlab.domain.domain.make_slabatm_axis"><code class="xref py py-func docutils literal"><span class="pre">make_slabatm_axis()</span></code></a> which has just 1 cell 
 in height by default.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -565,7 +569,7 @@ in height by default.</p>
 <em class="property">class </em><code class="descclassname">climlab.domain.domain.</code><code class="descname">SlabOcean</code><span class="sig-paren">(</span><em>axes=&lt;climlab.domain.axis.Axis object&gt;</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/domain/domain.html#SlabOcean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.domain.domain.SlabOcean" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="#climlab.domain.domain.Ocean" title="climlab.domain.domain.Ocean"><code class="xref py py-class docutils literal"><span class="pre">climlab.domain.domain.Ocean</span></code></a></p>
 <p>A class to create a SlabOcean Domain by default.</p>
-<p>Initializes the parent <a class="reference internal" href="#climlab.domain.domain.Ocean" title="climlab.domain.domain.Ocean"><code class="xref py py-class docutils literal"><span class="pre">Ocean</span></code></a> class for with a simple axis for a
+<p>Initializes the parent <a class="reference internal" href="#climlab.domain.domain.Ocean" title="climlab.domain.domain.Ocean"><code class="xref py py-class docutils literal"><span class="pre">Ocean</span></code></a> class with a simple axis for a
 Slab Ocean created by <a class="reference internal" href="#climlab.domain.domain.make_slabocean_axis" title="climlab.domain.domain.make_slabocean_axis"><code class="xref py py-func docutils literal"><span class="pre">make_slabocean_axis()</span></code></a> which has just 1 cell 
 in depth by default.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -953,9 +957,9 @@ a level/height axis.</p>
 <div class="section" id="climlab-domain-field-module">
 <h2>climlab.domain.field module<a class="headerlink" href="#climlab-domain-field-module" title="Permalink to this headline">¶</a></h2>
 <p class="graphviz">
-<img src="../_images/inheritance-7d9a678f4eafa44a52925357033c54be940c550e.png" alt="Inheritance diagram of climlab.domain.field" usemap="#inheritanceadab6f8b64" class="inheritance"/>
+<img src="../_images/inheritance-72fa3e9a49d3013dbc8710cf80f11f7b8971c199.png" alt="Inheritance diagram of climlab.domain.field" usemap="#inheritanceadab6f8b64" class="inheritance"/>
 <map id="inheritanceadab6f8b64" name="inheritanceadab6f8b64">
-<area shape="rect" id="node1" href="#climlab.domain.field.Field" target="_top" title="Custom class for climlab gridded quantities, called Field" alt="" coords="149,5,221,35"/>
+<area shape="rect" id="node1" href="#climlab.domain.field.Field" target="_top" title="Custom class for climlab gridded quantities, called Field." alt="" coords="149,5,221,35"/>
 <area shape="rect" id="node2" title="ndarray(shape, dtype=float, buffer=None, offset=0," alt="" coords="6,5,101,35"/>
 </map>
 </p>
@@ -963,7 +967,7 @@ a level/height axis.</p>
 <dt id="climlab.domain.field.Field">
 <em class="property">class </em><code class="descclassname">climlab.domain.field.</code><code class="descname">Field</code><a class="reference internal" href="../_modules/climlab/domain/field.html#Field"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.domain.field.Field" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="http://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.10)"><code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code></a></p>
-<p>Custom class for climlab gridded quantities, called Field</p>
+<p>Custom class for climlab gridded quantities, called Field.</p>
 <p>This class behaves exactly like <a class="reference external" href="http://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v1.10)"><code class="xref py py-class docutils literal"><span class="pre">numpy.ndarray</span></code></a>
 but every object has an attribute called <code class="docutils literal"><span class="pre">self.domain</span></code>
 which is the domain associated with that field (e.g. state variables).</p>
@@ -1102,8 +1106,10 @@ the number of levels given.</p>
 [default: 30]</li>
 <li><strong>num_lat</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of latitude points on the axis
 [default: 1]</li>
-<li><strong>lev</strong> (<a class="reference internal" href="#climlab.domain.axis.Axis" title="climlab.domain.axis.Axis"><code class="xref py py-class docutils literal"><span class="pre">Axis</span></code></a> or pressure array) &#8211; specification for height axis (optional)</li>
-<li><strong>lat</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/array.html#module-array" title="(in Python v2.7)"><em>array</em></a>) &#8211; size of array determines dimension of latitude</li>
+<li><strong>lev</strong> (<a class="reference internal" href="#climlab.domain.axis.Axis" title="climlab.domain.axis.Axis"><code class="xref py py-class docutils literal"><span class="pre">Axis</span></code></a> 
+or pressure array) &#8211; specification for height axis (optional)</li>
+<li><strong>lat</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/array.html#module-array" title="(in Python v2.7)"><em>array</em></a>) &#8211; size of array determines dimension of latitude
+(optional)</li>
 <li><strong>water_depth</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; <em>irrelevant</em></li>
 </ul>
 </td>
@@ -1165,7 +1171,7 @@ polynomial.</p>
 to calculate initial temperature</p>
 <ul>
 <li>unit: dimensionless</li>
-<li>default value: <code class="docutils literal"><span class="pre">40</span></code></li>
+<li>default value: <code class="docutils literal"><span class="pre">-40</span></code></li>
 </ul>
 </li>
 </ul>
@@ -1235,7 +1241,7 @@ for surface mixed layer <code class="docutils literal"><span class="pre">Ts</spa
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2016 (licensed under Creative Commons, see License), Moritz Kreuzer.
+        &copy; Copyright 2016 (licensed under MIT License), Moritz Kreuzer &amp; Brian Rose.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>

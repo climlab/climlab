@@ -21,12 +21,12 @@ d.integrate_years(1.)
 
 import matplotlib.pyplot as plt
 
-fig = plt.figure()
+fig = plt.figure( figsize=(6,4))
 ax = fig.add_subplot(111)
 ax.set_title('Example for Meridional Diffusion')
 ax.set_xlabel('latitude')
 ax.set_xticks([-90,-60,-30,0,30,60,90])
-ax.set_ylabel('temperature (degC)')
+ax.set_ylabel('temperature ($^{\circ}$C)')
 ax.plot(lat, initial, 	label='initial')
 ax.plot(lat, Ts, label='Ts (1yr)')
 ax.legend(loc='best')

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Preconfigured Energy Balance Models &mdash; climlab 0.3.0.1 documentation</title>
+    <title>Preconfigured Energy Balance Models &mdash; climlab 0.3.2 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3.0.1',
+        VERSION:     '0.3.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="climlab 0.3.0.1 documentation" href="../index.html" />
+    <link rel="top" title="climlab 0.3.2 documentation" href="../index.html" />
     <link rel="up" title="Tutorials" href="../tutorial.html" />
     <link rel="next" title="Boltzmann Outgoing Longwave Radiation" href="Boltzmann_EBM.html" />
     <link rel="prev" title="Tutorials" href="../tutorial.html" /> 
@@ -72,9 +72,6 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="">Preconfigured Energy Balance Models</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Boltzmann_EBM.html">Boltzmann Outgoing Longwave Radiation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="Budyko_Transport_EBM.html">Budyko Transport for Energy Balance Models</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Insolation.html">Distribution of insolation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Seasonal_cycle_and_heat_capacity.html">The seasonal cycle of surface temperature</a></li>
-<li class="toctree-l2"><a class="reference internal" href="Snowball_Earth_in_the_EBM.html">Ice - Albedo Feedback and runaway glaciation</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../api/climlab.html">Application Programming Interface</a></li>
@@ -594,32 +591,33 @@ directly as model attributes like:</p>
 
 <span class="n">ax1</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span><span class="o">-</span><span class="mi">60</span><span class="p">,</span><span class="o">-</span><span class="mi">30</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">30</span><span class="p">,</span><span class="mi">60</span><span class="p">,</span><span class="mi">90</span><span class="p">])</span>
 <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span><span class="mi">90</span><span class="p">])</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;latitude&#39;</span><span class="p">)</span>
-<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;surface temperature (degC)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Surface Temperature&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;(degC)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
 <span class="n">ax1</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
 
 <span class="c1"># Albedo plot</span>
 <span class="n">ax2</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">223</span><span class="p">,</span> <span class="n">sharex</span> <span class="o">=</span> <span class="n">ax1</span><span class="p">)</span>
 <span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ebm_model</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span><span class="n">ebm_model</span><span class="o">.</span><span class="n">albedo</span><span class="p">)</span>
 
-<span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;albedo&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Albedo&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
 <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
 <span class="n">ax2</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
 
 <span class="c1"># Net Radiation plot</span>
 <span class="n">ax3</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">222</span><span class="p">,</span> <span class="n">sharex</span> <span class="o">=</span> <span class="n">ax1</span><span class="p">)</span>
 <span class="n">ax3</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ebm_model</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">ebm_model</span><span class="o">.</span><span class="n">OLR</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;OLR&#39;</span><span class="p">,</span>
-                                         <span class="n">color</span><span class="o">=</span><span class="s1">&#39;cyan&#39;</span><span class="p">)</span>
+                                       <span class="n">color</span><span class="o">=</span><span class="s1">&#39;cyan&#39;</span><span class="p">)</span>
 <span class="n">ax3</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ebm_model</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">ebm_model</span><span class="o">.</span><span class="n">ASR</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;ASR&#39;</span><span class="p">,</span>
-                                         <span class="n">color</span><span class="o">=</span><span class="s1">&#39;magenta&#39;</span><span class="p">)</span>
+                                       <span class="n">color</span><span class="o">=</span><span class="s1">&#39;magenta&#39;</span><span class="p">)</span>
 <span class="n">ax3</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ebm_model</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">ebm_model</span><span class="o">.</span><span class="n">ASR</span><span class="o">-</span><span class="n">ebm_model</span><span class="o">.</span><span class="n">OLR</span><span class="p">,</span>
-                                         <span class="n">label</span><span class="o">=</span><span class="s1">&#39;net radiation&#39;</span><span class="p">,</span>
-                                         <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+                                       <span class="n">label</span><span class="o">=</span><span class="s1">&#39;net radiation&#39;</span><span class="p">,</span>
+                                       <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
 
-<span class="n">ax3</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;radiation (W/m$^2$)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Net Radiation&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;(W/m$^2$)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
 <span class="n">ax3</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;best&#39;</span><span class="p">)</span>
 <span class="n">ax3</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
-
 
 <span class="c1"># Energy Balance plot</span>
 <span class="n">net_rad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="n">ebm_model</span><span class="o">.</span><span class="n">net_radiation</span><span class="p">)</span>
@@ -627,13 +625,15 @@ directly as model attributes like:</p>
 
 <span class="n">ax4</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">224</span><span class="p">,</span> <span class="n">sharex</span> <span class="o">=</span> <span class="n">ax1</span><span class="p">)</span>
 <span class="n">ax4</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ebm_model</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">net_rad</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;net radiation&#39;</span><span class="p">,</span>
-                                             <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
+                                              <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">)</span>
 <span class="n">ax4</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ebm_model</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">transport</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;heat transport&#39;</span><span class="p">,</span>
-                                             <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span>
+                                              <span class="n">color</span><span class="o">=</span><span class="s1">&#39;blue&#39;</span><span class="p">)</span>
 <span class="n">ax4</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ebm_model</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">net_rad</span><span class="o">+</span><span class="n">transport</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;balance&#39;</span><span class="p">,</span>
                                              <span class="n">color</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)</span>
 
-<span class="n">ax4</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;energy (W/m$^2$)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+<span class="n">ax4</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Energy&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+<span class="n">ax4</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;latitude&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">ax4</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;(W/m$^2$)&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
 <span class="n">ax4</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;best&#39;</span><span class="p">)</span>
 <span class="n">ax4</span><span class="o">.</span><span class="n">grid</span><span class="p">()</span>
 
@@ -649,6 +649,8 @@ directly as model attributes like:</p>
 <img alt="../_images/notebooks_Preconfigured_EBM_31_0.png" src="../_images/notebooks_Preconfigured_EBM_31_0.png" />
 </div>
 </div>
+<p>The energy balance is zero at every latitude. That means the model is in
+equilibrium. Perfect!</p>
 </div>
 </div>
 <div class="section" id="Global-mean-temperature">
@@ -708,8 +710,10 @@ through</p>
 </pre></div>
 </div>
 <div class="highlight-ipython2"><div class="highlight"><pre>
-<span></span><span class="k">print</span> <span class="s1">&#39;The global mean temperature is </span><span class="si">%s</span><span class="s1"> degC with a model ice edge at </span><span class="si">%s</span><span class="s1"> deg.&#39;</span> \
-       <span class="o">%</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">global_mean</span><span class="p">(</span><span class="n">ebm_model</span><span class="o">.</span><span class="n">Ts</span><span class="p">),</span><span class="mi">2</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">ebm_model</span><span class="o">.</span><span class="n">icelat</span><span class="p">))</span>
+<span></span><span class="k">print</span> <span class="s1">&#39;The global mean temperature is </span><span class="si">%s</span><span class="s1"> degC.&#39;</span> \
+                               <span class="o">%</span><span class="k">np</span>.round(global_mean(ebm_model.Ts),2)
+
+<span class="k">print</span> <span class="s1">&#39;The modeled ice edge is at </span><span class="si">%s</span><span class="s1"> deg.&#39;</span> <span class="o">%</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">ebm_model</span><span class="o">.</span><span class="n">icelat</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -718,7 +722,8 @@ through</p>
 </div>
 <div class="container">
 <div class="highlight"><pre>
-The global mean temperature is 14.29 degC with a model ice edge at 70.0 deg.
+The global mean temperature is 14.29 degC.
+The modeled ice edge is at 70.0 deg.
 </pre></div></div>
 </div>
 </div>
@@ -755,7 +760,7 @@ The global mean temperature is 14.29 degC with a model ice edge at 70.0 deg.
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2016 (licensed under Creative Commons, see License), Moritz Kreuzer.
+        &copy; Copyright 2016 (licensed under MIT License), Moritz Kreuzer &amp; Brian Rose.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>

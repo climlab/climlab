@@ -14,7 +14,7 @@ Stables releases as well as the current development version can be found on gith
 
 Dependencies
 ------------
-`climlab` is written in `Python 2.7 <https://www.python.org/downloads/>`_ and requires following `Python` packages to run:
+`climlab` is written in `Python 2.7 <https://www.python.org/downloads/>`_ and the requires the following `Python` packages to run:
 
   * `Numpy <http://www.numpy.org/>`_
   * `Scipy <https://www.scipy.org/>`_
@@ -25,37 +25,37 @@ Dependencies
   * `Jupyter <http://jupyter.org/>`_ (to run Jupyter notebooks containing tutorials and introduction for climlab)
   * `Matplotlib <http://matplotlib.org/>`_ (plotting libary)
 
-The packages have to be installed on your machine. They can either be downloaded, compiled and installed individually. 
+The packages have to be installed on your machine. Either they can be individially downloaded, compiled and installed according to the the instructions on the corresponding websites. 
 
-Otherwise Python distributions like `Anaconda <https://www.continuum.io/downloads>`_ or `Enthought Canopy <https://www.enthought.com/products/canopy/>`_ can be used which already include many popular Python packages.
+Easier to handle however are Python distributions like `Anaconda <https://www.continuum.io/downloads>`_ or `Enthought Canopy <https://www.enthought.com/products/canopy/>`_ which already include many popular Python packages.
 
 Setup environment with Anaconda
 ###############################
 
 An example is given here how to set up a python environment with `Anaconda <https://www.continuum.io/downloads>`_.
 
-A new environment named ``climlab_env`` with all above packages is created like this:
+	A new environment named ``climlab_env`` with all above packages is created like this:
 
-	.. code-block:: console
+		.. code-block:: console
 
-		$ conda create --name climlab_env numpy scipy netcdf4 jupyter matplotlib
+			$ conda create --name climlab_env numpy scipy netcdf4 jupyter matplotlib
        
 	All new packages which will be installed are displayed including their version number. Press ``y`` to proceed.
 	
 	After the environment is build, it can be activated with
 
-	.. code-block:: console
+		.. code-block:: console
 
-		$ source activate climlab_env
+			$ source activate climlab_env
 
 	and can be deactivated with
 
-	.. code-block:: console
+		.. code-block:: console
 
-		$ source deactivate
+			$ source deactivate
 
 	
-	To install climlab in the new environment follow the steps below.        
+To install climlab in the new environment follow the steps below.        
 
 Installation
 ------------
@@ -63,7 +63,7 @@ Installation
 Stable Release
 ##############
 
-	With the Python package `pip <http://www.pip-installer.org/>`_ which collects the current version from the `Python Package Index <https://pypi.python.org/pypi>`_, climlab can be easily installed on a machine through the terminal command
+	With the Python package `pip <http://www.pip-installer.org/>`_, which collects the current version from the `Python Package Index <https://pypi.python.org/pypi>`_, climlab can be easily installed on a machine through the terminal command
 
 		.. code-block:: console
 
@@ -72,7 +72,7 @@ Stable Release
 Development Version
 ###################
 
-	Otherwise the package can be downloaded from the above referred link and installed manually through running from the package directory
+	Otherwise, the package can be downloaded from the above referred link and installed manually through running from the package directory
 
 		.. code-block:: console
 

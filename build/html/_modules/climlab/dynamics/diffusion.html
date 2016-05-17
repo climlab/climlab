@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>climlab.dynamics.diffusion &mdash; climlab 0.3.0.1 documentation</title>
+    <title>climlab.dynamics.diffusion &mdash; climlab 0.3.2 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.3.0.1',
+        VERSION:     '0.3.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="climlab 0.3.0.1 documentation" href="../../../index.html" />
+    <link rel="top" title="climlab 0.3.2 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -230,6 +230,7 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">    :param bool use_banded_solver:  input flag, whether to use </span>
 <span class="sd">                                    :py:func:`scipy.linalg.solve_banded`</span>
 <span class="sd">                                    instead of :py:func:`numpy.linalg.solve`</span>
+<span class="sd">                                    [default: False]</span>
 <span class="sd">                                    </span>
 <span class="sd">    .. note::</span>
 <span class="sd">    </span>
@@ -340,9 +341,9 @@ div.nboutput  > :nth-child(2).stderr {
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">newvar</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">diffTriDiag</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
             <span class="n">newstate</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span> <span class="o">=</span> <span class="n">newvar</span>
-        <span class="k">return</span> <span class="n">newstate</span>
+        <span class="k">return</span> <span class="n">newstate</span></div></div>
 
-</div></div>
+
 <div class="viewcode-block" id="_solve_implicit_banded"><a class="viewcode-back" href="../../../api/climlab.dynamics.html#climlab.dynamics.diffusion._solve_implicit_banded">[docs]</a><span class="k">def</span> <span class="nf">_solve_implicit_banded</span><span class="p">(</span><span class="n">current</span><span class="p">,</span> <span class="n">banded_matrix</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Uses a banded solver for matrix inversion of a tridiagonal matrix.</span>
 <span class="sd">    </span>
@@ -364,9 +365,9 @@ div.nboutput  > :nth-child(2).stderr {
     <span class="n">diag</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">banded_matrix</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
     <span class="n">diag</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">banded_matrix</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">diag</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">banded_matrix</span><span class="p">,</span> <span class="n">k</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">solve_banded</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">diag</span><span class="p">,</span> <span class="n">current</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">solve_banded</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">diag</span><span class="p">,</span> <span class="n">current</span><span class="p">)</span></div>
 
-</div>
+
 <div class="viewcode-block" id="MeridionalDiffusion"><a class="viewcode-back" href="../../../api/climlab.dynamics.html#climlab.dynamics.diffusion.MeridionalDiffusion">[docs]</a><span class="k">class</span> <span class="nc">MeridionalDiffusion</span><span class="p">(</span><span class="n">Diffusion</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A parent class for Meridional diffusion processes.</span>
 <span class="sd">    </span>
@@ -429,9 +430,9 @@ div.nboutput  > :nth-child(2).stderr {
         <span class="k">for</span> <span class="n">dom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
             <span class="n">latax</span> <span class="o">=</span> <span class="n">dom</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">diffTriDiag</span> <span class="o">=</span> \
-            <span class="n">_make_meridional_diffusion_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">K_dimensionless</span><span class="p">,</span> <span class="n">latax</span><span class="p">)</span>
+            <span class="n">_make_meridional_diffusion_matrix</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">K_dimensionless</span><span class="p">,</span> <span class="n">latax</span><span class="p">)</span></div>
 
-</div>
+
 <div class="viewcode-block" id="_make_diffusion_matrix"><a class="viewcode-back" href="../../../api/climlab.dynamics.html#climlab.dynamics.diffusion._make_diffusion_matrix">[docs]</a><span class="k">def</span> <span class="nf">_make_diffusion_matrix</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">weight1</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">weight2</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Builds the general diffusion matrix with dimension nxn.</span>
 
@@ -467,12 +468,12 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">         </span>
 <span class="sd">        \\textrm{diffTriDiag}= </span>
 <span class="sd">        \\left[ \\begin{array}{cccccc}</span>
-<span class="sd">        1+\\frac{w_{1,1} K_1 }{w_{2,0}} &amp; -\\frac{w_{1,1} K_1}{w_{2,0}} &amp; 0 &amp;  &amp; ... &amp; 0  \\\\</span>
-<span class="sd">        -\\frac{w_{1,1} K_1}{w_{2,1}} &amp; 1+\\frac{w_{1,1} K_1 + w_{1,2} K_2}{w_{2,1}} &amp; -\\frac{w_{1,2} K_2}{w_{2,1}} &amp; 0 &amp; ... &amp; 0 \\\\</span>
-<span class="sd">        0 &amp; -\\frac{w_{1,2} K_2}{w_{2,2}}  &amp; 1+\\frac{w_{1,2} K_2 + w_{1,3} K_3}{w_{2,2}} &amp; -\\frac{w_{1,3} K_3}{w_{2,2}} &amp;... &amp; 0  \\\\</span>
+<span class="sd">        1+\\frac{s_1 }{w_{2,0}} &amp; -\\frac{s_1}{w_{2,0}} &amp; 0 &amp;  &amp; ... &amp; 0  \\\\</span>
+<span class="sd">        -\\frac{s_1}{w_{2,1}} &amp; 1+\\frac{s_1 + s_2}{w_{2,1}} &amp; -\\frac{s_2}{w_{2,1}} &amp; 0 &amp; ... &amp; 0 \\\\</span>
+<span class="sd">        0 &amp; -\\frac{s_2}{w_{2,2}}  &amp; 1+\\frac{s_2 + s_3}{w_{2,2}} &amp; -\\frac{s_3}{w_{2,2}} &amp;... &amp; 0  \\\\</span>
 <span class="sd">          &amp;  &amp; \\ddots &amp; \\ddots &amp; \\ddots &amp; \\\\</span>
-<span class="sd">        0 &amp; 0 &amp; ... &amp; -\\frac{w_{1,n-2} K_{n-2}}{w_{2,n-2}}  &amp; 1+\\frac{w_{1,n-2} K_{n-2} + w_{1,n-1} K_{n-1}}{w_{2,{n-2}}} &amp; -\\frac{w_{1,n-1} K_{n-1}}{w_{2,{n-2}}} \\\\</span>
-<span class="sd">        0 &amp; 0 &amp; ... &amp; 0 &amp; -\\frac{w_{1,n-1} K_{n-1}}{w_{2,n-1}}  &amp; 1+\\frac{w_{1,n-1} K_{n-1}}{w_{2,n-1}} \\\\</span>
+<span class="sd">        0 &amp; 0 &amp; ... &amp; -\\frac{s_{n-2}}{w_{2,n-2}}  &amp; 1+\\frac{s_{n-2} + s_{n-1}}{w_{2,{n-2}}} &amp; -\\frac{s_{n-1}}{w_{2,{n-2}}} \\\\</span>
+<span class="sd">        0 &amp; 0 &amp; ... &amp; 0 &amp; -\\frac{s_{n-1}}{w_{2,n-1}}  &amp; 1+\\frac{s_{n-1}}{w_{2,n-1}} \\\\</span>
 <span class="sd">        \\end{array} \\right] </span>
 
 <span class="sd">    where </span>
@@ -484,6 +485,13 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">                w_1 &amp;= [w_{1,0}, &amp;w_{1,1},&amp;w_{1,2},&amp;...,&amp;w_{1,n-1},&amp;w_{1,n}] \\\\</span>
 <span class="sd">                w_2 &amp;= [w_{2,0}, &amp;w_{2,1},&amp;w_{2,2},&amp;...,&amp;w_{2,n-1}]</span>
 <span class="sd">           \\end{array}    </span>
+
+<span class="sd">    and following subsitute:</span>
+<span class="sd">    </span>
+<span class="sd">    .. math:: </span>
+<span class="sd">    </span>
+<span class="sd">        s_i = w_{1,i} K_i        </span>
+<span class="sd">        </span>
 <span class="sd">    &quot;&quot;&quot;</span>
     
 <span class="c1">#           \\begin{eqnarray}</span>
@@ -517,9 +525,9 @@ div.nboutput  > :nth-child(2).stderr {
     <span class="n">A</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">Ka2</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">+</span>
          <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="o">-</span><span class="n">Ka3</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">J</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">+</span>
          <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="o">-</span><span class="n">Ka1</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="n">J</span><span class="p">],</span> <span class="n">k</span><span class="o">=-</span><span class="mi">1</span><span class="p">))</span>
-    <span class="k">return</span> <span class="n">A</span>
+    <span class="k">return</span> <span class="n">A</span></div>
 
-</div>
+
 <div class="viewcode-block" id="_make_meridional_diffusion_matrix"><a class="viewcode-back" href="../../../api/climlab.dynamics.html#climlab.dynamics.diffusion._make_meridional_diffusion_matrix">[docs]</a><span class="k">def</span> <span class="nf">_make_meridional_diffusion_matrix</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">lataxis</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Calls :func:`_make_diffusion_matrix` with appropriate weights for </span>
 <span class="sd">    the meridional diffusion case.</span>
@@ -554,13 +562,19 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">        </span>
 <span class="sd">        \\textrm{diffTriDiag}= </span>
 <span class="sd">        \\left[ \\begin{array}{cccccc}</span>
-<span class="sd">        1+\\frac{\\cos(b_1) K_1 }{\\cos(p_0)} &amp; -\\frac{\\cos(b_1) K_1}{\\cos(p_0)} &amp; 0 &amp;  &amp; ... &amp; 0  \\\\</span>
-<span class="sd">        -\\frac{\\cos(b_1) K_1}{\\cos(p_1)} &amp; 1+\\frac{\\cos(b_1) K_1 + \\cos(b_2) K_2}{\\cos(p_1)} &amp; -\\frac{\\cos(b_2) K_2}{\\cos(b_1)} &amp; 0 &amp; ... &amp; 0 \\\\</span>
-<span class="sd">        0 &amp; -\\frac{\\cos(b_2) K_2}{\\cos(p_2)}  &amp; 1+\\frac{\\cos(b_2) K_2 + \\cos(b_3) K_3}{\\cos(p_2)} &amp; -\\frac{\\cos(b_3) K_3}{\\cos(p_2)} &amp;... &amp; 0  \\\\</span>
+<span class="sd">        1+\\frac{u_1 }{\\cos(p_0)} &amp; -\\frac{u_1}{\\cos(p_0)} &amp; 0 &amp;  &amp; ... &amp; 0  \\\\</span>
+<span class="sd">        -\\frac{u_1}{\\cos(p_1)} &amp; 1+\\frac{u_1 + u_2}{\\cos(p_1)} &amp; -\\frac{u_2}{\\cos(b_1)} &amp; 0 &amp; ... &amp; 0 \\\\</span>
+<span class="sd">        0 &amp; -\\frac{u_2}{\\cos(p_2)}  &amp; 1+\\frac{u_2 + u_3}{\\cos(p_2)} &amp; -\\frac{u_3}{\\cos(p_2)} &amp;... &amp; 0  \\\\</span>
 <span class="sd">          &amp;  &amp; \\ddots &amp; \\ddots &amp; \\ddots &amp; \\\\</span>
-<span class="sd">        0 &amp; 0 &amp; ... &amp; -\\frac{\\cos(b_{n-2}) K_{n-2}}{\\cos(p_{n-2})}  &amp; 1+\\frac{\\cos(b_{n-2}) K_{n-2} + \\cos(b_{n-1}) K_{n-1}}{\\cos(p_{n-2})} &amp; -\\frac{\\cos(b_{n-1}) K_{n-1}}{\\cos(p_{n-2})} \\\\</span>
-<span class="sd">        0 &amp; 0 &amp; ... &amp; 0 &amp; -\\frac{\\cos(b_{n-1}) K_{n-1}}{\\cos(p_{n-1})}  &amp; 1+\\frac{\\cos(b_{n-1}) K_{n-1}}{\\cos(p_{n-1})} \\\\</span>
+<span class="sd">        0 &amp; 0 &amp; ... &amp; -\\frac{u_{n-2}}{\\cos(p_{n-2})}  &amp; 1+\\frac{u_{n-2} + u_{n-1}}{\\cos(p_{n-2})} &amp; -\\frac{u_{n-1}}{\\cos(p_{n-2})} \\\\</span>
+<span class="sd">        0 &amp; 0 &amp; ... &amp; 0 &amp; -\\frac{u_{n-1}}{\\cos(p_{n-1})}  &amp; 1+\\frac{u_{n-1}}{\\cos(p_{n-1})} \\\\</span>
 <span class="sd">        \\end{array} \\right] </span>
+
+<span class="sd">    with the substitue of:</span>
+<span class="sd">    </span>
+<span class="sd">    .. math::</span>
+<span class="sd">        </span>
+<span class="sd">        u_i = \\cos(b_i) K_i      </span>
 
 <span class="sd">    &quot;&quot;&quot;</span>       
     <span class="n">phi_stag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">lataxis</span><span class="o">.</span><span class="n">bounds</span><span class="p">)</span>
@@ -568,9 +582,9 @@ div.nboutput  > :nth-child(2).stderr {
     <span class="n">weight1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi_stag</span><span class="p">)</span>
     <span class="n">weight2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
     <span class="n">diag</span> <span class="o">=</span> <span class="n">_make_diffusion_matrix</span><span class="p">(</span><span class="n">K</span><span class="p">,</span> <span class="n">weight1</span><span class="p">,</span> <span class="n">weight2</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">diag</span>
+    <span class="k">return</span> <span class="n">diag</span></div>
 
-</div>
+
 <div class="viewcode-block" id="_guess_diffusion_axis"><a class="viewcode-back" href="../../../api/climlab.dynamics.html#climlab.dynamics.diffusion._guess_diffusion_axis">[docs]</a><span class="k">def</span> <span class="nf">_guess_diffusion_axis</span><span class="p">(</span><span class="n">process_or_domain</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Scans given process, domain or dictionary of domains for a diffusion axis</span>
 <span class="sd">    and returns appropriate name.</span>
@@ -622,7 +636,7 @@ div.nboutput  > :nth-child(2).stderr {
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2016 (licensed under Creative Commons, see License), Moritz Kreuzer.
+        &copy; Copyright 2016 (licensed under MIT License), Moritz Kreuzer &amp; Brian Rose.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>

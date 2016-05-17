@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>climlab.solar package &mdash; climlab 0.3.0.1 documentation</title>
+    <title>climlab.solar package &mdash; climlab 0.3.2 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3.0.1',
+        VERSION:     '0.3.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="climlab 0.3.0.1 documentation" href="../index.html" />
+    <link rel="top" title="climlab 0.3.2 documentation" href="../index.html" />
     <link rel="up" title="Application Programming Interface" href="climlab.html" />
     <link rel="next" title="climlab.surface package" href="climlab.surface.html" />
     <link rel="prev" title="climlab.radiation package" href="climlab.radiation.html" /> 
@@ -240,7 +240,7 @@ solar radiation at the top of the atmosphere.</p>
 approximate solution to the differential equation representing conservation
 of angular momentum (Kepler&#8217;s Second Law).  Given the orbital parameters
 and solar longitude, daily average insolation is calculated exactly
-following <a class="reference internal" href="../references.html#berger1978" id="id1">[Berger1978]</a>. Further references: <a class="reference internal" href="../references.html#berger1991" id="id2">[Berger1991]</a>.</p>
+following [Berger_1978]. Further references: [Berger_1991].</p>
 <dl class="function">
 <dt id="climlab.solar.insolation.daily_insolation">
 <code class="descclassname">climlab.solar.insolation.</code><code class="descname">daily_insolation</code><span class="sig-paren">(</span><em>lat</em>, <em>day</em>, <em>orb={'long_peri': 281.37</em>, <em>'ecc': 0.017236</em>, <em>'obliquity': 23.446}</em>, <em>S0=None</em>, <em>day_type=1</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/solar/insolation.html#daily_insolation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.solar.insolation.daily_insolation" title="Permalink to this definition">¶</a></dt>
@@ -358,7 +358,7 @@ solstice over the past 5 Myears:</p>
 <dt id="climlab.solar.insolation.solar_longitude">
 <code class="descclassname">climlab.solar.insolation.</code><code class="descname">solar_longitude</code><span class="sig-paren">(</span><em>day</em>, <em>orb={'long_peri': 281.37</em>, <em>'ecc': 0.017236</em>, <em>'obliquity': 23.446}</em>, <em>days_per_year=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/solar/insolation.html#solar_longitude"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.solar.insolation.solar_longitude" title="Permalink to this definition">¶</a></dt>
 <dd><p>Estimates solar longitude from calendar day.</p>
-<p>Method is using an approximation from <a class="reference internal" href="../references.html#berger1978" id="id3">[Berger1978]</a> section 3
+<p>Method is using an approximation from [Berger_1978] section 3
 (lambda = 0 at spring equinox).</p>
 <p><strong>Function-call arguments</strong></p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -428,13 +428,13 @@ and includes a method <a class="reference internal" href="#climlab.solar.orbital
 which interpolates the orbital data for a specific year 
 (- works equally well for arrays of years).</p>
 <p>The base class <a class="reference internal" href="#climlab.solar.orbital.OrbitalTable" title="climlab.solar.orbital.OrbitalTable"><code class="xref py py-class docutils literal"><span class="pre">OrbitalTable()</span></code></a> is designed to work with 5 Myears of orbital data
-(<strong>eccentricity, obliquity, and longitude of perihelion</strong>) from <a class="reference internal" href="../references.html#berger1991" id="id4">[Berger1991]</a>.</p>
+(<strong>eccentricity, obliquity, and longitude of perihelion</strong>) from [Berger_1991].</p>
 <p>Data will be read from the file orbit91, which was originally obtained from
 <a class="reference external" href="ftp://ftp.ncdc.noaa.gov/pub/data/paleo/insolation/">ftp://ftp.ncdc.noaa.gov/pub/data/paleo/insolation/</a>
 If the file isn&#8217;t found locally, the module will attempt to read it remotely
 from the above URL.</p>
 <p>A subclass <a class="reference internal" href="#climlab.solar.orbital.LongOrbitalTable" title="climlab.solar.orbital.LongOrbitalTable"><code class="xref py py-class docutils literal"><span class="pre">LongOrbitalTable()</span></code></a> works with La2004 orbital data for 
--51 to +21 Myears as calculated by <a class="reference internal" href="../references.html#laskar2004" id="id5">[Laskar2004]</a>.
+-51 to +21 Myears as calculated by [Laskar_2004].
 See <a class="reference external" href="http://vo.imcce.fr/insola/earth/online/earth/La2004/README.TXT">http://vo.imcce.fr/insola/earth/online/earth/La2004/README.TXT</a></p>
 <dl class="class">
 <dt id="climlab.solar.orbital.LongOrbitalTable">
@@ -442,7 +442,7 @@ See <a class="reference external" href="http://vo.imcce.fr/insola/earth/online/e
 <dd><p>Bases: <a class="reference internal" href="#climlab.solar.orbital.OrbitalTable" title="climlab.solar.orbital.OrbitalTable"><code class="xref py py-class docutils literal"><span class="pre">climlab.solar.orbital.OrbitalTable</span></code></a></p>
 <p>Loads orbital parameter tables for -51 to +21 Myears.</p>
 <dl class="docutils">
-<dt>Based on calculations by <a class="reference internal" href="../references.html#laskar2004" id="id6">[Laskar2004]</a></dt>
+<dt>Based on calculations by [Laskar_2004]</dt>
 <dd><a class="reference external" href="http://vo.imcce.fr/insola/earth/online/earth/La2004/README.TXT">http://vo.imcce.fr/insola/earth/online/earth/La2004/README.TXT</a></dd>
 </dl>
 <p>Usage is identical to parent class <a class="reference internal" href="#climlab.solar.orbital.OrbitalTable" title="climlab.solar.orbital.OrbitalTable"><code class="xref py py-class docutils literal"><span class="pre">OrbitalTable()</span></code></a>.</p>
@@ -452,7 +452,7 @@ See <a class="reference external" href="http://vo.imcce.fr/insola/earth/online/e
 <dt id="climlab.solar.orbital.OrbitalTable">
 <em class="property">class </em><code class="descclassname">climlab.solar.orbital.</code><code class="descname">OrbitalTable</code><a class="reference internal" href="../_modules/climlab/solar/orbital.html#OrbitalTable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.solar.orbital.OrbitalTable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Invoking OrbitalTable() will load 5 million years of orbital data
-from <a class="reference internal" href="../references.html#berger1991" id="id7">[Berger1991]</a> and compute linear interpolants.</p>
+from [Berger_1991] and compute linear interpolants.</p>
 <p>The data can be accessed through the method <a class="reference internal" href="#climlab.solar.orbital.OrbitalTable.lookup_parameters" title="climlab.solar.orbital.OrbitalTable.lookup_parameters"><code class="xref py py-func docutils literal"><span class="pre">lookup_parameters()</span></code></a>.</p>
 <p><strong>Object attributes</strong></p>
 <p>Following object attributes are generated during initialization:</p>
@@ -488,7 +488,8 @@ For years before present, use <code class="docutils literal"><span class="pre">k
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>kyear</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/array.html#module-array" title="(in Python v2.7)"><em>array</em></a>) &#8211; Time for which oribtal parameters should be given.     
-Will handle scalar or vector input (for multiple years).</td>
+Will handle scalar or vector input (for multiple years).
+[default: 0]</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">a three-member dictionary of orbital parameters:<blockquote>
 <div><ul class="simple">
@@ -572,12 +573,12 @@ for time before present.</p>
 </div></blockquote>
 </li>
 <li><strong>segment_length_years</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; is the length of each integration with
-fixed orbital parameters. (default: <code class="docutils literal"><span class="pre">100.</span></code>)</li>
+fixed orbital parameters. [default: 100.]</li>
 <li><strong>orbital_year_factor</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; is an optional speed-up to the orbital cycles.
-(default: <code class="docutils literal"><span class="pre">1.</span></code>)</li>
+[default: 1.]</li>
 <li><strong>verbose</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; prints product of calculation and
 information about computation progress
-if set to <code class="docutils literal"><span class="pre">True</span></code> (default).</li>
+[default: True]</li>
 </ul>
 </td>
 </tr>
@@ -629,7 +630,7 @@ corresponding orbital parameters:</p>
 
 <span class="c1">#  start the integration</span>
 <span class="c1">#  run for 10,000 orbital years, but only 1,000 model years</span>
-<span class="n">experiment</span> <span class="o">=</span> <span class="n">OrbitalCycles</span><span class="p">(</span><span class="n">ebm</span><span class="p">,</span> <span class="n">kyear_start</span><span class="o">=-</span><span class="mi">20</span><span class="p">,</span> <span class="n">kyear_stop</span><span class="o">=-</span><span class="mi">10</span><span class="p">,</span> <span class="n">orbital_year_factor</span><span class="o">=</span><span class="mf">10.</span><span class="p">)</span>
+<span class="n">experiment</span> <span class="o">=</span> <span class="n">OrbitalCycles</span><span class="p">(</span><span class="n">ebm</span><span class="p">,</span> <span class="n">kyear_start</span><span class="o">=-</span><span class="mi">20</span><span class="p">,</span> <span class="n">kyear_stop</span><span class="o">=-</span><span class="mi">10</span><span class="p">,</span>                                                         <span class="n">orbital_year_factor</span><span class="o">=</span><span class="mf">10.</span><span class="p">)</span>
 </pre></div>
 </div>
 </td>
@@ -672,7 +673,7 @@ corresponding orbital parameters:</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2016 (licensed under Creative Commons, see License), Moritz Kreuzer.
+        &copy; Copyright 2016 (licensed under MIT License), Moritz Kreuzer &amp; Brian Rose.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>climlab.model.ebm &mdash; climlab 0.3.0.1 documentation</title>
+    <title>climlab.model.ebm &mdash; climlab 0.3.2 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.3.0.1',
+        VERSION:     '0.3.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="climlab 0.3.0.1 documentation" href="../../../index.html" />
+    <link rel="top" title="climlab 0.3.2 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -222,11 +222,11 @@ div.nboutput  > :nth-child(2).stderr {
 
 <span class="sd">    This class sets up a typical EnergyBalance Model with following subprocesses:</span>
 
-<span class="sd">    * Outgoing Longwave Radiation (OLR) parameterization through </span>
+<span class="sd">    * Outgoing Longwave Radiation (OLR) parametrization through </span>
 <span class="sd">      :class:`~climlab.radiation.AplusBT.AplusBT`</span>
-<span class="sd">    * solar insolation paramterization through </span>
+<span class="sd">    * solar insolation paramtrization through </span>
 <span class="sd">      :class:`~climlab.radiation.insolation.P2Insolation`</span>
-<span class="sd">    * albedo parameterization in dependence of temperature through</span>
+<span class="sd">    * albedo parametrization in dependence of temperature through</span>
 <span class="sd">      :class:`~climlab.surface.albedo.StepFunctionAlbedo`</span>
 <span class="sd">    * energy diffusion through </span>
 <span class="sd">      :class:`~climlab.dynamics.diffusion.MeridionalDiffusion`</span>
@@ -244,11 +244,11 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">    :param float S0:            solar constant                              \n</span>
 <span class="sd">                                - unit: :math:`\\frac{\\textrm{W}}{\\textrm{m}^2}`   \n</span>
 <span class="sd">                                - default value: ``1365.2``</span>
-<span class="sd">    :param float A:             parameter for linear OLR parameterization</span>
+<span class="sd">    :param float A:             parameter for linear OLR parametrization</span>
 <span class="sd">                                :class:`~climlab.radiation.AplusBT.AplusBT` \n</span>
 <span class="sd">                                - unit: :math:`\\frac{\\textrm{W}}{\\textrm{m}^2}`   \n</span>
 <span class="sd">                                - default value: ``210.0``</span>
-<span class="sd">    :param float B:             parameter for linear OLR parameterization</span>
+<span class="sd">    :param float B:             parameter for linear OLR parametrization</span>
 <span class="sd">                                :class:`~climlab.radiation.AplusBT.AplusBT` \n</span>
 <span class="sd">                                - unit: :math:`\\frac{\\textrm{W}}{\\textrm{m}^2 \\ ^{\circ} \\textrm{C}}`   \n</span>
 <span class="sd">                                - default value: ``2.0``</span>
@@ -265,12 +265,12 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">    :param float Tf:            freezing temperature                        \n</span>
 <span class="sd">                                - unit: :math:`^{\circ} \\textrm{C}`                    \n</span>
 <span class="sd">                                - default value: ``-10.0``</span>
-<span class="sd">    :param float a0:            base value for planetary albedo parameterization</span>
+<span class="sd">    :param float a0:            base value for planetary albedo parametrization</span>
 <span class="sd">                                :class:`~climlab.surface.albedo.StepFunctionAlbedo`</span>
 <span class="sd">                                                                            \n</span>
 <span class="sd">                                - unit: dimensionless</span>
 <span class="sd">                                - default value: ``0.3``</span>
-<span class="sd">    :param float a2:            parabolic value for planetary  albedo parameterization</span>
+<span class="sd">    :param float a2:            parabolic value for planetary  albedo parametrization</span>
 <span class="sd">                                :class:`~climlab.surface.albedo.StepFunctionAlbedo`</span>
 <span class="sd">                                                                            \n</span>
 <span class="sd">                                - unit: dimensionless</span>
@@ -428,8 +428,8 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">                Field(13.99873037400856)</span>
 <span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">global_mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Ts</span><span class="p">)</span>
-</div>
+        <span class="k">return</span> <span class="n">global_mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">Ts</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="EBM.inferred_heat_transport"><a class="viewcode-back" href="../../../api/climlab.model.html#climlab.model.ebm.EBM.inferred_heat_transport">[docs]</a>    <span class="k">def</span> <span class="nf">inferred_heat_transport</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Calculates the inferred heat transport by integrating the TOA </span>
 <span class="sd">        energy imbalance from pole to pole.</span>
@@ -455,11 +455,12 @@ div.nboutput  > :nth-child(2).stderr {
         <span class="n">phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lat</span><span class="p">)</span>
         <span class="n">energy_in</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">net_radiation</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span><span class="mf">1E-15</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="n">const</span><span class="o">.</span><span class="n">a</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span>
-                <span class="n">integrate</span><span class="o">.</span><span class="n">cumtrapz</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="o">*</span><span class="n">energy_in</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">phi</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="mf">0.</span><span class="p">))</span>
-</div>
+                <span class="n">integrate</span><span class="o">.</span><span class="n">cumtrapz</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="o">*</span><span class="n">energy_in</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">phi</span><span class="p">,</span> <span class="n">initial</span><span class="o">=</span><span class="mf">0.</span><span class="p">))</span></div>
+
 <div class="viewcode-block" id="EBM.heat_transport"><a class="viewcode-back" href="../../../api/climlab.model.html#climlab.model.ebm.EBM.heat_transport">[docs]</a>    <span class="k">def</span> <span class="nf">heat_transport</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns instantaneous heat transport in unit :math:`\\textrm{PW}`</span>
-<span class="sd">        on the staggered grid (bounds) through callinaag :func:`diffusive_heat_transport`.</span>
+<span class="sd">        on the staggered grid (bounds) through calling</span>
+<span class="sd">        :func:`diffusive_heat_transport`.</span>
 
 <span class="sd">        :Example: </span>
 <span class="sd">        </span>
@@ -467,8 +468,8 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">                :include-source:</span>
 <span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">diffusive_heat_transport</span><span class="p">()</span>
-</div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">diffusive_heat_transport</span><span class="p">()</span></div>
+
 <div class="viewcode-block" id="EBM.diffusive_heat_transport"><a class="viewcode-back" href="../../../api/climlab.model.html#climlab.model.ebm.EBM.diffusive_heat_transport">[docs]</a>    <span class="k">def</span> <span class="nf">diffusive_heat_transport</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Compute instantaneous diffusive heat transport in unit :math:`\\textrm{PW}`</span>
 <span class="sd">        on the staggered grid (bounds) through calculating:</span>
@@ -488,8 +489,8 @@ div.nboutput  > :nth-child(2).stderr {
         <span class="n">dTdphi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span>
         <span class="n">dTdphi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dTdphi</span><span class="p">,</span> <span class="mf">0.</span><span class="p">)</span>
         <span class="n">dTdphi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">dTdphi</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">(</span><span class="mf">1E-15</span><span class="o">*-</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi_stag</span><span class="p">)</span><span class="o">*</span><span class="n">const</span><span class="o">.</span><span class="n">a</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">D</span><span class="o">*</span><span class="n">dTdphi</span><span class="p">)</span>
-</div>
+        <span class="k">return</span> <span class="p">(</span><span class="mf">1E-15</span><span class="o">*-</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi_stag</span><span class="p">)</span><span class="o">*</span><span class="n">const</span><span class="o">.</span><span class="n">a</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">D</span><span class="o">*</span><span class="n">dTdphi</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="EBM.heat_transport_convergence"><a class="viewcode-back" href="../../../api/climlab.model.html#climlab.model.ebm.EBM.heat_transport_convergence">[docs]</a>    <span class="k">def</span> <span class="nf">heat_transport_convergence</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns instantaneous convergence of heat transport.</span>
 <span class="sd">        </span>
@@ -512,9 +513,9 @@ div.nboutput  > :nth-child(2).stderr {
         <span class="n">phi_stag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lat_bounds</span><span class="p">)</span>
         <span class="n">H</span> <span class="o">=</span> <span class="mf">1.E15</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">heat_transport</span><span class="p">()</span>
         <span class="k">return</span> <span class="p">(</span><span class="o">-</span><span class="mf">1.</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">math</span><span class="o">.</span><span class="n">pi</span><span class="o">*</span><span class="n">const</span><span class="o">.</span><span class="n">a</span><span class="o">**</span><span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">))</span> <span class="o">*</span>
-                <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">H</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">phi_stag</span><span class="p">))</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">H</span><span class="p">)</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">diff</span><span class="p">(</span><span class="n">phi_stag</span><span class="p">))</span></div></div>
 
-</div></div>
+
 <div class="viewcode-block" id="EBM_seasonal"><a class="viewcode-back" href="../../../api/climlab.model.html#climlab.model.ebm.EBM_seasonal">[docs]</a><span class="k">class</span> <span class="nc">EBM_seasonal</span><span class="p">(</span><span class="n">EBM</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a0</span><span class="o">=</span><span class="mf">0.33</span><span class="p">,</span> <span class="n">a2</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">ai</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;A class that implements Energy Balance Models with realistic </span>
@@ -532,18 +533,15 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">        An instance of ``EBM_seasonal`` is initialized with the following </span>
 <span class="sd">        arguments:</span>
 <span class="sd">        </span>
-<span class="sd">        :param float a0:            base value for planetary albedo parameterization</span>
+<span class="sd">        :param float a0:            base value for planetary albedo parametrization</span>
 <span class="sd">                                    :class:`~climlab.surface.albedo.StepFunctionAlbedo`</span>
-<span class="sd">                                                                                \n</span>
-<span class="sd">                                    - default value: ``0.33``</span>
-<span class="sd">        :param float a2:            parabolic value for planetary  albedo parameterization</span>
+<span class="sd">                                    [default: 0.33]</span>
+<span class="sd">        :param float a2:            parabolic value for planetary  albedo parametrization</span>
 <span class="sd">                                    :class:`~climlab.surface.albedo.StepFunctionAlbedo`</span>
-<span class="sd">                                                                                \n</span>
-<span class="sd">                                    - default value: ``0.25``</span>
+<span class="sd">                                    [default: 0.25]</span>
 <span class="sd">        :param float ai:            value for ice albedo paramerization in</span>
 <span class="sd">                                    :class:`~climlab.surface.albedo.StepFunctionAlbedo`</span>
-<span class="sd">                                                                                \n</span>
-<span class="sd">                                    - default value: ``None``</span>
+<span class="sd">                                    (optional)</span>
 <span class="sd">        </span>
 <span class="sd">        </span>
 <span class="sd">        **Object attributes** \n</span>
@@ -596,9 +594,9 @@ div.nboutput  > :nth-child(2).stderr {
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">[</span><span class="s1">&#39;ai&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ai</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_subprocess</span><span class="p">(</span><span class="s1">&#39;albedo&#39;</span><span class="p">,</span>
-                    <span class="n">albedo</span><span class="o">.</span><span class="n">StepFunctionAlbedo</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">))</span>
+                    <span class="n">albedo</span><span class="o">.</span><span class="n">StepFunctionAlbedo</span><span class="p">(</span><span class="n">state</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">))</span></div>
 
-</div>
+
 <div class="viewcode-block" id="EBM_annual"><a class="viewcode-back" href="../../../api/climlab.model.html#climlab.model.ebm.EBM_annual">[docs]</a><span class="k">class</span> <span class="nc">EBM_annual</span><span class="p">(</span><span class="n">EBM_seasonal</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;A class that implements Energy Balance Models with annual mean insolation.</span>
@@ -650,7 +648,7 @@ div.nboutput  > :nth-child(2).stderr {
         <span class="nb">super</span><span class="p">(</span><span class="n">EBM_annual</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="n">sfc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="s1">&#39;Ts&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_subprocess</span><span class="p">(</span><span class="s1">&#39;insolation&#39;</span><span class="p">,</span>
-                            <span class="n">AnnualMeanInsolation</span><span class="p">(</span><span class="n">domains</span><span class="o">=</span><span class="n">sfc</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">))</span>
+                            <span class="n">AnnualMeanInsolation</span><span class="p">(</span><span class="n">domains</span><span class="o">=</span><span class="n">sfc</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">param</span><span class="p">))</span></div>
 
 <span class="c1"># an EBM that computes degree-days has an additional state variable.</span>
 <span class="c1">#  Need to implement that</span>
@@ -945,7 +943,7 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="c1">#         # set the diffusivity, depends on global mean temperature</span>
 <span class="c1">#         self.set_diffusivity( K = self.compute_K() )</span>
 <span class="c1">#         _EBM.step_forward(self)</span>
-<span class="c1">#==============================================================================</span></div>
+<span class="c1">#==============================================================================</span>
 </pre></div>
 
           </div>
@@ -972,7 +970,7 @@ div.nboutput  > :nth-child(2).stderr {
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2016 (licensed under Creative Commons, see License), Moritz Kreuzer.
+        &copy; Copyright 2016 (licensed under MIT License), Moritz Kreuzer &amp; Brian Rose.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>

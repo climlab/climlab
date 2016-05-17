@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>climlab.solar.orbital_cycles &mdash; climlab 0.3.0.1 documentation</title>
+    <title>climlab.solar.orbital_cycles &mdash; climlab 0.3.2 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.3.0.1',
+        VERSION:     '0.3.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="climlab 0.3.0.1 documentation" href="../../../index.html" />
+    <link rel="top" title="climlab 0.3.2 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -261,12 +261,12 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">                                                * *default value:* ``0.``</span>
 
 <span class="sd">        :param float segment_length_years:  is the length of each integration with</span>
-<span class="sd">                                            fixed orbital parameters. (default: ``100.``)</span>
+<span class="sd">                                            fixed orbital parameters. [default: 100.]</span>
 <span class="sd">        :param float orbital_year_factor:   is an optional speed-up to the orbital cycles.</span>
-<span class="sd">                                            (default: ``1.``)</span>
+<span class="sd">                                            [default: 1.]</span>
 <span class="sd">        :param bool verbose:                prints product of calculation and</span>
 <span class="sd">                                            information about computation progress</span>
-<span class="sd">                                            if set to ``True`` (default).</span>
+<span class="sd">                                            [default: True]</span>
 <span class="sd">                                            </span>
 <span class="sd">        **Object attributes** \n</span>
 <span class="sd">        </span>
@@ -314,7 +314,8 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">        </span>
 <span class="sd">                #  start the integration</span>
 <span class="sd">                #  run for 10,000 orbital years, but only 1,000 model years</span>
-<span class="sd">                experiment = OrbitalCycles(ebm, kyear_start=-20, kyear_stop=-10, orbital_year_factor=10.)</span>
+<span class="sd">                experiment = OrbitalCycles(ebm, kyear_start=-20, kyear_stop=-10, \</span>
+<span class="sd">                                                        orbital_year_factor=10.)</span>
 <span class="sd">                </span>
 <span class="sd">        &quot;&quot;&quot;</span>      
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
@@ -393,7 +394,7 @@ div.nboutput  > :nth-child(2).stderr {
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2016 (licensed under Creative Commons, see License), Moritz Kreuzer.
+        &copy; Copyright 2016 (licensed under MIT License), Moritz Kreuzer &amp; Brian Rose.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>

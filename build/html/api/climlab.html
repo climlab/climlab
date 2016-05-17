@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Application Programming Interface &mdash; climlab 0.3.0.1 documentation</title>
+    <title>Application Programming Interface &mdash; climlab 0.3.2 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3.0.1',
+        VERSION:     '0.3.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,9 +24,9 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="climlab 0.3.0.1 documentation" href="../index.html" />
+    <link rel="top" title="climlab 0.3.2 documentation" href="../index.html" />
     <link rel="next" title="climlab.domain package" href="climlab.domain.html" />
-    <link rel="prev" title="Ice - Albedo Feedback and runaway glaciation" href="../notebooks/Snowball_Earth_in_the_EBM.html" /> 
+    <link rel="prev" title="Budyko Transport for Energy Balance Models" href="../notebooks/Budyko_Transport_EBM.html" /> 
   </head>
   <body role="document">
 
@@ -47,7 +47,7 @@
           <a href="climlab.domain.html" title="climlab.domain package"
              accesskey="N">next</a> |</li>
         <li class="right" >
-          <a href="../notebooks/Snowball_Earth_in_the_EBM.html" title="Ice - Albedo Feedback and runaway glaciation"
+          <a href="../notebooks/Budyko_Transport_EBM.html" title="Budyko Transport for Energy Balance Models"
              accesskey="P">previous</a> |</li>
         <li><a href="../intro.html">home</a>|&nbsp;</li>
         <li><a href="../search.html">search</a>|&nbsp;</li>
@@ -219,9 +219,11 @@ div.nboutput  > :nth-child(2).stderr {
 
 .ansibold { font-weight: bold; }
 </style>
-<div class="section" id="module-climlab">
-<span id="application-programming-interface"></span><h1>Application Programming Interface<a class="headerlink" href="#module-climlab" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="subpackages">
+<div class="section" id="application-programming-interface">
+<h1>Application Programming Interface<a class="headerlink" href="#application-programming-interface" title="Permalink to this headline">¶</a></h1>
+<p>This chapter documents the source code of the <code class="docutils literal"><span class="pre">climlab</span></code> package. The focus is on the methods and functions that the user invokes while using the package. Nevertheless also the underlying code of the <code class="docutils literal"><span class="pre">climlab</span></code> architecture has been documented for a comprehensive understanding and traceability.</p>
+<p>Until now only the Energy Balance Model revelent parts of <code class="docutils literal"><span class="pre">climlab</span></code> have been covered.</p>
+<span class="target" id="module-climlab"></span><div class="section" id="subpackages">
 <h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
@@ -279,7 +281,7 @@ div.nboutput  > :nth-child(2).stderr {
 <div class="section" id="inheritance-diagram">
 <h2>Inheritance Diagram<a class="headerlink" href="#inheritance-diagram" title="Permalink to this headline">¶</a></h2>
 <p class="graphviz">
-<img src="../_images/inheritance-c18b8d698617ee5c81adb9905afa37bc736d68d5.png" alt="Inheritance diagram of climlab.domain.axis, climlab.domain.domain, climlab.domain.field, climlab.dynamics.budyko_transport, climlab.dynamics.diffusion, climlab.model.ebm, climlab.process.diagnostic, climlab.process.energy_budget, climlab.process.implicit, climlab.process.process, climlab.process.time_dependent_process, climlab.radiation.AplusBT, climlab.radiation.Boltzmann, climlab.radiation.insolation, climlab.solar.insolation, climlab.solar.orbital_cycles, climlab.solar.orbital, climlab.surface.albedo" usemap="#inheritanceba8c397035" class="inheritance"/>
+<img src="../_images/inheritance-8786959650c7c1a69b61698c5eb20fed04e2d637.png" alt="Inheritance diagram of climlab.domain.axis, climlab.domain.domain, climlab.domain.field, climlab.dynamics.budyko_transport, climlab.dynamics.diffusion, climlab.model.ebm, climlab.process.diagnostic, climlab.process.energy_budget, climlab.process.implicit, climlab.process.process, climlab.process.time_dependent_process, climlab.radiation.AplusBT, climlab.radiation.Boltzmann, climlab.radiation.insolation, climlab.solar.insolation, climlab.solar.orbital_cycles, climlab.solar.orbital, climlab.surface.albedo" usemap="#inheritanceba8c397035" class="inheritance"/>
 <map id="inheritanceba8c397035" name="inheritanceba8c397035">
 <area shape="rect" id="node1" href="climlab.radiation.html#climlab.radiation.insolation.AnnualMeanInsolation" target="_top" title="A class for latitudewise solar insolation averaged over a year." alt="" coords="995,387,1221,418"/>
 <area shape="rect" id="node13" href="climlab.radiation.html#climlab.radiation.insolation.DailyInsolation" target="_top" title="A class to compute latitudewise daily solar insolation for specific " alt="" coords="1270,387,1429,418"/>
@@ -309,7 +311,7 @@ div.nboutput  > :nth-child(2).stderr {
 <area shape="rect" id="node27" href="climlab.dynamics.html#climlab.dynamics.diffusion.MeridionalDiffusion" target="_top" title="A parent class for Meridional diffusion processes." alt="" coords="1009,715,1207,746"/>
 <area shape="rect" id="node19" href="climlab.model.html#climlab.model.ebm.EBM_seasonal" target="_top" title="EBM_seasonal" alt="" coords="1032,333,1184,363"/>
 <area shape="rect" id="node18" href="climlab.model.html#climlab.model.ebm.EBM_annual" target="_top" title="EBM_annual" alt="" coords="1281,333,1417,363"/>
-<area shape="rect" id="node21" href="climlab.domain.html#climlab.domain.field.Field" target="_top" title="Custom class for climlab gridded quantities, called Field" alt="" coords="280,114,352,145"/>
+<area shape="rect" id="node21" href="climlab.domain.html#climlab.domain.field.Field" target="_top" title="Custom class for climlab gridded quantities, called Field." alt="" coords="280,114,352,145"/>
 <area shape="rect" id="node22" title="ndarray(shape, dtype=float, buffer=None, offset=0," alt="" coords="30,114,125,145"/>
 <area shape="rect" id="node25" href="climlab.solar.html#climlab.solar.orbital.LongOrbitalTable" target="_top" title="Loads orbital parameter tables for &#45;51 to +21 Myears." alt="" coords="227,59,405,90"/>
 <area shape="rect" id="node26" href="climlab.solar.html#climlab.solar.orbital.OrbitalTable" target="_top" title="Invoking OrbitalTable() will load 5 million years of orbital data" alt="" coords="11,59,143,90"/>
@@ -340,7 +342,7 @@ div.nboutput  > :nth-child(2).stderr {
           <a href="climlab.domain.html" title="climlab.domain package"
              >next</a> |</li>
         <li class="right" >
-          <a href="../notebooks/Snowball_Earth_in_the_EBM.html" title="Ice - Albedo Feedback and runaway glaciation"
+          <a href="../notebooks/Budyko_Transport_EBM.html" title="Budyko Transport for Energy Balance Models"
              >previous</a> |</li>
         <li><a href="../intro.html">home</a>|&nbsp;</li>
         <li><a href="../search.html">search</a>|&nbsp;</li>
@@ -351,7 +353,7 @@ div.nboutput  > :nth-child(2).stderr {
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2016 (licensed under Creative Commons, see License), Moritz Kreuzer.
+        &copy; Copyright 2016 (licensed under MIT License), Moritz Kreuzer &amp; Brian Rose.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>

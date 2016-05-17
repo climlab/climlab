@@ -10,7 +10,7 @@ c.add_subprocess('diffusion',d)
 
 ### Integrate & Plot ###
 
-fig = plt.figure()
+fig = plt.figure( figsize=(6,4))
 ax = fig.add_subplot(111)
 
 ax.plot(c.lev, c.state['Tatm'], label='step 0')

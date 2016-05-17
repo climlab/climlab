@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>climlab.surface package &mdash; climlab 0.3.0.1 documentation</title>
+    <title>climlab.surface package &mdash; climlab 0.3.2 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3.0.1',
+        VERSION:     '0.3.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="climlab 0.3.0.1 documentation" href="../index.html" />
+    <link rel="top" title="climlab 0.3.2 documentation" href="../index.html" />
     <link rel="up" title="Application Programming Interface" href="climlab.html" />
     <link rel="next" title="climlab.utils package" href="climlab.utils.html" />
     <link rel="prev" title="climlab.solar package" href="climlab.solar.html" /> 
@@ -247,12 +247,7 @@ div.nboutput  > :nth-child(2).stderr {
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>albedo</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; <p>albedo values</p>
-<ul class="simple">
-<li>unit: dimensionless</li>
-<li>default value: <code class="docutils literal"><span class="pre">0.33</span></code></li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>albedo</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; albedo values [default: 0.33]</td>
 </tr>
 </tbody>
 </table>
@@ -351,7 +346,7 @@ following object attributes are generated and updated during initialization:</p>
 <li><strong>param</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; The parameter dictionary is updated with the 
 input argument <code class="docutils literal"><span class="pre">'Tf'</span></code>.</li>
 <li><strong>diagnostics</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; key <code class="docutils literal"><span class="pre">'icelat'</span></code> initialized</li>
-<li><strong>icelat</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/array.html#module-array" title="(in Python v2.7)"><em>array</em></a>) &#8211; the subprocess attribute <code class="docutils literal"><span class="pre">self.icelat</span></code> is
+<li><a class="reference internal" href="#climlab.surface.albedo.Iceline.icelat" title="climlab.surface.albedo.Iceline.icelat"><strong>icelat</strong></a> (<a class="reference external" href="http://docs.python.org/2.7/library/array.html#module-array" title="(in Python v2.7)"><em>array</em></a>) &#8211; the subprocess attribute <code class="docutils literal"><span class="pre">self.icelat</span></code> is
 created</li>
 </ul>
 </td>
@@ -376,7 +371,7 @@ and updates following attributes according to the freezing temperature
 <span class="math">\(T_s \ge T_f\)</span></li>
 <li><strong>ice</strong> (<a class="reference internal" href="climlab.domain.html#climlab.domain.field.Field" title="climlab.domain.field.Field"><em>Field</em></a>) &#8211; a Field of booleans which are <code class="docutils literal"><span class="pre">True</span></code> where
 <span class="math">\(T_s &lt; T_f\)</span></li>
-<li><strong>icelat</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/array.html#module-array" title="(in Python v2.7)"><em>array</em></a>) &#8211; an array with two elements indicating the 
+<li><a class="reference internal" href="#climlab.surface.albedo.Iceline.icelat" title="climlab.surface.albedo.Iceline.icelat"><strong>icelat</strong></a> (<a class="reference external" href="http://docs.python.org/2.7/library/array.html#module-array" title="(in Python v2.7)"><em>array</em></a>) &#8211; an array with two elements indicating the 
 ice-edge latitudes</li>
 <li><strong>diagnostics</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; key <code class="docutils literal"><span class="pre">'icelat'</span></code> is updated according to object
 attribute <code class="docutils literal"><span class="pre">self.icelat</span></code> during modification</li>
@@ -386,6 +381,11 @@ attribute <code class="docutils literal"><span class="pre">self.icelat</span></c
 </tbody>
 </table>
 </dd></dl>
+
+<dl class="attribute">
+<dt id="climlab.surface.albedo.Iceline.icelat">
+<code class="descname">icelat</code><a class="headerlink" href="#climlab.surface.albedo.Iceline.icelat" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -406,18 +406,9 @@ and <span class="math">\(x=sin(\varphi)\)</span>.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>a0</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; <p>basic parameter for albedo function</p>
-<ul>
-<li>unit: dimensionless</li>
-<li>default value: <code class="docutils literal"><span class="pre">0.33</span></code></li>
-</ul>
-</li>
-<li><strong>a2</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; <p>factor for second legendre polynominal term in albedo function</p>
-<ul>
-<li>unit: dimensionless</li>
-<li>default value: <code class="docutils literal"><span class="pre">0.25</span></code></li>
-</ul>
-</li>
+<li><strong>a0</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; basic parameter for albedo function [default: 0.33]</li>
+<li><strong>a2</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; factor for second legendre polynominal term in albedo 
+function [default: 0.25]</li>
 </ul>
 </td>
 </tr>
@@ -523,6 +514,11 @@ to the new value</li>
 </table>
 </dd></dl>
 
+<dl class="attribute">
+<dt id="climlab.surface.albedo.P2Albedo.albedo">
+<code class="descname">albedo</code><a class="headerlink" href="#climlab.surface.albedo.P2Albedo.albedo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="class">
@@ -551,24 +547,11 @@ initialization:</p>
 <li>default value: <code class="docutils literal"><span class="pre">-10</span></code></li>
 </ul>
 </li>
-<li><strong>a0</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; <p>basic parameter for P2Albedo subprocess</p>
-<ul>
-<li>unit: dimensionless</li>
-<li>default value: <code class="docutils literal"><span class="pre">0.3</span></code></li>
-</ul>
-</li>
-<li><strong>a2</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; <p>factor for second legendre polynominal term in P2Albedo subprocess</p>
-<ul>
-<li>unit: dimensionless</li>
-<li>default value: <code class="docutils literal"><span class="pre">0.078</span></code></li>
-</ul>
-</li>
-<li><strong>ai</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; <p>ice albedo value for ConstantAlbedo subprocess</p>
-<ul>
-<li>unit: dimensionless</li>
-<li>default value: <code class="docutils literal"><span class="pre">0.62</span></code></li>
-</ul>
-</li>
+<li><strong>a0</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; basic parameter for P2Albedo subprocess [default: 0.3]</li>
+<li><strong>a2</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; factor for second legendre polynominal term in P2Albedo
+subprocess [default: 0.078]</li>
+<li><strong>ai</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; ice albedo value for ConstantAlbedo subprocess
+[default: 0.62]</li>
 </ul>
 </td>
 </tr>
@@ -617,6 +600,11 @@ created</li>
 </tr>
 </tbody>
 </table>
+<dl class="attribute">
+<dt id="climlab.surface.albedo.StepFunctionAlbedo.albedo">
+<code class="descname">albedo</code><a class="headerlink" href="#climlab.surface.albedo.StepFunctionAlbedo.albedo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 </div>
@@ -653,7 +641,7 @@ created</li>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2016 (licensed under Creative Commons, see License), Moritz Kreuzer.
+        &copy; Copyright 2016 (licensed under MIT License), Moritz Kreuzer &amp; Brian Rose.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>

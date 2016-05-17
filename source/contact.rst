@@ -23,7 +23,7 @@ climlab documentation
 The documentation has been built by Moritz Kreuzer using `Sphinx <http://www.sphinx-doc.org>`_.
 Based on some commentary strings in the source code and a couple of Jupyter Notebooks, this documentation has been developed.
 
-Currently it covers only the Energy Balance Model relevant parts of the package.
+Currently, it covers only the Energy Balance Model relevant parts of the package.
 
 	| **Moritz Kreuzer**				    
 	| Potsdam Institut for Climate Impact Research (PIK) 

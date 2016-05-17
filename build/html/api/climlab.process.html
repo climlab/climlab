@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>climlab.process package &mdash; climlab 0.3.0.1 documentation</title>
+    <title>climlab.process package &mdash; climlab 0.3.2 documentation</title>
     
     <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../',
-        VERSION:     '0.3.0.1',
+        VERSION:     '0.3.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="climlab 0.3.0.1 documentation" href="../index.html" />
+    <link rel="top" title="climlab 0.3.2 documentation" href="../index.html" />
     <link rel="up" title="Application Programming Interface" href="climlab.html" />
     <link rel="next" title="climlab.radiation package" href="climlab.radiation.html" />
     <link rel="prev" title="climlab.model package" href="climlab.model.html" /> 
@@ -414,7 +414,7 @@ subprocess</li>
 <dd><p>Computes the state variable tendencies in time for implicit processes.</p>
 <p>To calculate the new state the <code class="xref py py-func docutils literal"><span class="pre">_implicit_solver()</span></code> method is 
 called for daughter classes. This however returns the new state of the 
-variables, not just the tendencies. Therefore the adjustment is 
+variables, not just the tendencies. Therefore, the adjustment is 
 calculated which is the difference between the new and the old state 
 and stored in the object&#8217;s attribute adjustment.</p>
 <p>Calculating the new model states through solving the matrix problem 
@@ -471,10 +471,10 @@ Set to <code class="docutils literal"><span class="pre">None</span></code> if no
 <a class="reference internal" href="climlab.domain.html#climlab.domain.domain._Domain" title="climlab.domain.domain._Domain"><code class="xref py py-class docutils literal"><span class="pre">_Domain</span></code></a>) &#8211; domain(s) for the process</li>
 <li><strong>subprocess</strong> (<a class="reference internal" href="#climlab.process.process.Process" title="climlab.process.process.Process"><code class="xref py py-class docutils literal"><span class="pre">Process</span></code></a> or dict of 
 <a class="reference internal" href="#climlab.process.process.Process" title="climlab.process.process.Process"><code class="xref py py-class docutils literal"><span class="pre">Process</span></code></a>) &#8211; subprocess(es) of the process</li>
-<li><strong>lat</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/array.html#module-array" title="(in Python v2.7)"><em>array</em></a>) &#8211; latitudinal points [optional]</li>
-<li><strong>lev</strong> &#8211; altitudinal points [optional]</li>
-<li><strong>num_lat</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of latitudional points [optional]</li>
-<li><strong>num_levels</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of altitudinal points [optional]</li>
+<li><strong>lat</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/array.html#module-array" title="(in Python v2.7)"><em>array</em></a>) &#8211; latitudinal points (optional)</li>
+<li><strong>lev</strong> &#8211; altitudinal points (optional)</li>
+<li><strong>num_lat</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of latitudional points (optional)</li>
+<li><strong>num_levels</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; number of altitudinal points (optional)</li>
 <li><strong>input</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; collection of input quantities</li>
 </ul>
 </td>
@@ -662,7 +662,7 @@ i.e. <code class="docutils literal"><span class="pre">proc.diagnostics['name']</
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>name</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; name of diagnostic quantity to be initialized</li>
 <li><strong>value</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/array.html#module-array" title="(in Python v2.7)"><em>array</em></a>) &#8211; initial value for quantity - accepts also type
-float, int, etc. (<em>default</em>:<code class="docutils literal"><span class="pre">0.</span></code>)</li>
+float, int, etc. [default: 0.]</li>
 </ul>
 </td>
 </tr>
@@ -1067,12 +1067,11 @@ arguments <em>(for detailed information see Object attributes below)</em>:</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>timestep</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; specifies the timestep of the object</li>
-<li><strong>time_type</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; how time-dependent-process should be computed. 
-Set to <code class="docutils literal"><span class="pre">'explicit'</span></code> by default.</li>
+<li><strong>timestep</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; specifies the timestep of the object (optional)</li>
+<li><strong>time_type</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; how time-dependent-process should be computed 
+[default: &#8216;explicit&#8217;]</li>
 <li><strong>topdown</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; whether geneterate <em>process_types</em> in regular or 
-in reverse order.
-Set to <code class="docutils literal"><span class="pre">True</span></code> by default.</li>
+in reverse order [default: True]</li>
 </ul>
 </td>
 </tr>
@@ -1111,9 +1110,9 @@ Possible values are: <code class="docutils literal"><span class="pre">'explicit'
 <li><code class="docutils literal"><span class="pre">'timestep'</span></code>: see initialization parameter</li>
 <li><code class="docutils literal"><span class="pre">'num_steps_per_year'</span></code>: see <a class="reference internal" href="#climlab.process.time_dependent_process.TimeDependentProcess.set_timestep" title="climlab.process.time_dependent_process.TimeDependentProcess.set_timestep"><code class="xref py py-func docutils literal"><span class="pre">set_timestep()</span></code></a> and <a class="reference internal" href="#climlab.process.time_dependent_process.TimeDependentProcess.timestep" title="climlab.process.time_dependent_process.TimeDependentProcess.timestep"><code class="xref py py-func docutils literal"><span class="pre">timestep()</span></code></a> for details</li>
 <li><code class="docutils literal"><span class="pre">'day_of_year_index'</span></code>: counter how many steps have been integrated in current year</li>
-<li><code class="docutils literal"><span class="pre">'steps'</span></code>: counter how many steps have been integrated in total,</li>
-<li><code class="docutils literal"><span class="pre">'days_elapsed'</span></code>: time counter for days,</li>
-<li><code class="docutils literal"><span class="pre">'years_elapsed'</span></code>: time counter for years,</li>
+<li><code class="docutils literal"><span class="pre">'steps'</span></code>: counter how many steps have been integrated in total</li>
+<li><code class="docutils literal"><span class="pre">'days_elapsed'</span></code>: time counter for days</li>
+<li><code class="docutils literal"><span class="pre">'years_elapsed'</span></code>: time counter for years</li>
 <li><code class="docutils literal"><span class="pre">'days_of_year'</span></code>: array which holds the number of numerical steps per year, expressed in days</li>
 </ul>
 </li>
@@ -1127,24 +1126,28 @@ Possible values are: <code class="docutils literal"><span class="pre">'explicit'
 <code class="descname">compute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/process/time_dependent_process.html#TimeDependentProcess.compute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.process.time_dependent_process.TimeDependentProcess.compute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Computes the tendencies for all state variables given current state 
 and specified input.</p>
-<p>The function first computes all diagnostic processes as they may effect
-all the other processes (such as change in solar distribution).
-After all the diagnostic processes don&#8217;t produce any tendencies directly. Subsequently
-all tendencies and diagnostics for all explicit processes are computed.</p>
+<p>The function first computes all diagnostic processes. They don&#8217;t produce 
+any tendencies directly but they may effect the other processes (such as
+change in solar distribution). Subsequently, all tendencies and 
+diagnostics for all explicit processes are computed.</p>
 <p>Tendencies due to implicit and adjustment processes need to be
 calculated from a state that is already adjusted after explicit 
-alteration. So the explicit tendencies are applied to the states 
-temporarily. Now all tendencies from implicit processes are calculated 
-through matrix inversions and same like the explicit tendencies applied
-to the states temporarily. Subsequently all instantaneous adjustments 
-are computed.</p>
-<p>Then the changes made to the states from explicit and implicit 
-processes are removed again as this <a class="reference internal" href="#climlab.process.time_dependent_process.TimeDependentProcess.compute" title="climlab.process.time_dependent_process.TimeDependentProcess.compute"><code class="xref py py-func docutils literal"><span class="pre">compute()</span></code></a> function is
-supposed to calculate only tendencies and not applying them to the states.</p>
-<p>Finally all calculated tendencies from all processes are collected 
+alteration. For that reason the explicit tendencies are applied to the 
+states temporarily. Now all tendencies from implicit processes are 
+calculated by matrix inversions and similar to the explicit tendencies,
+the implicit ones are applied to the states temporarily. Subsequently,
+all instantaneous adjustments are computed.</p>
+<p>Then the changes that were made to the states from explicit and implicit 
+processes are removed again as this 
+<a class="reference internal" href="#climlab.process.time_dependent_process.TimeDependentProcess.compute" title="climlab.process.time_dependent_process.TimeDependentProcess.compute"><code class="xref py py-class docutils literal"><span class="pre">compute()</span></code></a>
+function is supposed to calculate only tendencies and not apply them 
+to the states.</p>
+<p>Finally, all calculated tendencies from all processes are collected 
 for each state, summed up and stored in the dictionary 
 <code class="docutils literal"><span class="pre">self.tendencies</span></code>, which is an attribute of the time-dependent-process 
-object for which the <a class="reference internal" href="#climlab.process.time_dependent_process.TimeDependentProcess.compute" title="climlab.process.time_dependent_process.TimeDependentProcess.compute"><code class="xref py py-func docutils literal"><span class="pre">compute()</span></code></a> method has been called.</p>
+object, for which the 
+<a class="reference internal" href="#climlab.process.time_dependent_process.TimeDependentProcess.compute" title="climlab.process.time_dependent_process.TimeDependentProcess.compute"><code class="xref py py-class docutils literal"><span class="pre">compute()</span></code></a>
+method has been called.</p>
 <p><strong>Object attributes</strong></p>
 <p>During method execution following object attributes are modified:</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -1184,9 +1187,10 @@ be changed with the input argument.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>crit</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; exit criteria for difference of iterated solutions</li>
+<li><strong>crit</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; exit criteria for difference of iterated
+solutions [default: 0.0001]</li>
 <li><strong>verbose</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; information whether total elapsed time 
-should be printed.</li>
+should be printed [default: True]</li>
 </ul>
 </td>
 </tr>
@@ -1220,9 +1224,10 @@ should be printed.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>days</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; integration time for the model in days</li>
+<li><strong>days</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; integration time for the model in days      
+[default: 1.0]</li>
 <li><strong>verbose</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; information whether model time details 
-should be printed.</li>
+should be printed [default: True]</li>
 </ul>
 </td>
 </tr>
@@ -1255,9 +1260,10 @@ should be printed.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>years</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; integration time for the model in years</li>
+<li><strong>years</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; integration time for the model in years     
+[default: 1.0]</li>
 <li><strong>verbose</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; information whether model time details 
-should be printed.</li>
+should be printed [default: True]</li>
 </ul>
 </td>
 </tr>
@@ -1302,8 +1308,9 @@ and calls the setter function of <a class="reference internal" href="#climlab.pr
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>timestep</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; the amount of time over which 
 <a class="reference internal" href="#climlab.process.time_dependent_process.TimeDependentProcess.step_forward" title="climlab.process.time_dependent_process.TimeDependentProcess.step_forward"><code class="xref py py-func docutils literal"><span class="pre">step_forward()</span></code></a> is integrating 
-in unit seconds</li>
-<li><strong>num_steps_per_year</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; a number of steps per calendar year</li>
+in unit seconds [default: 24*60*60]</li>
+<li><strong>num_steps_per_year</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; a number of steps per calendar year 
+(optional)</li>
 </ul>
 </td>
 </tr>
@@ -1400,7 +1407,7 @@ variables is updating all model states.</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2016 (licensed under Creative Commons, see License), Moritz Kreuzer.
+        &copy; Copyright 2016 (licensed under MIT License), Moritz Kreuzer &amp; Brian Rose.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>

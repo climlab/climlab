@@ -1,5 +1,0 @@
-<map id="inheritance4fe7168014" name="inheritance4fe7168014">
-<area shape="rect" id="node1" href="#climlab.process.implicit.ImplicitProcess" target="_top" title="A parent class for modules that use implicit time discretization." alt="" coords="1024,5,1395,35"/>
-<area shape="rect" id="node2" href="#climlab.process.time_dependent_process.TimeDependentProcess" target="_top" title="A generic parent class for all time&#45;dependent processes." alt="" coords="363,5,976,35"/>
-<area shape="rect" id="node3" href="#climlab.process.process.Process" target="_top" title="A generic parent class for all climlab process objects." alt="" coords="6,5,314,35"/>
-</map>

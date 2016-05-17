@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>climlab.radiation.insolation &mdash; climlab 0.3.0.1 documentation</title>
+    <title>climlab.radiation.insolation &mdash; climlab 0.3.2 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.3.0.1',
+        VERSION:     '0.3.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="climlab 0.3.0.1 documentation" href="../../../index.html" />
+    <link rel="top" title="climlab 0.3.2 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -308,8 +308,8 @@ div.nboutput  > :nth-child(2).stderr {
 
     <span class="k">def</span> <span class="nf">_compute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_get_current_insolation</span><span class="p">()</span>
-        <span class="k">return</span> <span class="p">{}</span>
-</div>
+        <span class="k">return</span> <span class="p">{}</span></div>
+
 <div class="viewcode-block" id="FixedInsolation"><a class="viewcode-back" href="../../../api/climlab.radiation.html#climlab.radiation.insolation.FixedInsolation">[docs]</a><span class="k">class</span> <span class="nc">FixedInsolation</span><span class="p">(</span><span class="n">_Insolation</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A class for fixed insolation at each point of latitude off the domain.</span>
 <span class="sd">    </span>
@@ -347,9 +347,9 @@ div.nboutput  > :nth-child(2).stderr {
     <span class="k">def</span> <span class="nf">_compute_fixed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1">#ins_adjustment = self.S0 - self.insolation</span>
         <span class="c1">#self.insolation += ins_adjustment</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">insolation</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">S0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">insolation</span><span class="p">[:]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">S0</span></div>
 
-</div>
+
 <div class="viewcode-block" id="P2Insolation"><a class="viewcode-back" href="../../../api/climlab.radiation.html#climlab.radiation.insolation.P2Insolation">[docs]</a><span class="k">class</span> <span class="nc">P2Insolation</span><span class="p">(</span><span class="n">_Insolation</span><span class="p">):</span>  
     <span class="sd">&quot;&quot;&quot;A class for parabolic solar distribution over the domain&#39;s latitude </span>
 <span class="sd">    on the basis of the second order Legendre Polynomial.</span>
@@ -428,12 +428,12 @@ div.nboutput  > :nth-child(2).stderr {
             <span class="c1">#self.insolation = Field(insolation, domain=dom)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">insolation</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">insolation</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">dom</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
-            <span class="k">pass</span>
+            <span class="k">pass</span></div>
 
 
 <span class="c1"># These classes calculate insolation based on orbital parameters</span>
 <span class="c1">#  and astronomical formulas</span>
-</div>
+
 <div class="viewcode-block" id="AnnualMeanInsolation"><a class="viewcode-back" href="../../../api/climlab.radiation.html#climlab.radiation.insolation.AnnualMeanInsolation">[docs]</a><span class="k">class</span> <span class="nc">AnnualMeanInsolation</span><span class="p">(</span><span class="n">_Insolation</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A class for latitudewise solar insolation averaged over a year.</span>
 <span class="sd">    </span>
@@ -441,7 +441,7 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">    latitude specified in the domain on the basis of orbital parameters and </span>
 <span class="sd">    astronomical formulas.</span>
 <span class="sd">    </span>
-<span class="sd">    Therefor it uses the method :func:`~climlab.solar.insolation.daily_insolation`.</span>
+<span class="sd">    Therefore it uses the method :func:`~climlab.solar.insolation.daily_insolation`.</span>
 <span class="sd">    For details how the solar distribution is dependend on orbital parameters </span>
 <span class="sd">    see there.</span>
 <span class="sd">    </span>
@@ -590,9 +590,9 @@ div.nboutput  > :nth-child(2).stderr {
             <span class="n">dom</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="s1">&#39;default&#39;</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">insolation</span><span class="p">[:]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">insolation</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">dom</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
-            <span class="k">pass</span>
+            <span class="k">pass</span></div>
 
-</div>
+
 <div class="viewcode-block" id="DailyInsolation"><a class="viewcode-back" href="../../../api/climlab.radiation.html#climlab.radiation.insolation.DailyInsolation">[docs]</a><span class="k">class</span> <span class="nc">DailyInsolation</span><span class="p">(</span><span class="n">AnnualMeanInsolation</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A class to compute latitudewise daily solar insolation for specific </span>
 <span class="sd">    days of the year.</span>
@@ -600,7 +600,7 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">    This class computes the solar insolation on basis of orbital parameters and </span>
 <span class="sd">    astronomical formulas.</span>
 <span class="sd">    </span>
-<span class="sd">    Therefor it uses the method :func:`~climlab.solar.insolation.daily_insolation`.</span>
+<span class="sd">    Therefore it uses the method :func:`~climlab.solar.insolation.daily_insolation`.</span>
 <span class="sd">    For details how the solar distribution is dependend on orbital parameters </span>
 <span class="sd">    see there.</span>
 <span class="sd">        </span>
@@ -736,7 +736,7 @@ div.nboutput  > :nth-child(2).stderr {
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2016 (licensed under Creative Commons, see License), Moritz Kreuzer.
+        &copy; Copyright 2016 (licensed under MIT License), Moritz Kreuzer &amp; Brian Rose.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>

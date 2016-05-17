@@ -1,7 +1,0 @@
-<map id="inheritance7837723b8f" name="inheritance7837723b8f">
-<area shape="rect" id="node1" href="#climlab.dynamics.diffusion.Diffusion" title="A parent class for one dimensional implicit diffusion modules." alt="" coords="635,5,739,35"/>
-<area shape="rect" id="node4" href="#climlab.dynamics.diffusion.MeridionalDiffusion" title="A parent class for Meridional diffusion processes." alt="" coords="787,5,986,35"/>
-<area shape="rect" id="node2" href="climlab.process.html#climlab.process.implicit.ImplicitProcess" title="A parent class for modules that use implicit time discretization." alt="" coords="429,5,587,35"/>
-<area shape="rect" id="node3" href="climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess" title="A generic parent class for all time&#45;dependent processes." alt="" coords="144,5,381,35"/>
-<area shape="rect" id="node5" href="climlab.process.html#climlab.process.process.Process" title="A generic parent class for all climlab process objects." alt="" coords="5,5,96,35"/>
-</map>

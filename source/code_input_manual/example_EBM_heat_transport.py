@@ -6,7 +6,7 @@ model = climlab.EBM()
 model.step_forward()
 
 # plot
-fig = plt.figure()
+fig = plt.figure( figsize=(6,4))
 ax = fig.add_subplot(111)
 
 bounds = model.domains['Ts'].axes['lat'].bounds

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Download &mdash; climlab 0.3.0.1 documentation</title>
+    <title>Download &mdash; climlab 0.3.2 documentation</title>
     
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3.0.1',
+        VERSION:     '0.3.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="climlab 0.3.0.1 documentation" href="index.html" />
+    <link rel="top" title="climlab 0.3.2 documentation" href="index.html" />
     <link rel="next" title="Architecture" href="architecture.html" />
     <link rel="prev" title="Introduction" href="intro.html" /> 
   </head>
@@ -234,7 +234,7 @@ div.nboutput  > :nth-child(2).stderr {
 </div>
 <div class="section" id="dependencies">
 <h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
-<p><cite>climlab</cite> is written in <a class="reference external" href="https://www.python.org/downloads/">Python 2.7</a> and requires following <cite>Python</cite> packages to run:</p>
+<p><cite>climlab</cite> is written in <a class="reference external" href="https://www.python.org/downloads/">Python 2.7</a> and the requires the following <cite>Python</cite> packages to run:</p>
 <blockquote>
 <div><ul class="simple">
 <li><a class="reference external" href="http://www.numpy.org/">Numpy</a></li>
@@ -249,27 +249,33 @@ div.nboutput  > :nth-child(2).stderr {
 <li><a class="reference external" href="http://matplotlib.org/">Matplotlib</a> (plotting libary)</li>
 </ul>
 </div></blockquote>
-<p>The packages have to be installed on your machine. They can either be downloaded, compiled and installed individually.</p>
-<p>Otherwise Python distributions like <a class="reference external" href="https://www.continuum.io/downloads">Anaconda</a> or <a class="reference external" href="https://www.enthought.com/products/canopy/">Enthought Canopy</a> can be used which already include many popular Python packages.</p>
+<p>The packages have to be installed on your machine. Either they can be individially downloaded, compiled and installed according to the the instructions on the corresponding websites.</p>
+<p>Easier to handle however are Python distributions like <a class="reference external" href="https://www.continuum.io/downloads">Anaconda</a> or <a class="reference external" href="https://www.enthought.com/products/canopy/">Enthought Canopy</a> which already include many popular Python packages.</p>
 <div class="section" id="setup-environment-with-anaconda">
 <h3>Setup environment with Anaconda<a class="headerlink" href="#setup-environment-with-anaconda" title="Permalink to this headline">¶</a></h3>
 <p>An example is given here how to set up a python environment with <a class="reference external" href="https://www.continuum.io/downloads">Anaconda</a>.</p>
-<p>A new environment named <code class="docutils literal"><span class="pre">climlab_env</span></code> with all above packages is created like this:</p>
+<blockquote>
+<div><p>A new environment named <code class="docutils literal"><span class="pre">climlab_env</span></code> with all above packages is created like this:</p>
 <blockquote>
 <div><div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> conda create --name climlab_env numpy scipy netcdf4 jupyter matplotlib
 </pre></div>
 </div>
+</div></blockquote>
 <p>All new packages which will be installed are displayed including their version number. Press <code class="docutils literal"><span class="pre">y</span></code> to proceed.</p>
 <p>After the environment is build, it can be activated with</p>
-<div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> <span class="nb">source</span> activate climlab_env
+<blockquote>
+<div><div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> <span class="nb">source</span> activate climlab_env
 </pre></div>
 </div>
-<p>and can be deactivated with</p>
-<div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> <span class="nb">source</span> deactivate
-</pre></div>
-</div>
-<p>To install climlab in the new environment follow the steps below.</p>
 </div></blockquote>
+<p>and can be deactivated with</p>
+<blockquote>
+<div><div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> <span class="nb">source</span> deactivate
+</pre></div>
+</div>
+</div></blockquote>
+</div></blockquote>
+<p>To install climlab in the new environment follow the steps below.</p>
 </div>
 </div>
 <div class="section" id="installation">
@@ -277,7 +283,7 @@ div.nboutput  > :nth-child(2).stderr {
 <div class="section" id="stable-release">
 <h3>Stable Release<a class="headerlink" href="#stable-release" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<div><p>With the Python package <a class="reference external" href="http://www.pip-installer.org/">pip</a> which collects the current version from the <a class="reference external" href="https://pypi.python.org/pypi">Python Package Index</a>, climlab can be easily installed on a machine through the terminal command</p>
+<div><p>With the Python package <a class="reference external" href="http://www.pip-installer.org/">pip</a>, which collects the current version from the <a class="reference external" href="https://pypi.python.org/pypi">Python Package Index</a>, climlab can be easily installed on a machine through the terminal command</p>
 <blockquote>
 <div><div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> pip install climlab
 </pre></div>
@@ -288,7 +294,7 @@ div.nboutput  > :nth-child(2).stderr {
 <div class="section" id="id2">
 <h3>Development Version<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 <blockquote>
-<div><p>Otherwise the package can be downloaded from the above referred link and installed manually through running from the package directory</p>
+<div><p>Otherwise, the package can be downloaded from the above referred link and installed manually through running from the package directory</p>
 <blockquote>
 <div><div class="highlight-console"><div class="highlight"><pre><span></span><span class="gp">$</span> python setup.py install
 </pre></div>
@@ -336,7 +342,7 @@ div.nboutput  > :nth-child(2).stderr {
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2016 (licensed under Creative Commons, see License), Moritz Kreuzer.
+        &copy; Copyright 2016 (licensed under MIT License), Moritz Kreuzer &amp; Brian Rose.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>

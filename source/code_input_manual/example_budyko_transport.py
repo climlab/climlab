@@ -23,7 +23,7 @@ budyko_transp = BudykoTransport(state=Ts)
 
 ### Integrate & Plot ###
 
-fig = plt.figure()
+fig = plt.figure( figsize=(6,4))
 ax = fig.add_subplot(111)
 
 for i in np.arange(0,3,1):  
@@ -33,6 +33,6 @@ for i in np.arange(0,3,1):
 ax.set_title('Standalone Budyko Transport')
 ax.set_xlabel('latitude')
 ax.set_xticks([-90,-60,-30,0,30,60,90])
-ax.set_ylabel('temperature (degC)')
+ax.set_ylabel('temperature ($^{\circ}$C)')
 ax.legend(loc='best')
 plt.show()

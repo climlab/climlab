@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>climlab.process.process &mdash; climlab 0.3.0.1 documentation</title>
+    <title>climlab.process.process &mdash; climlab 0.3.2 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.3.0.1',
+        VERSION:     '0.3.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="climlab 0.3.0.1 documentation" href="../../../index.html" />
+    <link rel="top" title="climlab 0.3.2 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -306,11 +306,11 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">    :param subprocess:  subprocess(es) of the process</span>
 <span class="sd">    :type subprocess:   :class:`~climlab.process.process.Process` or dict of </span>
 <span class="sd">                        :class:`~climlab.process.process.Process`</span>
-<span class="sd">    :param array lat:   latitudinal points [optional]</span>
-<span class="sd">    :param lev:         altitudinal points [optional]</span>
-<span class="sd">    :param int num_lat: number of latitudional points [optional]    </span>
+<span class="sd">    :param array lat:   latitudinal points (optional)</span>
+<span class="sd">    :param lev:         altitudinal points (optional)</span>
+<span class="sd">    :param int num_lat: number of latitudional points (optional) </span>
 <span class="sd">    :param int num_levels:</span>
-<span class="sd">                        number of altitudinal points [optional]</span>
+<span class="sd">                        number of altitudinal points (optional)</span>
 <span class="sd">    :param dict input:  collection of input quantities</span>
 <span class="sd">    </span>
 <span class="sd">    **Object attributes** \n</span>
@@ -393,8 +393,8 @@ div.nboutput  > :nth-child(2).stderr {
             <span class="bp">self</span><span class="o">.</span><span class="n">add_subprocess</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="n">procdict</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">proc</span> <span class="ow">in</span> <span class="n">procdict</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">add_subprocess</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">proc</span><span class="p">)</span>
-</div>
+                <span class="bp">self</span><span class="o">.</span><span class="n">add_subprocess</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">proc</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="Process.add_subprocess"><a class="viewcode-back" href="../../../api/climlab.process.html#climlab.process.process.Process.add_subprocess">[docs]</a>    <span class="k">def</span> <span class="nf">add_subprocess</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">proc</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Adds a single subprocess to this process.</span>
 <span class="sd">        </span>
@@ -461,8 +461,8 @@ div.nboutput  > :nth-child(2).stderr {
             <span class="c1"># make subprocess available as object attribute</span>
             <span class="c1">#setattr(self, name, proc)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;subprocess must be Process object&#39;</span><span class="p">)</span>
-</div>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;subprocess must be Process object&#39;</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="Process.remove_subprocess"><a class="viewcode-back" href="../../../api/climlab.process.html#climlab.process.process.Process.remove_subprocess">[docs]</a>    <span class="k">def</span> <span class="nf">remove_subprocess</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Removes a single subprocess from this process.</span>
 <span class="sd">        </span>
@@ -503,10 +503,10 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">                </span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">subprocess</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">has_process_type_list</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">has_process_type_list</span> <span class="o">=</span> <span class="bp">False</span></div>
         <span class="c1">#  Since we made every subprocess an object attribute, we also remove</span>
         <span class="c1">#delattr(self, name)</span>
-</div>
+
 <div class="viewcode-block" id="Process.set_state"><a class="viewcode-back" href="../../../api/climlab.process.html#climlab.process.process.Process.set_state">[docs]</a>    <span class="k">def</span> <span class="nf">set_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Sets the variable ``name`` to a new state ``value``. </span>
 <span class="sd">        </span>
@@ -557,8 +557,8 @@ div.nboutput  > :nth-child(2).stderr {
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Shape mismatch between existing domain and new state variable.&#39;</span><span class="p">)</span>
         <span class="c1"># set the state dictionary</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
-        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-</div>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
     <span class="k">def</span> <span class="nf">_guess_state_domains</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">domname</span><span class="p">,</span> <span class="n">dom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">domains</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
@@ -610,7 +610,7 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">        </span>
 <span class="sd">        :param str name:        name of diagnostic quantity to be initialized</span>
 <span class="sd">        :param array value:     initial value for quantity - accepts also type</span>
-<span class="sd">                                float, int, etc. (*default*:``0.``)</span>
+<span class="sd">                                float, int, etc. [default: 0.]</span>
 <span class="sd">        </span>
 <span class="sd">        :Example:</span>
 <span class="sd">        </span>
@@ -635,8 +635,8 @@ div.nboutput  > :nth-child(2).stderr {
             <span class="bp">self</span><span class="o">.</span><span class="n">diagnostics</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
         <span class="nb">setattr</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="n">name</span><span class="p">,</span>
                 <span class="nb">property</span><span class="p">(</span><span class="n">fget</span><span class="o">=</span><span class="n">_diag_getter</span><span class="p">,</span> <span class="n">fset</span><span class="o">=</span><span class="n">_diag_setter</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__setattr__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-</div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__setattr__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="Process.remove_diagnostic"><a class="viewcode-back" href="../../../api/climlab.process.html#climlab.process.process.Process.remove_diagnostic">[docs]</a>    <span class="k">def</span> <span class="nf">remove_diagnostic</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;	Removes a diagnostic from the ``process.diagnostic`` dictionary</span>
 <span class="sd">        and also delete the associated process attribute.</span>
@@ -663,15 +663,15 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">                        </span>
 <span class="sd">        &quot;&quot;&quot;</span>        
         <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">diagnostics</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-        <span class="nb">delattr</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="n">name</span><span class="p">)</span>
-</div>
+        <span class="nb">delattr</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="n">name</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="Process.add_input"><a class="viewcode-back" href="../../../api/climlab.process.html#climlab.process.process.Process.add_input">[docs]</a>    <span class="k">def</span> <span class="nf">add_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputlist</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Updates the process&#39;s list of inputs.</span>
 <span class="sd">        </span>
 <span class="sd">        :param list inputlist:   list of names of input variables</span>
 <span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_input_vars</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_input_vars</span><span class="p">,</span> <span class="n">inputlist</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_input_vars</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_input_vars</span><span class="p">,</span> <span class="n">inputlist</span><span class="p">)</span></div>
 
    <span class="c1"># @property</span>
    <span class="c1"># def diagnostics(self):</span>
@@ -682,7 +682,7 @@ div.nboutput  > :nth-child(2).stderr {
    <span class="c1">#     </span>
    <span class="c1">#     &quot;&quot;&quot;</span>
    <span class="c1">#     return { key:value for key, value in self.__dict__.items()</span>
-   <span class="c1">#              if key in self._diag_vars }</span></div>
+   <span class="c1">#              if key in self._diag_vars }</span>
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">input</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;dictionary with all input variables</span>
@@ -858,9 +858,9 @@ div.nboutput  > :nth-child(2).stderr {
                     <span class="k">pass</span>
             <span class="k">return</span> <span class="n">thisdepth</span>
         <span class="k">except</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Can</span><span class="se">\&#39;</span><span class="s1">t resolve a depth axis.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Can</span><span class="se">\&#39;</span><span class="s1">t resolve a depth axis.&#39;</span><span class="p">)</span></div>
 
-</div>
+
 <div class="viewcode-block" id="process_like"><a class="viewcode-back" href="../../../api/climlab.process.html#climlab.process.process.process_like">[docs]</a><span class="k">def</span> <span class="nf">process_like</span><span class="p">(</span><span class="n">proc</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Copys the given process.</span>
 <span class="sd">    </span>
@@ -895,9 +895,9 @@ div.nboutput  > :nth-child(2).stderr {
     <span class="n">newproc</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">proc</span><span class="p">)</span>
     <span class="n">newproc</span><span class="o">.</span><span class="n">creation_date</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%a, </span><span class="si">%d</span><span class="s2"> %b %Y %H:%M:%S %z&quot;</span><span class="p">,</span>
                                           <span class="n">time</span><span class="o">.</span><span class="n">localtime</span><span class="p">())</span>
-    <span class="k">return</span> <span class="n">newproc</span>
+    <span class="k">return</span> <span class="n">newproc</span></div>
 
-</div>
+
 <div class="viewcode-block" id="get_axes"><a class="viewcode-back" href="../../../api/climlab.process.html#climlab.process.process.get_axes">[docs]</a><span class="k">def</span> <span class="nf">get_axes</span><span class="p">(</span><span class="n">process_or_domain</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Returns a dictionary of all Axis in a domain or dictionary of domains.</span>
 <span class="sd">    </span>
@@ -962,7 +962,7 @@ div.nboutput  > :nth-child(2).stderr {
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2016 (licensed under Creative Commons, see License), Moritz Kreuzer.
+        &copy; Copyright 2016 (licensed under MIT License), Moritz Kreuzer &amp; Brian Rose.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>

@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>climlab.radiation.AplusBT &mdash; climlab 0.3.0.1 documentation</title>
+    <title>climlab.radiation.AplusBT &mdash; climlab 0.3.2 documentation</title>
     
     <link rel="stylesheet" href="../../../_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../../',
-        VERSION:     '0.3.0.1',
+        VERSION:     '0.3.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="climlab 0.3.0.1 documentation" href="../../../index.html" />
+    <link rel="top" title="climlab 0.3.2 documentation" href="../../../index.html" />
     <link rel="up" title="Module code" href="../../index.html" /> 
   </head>
   <body role="document">
@@ -227,11 +227,11 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">    An instance of ``AplusBT`` is initialized with the following </span>
 <span class="sd">    arguments:</span>
 <span class="sd">    </span>
-<span class="sd">    :param float A:             parameter for linear OLR parameterization   \n</span>
+<span class="sd">    :param float A:             parameter for linear OLR parametrization   \n</span>
 <span class="sd">                                - unit: :math:`\\frac{\\textrm{W}}</span>
 <span class="sd">                                  {\\textrm{m}^2}`                          \n</span>
 <span class="sd">                                - default value: ``200.0``</span>
-<span class="sd">    :param float B:             parameter for linear OLR parameterization   \n</span>
+<span class="sd">    :param float B:             parameter for linear OLR parametrization   \n</span>
 <span class="sd">                                - unit: :math:`\\frac{\\textrm{W}}</span>
 <span class="sd">                                  {\\textrm{m}^2 \\ ^{\circ} \\textrm{C}}`  \n</span>
 <span class="sd">                                - default value: ``2.0``</span>
@@ -358,9 +358,9 @@ div.nboutput  > :nth-child(2).stderr {
         <span class="sd">&#39;&#39;&#39;Compute energy flux convergences to get heating rates in :math:`W/m^2`,&#39;&#39;&#39;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_compute_emission</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">varname</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">heating_rate</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">OLR</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">heating_rate</span><span class="p">[</span><span class="n">varname</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="bp">self</span><span class="o">.</span><span class="n">OLR</span></div>
 
-</div>
+
 <div class="viewcode-block" id="AplusBT_CO2"><a class="viewcode-back" href="../../../api/climlab.radiation.html#climlab.radiation.AplusBT.AplusBT_CO2">[docs]</a><span class="k">class</span> <span class="nc">AplusBT_CO2</span><span class="p">(</span><span class="n">EnergyBudget</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Linear longwave radiation module considering CO2 concentration.</span>
 <span class="sd">    </span>
@@ -380,7 +380,7 @@ div.nboutput  > :nth-child(2).stderr {
 <span class="sd">    where :math:`c=\\log \\frac{p}{300}` and :math:`p` represents </span>
 <span class="sd">    the concentration of :math:`CO_2` in the atmosphere.</span>
 <span class="sd">    </span>
-<span class="sd">    For further reading see [CaldeiraKasting1992]_.</span>
+<span class="sd">    For further reading see :cite:`Caldeira_1992`.</span>
 <span class="sd">    </span>
 <span class="sd">    </span>
 <span class="sd">    **Initialization parameters** \n</span>
@@ -552,7 +552,7 @@ div.nboutput  > :nth-child(2).stderr {
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2016 (licensed under Creative Commons, see License), Moritz Kreuzer.
+        &copy; Copyright 2016 (licensed under MIT License), Moritz Kreuzer &amp; Brian Rose.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>

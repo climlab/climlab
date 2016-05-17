@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Models &mdash; climlab 0.3.0.1 documentation</title>
+    <title>Models &mdash; climlab 0.3.2 documentation</title>
     
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3.0.1',
+        VERSION:     '0.3.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="climlab 0.3.0.1 documentation" href="index.html" />
+    <link rel="top" title="climlab 0.3.2 documentation" href="index.html" />
     <link rel="next" title="Tutorials" href="tutorial.html" />
     <link rel="prev" title="Architecture" href="architecture.html" /> 
   </head>
@@ -221,11 +221,11 @@ div.nboutput  > :nth-child(2).stderr {
 </style>
 <div class="section" id="models">
 <span id="id1"></span><h1>Models<a class="headerlink" href="#models" title="Permalink to this headline">¶</a></h1>
-<p>As indicated in the <a class="reference internal" href="intro.html#introduction"><span>Introduction</span></a> <cite>climlab</cite> can implement different types of models out of the box.
-Here we focus on Energy Balance Models which are refered to as EBMs.</p>
+<p>As indicated in the <a class="reference internal" href="intro.html#introduction"><span>Introduction</span></a>, <cite>climlab</cite> can implement different types of models out of the box.
+Here, we focus on Energy Balance Models which are refered to as EBMs.</p>
 <div class="section" id="energy-balance-model">
 <h2>Energy Balance Model<a class="headerlink" href="#energy-balance-model" title="Permalink to this headline">¶</a></h2>
-<p>Currently there are three &#8220;standard&#8221; Energy Balance Models implemented in the <cite>climlab</cite> code.
+<p>Currently, there are three &#8220;standard&#8221; Energy Balance Models implemented in the <cite>climlab</cite> code.
 These are <a class="reference internal" href="api/climlab.model.html#climlab.model.ebm.EBM" title="climlab.model.ebm.EBM"><code class="xref py py-class docutils literal"><span class="pre">EBM</span></code></a>, <a class="reference internal" href="api/climlab.model.html#climlab.model.ebm.EBM_seasonal" title="climlab.model.ebm.EBM_seasonal"><code class="xref py py-class docutils literal"><span class="pre">EBM_seasonal</span></code></a> and <a class="reference internal" href="api/climlab.model.html#climlab.model.ebm.EBM_annual" title="climlab.model.ebm.EBM_annual"><code class="xref py py-class docutils literal"><span class="pre">EBM_annual</span></code></a>, which are explained below.</p>
 <p>Let&#8217;s first give an overview about different (sub)processes that are implemented:</p>
 <div class="section" id="ebm-subprocesses">
@@ -235,7 +235,7 @@ These are <a class="reference internal" href="api/climlab.model.html#climlab.mod
 <ul>
 <li><dl class="first docutils">
 <dt><a class="reference internal" href="api/climlab.radiation.html#climlab.radiation.insolation.FixedInsolation" title="climlab.radiation.insolation.FixedInsolation"><code class="xref py py-class docutils literal"><span class="pre">FixedInsolation</span></code></a></dt>
-<dd><p class="first">defines a constant solar factor for all spatial points of the domain.</p>
+<dd><p class="first">defines a constant solar value for all spatial points of the domain:</p>
 <div class="last math">
 \[S(lat) = S_{\textrm{input}}\]</div>
 </dd>
@@ -243,15 +243,16 @@ These are <a class="reference internal" href="api/climlab.model.html#climlab.mod
 </li>
 <li><dl class="first docutils">
 <dt><a class="reference internal" href="api/climlab.radiation.html#climlab.radiation.insolation.P2Insolation" title="climlab.radiation.insolation.P2Insolation"><code class="xref py py-class docutils literal"><span class="pre">P2Insolation</span></code></a></dt>
-<dd><p class="first">characterizes a parabolic solar distribution over the domain&#8217;s latitude on basis of the second order Legendre Polynomial <span class="math">\(P_2\)</span>:</p>
-<div class="last math">
-\[S(lat) = \frac{S_0}{4} \big[1+ s_2 P_2(\sin lat) \big]\]</div>
+<dd><p class="first">characterizes a parabolic solar distribution over the domain&#8217;s latitude on the basis of the second order Legendre Polynomial <span class="math">\(P_2\)</span>:</p>
+<div class="math">
+\[S(\varphi) = \frac{S_0}{4} \Big[1+ s_2 P_2 \big(\sin (\varphi) \big) \Big]\]</div>
+<p class="last">Variable <span class="math">\(\varphi\)</span> represents the latitude.</p>
 </dd>
 </dl>
 </li>
 <li><dl class="first docutils">
 <dt><a class="reference internal" href="api/climlab.radiation.html#climlab.radiation.insolation.DailyInsolation" title="climlab.radiation.insolation.DailyInsolation"><code class="xref py py-class docutils literal"><span class="pre">DailyInsolation</span></code></a></dt>
-<dd><p class="first last">computes the daily solar insolation for each latitude off the domain on the basis of orbital parameters and astronomical formulas.</p>
+<dd><p class="first last">computes the daily solar insolation for each latitude of the domain on the basis of orbital parameters and astronomical formulas.</p>
 </dd>
 </dl>
 </li>
@@ -270,7 +271,7 @@ These are <a class="reference internal" href="api/climlab.model.html#climlab.mod
 <dt><a class="reference internal" href="api/climlab.surface.html#climlab.surface.albedo.ConstantAlbedo" title="climlab.surface.albedo.ConstantAlbedo"><code class="xref py py-class docutils literal"><span class="pre">ConstantAlbedo</span></code></a></dt>
 <dd><p class="first">defines constant albedo values at all spatial points of the domain:</p>
 <div class="last math">
-\[\alpha(lat) = a_0\]</div>
+\[\alpha(\varphi) = a_0\]</div>
 </dd>
 </dl>
 </li>
@@ -278,7 +279,7 @@ These are <a class="reference internal" href="api/climlab.model.html#climlab.mod
 <dt><a class="reference internal" href="api/climlab.surface.html#climlab.surface.albedo.P2Albedo" title="climlab.surface.albedo.P2Albedo"><code class="xref py py-class docutils literal"><span class="pre">P2Albedo</span></code></a></dt>
 <dd><p class="first">initializes parabolic distributed albedo values across the domain on basis of the second order Legendre Polynomial <span class="math">\(P_2\)</span>:</p>
 <div class="last math">
-\[\alpha(lat) = a_0 + a_2 P_2(\sin lat)\]</div>
+\[\alpha(\varphi) = a_0 + a_2 P_2 \big(\sin (\varphi) \big)\]</div>
 </dd>
 </dl>
 </li>
@@ -290,7 +291,7 @@ These are <a class="reference internal" href="api/climlab.model.html#climlab.mod
 </li>
 <li><dl class="first docutils">
 <dt><a class="reference internal" href="api/climlab.surface.html#climlab.surface.albedo.StepFunctionAlbedo" title="climlab.surface.albedo.StepFunctionAlbedo"><code class="xref py py-class docutils literal"><span class="pre">StepFunctionAlbedo</span></code></a></dt>
-<dd><p class="first last">implements an albedo step function in dependence of the surface temperature through using instances of the above described albedo classes as subprocesses.</p>
+<dd><p class="first last">implements an albedo step function in dependence of the surface temperature by using instances of the above described albedo classes as subprocesses.</p>
 </dd>
 </dl>
 </li>
@@ -301,25 +302,25 @@ These are <a class="reference internal" href="api/climlab.model.html#climlab.mod
 <ul>
 <li><dl class="first docutils">
 <dt><a class="reference internal" href="api/climlab.radiation.html#climlab.radiation.AplusBT.AplusBT" title="climlab.radiation.AplusBT.AplusBT"><code class="xref py py-class docutils literal"><span class="pre">AplusBT</span></code></a></dt>
-<dd><p class="first">calculates the Outgoing Longwave Radiation (<span class="math">\(OLR\)</span>) in form of a linear dependence of surface temperature <span class="math">\(T\)</span> like</p>
+<dd><p class="first">calculates the Outgoing Longwave Radiation (<span class="math">\(\text{OLR}\)</span>) in form of a linear dependence of surface temperature <span class="math">\(T\)</span>:</p>
 <div class="last math">
-\[OLR = A+B \cdot T\]</div>
+\[\text{OLR} = A+B \cdot T\]</div>
 </dd>
 </dl>
 </li>
 <li><dl class="first docutils">
 <dt><a class="reference internal" href="api/climlab.radiation.html#climlab.radiation.AplusBT.AplusBT_CO2" title="climlab.radiation.AplusBT.AplusBT_CO2"><code class="xref py py-class docutils literal"><span class="pre">AplusBT_CO2</span></code></a></dt>
-<dd><p class="first">calculates OLR same as <a class="reference internal" href="api/climlab.radiation.html#climlab.radiation.AplusBT.AplusBT" title="climlab.radiation.AplusBT.AplusBT"><code class="xref py py-class docutils literal"><span class="pre">AplusBT</span></code></a> but uses parameters <span class="math">\(A\)</span> and <span class="math">\(B\)</span> dependent of the atmospheric CO2 concentration <span class="math">\(c\)</span>.</p>
+<dd><p class="first">calculates <span class="math">\(\text{OLR}\)</span> in the same way as <a class="reference internal" href="api/climlab.radiation.html#climlab.radiation.AplusBT.AplusBT" title="climlab.radiation.AplusBT.AplusBT"><code class="xref py py-class docutils literal"><span class="pre">AplusBT</span></code></a> but uses parameters <span class="math">\(A\)</span> and <span class="math">\(B\)</span> dependent of the atmospheric <span class="math">\(\text{CO}_2\)</span> concentration <span class="math">\(c\)</span>.</p>
 <div class="last math">
-\[OLR = A(c)+B(c) \cdot T\]</div>
+\[\text{OLR} = A(c)+B(c) \cdot T\]</div>
 </dd>
 </dl>
 </li>
 <li><dl class="first docutils">
 <dt><a class="reference internal" href="api/climlab.radiation.html#climlab.radiation.Boltzmann.Boltzmann" title="climlab.radiation.Boltzmann.Boltzmann"><code class="xref py py-class docutils literal"><span class="pre">Boltzmann</span></code></a></dt>
-<dd><p class="first">calculates OLR after the Stefan-Boltzmann law for a grey body like</p>
+<dd><p class="first">calculates <span class="math">\(\text{OLR}\)</span> according to the Stefan-Boltzmann law for a grey body:</p>
 <div class="last math">
-\[OLR = \sigma \varepsilon T^4\]</div>
+\[\text{OLR} = \sigma \varepsilon T^4\]</div>
 </dd>
 </dl>
 </li>
@@ -327,7 +328,7 @@ These are <a class="reference internal" href="api/climlab.model.html#climlab.mod
 </div>
 <div class="section" id="energy-transport">
 <h4>Energy Transport<a class="headerlink" href="#energy-transport" title="Permalink to this headline">¶</a></h4>
-<p>These classes calculate the transport of energy <span class="math">\(H(\varphi)\)</span> across the latitude <span class="math">\(\varphi\)</span> in an Energy Budget noted as:</p>
+<p>These classes calculate the transport of energy <span class="math">\(H(\varphi)\)</span> across the latitude <span class="math">\(\varphi\)</span> in an energy budget noted as:</p>
 <div class="math">
 \[C(\varphi) \frac{dT(\varphi)}{dt} = R\downarrow (\varphi) - R\uparrow (\varphi) + H(\varphi)\]</div>
 <ul>
@@ -341,7 +342,7 @@ These are <a class="reference internal" href="api/climlab.model.html#climlab.mod
 </li>
 <li><dl class="first docutils">
 <dt><a class="reference internal" href="api/climlab.dynamics.html#climlab.dynamics.budyko_transport.BudykoTransport" title="climlab.dynamics.budyko_transport.BudykoTransport"><code class="xref py py-class docutils literal"><span class="pre">BudykoTransport</span></code></a></dt>
-<dd><p class="first">calculates the energy transport for each latitude <span class="math">\(\varphi\)</span> in relation to the global mean temperature <span class="math">\(\bar{T}\)</span>:</p>
+<dd><p class="first">calculates the energy transport for each latitude <span class="math">\(\varphi\)</span> depending on the global mean temperature <span class="math">\(\bar{T}\)</span>:</p>
 <div class="last math">
 \[H(\varphi) = - b [T(\varphi) - \bar{T}]\]</div>
 </dd>
@@ -358,13 +359,13 @@ These are <a class="reference internal" href="api/climlab.model.html#climlab.mod
 <p>The <a class="reference internal" href="api/climlab.model.html#climlab.model.ebm.EBM" title="climlab.model.ebm.EBM"><code class="xref py py-class docutils literal"><span class="pre">EBM</span></code></a> class sets up a typical Energy Balance Model with following subprocesses:</p>
 <blockquote>
 <div><ul class="simple">
-<li>Outgoing Longwave Radiation (OLR) parameterization through
+<li>Outgoing Longwave Radiation (OLR) parametrization via
 <a class="reference internal" href="api/climlab.radiation.html#climlab.radiation.AplusBT.AplusBT" title="climlab.radiation.AplusBT.AplusBT"><code class="xref py py-class docutils literal"><span class="pre">AplusBT</span></code></a></li>
-<li>solar insolation paramterization through
+<li>solar insolation paramterization via
 <a class="reference internal" href="api/climlab.radiation.html#climlab.radiation.insolation.P2Insolation" title="climlab.radiation.insolation.P2Insolation"><code class="xref py py-class docutils literal"><span class="pre">P2Insolation</span></code></a></li>
-<li>albedo parameterization in dependence of temperature through
+<li>albedo parametrization in dependence of temperature via
 <a class="reference internal" href="api/climlab.surface.html#climlab.surface.albedo.StepFunctionAlbedo" title="climlab.surface.albedo.StepFunctionAlbedo"><code class="xref py py-class docutils literal"><span class="pre">StepFunctionAlbedo</span></code></a></li>
-<li>energy diffusion through
+<li>energy diffusion via
 <a class="reference internal" href="api/climlab.dynamics.html#climlab.dynamics.diffusion.MeridionalDiffusion" title="climlab.dynamics.diffusion.MeridionalDiffusion"><code class="xref py py-class docutils literal"><span class="pre">MeridionalDiffusion</span></code></a></li>
 </ul>
 </div></blockquote>
@@ -375,13 +376,13 @@ These are <a class="reference internal" href="api/climlab.model.html#climlab.mod
 It uses following subprocesses:</p>
 <blockquote>
 <div><ul class="simple">
-<li>Outgoing Longwave Radiation (OLR) parameterization through
+<li>Outgoing Longwave Radiation (OLR) parametrization via
 <a class="reference internal" href="api/climlab.radiation.html#climlab.radiation.AplusBT.AplusBT" title="climlab.radiation.AplusBT.AplusBT"><code class="xref py py-class docutils literal"><span class="pre">AplusBT</span></code></a></li>
-<li>solar insolation paramterization through
+<li>solar insolation paramterization via
 <a class="reference internal" href="api/climlab.radiation.html#climlab.radiation.insolation.DailyInsolation" title="climlab.radiation.insolation.DailyInsolation"><code class="xref py py-class docutils literal"><span class="pre">DailyInsolation</span></code></a></li>
-<li>albedo parameterization in dependence of temperature through
+<li>albedo parametrization in dependence of temperature via
 <a class="reference internal" href="api/climlab.surface.html#climlab.surface.albedo.StepFunctionAlbedo" title="climlab.surface.albedo.StepFunctionAlbedo"><code class="xref py py-class docutils literal"><span class="pre">StepFunctionAlbedo</span></code></a></li>
-<li>energy diffusion through
+<li>energy diffusion via
 <a class="reference internal" href="api/climlab.dynamics.html#climlab.dynamics.diffusion.MeridionalDiffusion" title="climlab.dynamics.diffusion.MeridionalDiffusion"><code class="xref py py-class docutils literal"><span class="pre">MeridionalDiffusion</span></code></a></li>
 </ul>
 </div></blockquote>
@@ -392,13 +393,13 @@ It uses following subprocesses:</p>
 It uses following subprocesses:</p>
 <blockquote>
 <div><ul class="simple">
-<li>Outgoing Longwave Radiation (OLR) parameterization through
+<li>Outgoing Longwave Radiation (OLR) parametrization via
 <a class="reference internal" href="api/climlab.radiation.html#climlab.radiation.AplusBT.AplusBT" title="climlab.radiation.AplusBT.AplusBT"><code class="xref py py-class docutils literal"><span class="pre">AplusBT</span></code></a></li>
-<li>solar insolation paramterization through
+<li>solar insolation paramterization via
 <a class="reference internal" href="api/climlab.radiation.html#climlab.radiation.insolation.AnnualMeanInsolation" title="climlab.radiation.insolation.AnnualMeanInsolation"><code class="xref py py-class docutils literal"><span class="pre">AnnualMeanInsolation</span></code></a></li>
-<li>albedo parameterization in dependence of temperature through
+<li>albedo parametrization in dependence of temperature via
 <a class="reference internal" href="api/climlab.surface.html#climlab.surface.albedo.StepFunctionAlbedo" title="climlab.surface.albedo.StepFunctionAlbedo"><code class="xref py py-class docutils literal"><span class="pre">StepFunctionAlbedo</span></code></a></li>
-<li>energy diffusion through
+<li>energy diffusion via
 <a class="reference internal" href="api/climlab.dynamics.html#climlab.dynamics.diffusion.MeridionalDiffusion" title="climlab.dynamics.diffusion.MeridionalDiffusion"><code class="xref py py-class docutils literal"><span class="pre">MeridionalDiffusion</span></code></a></li>
 </ul>
 </div></blockquote>
@@ -411,7 +412,7 @@ It uses following subprocesses:</p>
 </div>
 <div class="section" id="other-models">
 <h2>Other Models<a class="headerlink" href="#other-models" title="Permalink to this headline">¶</a></h2>
-<p>As noted in the <a class="reference internal" href="intro.html#introduction"><span>Introduction</span></a> more model types are implemented in climlab but not covered in the documentation yet.</p>
+<p>As noted in the <a class="reference internal" href="intro.html#introduction"><span>Introduction</span></a>, more model types are implemented in <cite>climlab</cite> but not covered in the documentation yet.</p>
 </div>
 </div>
 
@@ -445,7 +446,7 @@ It uses following subprocesses:</p>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2016 (licensed under Creative Commons, see License), Moritz Kreuzer.
+        &copy; Copyright 2016 (licensed under MIT License), Moritz Kreuzer &amp; Brian Rose.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>

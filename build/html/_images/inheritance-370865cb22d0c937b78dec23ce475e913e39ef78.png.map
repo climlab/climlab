@@ -1,5 +1,0 @@
-<map id="inheritance790795bf86" name="inheritance790795bf86">
-<area shape="rect" id="node1" href="#climlab.process.diagnostic.DiagnosticProcess" target="_top" title="A parent class for all processes that are strictly diagnostic, namely" alt="" coords="1025,5,1453,35"/>
-<area shape="rect" id="node2" href="#climlab.process.time_dependent_process.TimeDependentProcess" target="_top" title="A generic parent class for all time&#45;dependent processes." alt="" coords="363,5,976,35"/>
-<area shape="rect" id="node3" href="#climlab.process.process.Process" target="_top" title="A generic parent class for all climlab process objects." alt="" coords="6,5,314,35"/>
-</map>

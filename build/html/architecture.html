@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Architecture &mdash; climlab 0.3.0.1 documentation</title>
+    <title>Architecture &mdash; climlab 0.3.2 documentation</title>
     
     <link rel="stylesheet" href="_static/sphinxdoc.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.3.0.1',
+        VERSION:     '0.3.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -24,7 +24,7 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <link rel="top" title="climlab 0.3.0.1 documentation" href="index.html" />
+    <link rel="top" title="climlab 0.3.2 documentation" href="index.html" />
     <link rel="next" title="Models" href="models.html" />
     <link rel="prev" title="Download" href="download.html" /> 
   </head>
@@ -224,26 +224,26 @@ div.nboutput  > :nth-child(2).stderr {
 <div class="section" id="architecture">
 <h1>Architecture<a class="headerlink" href="#architecture" title="Permalink to this headline">¶</a></h1>
 <p>The backbone of the climlab architecture are <cite>Processes</cite> and their relatives <cite>TimeDependentProcesses</cite>. As all relevant procedures and events that can be modelled with <cite>climlab</cite> are expressed in <cite>Processes</cite>, they build the basic structure of the package.</p>
-<p>For example if you want to model the incoming solar radiation on Earth, <cite>climlab</cite> implements it as a <cite>Process</cite> namely in the <cite>Diagnostic Process</cite> <a class="reference internal" href="api/climlab.radiation.html#climlab.radiation.insolation._Insolation" title="climlab.radiation.insolation._Insolation"><code class="xref py py-class docutils literal"><span class="pre">_Insolation</span></code></a> (or one of it&#8217;s daughter classes to be specific).</p>
-<p>Or the emitted energy of a surface can be computed through  the <a class="reference internal" href="api/climlab.radiation.html#climlab.radiation.Boltzmann.Boltzmann" title="climlab.radiation.Boltzmann.Boltzmann"><code class="xref py py-class docutils literal"><span class="pre">Boltzmann</span></code></a> class which is also a climlab <cite>Process</cite> and implements the Stefan Boltzmann Law for a grey body. Like that all events and procedures that climlab can model are organized in <cite>Processes</cite></p>
+<p>For example, if you want to model the incoming solar radiation on Earth, <cite>climlab</cite> implements it as a <cite>Process</cite>, namely in the <cite>Diagnostic Process</cite> <a class="reference internal" href="api/climlab.radiation.html#climlab.radiation.insolation._Insolation" title="climlab.radiation.insolation._Insolation"><code class="xref py py-class docutils literal"><span class="pre">_Insolation</span></code></a> (or one of it&#8217;s daughter classes to be specific).</p>
+<p>Another example: the emitted energy of a surface can be computed through  the <a class="reference internal" href="api/climlab.radiation.html#climlab.radiation.Boltzmann.Boltzmann" title="climlab.radiation.Boltzmann.Boltzmann"><code class="xref py py-class docutils literal"><span class="pre">Boltzmann</span></code></a> class which is also a climlab <cite>Process</cite> and implements the Stefan Boltzmann Law for a grey body. Like that, all events and procedures that <cite>climlab</cite> can model are organized in <cite>Processes</cite>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p>Also the implementation of a whole model, for example an Energy Balance Model (<a class="reference internal" href="api/climlab.model.html#climlab.model.ebm.EBM" title="climlab.model.ebm.EBM"><code class="xref py py-class docutils literal"><span class="pre">EBM</span></code></a>) is also an instance of the <a class="reference internal" href="api/climlab.process.html#climlab.process.process.Process" title="climlab.process.process.Process"><code class="xref py py-class docutils literal"><span class="pre">Process</span></code></a> class in <cite>climlab</cite>.</p>
-<p class="last">For more about models, see the climlab <a class="reference internal" href="models.html#models"><span>Models</span></a> chapter.</p>
+<p>The implementation of a whole model, for example an Energy Balance Model (<a class="reference internal" href="api/climlab.model.html#climlab.model.ebm.EBM" title="climlab.model.ebm.EBM"><code class="xref py py-class docutils literal"><span class="pre">EBM</span></code></a>), is also an instance of the <a class="reference internal" href="api/climlab.process.html#climlab.process.process.Process" title="climlab.process.process.Process"><code class="xref py py-class docutils literal"><span class="pre">Process</span></code></a> class in <cite>climlab</cite>.</p>
+<p class="last">For more information about models, see the climlab <a class="reference internal" href="models.html#models"><span>Models</span></a> chapter.</p>
 </div>
 <p>A <cite>Process</cite> that represents a whole model will have a couple of <cite>subprocesses</cite> which will be <cite>Processes</cite> themselves. They represent a certain part of the model, for example the albedo or the insolation component. More details about subprocesses can be found below.</p>
 <p>A <strong>Process</strong> is always defined on a <strong>Domain</strong> which itself is based on <strong>Axes</strong> or a single <strong>Axis</strong>. The following section will give a basic introduction about their role in the package, their dependencies and their implementation.</p>
 <div class="section" id="process">
 <span id="process-architecture"></span><h2>Process<a class="headerlink" href="#process" title="Permalink to this headline">¶</a></h2>
-<p>A process is an instance of the class <a class="reference internal" href="api/climlab.process.html#climlab.process.process.Process" title="climlab.process.process.Process"><code class="xref py py-class docutils literal"><span class="pre">Process</span></code></a>. Most processes are timedependent and therefore instance of the daughter class <a class="reference internal" href="api/climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess" title="climlab.process.time_dependent_process.TimeDependentProcess"><code class="xref py py-class docutils literal"><span class="pre">TimeDependentProcess</span></code></a>.</p>
+<p>A process is an instance of the class <a class="reference internal" href="api/climlab.process.html#climlab.process.process.Process" title="climlab.process.process.Process"><code class="xref py py-class docutils literal"><span class="pre">Process</span></code></a>. Most processes are timedependent and therefore an instance of the daughter class <a class="reference internal" href="api/climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess" title="climlab.process.time_dependent_process.TimeDependentProcess"><code class="xref py py-class docutils literal"><span class="pre">TimeDependentProcess</span></code></a>.</p>
 <div class="section" id="basic-dictionaries">
 <h3>Basic Dictionaries<a class="headerlink" href="#basic-dictionaries" title="Permalink to this headline">¶</a></h3>
-<p>A <cite>climlab.Process</cite> object has several iterable dictionaries (<a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a>) of named, gridded variables:</p>
+<p>A <cite>climlab.Process</cite> object has several iterable dictionaries (<a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">dict</span></code></a>) of named, gridded variables <a class="footnote-reference" href="#id2" id="id1">[1]</a>:</p>
 <blockquote>
 <div><ul>
 <li><dl class="first docutils">
 <dt><code class="docutils literal"><span class="pre">process.state</span></code></dt>
-<dd><p class="first last">contains the <cite>process</cite>&#8216;s state variables, which are usually time-dependent and which are major quantities that identify the condition and status of the <cite>process</cite>. This can be the (surface) temperature of a model for instance.</p>
+<dd><p class="first last">contains the <cite>process</cite>&#8216; state variables, which are usually time-dependent and which are major quantities that identify the condition and status of the <cite>process</cite>. This can be the (surface) temperature of a model for instance.</p>
 </dd>
 </dl>
 </li>
@@ -255,13 +255,13 @@ div.nboutput  > :nth-child(2).stderr {
 </li>
 <li><dl class="first docutils">
 <dt><code class="docutils literal"><span class="pre">process.param</span></code></dt>
-<dd><p class="first last">contains parameter of the <cite>Process</cite> or model. Basically this is the same as <code class="docutils literal"><span class="pre">process.input</span></code> but with scalar entries.</p>
+<dd><p class="first last">contains parameter of the <cite>Process</cite> or model. Basically, this is the same as <code class="docutils literal"><span class="pre">process.input</span></code> but with scalar entries.</p>
 </dd>
 </dl>
 </li>
 <li><dl class="first docutils">
 <dt><code class="docutils literal"><span class="pre">process.tendencies</span></code></dt>
-<dd><p class="first">is an iterable dictionary of time-tendencies <span class="math">\((d/dt)\)</span> for each state variable defined in <code class="docutils literal"><span class="pre">process.state</span></code>.</p>
+<dd><p class="first">is an iterable dictionary of time tendencies <span class="math">\((d/dt)\)</span> for each state variable defined in <code class="docutils literal"><span class="pre">process.state</span></code>.</p>
 <div class="last admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">A non TimeDependentProcess (but instance of <a class="reference internal" href="api/climlab.process.html#climlab.process.process.Process" title="climlab.process.process.Process"><code class="xref py py-class docutils literal"><span class="pre">Process</span></code></a>) does not have this dictionary.</p>
@@ -271,7 +271,7 @@ div.nboutput  > :nth-child(2).stderr {
 </li>
 <li><dl class="first docutils">
 <dt><code class="docutils literal"><span class="pre">process.diagnostics</span></code></dt>
-<dd><p class="first last">contains any quantity derived from current state. In an Energy Balance Model this dictionary can have entries like <code class="docutils literal"><span class="pre">'ASR'</span></code>, <code class="docutils literal"><span class="pre">'OLR'</span></code>, <code class="docutils literal"><span class="pre">'icelat'</span></code>, <code class="docutils literal"><span class="pre">'net_radiation'</span></code>, <code class="docutils literal"><span class="pre">'albedo'</span></code> or <code class="docutils literal"><span class="pre">'insolation'</span></code>.</p>
+<dd><p class="first last">contains any quantity derived from the current state. In an Energy Balance Model this dictionary can have entries like <code class="docutils literal"><span class="pre">'ASR'</span></code>, <code class="docutils literal"><span class="pre">'OLR'</span></code>, <code class="docutils literal"><span class="pre">'icelat'</span></code>, <code class="docutils literal"><span class="pre">'net_radiation'</span></code>, <code class="docutils literal"><span class="pre">'albedo'</span></code> or <code class="docutils literal"><span class="pre">'insolation'</span></code>.</p>
 </dd>
 </dl>
 </li>
@@ -284,12 +284,18 @@ div.nboutput  > :nth-child(2).stderr {
 </ul>
 </div></blockquote>
 <p>The <cite>process</cite> is fully described by contents of <cite>state</cite>, <cite>input</cite> and <cite>param</cite>
-dictionaries. <cite>tendencies</cite> and <cite>diagnostics</cite> are always computable from current
+dictionaries. <cite>tendencies</cite> and <cite>diagnostics</cite> are always computable from the current
 state.</p>
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>In the following the small written <cite>process</cite> refers to an instance of the <a class="reference internal" href="api/climlab.process.html#climlab.process.process.Process" title="climlab.process.process.Process"><code class="xref py py-class docutils literal"><span class="pre">Process</span></code></a> class.</td></tr>
+</tbody>
+</table>
 </div>
 <div class="section" id="subprocesses">
 <h3>Subprocesses<a class="headerlink" href="#subprocesses" title="Permalink to this headline">¶</a></h3>
-<p>Subprocesses are representing and modelling certain components of the parent process. A model consists of many subprocesses which are usually defined on the same state variables, domains and axes as the parent process, at least partially.</p>
+<p>Subprocesses are representing and modeling certain components of the parent process. A model consists of many subprocesses which are usually defined on the same state variables, domains and axes as the parent process, at least partially.</p>
 <blockquote>
 <div><table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -311,8 +317,8 @@ state.</p>
 </tbody>
 </table>
 </div></blockquote>
-<p>It can be seen that subprocesses can have subprocesses themself, like <code class="docutils literal"><span class="pre">albedo</span></code> in this case.</p>
-<p>A <code class="docutils literal"><span class="pre">subprocess</span></code> is same as the <code class="docutils literal"><span class="pre">parent</span> <span class="pre">process</span></code> an instance of the <a class="reference internal" href="api/climlab.process.html#climlab.process.process.Process" title="climlab.process.process.Process"><code class="xref py py-class docutils literal"><span class="pre">Process</span></code></a> class. So it has dictionaries and attributes with same names as it&#8217;s <code class="docutils literal"><span class="pre">parent</span> <span class="pre">process</span></code>. Not necessary all will be the same or having the same entries, but a <code class="docutils literal"><span class="pre">subprocess</span></code> has at least the basic dictionaries and attributes created during initialization of the <a class="reference internal" href="api/climlab.process.html#climlab.process.process.Process" title="climlab.process.process.Process"><code class="xref py py-class docutils literal"><span class="pre">Process</span></code></a> instance.</p>
+<p>It can be seen that subprocesses can have subprocesses themselves, like <code class="docutils literal"><span class="pre">albedo</span></code> in this case.</p>
+<p>A <code class="docutils literal"><span class="pre">subprocess</span></code> is similar to its <code class="docutils literal"><span class="pre">parent</span> <span class="pre">process</span></code> an instance of the <a class="reference internal" href="api/climlab.process.html#climlab.process.process.Process" title="climlab.process.process.Process"><code class="xref py py-class docutils literal"><span class="pre">Process</span></code></a> class. That means a <code class="docutils literal"><span class="pre">subprocess</span></code> has dictionaries and attributes with the same names as its <code class="docutils literal"><span class="pre">parent</span> <span class="pre">process</span></code>. Not necessary all will be the same or have the same entries, but a <code class="docutils literal"><span class="pre">subprocess</span></code> has at least the basic dictionaries and attributes created during initialization of the <a class="reference internal" href="api/climlab.process.html#climlab.process.process.Process" title="climlab.process.process.Process"><code class="xref py py-class docutils literal"><span class="pre">Process</span></code></a> instance.</p>
 <p>Every <cite>subprocess</cite> should work independently of its <cite>parent process</cite> given
 appropriate <cite>input</cite>.</p>
 <blockquote>
@@ -320,7 +326,7 @@ appropriate <cite>input</cite>.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Example:</th><td class="field-body"><p class="first">Investigating an individual <cite>process</cite> (possibly with its own <cite>subprocesses</cite>) isolated from it&#8217;s parent can be done through:</p>
+<tr class="field-odd field"><th class="field-name">Example:</th><td class="field-body"><p class="first">Investigating an individual <cite>process</cite> (possibly with its own <cite>subprocesses</cite>) isolated from its parent can be done through:</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">newproc</span> <span class="o">=</span> <span class="n">climlab</span><span class="o">.</span><span class="n">process_like</span><span class="p">(</span><span class="n">procname</span><span class="o">.</span><span class="n">subprocess</span><span class="p">[</span><span class="s1">&#39;subprocname&#39;</span><span class="p">])</span>
 <span class="n">newproc</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
 </pre></div>
@@ -340,16 +346,16 @@ appropriate <cite>input</cite>.</p>
 <p>For a state variable <span class="math">\(S\)</span> which is dependendet on processes <span class="math">\(P_A\)</span>, <span class="math">\(P_B\)</span>, ... the time dependency can be written as</p>
 <div class="math">
 \[\frac{dS}{dt} = \underbrace{P_A(S)}_{S \textrm{ tendency by }P_A} + \underbrace{P_B(S)}_{S \textrm{ tendency by } P_B} + \ ...\]</div>
-<p>When state variable <span class="math">\(S\)</span> is discretized over time like</p>
+<p>When the state variable <span class="math">\(S\)</span> is discretized over time like</p>
 <div class="math">
-\[\frac{dS}{dt} = \frac{\Delta S}{\Delta t} = \frac{S(t_1) - S(t_0)}{t_1 - t_0} = \frac{S_1 - S_0}{\Delta t}\]</div>
+\[\frac{dS}{dt} = \frac{\Delta S}{\Delta t} = \frac{S(t_1) - S(t_0)}{t_1 - t_0} = \frac{S_1 - S_0}{\Delta t} ~,\]</div>
 <p>the state tendency can be calculated through</p>
 <div class="math">
 \[\Delta S = \big[ P_A(S) + P_B(S) + \ ... \big] \Delta t\]</div>
 <p>and the new state of <span class="math">\(S\)</span> after one timestep <span class="math">\(\Delta t\)</span> is then:</p>
 <div class="math">
-\[S_1 = S_0 + \big[ \underbrace{P_A(S)}_{S \textrm{ tendency by }P_A} + \underbrace{P_B(S)}_{S \textrm{ tendency by }P_B} + \ ... \ \big] \Delta t\]</div>
-<p>So the new state of <span class="math">\(S\)</span> is calculated trough multiplying the process tendencies of <span class="math">\(S\)</span> with the timestep and adding them up to the previous state of <span class="math">\(S\)</span>.</p>
+\[S_1 = S_0 + \big[ \underbrace{P_A(S)}_{S \textrm{ tendency by }P_A} + \underbrace{P_B(S)}_{S \textrm{ tendency by }P_B} + \ ... \ \big] \Delta t  ~.\]</div>
+<p>Therefore, the new state of <span class="math">\(S\)</span> is calculated by multiplying the process tendencies of <span class="math">\(S\)</span> with the timestep and adding them up to the previous state of <span class="math">\(S\)</span>.</p>
 </div>
 <div class="section" id="time-dependency-of-an-energy-budget">
 <h4>Time Dependency of an Energy Budget<a class="headerlink" href="#time-dependency-of-an-energy-budget" title="Permalink to this headline">¶</a></h4>
@@ -357,10 +363,10 @@ appropriate <cite>input</cite>.</p>
 <div class="math">
 \[\begin{split}\frac{dE}{dt} = C \frac{dT}{dt} = \underbrace{SP_A(T)}_{\textrm{heating-rate of }SP_A} + \underbrace{SP_B(T)}_{\textrm{ heating-rate of }SP_B} + \ ...                          \\
 \Leftrightarrow   \frac{dT}{dt} = \underbrace{\frac{SP_A(T)}{C}}_{T \textrm{ tendency by }SP_A} + \underbrace{\frac{SP_B(T)}{C}}_{T \textrm{ tendency by }SP_B} + \ ...\end{split}\]</div>
-<p>Therefore the new state of <span class="math">\(T\)</span> after one timestep <span class="math">\(\Delta t\)</span> can be written as:</p>
+<p>Therefore, the new state of <span class="math">\(T\)</span> after one timestep <span class="math">\(\Delta t\)</span> can be written as:</p>
 <div class="math">
 \[T_1 = \underbrace{T_0 + \underbrace{ \left[ \frac{SP_A(T)}{C} + \frac{SP_B(T)}{C} + \ ... \right]}_{\textrm{compute()}}  \Delta t }_{\textrm{step\_forward()}}\]</div>
-<p>The integration procedure is implemented in multiple nested function calls. The top functions for model integration are explained here, for details about computation of subprocess tendencies, see <a class="reference internal" href="#classification-of-subprocess-types">Classification of Subprocess Types</a> below.</p>
+<p>The integration procedure is implemented in multiple nested function calls. The top functions for model integration are explained here, for details about computation of subprocess tendencies see <a class="reference internal" href="#classification-of-subprocess-types">Classification of Subprocess Types</a> below.</p>
 <ul>
 <li><dl class="first docutils">
 <dt><a class="reference internal" href="api/climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess.compute" title="climlab.process.time_dependent_process.TimeDependentProcess.compute"><code class="xref py py-class docutils literal"><span class="pre">compute()</span></code></a> is a method that computes tendencies <span class="math">\(d/dt\)</span> for all state variables</dt>
@@ -372,9 +378,9 @@ appropriate <cite>input</cite>.</p>
 \[\textrm{tendencies}(T) = \frac{SP_A(T)}{C} + \frac{SP_B(T)}{C} + ...\]</div>
 </div></blockquote>
 </li>
-<li><p class="first">the keys for this dictionary are same as keys of state dictionary</p>
+<li><p class="first">the keys for this dictionary are the same as keys of state dictionary</p>
 <blockquote>
-<div><p>As temperature <span class="math">\(T\)</span> is the only state variable in this energy budget, the tendencies dictionary also just has the one key, representing state variable <span class="math">\(T\)</span>.</p>
+<div><p>As temperature <span class="math">\(T\)</span> is the only state variable in this energy budget, the tendencies dictionary also just has the one key, representing the state variable <span class="math">\(T\)</span>.</p>
 </div></blockquote>
 </li>
 <li><p class="first">the tendency dictionary holds the total tendencies for each state including all subprocesses</p>
@@ -384,9 +390,9 @@ appropriate <cite>input</cite>.</p>
 </li>
 <li><p class="first">the method only computes <span class="math">\(d/dt\)</span> but <strong>does not apply changes</strong> (which is done by <a class="reference internal" href="api/climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess.step_forward" title="climlab.process.time_dependent_process.TimeDependentProcess.step_forward"><code class="xref py py-class docutils literal"><span class="pre">step_forward()</span></code></a>)</p>
 </li>
-<li><p class="first">therefore the method is relatively independent of numerical scheme</p>
+<li><p class="first">therefore, the method is relatively independent of the numerical scheme</p>
 </li>
-<li><p class="first">method <strong>will update</strong> variables in <code class="docutils literal"><span class="pre">proc.diagnostic</span></code> dictionary. Therefore it will also <strong>gather all diagnostics</strong> from the <cite>subprocesses</cite></p>
+<li><p class="first">method <strong>will update</strong> variables in <code class="docutils literal"><span class="pre">proc.diagnostic</span></code> dictionary. Therefore, it will also <strong>gather all diagnostics</strong> from the <cite>subprocesses</cite></p>
 </li>
 </ul>
 </dd>
@@ -401,7 +407,7 @@ appropriate <cite>input</cite>.</p>
 </dd>
 </dl>
 </li>
-<li><p class="first"><a class="reference internal" href="api/climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess.integrate_years" title="climlab.process.time_dependent_process.TimeDependentProcess.integrate_years"><code class="xref py py-class docutils literal"><span class="pre">integrate_years()</span></code></a> etc will automate time-stepping through calling the <a class="reference internal" href="api/climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess.step_forward" title="climlab.process.time_dependent_process.TimeDependentProcess.step_forward"><code class="xref py py-class docutils literal"><span class="pre">step_forward</span></code></a> method multiple times. It also does the computation of time-average diagnostics.</p>
+<li><p class="first"><a class="reference internal" href="api/climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess.integrate_years" title="climlab.process.time_dependent_process.TimeDependentProcess.integrate_years"><code class="xref py py-class docutils literal"><span class="pre">integrate_years()</span></code></a> etc will automate time-stepping by calling the <a class="reference internal" href="api/climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess.step_forward" title="climlab.process.time_dependent_process.TimeDependentProcess.step_forward"><code class="xref py py-class docutils literal"><span class="pre">step_forward</span></code></a> method multiple times. It also does the computation of time-average diagnostics.</p>
 </li>
 <li><p class="first"><a class="reference internal" href="api/climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess.integrate_converge" title="climlab.process.time_dependent_process.TimeDependentProcess.integrate_converge"><code class="xref py py-class docutils literal"><span class="pre">integrate_converge()</span></code></a> calls <a class="reference internal" href="api/climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess.integrate_years" title="climlab.process.time_dependent_process.TimeDependentProcess.integrate_years"><code class="xref py py-class docutils literal"><span class="pre">integrate_years()</span></code></a> as long as the state variables keep changing over time.</p>
 </li>
@@ -410,7 +416,7 @@ appropriate <cite>input</cite>.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Example:</th><td class="field-body"><p class="first">to integrate a climlab EBM model over time can look like this:</p>
+<tr class="field-odd field"><th class="field-name">Example:</th><td class="field-body"><p class="first">Integration of a <cite>climlab</cite> EBM model over time can look like this:</p>
 <div class="last highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">climlab</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">climlab</span><span class="o">.</span><span class="n">EBM</span><span class="p">()</span>
 
@@ -427,31 +433,31 @@ appropriate <cite>input</cite>.</p>
 <h4>Classification of Subprocess Types<a class="headerlink" href="#classification-of-subprocess-types" title="Permalink to this headline">¶</a></h4>
 <p>Processes can be classified in types: <cite>explicit</cite>, <cite>implicit</cite>, <cite>diagnostic</cite> and <cite>adjustment</cite>.
 This makes sense as subprocesses may have different impact on state variable tendencies (<cite>diagnostic</cite> processes don&#8217;t have a direct influence for instance) or the way their tendencies are computed differ (<cite>explixit</cite> and <cite>implicit</cite>).</p>
-<p>Therefore the <a class="reference internal" href="api/climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess.compute" title="climlab.process.time_dependent_process.TimeDependentProcess.compute"><code class="xref py py-class docutils literal"><span class="pre">compute()</span></code></a> method handles them seperately as well as in specific order. It calls private <code class="xref py py-func docutils literal"><span class="pre">_compute()</span></code> methods that are specified in daugther classes of <a class="reference internal" href="api/climlab.process.html#climlab.process.process.Process" title="climlab.process.process.Process"><code class="xref py py-class docutils literal"><span class="pre">Process</span></code></a> namely <a class="reference internal" href="api/climlab.process.html#climlab.process.diagnostic.DiagnosticProcess" title="climlab.process.diagnostic.DiagnosticProcess"><code class="xref py py-class docutils literal"><span class="pre">DiagnosticProcess</span></code></a>,
+<p>Therefore, the <a class="reference internal" href="api/climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess.compute" title="climlab.process.time_dependent_process.TimeDependentProcess.compute"><code class="xref py py-class docutils literal"><span class="pre">compute()</span></code></a> method handles them seperately as well as in specific order. It calls private <code class="xref py py-func docutils literal"><span class="pre">_compute()</span></code> methods that are specified in daugther classes of <a class="reference internal" href="api/climlab.process.html#climlab.process.process.Process" title="climlab.process.process.Process"><code class="xref py py-class docutils literal"><span class="pre">Process</span></code></a> namely <a class="reference internal" href="api/climlab.process.html#climlab.process.diagnostic.DiagnosticProcess" title="climlab.process.diagnostic.DiagnosticProcess"><code class="xref py py-class docutils literal"><span class="pre">DiagnosticProcess</span></code></a>,
 <a class="reference internal" href="api/climlab.process.html#climlab.process.energy_budget.EnergyBudget" title="climlab.process.energy_budget.EnergyBudget"><code class="xref py py-class docutils literal"><span class="pre">EnergyBudget</span></code></a> (which are explicit processes) or
 <a class="reference internal" href="api/climlab.process.html#climlab.process.implicit.ImplicitProcess" title="climlab.process.implicit.ImplicitProcess"><code class="xref py py-class docutils literal"><span class="pre">ImplicitProcess</span></code></a>.</p>
 <p>The description of <a class="reference internal" href="api/climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess.compute" title="climlab.process.time_dependent_process.TimeDependentProcess.compute"><code class="xref py py-class docutils literal"><span class="pre">compute()</span></code></a> reveals the details how the different process types are handeled:</p>
 <blockquote>
-<div><p>The function first computes all diagnostic processes as they may effect
-all the other processes (such as change in solar distribution).
-After all the diagnostic processes don&#8217;t produce any tendencies directly. Subsequently
-all tendencies and diagnostics for all explicit processes are computed.</p>
+<div><p>The function first computes all diagnostic processes. They don&#8217;t produce
+any tendencies directly but they may effect the other processes (such as
+change in solar distribution). Subsequently, all tendencies and diagnostics
+for all explicit processes are computed.</p>
 <p>Tendencies due to implicit and adjustment processes need to be
 calculated from a state that is already adjusted after explicit
-alteration. So the explicit tendencies are applied to the states
+alteration. For that reason the explicit tendencies are applied to the states
 temporarily. Now all tendencies from implicit processes are calculated
-through matrix inversions and same like the explicit tendencies applied
-to the states temporarily. Subsequently all instantaneous adjustments
+by matrix inversions and similar to the explicit tendencies, the implicit ones
+are applied to the states temporarily. Subsequently, all instantaneous adjustments
 are computed.</p>
-<p>Then the changes made to the states from explicit and implicit
+<p>Then the changes that were made to the states from explicit and implicit
 processes are removed again as this
 <a class="reference internal" href="api/climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess.compute" title="climlab.process.time_dependent_process.TimeDependentProcess.compute"><code class="xref py py-class docutils literal"><span class="pre">compute()</span></code></a>
 function is
-supposed to calculate only tendencies and not applying them to the states.</p>
-<p>Finally all calculated tendencies from all processes are collected
+supposed to calculate only tendencies and not apply them to the states.</p>
+<p>Finally, all calculated tendencies from all processes are collected
 for each state, summed up and stored in the dictionary
 <code class="docutils literal"><span class="pre">self.tendencies</span></code>, which is an attribute of the time-dependent-process
-object for which the
+object, for which the
 <a class="reference internal" href="api/climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess.compute" title="climlab.process.time_dependent_process.TimeDependentProcess.compute"><code class="xref py py-class docutils literal"><span class="pre">compute()</span></code></a>
 method has been called.</p>
 </div></blockquote>
@@ -492,10 +498,10 @@ as <code class="docutils literal"><span class="pre">proc.subprocess.name</span><
 <span class="n">model</span> <span class="o">=</span> <span class="n">climlab</span><span class="o">.</span><span class="n">EBM</span><span class="p">()</span>
 
 <span class="c1"># quick access</span>
-<span class="n">longwave_subp</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">subprocess</span><span class="p">[</span><span class="s1">&#39;LW&#39;</span><span class="p">]</span>
+<span class="n">longwave_subp</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">subprocess</span><span class="o">.</span><span class="n">LW</span>
 
 <span class="c1"># regular path</span>
-<span class="n">longwave_subp</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">subprocess</span><span class="o">.</span><span class="n">LW</span>
+<span class="n">longwave_subp</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">subprocess</span><span class="p">[</span><span class="s1">&#39;LW&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </td>
@@ -564,7 +570,7 @@ These attributes are <code class="docutils literal"><span class="pre">lat</span>
       </ul>
     </div>
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2016 (licensed under Creative Commons, see License), Moritz Kreuzer.
+        &copy; Copyright 2016 (licensed under MIT License), Moritz Kreuzer &amp; Brian Rose.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
     </div>
   </body>

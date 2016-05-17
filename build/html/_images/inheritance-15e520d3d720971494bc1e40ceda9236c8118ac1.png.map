@@ -1,7 +1,0 @@
-<map id="inheritance2878b3a7d8" name="inheritance2878b3a7d8">
-<area shape="rect" id="node1" href="#climlab.radiation.AplusBT.AplusBT" target="_top" title="The simplest linear longwave radiation module." alt="" coords="657,5,754,35"/>
-<area shape="rect" id="node2" href="climlab.process.html#climlab.process.energy_budget.EnergyBudget" target="_top" title="A parent class for explicit energy budget processes." alt="" coords="430,33,583,63"/>
-<area shape="rect" id="node3" href="#climlab.radiation.AplusBT.AplusBT_CO2" target="_top" title="Linear longwave radiation module considering CO2 concentration." alt="" coords="632,59,779,90"/>
-<area shape="rect" id="node4" href="climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess" target="_top" title="A generic parent class for all time&#45;dependent processes." alt="" coords="144,33,381,63"/>
-<area shape="rect" id="node5" href="climlab.process.html#climlab.process.process.Process" target="_top" title="A generic parent class for all climlab process objects." alt="" coords="5,33,96,63"/>
-</map>
