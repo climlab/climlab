@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ================
 climlab
 ================
@@ -111,3 +112,4 @@ See the accompanying LICENSE file.
    :target: https://codecov.io/github/brian-rose/climlab?branch=master
 .. |DOI| image:: https://zenodo.org/badge/doi/10.5281/zenodo.48984.svg
    :target: http://dx.doi.org/10.5281/zenodo.48984
+=======

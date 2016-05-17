@@ -1,0 +1,378 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>climlab.domain.initial &mdash; climlab 0.3.2 documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '0.3.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="climlab 0.3.2 documentation" href="../../../index.html" />
+    <link rel="up" title="Module code" href="../../index.html" /> 
+  </head>
+  <body role="document">
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../../../index.html"><img src="../../../_static/logo.png" border="0" alt="sampledoc"/></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../intro.html">home</a>|&nbsp;</li>
+        <li><a href="../../../search.html">search</a>|&nbsp;</li>
+        <!-- 
+	<li><a href="../../../contents.html">documentation </a> &raquo;</li>
+	-->
+
+          <li class="nav-item nav-item-1"><a href="../../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../../../index.html">Table Of Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../download.html">Download</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../models.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorial.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api/climlab.html">Application Programming Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contact.html">Contact</a></li>
+</ul>
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput > div,
+div.nbinput div[class^=highlight],
+div.nbinput div[class^=highlight] pre,
+div.nboutput,
+div.nboutput > div,
+div.nboutput div[class^=highlight],
+div.nboutput div[class^=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput > :first-child pre {
+    color: navy;
+}
+
+/* output prompt */
+div.nboutput > :first-child pre {
+    color: darkred;
+}
+
+/* all prompts */
+div.nbinput > :first-child[class^=highlight],
+div.nboutput > :first-child[class^=highlight],
+div.nboutput > :first-child {
+    min-width: 11ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+
+/* input/output area */
+div.nbinput > :nth-child(2)[class^=highlight],
+div.nboutput > :nth-child(2),
+div.nboutput > :nth-child(2)[class^=highlight] {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+}
+
+/* input area */
+div.nbinput > :nth-child(2)[class^=highlight] {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput  > :nth-child(2).stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansiblack { color: black; }
+.ansired { color: darkred; }
+.ansigreen { color: darkgreen; }
+.ansiyellow { color: #c4a000; }
+.ansiblue { color: darkblue; }
+.ansipurple { color: darkviolet; }
+.ansicyan { color: steelblue; }
+/* See https://github.com/jupyter/nbconvert/issues/174 */
+.ansigray { color: gray; }  /* nbconvert CSS */
+.ansigrey { color: gray; }  /* nbconvert HTML output */
+
+.ansibgblack { background-color: black; }
+.ansibgred { background-color: red; }
+.ansibggreen { background-color: green; }
+.ansibgyellow { background-color: yellow; }
+.ansibgblue { background-color: blue; }
+.ansibgpurple { background-color: magenta; }
+.ansibgcyan { background-color: cyan; }
+.ansibggray { background-color: gray; }
+
+.ansibold { font-weight: bold; }
+</style>
+<h1>Source code for climlab.domain.initial</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Convenience routines for setting up initial conditions.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">climlab.domain</span> <span class="kn">import</span> <span class="n">domain</span>
+<span class="kn">from</span> <span class="nn">climlab.domain.field</span> <span class="kn">import</span> <span class="n">Field</span>
+<span class="kn">from</span> <span class="nn">climlab.utils.attr_dict</span> <span class="kn">import</span> <span class="n">AttrDict</span>
+<span class="kn">from</span> <span class="nn">climlab.utils</span> <span class="kn">import</span> <span class="n">legendre</span>
+
+
+<div class="viewcode-block" id="column_state"><a class="viewcode-back" href="../../../api/climlab.domain.html#climlab.domain.initial.column_state">[docs]</a><span class="k">def</span> <span class="nf">column_state</span><span class="p">(</span><span class="n">num_lev</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span>
+                 <span class="n">num_lat</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                 <span class="n">lev</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">lat</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span>
+                 <span class="n">water_depth</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Sets up a state variable dictionary consisting of temperatures</span>
+<span class="sd">    for atmospheric column (``Tatm``) and surface mixed layer (``Ts``).</span>
+<span class="sd">    </span>
+<span class="sd">    Surface temperature is always 288 K. Atmospheric temperature is initialized </span>
+<span class="sd">    between 278 K at lowest altitude and 200 at top of atmosphere according to</span>
+<span class="sd">    the number of levels given.</span>
+<span class="sd">    </span>
+<span class="sd">    **Function-call arguments** \n        </span>
+<span class="sd">        </span>
+<span class="sd">    :param int num_lev:         number of pressure levels</span>
+<span class="sd">                                (evenly spaced from surface to top of atmosphere) </span>
+<span class="sd">                                [default: 30]</span>
+<span class="sd">    :param int num_lat:         number of latitude points on the axis</span>
+<span class="sd">                                [default: 1]</span>
+<span class="sd">    :param lev:                 specification for height axis (optional)</span>
+<span class="sd">    :type lev:                  :class:`~climlab.domain.axis.Axis` </span>
+<span class="sd">                                or pressure array</span>
+<span class="sd">    :param array lat:           size of array determines dimension of latitude</span>
+<span class="sd">                                (optional)</span>
+<span class="sd">    :param float water_depth:   *irrelevant*</span>
+<span class="sd">    </span>
+<span class="sd">    :returns:                   dictionary with two temperature </span>
+<span class="sd">                                :class:`~climlab.domain.field.Field` </span>
+<span class="sd">                                for atmospheric column ``Tatm`` and </span>
+<span class="sd">                                surface mixed layer ``Ts``</span>
+<span class="sd">    :rtype:                     dict</span>
+<span class="sd">    </span>
+<span class="sd">    :Example:</span>
+
+<span class="sd">        ::</span>
+<span class="sd">            </span>
+<span class="sd">            &gt;&gt;&gt; from climlab.domain import initial</span>
+<span class="sd">            &gt;&gt;&gt; T_dict = initial.column_state()</span>
+<span class="sd">            </span>
+<span class="sd">            &gt;&gt;&gt; print T_dict</span>
+<span class="sd">            {&#39;Tatm&#39;: Field([ 200.        ,  202.68965517,  205.37931034,  208.06896552,</span>
+<span class="sd">                    210.75862069,  213.44827586,  216.13793103,  218.82758621,</span>
+<span class="sd">                    221.51724138,  224.20689655,  226.89655172,  229.5862069 ,</span>
+<span class="sd">                    232.27586207,  234.96551724,  237.65517241,  240.34482759,</span>
+<span class="sd">                    243.03448276,  245.72413793,  248.4137931 ,  251.10344828,</span>
+<span class="sd">                    253.79310345,  256.48275862,  259.17241379,  261.86206897,</span>
+<span class="sd">                    264.55172414,  267.24137931,  269.93103448,  272.62068966,</span>
+<span class="sd">                    275.31034483,  278.        ]), &#39;Ts&#39;: Field([ 288.])}</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">lat</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">num_lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lat</span><span class="p">)</span><span class="o">.</span><span class="n">size</span>
+    <span class="k">if</span> <span class="n">lev</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="n">num_lev</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lev</span><span class="p">)</span><span class="o">.</span><span class="n">size</span>
+
+    <span class="k">if</span> <span class="n">num_lat</span> <span class="ow">is</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">sfc</span><span class="p">,</span> <span class="n">atm</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">single_column</span><span class="p">(</span><span class="n">water_depth</span><span class="o">=</span><span class="n">water_depth</span><span class="p">,</span>
+                                        <span class="n">num_lev</span><span class="o">=</span><span class="n">num_lev</span><span class="p">,</span>
+                                        <span class="n">lev</span><span class="o">=</span><span class="n">lev</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sfc</span><span class="p">,</span> <span class="n">atm</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">zonal_mean_column</span><span class="p">(</span><span class="n">water_depth</span><span class="o">=</span><span class="n">water_depth</span><span class="p">,</span>
+                                            <span class="n">num_lev</span><span class="o">=</span><span class="n">num_lev</span><span class="p">,</span>
+                                            <span class="n">lev</span><span class="o">=</span><span class="n">lev</span><span class="p">,</span>
+                                            <span class="n">num_lat</span><span class="o">=</span><span class="n">num_lat</span><span class="p">,</span>
+                                            <span class="n">lat</span><span class="o">=</span><span class="n">lat</span><span class="p">)</span>
+    <span class="n">num_lev</span> <span class="o">=</span> <span class="n">atm</span><span class="o">.</span><span class="n">lev</span><span class="o">.</span><span class="n">num_points</span>
+    <span class="n">Ts</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="mf">288.</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">sfc</span><span class="o">.</span><span class="n">shape</span><span class="p">),</span> <span class="n">domain</span><span class="o">=</span><span class="n">sfc</span><span class="p">)</span>
+    <span class="n">Tinitial</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">200.</span><span class="p">,</span> <span class="mf">288.</span><span class="o">-</span><span class="mf">10.</span><span class="p">,</span> <span class="n">num_lev</span><span class="p">),</span> <span class="n">sfc</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">Tatm</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">Tinitial</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">atm</span><span class="p">)</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="n">AttrDict</span><span class="p">()</span>
+    <span class="n">state</span><span class="p">[</span><span class="s1">&#39;Ts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Ts</span>
+    <span class="n">state</span><span class="p">[</span><span class="s1">&#39;Tatm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Tatm</span>
+    <span class="k">return</span> <span class="n">state</span></div>
+
+
+<div class="viewcode-block" id="surface_state"><a class="viewcode-back" href="../../../api/climlab.domain.html#climlab.domain.initial.surface_state">[docs]</a><span class="k">def</span> <span class="nf">surface_state</span><span class="p">(</span><span class="n">num_lat</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>
+                  <span class="n">water_depth</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span>
+                  <span class="n">T0</span><span class="o">=</span><span class="mf">12.</span><span class="p">,</span>
+                  <span class="n">T2</span><span class="o">=-</span><span class="mf">40.</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Sets up a state variable dictionary for a zonal-mean surface model</span>
+<span class="sd">    (e.g. basic EBM). </span>
+<span class="sd">    </span>
+<span class="sd">    Returns a single state variable `Ts`, the temperature of the surface </span>
+<span class="sd">    mixed layer, initialized by a basic temperature and the second Legendre</span>
+<span class="sd">    polynomial.</span>
+<span class="sd">    </span>
+<span class="sd">    **Function-call arguments** \n        </span>
+<span class="sd">        </span>
+<span class="sd">    :param int num_lat:         number of latitude points on the axis</span>
+<span class="sd">                                [default: 90]</span>
+<span class="sd">    :param float water_depth:   *irrelevant*</span>
+<span class="sd">    :param float T0:            base value for initial temperature          \n</span>
+<span class="sd">                                - unit :math:`^{\circ} \\textrm{C}`         \n</span>
+<span class="sd">                                - default value: ``12``</span>
+<span class="sd">    :param float T2:            factor for 2nd Legendre polynomial </span>
+<span class="sd">                                :class:`~climlab.utils.legendre.P2` </span>
+<span class="sd">                                to calculate initial temperature            \n</span>
+<span class="sd">                                - unit: dimensionless</span>
+<span class="sd">                                - default value: ``-40``</span>
+
+<span class="sd">    :returns:                   dictionary with temperature </span>
+<span class="sd">                                :class:`~climlab.domain.field.Field` </span>
+<span class="sd">                                for surface mixed layer ``Ts``</span>
+<span class="sd">    :rtype:                     dict</span>
+<span class="sd">    </span>
+<span class="sd">    </span>
+<span class="sd">    :Example:</span>
+<span class="sd">    </span>
+<span class="sd">        ::</span>
+<span class="sd">        </span>
+<span class="sd">            &gt;&gt;&gt; from climlab.domain import initial</span>
+<span class="sd">            &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">            </span>
+<span class="sd">            &gt;&gt;&gt; T_dict = initial.surface_state(num_lat=36)</span>
+<span class="sd">            </span>
+<span class="sd">            &gt;&gt;&gt; print np.squeeze(T_dict[&#39;Ts&#39;])</span>
+<span class="sd">            [-27.88584094 -26.97777479 -25.18923361 -22.57456133 -19.21320344</span>
+<span class="sd">             -15.20729309 -10.67854785  -5.76457135  -0.61467228   4.61467228</span>
+<span class="sd">               9.76457135  14.67854785  19.20729309  23.21320344  26.57456133</span>
+<span class="sd">              29.18923361  30.97777479  31.88584094  31.88584094  30.97777479</span>
+<span class="sd">              29.18923361  26.57456133  23.21320344  19.20729309  14.67854785</span>
+<span class="sd">               9.76457135   4.61467228  -0.61467228  -5.76457135 -10.67854785</span>
+<span class="sd">             -15.20729309 -19.21320344 -22.57456133 -25.18923361 -26.97777479</span>
+<span class="sd">             -27.88584094]</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sfc</span> <span class="o">=</span> <span class="n">domain</span><span class="o">.</span><span class="n">zonal_mean_surface</span><span class="p">(</span><span class="n">num_lat</span><span class="o">=</span><span class="n">num_lat</span><span class="p">,</span>
+                                    <span class="n">water_depth</span><span class="o">=</span><span class="n">water_depth</span><span class="p">)</span>
+    <span class="n">sinphi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">sfc</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">points</span><span class="p">))</span>
+    <span class="n">initial</span> <span class="o">=</span> <span class="n">T0</span> <span class="o">+</span> <span class="n">T2</span> <span class="o">*</span> <span class="n">legendre</span><span class="o">.</span><span class="n">P2</span><span class="p">(</span><span class="n">sinphi</span><span class="p">)</span>
+    <span class="n">Ts</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">initial</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">sfc</span><span class="p">)</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="n">AttrDict</span><span class="p">()</span>
+    <span class="n">state</span><span class="p">[</span><span class="s1">&#39;Ts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Ts</span>
+    <span class="k">return</span> <span class="n">state</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../../intro.html">home</a>|&nbsp;</li>
+        <li><a href="../../../search.html">search</a>|&nbsp;</li>
+        <!-- 
+	<li><a href="../../../contents.html">documentation </a> &raquo;</li>
+	-->
+
+          <li class="nav-item nav-item-1"><a href="../../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016 (licensed under MIT License), Moritz Kreuzer &amp; Brian Rose.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+    </div>
+  </body>
+</html>

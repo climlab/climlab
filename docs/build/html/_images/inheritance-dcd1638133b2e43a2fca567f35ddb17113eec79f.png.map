@@ -1,0 +1,7 @@
+<map id="inheritancee411ddb18a" name="inheritancee411ddb18a">
+<area shape="rect" id="node1" href="#climlab.domain.domain.Atmosphere" target="_top" title="Class for the implementation of an Atmosphere Domain." alt="" coords="157,5,291,35"/>
+<area shape="rect" id="node4" href="#climlab.domain.domain.SlabAtmosphere" target="_top" title="A class to create a SlabAtmosphere Domain by default." alt="" coords="339,5,511,35"/>
+<area shape="rect" id="node2" href="#climlab.domain.domain._Domain" target="_top" title="Private parent class for `Domains`." alt="" coords="6,33,109,63"/>
+<area shape="rect" id="node3" href="#climlab.domain.domain.Ocean" target="_top" title="Class for the implementation of an Ocean Domain." alt="" coords="184,59,264,90"/>
+<area shape="rect" id="node5" href="#climlab.domain.domain.SlabOcean" target="_top" title="A class to create a SlabOcean Domain by default." alt="" coords="366,59,485,90"/>
+</map>
