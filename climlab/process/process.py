@@ -261,7 +261,9 @@ class Process(object):
     def remove_subprocess(self, name, verbose=True):
         """Removes a single subprocess from this process.
         
-        :param string name:     name of the subprocess
+        :param string name:     name of the subprocess 
+        :param bool verbose:    information whether warning message 
+                                should be printed [default: True]
         
         :Example:
         
@@ -301,7 +303,7 @@ class Process(object):
             self.subprocess.pop(name)
         except KeyError:
             if verbose: 
-                print 'WARNING: Subprocess does not exist'
+                print 'WARNING: {} not found in subprocess dictionary.'.format(name)
         self.has_process_type_list = False
         #  Since we made every subprocess an object attribute, we also remove
         #delattr(self, name)
