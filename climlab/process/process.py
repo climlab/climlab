@@ -258,7 +258,7 @@ class Process(object):
         else:
             raise ValueError('subprocess must be Process object')
 
-    def remove_subprocess(self, name):
+    def remove_subprocess(self, name, verbose=True):
         """Removes a single subprocess from this process.
         
         :param string name:     name of the subprocess
@@ -297,7 +297,11 @@ class Process(object):
                    insolation: <class 'climlab.radiation.insolation.P2Insolation'>
                 
         """
-        self.subprocess.pop(name, None)
+        try:
+            self.subprocess.pop(name)
+        except KeyError:
+            if verbose: 
+                print 'WARNING: Subprocess does not exist'
         self.has_process_type_list = False
         #  Since we made every subprocess an object attribute, we also remove
         #delattr(self, name)
