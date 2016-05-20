@@ -20,10 +20,13 @@ import climlab
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath('/home/moritz/PIK/subversion/working_dir/v-0.3.2-docstr-changes'))
+#sys.path.insert(0, os.path.abspath('/home/moritz/PIK/subversion/working_dir/v-0.3.2-docstr-changes'))
 #sys.path.insert(0, os.path.abspath('/home/moritz/anaconda2/envs/env_sphinx_5/lib/python2.7/site-packages/Sphinx-1.3.1-py2.7.egg/sphinx/ext'))
 #sys.path.insert(0, os.path.abspath('/home/moritz/PIK/subversion/documentation/climlab-0.2.13/sphinx/source/ext'))
-sys.path.insert(0, os.path.abspath('/home/moritz/anaconda2/envs/env_sphinx_5/lib/python2.7/site-packages/astropy_helpers'))
+#sys.path.insert(0, os.path.abspath('/home/moritz/anaconda2/envs/env_sphinx_5/lib/python2.7/site-packages/astropy_helpers'))
+
+print "python exec:", sys.executable
+print "sys.path:", sys.path
 
 # -- General configuration ------------------------------------------------
 
