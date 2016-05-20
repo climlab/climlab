@@ -124,3 +124,8 @@ See the accompanying LICENSE file.
    :target: http://climlab.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation Status
 =======
+
+
+Support
+-----------------
+Development of ``climlab`` is partially supported by the National Science Foundation under award AGS-1455071 to Brian Rose
