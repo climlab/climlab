@@ -9,3 +9,4 @@ dependencies:
     - ipython
     - pip:
         - nbsphinx
+        - sphinxcontrib-bibtex
