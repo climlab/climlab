@@ -286,7 +286,9 @@ latex_documents = [
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
-latex_logo = os.path.abspath('/home/moritz/PIK/subversion/github/climlab-documentation/source/_static/logo.png')
+#latex_logo = os.path.abspath('/home/moritz/PIK/subversion/github/climlab-documentation/source/_static/logo.png')
+# relative path within source directory
+latex_logo = '_static/logo.png'
 
 
 # For "manual" documents, if this is true, then toplevel headings are parts,
