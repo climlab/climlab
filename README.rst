@@ -111,7 +111,7 @@ See the accompanying LICENSE file.
    :target: https://codecov.io/github/brian-rose/climlab?branch=master
 .. |DOI| image:: https://zenodo.org/badge/doi/10.5281/zenodo.48984.svg
    :target: http://dx.doi.org/10.5281/zenodo.48984
-.. |docs| image:: http://readthedocs.org/projects/climlab/badge/?version=stable
-   :target: http://climlab.readthedocs.io/en/stable/?badge=stable
+.. |docs| image:: http://readthedocs.org/projects/climlab/badge/?version=latest
+   :target: http://climlab.readthedocs.io/en/latest/?badge=latest
    :alt: Documentation Status
 =======
