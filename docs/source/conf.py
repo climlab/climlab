@@ -15,14 +15,18 @@
 import sys
 import os
 import shlex
+import climlab
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath('/home/moritz/PIK/subversion/working_dir/v-0.3.2-docstr-changes'))
+#sys.path.insert(0, os.path.abspath('/home/moritz/PIK/subversion/working_dir/v-0.3.2-docstr-changes'))
 #sys.path.insert(0, os.path.abspath('/home/moritz/anaconda2/envs/env_sphinx_5/lib/python2.7/site-packages/Sphinx-1.3.1-py2.7.egg/sphinx/ext'))
 #sys.path.insert(0, os.path.abspath('/home/moritz/PIK/subversion/documentation/climlab-0.2.13/sphinx/source/ext'))
-sys.path.insert(0, os.path.abspath('/home/moritz/anaconda2/envs/env_sphinx_5/lib/python2.7/site-packages/astropy_helpers'))
+#sys.path.insert(0, os.path.abspath('/home/moritz/anaconda2/envs/env_sphinx_5/lib/python2.7/site-packages/astropy_helpers'))
+
+print "python exec:", sys.executable
+print "sys.path:", sys.path
 
 # -- General configuration ------------------------------------------------
 
@@ -49,7 +53,8 @@ extensions = [
     #'sphinx.ext.automodsumm',
     'nbsphinx',
     'IPython.sphinxext.ipython_console_highlighting',
-    'sphinxcontrib.bibtex'
+    'sphinxcontrib.bibtex',
+    'numpydoc',
 ]
 
 #inheritance_graph_attrs = dict(rankdir="TB", size='"6.0, 8.0"', fontsize=14, ratio='compress')
@@ -144,6 +149,12 @@ intersphinx_mapping = {	'python':('http://docs.python.org/2.7', None),
 		      }
 
 # -- Options for HTML output ----------------------------------------------
+
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+if not on_rtd:  # only import and set the theme if we're building docs locally
+    import sphinx_rtd_theme
+    html_theme = 'sphinx_rtd_theme'
+    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
