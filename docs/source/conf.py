@@ -53,7 +53,8 @@ extensions = [
     #'sphinx.ext.automodsumm',
     'nbsphinx',
     'IPython.sphinxext.ipython_console_highlighting',
-    'sphinxcontrib.bibtex'
+    'sphinxcontrib.bibtex',
+    'numpydoc',
 ]
 
 #inheritance_graph_attrs = dict(rankdir="TB", size='"6.0, 8.0"', fontsize=14, ratio='compress')
