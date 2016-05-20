@@ -10,3 +10,4 @@ dependencies:
     - pip:
         - nbsphinx
         - sphinxcontrib-bibtex
+        - numpydoc
