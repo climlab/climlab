@@ -6,4 +6,5 @@ dependencies:
     - netCDF4
     - sphinx=1.3.5
     - matplotlib
-    - nbsphinx
+    - pip:
+        - nbsphinx
