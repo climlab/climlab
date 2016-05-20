@@ -15,6 +15,15 @@ Author
 | University at Albany
 | brose@albany.edu
 
+
+Links
+-----
+
+-  HTML documentation: http://climlab.readthedocs.io/en/latest
+-  Issue tracker: http://github.com/brian-rose/climlab/issues
+-  Source code: http://github.com/brian-rose/climlab
+
+
 Installation
 ----------------
 ``python setup.py install``
