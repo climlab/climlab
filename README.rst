@@ -99,6 +99,9 @@ Version 0.3 was released in February 2016. It includes many internal changes and
 some backwards-incompatible changes (hopefully simplifications) to the public API.
 It also includes the CAM3 radiation module.
 
+The documentation_ was first created by Moritz Kreuzer (Potsdam Institut for Climate Impact Research) as part of a thesis project in Spring 2016.
+
+.. _documentation: http://climlab.readthedocs.io
 
 Contact and Bug Reports
 ----------------------
