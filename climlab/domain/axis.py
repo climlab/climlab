@@ -9,14 +9,129 @@ axis_types = ['lev', 'lat', 'lon', 'depth', 'abstract']
 # and probaly also an abstract dimensionless axis type (for box models)
 
 class Axis(object):
-    '''Create a new climlab Axis object
-    Valid axis types are:
-        'lev'
-        'lat'
-        'lon'
-        'depth'
-        'abstract' (default)
-    '''
+    """Creates a new climlab Axis object.
+    
+    An :class:`~climlab.domain.axis.Axis` is an object where information of a
+    spacial dimension of a :class:`~climlab.domain.domain._Domain` are specified.
+
+    These include the `type` of the axis, the `number of points`, location of 
+    `points` and `bounds` on the spatial dimension, magnitude of bounds
+    differences `delta` as well as their `unit`.
+
+    The `axes` of a :class:`~climlab.domain.domain._Domain` are stored in the
+    dictionary axes, so they can be accessed through ``dom.axes`` if ``dom`` 
+    is an instance of :class:`~climlab.domain.domain._Domain`.
+
+    
+    **Initialization parameters** \n
+        
+    An instance of ``Axis`` is initialized with the following 
+    arguments *(for detailed information see Object attributes below)*:
+    
+    :param str axis_type:   information about the type of axis 
+                            [default: 'abstract']
+    :param int num_points:  number of points on axis
+                            [default: 10]
+    :param array points:    array with specific points (optional)
+    :param array bounds:    array with specific bounds between points (optional)
+    :raises: :exc:`ValueError`
+                            if ``axis_type`` is not one of the valid types or 
+                            their euqivalents (see below).
+    :raises: :exc:`ValueError`
+                            if ``points`` are given and not array-like.
+    :raises: :exc:`ValueError`
+                            if ``bounds`` are given and not array-like.
+    
+    **Object attributes** \n
+    
+    Following object attributes are generated during initialization:
+        
+    :ivar str axis_type:    Information about the type of axis. Valid axis types are: 
+    
+                                * ``'lev'``
+                                * ``'lat'``
+                                * ``'lon'``
+                                * ``'depth'``
+                                * ``'abstract'`` (default)
+
+    :ivar int num_points:   number of points on axis
+    :ivar str units:        Unit of the axis. During intialization the unit is 
+                            chosen from the ``defaultUnits`` dictionary (see below).
+    :ivar array points:     array with all points of the axis (grid)
+    :ivar array bounds:     array with all bounds between points (staggered grid)
+    :ivar array delta:      array with spatial differences between bounds
+    
+
+    **Axis Types** \n
+    
+    A couple of differing axis type strings are rendered to valid axis types.
+    Alternate forms are listed here:
+    
+    * ``'lev'``
+        * ``'p'``
+        * ``'press'``
+        * ``'pressure'``
+        * ``'P'``
+        * ``'Pressure'``
+        * ``'Press'``
+    * ``'lat'``
+        * ``'Latitude'``
+        * ``'latitude'``
+    * ``'lon'``
+        * ``'Longitude'``
+        * ``'longitude'``
+    * ``'depth'``
+        * ``'Depth'``
+        * ``'waterDepth'``
+        * ``'water_depth'``
+        * ``'slab'``    
+
+    
+    The **default units** are::
+        
+        defaultUnits = {'lev': 'mb',
+                        'lat': 'degrees',
+                        'lon': 'degrees',
+                        'depth': 'meters',
+                        'abstract': 'none'}
+    
+    If bounds are not given during initialization, **default end points** 
+    are used::
+
+        defaultEndPoints = {'lev': (0., climlab.constants.ps),
+                            'lat': (-90., 90.),
+                            'lon': (0., 360.),
+                            'depth': (0., 10.),
+                            'abstract': (0, num_points)}
+                                          
+    :Example: 
+        
+        Creation of a standalone Axis::
+            
+            >>> import climlab
+            >>> ax = climlab.domain.Axis(axis_type='Latitude', num_points=36)
+            
+            >>> print ax
+            Axis of type lat with 36 points.
+
+            >>> ax.points
+            array([-87.5, -82.5, -77.5, -72.5, -67.5, -62.5, -57.5, -52.5, -47.5,
+                   -42.5, -37.5, -32.5, -27.5, -22.5, -17.5, -12.5,  -7.5,  -2.5,
+                     2.5,   7.5,  12.5,  17.5,  22.5,  27.5,  32.5,  37.5,  42.5,
+                    47.5,  52.5,  57.5,  62.5,  67.5,  72.5,  77.5,  82.5,  87.5])
+
+            >>> ax.bounds
+            array([-90., -85., -80., -75., -70., -65., -60., -55., -50., -45., -40.,
+                   -35., -30., -25., -20., -15., -10.,  -5.,   0.,   5.,  10.,  15.,
+                    20.,  25.,  30.,  35.,  40.,  45.,  50.,  55.,  60.,  65.,  70.,
+                    75.,  80.,  85.,  90.])
+
+            >>> ax.delta
+            array([ 5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,
+                    5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,
+                    5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.])   
+                
+    """
     def __str__(self):
         return ("Axis of type " + self.axis_type + " with " +
                 str(self.num_points) + " points.")

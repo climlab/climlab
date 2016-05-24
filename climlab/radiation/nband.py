@@ -11,17 +11,17 @@ class NbandRadiation(GreyGas):
     with the spectrum divided into N spectral bands.
 
     Every NbandRadiation object has an attribute
-        self.band_fraction
+    ``self.band_fraction``
     with sum(self.band_fraction) == 1
     that gives the fraction of the total beam in each band
 
     Also a dictionary
-        self.absorber_vmr
+    ``self.absorber_vmr``
     that gives the volumetric mixing ratio of every absorbing gas
     on the same grid as temperature
 
     and a dictionary
-        self.absorption_cross_section
+    ``self.absorption_cross_section``
     that gives the absorption cross-section per unit mass for each gas
     in every spectral band
     '''
@@ -280,26 +280,28 @@ def SPEEDY_band_fraction(T):
 
     Reproducing here the FORTRAN code from MITgcm/pkg/aim_v23/phy_radiat.F
 
-
-	      EPS3=0.95 _d 0
-
-	      DO JTEMP=200,320
-	        FBAND(JTEMP,0)= EPSLW
-	        FBAND(JTEMP,2)= 0.148 _d 0 - 3.0 _d -6 *(JTEMP-247)**2
-	        FBAND(JTEMP,3)=(0.375 _d 0 - 5.5 _d -6 *(JTEMP-282)**2)*EPS3
-	        FBAND(JTEMP,4)= 0.314 _d 0 + 1.0 _d -5 *(JTEMP-315)**2
-	        FBAND(JTEMP,1)= 1. _d 0 -(FBAND(JTEMP,0)+FBAND(JTEMP,2)
-	     &                           +FBAND(JTEMP,3)+FBAND(JTEMP,4))
-	      ENDDO
-
-	      DO JB=0,NBAND
-	        DO JTEMP=lwTemp1,199
-	          FBAND(JTEMP,JB)=FBAND(200,JB)
-	        ENDDO
-	        DO JTEMP=321,lwTemp2
-	          FBAND(JTEMP,JB)=FBAND(320,JB)
-	        ENDDO
-	      ENDDO
+    .. code-block:: fortran
+    
+    	      EPS3=0.95 _d 0
+       
+    	      DO JTEMP=200,320
+    	        FBAND(JTEMP,0)= EPSLW
+    	        FBAND(JTEMP,2)= 0.148 _d 0 - 3.0 _d -6 *(JTEMP-247)**2
+    	        FBAND(JTEMP,3)=(0.375 _d 0 - 5.5 _d -6 *(JTEMP-282)**2)*EPS3
+    	        FBAND(JTEMP,4)= 0.314 _d 0 + 1.0 _d -5 *(JTEMP-315)**2
+    	        FBAND(JTEMP,1)= 1. _d 0 -(FBAND(JTEMP,0)+FBAND(JTEMP,2)
+    	     &                           +FBAND(JTEMP,3)+FBAND(JTEMP,4))
+    	      ENDDO
+       
+    	      DO JB=0,NBAND
+    	        DO JTEMP=lwTemp1,199
+    	          FBAND(JTEMP,JB)=FBAND(200,JB)
+    	        ENDDO
+    	        DO JTEMP=321,lwTemp2
+    	          FBAND(JTEMP,JB)=FBAND(320,JB)
+    	        ENDDO
+    	      ENDDO
+       
     '''
     # EPSLW is the fraction of longwave emission that goes directly to space
     #  It is set to zero by default in MITgcm code. We won't use it here.

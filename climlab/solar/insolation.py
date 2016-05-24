@@ -1,27 +1,23 @@
-"""insolation.py
-
-This module contains general-purpose routines for computing incoming
+"""This module contains general-purpose routines for computing incoming
 solar radiation at the top of the atmosphere.
 
 Currently, only daily average insolation is computed.
 
-Ported and modified from MATLAB code daily_insolation.m
-Original authors:
-    Ian Eisenman and Peter Huybers, Harvard University, August 2006
-Available online at http://eisenman.ucsd.edu/code/daily_insolation.m
+.. note::
+
+    Ported and modified from MATLAB code daily_insolation.m         \n
+    *Original authors:*                                             \n
+    
+     Ian Eisenman and Peter Huybers, Harvard University, August 2006
+
+    Available online at http://eisenman.ucsd.edu/code/daily_insolation.m
 
 If using calendar days, solar longitude is found using an
 approximate solution to the differential equation representing conservation
 of angular momentum (Kepler's Second Law).  Given the orbital parameters
 and solar longitude, daily average insolation is calculated exactly
-following Berger 1978.
+following :cite:`Berger_1978`. Further references: :cite:`Berger_1991`.
 
-References:
-Berger A. and Loutre M.F. (1991). Insolation values for the climate of
- the last 10 million years. Quaternary Science Reviews, 10(4), 297-317.
-Berger A. (1978). Long-term variations of daily insolation and
- Quaternary climatic changes. Journal of Atmospheric Science, 35(12),
- 2362-2367.
 """
 
 import numpy as np
@@ -32,42 +28,84 @@ def daily_insolation(lat, day, orb=const.orb_present, S0=None, day_type=1):
     """Compute daily average insolation given latitude, time of year and orbital parameters.
 
     Orbital parameters can be computed for any time in the last 5 Myears with
-    ecc,long_peri,obliquity = orbital.lookup_parameters(kyears)
+    :func:`~climlab.solar.orbital.OrbitalTable.lookup_parameters` (see example below).
+        
 
-    Inputs:
-    lat:      Latitude in degrees (-90 to 90).
-    day:      Indicator of time of year, by default day 1 is Jan 1.
-    orb:    a dictionary with three members (as provided by orbital.py)
-        ecc:      eccentricity (dimensionless)
-        long_peri:    longitude of perihelion (precession angle) (degrees)
-        obliquity:  obliquity angle (degrees)
-    S0:       Solar constant in W/m^2, will try to read from constants.py
-    day_type: Convention for specifying time of year (+/- 1,2) [optional].
-        day_type=1 (default): day input is calendar day (1-365.24), where day 1
-        is January first.  The calendar is referenced to the vernal equinox
-        which always occurs at day 80.
-        day_type=2: day input is solar longitude (0-360 degrees). Solar
-        longitude is the angle of the Earth's orbit measured from spring
-        equinox (21 March). Note that calendar days and solar longitude are
-        not linearly related because, by Kepler's Second Law, Earth's
-        angular velocity varies according to its distance from the sun.
-    Default values for orbital parameters are present-day
+    **Function-call argument** \n        
+        
+    :param array lat:       Latitude in degrees (-90 to 90).
+    :param array day:       Indicator of time of year. See argument ``day_type``
+                            for details about format.
+    :param dict orb:        a dictionary with three members (as provided by 
+                            :class:`~climlab.solar.orbital.OrbitalTable`)
+                            
+                            * ``'ecc'`` - eccentricity
+                            
+                                * unit: dimensionless
+                                * default value: ``0.017236``
+                                
+                            * ``'long_peri'`` - longitude of perihelion (precession angle) 
+                            
+                                * unit: degrees
+                                * default value: ``281.37``
+                                
+                            * ``'obliquity'`` - obliquity angle
+                            
+                                * unit: degrees
+                                * default value: ``23.446``
+                                
+    :param float S0:        solar constant                                  \n
+                            - unit: :math:`\\textrm{W}/\\textrm{m}^2`       \n
+                            - default value: ``1365.2`` 
+    :param int day_type:    Convention for specifying time of year (+/- 1,2) [optional].
+    
+                            *day_type=1* (default):
+                             day input is calendar day (1-365.24), where day 1
+                             is January first. The calendar is referenced to the 
+                             vernal equinox which always occurs at day 80.
+                             
+                            *day_type=2:* 
+                             day input is solar longitude (0-360 degrees). Solar
+                             longitude is the angle of the Earth's orbit measured from spring
+                             equinox (21 March). Note that calendar days and solar longitude are
+                             not linearly related because, by Kepler's Second Law, Earth's
+                             angular velocity varies according to its distance from the sun.
+    :raises: :exc:`ValueError`
+                            if day_type is neither 1 nor 2
+    :returns:               Daily average solar radiation in unit 
+                            :math:`\\textrm{W}/\\textrm{m}^2`.
+                            
+                            Dimensions of output are ``(lat.size, day.size, ecc.size)``
+    :rtype:                 array
+    
 
-    Output:
-    Fsw = Daily average solar radiation in W/m^2.
-
-    Dimensions of output are (lat.size, day.size, ecc.size)
-
-    Code is fully vectorized to handle array input for all arguments.
+    Code is fully vectorized to handle array input for all arguments.       \n
     Orbital arguments should all have the same sizes.
-    This is automatic if computed from orbital.OrbitalTable.lookup_parameters()
+    This is automatic if computed from 
+    :func:`~climlab.solar.orbital.OrbitalTable.lookup_parameters`
 
-    e.g. to compute the timeseries of insolation at 65N at summer solstice over the past 5 Myears
-        from climlab.orbital import OrbitalTable
-        table = OrbitalTable()
-        years = np.linspace(0, 5000, 5001)
-        orb = table.lookup_parameters( years )
-        S65 = orbital.daily_insolation( 65, 172, orb )
+    :Example: 
+        to compute the timeseries of insolation at 65N at summer
+        solstice over the past 5 Myears::
+        
+            from climlab.solar.orbital import OrbitalTable
+            from climlab.solar.insolation import daily_insolation
+            
+            # import orbital table
+            table = OrbitalTable()
+            
+            # array with specified kyears 
+            years = np.linspace(-5000, 0, 5001)
+
+            # orbital parameters for specified time
+            orb = table.lookup_parameters( years )
+
+            # insolation values for past 5 Myears at 65N at summer solstice
+            S65 = daily_insolation( 65, 172, orb )
+            
+        For more information about computation of solar insolation see the
+        :ref:`Tutorial` chapter.
+        
      """
 
     # If input argument S0 is not given, use the standard Earth value
@@ -121,14 +159,45 @@ def daily_insolation(lat, day, orb=const.orb_present, S0=None, day_type=1):
 
 
 def solar_longitude( day, orb=const.orb_present, days_per_year = None ):
-    '''Estimate solar longitude (lambda = 0 at spring equinox) from calendar day 
-    using an approximation from Berger 1978 section 3.
+    """Estimates solar longitude from calendar day.
     
-    Works for both scalar and vector orbital parameters.
+    Method is using an approximation from :cite:`Berger_1978` section 3
+    (lambda = 0 at spring equinox).
+
+    **Function-call arguments** \n        
+        
+    :param array day:           Indicator of time of year.
+    :param dict orb:            a dictionary with three members (as provided by 
+                                :class:`~climlab.solar.orbital.OrbitalTable`)
+                                
+                                * ``'ecc'`` - eccentricity
+                                
+                                    * unit: dimensionless
+                                    * default value: ``0.017236``
+                                    
+                                * ``'long_peri'`` - longitude of perihelion 
+                                  (precession angle) 
+                                
+                                    * unit: degrees
+                                    * default value: ``281.37``
+                                    
+                                * ``'obliquity'`` - obliquity angle
+                                
+                                    * unit: degrees
+                                    * default value: ``23.446``
+    :param float days_per_year: number of days in a year (optional) 
+                                (default: 365.2422)
+                                Reads the length of the year from 
+                                :mod:`~climlab.utils.constants` if available.
+    :returns:                   solar longitude ``lambda_long``
+                                in dimension``( day.size, ecc.size )``                 
+    :rtype:                     array
     
-    Reads the length of the year from constants.py if available.
-    '''
+    Works for both scalar and vector orbital parameters.  
     
+    
+    
+    """
     if days_per_year is None:
         days_per_year = const.days_per_year
     

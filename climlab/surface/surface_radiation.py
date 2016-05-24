@@ -31,7 +31,7 @@ class SurfaceRadiation(EnergyBudget):
         return self.SW_from_atm * self.albedo_sfc
 
     def _compute_heating_rates(self):
-        '''Compute energy flux convergences to get heating rates in W / m**2.'''
+        '''Compute energy flux convergences to get heating rates in :math:`W/m^2`.'''
         self.LW_to_atm = self._compute_emission()
         self.SW_to_atm = self._compute_reflected_flux()
         self.heating_rate['Ts'] = ( self.LW_from_atm - self.LW_to_atm

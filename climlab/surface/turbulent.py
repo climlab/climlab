@@ -15,7 +15,7 @@ class SurfaceFlux(EnergyBudget):
         self.U = 5. * np.ones_like(self.Ts)
 
     def _compute_heating_rates(self):
-        '''Compute energy flux convergences to get heating rates in W/m2.'''
+        '''Compute energy flux convergences to get heating rates in :math:`W/m^2`.'''
         self._compute_flux()
         self.heating_rate['Ts'] = -self._flux
         # Modify only the lowest model level

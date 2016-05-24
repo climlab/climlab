@@ -1,0 +1,693 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Orbital Cycles &mdash; climlab 0.3.2 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.3.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="climlab 0.3.2 documentation" href="../index.html" /> 
+  </head>
+  <body role="document">
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../index.html"><img src="../_static/logo.png" border="0" alt="sampledoc"/></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../intro.html">home</a>|&nbsp;</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+        <!-- 
+	<li><a href="../contents.html">documentation </a> &raquo;</li>
+	-->
+ 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../index.html">Table Of Contents</a></h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../download.html">Download</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/climlab.html">Application Programming Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contact.html">Contact</a></li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/notebooks/Orbital Cycles.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput > div,
+div.nbinput div[class^=highlight],
+div.nbinput div[class^=highlight] pre,
+div.nboutput,
+div.nboutput > div,
+div.nboutput div[class^=highlight],
+div.nboutput div[class^=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput > :first-child pre {
+    color: navy;
+}
+
+/* output prompt */
+div.nboutput > :first-child pre {
+    color: darkred;
+}
+
+/* all prompts */
+div.nbinput > :first-child[class^=highlight],
+div.nboutput > :first-child[class^=highlight],
+div.nboutput > :first-child {
+    min-width: 11ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+
+/* input/output area */
+div.nbinput > :nth-child(2)[class^=highlight],
+div.nboutput > :nth-child(2),
+div.nboutput > :nth-child(2)[class^=highlight] {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+}
+
+/* input area */
+div.nbinput > :nth-child(2)[class^=highlight] {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput  > :nth-child(2).stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansiblack { color: black; }
+.ansired { color: darkred; }
+.ansigreen { color: darkgreen; }
+.ansiyellow { color: #c4a000; }
+.ansiblue { color: darkblue; }
+.ansipurple { color: darkviolet; }
+.ansicyan { color: steelblue; }
+/* See https://github.com/jupyter/nbconvert/issues/174 */
+.ansigray { color: gray; }  /* nbconvert CSS */
+.ansigrey { color: gray; }  /* nbconvert HTML output */
+
+.ansibgblack { background-color: black; }
+.ansibgred { background-color: red; }
+.ansibggreen { background-color: green; }
+.ansibgyellow { background-color: yellow; }
+.ansibgblue { background-color: blue; }
+.ansibgpurple { background-color: magenta; }
+.ansibgcyan { background-color: cyan; }
+.ansibggray { background-color: gray; }
+
+.ansibold { font-weight: bold; }
+</style>
+<div class="section" id="Orbital-Cycles">
+<h1>Orbital Cycles<a class="headerlink" href="#Orbital-Cycles" title="Permalink to this headline">¶</a></h1>
+<p>In this document ...</p>
+<div class="nbinput nblast container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In [1]:
+</pre></div>
+</div>
+<div class="highlight-ipython2"><div class="highlight"><pre>
+<span></span><span class="c1"># import header</span>
+
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">climlab</span>
+<span class="kn">from</span> <span class="nn">climlab.model.ebm</span> <span class="kn">import</span> <span class="n">EBM_seasonal</span>
+<span class="kn">from</span> <span class="nn">climlab.solar.orbital_cycles</span> <span class="kn">import</span> <span class="n">OrbitalCycles</span>
+<span class="kn">from</span> <span class="nn">climlab.surface.albedo</span> <span class="kn">import</span> <span class="n">StepFunctionAlbedo</span>
+<span class="kn">from</span> <span class="nn">climlab.domain.field</span> <span class="kn">import</span> <span class="n">global_mean</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="Model-Creation">
+<h2>Model Creation<a class="headerlink" href="#Model-Creation" title="Permalink to this headline">¶</a></h2>
+<p>An EBM model instance is created through</p>
+<div class="nbinput nblast container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In [2]:
+</pre></div>
+</div>
+<div class="highlight-ipython2"><div class="highlight"><pre>
+<span></span><span class="c1"># model creation</span>
+<span class="n">ebm_model</span> <span class="o">=</span> <span class="n">EBM_seasonal</span><span class="p">(</span><span class="n">A</span><span class="o">=</span><span class="mi">204</span><span class="p">,</span> <span class="n">B</span><span class="o">=</span><span class="mf">2.17</span><span class="p">,</span> <span class="n">D</span><span class="o">=</span><span class="mf">0.79</span><span class="p">,</span> <span class="n">a0</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">a2</span> <span class="o">=</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">ai</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">Tf</span><span class="o">=-</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>The model is set up with an albedo feedback subprocess:</p>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In [3]:
+</pre></div>
+</div>
+<div class="highlight-ipython2"><div class="highlight"><pre>
+<span></span><span class="c1"># print model states and suprocesses</span>
+<span class="k">print</span> <span class="n">ebm_model</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="container">
+</div>
+<div class="container">
+<div class="highlight"><pre>
+climlab Process of type &lt;class &apos;climlab.model.ebm.EBM_seasonal&apos;&gt;.
+State variables and domain shapes:
+  Ts: (90, 1)
+The subprocess tree:
+top: &lt;class &apos;climlab.model.ebm.EBM_seasonal&apos;&gt;
+   diffusion: &lt;class &apos;climlab.dynamics.diffusion.MeridionalDiffusion&apos;&gt;
+   LW: &lt;class &apos;climlab.radiation.AplusBT.AplusBT&apos;&gt;
+   albedo: &lt;class &apos;climlab.surface.albedo.StepFunctionAlbedo&apos;&gt;
+      iceline: &lt;class &apos;climlab.surface.albedo.Iceline&apos;&gt;
+      cold_albedo: &lt;class &apos;climlab.surface.albedo.ConstantAlbedo&apos;&gt;
+      warm_albedo: &lt;class &apos;climlab.surface.albedo.P2Albedo&apos;&gt;
+   insolation: &lt;class &apos;climlab.radiation.insolation.DailyInsolation&apos;&gt;
+
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Test-Run">
+<h2>Test Run<a class="headerlink" href="#Test-Run" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In [4]:
+</pre></div>
+</div>
+<div class="highlight-ipython2"><div class="highlight"><pre>
+<span></span><span class="n">ebm_model</span><span class="o">.</span><span class="n">integrate_converge</span><span class="p">()</span>
+
+<span class="n">global_mean</span><span class="p">(</span><span class="n">ebm_model</span><span class="o">.</span><span class="n">timeave</span><span class="p">[</span><span class="s1">&#39;Ts&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput container">
+<div class="container">
+</div>
+<div class="container">
+<div class="highlight"><pre>
+Total elapsed time is 9.0 years.
+</pre></div></div>
+</div>
+<div class="nboutput nblast container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>Out[4]:
+</pre></div>
+</div>
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>Field(10.695892552075234)
+</pre></div>
+</div>
+</div>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In [5]:
+</pre></div>
+</div>
+<div class="highlight-ipython2"><div class="highlight"><pre>
+<span></span><span class="n">ebm_model</span><span class="o">.</span><span class="n">diagnostics</span><span class="p">[</span><span class="s1">&#39;icelat&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>Out[5]:
+</pre></div>
+</div>
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>array([-60.,  52.])
+</pre></div>
+</div>
+</div>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In [6]:
+</pre></div>
+</div>
+<div class="highlight-ipython2"><div class="highlight"><pre>
+<span></span><span class="n">ebm_model</span><span class="o">.</span><span class="n">time</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>Out[6]:
+</pre></div>
+</div>
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>{&#39;day_of_year_index&#39;: 0,
+ &#39;days_elapsed&#39;: 3287.179799999966,
+ &#39;days_of_year&#39;: array([   0.        ,    4.05824667,    8.11649333,   12.17474   ,
+          16.23298667,   20.29123333,   24.34948   ,   28.40772667,
+          32.46597333,   36.52422   ,   40.58246667,   44.64071333,
+          48.69896   ,   52.75720667,   56.81545333,   60.8737    ,
+          64.93194667,   68.99019333,   73.04844   ,   77.10668667,
+          81.16493333,   85.22318   ,   89.28142667,   93.33967333,
+          97.39792   ,  101.45616667,  105.51441333,  109.57266   ,
+         113.63090667,  117.68915333,  121.7474    ,  125.80564667,
+         129.86389333,  133.92214   ,  137.98038667,  142.03863333,
+         146.09688   ,  150.15512667,  154.21337333,  158.27162   ,
+         162.32986667,  166.38811333,  170.44636   ,  174.50460667,
+         178.56285333,  182.6211    ,  186.67934667,  190.73759333,
+         194.79584   ,  198.85408667,  202.91233333,  206.97058   ,
+         211.02882667,  215.08707333,  219.14532   ,  223.20356667,
+         227.26181333,  231.32006   ,  235.37830667,  239.43655333,
+         243.4948    ,  247.55304667,  251.61129333,  255.66954   ,
+         259.72778667,  263.78603333,  267.84428   ,  271.90252667,
+         275.96077333,  280.01902   ,  284.07726667,  288.13551333,
+         292.19376   ,  296.25200667,  300.31025333,  304.3685    ,
+         308.42674667,  312.48499333,  316.54324   ,  320.60148667,
+         324.65973333,  328.71798   ,  332.77622667,  336.83447333,
+         340.89272   ,  344.95096667,  349.00921333,  353.06746   ,
+         357.12570667,  361.18395333]),
+ &#39;num_steps_per_year&#39;: 90.0,
+ &#39;steps&#39;: 810,
+ &#39;timestep&#39;: 350632.51200000005,
+ &#39;years_elapsed&#39;: 9}
+</pre></div>
+</div>
+</div>
+<div class="section" id="Orbital-Cycle-Routine">
+<h3>Orbital Cycle Routine<a class="headerlink" href="#Orbital-Cycle-Routine" title="Permalink to this headline">¶</a></h3>
+<p>The model integration through a different set of orbital parameters is
+done by a function called <code class="docutils literal"><span class="pre">OrbitalCycles</span></code> from the
+<code class="docutils literal"><span class="pre">climlab.solar.orbital_cycles</span></code> module.</p>
+<p>We want to integrate the model for orbital parameters from the last
+5,000 years. To save computation time we speed up the process by the
+factor 10.</p>
+</div>
+<div class="section" id="Start-the-integration">
+<h3>Start the integration<a class="headerlink" href="#Start-the-integration" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In [7]:
+</pre></div>
+</div>
+<div class="highlight-ipython2"><div class="highlight"><pre>
+<span></span><span class="c1">#  run for 5,000 orbital years, but only 500 model years</span>
+<span class="n">experiment</span> <span class="o">=</span> <span class="n">OrbitalCycles</span><span class="p">(</span><span class="n">ebm_model</span><span class="p">,</span> <span class="n">kyear_start</span><span class="o">=-</span><span class="mi">23</span><span class="p">,</span> <span class="n">kyear_stop</span><span class="o">=-</span><span class="mi">10</span><span class="p">,</span> <span class="n">segment_length_years</span><span class="o">=</span><span class="mf">10.</span><span class="p">,</span> <span class="n">orbital_year_factor</span><span class="o">=</span><span class="mf">100.</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="container">
+</div>
+<div class="container">
+<div class="highlight"><pre>
+---------  OrbitalCycles  START ----------
+Beginning integration for the model from -23 to -10 kyears before present.
+Integration time for each set of orbital parameters is 10.0 years.
+Orbital cycles will be sped up by a factor 100.0
+Total number of segments is 13
+Loading Berger and Loutre (1991) orbital parameter data from file /home/moritz/anaconda2/envs/climlab_0.3_env/lib/python2.7/site-packages/climlab/solar/orbit91
+-------------------------
+Segment 0 out of 13
+Using orbital parameters from -23 kyears before present.
+Global mean temperature from the final year of integration is 10.8922858558 degrees C.
+-------------------------
+Segment 1 out of 13
+Using orbital parameters from -22.0 kyears before present.
+Global mean temperature from the final year of integration is 10.8914821979 degrees C.
+-------------------------
+Segment 2 out of 13
+Using orbital parameters from -21.0 kyears before present.
+Global mean temperature from the final year of integration is 10.8467065845 degrees C.
+-------------------------
+Segment 3 out of 13
+Using orbital parameters from -20.0 kyears before present.
+Global mean temperature from the final year of integration is 10.822265004 degrees C.
+-------------------------
+Segment 4 out of 13
+Using orbital parameters from -19.0 kyears before present.
+Global mean temperature from the final year of integration is 10.6731087485 degrees C.
+-------------------------
+Segment 5 out of 13
+Using orbital parameters from -18.0 kyears before present.
+Global mean temperature from the final year of integration is 10.7137106376 degrees C.
+-------------------------
+Segment 6 out of 13
+Using orbital parameters from -17.0 kyears before present.
+Global mean temperature from the final year of integration is 10.6219622769 degrees C.
+-------------------------
+Segment 7 out of 13
+Using orbital parameters from -16.0 kyears before present.
+Global mean temperature from the final year of integration is 10.546520891 degrees C.
+-------------------------
+Segment 8 out of 13
+Using orbital parameters from -15.0 kyears before present.
+Global mean temperature from the final year of integration is 10.533891031 degrees C.
+-------------------------
+Segment 9 out of 13
+Using orbital parameters from -14.0 kyears before present.
+Global mean temperature from the final year of integration is 10.6091502818 degrees C.
+-------------------------
+Segment 10 out of 13
+Using orbital parameters from -13.0 kyears before present.
+Global mean temperature from the final year of integration is 10.5801589069 degrees C.
+-------------------------
+Segment 11 out of 13
+Using orbital parameters from -12.0 kyears before present.
+Global mean temperature from the final year of integration is 10.5283315159 degrees C.
+-------------------------
+Segment 12 out of 13
+Using orbital parameters from -11.0 kyears before present.
+Global mean temperature from the final year of integration is 10.4426197575 degrees C.
+---------  OrbitalCycles  END ----------
+</pre></div></div>
+</div>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In [8]:
+</pre></div>
+</div>
+<div class="highlight-ipython2"><div class="highlight"><pre>
+<span></span><span class="n">ebm_model</span><span class="o">.</span><span class="n">time</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>Out[8]:
+</pre></div>
+</div>
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>{&#39;day_of_year_index&#39;: 0,
+ &#39;days_elapsed&#39;: 50768.66580000745,
+ &#39;days_of_year&#39;: array([   0.        ,    4.05824667,    8.11649333,   12.17474   ,
+          16.23298667,   20.29123333,   24.34948   ,   28.40772667,
+          32.46597333,   36.52422   ,   40.58246667,   44.64071333,
+          48.69896   ,   52.75720667,   56.81545333,   60.8737    ,
+          64.93194667,   68.99019333,   73.04844   ,   77.10668667,
+          81.16493333,   85.22318   ,   89.28142667,   93.33967333,
+          97.39792   ,  101.45616667,  105.51441333,  109.57266   ,
+         113.63090667,  117.68915333,  121.7474    ,  125.80564667,
+         129.86389333,  133.92214   ,  137.98038667,  142.03863333,
+         146.09688   ,  150.15512667,  154.21337333,  158.27162   ,
+         162.32986667,  166.38811333,  170.44636   ,  174.50460667,
+         178.56285333,  182.6211    ,  186.67934667,  190.73759333,
+         194.79584   ,  198.85408667,  202.91233333,  206.97058   ,
+         211.02882667,  215.08707333,  219.14532   ,  223.20356667,
+         227.26181333,  231.32006   ,  235.37830667,  239.43655333,
+         243.4948    ,  247.55304667,  251.61129333,  255.66954   ,
+         259.72778667,  263.78603333,  267.84428   ,  271.90252667,
+         275.96077333,  280.01902   ,  284.07726667,  288.13551333,
+         292.19376   ,  296.25200667,  300.31025333,  304.3685    ,
+         308.42674667,  312.48499333,  316.54324   ,  320.60148667,
+         324.65973333,  328.71798   ,  332.77622667,  336.83447333,
+         340.89272   ,  344.95096667,  349.00921333,  353.06746   ,
+         357.12570667,  361.18395333]),
+ &#39;num_steps_per_year&#39;: 90.0,
+ &#39;steps&#39;: 12510,
+ &#39;timestep&#39;: 350632.51200000005,
+ &#39;years_elapsed&#39;: 139}
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="Orbital-Table">
+<h2>Orbital Table<a class="headerlink" href="#Orbital-Table" title="Permalink to this headline">¶</a></h2>
+<div class="nbinput nblast container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In [9]:
+</pre></div>
+</div>
+<div class="highlight-ipython2"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">climlab.solar.orbital</span> <span class="kn">import</span> <span class="n">OrbitalTable</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In [32]:
+</pre></div>
+</div>
+<div class="highlight-ipython2"><div class="highlight"><pre>
+<span></span><span class="n">kyears</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">50</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">table</span> <span class="o">=</span> <span class="n">OrbitalTable</span><span class="p">()</span>
+<span class="n">orb</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">lookup_parameters</span><span class="p">(</span><span class="n">kyears</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="container">
+</div>
+<div class="container">
+<div class="highlight"><pre>
+Loading Berger and Loutre (1991) orbital parameter data from file /home/moritz/anaconda2/envs/climlab_0.3_env/lib/python2.7/site-packages/climlab/solar/orbit91
+</pre></div></div>
+</div>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In [43]:
+</pre></div>
+</div>
+<div class="highlight-ipython2"><div class="highlight"><pre>
+<span></span><span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span> <span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="mi">9</span><span class="p">)</span> <span class="p">)</span>
+<span class="n">ax1</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">311</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kyears</span><span class="p">,</span> <span class="n">orb</span><span class="p">[</span><span class="s1">&#39;ecc&#39;</span><span class="p">])</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="o">-</span><span class="mi">23</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Eccentricity $e$&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span> <span class="p">)</span>
+
+
+<span class="n">ax2</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">312</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kyears</span><span class="p">,</span> <span class="n">orb</span><span class="p">[</span><span class="s1">&#39;obliquity&#39;</span><span class="p">])</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="o">-</span><span class="mi">23</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Obliquity (axial tilt) $\Phi$&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span> <span class="p">)</span>
+
+<span class="n">ax3</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">313</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kyears</span><span class="p">,</span> <span class="n">orb</span><span class="p">[</span><span class="s1">&#39;ecc&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span> <span class="n">orb</span><span class="p">[</span><span class="s1">&#39;long_peri&#39;</span><span class="p">])))</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="o">-</span><span class="mi">23</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span><span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Precessional parameter $e \sin(\Lambda)$&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span> <span class="p">)</span>
+<span class="n">ax3</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span> <span class="s1">&#39;kyears before present&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>Out[43]:
+</pre></div>
+</div>
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>&lt;matplotlib.text.Text at 0x7f8ed97075d0&gt;
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="container">
+</div>
+<div class="container">
+<img alt="notebooks/../../build/doctrees/nbsphinx/notebooks_OrbitalCycles_20_1.*" src="notebooks/../../build/doctrees/nbsphinx/notebooks_OrbitalCycles_20_1.*" />
+</div>
+</div>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In [12]:
+</pre></div>
+</div>
+<div class="highlight-ipython2"><div class="highlight"><pre>
+<span></span><span class="n">experiment</span><span class="o">.</span><span class="n">T_segments_annual</span><span class="p">[</span><span class="mi">45</span><span class="p">,:]</span>
+<span class="c1">#experiment.orb_kyear</span>
+<span class="c1">#experiment.kyear_start</span>
+<span class="c1">#experiment.segment_length_years * experiment.orbital_year_factor /1000.</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>Out[12]:
+</pre></div>
+</div>
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>array([ 21.44130362,  21.41453074,  21.35301444,  21.30861506,
+        21.17633305,  21.17104497,  21.08137198,  20.99880634,
+        20.9587408 ,  20.99336685,  20.95220832,  20.90622809,  20.83580519])
+</pre></div>
+</div>
+</div>
+<div class="nbinput container">
+<div class="highlight-none"><div class="highlight"><pre>
+<span></span>In [13]:
+</pre></div>
+</div>
+<div class="highlight-ipython2"><div class="highlight"><pre>
+<span></span><span class="c1">#import matplotlib.pyplot as plt</span>
+<span class="c1">#from mpl_toolkits.mplot3d import Axes3D</span>
+
+<span class="c1"># creating plot figure</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+
+<span class="n">lat</span>      <span class="o">=</span> <span class="n">ebm_model</span><span class="o">.</span><span class="n">lat</span>
+
+<span class="n">start</span>    <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">kyear_start</span>
+<span class="n">stop</span>     <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">kyear_stop</span>
+<span class="n">interval</span> <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">segment_length_years</span> <span class="o">*</span> <span class="n">experiment</span><span class="o">.</span><span class="n">orbital_year_factor</span> <span class="o">/</span> <span class="mf">1000.</span>
+<span class="n">time</span>     <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">stop</span><span class="p">,</span> <span class="n">interval</span><span class="p">)</span>
+
+<span class="c1"># Temperature plot</span>
+<span class="n">ax1</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span> <span class="n">time</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">experiment</span><span class="o">.</span><span class="n">T_segments_annual</span><span class="p">,</span>  <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;RdBu&#39;</span><span class="p">)</span>
+
+<span class="c1">#ax1.set_xticks([-90,-60,-30,0,30,60,90])</span>
+<span class="c1">#ax1.set_xlim([-90,90])</span>
+<span class="c1">#ax1.set_xlabel(&#39;latitude&#39;)</span>
+<span class="c1">#ax1.set_ylabel(&#39;surface temperature (degC)&#39;)</span>
+<span class="c1">#ax1.grid()</span>
+
+
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast container">
+<div class="container">
+</div>
+<div class="container">
+<img alt="notebooks/../../build/doctrees/nbsphinx/notebooks_OrbitalCycles_22_0.*" src="notebooks/../../build/doctrees/nbsphinx/notebooks_OrbitalCycles_22_0.*" />
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../intro.html">home</a>|&nbsp;</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+        <!-- 
+	<li><a href="../contents.html">documentation </a> &raquo;</li>
+	-->
+ 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016 (licensed under MIT License), Moritz Kreuzer &amp; Brian Rose.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+    </div>
+  </body>
+</html>

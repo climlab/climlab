@@ -2,7 +2,7 @@
 climlab
 ================
 
-|pypi| |Build Status| |coverage| |DOI|
+|docs| |DOI| |pypi| |Build Status| |coverage| 
 
 ----------
  Python package for process-oriented climate modeling
@@ -14,6 +14,15 @@ Author
 | Department of Atmospheric and Environmental Sciences
 | University at Albany
 | brose@albany.edu
+
+
+Links
+-----
+
+-  HTML documentation: http://climlab.readthedocs.io/en/latest
+-  Issue tracker: http://github.com/brian-rose/climlab/issues
+-  Source code: http://github.com/brian-rose/climlab
+
 
 Installation
 ----------------
@@ -45,7 +54,7 @@ numerically intensive processes implemented in Fortran code (specifically the
 CAM3 radiation module). These require a Fortran compiler on your system,
 but otherwise have no other library dependencies.  ``climlab`` uses a compile-on-demand
 strategy. The compiler is invoked automatically as necessary when a new process
-in created by the user.
+is created by the user.
 
 Currently, ``climlab`` has out-of-the-box support and documented examples for
 
@@ -90,6 +99,9 @@ Version 0.3 was released in February 2016. It includes many internal changes and
 some backwards-incompatible changes (hopefully simplifications) to the public API.
 It also includes the CAM3 radiation module.
 
+The documentation_ was first created by Moritz Kreuzer (Potsdam Institut for Climate Impact Research) as part of a thesis project in Spring 2016.
+
+.. _documentation: http://climlab.readthedocs.io
 
 Contact and Bug Reports
 ----------------------
@@ -111,3 +123,12 @@ See the accompanying LICENSE file.
    :target: https://codecov.io/github/brian-rose/climlab?branch=master
 .. |DOI| image:: https://zenodo.org/badge/doi/10.5281/zenodo.48984.svg
    :target: http://dx.doi.org/10.5281/zenodo.48984
+.. |docs| image:: http://readthedocs.org/projects/climlab/badge/?version=latest
+   :target: http://climlab.readthedocs.io/en/latest/?badge=latest
+   :alt: Documentation Status
+=======
+
+
+Support
+-----------------
+Development of ``climlab`` is partially supported by the National Science Foundation under award AGS-1455071 to Brian Rose

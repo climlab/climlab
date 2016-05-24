@@ -1,12 +1,12 @@
-'''thermo.py
+#thermo.py
 
+# Code developed by Brian Rose, University at Albany
+# brose@albany.edu
+# in support of the class ATM/ENV 415: Climate Laboratory
+"""
 A collection of function definitions to handle common
 thermodynamic calculations for the atmosphere.
-
-Code developed by Brian Rose, University at Albany
-brose@albany.edu
-in support of the class ATM/ENV 415: Climate Laboratory
-'''
+"""
 
 import numpy as np
 from climlab import constants as const
@@ -18,8 +18,8 @@ def potential_temperature(T,p):
     Input:  T is temperature in Kelvin
             p is pressure in mb or hPa
     Output: potential temperature in Kelvin.
-    """
     
+    """  
     theta = T*(const.ps/p)**const.kappa
     return theta
 
@@ -34,8 +34,8 @@ def temperature_from_potential(theta,p):
     Input:  theta is potential temperature in Kelvin
             p is pressure in mb or hPa
     Output: absolute temperature in Kelvin.
-    """
     
+    """
     T = theta/((const.ps/p)**const.kappa)
     return T
 
@@ -54,8 +54,8 @@ def clausius_clapeyron(T):
     Formula from Rogers and Yau "A Short Course in Cloud Physics" (Pergammon Press), p. 16
     claimed to be accurate to within 0.1% between -30degC and 35 degC
     Based on the paper by Bolton (1980, Monthly Weather Review).
-    """
 
+    """
     Tcel = T - const.tempCtoK
     es = 6.112 * np.exp(17.67*Tcel/(Tcel+243.5))
     return es
@@ -67,8 +67,8 @@ def qsat(T,p):
     Input:  T is temperature in Kelvin
             p is pressure in hPa or mb
     Output: saturation specific humidity (dimensionless).
-    """
     
+    """   
     eps = const.Rd / const.Rv
     es = clausius_clapeyron(T)
     q = eps * es / (p - (1 - eps) * es )
@@ -86,8 +86,8 @@ def pseudoadiabat(T,p):
     parcel at saturation assuming instantaneous rain-out of the super-saturated water
     
     Formula from Raymond Pierrehumbert, "Principles of Planetary Climate" 
-    """
 
+    """
     esoverp = clausius_clapeyron(T) / p
     Tcel = T - const.tempCtoK
     L = (2.501 - 0.00237 * Tcel) * 1.E6   # Accurate form of latent heat of vaporization in J/kg
@@ -100,8 +100,8 @@ def pseudoadiabat(T,p):
 def estimated_inversion_strength(T0,T700):
     '''Compute the "estimated inversion strength", T0 is surface temp, T700 is temp at 700 hPa, both in K.
     Following Wood and Bretherton, J. Climate 2006.
-    '''
-    
+
+    '''   
     RH = 0.8
     T850 = (T0+T700)/2;
     LCL = (20 + (T0-const.tempCtoK)/5)*(1-RH)  # approximate formula... could do this more accurately.
@@ -127,6 +127,7 @@ def Planck_frequency(nu, T):
     T is temperature in Kelvin
     
     Formula from Raymond Pierrehumbert, "Principles of Planetary Climate" 
+
     '''
     h = const.hPlanck
     c = const.c_light
@@ -140,6 +141,7 @@ def Planck_wavenumber(n, T):
     T is temperature in Kelvin
     
     Formula from Raymond Pierrehumbert, "Principles of Planetary Climate" 
+
     '''
     c = const.c_light
     # convert to mks units
@@ -153,6 +155,7 @@ def Planck_wavelength(l, T):
     T is temperature in Kelvin
     
     Formula from Raymond Pierrehumbert, "Principles of Planetary Climate" 
+
     '''
     h = const.hPlanck
     c = const.c_light

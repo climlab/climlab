@@ -1,0 +1,796 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>climlab.model package &mdash; climlab 0.3.2 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/sphinxdoc.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.3.2',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="climlab 0.3.2 documentation" href="../index.html" />
+    <link rel="up" title="Application Programming Interface" href="climlab.html" />
+    <link rel="next" title="climlab.process package" href="climlab.process.html" />
+    <link rel="prev" title="climlab.dynamics package" href="climlab.dynamics.html" /> 
+  </head>
+  <body role="document">
+
+<div style="background-color: white; text-align: left; padding: 10px 10px 15px 15px">
+<a href="../index.html"><img src="../_static/logo.png" border="0" alt="sampledoc"/></a>
+</div>
+
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="climlab.process.html" title="climlab.process package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="climlab.dynamics.html" title="climlab.dynamics package"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../intro.html">home</a>|&nbsp;</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+        <!-- 
+	<li><a href="../contents.html">documentation </a> &raquo;</li>
+	-->
+
+          <li class="nav-item nav-item-1"><a href="climlab.html" accesskey="U">Application Programming Interface</a> &raquo;</li> 
+      </ul>
+    </div>
+
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h3><a href="../index.html">Table Of Contents</a></h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../intro.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../download.html">Download</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../architecture.html">Architecture</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../models.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tutorial.html">Tutorials</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="climlab.html">Application Programming Interface</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="climlab.html#subpackages">Subpackages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="climlab.html#inheritance-diagram">Inheritance Diagram</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../references.html">References</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contact.html">Contact</a></li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/api/climlab.model.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput > div,
+div.nbinput div[class^=highlight],
+div.nbinput div[class^=highlight] pre,
+div.nboutput,
+div.nboutput > div,
+div.nboutput div[class^=highlight],
+div.nboutput div[class^=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput > :first-child pre {
+    color: navy;
+}
+
+/* output prompt */
+div.nboutput > :first-child pre {
+    color: darkred;
+}
+
+/* all prompts */
+div.nbinput > :first-child[class^=highlight],
+div.nboutput > :first-child[class^=highlight],
+div.nboutput > :first-child {
+    min-width: 11ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+
+/* input/output area */
+div.nbinput > :nth-child(2)[class^=highlight],
+div.nboutput > :nth-child(2),
+div.nboutput > :nth-child(2)[class^=highlight] {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+}
+
+/* input area */
+div.nbinput > :nth-child(2)[class^=highlight] {
+    border: 1px solid #cfcfcf;
+    border-radius: 2px;
+    background: #f7f7f7;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.pngmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput  > :nth-child(2).stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansiblack { color: black; }
+.ansired { color: darkred; }
+.ansigreen { color: darkgreen; }
+.ansiyellow { color: #c4a000; }
+.ansiblue { color: darkblue; }
+.ansipurple { color: darkviolet; }
+.ansicyan { color: steelblue; }
+/* See https://github.com/jupyter/nbconvert/issues/174 */
+.ansigray { color: gray; }  /* nbconvert CSS */
+.ansigrey { color: gray; }  /* nbconvert HTML output */
+
+.ansibgblack { background-color: black; }
+.ansibgred { background-color: red; }
+.ansibggreen { background-color: green; }
+.ansibgyellow { background-color: yellow; }
+.ansibgblue { background-color: blue; }
+.ansibgpurple { background-color: magenta; }
+.ansibgcyan { background-color: cyan; }
+.ansibggray { background-color: gray; }
+
+.ansibold { font-weight: bold; }
+</style>
+<div class="section" id="climlab-model-package">
+<h1>climlab.model package<a class="headerlink" href="#climlab-model-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="climlab-model-ebm-module">
+<h2>climlab.model.ebm module<a class="headerlink" href="#climlab-model-ebm-module" title="Permalink to this headline">¶</a></h2>
+<p class="graphviz">
+<img src="../_images/inheritance-1526180bbb68c42048bcac69e15910bba9dceea7.png" alt="Inheritance diagram of climlab.model.ebm" usemap="#inheritancecf2c842c9d" class="inheritance"/>
+<map id="inheritancecf2c842c9d" name="inheritancecf2c842c9d">
+<area shape="rect" id="node1" href="#climlab.model.ebm.EBM" target="_top" title="A parent class for all Energy&#45;Balance&#45;Model classes." alt="" coords="632,5,704,35"/>
+<area shape="rect" id="node4" href="#climlab.model.ebm.EBM_seasonal" target="_top" title="EBM_seasonal" alt="" coords="752,5,904,35"/>
+<area shape="rect" id="node2" href="climlab.process.html#climlab.process.energy_budget.EnergyBudget" target="_top" title="A parent class for explicit energy budget processes." alt="" coords="430,5,583,35"/>
+<area shape="rect" id="node3" href="#climlab.model.ebm.EBM_annual" target="_top" title="EBM_annual" alt="" coords="952,5,1088,35"/>
+<area shape="rect" id="node5" href="climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess" target="_top" title="A generic parent class for all time&#45;dependent processes." alt="" coords="144,5,381,35"/>
+<area shape="rect" id="node6" href="climlab.process.html#climlab.process.process.Process" target="_top" title="A generic parent class for all climlab process objects." alt="" coords="5,5,96,35"/>
+</map>
+</p>
+<span class="target" id="module-climlab.model.ebm"></span><dl class="class">
+<dt id="climlab.model.ebm.EBM">
+<em class="property">class </em><code class="descclassname">climlab.model.ebm.</code><code class="descname">EBM</code><span class="sig-paren">(</span><em>num_lat=90</em>, <em>S0=1365.2</em>, <em>A=210.0</em>, <em>B=2.0</em>, <em>D=0.555</em>, <em>water_depth=10.0</em>, <em>Tf=-10.0</em>, <em>a0=0.3</em>, <em>a2=0.078</em>, <em>ai=0.62</em>, <em>timestep=350632.51200000005</em>, <em>T0=12.0</em>, <em>T2=-40.0</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/model/ebm.html#EBM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.model.ebm.EBM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="climlab.process.html#climlab.process.energy_budget.EnergyBudget" title="climlab.process.energy_budget.EnergyBudget"><code class="xref py py-class docutils literal"><span class="pre">climlab.process.energy_budget.EnergyBudget</span></code></a></p>
+<p>A parent class for all Energy-Balance-Model classes.</p>
+<p>This class sets up a typical EnergyBalance Model with following subprocesses:</p>
+<ul class="simple">
+<li>Outgoing Longwave Radiation (OLR) parametrization through 
+<a class="reference internal" href="climlab.radiation.html#climlab.radiation.AplusBT.AplusBT" title="climlab.radiation.AplusBT.AplusBT"><code class="xref py py-class docutils literal"><span class="pre">AplusBT</span></code></a></li>
+<li>solar insolation paramtrization through 
+<a class="reference internal" href="climlab.radiation.html#climlab.radiation.insolation.P2Insolation" title="climlab.radiation.insolation.P2Insolation"><code class="xref py py-class docutils literal"><span class="pre">P2Insolation</span></code></a></li>
+<li>albedo parametrization in dependence of temperature through
+<a class="reference internal" href="climlab.surface.html#climlab.surface.albedo.StepFunctionAlbedo" title="climlab.surface.albedo.StepFunctionAlbedo"><code class="xref py py-class docutils literal"><span class="pre">StepFunctionAlbedo</span></code></a></li>
+<li>energy diffusion through 
+<a class="reference internal" href="climlab.dynamics.html#climlab.dynamics.diffusion.MeridionalDiffusion" title="climlab.dynamics.diffusion.MeridionalDiffusion"><code class="xref py py-class docutils literal"><span class="pre">MeridionalDiffusion</span></code></a></li>
+</ul>
+<p><strong>Initialization parameters</strong></p>
+<p>An instance of <code class="docutils literal"><span class="pre">EBM</span></code> is initialized with the following 
+arguments <em>(for detailed information see Object attributes below)</em>:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>num_lat</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; <p>number of equally spaced points for the 
+latitue grid. Used for domain intialization of
+<a class="reference internal" href="climlab.domain.html#climlab.domain.domain.zonal_mean_surface" title="climlab.domain.domain.zonal_mean_surface"><code class="xref py py-class docutils literal"><span class="pre">zonal_mean_surface</span></code></a></p>
+<ul>
+<li>default value: <code class="docutils literal"><span class="pre">90</span></code></li>
+</ul>
+</li>
+<li><strong>S0</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; <p>solar constant</p>
+<ul>
+<li>unit: <span class="math">\(\frac{\textrm{W}}{\textrm{m}^2}\)</span></li>
+<li>default value: <code class="docutils literal"><span class="pre">1365.2</span></code></li>
+</ul>
+</li>
+<li><strong>A</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; <p>parameter for linear OLR parametrization
+<a class="reference internal" href="climlab.radiation.html#climlab.radiation.AplusBT.AplusBT" title="climlab.radiation.AplusBT.AplusBT"><code class="xref py py-class docutils literal"><span class="pre">AplusBT</span></code></a></p>
+<ul>
+<li>unit: <span class="math">\(\frac{\textrm{W}}{\textrm{m}^2}\)</span></li>
+<li>default value: <code class="docutils literal"><span class="pre">210.0</span></code></li>
+</ul>
+</li>
+<li><strong>B</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; <p>parameter for linear OLR parametrization
+<a class="reference internal" href="climlab.radiation.html#climlab.radiation.AplusBT.AplusBT" title="climlab.radiation.AplusBT.AplusBT"><code class="xref py py-class docutils literal"><span class="pre">AplusBT</span></code></a></p>
+<ul>
+<li>unit: <span class="math">\(\frac{\textrm{W}}{\textrm{m}^2 \ ^{\circ} \textrm{C}}\)</span></li>
+<li>default value: <code class="docutils literal"><span class="pre">2.0</span></code></li>
+</ul>
+</li>
+<li><strong>D</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; <p>diffusion parameter for Meridional Energy Diffusion
+<a class="reference internal" href="climlab.dynamics.html#climlab.dynamics.diffusion.MeridionalDiffusion" title="climlab.dynamics.diffusion.MeridionalDiffusion"><code class="xref py py-class docutils literal"><span class="pre">MeridionalDiffusion</span></code></a></p>
+<ul>
+<li>unit: <span class="math">\(\frac{\textrm{W}}{\textrm{m}^2 \ ^{\circ} \textrm{C}}\)</span></li>
+<li>default value: <code class="docutils literal"><span class="pre">0.555</span></code></li>
+</ul>
+</li>
+<li><strong>water_depth</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; <p>depth of <a class="reference internal" href="climlab.domain.html#climlab.domain.domain.zonal_mean_surface" title="climlab.domain.domain.zonal_mean_surface"><code class="xref py py-class docutils literal"><span class="pre">zonal_mean_surface</span></code></a>
+domain, which the heat capacity is dependent on</p>
+<ul>
+<li>unit: meters</li>
+<li>default value: <code class="docutils literal"><span class="pre">10.0</span></code></li>
+</ul>
+</li>
+<li><strong>Tf</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; <p>freezing temperature</p>
+<ul>
+<li>unit: <span class="math">\(^{\circ} \textrm{C}\)</span></li>
+<li>default value: <code class="docutils literal"><span class="pre">-10.0</span></code></li>
+</ul>
+</li>
+<li><strong>a0</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; <p>base value for planetary albedo parametrization
+<a class="reference internal" href="climlab.surface.html#climlab.surface.albedo.StepFunctionAlbedo" title="climlab.surface.albedo.StepFunctionAlbedo"><code class="xref py py-class docutils literal"><span class="pre">StepFunctionAlbedo</span></code></a></p>
+<ul>
+<li>unit: dimensionless</li>
+<li>default value: <code class="docutils literal"><span class="pre">0.3</span></code></li>
+</ul>
+</li>
+<li><strong>a2</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; <p>parabolic value for planetary  albedo parametrization
+<a class="reference internal" href="climlab.surface.html#climlab.surface.albedo.StepFunctionAlbedo" title="climlab.surface.albedo.StepFunctionAlbedo"><code class="xref py py-class docutils literal"><span class="pre">StepFunctionAlbedo</span></code></a></p>
+<ul>
+<li>unit: dimensionless</li>
+<li>default value: <code class="docutils literal"><span class="pre">0.078</span></code></li>
+</ul>
+</li>
+<li><strong>ai</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; <p>value for ice albedo paramerization in
+<a class="reference internal" href="climlab.surface.html#climlab.surface.albedo.StepFunctionAlbedo" title="climlab.surface.albedo.StepFunctionAlbedo"><code class="xref py py-class docutils literal"><span class="pre">StepFunctionAlbedo</span></code></a></p>
+<ul>
+<li>unit: dimensionless</li>
+<li>default value: <code class="docutils literal"><span class="pre">0.62</span></code></li>
+</ul>
+</li>
+<li><strong>timestep</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; <p>specifies the EBM&#8217;s timestep</p>
+<ul>
+<li>unit: seconds</li>
+<li>default value: (365.2422 * 24 * 60 * 60 ) / 90<p>-&gt; (90 timesteps per year)</p>
+</li>
+</ul>
+</li>
+<li><strong>T0</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; <p>base value for initial temperature</p>
+<ul>
+<li>unit <span class="math">\(^{\circ} \textrm{C}\)</span></li>
+<li>default value: <code class="docutils literal"><span class="pre">12</span></code></li>
+</ul>
+</li>
+<li><strong>T2</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; <p>factor for 2nd Legendre polynomial 
+<a class="reference internal" href="climlab.utils.html#climlab.utils.legendre.P2" title="climlab.utils.legendre.P2"><code class="xref py py-class docutils literal"><span class="pre">P2</span></code></a> 
+to calculate initial temperature</p>
+<ul>
+<li>unit: dimensionless</li>
+<li>default value: <code class="docutils literal"><span class="pre">40</span></code></li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Object attributes</strong></p>
+<p>Additional to the parent class <a class="reference internal" href="climlab.process.html#climlab.process.energy_budget.EnergyBudget" title="climlab.process.energy_budget.EnergyBudget"><code class="xref py py-class docutils literal"><span class="pre">EnergyBudget</span></code></a>
+following object attributes are generated and updated during initialization:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first simple">
+<li><strong>param</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; The parameter dictionary is updated with a couple 
+of the initatilzation input arguments, namely
+<code class="docutils literal"><span class="pre">'S0'</span></code>, <code class="docutils literal"><span class="pre">'A'</span></code>, <code class="docutils literal"><span class="pre">'B'</span></code>, <code class="docutils literal"><span class="pre">'D'</span></code>, <code class="docutils literal"><span class="pre">'Tf'</span></code>, 
+<code class="docutils literal"><span class="pre">'water_depth'</span></code>, <code class="docutils literal"><span class="pre">'a0'</span></code>, <code class="docutils literal"><span class="pre">'a2'</span></code> and <code class="docutils literal"><span class="pre">'ai'</span></code>.</li>
+<li><strong>domains</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; If the object&#8217;s <code class="docutils literal"><span class="pre">domains</span></code> and the <code class="docutils literal"><span class="pre">state</span></code> 
+dictionaries are empty during initialization 
+a domain <code class="docutils literal"><span class="pre">sfc</span></code> is created through 
+<a class="reference internal" href="climlab.domain.html#climlab.domain.domain.zonal_mean_surface" title="climlab.domain.domain.zonal_mean_surface"><code class="xref py py-func docutils literal"><span class="pre">zonal_mean_surface()</span></code></a>.
+In the meantime the object&#8217;s <code class="docutils literal"><span class="pre">domains</span></code> and 
+<code class="docutils literal"><span class="pre">state</span></code> dictionaries are updated.</li>
+<li><a class="reference external" href="http://docs.python.org/2.7/library/subprocess.html#module-subprocess" title="(in Python v2.7)"><strong>subprocess</strong></a> (<a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; Several subprocesses are created (see above) 
+through calling 
+<a class="reference internal" href="climlab.process.html#climlab.process.process.Process.add_subprocess" title="climlab.process.process.Process.add_subprocess"><code class="xref py py-func docutils literal"><span class="pre">add_subprocess()</span></code></a>
+and therefore the subprocess dictionary is updated.</li>
+<li><strong>topdown</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; is set to <code class="docutils literal"><span class="pre">False</span></code> to call subprocess compute 
+methods first.
+See also 
+<a class="reference internal" href="climlab.process.html#climlab.process.time_dependent_process.TimeDependentProcess" title="climlab.process.time_dependent_process.TimeDependentProcess"><code class="xref py py-class docutils literal"><span class="pre">TimeDependentProcess</span></code></a>.</li>
+<li><strong>diagnostics</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; is initialized with keys: <code class="docutils literal"><span class="pre">'OLR'</span></code>, <code class="docutils literal"><span class="pre">'ASR'</span></code>,
+<code class="docutils literal"><span class="pre">'net_radiation'</span></code>, <code class="docutils literal"><span class="pre">'albedo'</span></code> and <code class="docutils literal"><span class="pre">'icelat'</span></code>
+through 
+<a class="reference internal" href="climlab.process.html#climlab.process.process.Process.init_diagnostic" title="climlab.process.process.Process.init_diagnostic"><code class="xref py py-func docutils literal"><span class="pre">init_diagnostic()</span></code></a>.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Example:</th><td class="field-body"><p class="first">Creation and integration of the preconfigured Energy Balance Model:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">climlab</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">climlab</span><span class="o">.</span><span class="n">EBM</span><span class="p">()</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">integrate_years</span><span class="p">(</span><span class="mf">2.</span><span class="p">)</span>
+<span class="go">Integrating for 180 steps, 730.4844 days, or 2.0 years.</span>
+<span class="go">Total elapsed time is 2.0 years.</span>
+</pre></div>
+</div>
+<p class="last">For more information how to use the EBM class, see the <a class="reference internal" href="../tutorial.html#tutorial"><span>Tutorials</span></a> 
+chapter.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="climlab.model.ebm.EBM.diffusive_heat_transport">
+<code class="descname">diffusive_heat_transport</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/model/ebm.html#EBM.diffusive_heat_transport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.model.ebm.EBM.diffusive_heat_transport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute instantaneous diffusive heat transport in unit <span class="math">\(\textrm{PW}\)</span>
+on the staggered grid (bounds) through calculating:</p>
+<div class="math">
+\[H(\varphi) = - 2 \pi R^2 cos(\varphi) D \frac{dT}{d\varphi}
+            \approx - 2 \pi R^2 cos(\varphi) D \frac{\Delta T}{\Delta \varphi}\]</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">array of size <code class="docutils literal"><span class="pre">np.size(self.lat_bounds)</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="climlab.model.ebm.EBM.global_mean_temperature">
+<code class="descname">global_mean_temperature</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/model/ebm.html#EBM.global_mean_temperature"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.model.ebm.EBM.global_mean_temperature" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convenience method to compute global mean surface temperature.</p>
+<p>Calls <a class="reference internal" href="climlab.domain.html#climlab.domain.field.global_mean" title="climlab.domain.field.global_mean"><code class="xref py py-func docutils literal"><span class="pre">global_mean()</span></code></a> method which
+for the object attriute <code class="docutils literal"><span class="pre">Ts</span></code> which calculates the latitude weighted
+global mean of a field.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Example:</th><td class="field-body"><p class="first">Calculating the global mean temperature of initial EBM temperature:</p>
+<div class="last highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">climlab</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">climlab</span><span class="o">.</span><span class="n">EBM</span><span class="p">(</span><span class="n">T0</span><span class="o">=</span><span class="mf">14.</span><span class="p">,</span> <span class="n">T2</span><span class="o">=-</span><span class="mi">25</span><span class="p">)</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">global_mean_temperature</span><span class="p">()</span>
+<span class="go">Field(13.99873037400856)</span>
+</pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="climlab.model.ebm.EBM.heat_transport">
+<code class="descname">heat_transport</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/model/ebm.html#EBM.heat_transport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.model.ebm.EBM.heat_transport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns instantaneous heat transport in unit <span class="math">\(\textrm{PW}\)</span>
+on the staggered grid (bounds) through calling
+<a class="reference internal" href="#climlab.model.ebm.EBM.diffusive_heat_transport" title="climlab.model.ebm.EBM.diffusive_heat_transport"><code class="xref py py-func docutils literal"><span class="pre">diffusive_heat_transport()</span></code></a>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Example:</th><td class="field-body"><div class="first highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">climlab</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+
+<span class="c1"># creating &amp; integrating model</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">climlab</span><span class="o">.</span><span class="n">EBM</span><span class="p">()</span>
+<span class="n">model</span><span class="o">.</span><span class="n">step_forward</span><span class="p">()</span>
+
+<span class="c1"># plot</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+
+<span class="n">bounds</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">domains</span><span class="p">[</span><span class="s1">&#39;Ts&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">axes</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">bounds</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">bounds</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">heat_transport</span><span class="p">())</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;heat transport&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;latitude&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span><span class="o">-</span><span class="mi">60</span><span class="p">,</span><span class="o">-</span><span class="mi">30</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">30</span><span class="p">,</span><span class="mi">60</span><span class="p">,</span><span class="mi">90</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;energy (PW)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;grey&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>(<a class="reference external" href="../code_input_manual/example_EBM_heat_transport.py">Source code</a>, <a class="reference external" href="../code_input_manual/example_EBM_heat_transport.png">png</a>, <a class="reference external" href="../code_input_manual/example_EBM_heat_transport.hires.png">hires.png</a>, <a class="reference external" href="../code_input_manual/example_EBM_heat_transport.pdf">pdf</a>)</p>
+<div class="last figure">
+<img alt="../_images/example_EBM_heat_transport.png" src="../_images/example_EBM_heat_transport.png" />
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="climlab.model.ebm.EBM.heat_transport_convergence">
+<code class="descname">heat_transport_convergence</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/model/ebm.html#EBM.heat_transport_convergence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.model.ebm.EBM.heat_transport_convergence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns instantaneous convergence of heat transport.</p>
+<div class="math">
+\[h(\varphi) = - \frac{1}{2 \pi R^2 cos(\varphi)} \frac{dH}{d\varphi} 
+            \approx - \frac{1}{2 \pi R^2 cos(\varphi)} \frac{\Delta H}{\Delta \varphi} \]</div>
+<p>h is the <em>dynamical heating rate</em> in unit <span class="math">\(\textrm{W}/ \textrm{m}^2\)</span>
+which is the convergence of energy transport into each latitude band,
+namely the difference between what&#8217;s coming in and what&#8217;s going out.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Example:</th><td class="field-body"><div class="first highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">climlab</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+
+<span class="c1"># creating &amp; integrating model</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">climlab</span><span class="o">.</span><span class="n">EBM</span><span class="p">()</span>
+<span class="n">model</span><span class="o">.</span><span class="n">integrate_converge</span><span class="p">()</span>
+
+<span class="c1"># plot</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">heat_transport_convergence</span><span class="p">())</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;heat transport convergence&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;latitude&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span><span class="o">-</span><span class="mi">60</span><span class="p">,</span><span class="o">-</span><span class="mi">30</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">30</span><span class="p">,</span><span class="mi">60</span><span class="p">,</span><span class="mi">90</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;energy (W/m$^2$)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;grey&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>(<a class="reference external" href="../code_input_manual/example_EBM_heat_transport_convergence.py">Source code</a>, <a class="reference external" href="../code_input_manual/example_EBM_heat_transport_convergence.png">png</a>, <a class="reference external" href="../code_input_manual/example_EBM_heat_transport_convergence.hires.png">hires.png</a>, <a class="reference external" href="../code_input_manual/example_EBM_heat_transport_convergence.pdf">pdf</a>)</p>
+<div class="last figure">
+<img alt="../_images/example_EBM_heat_transport_convergence.png" src="../_images/example_EBM_heat_transport_convergence.png" />
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="climlab.model.ebm.EBM.inferred_heat_transport">
+<code class="descname">inferred_heat_transport</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/model/ebm.html#EBM.inferred_heat_transport"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.model.ebm.EBM.inferred_heat_transport" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the inferred heat transport by integrating the TOA 
+energy imbalance from pole to pole.</p>
+<p>The method is calculating</p>
+<div class="math">
+\[H(\varphi) = 2 \pi R^2 \int_{-\pi/2}^{\varphi} cos\phi \ R_{TOA} d\phi\]</div>
+<p>where <span class="math">\(R_{TOA}\)</span> is the net radiation at top of atmosphere.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">total heat transport on the latitude grid in unit <span class="math">\(\textrm{PW}\)</span></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">array of size <code class="docutils literal"><span class="pre">np.size(self.lat_lat)</span></code></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Example:</th><td class="field-body"><div class="first highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">climlab</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+
+<span class="c1"># creating &amp; integrating model</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">climlab</span><span class="o">.</span><span class="n">EBM</span><span class="p">()</span>
+<span class="n">model</span><span class="o">.</span><span class="n">step_forward</span><span class="p">()</span>
+
+<span class="c1"># plot</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">inferred_heat_transport</span><span class="p">())</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;inferred heat transport&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;latitude&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span><span class="o">-</span><span class="mi">60</span><span class="p">,</span><span class="o">-</span><span class="mi">30</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">30</span><span class="p">,</span><span class="mi">60</span><span class="p">,</span><span class="mi">90</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;energy (PW)&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">linewidth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;grey&#39;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>(<a class="reference external" href="../code_input_manual/example_EBM_inferred_heat_transport.py">Source code</a>, <a class="reference external" href="../code_input_manual/example_EBM_inferred_heat_transport.png">png</a>, <a class="reference external" href="../code_input_manual/example_EBM_inferred_heat_transport.hires.png">hires.png</a>, <a class="reference external" href="../code_input_manual/example_EBM_inferred_heat_transport.pdf">pdf</a>)</p>
+<div class="last figure">
+<img alt="../_images/example_EBM_inferred_heat_transport.png" src="../_images/example_EBM_inferred_heat_transport.png" />
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="climlab.model.ebm.EBM_annual">
+<em class="property">class </em><code class="descclassname">climlab.model.ebm.</code><code class="descname">EBM_annual</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/model/ebm.html#EBM_annual"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.model.ebm.EBM_annual" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#climlab.model.ebm.EBM_seasonal" title="climlab.model.ebm.EBM_seasonal"><code class="xref py py-class docutils literal"><span class="pre">climlab.model.ebm.EBM_seasonal</span></code></a></p>
+<p>A class that implements Energy Balance Models with annual mean insolation.</p>
+<p>The annual solar distribution is calculated through averaging the 
+<a class="reference internal" href="climlab.radiation.html#climlab.radiation.insolation.DailyInsolation" title="climlab.radiation.insolation.DailyInsolation"><code class="xref py py-class docutils literal"><span class="pre">DailyInsolation</span></code></a> over time 
+which has been used in used in the parent class
+<a class="reference internal" href="#climlab.model.ebm.EBM_seasonal" title="climlab.model.ebm.EBM_seasonal"><code class="xref py py-class docutils literal"><span class="pre">EBM_seasonal</span></code></a>. That is done by the subprocess
+<a class="reference internal" href="climlab.radiation.html#climlab.radiation.insolation.AnnualMeanInsolation" title="climlab.radiation.insolation.AnnualMeanInsolation"><code class="xref py py-class docutils literal"><span class="pre">AnnualMeanInsolation</span></code></a> which is
+more realistic than the <a class="reference internal" href="climlab.radiation.html#climlab.radiation.insolation.P2Insolation" title="climlab.radiation.insolation.P2Insolation"><code class="xref py py-class docutils literal"><span class="pre">P2Insolation</span></code></a>
+module used in the classical <a class="reference internal" href="#climlab.model.ebm.EBM" title="climlab.model.ebm.EBM"><code class="xref py py-class docutils literal"><span class="pre">EBM</span></code></a> class.</p>
+<p>According to the parent class <a class="reference internal" href="#climlab.model.ebm.EBM_seasonal" title="climlab.model.ebm.EBM_seasonal"><code class="xref py py-class docutils literal"><span class="pre">EBM_seasonal</span></code></a>
+the model will not have an ice-albedo feedback, if albedo ice parameter
+<code class="docutils literal"><span class="pre">'ai'</span></code> is not given. For details see there.</p>
+<p><strong>Object attributes</strong></p>
+<p>Following object attributes are updated during initialization:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><p class="first"><a class="reference external" href="http://docs.python.org/2.7/library/subprocess.html#module-subprocess" title="(in Python v2.7)"><strong>subprocess</strong></a> (<a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; suprocess <code class="docutils literal"><span class="pre">'insolation'</span></code> is overwritten by
+<a class="reference internal" href="climlab.radiation.html#climlab.radiation.insolation.AnnualMeanInsolation" title="climlab.radiation.insolation.AnnualMeanInsolation"><code class="xref py py-class docutils literal"><span class="pre">AnnualMeanInsolation</span></code></a></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Example:</th><td class="field-body"><p class="first">The <a class="reference internal" href="#climlab.model.ebm.EBM_annual" title="climlab.model.ebm.EBM_annual"><code class="xref py py-class docutils literal"><span class="pre">EBM_annual</span></code></a> class uses a different 
+insolation subprocess than the <a class="reference internal" href="#climlab.model.ebm.EBM" title="climlab.model.ebm.EBM"><code class="xref py py-class docutils literal"><span class="pre">EBM</span></code></a> class:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">climlab</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model_annual</span> <span class="o">=</span> <span class="n">climlab</span><span class="o">.</span><span class="n">EBM_annual</span><span class="p">()</span>
+
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">model_annual</span>
+</pre></div>
+</div>
+<div class="last highlight-none"><div class="highlight"><pre><span></span> climlab Process of type &lt;class &#39;climlab.model.ebm.EBM_annual&#39;&gt;. 
+ State variables and domain shapes: 
+   Ts: (90, 1) 
+ The subprocess tree: 
+ top: &lt;class &#39;climlab.model.ebm.EBM_annual&#39;&gt;
+    diffusion: &lt;class &#39;climlab.dynamics.diffusion.MeridionalDiffusion&#39;&gt;
+    LW: &lt;class &#39;climlab.radiation.AplusBT.AplusBT&#39;&gt;
+    albedo: &lt;class &#39;climlab.surface.albedo.P2Albedo&#39;&gt;
+<span class="hll">    insolation: &lt;class &#39;climlab.radiation.insolation.AnnualMeanInsolation&#39;&gt;
+</span></pre></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="climlab.model.ebm.EBM_seasonal">
+<em class="property">class </em><code class="descclassname">climlab.model.ebm.</code><code class="descname">EBM_seasonal</code><span class="sig-paren">(</span><em>a0=0.33</em>, <em>a2=0.25</em>, <em>ai=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/climlab/model/ebm.html#EBM_seasonal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#climlab.model.ebm.EBM_seasonal" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#climlab.model.ebm.EBM" title="climlab.model.ebm.EBM"><code class="xref py py-class docutils literal"><span class="pre">climlab.model.ebm.EBM</span></code></a></p>
+<p>A class that implements Energy Balance Models with realistic 
+daily insolation.</p>
+<p>This class is inherited from the general <a class="reference internal" href="#climlab.model.ebm.EBM" title="climlab.model.ebm.EBM"><code class="xref py py-class docutils literal"><span class="pre">EBM</span></code></a>
+class and uses the insolation subprocess 
+<a class="reference internal" href="climlab.radiation.html#climlab.radiation.insolation.DailyInsolation" title="climlab.radiation.insolation.DailyInsolation"><code class="xref py py-class docutils literal"><span class="pre">DailyInsolation</span></code></a> instead of 
+<a class="reference internal" href="climlab.radiation.html#climlab.radiation.insolation.P2Insolation" title="climlab.radiation.insolation.P2Insolation"><code class="xref py py-class docutils literal"><span class="pre">P2Insolation</span></code></a> to compute a
+realisitc distribution of solar radiation on a daily basis.</p>
+<p>If argument for ice albedo <code class="docutils literal"><span class="pre">'ai'</span></code> is not given, the model will not 
+have an albedo feedback.</p>
+<p>An instance of <code class="docutils literal"><span class="pre">EBM_seasonal</span></code> is initialized with the following 
+arguments:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>a0</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; base value for planetary albedo parametrization
+<a class="reference internal" href="climlab.surface.html#climlab.surface.albedo.StepFunctionAlbedo" title="climlab.surface.albedo.StepFunctionAlbedo"><code class="xref py py-class docutils literal"><span class="pre">StepFunctionAlbedo</span></code></a>
+[default: 0.33]</li>
+<li><strong>a2</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; parabolic value for planetary  albedo parametrization
+<a class="reference internal" href="climlab.surface.html#climlab.surface.albedo.StepFunctionAlbedo" title="climlab.surface.albedo.StepFunctionAlbedo"><code class="xref py py-class docutils literal"><span class="pre">StepFunctionAlbedo</span></code></a>
+[default: 0.25]</li>
+<li><strong>ai</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; value for ice albedo paramerization in
+<a class="reference internal" href="climlab.surface.html#climlab.surface.albedo.StepFunctionAlbedo" title="climlab.surface.albedo.StepFunctionAlbedo"><code class="xref py py-class docutils literal"><span class="pre">StepFunctionAlbedo</span></code></a>
+(optional)</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Object attributes</strong></p>
+<p>Following object attributes are updated during initialization:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>param</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; The parameter dictionary is updated with 
+<code class="docutils literal"><span class="pre">'a0'</span></code> and <code class="docutils literal"><span class="pre">'a2'</span></code>.</li>
+<li><a class="reference external" href="http://docs.python.org/2.7/library/subprocess.html#module-subprocess" title="(in Python v2.7)"><strong>subprocess</strong></a> (<a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; suprocess <code class="docutils literal"><span class="pre">'insolation'</span></code> is overwritten by
+<a class="reference internal" href="climlab.radiation.html#climlab.radiation.insolation.DailyInsolation" title="climlab.radiation.insolation.DailyInsolation"><code class="xref py py-class docutils literal"><span class="pre">DailyInsolation</span></code></a>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><em>if</em> <code class="docutils literal"><span class="pre">'ai'</span></code> <em>is not given</em>:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first last simple">
+<li><strong>param</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; <code class="docutils literal"><span class="pre">'ai'</span></code> and <code class="docutils literal"><span class="pre">'Tf'</span></code> are removed from the 
+parameter dictionary (initialized by parent class
+<a class="reference internal" href="#climlab.model.ebm.EBM" title="climlab.model.ebm.EBM"><code class="xref py py-class docutils literal"><span class="pre">EBM</span></code></a>)</li>
+<li><a class="reference external" href="http://docs.python.org/2.7/library/subprocess.html#module-subprocess" title="(in Python v2.7)"><strong>subprocess</strong></a> (<a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; suprocess <code class="docutils literal"><span class="pre">'albedo'</span></code> is overwritten by
+<a class="reference internal" href="climlab.surface.html#climlab.surface.albedo.P2Albedo" title="climlab.surface.albedo.P2Albedo"><code class="xref py py-class docutils literal"><span class="pre">P2Albedo</span></code></a>.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p><em>if</em> <code class="docutils literal"><span class="pre">'ai'</span></code> <em>is given</em>:</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Variables:</th><td class="field-body"><ul class="first simple">
+<li><strong>param</strong> (<a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; The parameter dictionary is updated with
+<code class="docutils literal"><span class="pre">'ai'</span></code>.</li>
+<li><a class="reference external" href="http://docs.python.org/2.7/library/subprocess.html#module-subprocess" title="(in Python v2.7)"><strong>subprocess</strong></a> (<a class="reference external" href="http://docs.python.org/2.7/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; suprocess <code class="docutils literal"><span class="pre">'albedo'</span></code> is overwritten by
+<a class="reference internal" href="climlab.surface.html#climlab.surface.albedo.StepFunctionAlbedo" title="climlab.surface.albedo.StepFunctionAlbedo"><code class="xref py py-class docutils literal"><span class="pre">StepFunctionAlbedo</span></code></a> 
+(which basically has been there before but now is 
+updated with the new albedo parameter values).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Example:</th><td class="field-body"><p class="first">The annual distribution of solar insolation:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">climlab</span>
+<span class="kn">from</span> <span class="nn">climlab.utils</span> <span class="kn">import</span> <span class="n">constants</span> <span class="k">as</span> <span class="n">const</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+
+<span class="c1"># creating model</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">climlab</span><span class="o">.</span><span class="n">EBM_seasonal</span><span class="p">()</span>
+<span class="n">model</span><span class="o">.</span><span class="n">step_forward</span><span class="p">()</span>
+
+<span class="n">solar</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">subprocess</span><span class="p">[</span><span class="s1">&#39;insolation&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">insolation</span>
+
+<span class="c1"># plot</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+
+<span class="n">season_days</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">days_per_year</span><span class="o">/</span><span class="mi">4</span>
+
+<span class="k">for</span> <span class="n">season</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;winter&#39;</span><span class="p">,</span><span class="s1">&#39;spring&#39;</span><span class="p">,</span><span class="s1">&#39;summer&#39;</span><span class="p">,</span><span class="s1">&#39;autumn&#39;</span><span class="p">]:</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">solar</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">season</span><span class="p">)</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">integrate_days</span><span class="p">(</span><span class="n">season_days</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;seasonal solar distribution&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">&#39;latitude&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([</span><span class="o">-</span><span class="mi">90</span><span class="p">,</span><span class="o">-</span><span class="mi">60</span><span class="p">,</span><span class="o">-</span><span class="mi">30</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">30</span><span class="p">,</span><span class="mi">60</span><span class="p">,</span><span class="mi">90</span><span class="p">])</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">&#39;solar insolation (W/m$^2$)&#39;</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s1">&#39;best&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>(<a class="reference external" href="../code_input_manual/example_EBM_seasonal.py">Source code</a>, <a class="reference external" href="../code_input_manual/example_EBM_seasonal.png">png</a>, <a class="reference external" href="../code_input_manual/example_EBM_seasonal.hires.png">hires.png</a>, <a class="reference external" href="../code_input_manual/example_EBM_seasonal.pdf">pdf</a>)</p>
+<div class="last figure">
+<img alt="../_images/example_EBM_seasonal.png" src="../_images/example_EBM_seasonal.png" />
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="climlab.process.html" title="climlab.process package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="climlab.dynamics.html" title="climlab.dynamics package"
+             >previous</a> |</li>
+        <li><a href="../intro.html">home</a>|&nbsp;</li>
+        <li><a href="../search.html">search</a>|&nbsp;</li>
+        <!-- 
+	<li><a href="../contents.html">documentation </a> &raquo;</li>
+	-->
+
+          <li class="nav-item nav-item-1"><a href="climlab.html" >Application Programming Interface</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016 (licensed under MIT License), Moritz Kreuzer &amp; Brian Rose.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+    </div>
+  </body>
+</html>
