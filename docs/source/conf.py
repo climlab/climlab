@@ -38,14 +38,14 @@ print "sys.path:", sys.path
 # ones.
 extensions = [
 	#'matplotlib.sphinxext.mathmpl',
-	'matplotlib.sphinxext.only_directives',
-	'matplotlib.sphinxext.plot_directive',
+	#'matplotlib.sphinxext.only_directives',
+	#'matplotlib.sphinxext.plot_directive',
 	#'matplotlib.sphinxext.ipython_directive',
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
     #'sphinx.ext.imgmath',
     'sphinx.ext.viewcode',
-    'sphinx.ext.graphviz',
+    #'sphinx.ext.graphviz',
     'sphinx.ext.inheritance_diagram',
     'sphinx.ext.intersphinx',
     'sphinx.ext.mathjax',
