@@ -43,7 +43,7 @@ extensions = [
 	#'matplotlib.sphinxext.ipython_directive',
     'sphinx.ext.autodoc',
     'sphinx.ext.doctest',
-    'sphinx.ext.pngmath',
+    #'sphinx.ext.imgmath',
     'sphinx.ext.viewcode',
     'sphinx.ext.graphviz',
     'sphinx.ext.inheritance_diagram',
@@ -263,7 +263,7 @@ latex_elements = {
 'papersize': 'a4paper',
 
 # overwrite printindex -> no index
-'printindex': '',	
+'printindex': '',
 
 
 # The font size ('10pt', '11pt' or '12pt').
