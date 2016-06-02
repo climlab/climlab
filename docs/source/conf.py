@@ -49,7 +49,7 @@ extensions = [
     'sphinx.ext.inheritance_diagram',
     'sphinx.ext.intersphinx',
     'sphinx.ext.mathjax',
-    #'sphinx.ext.autosummary',
+    'sphinx.ext.autosummary',
     #'sphinx.ext.automodsumm',
     'nbsphinx',
     'IPython.sphinxext.ipython_console_highlighting',
