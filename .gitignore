@@ -14,3 +14,9 @@
 
 # ipynb checkpoints
 /courseware/.ipynb_checkpoints/
+
+# binary package build
+/build/
+
+# documentation built by sphinx
+/docs/build/
