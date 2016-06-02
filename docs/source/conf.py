@@ -20,10 +20,6 @@ import climlab
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.insert(0, os.path.abspath('/home/moritz/PIK/subversion/working_dir/v-0.3.2-docstr-changes'))
-#sys.path.insert(0, os.path.abspath('/home/moritz/anaconda2/envs/env_sphinx_5/lib/python2.7/site-packages/Sphinx-1.3.1-py2.7.egg/sphinx/ext'))
-#sys.path.insert(0, os.path.abspath('/home/moritz/PIK/subversion/documentation/climlab-0.2.13/sphinx/source/ext'))
-#sys.path.insert(0, os.path.abspath('/home/moritz/anaconda2/envs/env_sphinx_5/lib/python2.7/site-packages/astropy_helpers'))
 
 print "python exec:", sys.executable
 print "sys.path:", sys.path
@@ -260,13 +256,16 @@ html_sidebars = {
 #html_search_scorer = 'scorer.js'
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'climlab-032Documentationdoc'
+#htmlhelp_basename = 'climlab-032Documentationdoc'
+htmlhelp_basename = 'climlab-' + release + 'Documentationdoc'
 
 # -- Options for LaTeX output ---------------------------------------------
 
 latex_elements = {
 # The paper size ('letterpaper' or 'a4paper').
-'papersize': 'a4paper',
+#'papersize': 'a4paper',
+#  Let's go with the US standard here
+'papersize': 'letterpaper',
 
 # overwrite printindex -> no index
 'printindex': '',
@@ -286,8 +285,11 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  (master_doc, 'climlab-032Documentation.tex', u'climlab-0.3 Documentation',
-   u'Moritz Kreuzer', 'manual'),
+  (master_doc,
+   'climlab-' + release + 'Documentation.tex',
+   u'climlab-' + version + ' Documentation',
+   u'Moritz Kreuzer and Brian E. J. Rose',
+   'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -322,7 +324,9 @@ latex_domain_indices = False
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'climlab-032documentation', u'climlab-0.3 Documentation',
+    (master_doc,
+	'climlab-' + release + 'documentation',
+	u'climlab-' + version + ' Documentation',
      [author], 1)
 ]
 
@@ -336,8 +340,12 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  (master_doc, 'climlab-032Documentation', u'climlab-0.3.2 Documentation',
-   author, 'climlab-032Documentation', 'One line description of project.',
+  (master_doc,
+  'climlab-' + release +'Documentation',
+  u'climlab-' + release + ' Documentation',
+   author,
+   'climlab-' + release +'Documentation',
+   'Python package for process-oriented climate modeling',
    'Miscellaneous'),
 ]
 
