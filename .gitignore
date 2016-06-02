@@ -6,17 +6,15 @@
 # f2py signature files
 *.pyf
 
-# Setuptools distribution folder.
+# Setuptools distribution and binary build folders.
 /dist/
+/build/
 
 # Python egg metadata, regenerated from source files by setuptools.
 /*.egg-info
 
 # ipynb checkpoints
 /courseware/.ipynb_checkpoints/
-
-# binary package build
-/build/
 
 # documentation built by sphinx
 /docs/build/
