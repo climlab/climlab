@@ -1,7 +1,7 @@
 import numpy as np
 from climlab import constants as const
 from climlab.solar.insolation import daily_insolation
-from climlab.solar.orbital import OrbitalTable
+from climlab.solar.orbital import OrbitalTable, LongOrbitalTable
 from climlab.model.ebm import EBM_seasonal
 from climlab.solar.orbital_cycles import OrbitalCycles
 from climlab.surface.albedo import StepFunctionAlbedo
@@ -33,8 +33,23 @@ def test_orbital_parameters():
                     'obliquity': (22, 24.5) }
 
     for k in orb_expected:
-        orb[k].min() > orb_expected[k][0]
-        orb[k].max() > orb_expected[k][0]
+        assert orb[k].min() > orb_expected[k][0]
+        assert orb[k].max() < orb_expected[k][1]
+
+def test_long_orbital_parameters():
+    kyears = np.arange( -1000., +500.)
+    table = LongOrbitalTable()
+    orb = table.lookup_parameters(kyears)
+
+    # check that orb has the right dictionary keys
+    # key: (min, max)
+    orb_expected = {'ecc': (0.0018, 0.0579),
+                    'long_peri': (0.182, 360),
+                    'obliquity': (22, 24.5) }
+
+    for k in orb_expected:
+        assert orb[k].min() > orb_expected[k][0]
+        assert orb[k].max() < orb_expected[k][1]
 
 #  Tests of automatic orbital cycles with EBM
 def test_orbital_cycles():
