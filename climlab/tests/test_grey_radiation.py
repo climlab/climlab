@@ -38,6 +38,24 @@ def diffmodel(rcmodel):
     diffmodel.add_subprocess('diffusion', d)
     return diffmodel
 
+@pytest.fixture()
+def diffmodel_surfflux(diffmodel):
+    diffmodel_surfflux = climlab.process_like(diffmodel)
+    # process models for surface heat fluxes
+    shf = SensibleHeatFlux(state=diffmodel_surfflux.state, Cd=0.5E-3)
+    lhf = LatentHeatFlux(state=diffmodel_surfflux, Cd=0.5E-3)
+    # set the water vapor input field for LHF
+    lhf.q = diffmodel_surfflux.q
+    diffmodel_surfflux.add_subprocess('SHF', shf)
+    diffmodel_surfflux.add_subprocess('LHF', lhf)
+    #  Convective adjustment for atmosphere only
+    diffmodel_surfflux.remove_subprocess('convective adjustment')
+    conv = ConvectiveAdjustment(state={'Tatm':diffmodel_surfflux.state['Tatm']},
+                                **diffmodel_surfflux.param)
+    diffmodel_surfflux.add_subprocess('convective adjustment', conv)
+    return diffmodel_surfflux
+
+
 # helper for a common test pattern
 def _check_minmax(array, amin, amax):
     return (np.allclose(array.min(), amin) and
