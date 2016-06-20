@@ -57,3 +57,17 @@ def test_decreased_S0(EBM_iceline):
     EBM_iceline.subprocess['insolation'].S0 = 1200.
     EBM_iceline.integrate_years(5.)
     assert np.all(EBM_iceline.icelat == np.array([-0.,  0.]))
+    
+def test_float():
+    '''Check that we can step forward the model after setting the state 
+    variable with an ndarray of integers through 2 different methods'''
+    from climlab.domain import initial
+    from climlab.domain.field import Field
+    state = initial.surface_state()
+    sfc = climlab.domain.zonal_mean_surface(num_lat=4)
+    state.Ts = Field([10,15,15,10],domain=sfc)
+    m = climlab.EBM(state=state)
+    m.step_forward()
+    k = climlab.EBM(num_lat=4)
+    k.set_state('Ts', Field([10,15,15,10], domain=k.domains['Ts']))
+    k.step_forward()
