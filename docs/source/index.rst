@@ -17,8 +17,9 @@ Welcome to the climlab documentation!
    api/climlab
    references
    license
+   support
    contact
-   
+
 
 
 .. only:: html
@@ -29,4 +30,3 @@ Welcome to the climlab documentation!
    * :ref:`genindex`
    * :ref:`modindex`
    * :ref:`search`
-
