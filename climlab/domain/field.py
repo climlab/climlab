@@ -317,12 +317,27 @@ def global_mean(field):
 
     """
     try:
-        lat = field.domain.axes['lat'].points
+        lat = field.domain.lat.points
     except:
         raise ValueError('No latitude axis in input field.')
-    lat_radians = np.deg2rad(lat)
-    return _global_mean(field.squeeze(), lat_radians)
+    try:
+        #  Field is 2D latitude / longitude
+        lon = field.domain.lon.points
+        return _global_mean_latlon(field.squeeze())
+    except:
+        #  Field is 1D latitude only (zonal average)
+        lat_radians = np.deg2rad(lat)
+        return _global_mean(field.squeeze(), lat_radians)
 
 
 def _global_mean(array, lat_radians):
-    return np.sum(array * np.cos(lat_radians)) / np.sum(np.cos(lat_radians))
+    return np.average(array, weights=np.cos(lat_radians))
+
+
+def _global_mean_latlon(field):
+    dom = field.domain
+    lon, lat = np.meshgrid(dom.lon.points, dom.lat.points)
+    dy = np.deg2rad(np.diff(dom.lat.bounds))
+    dx = np.deg2rad(np.diff(dom.lon.bounds))*np.cos(np.deg2rad(lat))
+    area = dx * dy[:,np.newaxis]  # grid cell area in radians^2
+    return np.average(field, weights=area)
