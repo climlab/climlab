@@ -79,6 +79,7 @@ class _Domain(object):
         #  lat is second-last
         add_lev = False
         add_depth = False
+        add_lon = False
         add_lat = False
         axlist = self.axes.keys()
         if 'lev' in axlist:
@@ -87,12 +88,17 @@ class _Domain(object):
         elif 'depth' in axlist:
             axlist.remove('depth')
             add_depth = True
+        if 'lon' in axlist:
+            axlist.remove('lon')
+            add_lon = True
         if 'lat' in axlist:
             axlist.remove('lat')
             add_lat = True
         axlist2 = axlist[:]
         if add_lat:
             axlist2.append('lat')
+        if add_lon:
+            axlist2.append('lon')
         if add_depth:
             axlist2.append('depth')
         if add_lev:
@@ -466,6 +472,62 @@ def zonal_mean_surface(num_lat=90, water_depth=10., lat=None, **kwargs):
             raise ValueError('lat must be Axis object or latitude array')
     depthax = Axis(axis_type='depth', bounds=[water_depth, 0.])
     axes = {'depth': depthax, 'lat': latax}
+    slab = SlabOcean(axes=axes, **kwargs)
+    return slab
+
+def surface_2D(num_lat=90, num_lon=180, water_depth=10., lon=None, 
+               lat=None, **kwargs):
+    """Creates a Domain with one water cell, and latitude and longitude axes above.
+    
+    Domain has a single heat capacity according to the specified water depth.
+    
+    **Function-call argument** \n        
+    
+    :param int num_lat:         number of latitude points on the axis
+                                [default: 90]
+    :param int num_lon:         number of longitude points on the axis
+                                [default: 180]                       
+    :param float water_depth:   depth of the water cell (slab ocean) [default: 10.]
+    :param lat:                 specification for latitude axis (optional)
+    :type lat:                  :class:`~climlab.domain.axis.Axis` or latitude array
+    :param lon:                 specification for longitude axis (optional)
+    :type lon:                  :class:`~climlab.domain.axis.Axis` or longitude array
+    :raises: :exc:`ValueError`  if `lat` is given but neither Axis nor latitude array.
+    :raises: :exc:`ValueError`  if `lon` is given but neither Axis nor longitude array.
+    :returns:                   surface domain
+    :rtype:                     :class:`SlabOcean`
+
+    :Example:
+    
+        ::
+        
+            >>> from climlab import domain
+            >>> sfc = domain.surface_2D(num_lat=36, num_lat=72)
+            
+            >>> print sfc
+            climlab Domain object with domain_type=ocean and shape=(36, 72, 1)
+            
+    """
+    if lat is None:
+        latax = Axis(axis_type='lat', num_points=num_lat)
+    elif isinstance(lat, Axis):
+        latax = lat
+    else:
+        try:
+            latax = Axis(axis_type='lat', points=lat)
+        except:
+            raise ValueError('lat must be Axis object or latitude array')
+    if lon is None:
+        lonax = Axis(axis_type='lon', num_points=num_lon)
+    elif isinstance(lon, Axis):
+        lonax = lon
+    else:
+        try:
+            lonax = Axis(axis_type='lon', points=lon)
+        except:
+            raise ValueError('lon must be Axis object or longitude array')
+    depthax = Axis(axis_type='depth', bounds=[water_depth, 0.])
+    axes = {'lat': latax, 'lon': lonax, 'depth': depthax}
     slab = SlabOcean(axes=axes, **kwargs)
     return slab
 
