@@ -82,12 +82,15 @@ def column_state(num_lev=30,
 
 
 def surface_state(num_lat=90,
+                  num_lon=None,
                   water_depth=10.,
                   T0=12.,
                   T2=-40.):
-    """Sets up a state variable dictionary for a 1D zonal-mean latitude-dependent
-    surface model with a uniform slab ocean depth
-    (e.g. basic EBM).
+    """Sets up a state variable dictionary for a surface model
+    (e.g. :class:`~climlab.model.ebm.EBM`) with a uniform slab ocean depth.
+
+    The domain is either 1D (latitude) or 2D (latitude, longitude)
+    depending on whether the input argument num_lon is supplied.
 
     Returns a single state variable `Ts`, the temperature of the surface
     mixed layer (slab ocean).
@@ -103,8 +106,8 @@ def surface_state(num_lat=90,
 
     **Function-call arguments** \n
 
-    :param int num_lat:         number of latitude points on the axis
-                                [default: 90]
+    :param int num_lat:         number of latitude points [default: 90]
+    :param int num_lat:         (optional) number of longitude points [default: None]
     :param float water_depth:   depth of the slab ocean in meters [default: 10.]
     :param float T0:            global-mean initial temperature in :math:`^{\circ} \\textrm{C}` [default: 12.]
     :param float T2:            2nd Legendre coefficient for equator-to-pole gradient in
@@ -136,82 +139,19 @@ def surface_state(num_lat=90,
              -27.88584094]
 
     """
-    sfc = domain.zonal_mean_surface(num_lat=num_lat,
-                                    water_depth=water_depth)
+    if num_lon is None:
+        sfc = domain.zonal_mean_surface(num_lat=num_lat,
+                                        water_depth=water_depth)
+    else:
+        sfc = domain.surface_2D(num_lat=num_lat,
+                                num_lon=num_lon,
+                                water_depth=water_depth)
     sinphi = np.sin(np.deg2rad(sfc.axes['lat'].points))
     initial = T0 + T2 * legendre.P2(sinphi)
-    Ts = Field(initial, domain=sfc)
-    state = AttrDict()
-    state['Ts'] = Ts
-    return state
-
-def surface_state_2D(num_lat=90,
-                     num_lon=180,
-                     water_depth=10.,
-                     T0=12.,
-                     T2=-40.):
-    """Sets up a state variable dictionary for a two-dimensional surface
-    model on a latitude-longitude grid and uniform water depth
-    (e.g. 2D EBM).
-
-    Returns a single state variable `Ts`, the temperature of the surface
-    mixed layer.
-
-    Returns a single state variable `Ts`, the temperature of the surface
-    mixed layer (slab ocean).
-
-    The temperature is initialized to a zonally uniform, smooth equator-to-pole shape given by
-
-    .. math::
-
-        T(\phi) = T_0 + T_2 P_2(\sin\phi)
-
-    where :math:`\phi` is latitude, and :math:`P_2` is the second Legendre
-    polynomial :class:`~climlab.utils.legendre.P2`.
-
-    **Function-call arguments** \n
-
-    :param int num_lat:         number of latitude points [default: 90]
-    :param int num_lon:         number of longitude points [default: 180]
-    :param float water_depth:   depth of the slab ocean in meters [default: 10.]
-    :param float T0:            global-mean initial temperature in :math:`^{\circ} \\textrm{C}` [default: 12.]
-    :param float T2:            2nd Legendre coefficient for equator-to-pole gradient in
-                                initial temperature, in :math:`^{\circ} \\textrm{C}` [default: -40.]
-
-    :returns:                   dictionary with temperature
-                                :class:`~climlab.domain.field.Field`
-                                for surface mixed layer ``Ts``
-    :rtype:                     dict
-
-
-    :Example:
-
-        ::
-
-            >>> from climlab.domain import initial
-            >>> import numpy as np
-
-            >>> T_dict = initial.surface_state_2D(num_lat=5, num_lon=10)
-
-            >>> print np.squeeze(T_dict['Ts'])
-            [[-22.27050983 -22.27050983 -22.27050983 -22.27050983 -22.27050983
-              -22.27050983 -22.27050983 -22.27050983 -22.27050983 -22.27050983]
-             [ 11.27050983  11.27050983  11.27050983  11.27050983  11.27050983
-               11.27050983  11.27050983  11.27050983  11.27050983  11.27050983]
-             [ 32.          32.          32.          32.          32.
-               32.          32.          32.          32.          32.        ]
-             [ 11.27050983  11.27050983  11.27050983  11.27050983  11.27050983
-               11.27050983  11.27050983  11.27050983  11.27050983  11.27050983]
-             [-22.27050983 -22.27050983 -22.27050983 -22.27050983 -22.27050983
-              -22.27050983 -22.27050983 -22.27050983 -22.27050983 -22.27050983]]
-
-    """
-    sfc = domain.surface_2D(num_lat=num_lat,
-                            num_lon=num_lon,
-                            water_depth=water_depth)
-    sinphi = np.sin(np.deg2rad(sfc.axes['lat'].points))
-    initial = T0 + T2 * legendre.P2(sinphi)
-    Ts = Field([[initial for k in range(num_lon)]], domain=sfc)
+    if num_lon is None:
+        Ts = Field(initial, domain=sfc)
+    else:
+        Ts = Field([[initial for k in range(num_lon)]], domain=sfc)
     state = AttrDict()
     state['Ts'] = Ts
     return state
