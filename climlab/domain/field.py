@@ -87,19 +87,32 @@ class Field(np.ndarray):
         # We first cast to be our class type
         #obj = np.asarray(input_array).view(cls)
         # This should ensure that shape is (1,) for scalar input
-        obj = np.atleast_1d(input_array).view(cls)
+        #obj = np.atleast_1d(input_array).view(cls)
         # add the new attribute to the created instance
         #  do some checking for correct dimensions
-        if obj.shape == domain.shape:
-            obj.domain = domain
-        else:
+        try:
+            #assert obj.shape == domain.shape
+            #  This will work if input_array is any of:
+            #   - scalar
+            #   - same shape as domain
+            #   - broadcast-compatible with domain shape
+            obj = (input_array * np.ones(domain.shape)).view(cls)
+            assert obj.shape == domain.shape
+        except:
             try:
-                obj = np.transpose(np.atleast_2d(obj))
-                if obj.shape == domain.shape:
-                    obj.domain = domain
+                # Do we get a match if we add a singleton dimension
+                #  (e.g. a singleton depth axis)?
+                obj = np.expand_dims(input_array, axis=-1).view(cls)
+                assert obj.shape == domain.shape
+                #obj = np.transpose(np.atleast_2d(obj))
+                #if obj.shape == domain.shape:
+                #    obj.domain = domain
             except:
-                raise ValueError('input_array and domain have different shapes.')
-
+                if input_array is None:
+                    return None
+                else:
+                    raise ValueError('Cannot reconcile shapes of input_array and domain.')
+        obj.domain = domain
         #  would be nice to have some automatic domain creation here if none given
 
         # Finally, we must return the newly created object:

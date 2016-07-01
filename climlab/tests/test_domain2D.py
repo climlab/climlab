@@ -12,3 +12,11 @@ def test_state():
     assert state.Ts.ndim == 3
     assert state.Ts.shape == (90, 180, 1)
     assert np.isclose(climlab.global_mean(state.Ts), initialT0, atol=1E-02)
+
+def test_2D_EBM():
+    '''Can we step forward a 2D lat/lon EBM?'''
+    state = climlab.surface_state(num_lon=4)
+    m = climlab.EBM_annual(state=state)
+    m.step_forward()
+    assert m.state.Ts.shape == (90, 4, 1)
+    

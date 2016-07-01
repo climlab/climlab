@@ -146,12 +146,17 @@ def surface_state(num_lat=90,
         sfc = domain.surface_2D(num_lat=num_lat,
                                 num_lon=num_lon,
                                 water_depth=water_depth)
-    sinphi = np.sin(np.deg2rad(sfc.axes['lat'].points))
-    initial = T0 + T2 * legendre.P2(sinphi)
-    if num_lon is None:
-        Ts = Field(initial, domain=sfc)
+    if 'lon' in sfc.axes:
+        lon, lat = np.meshgrid(sfc.axes['lon'].points, sfc.axes['lat'].points)
     else:
-        Ts = Field([[initial for k in range(num_lon)]], domain=sfc)
+        lat = sfc.axes['lat'].points
+    sinphi = np.sin(np.deg2rad(lat))
+    initial = T0 + T2 * legendre.P2(sinphi)
+    Ts = Field(initial, domain=sfc)
+    #if num_lon is None:
+    #    Ts = Field(initial, domain=sfc)
+    #else:
+    #    Ts = Field([[initial for k in range(num_lon)]], domain=sfc)
     state = AttrDict()
     state['Ts'] = Ts
     return state
