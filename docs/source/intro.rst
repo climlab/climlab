@@ -60,14 +60,12 @@ Currently, `climlab` has out-of-the-box support and documented examples for:
 - boundary layer sensible and latent heat fluxes
 
 .. note::
-	
+
 	For more details about the implemented Energy Balance Models, see the :ref:`models` chapter.
 
 
 Documentation
 -------------
 
-This documentation currently only covers all Energy Balance Model relevant parts of the code, which is just a part of the package. The whole package may be covered in a later release of the documentation.
-
-
-
+The documentation is a work in progress! Currently there is good coverage and example usage
+for the Energy Balance Models. Comprehensive tutorials for other model types will be coming soon.
