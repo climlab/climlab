@@ -218,11 +218,17 @@ class P2Insolation(_Insolation):
         #  Why is there a silent fail here? Should get rid of this.
         try:
             insolation = self.S0 / 4 * (1. + self.s2 * P2(np.sin(phi)))
+            try:
+                if self.lon.all():
+                    insolation = np.array([insolation for i in range(self.lon.size)])
+                    insolation = np.swapaxes(insolation,1,0)
+            except ValueError:
+                pass
             # make sure that the diagnostic has the correct field dimensions.
             dom = self.domains['default']
             #self.insolation = Field(insolation, domain=dom)
             self.insolation[:] = Field(insolation, domain=dom)
-        except:
+        except AttributeError:
             pass
 
 
@@ -381,10 +387,16 @@ class AnnualMeanInsolation(_Insolation):
         try:
             temp_array = self._daily_insolation_array()
             insolation = np.mean(temp_array, axis=1)
+            try:
+                if self.lon.all():
+                    insolation = np.array([insolation for i in range(self.lon.size)])
+                    insolation = np.swapaxes(insolation,1,0)
+            except ValueError:
+                pass
             # make sure that the diagnostic has the correct field dimensions.
             dom = self.domains['default']
             self.insolation[:] = Field(insolation, domain=dom)
-        except:
+        except AttributeError:
             pass
 
 
@@ -494,7 +506,7 @@ class DailyInsolation(AnnualMeanInsolation):
     def _compute_fixed(self):
         try:
             self.insolation_array = self._daily_insolation_array()
-        except:
+        except AttributeError:
             pass
 
     def _get_current_insolation(self):
