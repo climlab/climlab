@@ -354,3 +354,14 @@ def _global_mean_latlon(field):
     dx = np.deg2rad(np.diff(dom.lon.bounds))*np.cos(np.deg2rad(lat))
     area = dx * dy[:,np.newaxis]  # grid cell area in radians^2
     return np.average(field, weights=area)
+
+
+def to_latlon(array, domain = None, axis = 'lon'):
+    #  broadcasts a 1D axis dependent array onto onother axis
+    #  if array is latitude dependent (has the same shape as lat)
+    axis, array, depth = np.meshgrid(domain.axes[axis].points, array, 
+                                    domain.axes['depth'].points)
+    if axis == 'lat':
+    #  if array is longitude dependent (has the same shape as lon)    
+        np.swapaxes(array,1,0)      
+    return Field(array, domain=domain)
