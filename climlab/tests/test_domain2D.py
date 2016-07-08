@@ -20,3 +20,15 @@ def test_2D_EBM():
     m.step_forward()
     assert m.state.Ts.shape == (90, 4, 1)
     
+def test_2D_insolation():
+    state = climlab.surface_state(num_lon=4)
+    m = climlab.EBM_annual(state=state)
+    #  the answers are the mean of 1D insolation arrays
+    #  the mean shouldn't change from 1D to 2D...
+    #  there are exactly the same amount of each number in 2D array
+    assert np.mean(m.subprocess['insolation'].insolation) == 299.30467670961832
+    from climlab.radiation.insolation import P2Insolation
+    sfc = m.domains['Ts']
+    m.add_subprocess('insolation', P2Insolation(domains=sfc, **m.param))
+    assert np.mean(m.subprocess['insolation'].insolation) == 300.34399999999999    
+
