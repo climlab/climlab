@@ -1,6 +1,7 @@
 import numpy as np
 from climlab.process.diagnostic import DiagnosticProcess
 from climlab.domain.field import Field
+from climlab.domain.field import to_latlon
 from climlab.utils.legendre import P2
 from climlab import constants as const
 from climlab.solar.insolation import daily_insolation
@@ -218,11 +219,18 @@ class P2Insolation(_Insolation):
         #  Why is there a silent fail here? Should get rid of this.
         try:
             insolation = self.S0 / 4 * (1. + self.s2 * P2(np.sin(phi)))
-            # make sure that the diagnostic has the correct field dimensions.
             dom = self.domains['default']
+            try:
+                insolation = to_latlon(insolation, domain=dom)
+                self.insolation[:] = insolation
+            except:                    
+                self.insolation[:] = Field(insolation, domain=dom)
+            # make sure that the diagnostic has the correct field dimensions.
             #self.insolation = Field(insolation, domain=dom)
             self.insolation[:] = Field(insolation, domain=dom)
-        except:
+        #  Silent fail only for attribute error: _s2 is not an attribute of self 
+        #  but s2 parameter is being stored in self._s2 
+        except AttributeError:
             pass
 
 
@@ -383,8 +391,14 @@ class AnnualMeanInsolation(_Insolation):
             insolation = np.mean(temp_array, axis=1)
             # make sure that the diagnostic has the correct field dimensions.
             dom = self.domains['default']
-            self.insolation[:] = Field(insolation, domain=dom)
-        except:
+            try:
+                insolation = to_latlon(insolation, domain=dom)
+                self.insolation[:] = insolation
+            except:                    
+                self.insolation[:] = Field(insolation, domain=dom)
+        #  Silent fail only for attribute error: _orb is not an attribute of self 
+        #  but orb parameter is being stored in self._orb 
+        except AttributeError:
             pass
 
 
@@ -494,7 +508,7 @@ class DailyInsolation(AnnualMeanInsolation):
     def _compute_fixed(self):
         try:
             self.insolation_array = self._daily_insolation_array()
-        except:
+        except AttributeError:
             pass
 
     def _get_current_insolation(self):

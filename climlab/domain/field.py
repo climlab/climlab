@@ -354,3 +354,44 @@ def _global_mean_latlon(field):
     dx = np.deg2rad(np.diff(dom.lon.bounds))*np.cos(np.deg2rad(lat))
     area = dx * dy[:,np.newaxis]  # grid cell area in radians^2
     return np.average(field, weights=area)
+
+
+def to_latlon(array, domain, axis = 'lon'):
+    """Broadcasts a 1D axis dependent array accros another axis.
+    
+    :param array input_array:   the 1D array used for broadcasting
+    :param domain:              the domain associated with that
+                                array
+    :param axis:                the axis that the input array will 
+                                be broadcasted across 
+                                [default: 'lon']
+    :return:                    Field with the same shape as the 
+                                domain
+    :Example:
+
+        ::
+            
+            >>> import climlab
+            >>> from climlab.domain.field import to_latlon
+            >>> import numpy as np
+            
+            >>> state = climlab.surface_state(num_lat=3, num_lon=4)
+            >>> m = climlab.EBM_annual(state=state)
+            >>> insolation = np.array([237., 417., 237.])
+            >>> insolation = to_latlon(insolation, domain = m.domains['Ts'])
+            >>> insolation.shape
+            (3, 4, 1)
+            >>> insolation
+            Field([[[ 237.],   [[ 417.],   [[ 237.],
+                    [ 237.],    [ 417.],    [ 237.],
+                    [ 237.],    [ 417.],    [ 237.],
+                    [ 237.]],   [ 417.]],   [ 237.]]])
+                
+    """
+    #  if array is latitude dependent (has the same shape as lat)
+    axis, array, depth = np.meshgrid(domain.axes[axis].points, array, 
+                                    domain.axes['depth'].points)
+    if axis == 'lat':
+    #  if array is longitude dependent (has the same shape as lon)    
+        np.swapaxes(array,1,0)      
+    return Field(array, domain=domain)
