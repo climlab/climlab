@@ -357,7 +357,7 @@ def _global_mean_latlon(field):
 
 
 def to_latlon(array, domain, axis = 'lon'):
-    """Broadcasts a 1D axis dependent array accros another axis.
+    """Broadcasts a 1D axis dependent array across another axis.
     
     :param array input_array:   the 1D array used for broadcasting
     :param domain:              the domain associated with that
