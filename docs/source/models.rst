@@ -27,7 +27,7 @@ Insolation
 
 	.. math::
 
-		S(lat) = S_{\textrm{input}}
+		S(\varphi) = S_{\textrm{input}}
 
 - :class:`~climlab.radiation.insolation.P2Insolation`
 	characterizes a parabolic solar distribution over the domain's latitude on the basis of the second order Legendre Polynomial :math:`P_2`:
