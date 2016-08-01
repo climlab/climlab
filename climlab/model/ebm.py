@@ -187,6 +187,7 @@ class EBM(EnergyBudget):
         self.init_diagnostic('icelat', None)
 
 
+
     def _compute_heating_rates(self):
         """Computes energy flux convergences to get heating rates in :math:`W/m^2`
         
@@ -201,7 +202,11 @@ class EBM(EnergyBudget):
         self.heating_rate['Ts'] = self.ASR
         # useful diagnostics
         try:
-            self.icelat = self.subprocess['albedo'].subprocess['iceline'].icelat
+            if 'iceline' not in self.subprocess['albedo'].subprocess:
+                self.remove_diagnostic('icelat')
+            else:
+                self.init_diagnostic('icelat', None)
+                self.icelat = self.subprocess['albedo'].subprocess['iceline'].icelat
         except:
             pass
 
