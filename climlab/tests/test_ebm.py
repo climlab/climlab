@@ -71,3 +71,16 @@ def test_float():
     k = climlab.EBM(num_lat=4)
     k.set_state('Ts', Field([10,15,15,10], domain=k.domains['Ts']))
     k.step_forward()
+    
+def test_albedo():
+    '''Check that we can integrate forward a model after changing the albedo 
+    subprocess and get the expected icelat (ice at 70 degrees and no ice
+    respectively'''
+    import numpy as np
+    from climlab.surface import albedo
+    m = climlab.EBM()
+    m.integrate_years(10.)
+    assert np.all(m.icelat == np.array([-70.,  70.]))
+    m.add_subprocess('albedo', albedo.ConstantAlbedo(state=m.state, **m.param))
+    m.integrate_years(10.)
+    assert 'icelat' not in m.diagnostics
