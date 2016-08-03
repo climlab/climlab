@@ -362,6 +362,10 @@ class TimeDependentProcess(Process):
                 self.timeave.update(self.diagnostics)
                 # reset all values to zero
                 for varname, value in self.timeave.iteritems():
+                # moves on to the next varname if value is None
+                # this preserves NoneType diagnostics
+                    if value is None:
+                        continue
                     self.timeave[varname] = 0*value
             # adding up all values for each timestep
             for varname in self.timeave.keys():
@@ -372,7 +376,9 @@ class TimeDependentProcess(Process):
                         self.timeave[varname] += self.diagnostics[varname]
                     except: pass
         # calculating mean values through dividing the sum by number of steps
-        for varname in self.timeave.keys():
+        for varname, value in self.timeave.iteritems():
+            if value is None:
+                continue 
             self.timeave[varname] /= numsteps
         if verbose:
             print("Total elapsed time is %s years."

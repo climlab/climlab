@@ -202,8 +202,8 @@ class EBM(EnergyBudget):
         # useful diagnostics
         try:
             self.icelat = self.subprocess['albedo'].subprocess['iceline'].icelat
-        except:
-            pass
+        except KeyError, icelat:
+            self.icelat = None
 
     def global_mean_temperature(self):
         """Convenience method to compute global mean surface temperature.
