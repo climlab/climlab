@@ -170,13 +170,11 @@ It uses following subprocesses:
     * energy diffusion via 
       :class:`~climlab.dynamics.diffusion.MeridionalDiffusion`
 
+Column Models
+-------------
+
+Information on column models located in :any:`column` in the :any:`Climlab Reference`.
+
 .. note::
 
 	For information how to set up individual models or modify instances of the classes above, see the :ref:`Tutorial` chapter.
-
-
-Other Models
-------------
-
-As noted in the :ref:`Introduction`, more model types are implemented in `climlab` but not covered in the documentation yet.
-

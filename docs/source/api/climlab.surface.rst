@@ -1,8 +1,8 @@
-climlab.surface package
-=======================
+climlab.surface
+===============
 
-climlab.surface.albedo module
------------------------------
+albedo
+------
 
 .. inheritance-diagram:: climlab.surface.albedo
    :parts: 1
@@ -12,4 +12,3 @@ climlab.surface.albedo module
     :members:
     :undoc-members:
     :show-inheritance:
-
