@@ -7,7 +7,7 @@ Welcome to the climlab documentation!
 =====================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
 
    intro
    download

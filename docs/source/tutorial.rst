@@ -38,6 +38,32 @@ Some more notebooks which focus on specific aspects of Energy Balance Models:
    notebooks/Insolation.ipynb
    notebooks/Seasonal_cycle_and_heat_capacity.ipynb
    notebooks/Snowball_Earth_in_the_EBM.ipynb
+   notebooks/PolarAmplification.ipynb
+   
+Column models with grey radiation notebooks:   
+   
+.. toctree::
+   :titlesonly:
+   
+   notebooks/Introducing the Column Model.ipynb 
+   notebooks/Latitude-dependent grey radiation.ipynb
+   notebooks/The spectral column model.ipynb
+   notebooks/Two_layer_atmosphere.ipynb
+   notebooks/Soundings from Observations and RCE Models.ipynb
+   
+RCE with CAM3 radiation notebook:   
+   
+.. toctree::
+   :titlesonly:
+   
+   notebooks/RCE with CAM3 radiation.ipynb
+   
+CESM notebook:   
 
-
-
+.. toctree::
+   :titlesonly:
+   
+   notebooks/Introducing_CESM.ipynb
+   
+   
+   
