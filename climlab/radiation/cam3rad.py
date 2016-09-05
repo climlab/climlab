@@ -112,7 +112,9 @@ class CAM3Radiation(Radiation):
         #  Set up some useful defaults, mostly following climt/state.py
         self.shape3D = (self.KM, self.JM, self.IM)
         self.shape2D = self.shape3D[1:]
-        self.ps = const.ps * np.ones(self.shape2D)
+        #self.ps = const.ps * np.ones(self.shape2D)
+        #  surface pressure should correspond to model domain!
+        self.ps = self.lev_bounds[-1] * np.ones(self.shape2D)
         #lev = (np.arange(self.KM)+0.5) * const.ps/self.KM
         #self.p = np.transpose(np.resize(lev,self.shape3D[::-1]))
         self.p = self.lev
