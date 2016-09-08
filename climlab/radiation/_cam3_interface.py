@@ -140,7 +140,11 @@ def _build_extension(KM,JM,IM, extname='_cam3_radiation'):
         print F2pyCommand
         if subprocess.call(F2pyCommand, shell=True) > 0:
             raise StandardError('+++ Compilation failed')
-        _patch_extension_rpath(target)
+        # Check to see if we are using Mac OSX
+        #  which might need this hack to make the linking work if using
+        #  gcc compilers installed with conda
+        if sys.platform == 'darwin':
+            _patch_extension_rpath(target)
         # delete signature file
         subprocess.call('rm -f %s.pyf' % name, shell=True)
         # Move shared object file to working directory
