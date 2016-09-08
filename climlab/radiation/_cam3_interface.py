@@ -96,8 +96,8 @@ def _build_extension(KM,JM,IM, extname='_cam3_radiation'):
         compiler = fcompiler.get_default_fcompiler()
         # set some fortran compiler-dependent flags
         if compiler == 'gnu95':
-            f77flags='-ffixed-line-length-132 -fdefault-real-8 -Wl,-rpath=${CONDA_PREFIX}/lib'
-            f90flags='-fdefault-real-8 -fno-range-check -ffree-form -Wl,-rpath=${CONDA_PREFIX}/lib'
+            f77flags='-ffixed-line-length-132 -fdefault-real-8'
+            f90flags='-fdefault-real-8 -fno-range-check -ffree-form'
         elif compiler == 'intel' or compiler == 'intelem':
             f77flags='-132 -r8'
             f90flags='-132 -r8'
