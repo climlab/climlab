@@ -140,17 +140,7 @@ def _build_extension(KM,JM,IM, extname='_cam3_radiation'):
         print F2pyCommand
         if subprocess.call(F2pyCommand, shell=True) > 0:
             raise StandardError('+++ Compilation failed')
-        ####   This is a little hack to get the build to work on OSX
-        ####   with gcc compilers installed by conda
-        ####   see https://github.com/ContinuumIO/anaconda-issues/issues/739#issuecomment-238076905
-        hack_rpath = []
-        hack_rpath.append('install_name_tool -change @rpath/./libgfortran.3.dylib ${CONDA_PREFIX}/lib/libgfortran.3.dylib -change @rpath/./libquadmath.0.dylib ${CONDA_PREFIX}/lib/libquadmath.0.dylib')
-        hack_rpath.append('%s' % target)
-        hack_rpath = string.join(hack_rpath)
-        print hack_rpath
-        if subprocess.call(hack_rpath, shell=True) > 0:
-            raise StandardError('+++ rpath change failed')
-        ####    End hack
+        _patch_extension_rpath(target)
         # delete signature file
         subprocess.call('rm -f %s.pyf' % name, shell=True)
         # Move shared object file to working directory
@@ -159,6 +149,22 @@ def _build_extension(KM,JM,IM, extname='_cam3_radiation'):
         os.chdir(here)
     else:
         print 'Extension %s is up to date' %name
+
+def _patch_extension_rpath(extname, verbose=False):
+        ####   This is a little hack to get the build to work on OSX
+        ####   with gcc compilers installed by conda
+        ####   see https://github.com/ContinuumIO/anaconda-issues/issues/739#issuecomment-238076905
+    patch_rpath = []
+    #patch_rpath.append('install_name_tool -change @rpath/./libgfortran.3.dylib ${CONDA_PREFIX}/lib/libgfortran.3.dylib -change @rpath/./libquadmath.0.dylib ${CONDA_PREFIX}/lib/libquadmath.0.dylib')
+    patch_rpath.append('install_name_tool -change @rpath/./libgfortran.3.dylib ${CONDA_PREFIX}/lib/libgfortran.3.dylib')
+    patch_rpath.append('-change @rpath/./libquadmath.0.dylib ${CONDA_PREFIX}/lib/libquadmath.0.dylib %s' %extname)
+    patch_rpath = string.join(patch_rpath)
+    if verbose:
+        print patch_rpath
+    if subprocess.call(patch_rpath, shell=True) > 0:
+        raise StandardError('+++ rpath change failed')
+    if verbose:
+        print 'rpath patch successful'
 
 def _init_extension(module, extname='_cam3_radiation'):
     #  Import the extension module using the supplied name
