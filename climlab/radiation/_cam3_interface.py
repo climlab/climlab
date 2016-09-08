@@ -96,8 +96,8 @@ def _build_extension(KM,JM,IM, extname='_cam3_radiation'):
         compiler = fcompiler.get_default_fcompiler()
         # set some fortran compiler-dependent flags
         if compiler == 'gnu95':
-            f77flags='-ffixed-line-length-132 -fdefault-real-8'
-            f90flags='-fdefault-real-8 -fno-range-check -ffree-form'
+            f77flags='-ffixed-line-length-132 -fdefault-real-8 -Wl,-rpath=${CONDA_PREFIX}/lib'
+            f90flags='-fdefault-real-8 -fno-range-check -ffree-form -Wl,-rpath=${CONDA_PREFIX}/lib'
         elif compiler == 'intel' or compiler == 'intelem':
             f77flags='-132 -r8'
             f90flags='-132 -r8'
@@ -140,6 +140,17 @@ def _build_extension(KM,JM,IM, extname='_cam3_radiation'):
         print F2pyCommand
         if subprocess.call(F2pyCommand, shell=True) > 0:
             raise StandardError('+++ Compilation failed')
+        ####   This is a little hack to get the build to work on OSX
+        ####   with gcc compilers installed by conda
+        ####   see https://github.com/ContinuumIO/anaconda-issues/issues/739#issuecomment-238076905
+        hack_rpath = []
+        hack_rpath.append('install_name_tool -change @rpath/./libgfortran.3.dylib ${CONDA_PREFIX}/lib/libgfortran.3.dylib -change @rpath/./libquadmath.0.dylib ${CONDA_PREFIX}/lib/libquadmath.0.dylib')
+        hack_rpath.append('%s' % target)
+        hack_rpath = string.join(hack_rpath)
+        print hack_rpath
+        if subprocess.call(hack_rpath, shell=True) > 0:
+            raise StandardError('+++ rpath change failed')
+        ####    End hack
         # delete signature file
         subprocess.call('rm -f %s.pyf' % name, shell=True)
         # Move shared object file to working directory
