@@ -33,8 +33,10 @@ class SensibleHeatFlux(SurfaceFlux):
         Ta = self.Tatm[..., -1, np.newaxis]
         Ts = self.Ts
         DeltaT = Ts - Ta
+        #  retrieving surface pressure from model grid
+        ps = self.lev_bounds[-1] * const.mb_to_Pa
         #  air density
-        rho = const.ps * const.mb_to_Pa / const.Rd / Ta
+        rho = ps / const.Rd / Ta
         #  flux from bulk formula
         self._flux = const.cp * rho * self.Cd * self.U * DeltaT
         self.SHF = self._flux
