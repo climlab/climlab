@@ -1,48 +1,14 @@
-climlab.radiation package
-=========================
+climlab.radiation
+=================
 
-climlab.radiation.AplusBT module
---------------------------------
+.. toctree::
 
-.. inheritance-diagram:: climlab.radiation.AplusBT
-   :parts: 1
-   :private-bases:
-
-.. automodule:: climlab.radiation.AplusBT
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-climlab.radiation.Boltzmann module
-----------------------------------
-
-.. inheritance-diagram:: climlab.radiation.Boltzmann
-   :parts: 1
-   :private-bases:
-
-.. automodule:: climlab.radiation.Boltzmann
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-climlab.radiation.insolation module
------------------------------------
-
-.. inheritance-diagram:: climlab.radiation.insolation
-   :parts: 1
-   :private-bases:
-
-.. automodule:: climlab.radiation.insolation
-    :members:
-    :undoc-members: 
-    :show-inheritance:
-
-.. autoclass:: climlab.radiation.insolation._Insolation
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
-
-
-
+   climlab.radiation.AplusBT
+   climlab.radiation.Boltzmann
+   climlab.radiation.cam3rad
+   climlab.radiation.greygas
+   climlab.radiation.insolation
+   climlab.radiation.nband
+   climlab.radiation.radiation
+   climlab.radiation.transmissivity
+   climlab.radiation.water_vapor

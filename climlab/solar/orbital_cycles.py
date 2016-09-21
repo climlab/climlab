@@ -109,7 +109,7 @@ class OrbitalCycles:
         
                 #  start the integration
                 #  run for 10,000 orbital years, but only 1,000 model years
-                experiment = OrbitalCycles(ebm, kyear_start=-20, kyear_stop=-10, \
+                experiment = OrbitalCycles(ebm, kyear_start=-20, kyear_stop=-10,
                                                         orbital_year_factor=10.)
                 
         """      
