@@ -21,7 +21,10 @@ class ConvectiveAdjustment(TimeDependentProcess):
         c_atm = self.Tatm.domain.heat_capacity
         if 'Ts' in self.state:
             c_sfc = self.Ts.domain.heat_capacity
-            self.pnew = np.append(patm, const.ps)
+            #self.pnew = np.append(patm, const.ps)
+            #  surface pressure should correspond to model domain!
+            ps = self.lev_bounds[-1]
+            self.pnew = np.append(patm, ps)
             self.cnew = np.append(c_atm, c_sfc)
         else:
             self.pnew = patm
@@ -101,6 +104,9 @@ def convective_adjustment_direct(p, T, c, lapserate=6.5):
     #lapserate = lapserate * np.ones(T.shape)  # same dimensions as T
     alpha = const.Rd / const.g * lapserate / 1.E3 # same dimensions as lapserate
     L = p.size
+    #  Here const.ps = 1000 hPa is just used as a reference pressure
+    #  to compute potential temperature, so is valid even for different
+    #  surface pressures
     Pi = (p[:]/const.ps)**alpha  # will need to modify to allow variable lapse rates
     beta = 1./Pi
     theta = T * beta
@@ -261,6 +267,6 @@ def Akamaev_adjustment(theta, q, beta, n_k, theta_k, s_k, t_k):
 try:
     from numba import jit
     Akamaev_adjustment = jit(signature_or_function=Akamaev_adjustment)
-    #print 'Compiling Akamaev_adjustment() with numba.'
+    print 'Compiling Akamaev_adjustment() with numba.'
 except:
     pass
