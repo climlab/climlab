@@ -13,6 +13,8 @@ class SurfaceFlux(EnergyBudget):
         self.add_input(newinput)
         #  fixed wind speed (for now)
         self.U = 5. * np.ones_like(self.Ts)
+        #  retrieving surface pressure from model grid
+        self.ps = self.lev_bounds[-1]
 
     def _compute_heating_rates(self):
         '''Compute energy flux convergences to get heating rates in :math:`W/m^2`.'''
@@ -21,6 +23,8 @@ class SurfaceFlux(EnergyBudget):
         # Modify only the lowest model level
         self.heating_rate['Tatm'][..., -1, np.newaxis] = self._flux
 
+    def _air_density(self, Ta):
+        return self.ps * const.mb_to_Pa / const.Rd / Ta
 
 class SensibleHeatFlux(SurfaceFlux):
     def __init__(self, Cd=3E-3, **kwargs):
@@ -33,10 +37,7 @@ class SensibleHeatFlux(SurfaceFlux):
         Ta = self.Tatm[..., -1, np.newaxis]
         Ts = self.Ts
         DeltaT = Ts - Ta
-        #  retrieving surface pressure from model grid
-        ps = self.lev_bounds[-1] * const.mb_to_Pa
-        #  air density
-        rho = ps / const.Rd / Ta
+        rho = self._air_density(Ta)
         #  flux from bulk formula
         self._flux = const.cp * rho * self.Cd * self.U * DeltaT
         self.SHF = self._flux
@@ -52,10 +53,9 @@ class LatentHeatFlux(SurfaceFlux):
         #  assumes pressure is the last axis
         q = self.q[..., -1, np.newaxis]
         Ta = self.Tatm[..., -1, np.newaxis]
-        qs = qsat(self.Ts, const.ps)
+        qs = qsat(self.Ts, self.ps)
         Deltaq = qs - q
-        #  air density
-        rho = const.ps * const.mb_to_Pa / const.Rd / Ta
+        rho = self._air_density(Ta)
         #  flux from bulk formula
         self._flux = const.Lhvap * rho * self.Cd * self.U * Deltaq
         self.LHF = self._flux
