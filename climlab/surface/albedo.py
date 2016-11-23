@@ -1,7 +1,7 @@
 import numpy as np
 from climlab.process.diagnostic import DiagnosticProcess
 from climlab.utils.legendre import P2
-from climlab.domain.field import Field
+from climlab.domain.field import Field, global_mean
 
 
 class ConstantAlbedo(DiagnosticProcess):
@@ -223,6 +223,7 @@ class Iceline(DiagnosticProcess):
         super(DiagnosticProcess, self).__init__(**kwargs)
         self.param['Tf'] = Tf
         self.init_diagnostic('icelat')
+        self.init_diagnostic('ice_area')
 
     def find_icelines(self):
         """Finds iceline according to the surface temperature.
@@ -250,6 +251,9 @@ class Iceline(DiagnosticProcess):
         lat_bounds = self.domains['Ts'].axes['lat'].bounds
         self.noice = np.where(Ts >= Tf, True, False)
         self.ice = np.where(Ts < Tf, True, False)
+        #  Ice cover in fractional area
+        self.ice_area = global_mean(self.ice * np.ones_like(self.Ts))
+        #  Express ice cover in terms of ice edge latitudes
         if self.ice.all():
             # 100% ice cover
             self.icelat = np.array([-0., 0.])

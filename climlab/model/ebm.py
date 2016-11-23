@@ -186,6 +186,7 @@ class EBM(EnergyBudget):
         self.init_diagnostic('net_radiation', 0.*self.Ts)
         self.init_diagnostic('albedo', 0.*self.Ts)
         self.init_diagnostic('icelat', None)
+        self.init_diagnostic('ice_area', None)
 
 
     def _compute_heating_rates(self):
@@ -205,6 +206,11 @@ class EBM(EnergyBudget):
             self.icelat = self.subprocess['albedo'].subprocess['iceline'].icelat
         except KeyError, icelat:
             self.icelat = None
+        try:
+            self.ice_area = self.subprocess['albedo'].subprocess['iceline'].ice_area
+        except KeyError, ice_area:
+            self.ice_area = None
+
 
     def global_mean_temperature(self):
         """Convenience method to compute global mean surface temperature.
