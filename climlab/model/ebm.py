@@ -115,8 +115,8 @@ class EBM(EnergyBudget):
                             See also
                             :class:`~climlab.process.time_dependent_process.TimeDependentProcess`.
     :ivar dict diagnostics: is initialized with keys: ``'OLR'``, ``'ASR'``,
-                            ``'net_radiation'``, ``'albedo'`` and ``'icelat'``
-                            through
+                            ``'net_radiation'``, ``'albedo'``, ``'icelat'`` and
+                            ``'ice_area'`` through
                             :func:`~climlab.process.process.Process.init_diagnostic`.
 
     :Example:

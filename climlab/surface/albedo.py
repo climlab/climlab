@@ -213,8 +213,10 @@ class Iceline(DiagnosticProcess):
 
     :ivar dict param:           The parameter dictionary is updated with the
                                 input argument ``'Tf'``.
-    :ivar dict diagnostics:     key ``'icelat'`` initialized
+    :ivar dict diagnostics:     keys ``'icelat'`` and ``'ice_area'`` initialized
     :ivar array icelat:         the subprocess attribute ``self.icelat`` is
+                                created
+    :ivar float ice_area:       the subprocess attribute ``self.ice_area`` is
                                 created
 
 
@@ -241,9 +243,8 @@ class Iceline(DiagnosticProcess):
                                 :math:`T_s < T_f`
         :ivar array icelat:     an array with two elements indicating the
                                 ice-edge latitudes
-        :ivar dict diagnostics: key ``'icelat'`` is updated according to object
-                                attribute ``self.icelat`` during modification
-
+        :ivar float ice_area:   fractional area covered by ice (0 - 1)
+        :ivar dict diagnostics: keys ``'icelat'`` and ``'ice_area'`` are updated
 
         """
         Tf = self.param['Tf']
