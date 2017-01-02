@@ -10,6 +10,20 @@ import os
 from scipy.interpolate import interp1d, interp2d
 
 
+#  New concept: the driver is compiled once at import time
+#  and not attached to individual climlab process instances
+
+extname='_cam3_radiation'
+#  Check to see if an extension object already exists.
+#  Might need to change the name
+#extname = _cam3_interface._modify_extname(extname)
+KM = 30
+JM = 1
+IM = 1
+_cam3_interface._build_extension(KM=KM, JM=JM, IM=IM, extname=extname)
+extension = _cam3_interface._init_extension(extname=extname)
+
+
 class CAM3Radiation(Radiation):
     '''
     climlab wrapper for the CAM3 radiation code.
@@ -68,7 +82,6 @@ class CAM3Radiation(Radiation):
                  aldif=0.07,
                  O3init = False,
                  O3file = 'apeozone_cam3_5_54.nc',
-                 extname='_cam3_radiation',
                  **kwargs):
         super(CAM3Radiation, self).__init__(**kwargs)
         newinput = ['q',
@@ -188,13 +201,6 @@ class CAM3Radiation(Radiation):
                     print 'Interpolation of ozone data failed.'
                     print 'Reverting to default O3.'
 
-        #  Check to see if an extension object already exists.
-        #  Might need to change the name
-        extname = _cam3_interface._modify_extname(extname)
-        _cam3_interface._build_extension(KM=self.KM, JM=self.JM, IM=self.IM,
-            extname=extname)
-        _cam3_interface._init_extension(module=self, extname=extname)
-
     def _climlab_to_cam3(self, field):
         '''Prepare field wit proper dimension order.
         CAM3 code expects 3D arrays with (KM, JM, 1)
@@ -241,7 +247,8 @@ class CAM3Radiation(Radiation):
                 args.append(value)
             else:
                 args.append(self._climlab_to_cam3(value))
-        OutputValues = self.extension.driver(*args)
+        #  new concept -- extension is NOT an attribute of the climlab process
+        OutputValues = extension.driver(*args)
         Output = dict( zip(_cam3_interface.FromExtension, OutputValues ))
         self.Output = Output
         #for name, value in Output.iteritems():

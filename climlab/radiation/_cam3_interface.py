@@ -170,7 +170,7 @@ def _patch_extension_rpath(extname, verbose=False):
     if verbose:
         print 'rpath patch successful'
 
-def _init_extension(module, extname='_cam3_radiation'):
+def _init_extension(extname='_cam3_radiation'):
     #  Import the extension module using the supplied name
     _cam3_radiation = importlib.import_module(extname)
     # Initialise abs/ems.
@@ -186,4 +186,4 @@ def _init_extension(module, extname='_cam3_radiation'):
     #  Populate storage arrays with values from netcdf file
     for field in ['ah2onw', 'eh2onw', 'ah2ow', 'ln_ah2ow', 'cn_ah2ow', 'ln_eh2ow', 'cn_eh2ow']:
         setattr(mod, field, data.variables[field][:].T)
-    module.extension = _cam3_radiation
+    return _cam3_radiation
