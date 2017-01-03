@@ -42,3 +42,30 @@ call radsw_init(gravit)
 call radlw_init(gravit, stebol)
 call radae_init(gravit, epsilo, stebol, pstd, mwdry, mwco2, mwo3)
 ```
+
+But the first two of these are just doing some trivial setting of constants
+
+Anyway the main calls that actually invoke the radiative transfer calculation are
+`call radcswmx` and `call radclwmx`.
+
+Need to reorganize the code so that these calls are essentially free-standing
+and don't rely on any global module data.
+
+### Details of what is used in LW code
+
+So the subroutine `radclwmx` uses the following external modules
+(including my earlier reorganization of `radae` and creation of `absems`):
+```
+use absems,    only: abstot_3d, absnxt_3d, emstot_3d, ntoplw
+use radae,     only: nbands, radems, radabs, radtpl, radoz2, trcpth
+use volcrad,   only: aer_pth, aer_trn, bnd_nbr_LW
+#if ( defined SCAM )
+use history,       only: outfld
+#endif
+use quicksort, only: quick_sort
+```
+(the history stuff is not used)
+
+Basically I need to rewrite all subroutines to accept grid dimensions (pcols, pver, pverp)
+as input arguments rather than using the ppgrid module. Yes? That should be straightforward.
+There will be more work to do to figure out storage of abs/ems data.
