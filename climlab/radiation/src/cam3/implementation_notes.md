@@ -69,3 +69,12 @@ use quicksort, only: quick_sort
 Basically I need to rewrite all subroutines to accept grid dimensions (pcols, pver, pverp)
 as input arguments rather than using the ppgrid module. Yes? That should be straightforward.
 There will be more work to do to figure out storage of abs/ems data.
+
+... This is done now!
+
+### Still to do:
+
+- Rationalize physical constants and basic thermo (saturation)
+- Radiation code should be using same constants as the rest of climlab
+- Get rid of vestigal parallelism in the CAM3 code. It's just cruft.
+- If ever we implement parallelism in CLIMLAB it will be operating at a higher abstraction level
