@@ -125,7 +125,7 @@ subroutine driver(  &
      integer pverp      ! pver + 1
      parameter (pcols  = 1)
 
-!  climlab -- set grid dimensions
+!  CLIMLAB -- set grid dimensions
   pver = km
   pverp = pver + 1
 
@@ -196,10 +196,6 @@ subroutine driver(  &
   !tdot = tdot * 86400.
 
 end subroutine driver
-
-
-
-
 
 
 !integer function get_nlev()

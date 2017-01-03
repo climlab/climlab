@@ -51,26 +51,44 @@ Anyway the main calls that actually invoke the radiative transfer calculation ar
 Need to reorganize the code so that these calls are essentially free-standing
 and don't rely on any global module data.
 
-### Details of what is used in LW code
-
-So the subroutine `radclwmx` uses the following external modules
-(including my earlier reorganization of `radae` and creation of `absems`):
-```
-use absems,    only: abstot_3d, absnxt_3d, emstot_3d, ntoplw
-use radae,     only: nbands, radems, radabs, radtpl, radoz2, trcpth
-use volcrad,   only: aer_pth, aer_trn, bnd_nbr_LW
-#if ( defined SCAM )
-use history,       only: outfld
-#endif
-use quicksort, only: quick_sort
-```
-(the history stuff is not used)
+### Removing dependence on ppgrid.F90 module
 
 Basically I need to rewrite all subroutines to accept grid dimensions (pcols, pver, pverp)
 as input arguments rather than using the ppgrid module. Yes? That should be straightforward.
 There will be more work to do to figure out storage of abs/ems data.
 
-... This is done now!
+... This is done now! Builds and runs -- but for now it *only* works with 30 levels
+
+### Identifying and removing *all* state and size-dependent data storage
+
+- When the module is initialized, the abs / ems data must be read from netcdf file
+- This is universal and independent of grid dimensions
+- In fortran code this info is stored in arrays:
+  - `ah2onw`, `eh2onw`, `ah2ow`, `ln_ah2ow`, `cn_ah2ow`, `ln_eh2ow`, `cn_eh2ow`
+  - Currently these are defined in `absems.F90` as module global data
+- This data is used on the model grid through arrays
+```
+real(r8), public, allocatable, target :: abstot_3d(:,:,:,:) ! Non-adjacent layer absorptivites
+real(r8), public, allocatable, target :: absnxt_3d(:,:,:,:) ! Nearest layer absorptivities
+real(r8), public, allocatable, target :: emstot_3d(:,:,:)   ! Total emissivity
+```
+also currently defined in `absems.F90` as module global data
+- Where and when do these values get set?
+  - A pointer to emstot_3d is passed to `radems` inside `subroutine radclwmx`
+  - Values are set in this subroutine (in `radae.F90`) using the abs/ems data in arrays `ah2onw`, etc.
+  - Similarly...  pointers to abstot_3d and absnxt_3d are passed to `radabs` inside `subroutine radclwmx`
+  - It is here that the data `ah2onw` etc are used.
+- So basically the code in `radae.F90` wants to be a free-standing module that computes absorptivities and emissivity for a particular grid and model state.
+- This is the part that needs the data in the netCDF file.
+- Currently we have the data being read in and the `ah2onw` etc. arrays populated at import time. That's good.
+- What we need to do is make the `abstot_3d` etc. arrays local and not global module arrays.
+- Why not declare them in the driver?
+- Actually these arrays are *only* used within the LW code in `subroutine radclwmx`
+- So it makes sense to define them locally in that subroutine
+(could be a performance penalty but whatever)
+
+... This is now done! Compiles are runs with arbirary levels! And I can freely copy and have multiple instances on different grids and it seems to work!
+
 
 ### Still to do:
 

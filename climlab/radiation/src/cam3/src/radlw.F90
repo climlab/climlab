@@ -67,8 +67,8 @@ subroutine radclwmx(pcols, pver, pverp,                           &
 !!++CliMT  BRIAN  moved some array declarations to absems.F90
 !   use radae,     only: nbands, radems, radabs, radtpl, abstot_3d, &
 !                        absnxt_3d, emstot_3d, ntoplw, radoz2, trcpth
-   use absems,    only: abstot_3d, absnxt_3d, emstot_3d, ntoplw
-   use radae,     only: nbands, radems, radabs, radtpl, radoz2, trcpth
+   !use absems,    only: abstot_3d, absnxt_3d, emstot_3d, ntoplw
+   use radae,     only: nbands, radems, radabs, radtpl, ntoplw, radoz2, trcpth
 !!++CliMT
    use volcrad,   only: aer_pth, aer_trn, bnd_nbr_LW
 #if ( defined SCAM )
@@ -256,10 +256,23 @@ subroutine radclwmx(pcols, pver, pverp,                           &
    real(r8) uptype(pcols,pverp)  ! p-type continuum path length
    real(r8) abplnk1(14,pcols,pverp)  ! non-nearest layer Plack factor
    real(r8) abplnk2(14,pcols,pverp)  ! nearest layer factor
-!
-!
-!-----------------------------------------------------------------------
-!
+
+! CLIMLAB: try declaring the storage for absorptivities / emissivity here
+!  This should reproduce the declarations in radae.F90
+!  along with the allocation to the appropriate size
+   real(r8), target :: abstot_3d(pcols,ntoplw:pverp,ntoplw:pverp,1)  ! Non-adjacent layer absorptivites
+   real(r8), target :: absnxt_3d(pcols,pver,4,1) ! Nearest layer absorptivities
+   real(r8), target :: emstot_3d(pcols,pverp,1)   ! Total emissivity
+   !
+   !
+   !-----------------------------------------------------------------------
+   !
+
+   ! CLIMLAB:  initalize rad buffers
+   abstot_3d(:,:,:,:) = 0.
+   absnxt_3d(:,:,:,:) = 0.
+   emstot_3d(:,:,:) = 0.
+
 ! CLIMLAB: pverp2, pver3, pver4 are now local vars and need to be set
    pverp2 = pver + 2
    pverp3 = pver + 3

@@ -44,7 +44,9 @@ module radae
 ! PUBLIC:: By default data and interfaces are private
 !-----------------------------------------------------------------------------
   private
-  public radabs, radems, radtpl, radae_init, initialize_radbuffer, radoz2, trcpth
+  !public radabs, radems, radtpl, radae_init, initialize_radbuffer, radoz2, trcpth
+  ! CLIMLAB: removed subroutine initialize_radbuffer
+  public radabs, radems, radtpl, radae_init, radoz2, trcpth
 
   integer, public, parameter :: nbands = 2          ! Number of spectral bands
 !
@@ -56,6 +58,8 @@ module radae
   ! real(r8), public, allocatable, target :: emstot_3d(:,:,:)   ! Total emissivity
   ! integer,  public :: ntoplw    !top level to solve for longwave cooling
 !+++CliMT
+!  CLIMLAB: hard-code ntoplw to 1
+  integer, public, parameter :: ntoplw = 1
 !-----------------------------------------------------------------------------
 ! PRIVATE:: The rest of the data is private to this module.
 !-----------------------------------------------------------------------------

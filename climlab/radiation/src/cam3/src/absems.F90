@@ -9,10 +9,10 @@ module absems
 
     implicit none
     !  reproducing what's in radae.F90
-    real(r8), public, allocatable, target :: abstot_3d(:,:,:,:) ! Non-adjacent layer absorptivites
-    real(r8), public, allocatable, target :: absnxt_3d(:,:,:,:) ! Nearest layer absorptivities
-    real(r8), public, allocatable, target :: emstot_3d(:,:,:)   ! Total emissivity
-    integer,  public :: ntoplw    !top level to solve for longwave cooling
+    !real(r8), public, allocatable, target :: abstot_3d(:,:,:,:) ! Non-adjacent layer absorptivites
+    !real(r8), public, allocatable, target :: absnxt_3d(:,:,:,:) ! Nearest layer absorptivities
+    !real(r8), public, allocatable, target :: emstot_3d(:,:,:)   ! Total emissivity
+    !integer,  public :: ntoplw    !top level to solve for longwave cooling
 
     integer, parameter :: n_u = 25   ! Number of U in abs/emis tables
     integer, parameter :: n_p = 10   ! Number of P in abs/emis tables
@@ -30,37 +30,37 @@ module absems
 
     save
 
-    contains
-
-    subroutine initialize_radbuffer(pcols, pver, pverp)
+    ! contains
     !
-    ! Initialize radiation buffer data
+    ! subroutine initialize_radbuffer(pcols, pver, pverp)
+    ! !
+    ! ! Initialize radiation buffer data
+    ! !
+    ! !  CLIMLAB now passing grid dimensions as input
+    !    integer, intent(in) ::   pcols
+    !    integer, intent(in) ::   pver
+    !    integer, intent(in) ::   pverp
+    ! !
+    ! !!++CliMT:  BRIAN moving this from radae.F90 to absems.F90
+    !   ntoplw = 1
+    ! !!++CliMT: NOTE: buffers allocated at first instantiation, no allocation needed
+    ! !                in successive instatiations
+    !   if (.not. allocated(abstot_3d)) then
+    !      allocate (abstot_3d(pcols,ntoplw:pverp,ntoplw:pverp,1))
+    !      allocate (absnxt_3d(pcols,pver,4,1))
+    !      allocate (emstot_3d(pcols,pverp,1))
+    !   endif
+    ! !!--CliMT
     !
-    !  CLIMLAB now passing grid dimensions as input
-       integer, intent(in) ::   pcols
-       integer, intent(in) ::   pver
-       integer, intent(in) ::   pverp
-    !
-    !!++CliMT:  BRIAN moving this from radae.F90 to absems.F90
-      ntoplw = 1
-    !!++CliMT: NOTE: buffers allocated at first instantiation, no allocation needed
-    !                in successive instatiations
-      if (.not. allocated(abstot_3d)) then
-         allocate (abstot_3d(pcols,ntoplw:pverp,ntoplw:pverp,1))
-         allocate (absnxt_3d(pcols,pver,4,1))
-         allocate (emstot_3d(pcols,pverp,1))
-      endif
-    !!--CliMT
-
-    !++CliMT inf/nan disabled
-    !+++rca   abstot_3d(:,:,:,:) = inf
-    !+++rca   absnxt_3d(:,:,:,:) = inf
-    !+++rca   emstot_3d(:,:,:) = inf
-      abstot_3d(:,:,:,:) = 0.
-      absnxt_3d(:,:,:,:) = 0.
-      emstot_3d(:,:,:) = 0.
-    !---CliMT
-      return
-    end subroutine initialize_radbuffer
+    ! !++CliMT inf/nan disabled
+    ! !+++rca   abstot_3d(:,:,:,:) = inf
+    ! !+++rca   absnxt_3d(:,:,:,:) = inf
+    ! !+++rca   emstot_3d(:,:,:) = inf
+    !   abstot_3d(:,:,:,:) = 0.
+    !   absnxt_3d(:,:,:,:) = 0.
+    !   emstot_3d(:,:,:) = 0.
+    ! !---CliMT
+    !   return
+    ! end subroutine initialize_radbuffer
 
 end module absems

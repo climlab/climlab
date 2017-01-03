@@ -184,10 +184,10 @@ def _init_extension(extname='_cam3_radiation'):
     #  initialize storage arrays
     ######  actually don't because we don't know the size yet
     #  temp hack for levels
-    pcols = 1
-    pver = 30
-    pverp = pver+1
-    mod.initialize_radbuffer(pcols, pver, pverp)
+    #pcols = 1
+    #pver = 30
+    #pverp = pver+1
+    #mod.initialize_radbuffer(pcols, pver, pverp)
     #  Populate storage arrays with values from netcdf file
     for field in ['ah2onw', 'eh2onw', 'ah2ow', 'ln_ah2ow', 'cn_ah2ow', 'ln_eh2ow', 'cn_eh2ow']:
         setattr(mod, field, data.variables[field][:].T)
