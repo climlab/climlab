@@ -50,10 +50,12 @@ module radae
 !
 ! Following data needed for restarts and in radclwmx
 !
-   real(r8), public, allocatable, target :: abstot_3d(:,:,:,:) ! Non-adjacent layer absorptivites
-   real(r8), public, allocatable, target :: absnxt_3d(:,:,:,:) ! Nearest layer absorptivities
-   real(r8), public, allocatable, target :: emstot_3d(:,:,:)   ! Total emissivity
-   integer,  public :: ntoplw    !top level to solve for longwave cooling
+!+++CliMT  BRIAN these arrays and dimensions are now defined in module absems
+  ! real(r8), public, allocatable, target :: abstot_3d(:,:,:,:) ! Non-adjacent layer absorptivites
+  ! real(r8), public, allocatable, target :: absnxt_3d(:,:,:,:) ! Nearest layer absorptivities
+  ! real(r8), public, allocatable, target :: emstot_3d(:,:,:)   ! Total emissivity
+  ! integer,  public :: ntoplw    !top level to solve for longwave cooling
+!+++CliMT
 !-----------------------------------------------------------------------------
 ! PRIVATE:: The rest of the data is private to this module.
 !-----------------------------------------------------------------------------
@@ -3013,59 +3015,55 @@ end subroutine radae_init
 
 !====================================================================================
 
- subroutine initialize_radbuffer(pcols, pver, pverp)
- !
- ! Initialize radiation buffer data
- !
- !  CLIMLAB now passing grid dimensions as input
-    integer, intent(in) ::   pcols
-    integer, intent(in) ::   pver
-    integer, intent(in) ::   pverp
- !
-
- !!++CliMT
- !+++rca #include <comhyb.h>
- !+++rca
-!+++rca    integer :: k
-!+++rca
-!+++rca ! If the top model level is above ~90 km (0.1 Pa), set the top level to compute
-!+++rca ! longwave cooling to about 80 km (1 Pa)
-!+++rca    if (hypm(1) .lt. 0.1) then
-!+++rca       do k = 1, plev
-!+++rca          if (hypm(k) .lt. 1.) ntoplw  = k
-!+++rca       end do
-!+++rca    else
-!+++rca       ntoplw = 1
-!+++rca    end if
-!+++rca    if (masterproc) then
-!+++rca       write (6,*) 'INITIALIZE_RADBUFFER: ntoplw =',ntoplw, ' pressure:',hypm(ntoplw)
-!+++rca    endif
-!+++rca
-!+++rca
-!+++rca   allocate (abstot_3d(pcols,ntoplw:pverp,ntoplw:pverp,begchunk:endchunk))
-!+++rca   allocate (absnxt_3d(pcols,pver,4,begchunk:endchunk))
-!+++rca   allocate (emstot_3d(pcols,pverp,begchunk:endchunk))
-
-  ntoplw = 1
-!!++CliMT: NOTE: buffers allocated at first instantiation, no allocation needed
-!                in successive instatiations
-  if (.not. allocated(abstot_3d)) then
-     allocate (abstot_3d(pcols,ntoplw:pverp,ntoplw:pverp,1))
-     allocate (absnxt_3d(pcols,pver,4,1))
-     allocate (emstot_3d(pcols,pverp,1))
-  endif
-!!--CliMT
-
-!++CliMT inf/nan disabled
-!+++rca   abstot_3d(:,:,:,:) = inf
-!+++rca   absnxt_3d(:,:,:,:) = inf
-!+++rca   emstot_3d(:,:,:) = inf
-  abstot_3d(:,:,:,:) = 0.
-  absnxt_3d(:,:,:,:) = 0.
-  emstot_3d(:,:,:) = 0.
-!---CliMT
-  return
-end subroutine initialize_radbuffer
+!!++CliMT  BRIAN  moved this whole subroutine to absems.F90
+! subroutine initialize_radbuffer
+! !
+! ! Initialize radiation buffer data
+! !
+!
+! !!++CliMT
+! !+++rca #include <comhyb.h>
+! !+++rca
+! !+++rca    integer :: k
+! !+++rca
+! !+++rca ! If the top model level is above ~90 km (0.1 Pa), set the top level to compute
+! !+++rca ! longwave cooling to about 80 km (1 Pa)
+! !+++rca    if (hypm(1) .lt. 0.1) then
+! !+++rca       do k = 1, plev
+! !+++rca          if (hypm(k) .lt. 1.) ntoplw  = k
+! !+++rca       end do
+! !+++rca    else
+! !+++rca       ntoplw = 1
+! !+++rca    end if
+! !+++rca    if (masterproc) then
+! !+++rca       write (6,*) 'INITIALIZE_RADBUFFER: ntoplw =',ntoplw, ' pressure:',hypm(ntoplw)
+! !+++rca    endif
+! !+++rca
+! !+++rca
+! !+++rca   allocate (abstot_3d(pcols,ntoplw:pverp,ntoplw:pverp,begchunk:endchunk))
+! !+++rca   allocate (absnxt_3d(pcols,pver,4,begchunk:endchunk))
+! !+++rca   allocate (emstot_3d(pcols,pverp,begchunk:endchunk))
+!
+!   ntoplw = 1
+! !!++CliMT: NOTE: buffers allocated at first instantiation, no allocation needed
+! !                in successive instatiations
+!   if (.not. allocated(abstot_3d)) then
+!      allocate (abstot_3d(pcols,ntoplw:pverp,ntoplw:pverp,1))
+!      allocate (absnxt_3d(pcols,pver,4,1))
+!      allocate (emstot_3d(pcols,pverp,1))
+!   endif
+! !!--CliMT
+!
+! !++CliMT inf/nan disabled
+! !+++rca   abstot_3d(:,:,:,:) = inf
+! !+++rca   absnxt_3d(:,:,:,:) = inf
+! !+++rca   emstot_3d(:,:,:) = inf
+!   abstot_3d(:,:,:,:) = 0.
+!   absnxt_3d(:,:,:,:) = 0.
+!   emstot_3d(:,:,:) = 0.
+! !---CliMT
+!   return
+! end subroutine initialize_radbuffer
 
 !====================================================================================
 

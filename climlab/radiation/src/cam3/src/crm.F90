@@ -372,20 +372,20 @@ subroutine crm(  &
 
 end subroutine crm
 
-!------------------------------------------------------------------------------
-subroutine crm_init_absems(absemsfile)
-! Calls radae_init to initialise abs/ems values from file absemsfile.
-! THIS ROUTINE CALLED ONLY ONCE, WHEN CAM3 RAD IS INSTANTIATED
-
-  use radae,        only: radae_init, initialize_radbuffer
-  character(len=256) absemsfile
-
-  ! allocate buffers
-  call initialize_radbuffer()
-
-
-  ! pass dummy values of variable other than absemsfile
-  ! (these are initialised in the main crm call)
-  call radae_init(1., 1., 1., 1., 1., 1., 1., absemsfile)
-
-end subroutine crm_init_absems
+! !------------------------------------------------------------------------------
+! subroutine crm_init_absems(absemsfile)
+! ! Calls radae_init to initialise abs/ems values from file absemsfile.
+! ! THIS ROUTINE CALLED ONLY ONCE, WHEN CAM3 RAD IS INSTANTIATED
+!
+!   use radae,        only: radae_init, initialize_radbuffer
+!   character(len=256) absemsfile
+!
+!   ! allocate buffers
+!   call initialize_radbuffer()
+!
+!
+!   ! pass dummy values of variable other than absemsfile
+!   ! (these are initialised in the main crm call)
+!   call radae_init(1., 1., 1., 1., 1., 1., 1., absemsfile)
+!
+! end subroutine crm_init_absems

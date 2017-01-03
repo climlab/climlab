@@ -136,7 +136,9 @@ subroutine radclwmx(pcols, pver, pverp,                           &
 !---------------------------Local variables-----------------------------
 !
 ! CLIMLAB: declare pverp2, pver3, pver4 here as local vars
-   integer,  parameter :: pverp2=pver+2, pverp3=pver+3, pverp4=pver+4
+   integer pverp2
+   integer pverp3
+   integer pverp4
 !
    integer i                 ! Longitude index
    integer ilon              ! Longitude index
@@ -258,6 +260,10 @@ subroutine radclwmx(pcols, pver, pverp,                           &
 !
 !-----------------------------------------------------------------------
 !
+! CLIMLAB: pverp2, pver3, pver4 are now local vars and need to be set
+   pverp2 = pver + 2
+   pverp3 = pver + 3
+   pverp4 = pver + 4
 !
 ! Set pointer variables
 !
