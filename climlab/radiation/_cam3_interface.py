@@ -77,7 +77,7 @@ def buildNeeded(src, KM, extname='_cam3_radiation'):
     return rebuild
 
 
-def _build_extension(KM,JM,IM, extname='_cam3_radiation'):
+def _build_extension(KM, extname='_cam3_radiation'):
     #name = 'cam3_radiation'
     name = extname
     #  current working directory
