@@ -8,7 +8,7 @@ module radlw
 !
 !-----------------------------------------------------------------------
 use shr_kind_mod,      only: r8 => shr_kind_r8
-use ppgrid,            only: pcols, pver, pverp
+use ppgrid,            only: pcols, pver, pverp, pverp2, pverp3, pverp4
 use abortutils,        only: endrun
 
 implicit none
@@ -75,7 +75,8 @@ subroutine radclwmx(lchnk   ,ncol    ,doabsems                  , &
 #endif
    use quicksort, only: quick_sort
 
-   integer,  parameter :: pverp2=pver+2, pverp3=pver+3, pverp4=pver+4
+!   integer,  parameter :: pverp2=pver+2, pverp3=pver+3, pverp4=pver+4
+!  climlab -- now declared in ppgrid
    real(r8), parameter :: cldmin = 1.0d-80
 
 !------------------------------Arguments--------------------------------

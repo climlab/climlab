@@ -5,7 +5,7 @@ module absems
 !  So all I/O can be handled by Python-level reading of netcdf files.
 
     use shr_kind_mod, only: r8 => shr_kind_r8
-    use ppgrid, only: pcols, pver, pverp
+    !use ppgrid, only: pcols, pver, pverp
 
     implicit none
     !  reproducing what's in radae.F90
@@ -30,32 +30,32 @@ module absems
 
     save
 
-    contains
-
-    subroutine initialize_radbuffer
+    ! contains
     !
-    ! Initialize radiation buffer data
+    ! subroutine initialize_radbuffer
+    ! !
+    ! ! Initialize radiation buffer data
+    ! !
+    ! !!++CliMT:  BRIAN moving this from radae.F90 to absems.F90
+    !   ntoplw = 1
+    ! !!++CliMT: NOTE: buffers allocated at first instantiation, no allocation needed
+    ! !                in successive instatiations
+    !   if (.not. allocated(abstot_3d)) then
+    !      allocate (abstot_3d(pcols,ntoplw:pverp,ntoplw:pverp,1))
+    !      allocate (absnxt_3d(pcols,pver,4,1))
+    !      allocate (emstot_3d(pcols,pverp,1))
+    !   endif
+    ! !!--CliMT
     !
-    !!++CliMT:  BRIAN moving this from radae.F90 to absems.F90
-      ntoplw = 1
-    !!++CliMT: NOTE: buffers allocated at first instantiation, no allocation needed
-    !                in successive instatiations
-      if (.not. allocated(abstot_3d)) then
-         allocate (abstot_3d(pcols,ntoplw:pverp,ntoplw:pverp,1))
-         allocate (absnxt_3d(pcols,pver,4,1))
-         allocate (emstot_3d(pcols,pverp,1))
-      endif
-    !!--CliMT
-
-    !++CliMT inf/nan disabled
-    !+++rca   abstot_3d(:,:,:,:) = inf
-    !+++rca   absnxt_3d(:,:,:,:) = inf
-    !+++rca   emstot_3d(:,:,:) = inf
-      abstot_3d(:,:,:,:) = 0.
-      absnxt_3d(:,:,:,:) = 0.
-      emstot_3d(:,:,:) = 0.
-    !---CliMT
-      return
-    end subroutine initialize_radbuffer
+    ! !++CliMT inf/nan disabled
+    ! !+++rca   abstot_3d(:,:,:,:) = inf
+    ! !+++rca   absnxt_3d(:,:,:,:) = inf
+    ! !+++rca   emstot_3d(:,:,:) = inf
+    !   abstot_3d(:,:,:,:) = 0.
+    !   absnxt_3d(:,:,:,:) = 0.
+    !   emstot_3d(:,:,:) = 0.
+    ! !---CliMT
+    !   return
+    ! end subroutine initialize_radbuffer
 
 end module absems

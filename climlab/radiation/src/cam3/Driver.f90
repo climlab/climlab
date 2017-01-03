@@ -57,6 +57,9 @@ subroutine driver(  &
      sw_srf, &
      lwup_out, lwdn_out)
 
+!  climlab -- set grid dimension values here in the driver
+  use ppgrid,              only: set_pver
+
 ! Input
   integer, intent(in) :: km,jm,im,idosw,idolw,in_cld
   real*8, intent(in) :: aldif(jm,im)
@@ -112,6 +115,9 @@ subroutine driver(  &
   real*8 lwflx(km+1)
   real*8 lwup(km+1)
   real*8 lwdn(km+1)
+
+!  climlab -- set grid dimensions
+  call set_pver(km)
 
   do i=1,im
      do j=1,jm
@@ -183,11 +189,11 @@ end subroutine driver
 
 
 
-integer function get_nlev()
-
-  integer get_km
-  external get_km
-
-  get_nlev = get_km()
-
-end function get_nlev
+!integer function get_nlev()
+!
+!  integer get_km
+!  external get_km
+!
+!  get_nlev = get_km()
+!
+!end function get_nlev
