@@ -1,4 +1,3 @@
-src/ppgrid.F90
 src/pmgrid.F90
 src/prescribed_aerosols.F90
 src/quicksort.F90

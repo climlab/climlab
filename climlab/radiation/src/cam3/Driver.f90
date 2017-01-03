@@ -58,7 +58,8 @@ subroutine driver(  &
      lwup_out, lwdn_out)
 
 !  climlab -- set grid dimension values here in the driver
-  use ppgrid,              only: set_pver
+!  use ppgrid,              only: set_pver
+!   Don't use ppgrid module, rather define the dimension variables below
 
 ! Input
   integer, intent(in) :: km,jm,im,idosw,idolw,in_cld
@@ -116,12 +117,24 @@ subroutine driver(  &
   real*8 lwup(km+1)
   real*8 lwdn(km+1)
 
+  ! CLIMLAB: take this code from ppgrid.F90
+  ! Grid point resolution parameters
+
+     integer pcols      ! number of columns (max)
+     integer pver       ! number of vertical levels
+     integer pverp      ! pver + 1
+     parameter (pcols  = 1)
+
 !  climlab -- set grid dimensions
-  call set_pver(km)
+  pver = km
+  pverp = pver + 1
 
   do i=1,im
      do j=1,jm
         call crm(  &
+             pcols,  &
+             pver,   &
+             pverp,  &
              aldif(j,i),  &
              aldir(j,i),  &
              asdif(j,i),  &

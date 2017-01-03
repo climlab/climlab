@@ -23,7 +23,7 @@ module radae
 ! $Id: radae.F90,v 1.3 2009/04/15 22:26:01 rca Exp $
 !------------------------------------------------------------------------------
   use shr_kind_mod, only: r8 => shr_kind_r8
-  use ppgrid
+  !use ppgrid
 !+++CliMT inf/nan disabled
 !+++rca  use infnan
 ! climlab ... use only grid info from ppgrid
@@ -212,7 +212,8 @@ module radae
 CONTAINS
 !====================================================================================
 
-subroutine radabs(lchnk   ,ncol    ,             &
+subroutine radabs(pcols, pver, pverp,            &
+   lchnk   ,ncol    ,             &
    pbr    ,pnm     ,co2em    ,co2eml  ,tplnka  , &
    s2c    ,tcg     ,w        ,h2otr   ,plco2   , &
    plh2o  ,co2t    ,tint     ,tlayr   ,plol    , &
@@ -277,6 +278,11 @@ subroutine radabs(lchnk   ,ncol    ,             &
 !------------------------------Arguments--------------------------------
 !
 ! Input arguments
+!
+!  CLIMLAB now passing grid dimensions as input
+   integer, intent(in) ::   pcols
+   integer, intent(in) ::   pver
+   integer, intent(in) ::   pverp
 !
    integer, intent(in) :: lchnk                       ! chunk identifier
    integer, intent(in) :: ncol                        ! number of atmospheric columns
@@ -1156,7 +1162,7 @@ subroutine radabs(lchnk   ,ncol    ,             &
 !
 ! Calculate absorptivity due to trace gases, abstrc
 !
-         call trcab(ncol     ,                            &
+         call trcab(pcols, pver, pverp, ncol     ,        &
             k1      ,k2      ,ucfc11  ,ucfc12  ,un2o0   , &
             un2o1   ,uch4    ,uco211  ,uco212  ,uco213  , &
             uco221  ,uco222  ,uco223  ,bn2o0   ,bn2o1   , &
@@ -1597,7 +1603,7 @@ subroutine radabs(lchnk   ,ncol    ,             &
 !
 ! Calculate trace gas absorptivity for nearest layer, abstrc
 !
-         call trcabn(ncol      ,                            &
+         call trcabn(pcols, pver, pverp, ncol      ,        &
               k2      ,kn      ,ucfc11  ,ucfc12  ,un2o0   , &
               un2o1   ,uch4    ,uco211  ,uco212  ,uco213  , &
               uco221  ,uco222  ,uco223  ,tbar    ,bplnk   , &
@@ -1620,7 +1626,8 @@ end subroutine radabs
 
 !====================================================================================
 
-subroutine radems(lchnk   ,ncol    ,                            &
+subroutine radems(pcols, pver, pverp,                           &
+                  lchnk   ,ncol    ,                            &
                   s2c     ,tcg     ,w       ,tplnke  ,plh2o   , &
                   pnm     ,plco2   ,tint    ,tint4   ,tlayr   , &
                   tlayr4  ,plol    ,plos    ,ucfc11  ,ucfc12  , &
@@ -1683,6 +1690,11 @@ subroutine radems(lchnk   ,ncol    ,                            &
 !------------------------------Arguments--------------------------------
 !
 ! Input arguments
+!
+!  CLIMLAB now passing grid dimensions as input
+   integer, intent(in) ::   pcols
+   integer, intent(in) ::   pver
+   integer, intent(in) ::   pverp
 !
    integer, intent(in) :: lchnk                    ! chunk identifier
    integer, intent(in) :: ncol                     ! number of atmospheric columns
@@ -2022,7 +2034,7 @@ subroutine radems(lchnk   ,ncol    ,                            &
 !
 ! Calculate trace gas Planck functions
 !
-   call trcplk(ncol    ,                                     &
+   call trcplk(pcols, pver, pverp, ncol    ,                 &
                tint    ,tlayr   ,tplnke  ,emplnk  ,abplnk1 , &
                abplnk2 )
 
@@ -2539,7 +2551,7 @@ subroutine radems(lchnk   ,ncol    ,                            &
 !
 !   Calculate trace gas emissivities
 !
-      call trcems(ncol    ,                                     &
+      call trcems(pcols, pver, pverp, ncol    ,                 &
                   k1      ,co2t    ,pnm     ,ucfc11  ,ucfc12  , &
                   un2o0   ,un2o1   ,bn2o0   ,bn2o1   ,uch4    , &
                   bch4    ,uco211  ,uco212  ,uco213  ,uco221  , &
@@ -2560,7 +2572,7 @@ end subroutine radems
 
 !====================================================================================
 
-subroutine radtpl(ncol    ,                                     &
+subroutine radtpl(pcols, pver, pverp, ncol    ,                          &
                   tnm     ,lwupcgs ,qnm     ,pnm     ,plco2   ,plh2o   , &
                   tplnka  ,s2c     ,tcg     ,w       ,tplnke  , &
                   tint    ,tint4   ,tlayr   ,tlayr4  ,pmln    , &
@@ -2578,6 +2590,11 @@ subroutine radtpl(ncol    ,                                     &
 !------------------------------Arguments-----------------------------
 !
 ! Input arguments
+!
+!  CLIMLAB now passing grid dimensions as input
+   integer, intent(in) ::   pcols
+   integer, intent(in) ::   pver
+   integer, intent(in) ::   pverp
 !
    integer, intent(in) :: ncol                  ! number of atmospheric columns
 
@@ -2996,9 +3013,14 @@ end subroutine radae_init
 
 !====================================================================================
 
- subroutine initialize_radbuffer
+ subroutine initialize_radbuffer(pcols, pver, pverp)
  !
  ! Initialize radiation buffer data
+ !
+ !  CLIMLAB now passing grid dimensions as input
+    integer, intent(in) ::   pcols
+    integer, intent(in) ::   pver
+    integer, intent(in) ::   pverp
  !
 
  !!++CliMT
@@ -3047,7 +3069,7 @@ end subroutine initialize_radbuffer
 
 !====================================================================================
 
-subroutine radoz2(ncol, o3, pint, plol, plos)
+subroutine radoz2(pcols, pver, pverp, ncol, o3, pint, plol, plos)
 !-----------------------------------------------------------------------
 !
 ! Purpose:
@@ -3061,6 +3083,11 @@ subroutine radoz2(ncol, o3, pint, plol, plos)
 ! Author: CCM1, CMS Contact J. Kiehl
 !
 !------------------------------Input arguments--------------------------
+!
+!  CLIMLAB now passing grid dimensions as input
+   integer, intent(in) ::   pcols
+   integer, intent(in) ::   pver
+   integer, intent(in) ::   pverp
 !
    integer, intent(in) :: ncol                 ! number of atmospheric columns
 
@@ -3116,7 +3143,7 @@ end subroutine radoz2
 
 !====================================================================================
 
-subroutine trcpth(ncol                                        , &
+subroutine trcpth(pcols, pver, pverp, ncol                    , &
                   tnm     ,pnm     ,cfc11   ,cfc12   ,n2o     , &
                   ch4     ,qnm     ,ucfc11  ,ucfc12  ,un2o0   , &
                   un2o1   ,uch4    ,uco211  ,uco212  ,uco213  , &
@@ -3136,6 +3163,11 @@ subroutine trcpth(ncol                                        , &
 !-----------------------------------------------------------------------
 !
 ! Input arguments
+!
+!  CLIMLAB now passing grid dimensions as input
+   integer, intent(in) ::   pcols
+   integer, intent(in) ::   pver
+   integer, intent(in) ::   pverp
 !
    integer, intent(in) :: ncol                  ! number of atmospheric columns
 
@@ -3385,7 +3417,7 @@ end function psi
 
 !====================================================================================
 
-subroutine trcab(ncol    ,                                     &
+subroutine trcab(pcols, pver, pverp, ncol    ,                 &
                  k1      ,k2      ,ucfc11  ,ucfc12  ,un2o0   , &
                  un2o1   ,uch4    ,uco211  ,uco212  ,uco213  , &
                  uco221  ,uco222  ,uco223  ,bn2o0   ,bn2o1   , &
@@ -3410,6 +3442,11 @@ subroutine trcab(ncol    ,                                     &
 !------------------------------Arguments--------------------------------
 !
 ! Input arguments
+!
+!  CLIMLAB now passing grid dimensions as input
+   integer, intent(in) ::   pcols
+   integer, intent(in) ::   pver
+   integer, intent(in) ::   pverp
 !
    integer, intent(in) :: ncol                     ! number of atmospheric columns
    integer, intent(in) :: k1,k2                    ! level indices
@@ -3665,7 +3702,7 @@ end subroutine trcab
 
 !====================================================================================
 
-subroutine trcabn(ncol    ,                                     &
+subroutine trcabn(pcols, pver, pverp, ncol    ,                 &
                   k2      ,kn      ,ucfc11  ,ucfc12  ,un2o0   , &
                   un2o1   ,uch4    ,uco211  ,uco212  ,uco213  , &
                   uco221  ,uco222  ,uco223  ,tbar    ,bplnk   , &
@@ -3689,6 +3726,11 @@ subroutine trcabn(ncol    ,                                     &
 !------------------------------Arguments--------------------------------
 !
 ! Input arguments
+!
+!  CLIMLAB now passing grid dimensions as input
+   integer, intent(in) ::   pcols
+   integer, intent(in) ::   pver
+   integer, intent(in) ::   pverp
 !
    integer, intent(in) :: ncol                  ! number of atmospheric columns
    integer, intent(in) :: k2                    ! level index
@@ -3949,7 +3991,7 @@ end subroutine trcabn
 
 !====================================================================================
 
-subroutine trcems(ncol    ,                                     &
+subroutine trcems(pcols, pver, pverp, ncol    ,                 &
                   k       ,co2t    ,pnm     ,ucfc11  ,ucfc12  , &
                   un2o0   ,un2o1   ,bn2o0   ,bn2o1   ,uch4    , &
                   bch4    ,uco211  ,uco212  ,uco213  ,uco221  , &
@@ -3973,6 +4015,11 @@ subroutine trcems(ncol    ,                                     &
 !------------------------------Arguments--------------------------------
 !
 ! Input arguments
+!
+!  CLIMLAB now passing grid dimensions as input
+   integer, intent(in) ::   pcols
+   integer, intent(in) ::   pver
+   integer, intent(in) ::   pverp
 !
    integer, intent(in) :: ncol                  ! number of atmospheric columns
 
@@ -4215,7 +4262,7 @@ end subroutine trcems
 
 !====================================================================================
 
-subroutine trcplk(ncol    ,                                     &
+subroutine trcplk(pcols, pver, pverp, ncol    ,                 &
                   tint    ,tlayr   ,tplnke  ,emplnk  ,abplnk1 , &
                   abplnk2 )
 !-----------------------------------------------------------------------
@@ -4232,6 +4279,11 @@ subroutine trcplk(ncol    ,                                     &
 !------------------------------Arguments--------------------------------
 !
 ! Input arguments
+!
+!  CLIMLAB now passing grid dimensions as input
+   integer, intent(in) ::   pcols
+   integer, intent(in) ::   pver
+   integer, intent(in) ::   pverp
 !
    integer, intent(in) :: ncol                 ! number of atmospheric columns
 

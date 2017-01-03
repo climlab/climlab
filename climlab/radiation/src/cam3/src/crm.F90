@@ -21,6 +21,9 @@
 
 ! climlab - try passing vertical levels as input argument and use dynamic arrays
 subroutine crm(  &
+     pcols,  &
+     pver,   &
+     pverp,  &
      aldif,  &
      aldir,  &
      asdif,  &
@@ -68,7 +71,7 @@ subroutine crm(  &
 
 
   use shr_kind_mod,        only: r8 => shr_kind_r8
-  use ppgrid,              only: pcols, pver, pverp
+  !use ppgrid,              only: pcols, pver, pverp
   use prescribed_aerosols, only: naer_all
   use radae,               only: radae_init
   use radsw,               only: radsw_init, radcswmx
@@ -81,6 +84,11 @@ subroutine crm(  &
   implicit none
 
   ! Input
+  !  CLIMLAB now passing grid dimensions as input
+  integer, intent(in) ::   pcols
+  integer, intent(in) ::   pver
+  integer, intent(in) ::   pverp
+  !
   real(r8), intent(in) ::  aldif(pcols)
   real(r8), intent(in) ::  aldir(pcols)
   real(r8), intent(in) ::  asdif(pcols)
@@ -289,9 +297,9 @@ subroutine crm(  &
      endif
   end do
   ! -- compute cloud emissivities
-  call cldems(lchnk, ncol, cicewp+cliqwp, fice, rei, emis)
+  call cldems(pcols, pver, pverp, lchnk, ncol, cicewp+cliqwp, fice, rei, emis)
   ! -- compute cloud overlap quantities
-  call cldovrlap(lchnk, ncol, pint, cldf, nmxrgn, pmxrgn)
+  call cldovrlap(pcols, pver, pverp, lchnk, ncol, pint, cldf, nmxrgn, pmxrgn)
   ! -- compute relative humidity
   call aqsat(t, pmid, esat, qsat, 1, 1, pver, 1, pver)
   rh = q / qsat *                         &
@@ -314,8 +322,9 @@ subroutine crm(  &
 
   ! Compute SW
   if (idosw == 1) then
-     call radcswmx(lchnk   ,ncol    ,                   &
-          pnm     ,pbr     ,q       ,rh      ,o3mmr, &
+     call radcswmx(pcols, pver, pverp,                  &
+          lchnk   ,ncol    ,                            &
+          pnm     ,pbr     ,q       ,rh      ,o3mmr,    &
           aerosol ,cldf    ,cicewp  ,cliqwp  ,rel     , &
           rei     ,eccf    ,coszrs  ,solincgs,solin_out,&
           asdir   ,asdif   ,aldir   ,aldif   ,nmxrgn  , &
@@ -342,7 +351,8 @@ subroutine crm(  &
 
   ! Compute LW
   if (idolw == 1) then
-     call radclwmx(lchnk, ncol, doabsems,     &
+     call radclwmx(pcols, pver, pverp,                  &
+          lchnk, ncol, doabsems,     &
           lwupcgs, t, q, o3mmr, pbr,             &
           pnm, lnpmid, lnpint, n2o, ch4,      &
           cfc11, cfc12, cldf, emis, pmxrgn,    &
