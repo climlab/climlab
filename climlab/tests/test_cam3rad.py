@@ -42,3 +42,14 @@ def test_rce(rcm):
     rcm.step_forward()
     #rcm.integrate_years(5)
     #assert(np.isclose(rcm.Ts, ))
+
+def test_radiative_forcing(rcm):
+    '''Run a single-column radiative-convective model with CAM3 radiation
+    out to equilibrium. Clone the model, double CO2 and measure the instantaneous
+    change in TOA flux. It should be positive net downward flux.'''
+    rcm.integrate_years(5.)
+    assert np.abs(rcm.subprocess['Radiation'].ASR - rcm.subprocess['Radiation'].OLR) < 0.1  # close to energy balance
+    rcm2 = climlab.process_like(rcm)
+    rcm2.subprocess['Radiation'].CO2 *= 2.
+    rcm2.compute_diagnostics()
+    assert (rcm2.subprocess['Radiation'].ASR - rcm2.subprocess['Radiation'].OLR) > 1.  # positive radiative forcing
