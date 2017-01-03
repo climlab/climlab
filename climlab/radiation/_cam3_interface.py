@@ -160,7 +160,6 @@ def _patch_extension_rpath(extname, verbose=False):
         ####   with gcc compilers installed by conda
         ####   see https://github.com/ContinuumIO/anaconda-issues/issues/739#issuecomment-238076905
     patch_rpath = []
-    #patch_rpath.append('install_name_tool -change @rpath/./libgfortran.3.dylib ${CONDA_PREFIX}/lib/libgfortran.3.dylib -change @rpath/./libquadmath.0.dylib ${CONDA_PREFIX}/lib/libquadmath.0.dylib')
     patch_rpath.append('install_name_tool -change @rpath/./libgfortran.3.dylib ${CONDA_PREFIX}/lib/libgfortran.3.dylib')
     patch_rpath.append('-change @rpath/./libquadmath.0.dylib ${CONDA_PREFIX}/lib/libquadmath.0.dylib %s' %extname)
     patch_rpath = string.join(patch_rpath)
