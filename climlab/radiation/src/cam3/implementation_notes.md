@@ -92,6 +92,9 @@ also currently defined in `absems.F90` as module global data
 
 ### Still to do:
 
+- Fix up the build procedure. Get rid to the 'build on demand' approach
+- Move the build script to setup.py
+- Work on cleaning up the code and the wrapper interface. More climlab and less climt.
 - Rationalize physical constants and basic thermo (saturation)
 - Radiation code should be using same constants as the rest of climlab
 - Get rid of vestigal parallelism in the CAM3 code. It's just cruft.
