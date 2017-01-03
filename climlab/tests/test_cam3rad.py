@@ -2,7 +2,7 @@ import numpy as np
 import climlab
 import pytest
 
-num_lev = 20
+num_lev = 30
 alb = 0.25
 
 @pytest.fixture()
@@ -29,10 +29,12 @@ def rcm():
     rcm.q = rcm.subprocess.H2O.q
     return rcm
 
-def test_model_creation(rcm):
-    '''Just make sure we can create a model and have access to the Fortran object.'''
-    assert len(rcm.Tatm)==num_lev
-    assert (rcm.subprocess.Radiation.extension.get_nlev() == num_lev)
+#  This test is not useful anymore,
+#the fortran object is not attached to the Process object
+#def test_model_creation(rcm):
+#    '''Just make sure we can create a model and have access to the Fortran object.'''
+#    assert len(rcm.Tatm)==num_lev
+#    assert (rcm.subprocess.Radiation.extension.get_nlev() == num_lev)
 
 def test_rce(rcm):
     '''Test a single-column radiative-convective model with CAM3 radiation and
