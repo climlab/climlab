@@ -10,7 +10,7 @@ module pkg_cldoptics
 !---------------------------------------------------------------------------------
 
   use shr_kind_mod,  only: r8=>shr_kind_r8
-  use ppgrid,        only: pcols, pver, pverp
+  !use ppgrid,        only: pcols, pver, pverp
 
   private
   public :: cldefr, cldems, cldovrlap, cldclw, reitab, reltab
@@ -18,23 +18,27 @@ module pkg_cldoptics
 contains
 
 !===============================================================================
-  subroutine cldefr(lchnk   ,ncol    , &
+  subroutine cldefr(pcols, pver, pverp, lchnk   ,ncol    , &
        landfrac,t       ,rel     ,rei     ,ps      ,pmid    , landm, icefrac, snowh)
-!----------------------------------------------------------------------- 
-! 
-! Purpose: 
-! Compute cloud water and ice particle size 
-! 
-! Method: 
+!-----------------------------------------------------------------------
+!
+! Purpose:
+! Compute cloud water and ice particle size
+!
+! Method:
 ! use empirical formulas to construct effective radii
-! 
+!
 ! Author: J.T. Kiehl, B. A. Boville, P. Rasch
-! 
+!
 !-----------------------------------------------------------------------
 
     implicit none
 !------------------------------Arguments--------------------------------
 !
+!  CLIMLAB now passing grid dimensions as input
+    integer, intent(in) ::   pcols
+    integer, intent(in) ::   pver
+    integer, intent(in) ::   pverp
 ! Input arguments
 !
     integer, intent(in) :: lchnk                 ! chunk identifier
@@ -56,10 +60,10 @@ contains
 
 !++pjr
 ! following Kiehl
-         call reltab(ncol, t, landfrac, landm, icefrac, rel, snowh)
+         call reltab(pcols, pver, pverp, ncol, t, landfrac, landm, icefrac, rel, snowh)
 
 ! following Kristjansson and Mitchell
-         call reitab(ncol, t, rei)
+         call reitab(pcols, pver, pverp, ncol, t, rei)
 !--pjr
 !
 !
@@ -67,18 +71,19 @@ contains
   end subroutine cldefr
 
 !===============================================================================
-  subroutine cldems(lchnk   ,ncol    ,clwp    ,fice    ,rei     ,emis    )
-!----------------------------------------------------------------------- 
-! 
-! Purpose: 
+  subroutine cldems(pcols, pver, pverp, lchnk   ,ncol    ,clwp    ,fice    , &
+        rei     ,emis    )
+!-----------------------------------------------------------------------
+!
+! Purpose:
 ! Compute cloud emissivity using cloud liquid water path (g/m**2)
-! 
-! Method: 
-! <Describe the algorithm(s) used in the routine.> 
-! <Also include any applicable external references.> 
-! 
+!
+! Method:
+! <Describe the algorithm(s) used in the routine.>
+! <Also include any applicable external references.>
+!
 ! Author: J.T. Kiehl
-! 
+!
 !-----------------------------------------------------------------------
 
     implicit none
@@ -89,6 +94,10 @@ contains
 !
 !------------------------------Arguments--------------------------------
 !
+!  CLIMLAB now passing grid dimensions as input
+    integer, intent(in) ::   pcols
+    integer, intent(in) ::   pver
+    integer, intent(in) ::   pverp
 ! Input arguments
 !
     integer, intent(in) :: lchnk                   ! chunk identifier
@@ -122,27 +131,33 @@ contains
   end subroutine cldems
 
 !===============================================================================
-  subroutine cldovrlap(lchnk   ,ncol    ,pint    ,cld     ,nmxrgn  ,pmxrgn  )
-!----------------------------------------------------------------------- 
-! 
-! Purpose: 
+  subroutine cldovrlap(pcols, pver, pverp, lchnk   ,ncol    ,pint    , &
+       cld     ,nmxrgn  ,pmxrgn  )
+!-----------------------------------------------------------------------
+!
+! Purpose:
 ! Partitions each column into regions with clouds in neighboring layers.
 ! This information is used to implement maximum overlap in these regions
 ! with random overlap between them.
 ! On output,
 !    nmxrgn contains the number of regions in each column
 !    pmxrgn contains the interface pressures for the lower boundaries of
-!           each region! 
-! Method: 
+!           each region!
+! Method:
 
-! 
+!
 ! Author: W. Collins
-! 
+!
 !-----------------------------------------------------------------------
 
     implicit none
 !
 ! Input arguments
+!
+!  CLIMLAB now passing grid dimensions as input
+    integer, intent(in) ::   pcols
+    integer, intent(in) ::   pver
+    integer, intent(in) ::   pverp
 !
     integer, intent(in) :: lchnk                ! chunk identifier
     integer, intent(in) :: ncol                 ! number of atmospheric columns
@@ -199,24 +214,30 @@ contains
   end subroutine cldovrlap
 
 !===============================================================================
-  subroutine cldclw(lchnk   ,ncol    ,zi      ,clwp    ,tpw     ,hl      )
-!----------------------------------------------------------------------- 
-! 
-! Purpose: 
+  subroutine cldclw(pcols, pver, pverp, lchnk   ,ncol    ,zi      , &
+       clwp    ,tpw     ,hl      )
+!-----------------------------------------------------------------------
+!
+! Purpose:
 ! Evaluate cloud liquid water path clwp (g/m**2)
-! 
-! Method: 
-! <Describe the algorithm(s) used in the routine.> 
-! <Also include any applicable external references.> 
-! 
+!
+! Method:
+! <Describe the algorithm(s) used in the routine.>
+! <Also include any applicable external references.>
+!
 ! Author: J.T. Kiehl
-! 
+!
 !-----------------------------------------------------------------------
 
     implicit none
 
 !
 ! Input arguments
+!
+!  CLIMLAB now passing grid dimensions as input
+    integer, intent(in) ::   pcols
+    integer, intent(in) ::   pver
+    integer, intent(in) ::   pverp
 !
     integer, intent(in) :: lchnk                 ! chunk identifier
     integer, intent(in) :: ncol                  ! number of atmospheric columns
@@ -268,23 +289,29 @@ contains
 
 
 !===============================================================================
-  subroutine reltab(ncol, t, landfrac, landm, icefrac, rel, snowh)
-!----------------------------------------------------------------------- 
-! 
-! Purpose: 
+  subroutine reltab(pcols, pver, pverp, ncol, t, landfrac, landm, icefrac, &
+        rel, snowh)
+!-----------------------------------------------------------------------
+!
+! Purpose:
 ! Compute cloud water size
-! 
-! Method: 
+!
+! Method:
 ! analytic formula following the formulation originally developed by J. T. Kiehl
-! 
+!
 ! Author: Phil Rasch
-! 
+!
 !-----------------------------------------------------------------------
     use physconst,          only: tmelt
     implicit none
 !------------------------------Arguments--------------------------------
 !
 ! Input arguments
+!
+!  CLIMLAB now passing grid dimensions as input
+    integer, intent(in) ::   pcols
+    integer, intent(in) ::   pver
+    integer, intent(in) ::   pverp
 !
     integer, intent(in) :: ncol
     real(r8), intent(in) :: landfrac(pcols)      ! Land fraction
@@ -328,9 +355,14 @@ contains
   end subroutine reltab
 
 !===============================================================================
-  subroutine reitab(ncol, t, re)
+  subroutine reitab(pcols, pver, pverp, ncol, t, re)
     !
 
+    !  CLIMLAB now passing grid dimensions as input
+        integer, intent(in) ::   pcols
+        integer, intent(in) ::   pver
+        integer, intent(in) ::   pverp
+    !
     integer, intent(in) :: ncol
     real(r8), intent(out) :: re(pcols,pver)
     real(r8), intent(in) :: t(pcols,pver)
@@ -359,7 +391,7 @@ contains
          93.6658, 98.5739, 103.603, 108.752, 114.025, 119.424, 	&
          124.954, 130.630, 136.457, 142.446, 148.608, 154.956,	&
          161.503, 168.262, 175.248, 182.473, 189.952, 197.699,	&
-         205.728, 214.055, 222.694, 231.661, 240.971, 250.639/	
+         205.728, 214.055, 222.694, 231.661, 240.971, 250.639/
     !
     save retab
     !

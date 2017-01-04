@@ -3,23 +3,24 @@
 
 module pmgrid
 
-!----------------------------------------------------------------------- 
-! 
+!-----------------------------------------------------------------------
+!
 ! Purpose: Parameters and variables related to the dynamics grid
-! 
-! Author: 
-! 
+!
+! Author:
+!
 !-----------------------------------------------------------------------
 
    implicit none
 
-   public 
+   public
 
+! CLIMLAB - not using any of this grid information
    integer, parameter :: plon   = 1                        ! number of longitudes
-   integer, parameter :: plev   = PLEV                     ! number of vertical levels
+!   integer, parameter :: plev   = PLEV                     ! number of vertical levels
    integer, parameter :: plat   = 1                        ! number of latitudes
-   integer, parameter :: plevp  = plev + 1                 ! plev + 1
-   integer, parameter :: plnlv  = plon*plev                ! Length of multilevel field slice
+!   integer, parameter :: plevp  = plev + 1                 ! plev + 1
+!   integer, parameter :: plnlv  = plon*plev                ! Length of multilevel field slice
 !
    integer :: beglat     ! beg. index for latitudes owned by a given proc
    integer :: endlat     ! end. index for latitudes owned by a given proc
@@ -42,4 +43,3 @@ module pmgrid
    parameter (masterproc = .true.)
 #endif
 end module pmgrid
-

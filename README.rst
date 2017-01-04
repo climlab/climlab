@@ -2,7 +2,7 @@
 climlab
 ================
 
-|docs| |DOI| |pypi| |Build Status| |coverage| 
+|docs| |DOI| |pypi| |Build Status| |coverage|
 
 ----------
  Python package for process-oriented climate modeling
@@ -32,6 +32,23 @@ Installation
 
 ``python setup.py develop``
 
+This will trigger the build process for the Fortran components.
+
+Dependencies
+-----------------
+Required
+~~~~~~~~~~~~
+- Python 2.7
+- numpy
+- scipy
+
+Recommended for full functionality
+~~~~~~~~~~~~
+- a Fortran compiler (tested with both gcc/gfortran and ifort)
+- netCDF4 Python package (for data i/o)
+- numba Python package (used for acceleration of some components)
+
+Anaconda Python is highly recommended and will provide everything you need.
 
 About climlab
 --------------
@@ -44,17 +61,6 @@ physical, turbulent, convective, chemical, etc.) can be simulated as a stand-alo
 process model given appropriate input, or as a sub-process of a more complex model.
 New classes of model can easily be defined and run interactively by putting together an
 appropriate collection of sub-processes.
-
-Most of the actual computation for simpler model components use vectorized
-``numpy`` array functions. It should run out-of-the-box on a standard scientific
-Python distribution, such as ``Anaconda`` or ``Enthought Canopy``.
-
-New in version 0.3, ``climlab`` now includes Python wrappers for more
-numerically intensive processes implemented in Fortran code (specifically the
-CAM3 radiation module). These require a Fortran compiler on your system,
-but otherwise have no other library dependencies.  ``climlab`` uses a compile-on-demand
-strategy. The compiler is invoked automatically as necessary when a new process
-is created by the user.
 
 Currently, ``climlab`` has out-of-the-box support and documented examples for
 
@@ -69,6 +75,12 @@ Currently, ``climlab`` has out-of-the-box support and documented examples for
 - orbital / insolation calculations
 - boundary layer sensible and latent heat fluxes
 
+
+Documentation
+------------------
+Full user manual available here_.
+
+.. _here: http://climlab.readthedocs.io
 
 Example usage
 ------------------
@@ -98,6 +110,9 @@ http://nbviewer.jupyter.org/github/brian-rose/ClimateModeling_courseware/blob/ma
 Version 0.3 was released in February 2016. It includes many internal changes and
 some backwards-incompatible changes (hopefully simplifications) to the public API.
 It also includes the CAM3 radiation module.
+
+Version 0.4 was released in October 2016. It includes comprehensive documentation,
+an automated test suite, support for latitude-longitude grids, and numerous small enhancements and bug fixes.
 
 The documentation_ was first created by Moritz Kreuzer (Potsdam Institut for Climate Impact Research) as part of a thesis project in Spring 2016.
 

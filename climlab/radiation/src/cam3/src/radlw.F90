@@ -8,7 +8,7 @@ module radlw
 !
 !-----------------------------------------------------------------------
 use shr_kind_mod,      only: r8 => shr_kind_r8
-use ppgrid,            only: pcols, pver, pverp
+!use ppgrid,            only: pcols, pver, pverp, pverp2, pverp3, pverp4
 use abortutils,        only: endrun
 
 implicit none
@@ -31,7 +31,8 @@ real(r8) :: stebol_cgs     ! Stefan-Boltzmann constant (CGS)
 CONTAINS
 !===============================================================================
 
-subroutine radclwmx(lchnk   ,ncol    ,doabsems                  , &
+subroutine radclwmx(pcols, pver, pverp,                           &
+                    lchnk   ,ncol    ,doabsems                  , &
                     lwupcgs ,tnm     ,qnm     ,o3      , &
                     pmid    ,pint    ,pmln    ,piln    ,          &
                              n2o     ,ch4     ,cfc11   ,cfc12   , &
@@ -63,24 +64,29 @@ subroutine radclwmx(lchnk   ,ncol    ,doabsems                  , &
 ! Author: B. Collins
 !
 !-----------------------------------------------------------------------
-!!++CliMT  BRIAN  moved some array declarations to absems.F90
+!!  CLIMLAB  moved some array declaration from radae to this module
 !   use radae,     only: nbands, radems, radabs, radtpl, abstot_3d, &
 !                        absnxt_3d, emstot_3d, ntoplw, radoz2, trcpth
-   use absems,    only: abstot_3d, absnxt_3d, emstot_3d, ntoplw
-   use radae,     only: nbands, radems, radabs, radtpl, radoz2, trcpth
-!!++CliMT
+   use radae,     only: nbands, radems, radabs, radtpl, ntoplw, radoz2, trcpth
+!  CLIMLAB
    use volcrad,   only: aer_pth, aer_trn, bnd_nbr_LW
 #if ( defined SCAM )
    use history,       only: outfld
 #endif
    use quicksort, only: quick_sort
 
-   integer,  parameter :: pverp2=pver+2, pverp3=pver+3, pverp4=pver+4
+!   integer,  parameter :: pverp2=pver+2, pverp3=pver+3, pverp4=pver+4
+!  CLIMLAB -- pver now passed as input argument, declare later as local vars
    real(r8), parameter :: cldmin = 1.0d-80
 
 !------------------------------Arguments--------------------------------
 !
 ! Input arguments
+!
+!  CLIMLAB now passing grid dimensions as input
+   integer, intent(in) ::   pcols
+   integer, intent(in) ::   pver
+   integer, intent(in) ::   pverp
 !
    integer, intent(in) :: lchnk                 ! chunk identifier
    integer, intent(in) :: ncol                  ! number of atmospheric columns
@@ -127,6 +133,11 @@ subroutine radclwmx(lchnk   ,ncol    ,doabsems                  , &
    real(r8),intent(out)  :: fnl(pcols,pverp)     ! net flux at interfaces
 !
 !---------------------------Local variables-----------------------------
+!
+! CLIMLAB: declare pverp2, pver3, pver4 here as local vars
+   integer pverp2
+   integer pverp3
+   integer pverp4
 !
    integer i                 ! Longitude index
    integer ilon              ! Longitude index
@@ -244,10 +255,27 @@ subroutine radclwmx(lchnk   ,ncol    ,doabsems                  , &
    real(r8) uptype(pcols,pverp)  ! p-type continuum path length
    real(r8) abplnk1(14,pcols,pverp)  ! non-nearest layer Plack factor
    real(r8) abplnk2(14,pcols,pverp)  ! nearest layer factor
-!
-!
-!-----------------------------------------------------------------------
-!
+
+! CLIMLAB: try declaring the storage for absorptivities / emissivity here
+!  This should reproduce the declarations in radae.F90
+!  along with the allocation to the appropriate size
+   real(r8), target :: abstot_3d(pcols,ntoplw:pverp,ntoplw:pverp,1)  ! Non-adjacent layer absorptivites
+   real(r8), target :: absnxt_3d(pcols,pver,4,1) ! Nearest layer absorptivities
+   real(r8), target :: emstot_3d(pcols,pverp,1)   ! Total emissivity
+   !
+   !
+   !-----------------------------------------------------------------------
+   !
+
+   ! CLIMLAB:  initalize rad buffers
+   abstot_3d(:,:,:,:) = 0.
+   absnxt_3d(:,:,:,:) = 0.
+   emstot_3d(:,:,:) = 0.
+
+! CLIMLAB: pverp2, pver3, pver4 are now local vars and need to be set
+   pverp2 = pver + 2
+   pverp3 = pver + 3
+   pverp4 = pver + 4
 !
 ! Set pointer variables
 !
@@ -257,7 +285,7 @@ subroutine radclwmx(lchnk   ,ncol    ,doabsems                  , &
 !
 ! accumulate mass path from top of atmosphere
 !
-  call aer_pth(aer_mass, aer_mpp, ncol)
+  call aer_pth(pcols, pver, pverp, aer_mass, aer_mpp, ncol)
 
 !  print*,'hello',pverp
 !  do i=1,pver
@@ -269,7 +297,7 @@ subroutine radclwmx(lchnk   ,ncol    ,doabsems                  , &
 ! Calculate some temperatures needed to derive absorptivity and
 ! emissivity, as well as some h2o path lengths
 !
-   call radtpl(ncol    ,                                     &
+   call radtpl(pcols, pver, pverp, ncol    ,                          &
                tnm     ,lwupcgs ,qnm     ,pint    ,plco2   ,plh2o   , &
                tplnka  ,s2c     ,tcg     ,w       ,tplnke  , &
                tint    ,tint4   ,tlayr   ,tlayr4  ,pmln    , &
@@ -279,11 +307,11 @@ subroutine radclwmx(lchnk   ,ncol    ,doabsems                  , &
 !
 ! Compute ozone path lengths at frequency of a/e calculation.
 !
-      call radoz2(ncol, o3, pint, plol, plos)
+      call radoz2(pcols, pver, pverp, ncol, o3, pint, plol, plos)
 !
 ! Compute trace gas path lengths
 !
-      call trcpth(ncol                                        , &
+      call trcpth(pcols, pver, pverp, ncol                    , &
                   tnm     ,pint    ,cfc11   ,cfc12   ,n2o     , &
                   ch4     ,qnm     ,ucfc11  ,ucfc12  ,un2o0   , &
                   un2o1   ,uch4    ,uco211  ,uco212  ,uco213  , &
@@ -291,13 +319,13 @@ subroutine radclwmx(lchnk   ,ncol    ,doabsems                  , &
                   bch4    ,uptype  )
 
 !     Compute transmission through STRAER absorption continuum
-      call aer_trn(aer_mpp, aer_trn_ttl)
+      call aer_trn(pcols, pver, pverp, aer_mpp, aer_trn_ttl)
 
 !
 !
 ! Compute total emissivity:
 !
-      call radems(lchnk   ,ncol    ,                            &
+      call radems(pcols, pver, pverp, lchnk   ,ncol    ,        &
                   s2c     ,tcg     ,w       ,tplnke  ,plh2o   , &
                   pint    ,plco2   ,tint    ,tint4   ,tlayr   , &
                   tlayr4  ,plol    ,plos    ,ucfc11  ,ucfc12  , &
@@ -310,7 +338,7 @@ subroutine radclwmx(lchnk   ,ncol    ,doabsems                  , &
 !
 ! Compute total absorptivity:
 !
-      call radabs(lchnk   ,ncol    ,                            &
+      call radabs(pcols, pver, pverp, lchnk   ,ncol    ,        &
                   pmid    ,pint    ,co2em   ,co2eml  ,tplnka  , &
                   s2c     ,tcg     ,w       ,h2otr   ,plco2   , &
                   plh2o   ,co2t    ,tint    ,tlayr   ,plol    , &

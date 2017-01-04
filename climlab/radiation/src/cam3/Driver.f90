@@ -1,10 +1,14 @@
-!  climlab
-!   adapting the CliMT CAM3 driver
+!  CLIMLAB CAM3 radiation driver
+!    Brian Rose
+!
+!   adapting from Rodrigo Caballero's CliMT CAM3 driver
 !  change units of q from g/kg to kg/kg
 !  remove argument dt
 !   remove output Tinc
 !  Change units of outputs qrl, qrs, Tdot from J/kg/day to J/kg/s or W/kg
 !  pass cosine of zenith angle rather than angle itself
+!  Pass grid dimensions as input arguments rather than global variables
+!  set at compile time
 
 subroutine driver(  &
      km,   &
@@ -113,9 +117,24 @@ subroutine driver(  &
   real*8 lwup(km+1)
   real*8 lwdn(km+1)
 
+  ! CLIMLAB: take this code from ppgrid.F90
+  ! Grid point resolution parameters
+
+     integer pcols      ! number of columns (max)
+     integer pver       ! number of vertical levels
+     integer pverp      ! pver + 1
+     parameter (pcols  = 1)
+
+!  CLIMLAB -- set grid dimensions
+  pver = km
+  pverp = pver + 1
+
   do i=1,im
      do j=1,jm
         call crm(  &
+             pcols,  &
+             pver,   &
+             pverp,  &
              aldif(j,i),  &
              aldir(j,i),  &
              asdif(j,i),  &
@@ -177,17 +196,3 @@ subroutine driver(  &
   !tdot = tdot * 86400.
 
 end subroutine driver
-
-
-
-
-
-
-integer function get_nlev()
-
-  integer get_km
-  external get_km
-
-  get_nlev = get_km()
-
-end function get_nlev

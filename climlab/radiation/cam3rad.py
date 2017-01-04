@@ -5,9 +5,36 @@ import numpy as np
 import netCDF4 as nc
 from climlab import constants as const
 from climlab.radiation.radiation import Radiation
-import _cam3_interface
+#import _cam3_interface
 import os
 from scipy.interpolate import interp1d, interp2d
+#  the compiled fortran extension
+import _cam3_radiation
+
+#  New concept: the driver is compiled once at import time
+#  and not attached to individual climlab process instances
+
+ToExtension = ['do_sw','do_lw','p','dp','ps','Tatm','Ts','q','O3','cldf','clwp',
+               'ciwp', 'in_cld','aldif','aldir','asdif','asdir','cosZen',
+               'insolation','flus','r_liq','r_ice','CO2','N2O','CH4','CFC11',
+               'CFC12','g','Cpd','epsilon','stebol']
+
+FromExtension = ['TdotRad','SrfRadFlx','swhr','lwhr','swflx','lwflx','SwToaCf',
+                 'SwSrfCf','LwToaCf','LwSrfCf','LwToa','LwSrf','SwToa','SwSrf',
+                 'lwuflx','lwdflx']
+
+# Initialise absorptivity / emissivity data
+here = os.path.dirname(__file__)
+datadir = os.path.abspath(os.path.join(here, os.pardir, 'data', 'cam3rad'))
+AbsEmsDataFile = os.path.join(datadir, 'abs_ems_factors_fastvx.c030508.nc')
+#  Open the absorption data file
+data = nc.Dataset(AbsEmsDataFile)
+#  The fortran module that holds the data
+mod = _cam3_radiation.absems
+#  Populate storage arrays with values from netcdf file
+for field in ['ah2onw', 'eh2onw', 'ah2ow', 'ln_ah2ow', 'cn_ah2ow', 'ln_eh2ow', 'cn_eh2ow']:
+    setattr(mod, field, data.variables[field][:].T)
+data.close()
 
 
 class CAM3Radiation(Radiation):
@@ -68,7 +95,6 @@ class CAM3Radiation(Radiation):
                  aldif=0.07,
                  O3init = False,
                  O3file = 'apeozone_cam3_5_54.nc',
-                 extname='_cam3_radiation',
                  **kwargs):
         super(CAM3Radiation, self).__init__(**kwargs)
         newinput = ['q',
@@ -188,13 +214,6 @@ class CAM3Radiation(Radiation):
                     print 'Interpolation of ozone data failed.'
                     print 'Reverting to default O3.'
 
-        #  Check to see if an extension object already exists.
-        #  Might need to change the name
-        extname = _cam3_interface._modify_extname(extname)
-        _cam3_interface._build_extension(KM=self.KM, JM=self.JM, IM=self.IM,
-            extname=extname)
-        _cam3_interface._init_extension(module=self, extname=extname)
-
     def _climlab_to_cam3(self, field):
         '''Prepare field wit proper dimension order.
         CAM3 code expects 3D arrays with (KM, JM, 1)
@@ -235,14 +254,15 @@ class CAM3Radiation(Radiation):
         # List of arguments to be passed to extension
         #args = [ getattr(self,key) for key in self.ToExtension ]
         args = []
-        for key in _cam3_interface.ToExtension:
+        for key in ToExtension:
             value = getattr(self, key)
             if np.isscalar(value):
                 args.append(value)
             else:
                 args.append(self._climlab_to_cam3(value))
-        OutputValues = self.extension.driver(*args)
-        Output = dict( zip(_cam3_interface.FromExtension, OutputValues ))
+        #  new concept -- extension is NOT an attribute of the climlab process
+        OutputValues = _cam3_radiation.driver(*args)
+        Output = dict( zip(FromExtension, OutputValues ))
         self.Output = Output
         #for name, value in Output.iteritems():
         #    setattr(self, name, value)
