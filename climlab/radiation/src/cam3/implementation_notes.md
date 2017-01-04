@@ -94,11 +94,10 @@ also currently defined in `absems.F90` as module global data
 
 I have gotten rid of the "build on demand" idea and moved the build scripts to setup.py
 
-Now builds cleanly and passes all tests on my mac.
+Now builds cleanly and passes all tests, both locally and on travisci
 
 ### Still to do:
 
-- Move the build script to setup.py
 - Work on cleaning up the code and the wrapper interface. More climlab and less climt.
 - Rationalize physical constants and basic thermo (saturation)
 - Radiation code should be using same constants as the rest of climlab
