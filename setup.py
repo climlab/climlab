@@ -97,6 +97,9 @@ Extensions = [
     {'name': '_cam3_radiation',
      'srcdir': os.path.join('climlab','radiation','src','cam3'),
      'targetdir': os.path.join('climlab','radiation')},
+    {'name': '_rrtm_radiation_fortran',
+     'srcdir': os.path.join('climlab','radiation','src','rrtm'),
+     'targetdir': os.path.join('climlab','radiation')},
     ]
 
 try:
