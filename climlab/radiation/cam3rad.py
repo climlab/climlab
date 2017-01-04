@@ -17,8 +17,8 @@ extname='_cam3_radiation'
 #  Check to see if an extension object already exists.
 #  Might need to change the name
 #extname = _cam3_interface._modify_extname(extname)
-KM = 30
-_cam3_interface._build_extension(KM=KM, extname=extname)
+#KM = 30
+#_cam3_interface._build_extension(KM=KM, extname=extname)
 extension = _cam3_interface._init_extension(extname=extname)
 
 
