@@ -24,15 +24,15 @@ def read_lw_abs_data(fort):
     and store it in appropriate fortran modules
 
     This code replicates the functionality in
-    `CliMT/src/radiation/rrtm/src/rrtmg_lw/gcm_model/src/rrtmg_lw_read_nc.f90`
+    `rrtmg_lw/gcm_model/src/rrtmg_lw_read_nc.f90`
     but removes dependency on compiled netcdf libraries.
 
     input argument: fortran object _rrtm_radiation_fortran
     '''
-    ClimtDir = os.path.dirname( __file__ )
-    ncfilepath = os.path.join(ClimtDir,'data', 'rrtm', 'rrtmg_lw.nc')
+    thisdir = os.path.dirname( __file__ )
+    ncfilepath = os.path.join(thisdir,'data', 'rrtm', 'rrtmg_lw.nc')
     data = nc.Dataset(ncfilepath)
-    # Following code in `CliMT/src/radiation/rrtm/src/rrtmg_lw/gcm_model/src/rrtmg_lw_read_nc.f90`
+    # Following code in `rrtmg_lw/gcm_model/src/rrtmg_lw_read_nc.f90`
     gPointSetNumber = 1
     numGPoints = 16
     # (actually this number is set in each separately from a constant in
@@ -262,13 +262,13 @@ def read_sw_abs_data(fort):
     and store it in appropriate fortran modules
 
     This code replicates the functionality in
-    `CliMT/src/radiation/rrtm/src/rrtmg_sw/gcm_model/src/rrtmg_sw_read_nc.f90`
+    `rrtmg_sw/gcm_model/src/rrtmg_sw_read_nc.f90`
     but removes dependency on compiled netcdf libraries.
 
     input argument: fortran object _rrtm_radiation_fortran
     '''
-    ClimtDir = os.path.dirname( __file__ )
-    ncfilepath = os.path.join(ClimtDir,'data', 'rrtm', 'rrtmg_sw.nc')
+    thisdir = os.path.dirname( __file__ )
+    ncfilepath = os.path.join(thisdir,'data', 'rrtm', 'rrtmg_sw.nc')
     data = nc.Dataset(ncfilepath)
     gPointSetNumber = 1
     numGPoints = 16
