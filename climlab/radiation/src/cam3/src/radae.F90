@@ -26,16 +26,16 @@ module radae
   !use ppgrid
 !+++CliMT inf/nan disabled
 !+++rca  use infnan
-! climlab ... use only grid info from ppgrid
+! CLIMLAB ... do not use only grid info from pmgrid or ppgrid modules
 !  use pmgrid,       only: masterproc, plev, plevp
   use pmgrid,        only: masterproc
   use chem_surfvals, only: chem_surfvals_get
   use volcrad
   use abortutils, only: endrun
   use prescribed_aerosols, only: strat_volcanic
-!+++CliMT  BRIAN now storing abs/ems data in separate module
+! CLIMLAB now storing abs/ems data in separate module
   use absems
-!+++CliMT
+! CLIMLAB
 
   implicit none
 
@@ -45,19 +45,18 @@ module radae
 !-----------------------------------------------------------------------------
   private
   !public radabs, radems, radtpl, radae_init, initialize_radbuffer, radoz2, trcpth
-  ! CLIMLAB: removed subroutine initialize_radbuffer
+  ! CLIMLAB: removed subroutine initialize_radbuffer, now handled at Python level
   public radabs, radems, radtpl, radae_init, radoz2, trcpth
 
   integer, public, parameter :: nbands = 2          ! Number of spectral bands
 !
 ! Following data needed for restarts and in radclwmx
 !
-!+++CliMT  BRIAN these arrays and dimensions are now defined in module absems
+!  CLIMLAB  these arrays and dimensions are now defined locally in radlw.F90
   ! real(r8), public, allocatable, target :: abstot_3d(:,:,:,:) ! Non-adjacent layer absorptivites
   ! real(r8), public, allocatable, target :: absnxt_3d(:,:,:,:) ! Nearest layer absorptivities
   ! real(r8), public, allocatable, target :: emstot_3d(:,:,:)   ! Total emissivity
   ! integer,  public :: ntoplw    !top level to solve for longwave cooling
-!+++CliMT
 !  CLIMLAB: hard-code ntoplw to 1
   integer, public, parameter :: ntoplw = 1
 !-----------------------------------------------------------------------------
@@ -78,7 +77,7 @@ module radae
   real(r8) :: dpfo3      ! Voigt correction factor for O3
   real(r8) :: dpfco2     ! Voigt correction factor for CO2
 
-!+++CliMT  BRIAN these arrays and dimensions are now defined in module absems
+!  CLIMLAB  these arrays and dimensions are now defined in module absems
   !
   ! integer, parameter :: n_u = 25   ! Number of U in abs/emis tables
   ! integer, parameter :: n_p = 10   ! Number of P in abs/emis tables
@@ -93,7 +92,7 @@ module radae
   ! real(r8):: cn_eh2ow(n_p, n_tp, n_u, n_te, n_rh)    ! continuum transmission for emissivity   (window)
   ! real(r8):: ln_ah2ow(n_p, n_tp, n_u, n_te, n_rh)    ! line-only transmission for absorptivity (window)
   ! real(r8):: ln_eh2ow(n_p, n_tp, n_u, n_te, n_rh)    ! line-only transmission for emissivity   (window)
-!+++CliMT
+!  CLIMLAB
 !
 ! Constant coefficients for water vapor overlap with trace gases.
 ! Reference: Ramanathan, V. and  P.Downey, 1986: A Nonisothermal
@@ -2776,10 +2775,10 @@ subroutine radae_init(gravx, epsilox, stebol, pstdx, mwdryx, mwco2x, mwo3x)
 #ifdef SPMD
    use mpishorthand, only: mpir8, mpicom
 #endif
-!+++CliMT  BRIAN getting rid of netcdf dependence
+!  CLIMLAB no netcdf dependence in fortran code
 !   also removed all references to absemsfile in this subroutine
 !   include 'netcdf.inc'
-!+++CliMT
+!  CLIMLAB
 !
 ! Input variables
 !
@@ -2793,7 +2792,7 @@ subroutine radae_init(gravx, epsilox, stebol, pstdx, mwdryx, mwco2x, mwo3x)
 
 !      Variables for loading absorptivity/emissivity
 !
-   !+++CliMT  BRIAN getting rid of netcdf dependence
+   !  CLIMLAB no netcdf dependence in fortran code
    ! integer ncid_ae                ! NetCDF file id for abs/ems file
    !
    ! integer pdimid                 ! pressure dimension id
@@ -2825,7 +2824,7 @@ subroutine radae_init(gravx, epsilox, stebol, pstdx, mwdryx, mwco2x, mwo3x)
    ! integer ndims                  ! number of dimensions
    ! integer dims(NF_MAX_VAR_DIMS)  ! vector of dimension ids
    ! integer natt                   ! number of attributes
-   !+++CliMT
+   !   CLIMLAB
 !
 ! Variables for setting up H2O table
 !
@@ -2876,7 +2875,7 @@ subroutine radae_init(gravx, epsilox, stebol, pstdx, mwdryx, mwco2x, mwo3x)
    fc1    = 2.6          ! See eq(34) R&D
 
    if ( masterproc ) then
-!!++CliMT  BRIAN  commented out this whole block -- no more calls to netcdf
+!!  CLIMLAB  commented out this whole block -- no more calls to netcdf
 ! !!++CliMT
 ! !      call getfil(absems_data, locfn)
 ! !      call wrap_open(locfn, NF_NOWRITE, ncid_ae)
@@ -2987,7 +2986,7 @@ subroutine radae_init(gravx, epsilox, stebol, pstdx, mwdryx, mwco2x, mwo3x)
 !       call wrap_get_var_realx (ncid_ae, ln_eh2owid, ln_eh2ow)
 !
 !       call wrap_close(ncid_ae)
-!!++CliMT  BRIAN end of commented out block of netcdf calls
+!!  CLIMLAB  end of commented out block of netcdf calls
 
 !
 ! Set up table of H2O saturation vapor pressures for use in calculation
@@ -3019,7 +3018,7 @@ end subroutine radae_init
 
 !====================================================================================
 
-!!++CliMT  BRIAN  moved this whole subroutine to absems.F90
+!!  CLIMLAB   initialization now happens in radlw.F90
 ! subroutine initialize_radbuffer
 ! !
 ! ! Initialize radiation buffer data
@@ -3068,6 +3067,7 @@ end subroutine radae_init
 ! !---CliMT
 !   return
 ! end subroutine initialize_radbuffer
+!!  CLIMLAB  end of commented out subroutine
 
 !====================================================================================
 

@@ -64,12 +64,11 @@ subroutine radclwmx(pcols, pver, pverp,                           &
 ! Author: B. Collins
 !
 !-----------------------------------------------------------------------
-!!++CliMT  BRIAN  moved some array declarations to absems.F90
+!!  CLIMLAB  moved some array declaration from radae to this module
 !   use radae,     only: nbands, radems, radabs, radtpl, abstot_3d, &
 !                        absnxt_3d, emstot_3d, ntoplw, radoz2, trcpth
-   !use absems,    only: abstot_3d, absnxt_3d, emstot_3d, ntoplw
    use radae,     only: nbands, radems, radabs, radtpl, ntoplw, radoz2, trcpth
-!!++CliMT
+!  CLIMLAB
    use volcrad,   only: aer_pth, aer_trn, bnd_nbr_LW
 #if ( defined SCAM )
    use history,       only: outfld
