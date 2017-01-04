@@ -25,13 +25,11 @@ def _build_extension(name=None, srcdir=None, targetdir=None,
         cppflags='', f77flags='', f90flags='', lib='', libdir='', incdir=''):
     #  current working directory
     here = os.getcwd()
-    #  Root directory of climlab code
-    climlab_root = os.path.abspath(os.path.dirname(__file__))
     #  need to change to src dir so f2py sees the .f2py_f2cmap file
     os.chdir(srcdir)
     #  Get list of sources
     src = _get_sources(srcdir)
-
+    print src
     target = '{}.so'.format(name)
     #driver = glob.glob(os.path.join(srcdir,'Driver.f*'))[0]
     f77flags = '"{} {}"'.format(cppflags,f77flags)
@@ -70,7 +68,7 @@ def _build_extension(name=None, srcdir=None, targetdir=None,
     os.remove('{}.pyf'.format(name))
     # Move shared object file to target directory
     print targetdir
-    os.rename(target, os.path.join(climlab_root, targetdir, target))
+    os.rename(target, os.path.join(targetdir, target))
     #  Switch back to original working directory
     os.chdir(here)
 
@@ -92,6 +90,8 @@ def _patch_extension_rpath(name, verbose=False):
 
 ###  Begin climlab install script  ###
 
+#  Root directory of climlab code
+climlab_root = os.path.abspath(os.path.dirname(__file__))
 #  List of all fortran extensions to be compiled
 Extensions = [
     {'name': '_cam3_radiation',
@@ -121,7 +121,9 @@ else:
 
 # Build all extensions
 for ext in Extensions:
-    print ext
+    # relative to absolute path
+    ext['srcdir'] = os.path.join(climlab_root, ext['srcdir'])
+    ext['targetdir'] = os.path.join(climlab_root, ext['targetdir'])
     _build_extension(cppflags=cppflags,
                      f77flags=f77flags,
                      f90flags=f90flags,

@@ -90,9 +90,14 @@ also currently defined in `absems.F90` as module global data
 ... This is now done! Compiles are runs with arbirary levels! And I can freely copy and have multiple instances on different grids and it seems to work!
 
 
+### Fixing the build procedure
+
+I have gotten rid of the "build on demand" idea and moved the build scripts to setup.py
+
+Now builds cleanly and passes all tests on my mac.
+
 ### Still to do:
 
-- Fix up the build procedure. Get rid to the 'build on demand' approach
 - Move the build script to setup.py
 - Work on cleaning up the code and the wrapper interface. More climlab and less climt.
 - Rationalize physical constants and basic thermo (saturation)
