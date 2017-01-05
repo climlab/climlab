@@ -3,6 +3,7 @@ A collection of function definitions to handle common
 thermodynamic calculations for the atmosphere.
 """
 
+from __future__ import division
 import numpy as np
 from climlab import constants as const
 

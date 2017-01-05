@@ -11,9 +11,9 @@ Here is an example to implement seasonal insolation at 45 degrees North
     :Example:
 
         .. code-block:: python
-        
+
             import climlab
-            
+
             #  create the column model object
             col = climlab.GreyRadiationModel()
 
@@ -34,6 +34,7 @@ This model is now a single column with seasonally varying insolation
 calculated for 45N.
 
 """
+from __future__ import division
 import numpy as np
 from climlab import constants as const
 from climlab.process.time_dependent_process import TimeDependentProcess
@@ -180,7 +181,7 @@ class BandRCModel(RadiativeConvectiveModel):
         # insolation and column radiation
         self.subprocess['SW'].flux_from_space = \
             self.subprocess['insolation'].diagnostics['insolation']
-        
+
 
 def compute_layer_absorptivity(abs_coeff, dp):
     '''Compute layer absorptivity from a constant absorption coefficient.'''

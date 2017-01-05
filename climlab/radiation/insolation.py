@@ -1,3 +1,4 @@
+from __future__ import division
 import numpy as np
 from climlab.process.diagnostic import DiagnosticProcess
 from climlab.domain.field import Field
@@ -22,25 +23,25 @@ from climlab.solar.insolation import daily_insolation
 
 class _Insolation(DiagnosticProcess):
     """A private parent class for insolation processes.
-    
+
     Calling compute() will update self.insolation with current values.
 
     **Initialization parameters** \n
-        
-    An instance of ``_Insolation`` is initialized with the following 
+
+    An instance of ``_Insolation`` is initialized with the following
     arguments *(for detailed information see Object attributes below)*:
-    
+
     :param float S0:        solar constant                              \n
                             - unit: :math:`\\frac{\\textrm{W}}{\\textrm{m}^2}`   \n
-                            - default value: ``1365.2``    
-    
+                            - default value: ``1365.2``
+
     **Object attributes** \n
-    
+
     Additional to the parent class :class:`~climlab.process.diagnostic.DiagnosticProcess`
     following object attributes are generated and updated during initialization:
-        
+
     :ivar array insolation: the array is initialized with zeros of the size of
-                            ``self.domains['sfc']`` or ``self.domains['default']``.                      
+                            ``self.domains['sfc']`` or ``self.domains['default']``.
     :ivar float S0:         initialized with given argument ``S0``
     :ivar dict diagnostics: key ``'insolation'`` initialized with value:
                             :class:`~climlab.domain.field.Field` of zeros
@@ -48,13 +49,13 @@ class _Insolation(DiagnosticProcess):
                             ``self.domains['default']``
     :ivar Field insolation: the subprocess attribute ``self.insolation`` is
                             created with correct dimensions
-                            
+
     .. note::
-    
-        ``self.insolation`` should always be modified with 
+
+        ``self.insolation`` should always be modified with
         ``self.insolation[:] = ...`` so that links to the insolation in other
         processes will work.
-                            
+
     """
     # parameter S0 is now stored using a python property
     # can be changed through self.S0 = newvalue
@@ -73,20 +74,20 @@ class _Insolation(DiagnosticProcess):
     @property
     def S0(self):
         """Property of solar constant S0.
-        
-        The parameter S0 is stored using a python property and can be changed through 
+
+        The parameter S0 is stored using a python property and can be changed through
         ``self.S0 = newvalue`` which will also update the parameter dictionary.
-        
+
         .. warning::
-        
+
             changing ``self.param['S0']`` will not work!
-    
+
         :getter:    Returns the S0 parameter which is stored in attribute ``self._S0``.
-        :setter:    * sets S0 which is addressed as ``self._S0`` to the new value 
-                    * updates the parameter dictionary ``self.param['S0']`` and 
+        :setter:    * sets S0 which is addressed as ``self._S0`` to the new value
+                    * updates the parameter dictionary ``self.param['S0']`` and
                     * calls method :func:`_compute_fixed`
         :type:      float
-        
+
         """
         return self._S0
     @S0.setter
@@ -108,18 +109,18 @@ class _Insolation(DiagnosticProcess):
 
 class FixedInsolation(_Insolation):
     """A class for fixed insolation at each point of latitude off the domain.
-    
+
     The solar distribution for the whole domain is constant and specified by
     a parameter.
-    
+
     **Initialization parameters** \n
 
     :param float S0:        solar constant                              \n
                             - unit: :math:`\\frac{\\textrm{W}}{\\textrm{m}^2}`   \n
-                            - default value: ``const.S0/4 = 341.2``    
-    
+                            - default value: ``const.S0/4 = 341.2``
+
     :Example:
-        
+
         ::
 
             >>> import climlab
@@ -129,11 +130,11 @@ class FixedInsolation(_Insolation):
             >>> sfc = model.Ts.domain
 
             >>> fixed_ins = FixedInsolation(S0=340.0, domains=sfc)
-            
+
             >>> print fixed_ins
-            climlab Process of type <class 'climlab.radiation.insolation.FixedInsolation'>. 
-            State variables and domain shapes: 
-            The subprocess tree: 
+            climlab Process of type <class 'climlab.radiation.insolation.FixedInsolation'>.
+            State variables and domain shapes:
+            The subprocess tree:
             top: <class 'climlab.radiation.insolation.FixedInsolation'>
 
     """
@@ -146,29 +147,29 @@ class FixedInsolation(_Insolation):
         self.insolation[:] = self.S0
 
 
-class P2Insolation(_Insolation):  
-    """A class for parabolic solar distribution over the domain's latitude 
+class P2Insolation(_Insolation):
+    """A class for parabolic solar distribution over the domain's latitude
     on the basis of the second order Legendre Polynomial.
-    
+
     Calculates the latitude dependent solar distribution as
-    
+
     .. math::
-    
+
         S(\\varphi) = \\frac{S_0}{4} \\left( 1 + s_2 P_2(x) \\right)
-    
+
     where :math:`P_2(x) = \\frac{1}{2} (3x^2 - 1)` is the second order Legendre Polynomial
     and :math:`x=sin(\\varphi)`.
-    
+
     **Initialization parameters** \n
 
     :param float S0:        solar constant                              \n
                             - unit: :math:`\\frac{\\textrm{W}}{\\textrm{m}^2}`   \n
-                            - default value: ``1365.2``     
+                            - default value: ``1365.2``
     :param floar s2:        factor for second legendre polynominal term \n
                             - default value: ``-0.48``
 
     :Example:
-        
+
         ::
 
             >>> import climlab
@@ -178,13 +179,13 @@ class P2Insolation(_Insolation):
             >>> sfc = model.Ts.domain
 
             >>> p2_ins = P2Insolation(S0=340.0, s2=-0.5, domains=sfc)
-            
+
             >>> print p2_ins
-            climlab Process of type <class 'climlab.radiation.insolation.P2Insolation'>. 
-            State variables and domain shapes: 
-            The subprocess tree: 
-            top: <class 'climlab.radiation.insolation.P2Insolation'>    
-            
+            climlab Process of type <class 'climlab.radiation.insolation.P2Insolation'>.
+            State variables and domain shapes:
+            The subprocess tree:
+            top: <class 'climlab.radiation.insolation.P2Insolation'>
+
     """
     def __init__(self, S0=const.S0, s2=-0.48, **kwargs):
         super(P2Insolation, self).__init__(S0=S0, **kwargs)
@@ -193,19 +194,19 @@ class P2Insolation(_Insolation):
     @property
     def s2(self):
         """Property of second legendre polynomial factor s2.
-        
+
         s2 in following equation:
-        
+
         .. math::
-            
+
             S(\\varphi) = \\frac{S_0}{4} \\left( 1 + s_2 P_2(x) \\right)
-            
+
         :getter:    Returns the s2 parameter which is stored in attribute ``self._s2``.
-        :setter:    * sets s2 which is addressed as ``self._S0`` to the new value 
-                    * updates the parameter dictionary ``self.param['s2']`` and 
+        :setter:    * sets s2 which is addressed as ``self._S0`` to the new value
+                    * updates the parameter dictionary ``self.param['s2']`` and
                     * calls method :func:`_compute_fixed`
         :type:      float
-        
+
         """
         return self._s2
     @s2.setter
@@ -223,13 +224,13 @@ class P2Insolation(_Insolation):
             try:
                 insolation = to_latlon(insolation, domain=dom)
                 self.insolation[:] = insolation
-            except:                    
+            except:
                 self.insolation[:] = Field(insolation, domain=dom)
             # make sure that the diagnostic has the correct field dimensions.
             #self.insolation = Field(insolation, domain=dom)
             self.insolation[:] = Field(insolation, domain=dom)
-        #  Silent fail only for attribute error: _s2 is not an attribute of self 
-        #  but s2 parameter is being stored in self._s2 
+        #  Silent fail only for attribute error: _s2 is not an attribute of self
+        #  but s2 parameter is being stored in self._s2
         except AttributeError:
             pass
 
@@ -239,75 +240,75 @@ class P2Insolation(_Insolation):
 
 class AnnualMeanInsolation(_Insolation):
     """A class for latitudewise solar insolation averaged over a year.
-    
-    This class computes the solar insolation for each day of the year and 
-    latitude specified in the domain on the basis of orbital parameters and 
+
+    This class computes the solar insolation for each day of the year and
+    latitude specified in the domain on the basis of orbital parameters and
     astronomical formulas.
-    
+
     Therefore it uses the method :func:`~climlab.solar.insolation.daily_insolation`.
-    For details how the solar distribution is dependend on orbital parameters 
+    For details how the solar distribution is dependend on orbital parameters
     see there.
-    
+
     The mean over the year is calculated from data given by
-    :func:`~climlab.solar.insolation.daily_insolation` and stored in the 
+    :func:`~climlab.solar.insolation.daily_insolation` and stored in the
     object's attribute ``self.insolation``
-    
+
     **Initialization parameters** \n
 
     :param float S0:    solar constant                                       \n
                         - unit: :math:`\\frac{\\textrm{W}}{\\textrm{m}^2}`   \n
-                        - default value: ``1365.2`` 
-                            
-    :param dict orb:    a dictionary with three orbital parameters (as provided by 
+                        - default value: ``1365.2``
+
+    :param dict orb:    a dictionary with three orbital parameters (as provided by
                         :class:`~climlab.solar.orbital.OrbitalTable`):
-    
+
                         * ``'ecc'`` - eccentricity
-                        
+
                             * unit: dimensionless
                             * default value: ``0.017236``
-                            
-                        * ``'long_peri'`` - longitude of perihelion (precession angle) 
-                        
+
+                        * ``'long_peri'`` - longitude of perihelion (precession angle)
+
                             * unit: degrees
                             * default value: ``281.37``
-                            
+
                         * ``'obliquity'`` - obliquity angle
-                        
+
                             * unit: degrees
                             * default value: ``23.446``
 
     **Object attributes** \n
-    
+
     Additional to the parent class :class:`~climlab.radiation.insolation._Insolation`
     following object attributes are generated and updated during initialization:
-        
-    :ivar insolation:       the solar distribution is calculated as a Field on 
+
+    :ivar insolation:       the solar distribution is calculated as a Field on
                             the basis of the ``self.domains['default']`` domain
                             and stored in the attribute ``self.insolation``.
     :vartype insolation:    Field
-                            
+
     :ivar dict orb:         initialized with given argument ``orb``
-    
+
     :Example:
 
-        Create regular EBM and replace standard insolation subprocess by 
+        Create regular EBM and replace standard insolation subprocess by
         :class:`~climlab.radation.AnnualMeanInsolation`::
-        
+
             >>> import climlab
             >>> from climlab.radiation import AnnualMeanInsolation
-            
+
             >>> # model creation
             >>> model = climlab.EBM()
-            
+
             >>> print model
-            
+
         .. code-block:: none
             :emphasize-lines: 12
-    
-            climlab Process of type <class 'climlab.model.ebm.EBM'>. 
-            State variables and domain shapes: 
-              Ts: (90, 1) 
-            The subprocess tree: 
+
+            climlab Process of type <class 'climlab.model.ebm.EBM'>.
+            State variables and domain shapes:
+              Ts: (90, 1)
+            The subprocess tree:
             top: <class 'climlab.model.ebm.EBM'>
                diffusion: <class 'climlab.dynamics.diffusion.MeridionalDiffusion'>
                LW: <class 'climlab.radiation.AplusBT.AplusBT'>
@@ -318,25 +319,25 @@ class AnnualMeanInsolation(_Insolation):
                insolation: <class 'climlab.radiation.insolation.P2Insolation'>
 
         ::
-        
+
             >>> # catch model domain for subprocess creation
             >>> sfc = model.domains['Ts']
-            
-            >>> # create AnnualMeanInsolation subprocess 
+
+            >>> # create AnnualMeanInsolation subprocess
             >>> new_insol = AnnualMeanInsolation(domains=sfc, **model.param)
-            
+
             >>> # add it to the model
             >>> model.add_subprocess('insolation',new_insol)
-            
+
             >>> print model
-        
+
         .. code-block:: none
             :emphasize-lines: 12
-            
-            climlab Process of type <class 'climlab.model.ebm.EBM'>. 
-            State variables and domain shapes: 
-              Ts: (90, 1) 
-            The subprocess tree: 
+
+            climlab Process of type <class 'climlab.model.ebm.EBM'>.
+            State variables and domain shapes:
+              Ts: (90, 1)
+            The subprocess tree:
             top: <class 'climlab.model.ebm.EBM'>
                diffusion: <class 'climlab.dynamics.diffusion.MeridionalDiffusion'>
                LW: <class 'climlab.radiation.AplusBT.AplusBT'>
@@ -345,8 +346,8 @@ class AnnualMeanInsolation(_Insolation):
                   cold_albedo: <class 'climlab.surface.albedo.ConstantAlbedo'>
                   warm_albedo: <class 'climlab.surface.albedo.P2Albedo'>
                insolation: <class 'climlab.radiation.insolation.AnnualMeanInsolation'>
-                  
-    """           
+
+    """
     def __init__(self, S0=const.S0, orb=const.orb_present, **kwargs):
         super(AnnualMeanInsolation, self).__init__(S0=S0, **kwargs)
         #self.param['orb'] = orb
@@ -356,20 +357,20 @@ class AnnualMeanInsolation(_Insolation):
     @property
     def orb(self):
         """Property of dictionary for orbital parameters.
-        
+
         orb contains: (for more information see :class:`~climlab.solar.orbital.OrbitalTable`)
-        
+
         * ``'ecc'`` - eccentricity [unit: dimensionless]
         * ``'long_peri'`` - longitude of perihelion (precession angle) [unit: degrees]
         * ``'obliquity'`` - obliquity angle [unit: degrees]
-            
-        :getter:    Returns the orbital dictionary which is stored in attribute 
+
+        :getter:    Returns the orbital dictionary which is stored in attribute
                     ``self._orb``.
-        :setter:    * sets orb which is addressed as ``self._orb`` to the new value 
-                    * updates the parameter dictionary ``self.param['orb']`` and 
+        :setter:    * sets orb which is addressed as ``self._orb`` to the new value
+                    * updates the parameter dictionary ``self.param['orb']`` and
                     * calls method :func:`_compute_fixed`
         :type:      dict
-        
+
         """
         return self._orb
     @orb.setter
@@ -394,80 +395,80 @@ class AnnualMeanInsolation(_Insolation):
             try:
                 insolation = to_latlon(insolation, domain=dom)
                 self.insolation[:] = insolation
-            except:                    
+            except:
                 self.insolation[:] = Field(insolation, domain=dom)
-        #  Silent fail only for attribute error: _orb is not an attribute of self 
-        #  but orb parameter is being stored in self._orb 
+        #  Silent fail only for attribute error: _orb is not an attribute of self
+        #  but orb parameter is being stored in self._orb
         except AttributeError:
             pass
 
 
 class DailyInsolation(AnnualMeanInsolation):
-    """A class to compute latitudewise daily solar insolation for specific 
+    """A class to compute latitudewise daily solar insolation for specific
     days of the year.
-    
-    This class computes the solar insolation on basis of orbital parameters and 
+
+    This class computes the solar insolation on basis of orbital parameters and
     astronomical formulas.
-    
+
     Therefore it uses the method :func:`~climlab.solar.insolation.daily_insolation`.
-    For details how the solar distribution is dependend on orbital parameters 
+    For details how the solar distribution is dependend on orbital parameters
     see there.
-        
+
     **Initialization parameters** \n
 
     :param float S0:    solar constant                              \n
                         - unit: :math:`\\frac{\\textrm{W}}{\\textrm{m}^2}`   \n
-                        - default value: ``1365.2`` 
-                            
+                        - default value: ``1365.2``
+
     :param dict orb:    a dictionary with orbital parameters:
-    
+
                         * ``'ecc'`` - eccentricity
-                        
+
                             * unit: dimensionless
                             * default value: ``0.017236``
-                            
-                        * ``'long_peri'`` - longitude of perihelion (precession angle) 
-                        
+
+                        * ``'long_peri'`` - longitude of perihelion (precession angle)
+
                             * unit: degrees
                             * default value: ``281.37``
-                            
+
                         * ``'obliquity'`` - obliquity angle
-                        
+
                             * unit: degrees
                             * default value: ``23.446``
 
     **Object attributes** \n
-    
+
     Additional to the parent class :class:`~climlab.radiation.insolation._Insolation`
     following object attributes are generated and updated during initialization:
-        
-    :ivar Field insolation: the solar distribution is calculated as a Field on 
+
+    :ivar Field insolation: the solar distribution is calculated as a Field on
                             the basis of the ``self.domains['default']`` domain
                             and stored in the attribute ``self.insolation``.
-                            
+
     :ivar dict orb:         initialized with given argument ``orb``
-    
-    
+
+
     :Example:
 
-        Create regular EBM and replace standard insolation subprocess by 
+        Create regular EBM and replace standard insolation subprocess by
         :class:`~climlab.radation.DailyInsolation`::
-        
+
             >>> import climlab
             >>> from climlab.radiation import DailyInsolation
-            
+
             >>> # model creation
             >>> model = climlab.EBM()
-            
+
             >>> print model
-            
+
         .. code-block:: none
             :emphasize-lines: 12
-    
-            climlab Process of type <class 'climlab.model.ebm.EBM'>. 
-            State variables and domain shapes: 
-              Ts: (90, 1) 
-            The subprocess tree: 
+
+            climlab Process of type <class 'climlab.model.ebm.EBM'>.
+            State variables and domain shapes:
+              Ts: (90, 1)
+            The subprocess tree:
             top: <class 'climlab.model.ebm.EBM'>
                diffusion: <class 'climlab.dynamics.diffusion.MeridionalDiffusion'>
                LW: <class 'climlab.radiation.AplusBT.AplusBT'>
@@ -478,22 +479,22 @@ class DailyInsolation(AnnualMeanInsolation):
                insolation: <class 'climlab.radiation.insolation.P2Insolation'>
 
         ::
-        
+
             >>> # catch model domain for subprocess creation
             >>> sfc = model.domains['Ts']
-            
+
             >>> # create DailyInsolation subprocess and add it to the model
             >>> model.add_subprocess('insolation',DailyInsolation(domains=sfc, **model.param))
-            
+
             >>> print model
-        
+
         .. code-block:: none
             :emphasize-lines: 12
-            
-            climlab Process of type <class 'climlab.model.ebm.EBM'>. 
-            State variables and domain shapes: 
-              Ts: (90, 1) 
-            The subprocess tree: 
+
+            climlab Process of type <class 'climlab.model.ebm.EBM'>.
+            State variables and domain shapes:
+              Ts: (90, 1)
+            The subprocess tree:
             top: <class 'climlab.model.ebm.EBM'>
                diffusion: <class 'climlab.dynamics.diffusion.MeridionalDiffusion'>
                LW: <class 'climlab.radiation.AplusBT.AplusBT'>
@@ -502,9 +503,9 @@ class DailyInsolation(AnnualMeanInsolation):
                   cold_albedo: <class 'climlab.surface.albedo.ConstantAlbedo'>
                   warm_albedo: <class 'climlab.surface.albedo.P2Albedo'>
                insolation: <class 'climlab.radiation.insolation.DailyInsolation'>
-    
-    """          
-    
+
+    """
+
     def _compute_fixed(self):
         try:
             self.insolation_array = self._daily_insolation_array()

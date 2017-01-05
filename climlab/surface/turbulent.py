@@ -1,3 +1,4 @@
+from __future__ import division
 import numpy as np
 from climlab.utils.thermo import qsat
 from climlab import constants as const

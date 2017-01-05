@@ -16,6 +16,7 @@ Diagnostics (minimum)
 - absorbed
 - absorbed_total
 '''
+from __future__ import division
 import numpy as np
 from climlab.process.energy_budget import EnergyBudget
 

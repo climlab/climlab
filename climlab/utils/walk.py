@@ -1,44 +1,46 @@
+from __future__ import division
+
 def walk_processes(top, topname='top', topdown=True, ignoreFlag=False):
     """Generator for recursive tree of climlab processes
-    
-    Starts walking from climlab process ``top`` and generates a complete 
+
+    Starts walking from climlab process ``top`` and generates a complete
     list of all processes and sub-processes that are managed from ``top`` process.
     ``level`` indicades the rank of specific process in the process hierarchy:
-    
-    .. note::    
-    
+
+    .. note::
+
         * level 0: ``top`` process
             * level 1: sub-processes of ``top`` process
                 * level 2: sub-sub-processes of ``top`` process (=subprocesses of level 1 processes)
-              
-              
+
+
 
     The method is based on os.walk().
 
-    
-    
+
+
     :param top:             top process from where walking should start
     :type top:              :class:`~climlab.process.process.Process`
     :param str topname:     name of top process [default: 'top']
-    :param bool topdown:    whether geneterate *process_types* in regular or 
+    :param bool topdown:    whether geneterate *process_types* in regular or
                             in reverse order [default: True]
     :param bool ignoreFlag: whether ``topdown`` flag should be ignored or not
                             [default: False]
     :returns: name (str), proc (process), level (int)
 
-    
+
     :Example:
-    
+
         ::
-            
+
             >>> import climlab
             >>> from climlab.utils import walk
-            
+
             >>> model = climlab.EBM()
-                        
+
             >>> for name, proc, top_proc in walk.walk_processes(model):
             ...     print name
-            ... 
+            ...
             top
             diffusion
             LW
@@ -47,7 +49,7 @@ def walk_processes(top, topname='top', topdown=True, ignoreFlag=False):
             warm_albedo
             albedo
             insolation
-                
+
     """
     if not ignoreFlag:
         flag = topdown
@@ -73,21 +75,21 @@ def process_tree(top, name='top'):
     """Creates a string representation of the process tree for process top.
 
     This method uses the :func:`walk_processes` method to create the process tree.
-    
-    :param  top:            top process for which process tree string should be 
+
+    :param  top:            top process for which process tree string should be
                             created
-    :type top:              :class:`~climlab.process.process.Process`                            
+    :type top:              :class:`~climlab.process.process.Process`
     :param str name:        name of top process
     :returns:               string representation of the process tree
     :rtype:                 str
-    
+
     :Example:
-    
+
         ::
-            
+
             >>> import climlab
             >>> from climlab.utils import walk
-    
+
             >>> model = climlab.EBM()
             >>> proc_tree_str = walk.process_tree(model, name='model')
 
@@ -100,7 +102,7 @@ def process_tree(top, name='top'):
                   cold_albedo: <class 'climlab.surface.albedo.ConstantAlbedo'>
                   warm_albedo: <class 'climlab.surface.albedo.P2Albedo'>
                insolation: <class 'climlab.radiation.insolation.P2Insolation'>
-                
+
     """
     str1 = ''
     for name, proc, level in walk_processes(top, name, ignoreFlag=True):

@@ -1,3 +1,4 @@
+from __future__ import division
 from scipy.interpolate import interp1d
 from math import cos, pi
 import _rrtm_radiation_fortran

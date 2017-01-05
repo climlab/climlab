@@ -7,9 +7,10 @@
 """Contains a collection of physical constants for the atmosphere and ocean.
 
     .. literalinclude:: ../code_input_manual/constants.py
-    
+
 """
 
+from __future__ import division
 import numpy as np
 
 a = 6.373E6      # Radius of Earth (m)

@@ -1,3 +1,4 @@
+from __future__ import division
 import numpy as np
 import climlab
 from climlab import domain
@@ -19,7 +20,7 @@ def test_2D_EBM():
     m = climlab.EBM_annual(state=state)
     m.step_forward()
     assert m.state.Ts.shape == (90, 4, 1)
-    
+
 def test_2D_insolation():
     state = climlab.surface_state(num_lon=4)
     m = climlab.EBM_annual(state=state)
@@ -30,5 +31,4 @@ def test_2D_insolation():
     from climlab.radiation.insolation import P2Insolation
     sfc = m.domains['Ts']
     m.add_subprocess('insolation', P2Insolation(domains=sfc, **m.param))
-    assert np.mean(m.subprocess['insolation'].insolation) == 300.34399999999999    
-
+    assert np.mean(m.subprocess['insolation'].insolation) == 300.34399999999999

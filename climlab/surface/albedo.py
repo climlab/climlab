@@ -1,3 +1,4 @@
+from __future__ import division
 import numpy as np
 from climlab.process.diagnostic import DiagnosticProcess
 from climlab.utils.legendre import P2

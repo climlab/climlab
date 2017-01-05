@@ -4,6 +4,7 @@
 
 # how easy is to implement the Stommel 1961 box model in climlab?
 #  currently... it still requires a fair bit of code:
+from __future__ import division
 import numpy as np
 from climlab.process.time_dependent_process import TimeDependentProcess
 from climlab.domain import domain, field
@@ -26,7 +27,7 @@ class StommelBox(TimeDependentProcess):
         tendencies['y'] = (1 - y - y * term)
         tendencies['x'] = (self.param['delta'] * (1 - x) - x * term)
         return tendencies
-        
+
 # make a parameter dictionary
 param = {'R': 2., 'lam': 1., 'delta': 1., 'timestep':0.01}
 # instantiate the process
