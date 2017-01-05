@@ -99,13 +99,13 @@ def estimated_inversion_strength(T0,T700):
 
     '''
     RH = 0.8
-    T850 = (T0+T700)/2;
-    LCL = (20 + (T0-const.tempCtoK)/5)*(1-RH)  # approximate formula... could do this more accurately.
+    T850 = (T0+T700)/2.;
+    LCL = (20. + (T0-const.tempCtoK)/5.)*(1.-RH)  # approximate formula... could do this more accurately.
     LTS = potential_temperature(T700, 700) - T0  # Lower Tropospheric Stability (theta700 - theta0)
     Gammam = (const.g/const.cp*(1.0 - (1.0 + const.Lhvap*qsat(T850,850) /
               const.Rd / T850) / (1.0 + const.Lhvap**2 * qsat(T850,850)/
               const.cp/const.Rv/T850**2)))
-    z700 = (const.Rd*T0/const.g)*np.log(1000/700)
+    z700 = (const.Rd*T0/const.g)*np.log(1000./700.)
     return LTS - Gammam*(z700 - LCL)
 
 def EIS(T0,T700):

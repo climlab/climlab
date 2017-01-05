@@ -16,8 +16,8 @@ def test_thermo():
 
     assert np.isclose(thermo.qsat(300., 1000.), 0.02227839)
 
-    assert np.isclose(thermo.estimated_inversion_strength(300., 275.), 4.54436)
-    assert np.isclose(thermo.EIS(300., 275.), 4.54436)
+    assert np.isclose(thermo.estimated_inversion_strength(300., 290.), 2.58025)
+    assert np.isclose(thermo.EIS(300., 290.), 2.58025)
 
     assert np.isclose(thermo.blackbody_emission(300.), 459.3)
 
