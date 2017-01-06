@@ -123,7 +123,7 @@ class TimeDependentProcess(Process):
         and specified input.
 
         The function first computes all diagnostic processes. They don't produce
-        any tendencies directly but they may effect the other processes (such as
+        any tendencies directly but they may affect the other processes (such as
         change in solar distribution). Subsequently, all tendencies and
         diagnostics for all explicit processes are computed.
 
