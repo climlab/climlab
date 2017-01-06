@@ -171,12 +171,15 @@ class Process(object):
         self.creation_date = time.strftime("%a, %d %b %Y %H:%M:%S %z",
                                            time.localtime())
         # subprocess is a dictionary of any sub-processes
-        if subprocess is None:
-            #self.subprocess = {}
-            # a dictionary whose items can be accessed as attributes
-            self.subprocess = attr_dict.AttrDict()
-        else:
+        self.subprocess = attr_dict.AttrDict()
+        if subprocess is not None:
             self.add_subprocesses(subprocess)
+        #if subprocess is None:
+        #    #self.subprocess = {}
+        #    # a dictionary whose items can be accessed as attributes
+        #    self.subprocess = attr_dict.AttrDict()
+        #else:
+        #    self.add_subprocesses(subprocess)
 
     def add_subprocesses(self, procdict):
         """Adds a dictionary of subproceses to this process.
