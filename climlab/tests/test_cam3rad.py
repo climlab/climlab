@@ -26,8 +26,6 @@ def rcm():
     rcm.add_subprocess('Radiation', rad)
     rcm.add_subprocess('ConvectiveAdjustment', convadj)
     rcm.add_subprocess('H2O', h2o)
-    #  Make diagnostic water vapor field easy to access
-    rcm.q = rcm.subprocess.H2O.q
     return rcm
 
 #  This test is not useful anymore,
@@ -41,6 +39,8 @@ def test_rce(rcm):
     '''Test a single-column radiative-convective model with CAM3 radiation and
     fixed relative humidity.'''
     rcm.step_forward()
+    # Did a diagnostic get properly updated?
+    assert np.all(rcm.OLR == rcm.subprocess.Radiation.OLR)
     #rcm.integrate_years(5)
     #assert(np.isclose(rcm.Ts, ))
 
