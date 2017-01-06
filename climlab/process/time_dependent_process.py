@@ -198,7 +198,6 @@ class TimeDependentProcess(Process):
                 self.tendencies[name] += tend_dict[name]
         #  pass diagnostics up the process tree
         for name, proc in self.subprocess.iteritems():
-            #self.add_diagnostics(proc.diagnostics.keys())
             self.diagnostics.update(proc.diagnostics)
 
     def _compute_type(self, proctype):

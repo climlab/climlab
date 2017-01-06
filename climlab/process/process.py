@@ -263,6 +263,11 @@ class Process(object):
             self.has_process_type_list = False
             # make subprocess available as object attribute
             #setattr(self, name, proc)
+            # Add subprocess diagnostics to parent
+            #  (if there are no name conflicts)
+            for diagname, value in proc.diagnostics.iteritems():
+                if not (diagname in self.diagnostics or hasattr(self, diagname)):
+                    self.init_diagnostic(diagname, value)
         else:
             raise ValueError('subprocess must be Process object')
 
