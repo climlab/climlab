@@ -182,7 +182,7 @@ class EBM(EnergyBudget):
                                                         use_banded_solver=True,
                                                              **self.param))
         self.topdown = False  # call subprocess compute methods first
-        self.init_diagnostic('OLR', 0.*self.Ts)
+        #self.init_diagnostic('OLR', 0.*self.Ts)
         self.init_diagnostic('ASR', 0.*self.Ts)
         self.init_diagnostic('net_radiation', 0.*self.Ts)
         self.init_diagnostic('albedo', 0.*self.Ts)
@@ -203,14 +203,14 @@ class EBM(EnergyBudget):
         #  (longwave part is computed in subprocess)
         self.heating_rate['Ts'] = self.ASR
         # useful diagnostics
-        try:
-            self.icelat = self.subprocess['albedo'].subprocess['iceline'].icelat
-        except KeyError, icelat:
-            self.icelat = None
-        try:
-            self.ice_area = self.subprocess['albedo'].subprocess['iceline'].ice_area
-        except KeyError, ice_area:
-            self.ice_area = None
+        #try:
+        #    self.icelat = self.subprocess['albedo'].subprocess['iceline'].icelat
+        #except KeyError, icelat:
+        #    self.icelat = None
+        #try:
+        #    self.ice_area = self.subprocess['albedo'].subprocess['iceline'].ice_area
+        #except KeyError, ice_area:
+        #    self.ice_area = None
 
 
     def global_mean_temperature(self):

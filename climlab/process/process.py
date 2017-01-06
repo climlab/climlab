@@ -159,11 +159,14 @@ class Process(object):
         # dictionary of model parameters
         self.param = kwargs
         # dictionary of diagnostic quantities
-        self.diagnostics = attr_dict.AttrDict()
+        #self.diagnostics = attr_dict.AttrDict()
+        #self._diag_vars = frozenset()
+        self._diag_vars = []
         # dictionary of input quantities
         #self.input = _make_dict(input, Field)
         if input is None:
-            self._input_vars = frozenset()
+            #self._input_vars = frozenset()
+            self._input_vars = []
         else:
             self.add_input(input.keys())
             for name, var in input:
@@ -261,13 +264,14 @@ class Process(object):
         if isinstance(proc, Process):
             self.subprocess.update({name: proc})
             self.has_process_type_list = False
-            # make subprocess available as object attribute
-            #setattr(self, name, proc)
             # Add subprocess diagnostics to parent
             #  (if there are no name conflicts)
             for diagname, value in proc.diagnostics.iteritems():
                 if not (diagname in self.diagnostics or hasattr(self, diagname)):
-                    self.init_diagnostic(diagname, value)
+                    #self.init_diagnostic(diagname, value)
+                    #setattr(self, diagname, value)
+                    self.add_diagnostics([diagname])
+                    setattr(self, diagname, getattr(proc, diagname))
         else:
             raise ValueError('subprocess must be Process object')
 
@@ -318,8 +322,6 @@ class Process(object):
             if verbose:
                 print 'WARNING: {} not found in subprocess dictionary.'.format(name)
         self.has_process_type_list = False
-        #  Since we made every subprocess an object attribute, we also remove
-        #delattr(self, name)
 
     def set_state(self, name, value):
         """Sets the variable ``name`` to a new state ``value``.
@@ -416,6 +418,15 @@ class Process(object):
    #     """
    #     self._diag_vars = frozenset.union(self._diag_vars, diaglist)
 
+    def add_diagnostics(self, diaglist):
+        """Updates the process's list of diagnostics.
+
+        :param list diaglist:   list of names of diagnostic variables
+        :type diaglist:     list
+
+        """
+        for item in diaglist:
+            self._diag_vars.append(item)
 
     def init_diagnostic(self, name, value=0.):
         """Defines a new diagnostic quantity called ``name``
@@ -448,13 +459,19 @@ class Process(object):
                 ['ASR', 'CO2', 'net_radiation', 'icelat', 'OLR', 'albedo']
 
         """
-        def _diag_getter(self):
-            return self.diagnostics[name]
-        def _diag_setter(self, value):
-            self.diagnostics[name] = value
-        setattr(type(self), name,
-                property(fget=_diag_getter, fset=_diag_setter))
-        self.__setattr__(name, value)
+        # def _diag_getter(self):
+        #     return self.diagnostics[name]
+        # def _diag_setter(self, value):
+        #     self.diagnostics[name] = value
+        # # This is causing problems I think because of type(self)
+        # #  which creates conflicts with other process objects
+        # setattr(type(self), name,
+        #         property(fget=_diag_getter, fset=_diag_setter))
+        # self.__setattr__(name, value)
+        #self._diag_vars = frozenset.union(self._diag_vars, [name])
+        self._diag_vars.append(name)
+        #self.__setattr__(name, value)
+        self.__dict__[name] = value
 
     def remove_diagnostic(self, name):
         """	Removes a diagnostic from the ``process.diagnostic`` dictionary
@@ -481,8 +498,14 @@ class Process(object):
                 >>>  # to access the diagnostic 'icelat' variable !!!
 
         """
-        _ = self.diagnostics.pop(name)
-        delattr(type(self), name)
+        #_ = self.diagnostics.pop(name)
+        #delattr(type(self), name)
+        try:
+            delattr(self, name)
+            self._diag_vars.remove(name)
+        except:
+            print 'No diagnostic named {} was found.'.format(name)
+
 
     def add_input(self, inputlist):
         """Updates the process's list of inputs.
@@ -490,18 +513,20 @@ class Process(object):
         :param list inputlist:   list of names of input variables
 
         """
-        self._input_vars = frozenset.union(self._input_vars, inputlist)
+        #self._input_vars = frozenset.union(self._input_vars, inputlist)
+        for item in inputlist:
+            self._input_vars.append(item)
 
-   # @property
-   # def diagnostics(self):
-   #     """dictionary with all diagnostic variables
-   #
-   #     :getter:    Returns the content of ``self._diag_vars``.
-   #     :type:      dict
-   #
-   #     """
-   #     return { key:value for key, value in self.__dict__.items()
-   #              if key in self._diag_vars }
+    @property
+    def diagnostics(self):
+        """dictionary with all diagnostic variables
+
+        :getter:    Returns the content of ``self._diag_vars``.
+        :type:      dict
+
+        """
+        return { key:value for key, value in self.__dict__.items()
+                if key in self._diag_vars }
     @property
     def input(self):
         """dictionary with all input variables

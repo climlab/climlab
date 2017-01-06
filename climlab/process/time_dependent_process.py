@@ -197,8 +197,10 @@ class TimeDependentProcess(Process):
             for name in tend_dict:
                 self.tendencies[name] += tend_dict[name]
         #  pass diagnostics up the process tree
-        for name, proc in self.subprocess.iteritems():
-            self.diagnostics.update(proc.diagnostics)
+        #for name, proc in self.subprocess.iteritems():
+        #    #self.diagnostics.update(proc.diagnostics)
+        #    for diagname, value in proc.diagnostics.iteritems():
+        #        self.__setattr__(diagname, value)
 
     def _compute_type(self, proctype):
         """Computes tendencies due to all subprocesses of given type
@@ -271,11 +273,14 @@ class TimeDependentProcess(Process):
         #  Total tendency is applied as an explicit forward timestep
         # (already accounting properly for order of operations in compute() )
         for name, var in self.state.iteritems():
-            var += self.tendencies[name] * self.param['timestep']
+            var += self.tendencies[name] * self.timestep
 
         # Update all time counters for this and all subprocesses in the tree
-        for name, proc, level in walk_processes(self):
+        #  Also pass diagnostics up the process tree
+        for name, proc, level in walk_processes(self, ignoreFlag=True):
             proc._update_time()
+            for diagname, value in proc.diagnostics.iteritems():
+                self.__setattr__(diagname, value)
 
     def compute_diagnostics(self, num_iter=3):
         """Compute all tendencies and diagnostics, but don't update model state.
@@ -286,6 +291,10 @@ class TimeDependentProcess(Process):
         """
         for n in range(num_iter):
             self.compute()
+        #  Pass diagnostics up the process tree
+        for name, proc, level in walk_processes(self, ignoreFlag=True):
+            for diagname, value in proc.diagnostics.iteritems():
+                self.__setattr__(diagname, value)
 
     def _update_time(self):
         """Increments the timestep counter by one.

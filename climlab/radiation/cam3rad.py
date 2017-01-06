@@ -179,13 +179,21 @@ class CAM3Radiation(Radiation):
         self.stebol = const.sigma
 
         # initialize diagnostics
-        self.init_diagnostic('ASR', 0. * self.Ts)
-        self.init_diagnostic('ASRcld', 0. * self.Ts)
-        self.init_diagnostic('OLR', 0. * self.Ts)
-        self.init_diagnostic('OLRcld', 0. * self.Ts)
-        self.init_diagnostic('TdotRad', 0. * self.Tatm)
-        self.init_diagnostic('TdotLW', 0. * self.Tatm)
-        self.init_diagnostic('TdotSW', 0. * self.Tatm)
+        self.ASR = 0. * self.Ts
+        self.ASRcld = 0. * self.Ts
+        self.OLR = 0. * self.Ts
+        self.OLRcld = 0. * self.Ts
+        self.TdotRad = 0. * self.Tatm
+        self.TdotLW = 0. * self.Tatm
+        self.TdotSW = 0. * self.Tatm
+        self.add_diagnostics(['ASR','ASRcld','OLR','OLRcld','TdotRad','TdotLW','TdotSW'])
+        #self.init_diagnostic('ASR', 0. * self.Ts)
+        #self.init_diagnostic('ASRcld', 0. * self.Ts)
+        #self.init_diagnostic('OLR', 0. * self.Ts)
+        #self.init_diagnostic('OLRcld', 0. * self.Ts)
+        #self.init_diagnostic('TdotRad', 0. * self.Tatm)
+        #self.init_diagnostic('TdotLW', 0. * self.Tatm)
+        #self.init_diagnostic('TdotSW', 0. * self.Tatm)
 
         # automatic ozone data initialization
         if O3init:

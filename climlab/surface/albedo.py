@@ -41,29 +41,31 @@ class ConstantAlbedo(DiagnosticProcess):
     def __init__(self, albedo=0.33, **kwargs):
         '''Uniform prescribed albedo.'''
         super(ConstantAlbedo, self).__init__(**kwargs)
-        self.albedo = albedo
-
-    @property
-    def albedo(self):
-        """Property of albedo value.
-
-        :getter:    Returns the albedo value which is stored in diagnostic dict
-                    ``self.diagnostic['albedo']``
-        :setter:    * sets albedo which is addressed as ``diagnostics['albedo']``
-                      to the new value through creating a Field on the basis
-                      of domain ``self.domain['default']``
-                    * updates the parameter dictionary ``self.param['albedo']``
-        :type:      Field
-
-        """
-        return self.diagnostics['albedo']
-    @albedo.setter
-    def albedo(self, value):
-        #dom = self.domains['default']
-        #  this is a more robust way to get the single value from dictionary:
         dom = self.domains.itervalues().next()
-        self.diagnostics['albedo'] = Field(value, domain=dom)
-        self.param['albedo'] = value
+        self.init_diagnostic('albedo', Field(albedo, domain=dom))
+        #self.albedo = albedo
+
+    # @property
+    # def albedo(self):
+    #     """Property of albedo value.
+    #
+    #     :getter:    Returns the albedo value which is stored in diagnostic dict
+    #                 ``self.diagnostic['albedo']``
+    #     :setter:    * sets albedo which is addressed as ``diagnostics['albedo']``
+    #                   to the new value through creating a Field on the basis
+    #                   of domain ``self.domain['default']``
+    #                 * updates the parameter dictionary ``self.param['albedo']``
+    #     :type:      Field
+    #
+    #     """
+    #     return self.diagnostics['albedo']
+    # @albedo.setter
+    # def albedo(self, value):
+    #     #dom = self.domains['default']
+    #     #  this is a more robust way to get the single value from dictionary:
+    #     dom = self.domains.itervalues().next()
+    #     self.diagnostics['albedo'] = Field(value, domain=dom)
+    #     self.param['albedo'] = value
 
 
 class P2Albedo(DiagnosticProcess):
