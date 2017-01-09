@@ -100,31 +100,34 @@ Extensions = [
     {'name': '_rrtm_radiation_fortran',
      'srcdir': os.path.join('climlab','radiation','src','rrtm'),
      'targetdir': os.path.join('climlab','radiation')},
+    {'name': '_rrtmg_lw',
+     'srcdir': os.path.join('climlab','radiation','src','rrtm','src','rrtmg_lw'),
+     'targetdir': os.path.join('climlab','radiation')}
     ]
 
-try:
-    #  Set default compiler flags
-    cppflags = ''
-    f77flags = ''
-    f90flags = ''
-    # figure out which compiler we're going to use
-    compiler = fcompiler.get_default_fcompiler()
-    # set some fortran compiler-dependent flags (following CliMT code here)
-    if compiler == 'gnu95':
-        f77flags='-ffixed-line-length-132 -fdefault-real-8'
-        f90flags='-fdefault-real-8 -fno-range-check -ffree-form'
-    elif compiler == 'intel' or compiler == 'intelem':
-        f77flags='-132 -r8'
-        f90flags='-132 -r8'
-    #  Cannot test of ibm compiler
-    #elif compiler == 'ibm':
-    #    f77flags='-qautodbl=dbl4 -qsuffix=f=f:cpp=F -qfixed=132'
-    #    f90flags='-qautodbl=dbl4 -qsuffix=f=f90:cpp=F90 -qfree=f90'
-    else:
-        print 'Compiler {} not supported, proceed at your own risk!'.format(compiler)
+#  Set default compiler flags
+cppflags = ''
+f77flags = ''
+f90flags = ''
+# figure out which compiler we're going to use
+compiler = fcompiler.get_default_fcompiler()
+# set some fortran compiler-dependent flags (following CliMT code here)
+if compiler == 'gnu95':
+    f77flags='-ffixed-line-length-132 -fdefault-real-8'
+    f90flags='-fdefault-real-8 -fno-range-check -ffree-form'
+elif compiler == 'intel' or compiler == 'intelem':
+    f77flags='-132 -r8'
+    f90flags='-132 -r8'
+#  Cannot test of ibm compiler
+#elif compiler == 'ibm':
+#    f77flags='-qautodbl=dbl4 -qsuffix=f=f:cpp=F -qfixed=132'
+#    f90flags='-qautodbl=dbl4 -qsuffix=f=f90:cpp=F90 -qfree=f90'
+else:
+    print 'Compiler {} not supported, proceed at your own risk!'.format(compiler)
 
-    # Build all extensions
-    for ext in Extensions:
+# Build all extensions
+for ext in Extensions:
+    try:
         # relative to absolute path
         ext['srcdir'] = os.path.join(climlab_root, ext['srcdir'])
         ext['targetdir'] = os.path.join(climlab_root, ext['targetdir'])
@@ -132,10 +135,8 @@ try:
                          f77flags=f77flags,
                          f90flags=f90flags,
                          **ext)
-except:
-    print 'Something went wrong building Fortran extensions.'
-    print 'Some modules will be unavailable, including:'
-    for ext in Extensions:
+    except:
+        print 'Something went wrong building Fortran extension:'
         print ext['name']
 
 
