@@ -1,13 +1,20 @@
-! see _rrtm_radiation for the python that prepares these arguments...
+!  CLIMLAB driver for RRTMG_LW radiation
+!
+!  This is a lightweight driver that uses identical variable names
+!  and units as found in the RRTM code. Refer to RRTMG_LW source code
+!  for more documentation
+!
+!  Brian Rose
+!  brose@albany.edu
+!  (inspired by CliMT code by Rodrigo Caballero)
+
 subroutine driver &
-    (ncol, nlay, icld, &
-    permuteseed, irng, idrv, play, plev, &
-    tlay, tlev, tsfc, h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, &
+    (ncol, nlay, icld, permuteseed, irng, idrv, &
+    play, plev, tlay, tlev, tsfc, &
+    h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, &
     o2vmr, cfc11vmr, cfc12vmr, cfc22vmr, ccl4vmr, &
-    emis, &
-    inflglw, iceflgslw, liqflglw, tauc, cldfrac, &
-    ciwp, clwp, reic, relq, &
-    tauaer, &
+    emis, inflglw, iceflgslw, liqflglw, &
+    cldfrac, tauc, ciwp, clwp, reic, relq, tauaer, &
     uflx, dflx, hr, uflxc, dflxc, hrc, duflx_dt, duflxc_dt)
 
 ! Modules
@@ -20,7 +27,6 @@ subroutine driver &
 
 ! Input
     integer, parameter :: rb = selected_real_kind(12)
-!     integer(kind=im), intent(in) :: iplon
     integer(kind=im), intent(in) :: ncol            ! number of columns
     integer(kind=im), intent(in) :: nlay            ! number of model layers
     integer(kind=im), intent(inout) :: icld         ! Cloud overlap method
@@ -83,17 +89,20 @@ subroutine driver &
                                                          ! with respect to surface temperature
 
     ! Local
-    real(kind=rb) :: cldfmcl(ngptlw,ncol,nlay)
-    real(kind=rb) :: taucmcl(ngptlw,ncol,nlay)
-    real(kind=rb) :: ciwpmcl(ngptlw,ncol,nlay)
-    real(kind=rb) :: clwpmcl(ngptlw,ncol,nlay)
-    real(kind=rb) :: reicmcl(ncol,nlay)
-    real(kind=rb) :: relqmcl(ncol,nlay)
+    !   These quantities are computed by McICA
+    real(kind=rb) :: cldfmcl(ngptlw,ncol,nlay)    ! cloud fraction [mcica]
+    real(kind=rb) :: ciwpmcl(ngptlw,ncol,nlay)    ! in-cloud ice water path [mcica]
+    real(kind=rb) :: clwpmcl(ngptlw,ncol,nlay)    ! in-cloud liquid water path [mcica]
+    real(kind=rb) :: reicmcl(ncol,nlay)           ! ice partcle size (microns)  [mcica]
+    real(kind=rb) :: relqmcl(ncol,nlay)           ! liquid particle size (microns) [mcica]
+    real(kind=rb) :: taucmcl(ngptlw,ncol,nlay)    ! in-cloud optical depth [mcica]
 
+    ! Call the Monte Carlo Independent Column Approximation
+    !   (McICA, Pincus et al., JC, 2003)
     call mcica_subcol_lw(1, ncol, nlay, icld, permuteseed, irng, play, &
                        cldfrac, ciwp, clwp, reic, relq, tauc, cldfmcl, &
                        ciwpmcl, clwpmcl, reicmcl, relqmcl, taucmcl)
-
+    !  Call the RRTMG_LW driver to compute radiative fluxes
     call rrtmg_lw(ncol    ,nlay    ,icld    ,idrv    , &
              play    ,plev    ,tlay    ,tlev    ,tsfc    , &
              h2ovmr  ,o3vmr   ,co2vmr  ,ch4vmr  ,n2ovmr  ,o2vmr , &
