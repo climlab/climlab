@@ -64,7 +64,7 @@ class _Insolation(DiagnosticProcess):
     def __init__(self, S0=const.S0, **kwargs):
         super(_Insolation, self).__init__(**kwargs)
         #  initialize diagnostic with correct shape
-        self.init_diagnostic('insolation')
+        self.add_diagnostic('insolation')
         try:
             self.insolation = np.zeros(self.domains['sfc'].shape)
         except:

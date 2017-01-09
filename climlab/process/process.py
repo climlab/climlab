@@ -268,10 +268,7 @@ class Process(object):
             #  (if there are no name conflicts)
             for diagname, value in proc.diagnostics.iteritems():
                 if not (diagname in self.diagnostics or hasattr(self, diagname)):
-                    #self.init_diagnostic(diagname, value)
-                    #setattr(self, diagname, value)
-                    self.add_diagnostics([diagname])
-                    setattr(self, diagname, getattr(proc, diagname))
+                    self.add_diagnostic(diagname, value)
         else:
             raise ValueError('subprocess must be Process object')
 
@@ -387,7 +384,7 @@ class Process(object):
                     # same shape, assume it's the right domain
                     self.state_domain[name] = dom
 
-    def _set_field(self, field_type, name, value):
+    def _add_field(self, field_type, name, value):
         """Adds a new field to a specified dictionary. The field is also added
         as a process attribute. field_type can be 'input', 'diagnostics' """
         try:
@@ -398,49 +395,21 @@ class Process(object):
         # setter method for that attribute
         self.__setattr__(name, value)
 
-
-   # def add_diagnostics(self, diaglist):
-   #     """Updates the process's list of diagnostics.
-   #
-   #     **Function-call argument** \n
-   #
-   #     :param diaglist:    list of names of diagnostic variables
-   #     :type diaglist:     list
-   #
-   #
-   #     **Object attributes** \n
-   #
-   #     During method execution following object attribute is modified:
-   #
-   #     :ivar frozenset _diag_vars:     extended by the list ``diaglist`` given as
-   #                                     method argument
-   #
-   #     """
-   #     self._diag_vars = frozenset.union(self._diag_vars, diaglist)
-
-    def add_diagnostics(self, diaglist):
-        """Updates the process's list of diagnostics.
-
-        :param list diaglist:   list of names of diagnostic variables
-        :type diaglist:     list
-
-        """
-        for item in diaglist:
-            self._diag_vars.append(item)
-
-    def init_diagnostic(self, name, value=0.):
-        """Defines a new diagnostic quantity called ``name``
+    def add_diagnostic(self, name, value=None):
+        """Create a new diagnostic variable called ``name`` for this process
         and initialize it with the given ``value``.
 
-        Quantity is accessible and settable in two ways:
+        Quantity is accessible in two ways:
 
             * as a process attribute, i.e. ``proc.name``
             * as a member of the diagnostics dictionary,
               i.e. ``proc.diagnostics['name']``
 
+        Use attribute method to set values, e.g.
+        ```proc.name = value ```
+
         :param str name:        name of diagnostic quantity to be initialized
-        :param array value:     initial value for quantity - accepts also type
-                                float, int, etc. [default: 0.]
+        :param array value:     initial value for quantity [default: None]
 
         :Example:
 
@@ -450,7 +419,7 @@ class Process(object):
                 >>> model = climlab.EBM()
 
                 >>> # initialize CO2 variable with value 280 ppm
-                >>> model.init_diagnostic('CO2',280)
+                >>> model.add_diagnostic('CO2',280.)
 
                 >>> # access variable directly or through diagnostic dictionary
                 >>> model.CO2
@@ -459,19 +428,32 @@ class Process(object):
                 ['ASR', 'CO2', 'net_radiation', 'icelat', 'OLR', 'albedo']
 
         """
-        # def _diag_getter(self):
-        #     return self.diagnostics[name]
-        # def _diag_setter(self, value):
-        #     self.diagnostics[name] = value
-        # # This is causing problems I think because of type(self)
-        # #  which creates conflicts with other process objects
-        # setattr(type(self), name,
-        #         property(fget=_diag_getter, fset=_diag_setter))
-        # self.__setattr__(name, value)
-        #self._diag_vars = frozenset.union(self._diag_vars, [name])
         self._diag_vars.append(name)
-        #self.__setattr__(name, value)
-        self.__dict__[name] = value
+        self.__setattr__(name, value)
+
+    def add_input(self, name, value=None):
+        '''Create a new input variable called ``name`` for this process
+        and initialize it with the given ``value``.
+
+        Quantity is accessible in two ways:
+
+            * as a process attribute, i.e. ``proc.name``
+            * as a member of the diagnostics dictionary,
+              i.e. ``proc.diagnostics['name']``
+
+        Use attribute method to set values, e.g.
+        ```proc.name = value ```
+
+        :param str name:        name of diagnostic quantity to be initialized
+        :param array value:     initial value for quantity [default: None]
+        '''
+        self._input_vars.append(name)
+        self.__setattr__(name, value)
+
+    def declare_input(self, inputlist):
+        '''Add the variable names in ``inputlist`` to the list of necessary inputs.'''
+        for name in inputlist:
+            self._input_vars.append(name)
 
     def remove_diagnostic(self, name):
         """	Removes a diagnostic from the ``process.diagnostic`` dictionary
@@ -505,17 +487,6 @@ class Process(object):
             self._diag_vars.remove(name)
         except:
             print 'No diagnostic named {} was found.'.format(name)
-
-
-    def add_input(self, inputlist):
-        """Updates the process's list of inputs.
-
-        :param list inputlist:   list of names of input variables
-
-        """
-        #self._input_vars = frozenset.union(self._input_vars, inputlist)
-        for item in inputlist:
-            self._input_vars.append(item)
 
     @property
     def diagnostics(self):

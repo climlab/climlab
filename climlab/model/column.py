@@ -101,7 +101,7 @@ class GreyRadiationModel(TimeDependentProcess):
                     'SW_down_TOA',
                     'planetary_albedo']
         for name in newdiags:
-            self.init_diagnostic(name)
+            self.add_diagnostic(name)
         # This process has to handle the coupling between
         # insolation and column radiation
         self.subprocess['SW'].flux_from_space = \
@@ -158,7 +158,7 @@ class BandRCModel(RadiativeConvectiveModel):
         # q is an input field for this process, which is set by subproc
         #  (though in this sense it is actually diagnostic...)
         newinput = ['q']
-        self.add_input(newinput)
+        self.add_input('q')
         self.q = self.subprocess['H2O'].q
 
         #  initialize radiatively active gas inventories

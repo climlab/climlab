@@ -59,7 +59,7 @@ class Boltzmann(EnergyBudget):
     :ivar dict diagnostics:     the subprocess's diagnostic dictionary
                                 ``self.diagnostic`` is initialized
                                 through calling
-                                ``self.init_diagnostic('OLR', 0. * self.Ts)``
+                                ``self.add_diagnostic('OLR', 0. * self.Ts)``
     :ivar Field OLR:            the subprocess attribute ``self.OLR`` is
                                 created with correct dimensions
 
@@ -123,9 +123,7 @@ class Boltzmann(EnergyBudget):
         super(Boltzmann, self).__init__(**kwargs)
         self.eps = eps
         self.tau = tau
-        # newdiags = ['OLR',]
-        # self.add_diagnostics(newdiags)
-        self.init_diagnostic('OLR', 0. * self.Ts)
+        self.add_diagnostic('OLR', 0. * self.Ts)
 
     @property
     def eps(self):

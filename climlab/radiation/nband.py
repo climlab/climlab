@@ -32,7 +32,7 @@ class NbandRadiation(GreyGas):
                     'absorber_vmr',
                     'absorption_cross_section',
                     'cosZen',]
-        self.add_input(newinput)
+        self.declare_input(newinput)
         # this should be overridden by daughter classes
         self.band_fraction = np.array(1.)
         ##  a dictionary of absorbing gases, in volumetric mixing ratios

@@ -42,7 +42,7 @@ class ConstantAlbedo(DiagnosticProcess):
         '''Uniform prescribed albedo.'''
         super(ConstantAlbedo, self).__init__(**kwargs)
         dom = self.domains.itervalues().next()
-        self.init_diagnostic('albedo', Field(albedo, domain=dom))
+        self.add_diagnostic('albedo', Field(albedo, domain=dom))
         #self.albedo = albedo
 
     # @property
@@ -133,7 +133,7 @@ class P2Albedo(DiagnosticProcess):
         super(P2Albedo, self).__init__(**kwargs)
         self.a0 = a0
         self.a2 = a2
-        self.init_diagnostic('albedo')
+        self.add_diagnostic('albedo')
         self._compute_fixed()
 
     @property
@@ -227,8 +227,8 @@ class Iceline(DiagnosticProcess):
     def __init__(self, Tf=-10., **kwargs):
         super(DiagnosticProcess, self).__init__(**kwargs)
         self.param['Tf'] = Tf
-        self.init_diagnostic('icelat')
-        self.init_diagnostic('ice_area')
+        self.add_diagnostic('icelat')
+        self.add_diagnostic('ice_area')
 
     def find_icelines(self):
         """Finds iceline according to the surface temperature.
@@ -360,7 +360,7 @@ class StepFunctionAlbedo(DiagnosticProcess):
         self.add_subprocess('warm_albedo', P2Albedo(a0=a0, a2=a2, domains=sfc))
         self.add_subprocess('cold_albedo', ConstantAlbedo(albedo=ai, domains=sfc))
         self.topdown = False  # call subprocess compute methods first
-        self.init_diagnostic('albedo')
+        self.add_diagnostic('albedo')
 
     def _get_current_albedo(self):
         '''Simple step-function albedo based on ice line at temperature Tf.'''

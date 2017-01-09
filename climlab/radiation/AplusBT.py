@@ -89,7 +89,7 @@ class AplusBT(EnergyBudget):
         super(AplusBT, self).__init__(**kwargs)
         self.A = A
         self.B = B
-        self.init_diagnostic('OLR', 0. * self.Ts)
+        self.add_diagnostic('OLR', 0. * self.Ts)
 
     @property
     def A(self):
@@ -199,7 +199,7 @@ class AplusBT_CO2(EnergyBudget):
     :ivar dict diagnostics:         the subprocess's diagnostic dictionary
                                     ``self.diagnostic`` is initialized
                                     through calling
-                                    ``self.init_diagnostic('OLR', 0. * self.Ts)``
+                                    ``self.add_diagnostic('OLR', 0. * self.Ts)``
     :ivar Field OLR:                the subprocess attribute ``self.OLR`` is
                                     created with correct dimensions
 
@@ -264,7 +264,7 @@ class AplusBT_CO2(EnergyBudget):
         self.CO2 = CO2
         #newdiags = ['OLR',]
         #self.add_diagnostics(newdiags)
-        self.init_diagnostic('OLR', 0. * self.Ts)
+        self.add_diagnostic('OLR', 0. * self.Ts)
 
     @property
     def CO2(self):

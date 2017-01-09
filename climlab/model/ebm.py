@@ -118,7 +118,7 @@ class EBM(EnergyBudget):
     :ivar dict diagnostics: is initialized with keys: ``'OLR'``, ``'ASR'``,
                             ``'net_radiation'``, ``'albedo'``, ``'icelat'`` and
                             ``'ice_area'`` through
-                            :func:`~climlab.process.process.Process.init_diagnostic`.
+                            :func:`~climlab.process.process.Process.add_diagnostic`.
 
     :Example:
 
@@ -182,12 +182,11 @@ class EBM(EnergyBudget):
                                                         use_banded_solver=True,
                                                              **self.param))
         self.topdown = False  # call subprocess compute methods first
-        #self.init_diagnostic('OLR', 0.*self.Ts)
-        self.init_diagnostic('ASR', 0.*self.Ts)
-        self.init_diagnostic('net_radiation', 0.*self.Ts)
-        self.init_diagnostic('albedo', 0.*self.Ts)
-        self.init_diagnostic('icelat', None)
-        self.init_diagnostic('ice_area', None)
+        self.add_diagnostic('ASR', 0.*self.Ts)
+        self.add_diagnostic('net_radiation', 0.*self.Ts)
+        self.add_diagnostic('albedo', 0.*self.Ts)
+        self.add_diagnostic('icelat', None)
+        self.add_diagnostic('ice_area', None)
 
 
     def _compute_heating_rates(self):

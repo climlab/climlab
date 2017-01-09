@@ -10,7 +10,7 @@ class SurfaceRadiation(EnergyBudget):
         newinput = ['albedo_sfc',
                     'LW_from_atm',
                     'SW_from_atm',]
-        self.add_input(newinput)
+        self.declare_input(newinput)
         if albedo_sfc is None:
             self.albedo_sfc = np.zeros_like(self.Ts)
         else:
@@ -20,7 +20,7 @@ class SurfaceRadiation(EnergyBudget):
         newdiags = ['LW_to_atm',
                     'SW_to_atm']
         for name in newdiags:
-            self.init_diagnostic(name)
+            self.add_diagnostic(name)
         self.LW_to_atm = 0. * self.Ts
         self.SW_to_atm = 0. * self.Ts
         self.heating_rate['Tatm'] = np.zeros_like(self.Tatm)
