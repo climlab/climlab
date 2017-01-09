@@ -1,6 +1,6 @@
 ! see _rrtm_radiation for the python that prepares these arguments...
 subroutine driver &
-    (nbndlw, ncol, nlay, icld, &
+    (ncol, nlay, icld, &
     permuteseed, irng, idrv, play, plev, &
     tlay, tlev, tsfc, h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, &
     o2vmr, cfc11vmr, cfc12vmr, cfc22vmr, ccl4vmr, &
@@ -15,11 +15,11 @@ subroutine driver &
     use parkind, only: im => kind_im
     use mcica_subcol_gen_lw, only: mcica_subcol_lw
     use rrtmg_lw_init, only: rrtmg_lw_ini
+    use parrrtm, only: nbndlw, ngptlw
 
 
 ! Input
     integer, parameter :: rb = selected_real_kind(12)
-    integer(kind=im), intent(in) :: nbndlw   !  number of spectral bands, set to 16
 !     integer(kind=im), intent(in) :: iplon
     integer(kind=im), intent(in) :: ncol            ! number of columns
     integer(kind=im), intent(in) :: nlay            ! number of model layers
@@ -83,10 +83,10 @@ subroutine driver &
                                                          ! with respect to surface temperature
 
     ! Local
-    real(kind=rb) :: cldfmcl(140,ncol,nlay)
-    real(kind=rb) :: taucmcl(140,ncol,nlay)
-    real(kind=rb) :: ciwpmcl(140,ncol,nlay)
-    real(kind=rb) :: clwpmcl(140,ncol,nlay)
+    real(kind=rb) :: cldfmcl(ngptlw,ncol,nlay)
+    real(kind=rb) :: taucmcl(ngptlw,ncol,nlay)
+    real(kind=rb) :: ciwpmcl(ngptlw,ncol,nlay)
+    real(kind=rb) :: clwpmcl(ngptlw,ncol,nlay)
     real(kind=rb) :: reicmcl(ncol,nlay)
     real(kind=rb) :: relqmcl(ncol,nlay)
 
