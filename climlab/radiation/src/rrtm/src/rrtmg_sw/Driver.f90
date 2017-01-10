@@ -10,15 +10,13 @@
 
 subroutine driver &
     (ncol, nlay, icld, permuteseed, irng, idrv, &
-    play, plev, &
-    tlay, tlev, tsfc, h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, &
-    o2vmr, aldif, aldir, asdif, &
-    asdir, coszen, adjes, dyofyr, scon, &
-    inflgsw, iceflgsw, liqflgsw, tauc_sw, cldfrac, ssac_sw, asmc_sw, &
-    fsfc_sw, ciwp, clwp, reic, relq, &
-    tauaer_sw, ssaaer_sw, asmaer_sw, ecaer_sw, &
-    swuflx, swdflx, swhr, swuflxc, &
-    swdflxc, swhrc)
+    play, plev, tlay, tlev, tsfc, &
+    h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr, &
+    aldif, aldir, asdif, asdir, coszen, adjes, dyofyr, scon, &
+    inflgsw, iceflgsw, liqflgsw, &
+    cldfrac, ciwp, clwp, reic, relq, tauc, ssac, asmc, fsfc, &
+    tauaer, ssaaer, asmaer, ecaer, &
+    swuflx, swdflx, swhr, swuflxc, swdflxc, swhrc)
 
 ! Modules
     use rrtmg_sw_rad, only: rrtmg_sw
@@ -74,70 +72,56 @@ subroutine driver &
     integer(kind=im), intent(in) :: inflgsw         ! Flag for cloud optical properties
     integer(kind=im), intent(in) :: iceflgsw        ! Flag for ice particle specification
     integer(kind=im), intent(in) :: liqflgsw        ! Flag for liquid droplet specification
-    real(kind=rb), intent(in) :: cldfrac(ncol,nlay)
-    real(kind=rb), intent(in) :: tauc_sw(nbndsw,ncol,nlay)
-    real(kind=rb), intent(in) :: ssac_sw(nbndsw,ncol,nlay)
-    real(kind=rb), intent(in) :: asmc_sw(nbndsw,ncol,nlay)
-    real(kind=rb), intent(in) :: fsfc_sw(nbndsw,ncol,nlay)
-    real(kind=rb), intent(in) :: ciwp(ncol,nlay)
-    real(kind=rb), intent(in) :: clwp(ncol,nlay)
-    real(kind=rb), intent(in) :: reic(ncol,nlay)
-    real(kind=rb), intent(in) :: relq(ncol,nlay)
-    real(kind=rb), intent(in) :: tauaer_sw(ncol,nlay,nbndsw)
-    real(kind=rb), intent(in) :: ssaaer_sw(ncol,nlay,nbndsw)
-    real(kind=rb), intent(in) :: asmaer_sw(ncol,nlay,nbndsw)
-    real(kind=rb), intent(in) :: ecaer_sw(ncol,nlay,naerec)
+    real(kind=rb), intent(in) :: cldfrac(ncol,nlay)        ! layer cloud fraction
+    real(kind=rb), intent(in) :: tauc(nbndsw,ncol,nlay)    ! in-cloud optical depth
+    real(kind=rb), intent(in) :: ssac(nbndsw,ncol,nlay)    ! in-cloud single scattering albedo (non-delta scaled)
+    real(kind=rb), intent(in) :: asmc(nbndsw,ncol,nlay)    ! in-cloud asymmetry parameter (non-delta scaled)
+    real(kind=rb), intent(in) :: fsfc(nbndsw,ncol,nlay)    ! in-cloud forward scattering fraction (non-delta scaled)
+    real(kind=rb), intent(in) :: ciwp(ncol,nlay)           ! in-cloud ice water path
+    real(kind=rb), intent(in) :: clwp(ncol,nlay)           ! in-cloud liquid water path
+    real(kind=rb), intent(in) :: reic(ncol,nlay)           ! cloud ice particle size
+    real(kind=rb), intent(in) :: relq(ncol,nlay)           ! cloud liquid particle size
+    real(kind=rb), intent(in) :: tauaer(ncol,nlay,nbndsw)  ! Aerosol optical depth (iaer=10 only)
+    real(kind=rb), intent(in) :: ssaaer(ncol,nlay,nbndsw)  ! Aerosol single scattering albedo (iaer=10 only)
+    real(kind=rb), intent(in) :: asmaer(ncol,nlay,nbndsw)  ! Aerosol asymmetry parameter (iaer=10 only)
+    real(kind=rb), intent(in) :: ecaer(ncol,nlay,naerec)   ! Aerosol optical depth at 0.55 micron (iaer=6 only)
 
 ! Output
-    ! SW
-    real(kind=rb), intent(out) :: swuflx(ncol,nlay+1)       ! Total sky shortwave upward flux (W/m2)
-    real(kind=rb), intent(out) :: swdflx(ncol,nlay+1)       ! Total sky shortwave downward flux (W/m2)
-    real(kind=rb), intent(out) :: swhr(ncol,nlay)         ! Total sky shortwave radiative heating rate (K/d)
-    real(kind=rb), intent(out) :: swuflxc(ncol,nlay+1)      ! Clear sky shortwave upward flux (W/m2)
-    real(kind=rb), intent(out) :: swdflxc(ncol,nlay+1)      ! Clear sky shortwave downward flux (W/m2)
-    real(kind=rb), intent(out) :: swhrc(ncol,nlay)        ! Clear sky shortwave radiative heating rate (K/d)
-
-    ! LW
-    real(kind=rb), intent(out) :: uflx(ncol,nlay+1)         ! Total sky longwave upward flux (W/m2)
-    real(kind=rb), intent(out) :: dflx(ncol,nlay+1)         ! Total sky longwave downward flux (W/m2)
-    real(kind=rb), intent(out) :: hr(ncol,nlay)           ! Total sky longwave radiative heating rate (K/d)
-    real(kind=rb), intent(out) :: uflxc(ncol,nlay+1)        ! Clear sky longwave upward flux (W/m2)
-    real(kind=rb), intent(out) :: dflxc(ncol,nlay+1)        ! Clear sky longwave downward flux (W/m2)
-    real(kind=rb), intent(out) :: hrc(ncol,nlay)          ! Clear sky longwave radiative heating rate (K/d)
-
-    real(kind=rb), intent(out) :: duflx_dt(ncol,nlay+1)
-    real(kind=rb), intent(out) :: duflxc_dt(ncol,nlay+1)
+    real(kind=rb), intent(out) :: swuflx(ncol,nlay+1)    ! Total sky shortwave upward flux (W/m2)
+    real(kind=rb), intent(out) :: swdflx(ncol,nlay+1)    ! Total sky shortwave downward flux (W/m2)
+    real(kind=rb), intent(out) :: swhr(ncol,nlay)        ! Total sky shortwave radiative heating rate (K/d)
+    real(kind=rb), intent(out) :: swuflxc(ncol,nlay+1)   ! Clear sky shortwave upward flux (W/m2)
+    real(kind=rb), intent(out) :: swdflxc(ncol,nlay+1)   ! Clear sky shortwave downward flux (W/m2)
+    real(kind=rb), intent(out) :: swhrc(ncol,nlay)       ! Clear sky shortwave radiative heating rate (K/d)
 
     ! Local
-    real(kind=rb) :: cldfmcl_sw(112,ncol,nlay)
-    real(kind=rb) :: taucmcl_sw(112,ncol,nlay)
-    real(kind=rb) :: ssacmcl_sw(112,ncol,nlay)
-    real(kind=rb) :: asmcmcl_sw(112,ncol,nlay)
-    real(kind=rb) :: fsfcmcl_sw(112,ncol,nlay)
-    real(kind=rb) :: ciwpmcl_sw(112,ncol,nlay)
-    real(kind=rb) :: clwpmcl_sw(112,ncol,nlay)
-    real(kind=rb) :: reicmcl_sw(ncol,nlay)
-    real(kind=rb) :: relqmcl_sw(ncol,nlay)
-    real(kind=rb) :: cldfmcl_lw(140,ncol,nlay)
-    real(kind=rb) :: taucmcl_lw(140,ncol,nlay)
-    real(kind=rb) :: ciwpmcl_lw(140,ncol,nlay)
-    real(kind=rb) :: clwpmcl_lw(140,ncol,nlay)
-    real(kind=rb) :: reicmcl_lw(ncol,nlay)
-    real(kind=rb) :: relqmcl_lw(ncol,nlay)
+    !   These quantities are computed by McICA
+    real(kind=rb) :: cldfmcl(ngptsw,ncol,nlay)   ! cloud fraction [mcica]
+    real(kind=rb) :: taucmcl(ngptsw,ncol,nlay)   ! in-cloud optical depth [mcica]
+    real(kind=rb) :: ssacmcl(ngptsw,ncol,nlay)   ! in-cloud single scattering albedo [mcica]
+    real(kind=rb) :: asmcmcl(ngptsw,ncol,nlay)   ! in-cloud asymmetry parameter [mcica]
+    real(kind=rb) :: fsfcmcl(ngptsw,ncol,nlay)   ! in-cloud forward scattering fraction [mcica]
+    real(kind=rb) :: ciwpmcl(ngptsw,ncol,nlay)   ! in-cloud ice water path [mcica]
+    real(kind=rb) :: clwpmcl(ngptsw,ncol,nlay)   ! in-cloud liquid water path [mcica]
+    real(kind=rb) :: reicmcl(ncol,nlay)          ! ice partcle size (microns)
+    real(kind=rb) :: relqmcl(ncol,nlay)          ! liquid particle size (microns)
 
-    call mcica_subcol_sw(1, ncol, nlay, icld, permuteseed_sw, irng, play, &
-                       cldfrac, ciwp, clwp, reic, relq, tauc_sw, ssac_sw, asmc_sw, fsfc_sw, &
-                       cldfmcl_sw, ciwpmcl_sw, clwpmcl_sw, reicmcl_sw, relqmcl_sw, &
-                       taucmcl_sw, ssacmcl_sw, asmcmcl_sw, fsfcmcl_sw)
+    ! Call the Monte Carlo Independent Column Approximation
+    !   (McICA, Pincus et al., JC, 2003)
+    call mcica_subcol_sw(1, ncol, nlay, icld, permuteseed, irng, play, &
+                       cldfrac, ciwp, clwp, reic, relq, tauc, ssac, asmc, fsfc, &
+                       cldfmcl, ciwpmcl, clwpmcl, reicmcl, relqmcl, &
+                       taucmcl, ssacmcl, asmcmcl, fsfcmcl)
+    !  Call the RRTMG_SW driver to compute radiative fluxes
     call rrtmg_sw(ncol    ,nlay    ,icld    , &
              play    ,plev    ,tlay    ,tlev    ,tsfc   , &
              h2ovmr , o3vmr   ,co2vmr  ,ch4vmr  ,n2ovmr ,o2vmr , &
              asdir   ,asdif   ,aldir   ,aldif   , &
              coszen  ,adjes   ,dyofyr  ,scon    , &
-             inflgsw ,iceflgsw,liqflgsw,cldfmcl_sw , &
-             taucmcl_sw ,ssacmcl_sw ,asmcmcl_sw ,fsfcmcl_sw , &
-             ciwpmcl_sw ,clwpmcl_sw ,reicmcl_sw ,relqmcl_sw , &
-             tauaer_sw  ,ssaaer_sw ,asmaer_sw  ,ecaer_sw   , &
+             inflgsw ,iceflgsw,liqflgsw,cldfmcl , &
+             taucmcl, ssacmcl ,asmcmcl ,fsfcmcl , &
+             ciwpmcl ,clwpmcl ,reicmcl ,relqmcl , &
+             tauaer  ,ssaaer ,asmaer ,ecaer   , &
              swuflx  ,swdflx  ,swhr    ,swuflxc ,swdflxc ,swhrc)
 
 end subroutine driver

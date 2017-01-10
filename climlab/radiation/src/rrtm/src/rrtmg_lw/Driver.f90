@@ -11,10 +11,10 @@
 subroutine driver &
     (ncol, nlay, icld, permuteseed, irng, idrv, &
     play, plev, tlay, tlev, tsfc, &
-    h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, &
-    o2vmr, cfc11vmr, cfc12vmr, cfc22vmr, ccl4vmr, &
-    emis, inflglw, iceflgslw, liqflglw, &
-    cldfrac, tauc, ciwp, clwp, reic, relq, tauaer, &
+    h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr, &
+    cfc11vmr, cfc12vmr, cfc22vmr, ccl4vmr, emis, &
+    inflglw, iceflgslw, liqflglw, &
+    cldfrac, ciwp, clwp, reic, relq, tauc, tauaer, &
     uflx, dflx, hr, uflxc, dflxc, hrc, duflx_dt, duflxc_dt)
 
 ! Modules
