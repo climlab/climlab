@@ -29,7 +29,7 @@ def test_swap_component():
     # initial state (temperatures)
     state = climlab.column_state(num_lev=num_lev, num_lat=1, water_depth=5.)
     #  Create a RRTM radiation model
-    rad = RRTM(state=state)
+    rad = RRTMG(state=state)
     rad.step_forward()
     #  Swap out the longwave model for CAM3
     rad.remove_subprocess('LW')

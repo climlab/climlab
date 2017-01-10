@@ -7,7 +7,7 @@ from nband import NbandRadiation, ThreeBandSW
 from water_vapor import ManabeWaterVapor
 #  CAM3Radiation requires netCDF4
 try:
-    from cam3rad import CAM3Radiation
+    from cam3rad import CAM3Radiation, CAM3Radiation_LW, CAM3Radiation_SW
 except:
     print 'CAM3Radiation module not available.'
 try:
