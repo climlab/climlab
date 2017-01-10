@@ -197,15 +197,16 @@ class CAM3Radiation(Radiation):
                     print 'Reverting to default O3.'
 
     def _climlab_to_cam3(self, field):
-        '''Prepare field wit proper dimension order.
+        '''Prepare field with proper dimension order.
         CAM3 code expects 3D arrays with (KM, JM, 1)
         and 2D arrays with (JM, 1).
 
         climlab grid dimensions are any of:
             - (KM,)
             - (JM, KM)
+            - (JM, IM, KM)
 
-        (longitude dimension IM not yet implemented).'''
+        (longitude dimension IM not yet implemented here).'''
         if np.isscalar(field):
             return field
         #  Check to see if column vector needs to be replicated over latitude

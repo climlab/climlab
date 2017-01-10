@@ -139,16 +139,8 @@ class RRTMG_LW(EnergyBudget):
                  O3init = False,
                  O3file = 'apeozone_cam3_5_54.nc',
                  **kwargs):
-
-
-    **kwargs):
         super(RRTMG_LW, self).__init__(**kwargs)
         #  define INPUTS
-        # Cloud overlap method, see RRTMG_LW code
-                                                    !    0: Clear only
-                                                    !    1: Random
-                                                    !    2: Maximum/random
-                                                    !    3: Maximum
         self.add_input('icld', 1)
         #  define diagnostics
 
@@ -163,8 +155,10 @@ class RRTMG_LW(EnergyBudget):
         plev = self._climlab_to_rrtm(self.lev_bounds)
         tlay = self._climlab_to_rrtm(self.Tatm)
         tlev = None  # figure this out -- interface temperatures
-        args = [ncol, nlay, self.icld, self._permuteseed,
-                self._irng, self._idrv,
+        #  Looks like element 0 of arrays is surface in RRTM code
+        #  opposite of climlab convention
+        args = [ncol, nlay, icld, permuteseed,
+                irng, idrv,
                 play, plev, tlay, tlev, tsfc,
                 h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr,
                 cfc11vmr, cfc12vmr, cfc22vmr, ccl4vmr, emis,
