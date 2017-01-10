@@ -1,6 +1,5 @@
-from AplusBT import AplusBT
-from AplusBT import AplusBT_CO2
-from Boltzmann import Boltzmann
+from aplusbt import AplusBT, AplusBT_CO2
+from boltzmann import Boltzmann
 from insolation import FixedInsolation, P2Insolation, AnnualMeanInsolation, DailyInsolation
 from radiation import Radiation
 #from three_band import ThreeBandSW
@@ -11,3 +10,7 @@ try:
     from cam3rad import CAM3Radiation
 except:
     print 'CAM3Radiation module not available.'
+try:
+    from rrtm import RRTMG, RRTMG_LW, RRTMG_SW
+except:
+    print 'RRTM module not available.'
