@@ -14,9 +14,9 @@ def rcm():
     rcm = climlab.TimeDependentProcess(state=state)
     ## Create individual physical process models:
     #  fixed relative humidity
-    h2o = climlab.radiation.water_vapor.ManabeWaterVapor(state=state)
+    h2o = climlab.radiation.ManabeWaterVapor(state=state)
     #  Hard convective adjustment
-    convadj = climlab.convection.convadj.ConvectiveAdjustment(state=state,
+    convadj = climlab.convection.ConvectiveAdjustment(state=state,
                                                              adj_lapse_rate=6.5)
     # CAM3 radiation with default parameters and interactive water vapor
     rad = climlab.radiation.CAM3Radiation(state=state, O3init=True,
