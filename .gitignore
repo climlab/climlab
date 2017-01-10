@@ -6,6 +6,8 @@
 # f2py signature files
 *.pyf
 
+*.DS_Store
+
 # Setuptools distribution and binary build folders.
 /dist/
 /build/
