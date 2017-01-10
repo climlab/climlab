@@ -113,6 +113,33 @@ class RRTMG_LW(EnergyBudget):
         self.add_input('icld', 1)
         #  define diagnostics
 
+    def _climlab_to_rrtm(self, field):
+        '''Prepare field with proper dimension order.
+        RRTM code expects arrays with (ncol, nlay)
+        and with pressure decreasing from surface at element 0
+
+        climlab grid dimensions are any of:
+            - (KM,)
+            - (JM, KM)
+            - (JM, IM, KM)
+
+        This is not yet fully implemented.'''
+
+        # Make this work just with 1D (KM,) arrays
+        #  (KM,)  -->  (1, nlay)
+        if np.isscalar(field):
+            return field
+        else:
+            #  This should append a new axis at position zeros
+            #  and flip along the last axis to reverse the pressure order
+            return field[np.newaxis, ..., ::-1]
+
+    def _rrtm_to_climlab(self, field):
+        if np.isscalar(field):
+            return field
+        else:
+            return np.squeeze(field[..., ::-1])
+
     def _compute_radiative_heating(self):
         '''Compute radiative fluxes and heating rates.
 
@@ -124,8 +151,6 @@ class RRTMG_LW(EnergyBudget):
         plev = self._climlab_to_rrtm(self.lev_bounds)
         tlay = self._climlab_to_rrtm(self.Tatm)
         tlev = None  # figure this out -- interface temperatures
-        #  Looks like element 0 of arrays is surface in RRTM code
-        #  opposite of climlab convention
 
 
         shape = list(self.Tatm.shape)

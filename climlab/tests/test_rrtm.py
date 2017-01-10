@@ -4,6 +4,14 @@ import climlab
 import pytest
 from climlab.radiation import RRTMG, RRTMG_LW, RRTMG_SW, CAM3Radiation_LW
 
+num_lev = 30
+
+def test_rrtmg_lw_creation():
+    state = climlab.column_state(num_lev=num_lev, water_depth=5.)
+    rad = RRTMG_LW(state=state)
+    #  are the transformations reversible?
+    assert np.all(rad._rrtm_to_climlab(rad._climlab_to_rrtm(rad.Tatm)) == rad.Tatm)
+
 def test_rrtm_creation():
     # initial state (temperatures)
     state = climlab.column_state(num_lev=num_lev, num_lat=1, water_depth=5.)
