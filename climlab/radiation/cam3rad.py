@@ -5,7 +5,7 @@ from __future__ import division
 import numpy as np
 import netCDF4 as nc
 from climlab import constants as const
-from climlab.radiation.radiation import Radiation
+from climlab.radiation import Radiation
 #import _cam3_interface
 import os
 from scipy.interpolate import interp1d, interp2d

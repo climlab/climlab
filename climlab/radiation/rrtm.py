@@ -128,6 +128,7 @@ class RRTMG_LW(EnergyBudget):
     def __init__(self,
                  #  volume mixing ratios (PPMV) for greenhouse gases
                  #  (if scalar assume well-mixed)
+                 absorber_vmr = {'CO2': }
                  CO2=380.,
                  N2O=1.E-9,
                  CH4=1.E-9,

@@ -2,13 +2,12 @@ from __future__ import division
 import numpy as np
 from climlab import constants as const
 from climlab.domain.field import Field, global_mean
-from climlab.process.energy_budget import EnergyBudget
+from climlab.process import EnergyBudget
 from climlab.utils import legendre
 from climlab.domain import domain
-from climlab.radiation.AplusBT import AplusBT
-from climlab.radiation.insolation import P2Insolation, AnnualMeanInsolation, DailyInsolation
+from climlab.radiation import AplusBT, P2Insolation, AnnualMeanInsolation, DailyInsolation
 from climlab.surface import albedo
-from climlab.dynamics.diffusion import MeridionalDiffusion
+from climlab.dynamics import MeridionalDiffusion
 from climlab.domain.initial import surface_state
 from scipy import integrate
 

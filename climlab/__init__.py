@@ -21,8 +21,5 @@ from climlab.domain import domain
 from climlab.domain.field import Field, global_mean
 from climlab.domain.axis import Axis
 from climlab.domain.initial import column_state, surface_state
-from climlab.process.process import Process, process_like, get_axes
-from climlab.process.time_dependent_process import TimeDependentProcess
-from climlab.process.implicit import ImplicitProcess
-from climlab.process.diagnostic import DiagnosticProcess
-from climlab.process.energy_budget import EnergyBudget
+from climlab.process import Process, TimeDependentProcess, ImplicitProcess, DiagnosticProcess, EnergyBudget
+from climlab.process import process_like, get_axes
