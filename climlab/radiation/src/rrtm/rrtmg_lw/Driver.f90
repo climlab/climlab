@@ -13,7 +13,7 @@ subroutine driver &
     play, plev, tlay, tlev, tsfc, &
     h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr, &
     cfc11vmr, cfc12vmr, cfc22vmr, ccl4vmr, emis, &
-    inflglw, iceflgslw, liqflglw, &
+    inflglw, iceflglw, liqflglw, &
     cldfrac, ciwp, clwp, reic, relq, tauc, tauaer, &
     uflx, dflx, hr, uflxc, dflxc, hrc, duflx_dt, duflxc_dt)
 
@@ -65,7 +65,7 @@ subroutine driver &
     real(kind=rb), intent(in) :: ccl4vmr(ncol,nlay)   ! CCL4 volume mixing ratio
     real(kind=rb), intent(in) :: emis(ncol,nbndlw)  ! Surface emissivity
     integer(kind=im), intent(in) :: inflglw         ! Flag for cloud optical properties
-    integer(kind=im), intent(in) :: iceflgslw       ! Flag for ice particle specification
+    integer(kind=im), intent(in) :: iceflglw       ! Flag for ice particle specification
     integer(kind=im), intent(in) :: liqflglw        ! Flag for liquid droplet specification
     real(kind=rb), intent(in) :: cldfrac(ncol,nlay)      ! layer cloud fraction
     real(kind=rb), intent(in) :: tauc(nbndlw,ncol,nlay)  ! in-cloud optical depth
