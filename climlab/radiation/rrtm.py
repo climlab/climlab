@@ -6,14 +6,6 @@ from climlab import constants as const
 import _rrtmg_lw, _rrtmg_sw
 from _rrtm_radiation_init import read_lw_abs_data, read_sw_abs_data
 
-#  Python-based initialization of absorption data from netcdf file
-#read_sw_abs_data(_rrtmg_sw)
-#read_lw_abs_data(_rrtmg_lw)
-#  Call the modified fortran init subroutine (netcdf calls are commented out)
-#_rrtmg_sw.rrtmg_sw_init.rrtmg_sw_ini(const.cp)
-#_rrtmg_lw.rrtmg_lw_init.rrtmg_lw_ini(const.cp)
-
-#  Ready for calls to _rrtmg_lw.driver() and _rrtmg_sw.driver()
 
 #  Get number of bands from fortran modules
 nbndsw = int(_rrtmg_sw.parrrsw.nbndsw)
@@ -112,6 +104,9 @@ class RRTMG_LW(EnergyBudget):
         #  define INPUTS
         self.add_input('icld', 1)
         #  define diagnostics
+        self.add_diagnostic('OLR', 0.*self.Ts)
+        self.add_diagnostic('OLRclr', 0.*self.Ts)
+        self.add_diagnostic('TdotLW', 0.*self.Ts)
 
     def _compute_heating_rates(self):
         '''Compute radiative fluxes and heating rates.
@@ -184,15 +179,15 @@ class RRTMG_LW(EnergyBudget):
                 inflglw, iceflglw, liqflglw,
                 cldfrac, ciwp, clwp, reic, relq, tauc, tauaer,]
 
-        #  Debugging
-        for j in range(len(args)):
-            if np.isscalar(args[j]):
-                thing = args[j]
-            else:
-                thing = args[j].shape
-            print j, thing
-        self.args = args
-
+        # #  Debugging
+        # for j in range(len(args)):
+        #     if np.isscalar(args[j]):
+        #         thing = args[j]
+        #     else:
+        #         thing = args[j].shape
+        #     print j, thing
+        # self.args = args
+        #
         #  Call the RRTM code!
         uflx, dflx, hr, uflxc, dflxc, hrc, duflx_dt, duflxc_dt = _rrtmg_lw.driver(*args)
         #  For debugging purposes: raw output
@@ -211,9 +206,9 @@ class RRTMG_LW(EnergyBudget):
         #  hr is the heating rate in K/day from RRTMG_LW
         #  Need to set to W/m2
         Catm = self.Tatm.domain.heat_capacity
-        #self.heating_rate['Tatm'] = _rrtm_to_climlab(hr) / const.seconds_per_day * Catm
+        self.heating_rate['Tatm'] = _rrtm_to_climlab(hr) / const.seconds_per_day * Catm
         #  calculate slab ocean heating rate from flux divergence
-        #self.heating_rate['Ts'] = self.flux_down[..., -1] - self.flux_up[..., -1]
+        self.heating_rate['Ts'] = self.flux_down[..., -1] - self.flux_up[..., -1]
         #  Set some diagnostics
         self.OLR = self.flux_up[..., 0]
         self.OLRclr = self.flux_up_clr[..., 0]

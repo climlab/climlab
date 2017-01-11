@@ -115,7 +115,7 @@ subroutine driver &
                        ciwpmcl, clwpmcl, reicmcl, relqmcl, taucmcl)
 
     ! In principle the init routine should not need to be called every timestep
-    !  But this seems to work better than calling it from Python...
+    !  But calling it from Python is not working... heatfac is not getting set properly
     call rrtmg_lw_ini(cpdair)
 
     !  Call the RRTMG_LW driver to compute radiative fluxes
