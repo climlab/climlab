@@ -112,13 +112,13 @@ subroutine driver &
                        ciwpmcl, clwpmcl, reicmcl, relqmcl, taucmcl)
     !  Call the RRTMG_LW driver to compute radiative fluxes
     call rrtmg_lw(ncol    ,nlay    ,icld    ,idrv    , &
-             play    ,plev    ,tlay    ,tlev    ,tsfc    , &
-             h2ovmr  ,o3vmr   ,co2vmr  ,ch4vmr  ,n2ovmr  ,o2vmr , &
-             cfc11vmr,cfc12vmr,cfc22vmr,ccl4vmr ,emis    , &
-             inflglw ,iceflglw,liqflglw,cldfmcl , &
-             taucmcl ,ciwpmcl ,clwpmcl ,reicmcl ,relqmcl , &
+             play    , plev    , tlay    , tlev    , tsfc    , &
+             h2ovmr  , o3vmr   , co2vmr  , ch4vmr  , n2ovmr  , o2vmr , &
+             cfc11vmr, cfc12vmr, cfc22vmr, ccl4vmr , emis    , &
+             inflglw , iceflglw, liqflglw, cldfmcl , &
+             taucmcl , ciwpmcl , clwpmcl , reicmcl , relqmcl , &
              tauaer  , &
-             uflx    ,dflx    ,hr      ,uflxc   ,dflxc,  hrc, &
+             uflx    , dflx    , hr      , uflxc   , dflxc,  hrc, &
              duflx_dt,duflxc_dt )
 
 end subroutine driver

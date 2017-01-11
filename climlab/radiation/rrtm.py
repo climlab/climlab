@@ -142,10 +142,10 @@ class RRTMG_LW(EnergyBudget):
                               #               dge range is limited to 5.0 to 140.0 microns
                               #               [dge = 1.0315 * r_ec]
         #  These arrays have an extra dimension for number of bands
-        dim_sw1 = [nbndsw]; dim_sw1.extend(_climlab_to_rrtm(self.Tatm).shape)     # [nbndsw,ncol,nlay]
-        dim_lw1 = [nbndlw]; dim_lw1.extend(_climlab_to_rrtm(self.Tatm).shape)
-        dim_sw2 = list(_climlab_to_rrtm(self.Tatm).shape); dim_sw2.append(nbndsw)  # [ncol,nlay,nbndsw]
-        dim_lw2 = list(_climlab_to_rrtm(self.Tatm).shape); dim_lw2.append(nbndlw)
+        dim_sw1 = [nbndsw]; dim_sw1.extend(tlay.shape)     # [nbndsw,ncol,nlay]
+        dim_lw1 = [nbndlw]; dim_lw1.extend(tlay.shape)
+        dim_sw2 = list(tlay.shape); dim_sw2.append(nbndsw)  # [ncol,nlay,nbndsw]
+        dim_lw2 = list(tlay.shape); dim_lw2.append(nbndlw)
         tauc_sw = np.zeros(dim_sw1) # In-cloud optical depth
         tauc_lw = np.zeros(dim_lw1) # in-cloud optical depth
         ssac_sw = np.zeros(dim_sw1) # In-cloud single scattering albedo
@@ -160,16 +160,16 @@ class RRTMG_LW(EnergyBudget):
         tauaer_lw = np.zeros(dim_lw2)   # Aerosol optical depth at mid-point of LW spectral bands
 
         # GASES
-        h2ovmr = 0. * np.zeros_like(tlay)
-        o3vmr = 0. * np.zeros_like(tlay)
-        co2vmr = 0. * np.zeros_like(tlay) + 380.
-        ch4vmr = 0. * np.zeros_like(tlay)
-        n2ovmr = 0. * np.zeros_like(tlay)
-        o2vmr = 0. * np.zeros_like(tlay)
-        cfc11vmr = 0. * np.zeros_like(tlay)
-        cfc12vmr = 0. * np.zeros_like(tlay)
-        cfc22vmr = 0. * np.zeros_like(tlay)
-        ccl4vmr = 0. * np.zeros_like(tlay)
+        h2ovmr = 0. * np.zeros_like(tlay) + 1E-9
+        o3vmr = 0. * np.zeros_like(tlay) + 1E-9
+        co2vmr = 0. * np.zeros_like(tlay) + 380./1E6
+        ch4vmr = 0. * np.zeros_like(tlay) + 1E-9
+        n2ovmr = 0. * np.zeros_like(tlay) + 1E-9
+        o2vmr = 0. * np.zeros_like(tlay) + 1E-9
+        cfc11vmr = 0. * np.zeros_like(tlay) + 1E-9
+        cfc12vmr = 0. * np.zeros_like(tlay) + 1E-9
+        cfc22vmr = 0. * np.zeros_like(tlay) + 1E-9
+        ccl4vmr = 0. * np.zeros_like(tlay) + 1E-9
 
         # surface emissivity
         emis = np.ones((ncol,nbndlw))
@@ -194,6 +194,12 @@ class RRTMG_LW(EnergyBudget):
 
         #  Call the RRTM code!
         uflx, dflx, hr, uflxc, dflxc, hrc, duflx_dt, duflxc_dt = _rrtmg_lw.driver(*args)
+        self.uflx = uflx
+        self.dflx = dflx
+        self.hr = hr
+        self.uflxc = uflxc
+        self.dflxc = dflxc
+        self.hrc = hrc
         #  Output is all (ncol,nlay+1) or (ncol,nlay)
         self.flux_up = _rrtm_to_climlab(uflx)
         self.flux_down = _rrtm_to_climlab(dflx)
@@ -202,9 +208,9 @@ class RRTMG_LW(EnergyBudget):
         #  hr is the heating rate in K/day from RRTMG_LW
         #  Need to set to W/m2
         Catm = self.Tatm.domain.heat_capacity
-        self.heating_rate['Tatm'] = _rrtm_to_climlab(hr) / const.seconds_per_day * Catm
+        #self.heating_rate['Tatm'] = _rrtm_to_climlab(hr) / const.seconds_per_day * Catm
         #  calculate slab ocean heating rate from flux divergence
-        self.heating_rate['Ts'] = self.flux_down[..., -1] - self.flux_up[..., -1]
+        #self.heating_rate['Ts'] = self.flux_down[..., -1] - self.flux_up[..., -1]
         #  Set some diagnostics
         self.OLR = self.flux_up[..., 0]
         self.OLRclr = self.flux_up_clr[..., 0]
@@ -252,4 +258,5 @@ def _rrtm_to_climlab(field):
     if np.isscalar(field):
         return field
     else:
-        return np.squeeze(field[..., ::-1])
+        field = field[..., ::-1]
+        return np.squeeze(field)
