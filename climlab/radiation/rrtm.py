@@ -208,7 +208,7 @@ class RRTMG_LW(EnergyBudget):
         #  Set some diagnostics
         self.OLR = self.flux_up[..., 0]
         self.OLRclr = self.flux_up_clr[..., 0]
-        self.TdotLW = self._rrtm_to_climlab(hr)  # heating rate in K/day
+        self.TdotLW = _rrtm_to_climlab(hr)  # heating rate in K/day
 
 
 class RRTMG_SW(EnergyBudget):

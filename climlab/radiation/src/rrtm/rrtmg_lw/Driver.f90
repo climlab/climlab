@@ -88,6 +88,14 @@ subroutine driver &
     real(kind=rb), intent(out) :: duflxc_dt(ncol,nlay+1) ! change in clear sky upward longwave flux (w/m2/K)
                                                          ! with respect to surface temperature
 
+!  These are not comments! Necessary directives to f2py to handle array dimensions
+!f2py depend(ncol,nlay) play, plev, tlay, tlev
+!f2py depend(ncol,nlay) h2ovmr,o3vmr,co2vmr,ch4vmr,n2ovmr,o2vmr
+!f2py depend(ncol,nlay) cfc11vmr,cfc12vmr,cfc22vmr,ccl4vmr
+!f2py depend(ncol) tsfc, emis
+!f2py depend(ncol,nlay) cldfrac,ciwp,clwp,reic,relq,tauc,tauaer
+!f2py depend(ncol,nlay) uflx,dflx,hr,uflxc,dflxc,duflx_dt,duflxc_dt
+
     ! Local
     !   These quantities are computed by McICA
     real(kind=rb) :: cldfmcl(ngptlw,ncol,nlay)    ! cloud fraction [mcica]
