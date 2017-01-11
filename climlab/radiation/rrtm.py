@@ -5,6 +5,7 @@ from climlab.process import EnergyBudget, TimeDependentProcess
 from climlab import constants as const
 import _rrtmg_lw, _rrtmg_sw
 from _rrtm_radiation_init import read_lw_abs_data, read_sw_abs_data
+from scipy.interpolate import interp1d
 
 
 #  Get number of bands from fortran modules
@@ -119,7 +120,12 @@ class RRTMG_LW(EnergyBudget):
         tlay = _climlab_to_rrtm(self.Tatm)
         tlev = _climlab_to_rrtm(interface_temperature(**self.state))
         ncol, nlay = tlay.shape
-        tsfc = self.Ts  #  this needs to be adapted for horizontal dimensions
+        if len(self.Ts.shape)==1:
+            tsfc = self.Ts  #  single column
+        elif len(self.Ts.shape)==2:
+            tsfc = np.squeeze(self.Ts)  # should handle case with num_lat > 1
+        else:
+            raise ValueError('Mix up with dimensions of surface temperature')
 
         cldfrac = _climlab_to_rrtm(0. * self.Tatm) # layer cloud fraction
         ciwp = _climlab_to_rrtm(0. * self.Tatm)    # in-cloud ice water path (g/m2)
@@ -178,16 +184,6 @@ class RRTMG_LW(EnergyBudget):
                 cfc11vmr, cfc12vmr, cfc22vmr, ccl4vmr, emis,
                 inflglw, iceflglw, liqflglw,
                 cldfrac, ciwp, clwp, reic, relq, tauc, tauaer,]
-
-        # #  Debugging
-        # for j in range(len(args)):
-        #     if np.isscalar(args[j]):
-        #         thing = args[j]
-        #     else:
-        #         thing = args[j].shape
-        #     print j, thing
-        # self.args = args
-        #
         #  Call the RRTM code!
         uflx, dflx, hr, uflxc, dflxc, hrc, duflx_dt, duflxc_dt = _rrtmg_lw.driver(*args)
         #  For debugging purposes: raw output
@@ -224,42 +220,57 @@ def interface_temperature(Ts, Tatm, **kwargs):
     #  Actually it's not clear to me how the RRTM code uses these values
     lev = Tatm.domain.axes['lev'].points
     lev_bounds = Tatm.domain.axes['lev'].bounds
-    #  For now just return something dumb but with the right dimensions
-    #return np.append(Tatm, Tatm[..., -1])
-    Tinterp = np.interp(lev_bounds[1:-1], lev, Tatm)
-    #  add TOA value
-    Tinterp = np.insert(Tinterp, 0, Tatm[0])
-    Tinterp = np.append(Tinterp, Ts)
+    #  Interpolate to layer interfaces
+    f = interp1d(lev, Tatm, axis=-1)  # interpolation function
+    Tinterp = f(lev_bounds[1:-1])
+    #  add TOA value, Assume surface temperature at bottom boundary
+    Ttoa = Tatm[...,0]
+    print Ttoa[..., np.newaxis].shape
+    print Tinterp.shape
+    print Ts.shape
+    Tinterp = np.concatenate((Ttoa[..., np.newaxis], Tinterp, Ts), axis=-1)
     return Tinterp
 
-def _climlab_to_rrtm(field, append_ncol=True):
+def _climlab_to_rrtm(field):
     '''Prepare field with proper dimension order.
     RRTM code expects arrays with (ncol, nlay)
     and with pressure decreasing from surface at element 0
 
     climlab grid dimensions are any of:
-        - (KM,)
-        - (JM, KM)
-        - (JM, IM, KM)
+        - (num_lev,) --> (1, num_lev)
+        - (num_lat, num_lev)  --> (num_lat, num_lev)
+        - (num_lat, num_lon, num_lev)  -->  (num_lat*num_lon, num_lev)
 
-    This is not yet fully implemented.'''
-
+        But lat-lon grids not yet supported here!
+    '''
     # Make this work just with 1D (KM,) arrays
     #  (KM,)  -->  (1, nlay)
-    if np.isscalar(field):
-        return field
-    else:
+    try:
         #  Flip along the last axis to reverse the pressure order
         field = field[..., ::-1]
-        #  Do we need to append an extra dimension for singleton horizontal ncol?
-        if append_ncol:
-            return field[np.newaxis, ...]
-        else:
+    except:
+        if np.isscalar(field):
             return field
+        else:
+            raise ValueError('field must be array_like or scalar.')
+    shape = field.shape
+    if len(shape)==1:  #  (num_lev)
+        #  Need to append an extra dimension for singleton horizontal ncol
+        return field[np.newaxis, ...]
+    elif len(shape)==2:  # (num_lat, num_lev)
+        return field
+    elif len(shape) > 2:
+        raise ValueError('lat-lon grids not yet supported here.')
+    #elif len(shape)==3:  # (num_lat, num_lon, num_lev)
+        #  Need to reshape this array
 
 def _rrtm_to_climlab(field):
-    if np.isscalar(field):
-        return field
-    else:
+    try:
+        #  Flip along the last axis to reverse the pressure order
         field = field[..., ::-1]
-        return np.squeeze(field)
+    except:
+        if np.isscalar(field):
+            return field
+        else:
+            raise ValueError('field must be array_like or scalar.')
+    return np.squeeze(field)
