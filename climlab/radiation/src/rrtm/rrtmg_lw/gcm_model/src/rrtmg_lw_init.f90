@@ -78,22 +78,22 @@
       call lwavplank              ! Planck function
       call lwavplankderiv         ! Planck function derivative wrt temp
       !  CliMT: Now reading in absorption data in Python code
-      !call lw_kgb01               ! molecular absorption coefficients
-      !call lw_kgb02
-      !call lw_kgb03
-      !call lw_kgb04
-      !call lw_kgb05
-      !call lw_kgb06
-      !call lw_kgb07
-      !call lw_kgb08
-      !call lw_kgb09
-      !call lw_kgb10
-      !call lw_kgb11
-      !call lw_kgb12
-      !call lw_kgb13
-      !call lw_kgb14
-      !call lw_kgb15
-      !call lw_kgb16
+      call lw_kgb01               ! molecular absorption coefficients
+      call lw_kgb02
+      call lw_kgb03
+      call lw_kgb04
+      call lw_kgb05
+      call lw_kgb06
+      call lw_kgb07
+      call lw_kgb08
+      call lw_kgb09
+      call lw_kgb10
+      call lw_kgb11
+      call lw_kgb12
+      call lw_kgb13
+      call lw_kgb14
+      call lw_kgb15
+      call lw_kgb16
 
 ! Compute lookup tables for transmittance, tau transition function,
 ! and clear sky tau (for the cloudy sky radiative transfer).  Tau is

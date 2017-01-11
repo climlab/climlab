@@ -28,6 +28,7 @@ gcm_model/src/mcica_subcol_gen_lw.f90
 gcm_model/src/rrtmg_lw_taumol.f90
 gcm_model/src/rrtmg_lw_setcoef.f90
 gcm_model/src/rrtmg_lw_rtrnmc.f90
+gcm_model/src/rrtmg_lw_k_g.f90
 gcm_model/src/rrtmg_lw_init.f90
 gcm_model/src/rrtmg_lw_cldprmc.f90
 gcm_model/src/rrtmg_lw_rad.f90

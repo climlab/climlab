@@ -8,7 +8,7 @@ from _rrtm_radiation_init import read_lw_abs_data, read_sw_abs_data
 
 #  Python-based initialization of absorption data from netcdf file
 read_sw_abs_data(_rrtmg_sw)
-read_lw_abs_data(_rrtmg_lw)
+#read_lw_abs_data(_rrtmg_lw)
 #  Call the modified fortran init subroutine (netcdf calls are commented out)
 _rrtmg_sw.rrtmg_sw_init.rrtmg_sw_ini(const.cp)
 _rrtmg_lw.rrtmg_lw_init.rrtmg_lw_ini(const.cp)
