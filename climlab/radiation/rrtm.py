@@ -119,8 +119,8 @@ class RRTMG_LW(EnergyBudget):
         Must be implemented by daughter classes.'''
 
         nlay = self.lev.size
-        play = _climlab_to_rrtm(self.lev, append_ncol=False)
-        plev = _climlab_to_rrtm(self.lev_bounds, append_ncol=False)
+        play = _climlab_to_rrtm(self.lev)
+        plev = _climlab_to_rrtm(self.lev_bounds)
         tlay = _climlab_to_rrtm(self.Tatm)
         tlev = _climlab_to_rrtm(interface_temperature(**self.state))
         ncol, nlay = tlay.shape
@@ -191,8 +191,6 @@ class RRTMG_LW(EnergyBudget):
             else:
                 thing = args[j].shape
             print j, thing
-
-        print inflglw
 
         #  Call the RRTM code!
         uflx, dflx, hr, uflxc, dflxc, hrc, duflx_dt, duflxc_dt = _rrtmg_lw.driver(*args)
