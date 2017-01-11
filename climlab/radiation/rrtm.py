@@ -7,10 +7,10 @@ import _rrtmg_lw, _rrtmg_sw
 from _rrtm_radiation_init import read_lw_abs_data, read_sw_abs_data
 
 #  Python-based initialization of absorption data from netcdf file
-read_sw_abs_data(_rrtmg_sw)
+#read_sw_abs_data(_rrtmg_sw)
 #read_lw_abs_data(_rrtmg_lw)
 #  Call the modified fortran init subroutine (netcdf calls are commented out)
-_rrtmg_sw.rrtmg_sw_init.rrtmg_sw_ini(const.cp)
+#_rrtmg_sw.rrtmg_sw_init.rrtmg_sw_ini(const.cp)
 _rrtmg_lw.rrtmg_lw_init.rrtmg_lw_ini(const.cp)
 
 #  Ready for calls to _rrtmg_lw.driver() and _rrtmg_sw.driver()
@@ -21,7 +21,7 @@ nbndlw = int(_rrtmg_lw.parrrtm.nbndlw)
 
 ## RRTM inputs  from CliMT code
 # GENERAL, used in both SW and LW
-icld = 0    # Cloud overlap method, 0: Clear only, 1: Random, 2,  Maximum/random] 3: Maximum
+icld = 1    # Cloud overlap method, 0: Clear only, 1: Random, 2,  Maximum/random] 3: Maximum
 permuteseed_sw =  150  # used for monte carlo clouds; must differ from permuteseed_lw by number of subcolumns
 permuteseed_lw =  300  # learn about these later...
 irng = 1  # more monte carlo stuff
@@ -191,10 +191,11 @@ class RRTMG_LW(EnergyBudget):
             else:
                 thing = args[j].shape
             print j, thing
+        self.args = args
 
         #  Call the RRTM code!
         uflx, dflx, hr, uflxc, dflxc, hrc, duflx_dt, duflxc_dt = _rrtmg_lw.driver(*args)
-        #  For debugging purposes: raw outpu
+        #  For debugging purposes: raw output
         self.uflx = uflx
         self.dflx = dflx
         self.hr = hr
