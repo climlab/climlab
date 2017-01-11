@@ -68,11 +68,11 @@ subroutine driver &
     integer(kind=im), intent(in) :: iceflglw       ! Flag for ice particle specification
     integer(kind=im), intent(in) :: liqflglw        ! Flag for liquid droplet specification
     real(kind=rb), intent(in) :: cldfrac(ncol,nlay)      ! layer cloud fraction
-    real(kind=rb), intent(in) :: tauc(nbndlw,ncol,nlay)  ! in-cloud optical depth
     real(kind=rb), intent(in) :: ciwp(ncol,nlay)         ! in-cloud ice water path
     real(kind=rb), intent(in) :: clwp(ncol,nlay)         ! in-cloud liquid water path
     real(kind=rb), intent(in) :: reic(ncol,nlay)         ! cloud ice particle size
     real(kind=rb), intent(in) :: relq(ncol,nlay)         ! cloud liquid particle size
+    real(kind=rb), intent(in) :: tauc(nbndlw,ncol,nlay)  ! in-cloud optical depth
     real(kind=rb), intent(in) :: tauaer(ncol,nlay,nbndlw) ! aerosol optical depth at mid-point of LW spectral bands
 
 ! Output
