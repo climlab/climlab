@@ -21,7 +21,7 @@ nbndlw = int(_rrtmg_lw.parrrtm.nbndlw)
 
 ## RRTM inputs  from CliMT code
 # GENERAL, used in both SW and LW
-icld = 1    # Cloud overlap method, 0: Clear only, 1: Random, 2,  Maximum/random] 3: Maximum
+icld = 0    # Cloud overlap method, 0: Clear only, 1: Random, 2,  Maximum/random] 3: Maximum
 permuteseed_sw =  150  # used for monte carlo clouds; must differ from permuteseed_lw by number of subcolumns
 permuteseed_lw =  300  # learn about these later...
 irng = 1  # more monte carlo stuff
@@ -194,12 +194,14 @@ class RRTMG_LW(EnergyBudget):
 
         #  Call the RRTM code!
         uflx, dflx, hr, uflxc, dflxc, hrc, duflx_dt, duflxc_dt = _rrtmg_lw.driver(*args)
+        #  For debugging purposes: raw outpu
         self.uflx = uflx
         self.dflx = dflx
         self.hr = hr
         self.uflxc = uflxc
         self.dflxc = dflxc
         self.hrc = hrc
+
         #  Output is all (ncol,nlay+1) or (ncol,nlay)
         self.flux_up = _rrtm_to_climlab(uflx)
         self.flux_down = _rrtm_to_climlab(dflx)
@@ -227,7 +229,12 @@ def interface_temperature(Ts, Tatm, **kwargs):
     lev = Tatm.domain.axes['lev'].points
     lev_bounds = Tatm.domain.axes['lev'].bounds
     #  For now just return something dumb but with the right dimensions
-    return np.append(Tatm, Tatm[..., -1])
+    #return np.append(Tatm, Tatm[..., -1])
+    Tinterp = np.interp(lev_bounds[1:-1], lev, Tatm)
+    #  add TOA value
+    Tinterp = np.insert(Tinterp, 0, Tatm[0])
+    Tinterp = np.append(Tinterp, Ts)
+    return Tinterp
 
 def _climlab_to_rrtm(field, append_ncol=True):
     '''Prepare field with proper dimension order.
