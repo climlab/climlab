@@ -77,7 +77,6 @@
       call lwatmref               ! reference MLS profile
       call lwavplank              ! Planck function
       call lwavplankderiv         ! Planck function derivative wrt temp
-      !  CliMT: Now reading in absorption data in Python code
       call lw_kgb01               ! molecular absorption coefficients
       call lw_kgb02
       call lw_kgb03

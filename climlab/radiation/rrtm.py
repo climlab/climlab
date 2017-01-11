@@ -11,7 +11,7 @@ from _rrtm_radiation_init import read_lw_abs_data, read_sw_abs_data
 #read_lw_abs_data(_rrtmg_lw)
 #  Call the modified fortran init subroutine (netcdf calls are commented out)
 #_rrtmg_sw.rrtmg_sw_init.rrtmg_sw_ini(const.cp)
-_rrtmg_lw.rrtmg_lw_init.rrtmg_lw_ini(const.cp)
+#_rrtmg_lw.rrtmg_lw_init.rrtmg_lw_ini(const.cp)
 
 #  Ready for calls to _rrtmg_lw.driver() and _rrtmg_sw.driver()
 
@@ -177,7 +177,7 @@ class RRTMG_LW(EnergyBudget):
         tauaer = tauaer_lw
         tauc = tauc_lw
 
-        args = [ncol, nlay, icld, permuteseed_lw, irng, idrv,
+        args = [ncol, nlay, icld, permuteseed_lw, irng, idrv, const.cp,
                 play, plev, tlay, tlev, tsfc,
                 h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr,
                 cfc11vmr, cfc12vmr, cfc22vmr, ccl4vmr, emis,

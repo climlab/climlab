@@ -567,7 +567,6 @@
          l = lev - 1
 
 ! Calculate heating rates at model layers
-         heatfac = 8.3944_rb  ! BRIAN this should be the correct value
          htr(l)=heatfac*(fnet(l)-fnet(lev))/(pz(l)-pz(lev))
          htrc(l)=heatfac*(fnetc(l)-fnetc(lev))/(pz(l)-pz(lev))
       enddo

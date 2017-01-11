@@ -9,7 +9,7 @@
 !  (inspired by CliMT code by Rodrigo Caballero)
 
 subroutine driver &
-    (ncol, nlay, icld, permuteseed, irng, idrv, &
+    (ncol, nlay, icld, permuteseed, irng, idrv, cpdair, &
     play, plev, tlay, tlev, tsfc, &
     h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr, &
     cfc11vmr, cfc12vmr, cfc22vmr, ccl4vmr, emis, &
@@ -23,6 +23,7 @@ subroutine driver &
     use mcica_subcol_gen_lw, only: mcica_subcol_lw
     use rrtmg_lw_init, only: rrtmg_lw_ini
     use parrrtm, only: nbndlw, ngptlw
+    use rrtmg_lw_init, only: rrtmg_lw_ini
 
 
 ! Input
@@ -47,7 +48,9 @@ subroutine driver &
                                                     !    0: Normal forward calculation
                                                     !    1: Normal forward calculation with
                                                     !       duflx_dt and duflxc_dt output
-
+    real(kind=rb), intent(in) :: cpdair    ! Specific heat capacity of dry air
+                                            ! at constant pressure at 273 K
+                                            ! (J kg-1 K-1)
     real(kind=rb), intent(in) :: play(ncol,nlay)    ! Layer pressures (hPa, mb)
     real(kind=rb), intent(in) :: plev(ncol,nlay+1)  ! Interface pressures (hPa, mb)
     real(kind=rb), intent(in) :: tlay(ncol,nlay)    ! Layer temperatures (K)
@@ -110,6 +113,11 @@ subroutine driver &
     call mcica_subcol_lw(1, ncol, nlay, icld, permuteseed, irng, play, &
                        cldfrac, ciwp, clwp, reic, relq, tauc, cldfmcl, &
                        ciwpmcl, clwpmcl, reicmcl, relqmcl, taucmcl)
+
+    ! In principle the init routine should not need to be called every timestep
+    !  But this seems to work better than calling it from Python...
+    call rrtmg_lw_ini(cpdair)
+
     !  Call the RRTMG_LW driver to compute radiative fluxes
     call rrtmg_lw(ncol    ,nlay    ,icld    ,idrv    , &
              play    , plev    , tlay    , tlev    , tsfc    , &
