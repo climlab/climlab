@@ -4,7 +4,6 @@ import numpy as np
 from climlab.process import EnergyBudget, TimeDependentProcess
 from climlab import constants as const
 import _rrtmg_lw, _rrtmg_sw
-from _rrtm_radiation_init import read_lw_abs_data, read_sw_abs_data
 from scipy.interpolate import interp1d
 
 
