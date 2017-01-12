@@ -17,7 +17,7 @@ def rcm():
     h2o = climlab.radiation.ManabeWaterVapor(state=state)
     #  Hard convective adjustment
     convadj = climlab.convection.ConvectiveAdjustment(state=state,
-                                                             adj_lapse_rate=6.5)
+                                                      adj_lapse_rate=6.5)
     # CAM3 radiation with default parameters and interactive water vapor
     rad = climlab.radiation.CAM3Radiation(state=state, O3init=True,
                                      aldif=alb, aldir=alb, asdif=alb, asdir=alb)

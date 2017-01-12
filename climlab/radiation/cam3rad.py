@@ -12,9 +12,6 @@ from scipy.interpolate import interp1d, interp2d
 #  the compiled fortran extension
 import _cam3_radiation
 
-#  New concept: the driver is compiled once at import time
-#  and not attached to individual climlab process instances
-
 ToExtension = ['do_sw','do_lw','p','dp','ps','Tatm','Ts','q','O3','cldf','clwp',
                'ciwp', 'in_cld','aldif','aldir','asdif','asdir','cosZen',
                'insolation','flus','r_liq','r_ice','CO2','N2O','CH4','CFC11',

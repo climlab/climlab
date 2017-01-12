@@ -15,7 +15,8 @@ h2o = climlab.radiation.ManabeWaterVapor(state=state)
 rad = climlab.radiation.RRTMG(state=state, h2ovmr=h2o.q,
                               aldir=alb, aldif=alb, asdir=alb, asdif=alb)
 #  Convective adjustment
-conv = climlab.convection.ConvectiveAdjustment(state=state)
+conv = climlab.convection.ConvectiveAdjustment(state=state,
+                                               adj_lapse_rate=6.5)
 #  Couple everything together
 rcm.add_subprocess('Radiation', rad)
 rcm.add_subprocess('WaterVapor', h2o)
