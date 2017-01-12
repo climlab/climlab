@@ -29,6 +29,7 @@ gcm_model/src/rrtmg_sw_reftra.f90
 gcm_model/src/rrtmg_sw_taumol.f90
 gcm_model/src/rrtmg_sw_spcvmc.f90
 gcm_model/src/rrtmg_sw_setcoef.f90
+gcm_model/src/rrtmg_sw_k_g.f90
 gcm_model/src/rrtmg_sw_init.f90
 gcm_model/src/rrtmg_sw_cldprmc.f90
 gcm_model/src/rrtmg_sw_rad.f90

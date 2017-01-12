@@ -9,7 +9,7 @@
 !  (inspired by CliMT code by Rodrigo Caballero)
 
 subroutine driver &
-    (ncol, nlay, icld, permuteseed, irng, idrv, &
+    (ncol, nlay, icld, permuteseed, irng, idrv, cpdair, &
     play, plev, tlay, tlev, tsfc, &
     h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr, &
     aldif, aldir, asdif, asdir, coszen, adjes, dyofyr, scon, &
@@ -24,6 +24,7 @@ subroutine driver &
     use mcica_subcol_gen_sw, only: mcica_subcol_sw
     use rrtmg_sw_init, only: rrtmg_sw_ini
     use parrrsw, only: nbndsw, ngptsw, naerec
+    use rrtmg_sw_init, only: rrtmg_sw_ini
 
 
 ! Input
@@ -48,7 +49,9 @@ subroutine driver &
                                                     !    0: Normal forward calculation
                                                     !    1: Normal forward calculation with
                                                     !       duflx_dt and duflxc_dt output
-
+    real(kind=rb), intent(in) :: cpdair    ! Specific heat capacity of dry air
+                                           ! at constant pressure at 273 K
+                                           ! (J kg-1 K-1)
     real(kind=rb), intent(in) :: play(ncol,nlay)    ! Layer pressures (hPa, mb)
     real(kind=rb), intent(in) :: plev(ncol,nlay+1)  ! Interface pressures (hPa, mb)
     real(kind=rb), intent(in) :: tlay(ncol,nlay)    ! Layer temperatures (K)
@@ -94,6 +97,14 @@ subroutine driver &
     real(kind=rb), intent(out) :: swdflxc(ncol,nlay+1)   ! Clear sky shortwave downward flux (W/m2)
     real(kind=rb), intent(out) :: swhrc(ncol,nlay)       ! Clear sky shortwave radiative heating rate (K/d)
 
+!  These are not comments! Necessary directives to f2py to handle array dimensions
+!f2py depend(ncol,nlay) play, plev, tlay, tlev
+!f2py depend(ncol,nlay) h2ovmr,o3vmr,co2vmr,ch4vmr,n2ovmr,o2vmr
+!f2py depend(ncol) tsfc, aldif, aldir, asdif, asdir, coszen
+!f2py depend(ncol,nlay) cldfrac,ciwp,clwp,reic,relq,tauc,ssac,asmc,fsfc
+!f2py depend(ncol,nlay) ciwp,clwp,reic,relq,tauaer,ssaaer,asmaer,ecaer
+!f2py depend(ncol,nlay) swuflx,swdflx,swhr,swuflxc,swdflxc,swhrc
+
     ! Local
     !   These quantities are computed by McICA
     real(kind=rb) :: cldfmcl(ngptsw,ncol,nlay)   ! cloud fraction [mcica]
@@ -112,6 +123,11 @@ subroutine driver &
                        cldfrac, ciwp, clwp, reic, relq, tauc, ssac, asmc, fsfc, &
                        cldfmcl, ciwpmcl, clwpmcl, reicmcl, relqmcl, &
                        taucmcl, ssacmcl, asmcmcl, fsfcmcl)
+
+     ! In principle the init routine should not need to be called every timestep
+     !  But calling it from Python is not working... heatfac is not getting set properly
+     call rrtmg_sw_ini(cpdair)
+
     !  Call the RRTMG_SW driver to compute radiative fluxes
     call rrtmg_sw(ncol    ,nlay    ,icld    , &
              play    ,plev    ,tlay    ,tlev    ,tsfc   , &

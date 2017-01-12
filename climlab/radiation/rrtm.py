@@ -10,8 +10,8 @@ from scipy.interpolate import interp1d
 
 #  Get number of bands from fortran modules
 nbndsw = int(_rrtmg_sw.parrrsw.nbndsw)
+naerec = int(_rrtmg_sw.parrrsw.naerec)
 nbndlw = int(_rrtmg_lw.parrrtm.nbndlw)
-
 
 class _RRTM(EnergyBudget):
     '''Generic parent class used for all RRTM radiation modules.
@@ -75,12 +75,7 @@ class _RRTM(EnergyBudget):
         play = _climlab_to_rrtm(self.lev * np.ones_like(tlay))
         plev = _climlab_to_rrtm(self.lev_bounds * np.ones_like(tlev))
         ncol, nlay = tlay.shape
-        if len(self.Ts.shape)==1:
-            tsfc = self.Ts  #  single column
-        elif len(self.Ts.shape)==2:
-            tsfc = np.squeeze(self.Ts)  # should handle case with num_lat > 1
-        else:
-            raise ValueError('Mix up with dimensions of surface temperature')
+        tsfc = _climlab_to_rrtm_sfc(self.Ts)
         # GASES -- put them in proper dimensions
         h2ovmr   = _climlab_to_rrtm(self.h2ovmr * np.ones_like(self.Tatm))
         o3vmr    = _climlab_to_rrtm(self.o3vmr * np.ones_like(self.Tatm))
@@ -119,7 +114,7 @@ class RRTMG(_RRTM):
                 # LW
                 emis = 1.,
                 # THE SUN - SW
-                coszen = 1.,      # cosine of the solar zenith angle
+                coszen = 0.1,    # cosine of the solar zenith angle
                 adjes = 1.,       # flux adjustment for earth/sun distance (if not dyofyr)
                 dyofyr = 0,       # day of the year used to get Earth/Sun distance (if not adjes)
                 scon = const.S0,  # solar constant
@@ -237,7 +232,7 @@ class RRTMG_SW(_RRTM):
                 aldir = 0.3,
                 asdif = 0.3,
                 asdir = 0.3,
-                coszen = 1.,      # cosine of the solar zenith angle
+                coszen = 0.25,    # cosine of the solar zenith angle
                 adjes = 1.,       # flux adjustment for earth/sun distance (if not dyofyr)
                 dyofyr = 0,       # day of the year used to get Earth/Sun distance (if not adjes)
                 scon = const.S0,  # solar constant
@@ -280,9 +275,83 @@ class RRTMG_SW(_RRTM):
         self.add_diagnostic('ASR', 0.*self.Ts)
         self.add_diagnostic('ASRclr', 0.*self.Ts)
         self.add_diagnostic('TdotSW', 0.*self.Tatm)
+        self.add_diagnostic('TdotSWclr', 0.*self.Tatm)
 
-    #def _compute_heating_rates(self):
-        #  Implement this driver....
+    def _prepare_sw_arguments(self, ncol, nlay):
+        aldif = _climlab_to_rrtm_sfc(self.aldif * np.ones_like(self.Ts))
+        aldir = _climlab_to_rrtm_sfc(self.aldir * np.ones_like(self.Ts))
+        asdif = _climlab_to_rrtm_sfc(self.asdif * np.ones_like(self.Ts))
+        asdir = _climlab_to_rrtm_sfc(self.asdir * np.ones_like(self.Ts))
+        coszen = _climlab_to_rrtm_sfc(self.coszen * np.ones_like(self.Ts))
+        #  THE REST OF THESE ARGUMENTS ARE STILL BEING HARD CODED.
+        #   NEED TO FIX THIS UP...
+
+        #  These arrays have an extra dimension for number of bands
+        dim_sw1 = [nbndsw,ncol,nlay]     # [nbndsw,ncol,nlay]
+        dim_sw2 = [ncol,nlay,nbndsw]  # [ncol,nlay,nbndsw]
+        tauc = np.zeros(dim_sw1) # In-cloud optical depth
+        ssac = np.zeros(dim_sw1) # In-cloud single scattering albedo
+        asmc = np.zeros(dim_sw1) # In-cloud asymmetry parameter
+        fsfc = np.zeros(dim_sw1) # In-cloud forward scattering fraction (delta function pointing forward "forward peaked scattering")
+
+        # AEROSOLS
+        tauaer = np.zeros(dim_sw2)   # Aerosol optical depth (iaer=10 only), Dimensions,  (ncol,nlay,nbndsw)] #  (non-delta scaled)
+        ssaaer = np.zeros(dim_sw2)   # Aerosol single scattering albedo (iaer=10 only), Dimensions,  (ncol,nlay,nbndsw)] #  (non-delta scaled)
+        asmaer = np.zeros(dim_sw2)   # Aerosol asymmetry parameter (iaer=10 only), Dimensions,  (ncol,nlay,nbndsw)] #  (non-delta scaled)
+        ecaer  = np.zeros([ncol,nlay,naerec])   # Aerosol optical depth at 0.55 micron (iaer=6 only), Dimensions,  (ncol,nlay,naerec)] #  (non-delta scaled)
+
+        return (aldif,aldir,asdif,asdir,coszen,tauc,ssac,asmc,
+                fsfc,tauaer,ssaaer,asmaer,ecaer)
+
+    def _compute_heating_rates(self):
+        '''Prepare arguments and call the RRTGM_SW driver to calculate
+        radiative fluxes and heating rates'''
+        #  scalar integer arguments
+        icld = self.icld
+        irng = self.irng
+        idrv = self.idrv
+        permuteseed = self.permuteseed
+        inflgsw = self.inflgsw
+        iceflgsw = self.iceflgsw
+        liqflgsw = self.liqflgsw
+        dyofyr = self.dyofyr
+        #  scalar real arguments
+        adjes = self.adjes
+        scon = self.scon
+        #  prepare proper array dimensions
+        (ncol, nlay, play, plev, tlay, tlev, tsfc,
+        h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr, cfc11vmr,
+        cfc12vmr, cfc12vmr, cfc22vmr, ccl4vmr,
+        cldfrac, ciwp, clwp, relq, reic) = self._prepare_arguments()
+        (aldif,aldir,asdif,asdir,coszen,tauc,ssac,asmc,
+         fsfc,tauaer,ssaaer,asmaer,ecaer) = self._prepare_sw_arguments(ncol, nlay)
+
+        args = [ncol, nlay, icld, permuteseed, irng, idrv, const.cp,
+                play, plev, tlay, tlev, tsfc,
+                h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr,
+                aldif, aldir, asdif, asdir, coszen, adjes, dyofyr, scon,
+                inflgsw, iceflgsw, liqflgsw,
+                cldfrac, ciwp, clwp, reic, relq, tauc, ssac, asmc, fsfc,
+                tauaer, ssaaer, asmaer, ecaer,]
+        #  Call the RRTM code!
+        swuflx, swdflx, swhr, swuflxc, swdflxc, swhrc = _rrtmg_sw.driver(*args)
+        #  Output is all (ncol,nlay+1) or (ncol,nlay)
+        self.flux_up = _rrtm_to_climlab(swuflx)
+        self.flux_down = _rrtm_to_climlab(swdflx)
+        self.flux_up_clr = _rrtm_to_climlab(swuflxc)
+        self.flux_down_clr = _rrtm_to_climlab(swdflxc)
+        #  hr is the heating rate in K/day from RRTMG_SW
+        #  Need to set to W/m2
+        Catm = self.Tatm.domain.heat_capacity
+        self.heating_rate['Tatm'] = _rrtm_to_climlab(swhr) / const.seconds_per_day * Catm
+        #  calculate slab ocean heating rate from flux divergence
+        self.heating_rate['Ts'] = (self.flux_down[..., -1, np.newaxis] -
+                                   self.flux_up[..., -1, np.newaxis])
+        #  Set some diagnostics
+        self.ASR = self.flux_down[..., 0, np.newaxis] - self.flux_up[..., 0, np.newaxis]
+        self.ASRclr = self.flux_down_clr[..., 0, np.newaxis] - self.flux_up_clr[..., 0, np.newaxis]
+        self.TdotSW = _rrtm_to_climlab(swhr)  # heating rate in K/day
+        self.TdotSWclr = _rrtm_to_climlab(swhrc)
 
 
 class RRTMG_LW(_RRTM):
@@ -308,6 +377,20 @@ class RRTMG_LW(_RRTM):
         self.add_diagnostic('OLR', 0.*self.Ts)
         self.add_diagnostic('OLRclr', 0.*self.Ts)
         self.add_diagnostic('TdotLW', 0.*self.Tatm)
+        self.add_diagnostic('TdotLWclr', 0.*self.Tatm)
+
+    def _prepare_lw_arguments(self, ncol, nlay):
+        # surface emissivity
+        emis = self.emis * np.ones((ncol,nbndlw))
+
+        #  THE REST OF THESE ARGUMENTS ARE STILL BEING HARD CODED.
+        #   NEED TO FIX THIS UP...
+
+        #  These arrays have an extra dimension for number of bands
+        #tauc = _climlab_to_rrtm(self.tauc * np.ones_like(self.Tatm))
+        tauc = np.zeros([nbndlw,ncol,nlay]) # in-cloud optical depth
+        tauaer = np.zeros([ncol,nlay,nbndlw])   # Aerosol optical depth at mid-point of LW spectral bands
+        return emis, tauc, tauaer
 
     def _compute_heating_rates(self):
         '''Prepare arguments and call the RRTGM_LW driver to calculate
@@ -326,29 +409,7 @@ class RRTMG_LW(_RRTM):
         cfc12vmr, cfc12vmr, cfc22vmr, ccl4vmr,
         cldfrac, ciwp, clwp, relq, reic) = self._prepare_arguments()
 
-        #  These arrays have an extra dimension for number of bands
-        dim_sw1 = [nbndsw]; dim_sw1.extend(tlay.shape)     # [nbndsw,ncol,nlay]
-        dim_lw1 = [nbndlw]; dim_lw1.extend(tlay.shape)
-        dim_sw2 = list(tlay.shape); dim_sw2.append(nbndsw)  # [ncol,nlay,nbndsw]
-        dim_lw2 = list(tlay.shape); dim_lw2.append(nbndlw)
-        tauc_sw = np.zeros(dim_sw1) # In-cloud optical depth
-        tauc_lw = np.zeros(dim_lw1) # in-cloud optical depth
-        ssac_sw = np.zeros(dim_sw1) # In-cloud single scattering albedo
-        asmc_sw = np.zeros(dim_sw1) # In-cloud asymmetry parameter
-        fsfc_sw = np.zeros(dim_sw1) # In-cloud forward scattering fraction (delta function pointing forward "forward peaked scattering")
-
-        # AEROSOLS
-        tauaer_sw = np.zeros(dim_sw2)   # Aerosol optical depth (iaer=10 only), Dimensions,  (ncol,nlay,nbndsw)] #  (non-delta scaled)
-        ssaaer_sw = np.zeros(dim_sw2)   # Aerosol single scattering albedo (iaer=10 only), Dimensions,  (ncol,nlay,nbndsw)] #  (non-delta scaled)
-        asmaer_sw = np.zeros(dim_sw2)   # Aerosol asymmetry parameter (iaer=10 only), Dimensions,  (ncol,nlay,nbndsw)] #  (non-delta scaled)
-        ecaer_sw  = np.zeros(dim_sw2)   # Aerosol optical depth at 0.55 micron (iaer=6 only), Dimensions,  (ncol,nlay,naerec)] #  (non-delta scaled)
-        tauaer_lw = np.zeros(dim_lw2)   # Aerosol optical depth at mid-point of LW spectral bands
-
-        # surface emissivity
-        emis = self.emis * np.ones((ncol,nbndlw))
-
-        tauaer = tauaer_lw
-        tauc = tauc_lw
+        emis, tauc, tauaer = self._prepare_lw_arguments(ncol, nlay)
 
         args = [ncol, nlay, icld, permuteseed, irng, idrv, const.cp,
                 play, plev, tlay, tlev, tsfc,
@@ -358,14 +419,6 @@ class RRTMG_LW(_RRTM):
                 cldfrac, ciwp, clwp, reic, relq, tauc, tauaer,]
         #  Call the RRTM code!
         uflx, dflx, hr, uflxc, dflxc, hrc, duflx_dt, duflxc_dt = _rrtmg_lw.driver(*args)
-        #  For debugging purposes: raw output
-        self.uflx = uflx
-        self.dflx = dflx
-        self.hr = hr
-        self.uflxc = uflxc
-        self.dflxc = dflxc
-        self.hrc = hrc
-
         #  Output is all (ncol,nlay+1) or (ncol,nlay)
         self.flux_up = _rrtm_to_climlab(uflx)
         self.flux_down = _rrtm_to_climlab(dflx)
@@ -382,6 +435,7 @@ class RRTMG_LW(_RRTM):
         self.OLR = self.flux_up[..., 0, np.newaxis]
         self.OLRclr = self.flux_up_clr[..., 0, np.newaxis]
         self.TdotLW = _rrtm_to_climlab(hr)  # heating rate in K/day
+        self.TdotLWclr = _rrtm_to_climlab(hrc)  # heating rate in K/day
 
 
 def interface_temperature(Ts, Tatm, **kwargs):
@@ -442,3 +496,11 @@ def _rrtm_to_climlab(field):
         else:
             raise ValueError('field must be array_like or scalar.')
     return np.squeeze(field)
+
+def _climlab_to_rrtm_sfc(field):
+    if len(field.shape)==1:
+        return field  #  single column
+    elif len(field.shape)==2:
+        return np.squeeze(field)  # should handle case with num_lat > 1
+    else:
+        raise ValueError('Mix up with dimensions of surface field')

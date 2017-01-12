@@ -72,21 +72,20 @@
       call swaerpr               ! aerosol optical properties
       call swcldpr               ! cloud optical properties
       call swatmref              ! reference MLS profile
-      !  CliMT: Now reading in absorption data in Python code
-      !call sw_kgb16              ! molecular absorption coefficients
-      !call sw_kgb17
-      !call sw_kgb18
-      !call sw_kgb19
-      !call sw_kgb20
-      !call sw_kgb21
-      !call sw_kgb22
-      !call sw_kgb23
-      !call sw_kgb24
-      !call sw_kgb25
-      !call sw_kgb26
-      !call sw_kgb27
-      !call sw_kgb28
-      !call sw_kgb29
+      call sw_kgb16              ! molecular absorption coefficients
+      call sw_kgb17
+      call sw_kgb18
+      call sw_kgb19
+      call sw_kgb20
+      call sw_kgb21
+      call sw_kgb22
+      call sw_kgb23
+      call sw_kgb24
+      call sw_kgb25
+      call sw_kgb26
+      call sw_kgb27
+      call sw_kgb28
+      call sw_kgb29
 
 ! Define exponential lookup tables for transmittance. Tau is
 ! computed as a function of the tau transition function, and transmittance

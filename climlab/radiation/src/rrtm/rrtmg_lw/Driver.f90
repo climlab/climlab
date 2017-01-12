@@ -97,7 +97,7 @@ subroutine driver &
 !f2py depend(ncol,nlay) cfc11vmr,cfc12vmr,cfc22vmr,ccl4vmr
 !f2py depend(ncol) tsfc, emis
 !f2py depend(ncol,nlay) cldfrac,ciwp,clwp,reic,relq,tauc,tauaer
-!f2py depend(ncol,nlay) uflx,dflx,hr,uflxc,dflxc,duflx_dt,duflxc_dt
+!f2py depend(ncol,nlay) uflx,dflx,hr,uflxc,dflxc,hrc,duflx_dt,duflxc_dt
 
     ! Local
     !   These quantities are computed by McICA
