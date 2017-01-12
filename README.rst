@@ -65,9 +65,10 @@ appropriate collection of sub-processes.
 Currently, ``climlab`` has out-of-the-box support and documented examples for
 
 - 1D radiative and radiative-convective single column models, with various radiation schemes:
+    - RRTMG (a widely used radiative transfer code)
+    - CAM3  (from the NCAR GCM)
     - Grey Gas
     - Simplified band-averaged models (4 bands each in longwave and shortwave)
-    - One GCM-level radiation module (CAM3)
 - 1D diffusive energy balance models
 - Seasonal and steady-state models
 - Arbitrary combinations of the above, for example:
