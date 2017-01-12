@@ -54,3 +54,10 @@ def test_radiative_forcing(rcm):
     rcm2.subprocess['Radiation'].CO2 *= 2.
     rcm2.compute_diagnostics()
     assert (rcm2.ASR - rcm2.OLR) > 1.  # positive radiative forcing
+
+def test_cam3_multidim():
+    state = climlab.column_state(num_lev=40, num_lat=3, water_depth=5.)
+    rad = climlab.radiation.CAM3Radiation(state=state)
+    # Can we integrate?
+    rad.step_forward()
+    assert rad.OLR.shape == rad.Ts.shape

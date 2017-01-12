@@ -38,3 +38,12 @@ def test_swap_component():
     rad.add_subprocess('LW', CAM3Radiation_LW(state=state))
     rad.step_forward()
     assert hasattr(rad, 'OLR')
+
+def test_multidim():
+    state = climlab.column_state(num_lev=40, num_lat=3, water_depth=5.)
+    rad = RRTMG_LW(state=state)
+    #  are the transformations reversible?
+    assert np.all(_rrtm_to_climlab(_climlab_to_rrtm(rad.Tatm)) == rad.Tatm)
+    # Can we integrate?
+    rad.step_forward()
+    assert rad.OLR.shape == rad.Ts.shape
