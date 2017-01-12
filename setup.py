@@ -168,7 +168,6 @@ setup(name='climlab',
       packages=[
         'climlab',
         'climlab.convection',
-        'climlab.data',
         'climlab.domain',
         'climlab.dynamics',
         'climlab.model',
@@ -196,5 +195,7 @@ setup(name='climlab',
             'src/cam3/src/*.F90',
             'src/cam3/src/*.h'
         ]},
+      setup_requires=['pytest-runner'],
+      tests_require=['pytest'],
       include_package_data=True,
       zip_safe=False)
