@@ -1,4 +1,32 @@
-''' climlab wrapper for RRTMG_LW and RRTMG_SW radiation schemes'''
+''' climlab wrapper for RRTMG_LW and RRTMG_SW radiation schemes
+
+Here is a quick example of setting up a single-column Radiative-Convective model
+
+```
+import climlab
+alb = 0.25
+#  State variables (Air and surface temperature)
+state = climlab.column_state(num_lev=30)
+#  Parent model process
+rcm = climlab.TimeDependentProcess(state=state)
+#  Fixed relative humidity
+h2o = climlab.radiation.ManabeWaterVapor(state=state)
+#  Couple water vapor to radiation
+rad = climlab.radiation.RRTMG(state=state, h2ovmr=h2o.q,
+                              aldir=alb, aldif=alb, asdir=alb, asdif=alb)
+#  Convective adjustment
+conv = climlab.convection.ConvectiveAdjustment(state=state)
+#  Couple everything together
+rcm.add_subprocess('Radiation', rad)
+rcm.add_subprocess('WaterVapor', h2o)
+rcm.add_subprocess('Convection', conv)
+#  Run the model
+rcm.integrate_years(1)
+#  Check for energy balance
+print rcm.ASR - rcm.OLR
+```
+
+'''
 from __future__ import division
 import numpy as np
 from climlab.process import EnergyBudget, TimeDependentProcess
@@ -113,10 +141,10 @@ class RRTMG(_RRTM):
                 # LW
                 emis = 1.,
                 # THE SUN - SW
-                coszen = 0.1,    # cosine of the solar zenith angle
+                coszen = 0.5,    # cosine of the solar zenith angle
                 adjes = 1.,       # flux adjustment for earth/sun distance (if not dyofyr)
                 dyofyr = 0,       # day of the year used to get Earth/Sun distance (if not adjes)
-                scon = const.S0,  # solar constant
+                scon = const.S0/4,  # solar constant...  RRTMG_SW code has been modified to expect TOA insolation instead.
                 # CLOUDS, SW see http://www.arm.gov/publications/proceedings/conf16/extended_abs/iacono_mj.pdf
                 inflgsw  = 2, # Flag for cloud optical properties
                             # INFLAG = 0 direct specification of optical depths of clouds;
@@ -231,10 +259,10 @@ class RRTMG_SW(_RRTM):
                 aldir = 0.3,
                 asdif = 0.3,
                 asdir = 0.3,
-                coszen = 0.25,    # cosine of the solar zenith angle
+                coszen = 0.5,    # cosine of the solar zenith angle
                 adjes = 1.,       # flux adjustment for earth/sun distance (if not dyofyr)
                 dyofyr = 0,       # day of the year used to get Earth/Sun distance (if not adjes)
-                scon = const.S0,  # solar constant
+                scon = const.S0/4,  # solar constant...  RRTMG_SW code has been modified to expect TOA insolation instead.
                 inflgsw  = 2,
                 iceflgsw = 1,
                 liqflgsw = 1,
