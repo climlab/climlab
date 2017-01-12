@@ -114,11 +114,10 @@ class RRTMG_LW(EnergyBudget):
 
         Must be implemented by daughter classes.'''
 
-        nlay = self.lev.size
-        play = _climlab_to_rrtm(self.lev)
-        plev = _climlab_to_rrtm(self.lev_bounds)
         tlay = _climlab_to_rrtm(self.Tatm)
         tlev = _climlab_to_rrtm(interface_temperature(**self.state))
+        play = _climlab_to_rrtm(self.lev * np.ones_like(tlay))
+        plev = _climlab_to_rrtm(self.lev_bounds * np.ones_like(tlev))
         ncol, nlay = tlay.shape
         if len(self.Ts.shape)==1:
             tsfc = self.Ts  #  single column
@@ -204,10 +203,11 @@ class RRTMG_LW(EnergyBudget):
         Catm = self.Tatm.domain.heat_capacity
         self.heating_rate['Tatm'] = _rrtm_to_climlab(hr) / const.seconds_per_day * Catm
         #  calculate slab ocean heating rate from flux divergence
-        self.heating_rate['Ts'] = self.flux_down[..., -1] - self.flux_up[..., -1]
+        self.heating_rate['Ts'] = (self.flux_down[..., -1, np.newaxis] -
+                                   self.flux_up[..., -1, np.newaxis])
         #  Set some diagnostics
-        self.OLR = self.flux_up[..., 0]
-        self.OLRclr = self.flux_up_clr[..., 0]
+        self.OLR = self.flux_up[..., 0, np.newaxis]
+        self.OLRclr = self.flux_up_clr[..., 0, np.newaxis]
         self.TdotLW = _rrtm_to_climlab(hr)  # heating rate in K/day
 
 
@@ -225,9 +225,6 @@ def interface_temperature(Ts, Tatm, **kwargs):
     Tinterp = f(lev_bounds[1:-1])
     #  add TOA value, Assume surface temperature at bottom boundary
     Ttoa = Tatm[...,0]
-    print Ttoa[..., np.newaxis].shape
-    print Tinterp.shape
-    print Ts.shape
     Tinterp = np.concatenate((Ttoa[..., np.newaxis], Tinterp, Ts), axis=-1)
     return Tinterp
 
@@ -242,6 +239,8 @@ def _climlab_to_rrtm(field):
         - (num_lat, num_lon, num_lev)  -->  (num_lat*num_lon, num_lev)
 
         But lat-lon grids not yet supported here!
+
+    Case single column
     '''
     # Make this work just with 1D (KM,) arrays
     #  (KM,)  -->  (1, nlay)

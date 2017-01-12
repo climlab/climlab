@@ -11,6 +11,7 @@ def test_rrtmg_lw_creation():
     state = climlab.column_state(num_lev=num_lev, water_depth=5.)
     rad = RRTMG_LW(state=state)
     #  are the transformations reversible?
+    assert np.all(_rrtm_to_climlab(_climlab_to_rrtm(rad.Ts)) == rad.Ts)
     assert np.all(_rrtm_to_climlab(_climlab_to_rrtm(rad.Tatm)) == rad.Tatm)
 
 def test_rrtm_creation():
@@ -43,6 +44,7 @@ def test_multidim():
     state = climlab.column_state(num_lev=40, num_lat=3, water_depth=5.)
     rad = RRTMG_LW(state=state)
     #  are the transformations reversible?
+    assert np.all(_rrtm_to_climlab(_climlab_to_rrtm(rad.Ts)) == rad.Ts)
     assert np.all(_rrtm_to_climlab(_climlab_to_rrtm(rad.Tatm)) == rad.Tatm)
     # Can we integrate?
     rad.step_forward()
