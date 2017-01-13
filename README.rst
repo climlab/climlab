@@ -77,20 +77,20 @@ Currently, ``climlab`` has out-of-the-box support and documented examples for
 - boundary layer sensible and latent heat fluxes
 
 
-Documentation
+Documentation and Examples
 ------------------
-Full user manual available here_.
+Full user manual is available here_. 
 
-.. _here: http://climlab.readthedocs.io
-
-Example usage
-------------------
-The directory ``climlab/courseware/`` contains a collection of Jupyter / IPython
+The directory ``climlab/courseware/`` also contains a collection of Jupyter
 notebooks (*.ipynb) used for teaching some basics of climate science,
 and documenting use of the ``climlab`` package.
 These are self-describing, and should all run out-of-the-box once the package is installed, e.g:
 
 ``jupyter notebook Insolation.ipynb``
+
+
+.. _here: http://climlab.readthedocs.io
+
 
 
 History
