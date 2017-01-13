@@ -115,7 +115,7 @@ It also includes the CAM3 radiation module.
 Version 0.4 was released in October 2016. It includes comprehensive documentation,
 an automated test suite, support for latitude-longitude grids, and numerous small enhancements and bug fixes.
 
-Version 0.4.2 introduces the RRTMG radiation scheme, a much-improved build process for the Fortran extension,
+Version 0.4.2 (released January 2017) introduces the RRTMG radiation scheme, a much-improved build process for the Fortran extension,
 and numerous enhancements and simplifications to the API.
 
 The documentation_ was first created by Moritz Kreuzer (Potsdam Institut for Climate Impact Research) as part of a thesis project in Spring 2016.
