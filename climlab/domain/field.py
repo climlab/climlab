@@ -5,7 +5,7 @@
 # Following a tutorial on subclassing ndarray here:
 #
 # http://docs.scipy.org/doc/numpy/user/basics.subclassing.html
-
+from __future__ import division
 import numpy as np
 
 
@@ -358,23 +358,23 @@ def _global_mean_latlon(field):
 
 def to_latlon(array, domain, axis = 'lon'):
     """Broadcasts a 1D axis dependent array across another axis.
-    
+
     :param array input_array:   the 1D array used for broadcasting
     :param domain:              the domain associated with that
                                 array
-    :param axis:                the axis that the input array will 
-                                be broadcasted across 
+    :param axis:                the axis that the input array will
+                                be broadcasted across
                                 [default: 'lon']
-    :return:                    Field with the same shape as the 
+    :return:                    Field with the same shape as the
                                 domain
     :Example:
 
         ::
-            
+
             >>> import climlab
             >>> from climlab.domain.field import to_latlon
             >>> import numpy as np
-            
+
             >>> state = climlab.surface_state(num_lat=3, num_lon=4)
             >>> m = climlab.EBM_annual(state=state)
             >>> insolation = np.array([237., 417., 237.])
@@ -386,12 +386,12 @@ def to_latlon(array, domain, axis = 'lon'):
                     [ 237.],    [ 417.],    [ 237.],
                     [ 237.],    [ 417.],    [ 237.],
                     [ 237.]],   [ 417.]],   [ 237.]]])
-                
+
     """
     #  if array is latitude dependent (has the same shape as lat)
-    axis, array, depth = np.meshgrid(domain.axes[axis].points, array, 
+    axis, array, depth = np.meshgrid(domain.axes[axis].points, array,
                                     domain.axes['depth'].points)
     if axis == 'lat':
-    #  if array is longitude dependent (has the same shape as lon)    
-        np.swapaxes(array,1,0)      
+    #  if array is longitude dependent (has the same shape as lon)
+        np.swapaxes(array,1,0)
     return Field(array, domain=domain)

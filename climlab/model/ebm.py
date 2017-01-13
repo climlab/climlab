@@ -1,13 +1,13 @@
+from __future__ import division
 import numpy as np
 from climlab import constants as const
 from climlab.domain.field import Field, global_mean
-from climlab.process.energy_budget import EnergyBudget
+from climlab.process import EnergyBudget
 from climlab.utils import legendre
 from climlab.domain import domain
-from climlab.radiation.AplusBT import AplusBT
-from climlab.radiation.insolation import P2Insolation, AnnualMeanInsolation, DailyInsolation
+from climlab.radiation import AplusBT, P2Insolation, AnnualMeanInsolation, DailyInsolation
 from climlab.surface import albedo
-from climlab.dynamics.diffusion import MeridionalDiffusion
+from climlab.dynamics import MeridionalDiffusion
 from climlab.domain.initial import surface_state
 from scipy import integrate
 
@@ -117,7 +117,7 @@ class EBM(EnergyBudget):
     :ivar dict diagnostics: is initialized with keys: ``'OLR'``, ``'ASR'``,
                             ``'net_radiation'``, ``'albedo'``, ``'icelat'`` and
                             ``'ice_area'`` through
-                            :func:`~climlab.process.process.Process.init_diagnostic`.
+                            :func:`~climlab.process.process.Process.add_diagnostic`.
 
     :Example:
 
@@ -181,12 +181,11 @@ class EBM(EnergyBudget):
                                                         use_banded_solver=True,
                                                              **self.param))
         self.topdown = False  # call subprocess compute methods first
-        self.init_diagnostic('OLR', 0.*self.Ts)
-        self.init_diagnostic('ASR', 0.*self.Ts)
-        self.init_diagnostic('net_radiation', 0.*self.Ts)
-        self.init_diagnostic('albedo', 0.*self.Ts)
-        self.init_diagnostic('icelat', None)
-        self.init_diagnostic('ice_area', None)
+        self.add_diagnostic('ASR', 0.*self.Ts)
+        self.add_diagnostic('net_radiation', 0.*self.Ts)
+        self.add_diagnostic('albedo', 0.*self.Ts)
+        self.add_diagnostic('icelat', None)
+        self.add_diagnostic('ice_area', None)
 
 
     def _compute_heating_rates(self):
@@ -202,14 +201,14 @@ class EBM(EnergyBudget):
         #  (longwave part is computed in subprocess)
         self.heating_rate['Ts'] = self.ASR
         # useful diagnostics
-        try:
-            self.icelat = self.subprocess['albedo'].subprocess['iceline'].icelat
-        except KeyError, icelat:
-            self.icelat = None
-        try:
-            self.ice_area = self.subprocess['albedo'].subprocess['iceline'].ice_area
-        except KeyError, ice_area:
-            self.ice_area = None
+        #try:
+        #    self.icelat = self.subprocess['albedo'].subprocess['iceline'].icelat
+        #except KeyError, icelat:
+        #    self.icelat = None
+        #try:
+        #    self.ice_area = self.subprocess['albedo'].subprocess['iceline'].ice_area
+        #except KeyError, ice_area:
+        #    self.ice_area = None
 
 
     def global_mean_temperature(self):

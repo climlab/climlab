@@ -1,18 +1,16 @@
 '''
 climlab wrap of the CAM3 radiation code
 '''
+from __future__ import division
 import numpy as np
 import netCDF4 as nc
 from climlab import constants as const
-from climlab.radiation.radiation import Radiation
+from climlab.radiation import Radiation
 #import _cam3_interface
 import os
 from scipy.interpolate import interp1d, interp2d
 #  the compiled fortran extension
 import _cam3_radiation
-
-#  New concept: the driver is compiled once at import time
-#  and not attached to individual climlab process instances
 
 ToExtension = ['do_sw','do_lw','p','dp','ps','Tatm','Ts','q','O3','cldf','clwp',
                'ciwp', 'in_cld','aldif','aldir','asdif','asdir','cosZen',
@@ -97,31 +95,36 @@ class CAM3Radiation(Radiation):
                  O3file = 'apeozone_cam3_5_54.nc',
                  **kwargs):
         super(CAM3Radiation, self).__init__(**kwargs)
-        newinput = ['q',
-                    'CO2',
-                    'N2O',
-                    'CH4',
-                    'CFC11',
-                    'CFC12',
-                    'O3',
-                    'cldf',
-                    'clwp',
-                    'ciwp',
-                    'r_liq',
-                    'r_ice',
-                    'asdir',
-                    'asdif',
-                    'aldir',
-                    'aldif',
-                    'cosZen',
-                    'insolation']
-        self.add_input(newinput)
+        ###  Declare all input variables
+        #  Specific humidity in kg/kg
+        if q is None:
+            q = 1.e-8*np.ones_like(self.Tatm)  # Driver.f90 expect q in kg/kg
+        self.add_input('q', q)
         # well-mixed absorbing gases in ppmv (scalars)
-        self.CO2 = CO2
-        self.N2O = N2O
-        self.CH4 = CH4
-        self.CFC11 = CFC11
-        self.CFC12 = CFC12
+        self.add_input('CO2', CO2)
+        self.add_input('N2O', N2O)
+        self.add_input('CH4', CH4)
+        self.add_input('CFC11', CFC11)
+        self.add_input('CFC12', CFC12)
+        # initalize ozone
+        self.add_input('O3', np.ones_like(self.Tatm) * O3)
+        # Cloud frac
+        self.add_input('cldf', 0.*self.Tatm )
+        # Cloud water / ice path
+        self.add_input('clwp', 0.*self.Tatm)
+        self.add_input('ciwp', 0.*self.Tatm)
+        # Effective radius cloud drops
+        self.add_input('r_liq', 0.*self.Tatm + 10.)
+        self.add_input('r_ice', 0.*self.Tatm + 30.)
+        # Albedos
+        self.add_input('asdir', 0.*self.Ts + asdir)
+        self.add_input('asdif', 0.*self.Ts + asdif)
+        self.add_input('aldir', 0.*self.Ts + asdir)
+        self.add_input('aldif', 0.*self.Ts + asdif)
+        # cosine of the average zenith angle
+        self.add_input('cosZen', 0.*self.Ts + cosZen)
+        # Insolation in W/m2
+        self.add_input('insolation', 0.*self.Ts + insolation)
 
         self.KM = self.lev.size
         try:
@@ -141,36 +144,12 @@ class CAM3Radiation(Radiation):
         #self.ps = const.ps * np.ones(self.shape2D)
         #  surface pressure should correspond to model domain!
         self.ps = self.lev_bounds[-1] * np.ones(self.shape2D)
-        #lev = (np.arange(self.KM)+0.5) * const.ps/self.KM
-        #self.p = np.transpose(np.resize(lev,self.shape3D[::-1]))
         self.p = self.lev
+        #   why are we passing missing instead of the actual layer thicknesses?
         self.dp = np.zeros_like(self.p) - 99. # set as missing
-        #  Specific humidity in kg/kg
-        if q is None:
-            self.q = 1.e-8*np.ones_like(self.Tatm)  # Driver.f90 expect q in kg/kg
-        else:
-            self.q = q
-        self.O3 = np.ones_like(self.Tatm) * O3
 
-        # Cloud frac
-        self.cldf = np.zeros_like(self.Tatm)
-        # Cloud water path
-        self.clwp = np.zeros_like(self.Tatm)
-        self.ciwp = np.zeros_like(self.Tatm)
-        # Effective radius cloud drops
-        self.r_liq = np.zeros_like(self.Tatm) + 10.
-        self.r_ice = np.zeros_like(self.Tatm) + 30.
         # Surface upwelling LW
         self.flus = np.zeros_like(self.Ts) - 99. # set to missing as default
-        # Albedos
-        self.asdir = np.zeros_like(self.Ts) + asdir
-        self.asdif = np.zeros_like(self.Ts) + asdif
-        self.aldir = np.zeros_like(self.Ts) + asdir
-        self.aldif = np.zeros_like(self.Ts) + asdif
-        # cosine of the average zenith angle
-        self.cosZen = np.zeros_like(self.Ts) + cosZen
-        # Insolation in W/m2
-        self.insolation = np.zeros_like(self.Ts) + insolation
         # physical constants
         self.g = const.g
         self.Cpd = const.cp
@@ -178,17 +157,17 @@ class CAM3Radiation(Radiation):
         self.stebol = const.sigma
 
         # initialize diagnostics
-        self.init_diagnostic('ASR', 0. * self.Ts)
-        self.init_diagnostic('ASRcld', 0. * self.Ts)
-        self.init_diagnostic('OLR', 0. * self.Ts)
-        self.init_diagnostic('OLRcld', 0. * self.Ts)
-        self.init_diagnostic('TdotRad', 0. * self.Tatm)
-        self.init_diagnostic('TdotLW', 0. * self.Tatm)
-        self.init_diagnostic('TdotSW', 0. * self.Tatm)
+        self.add_diagnostic('ASR', 0. * self.Ts)
+        self.add_diagnostic('ASRcld', 0. * self.Ts)
+        self.add_diagnostic('OLR', 0. * self.Ts)
+        self.add_diagnostic('OLRcld', 0. * self.Ts)
+        self.add_diagnostic('TdotRad', 0. * self.Tatm)
+        self.add_diagnostic('TdotLW', 0. * self.Tatm)
+        self.add_diagnostic('TdotSW', 0. * self.Tatm)
 
         # automatic ozone data initialization
         if O3init:
-            datadir = os.path.abspath(os.path.dirname(__file__) + '/../data/ozone')
+            datadir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data', 'ozone'))
             O3filepath = os.path.join(datadir, O3file)
             #  Open the ozone data file
             print 'Getting ozone data from', O3filepath
@@ -215,15 +194,16 @@ class CAM3Radiation(Radiation):
                     print 'Reverting to default O3.'
 
     def _climlab_to_cam3(self, field):
-        '''Prepare field wit proper dimension order.
+        '''Prepare field with proper dimension order.
         CAM3 code expects 3D arrays with (KM, JM, 1)
         and 2D arrays with (JM, 1).
 
         climlab grid dimensions are any of:
             - (KM,)
             - (JM, KM)
+            - (JM, IM, KM)
 
-        (longitude dimension IM not yet implemented).'''
+        (longitude dimension IM not yet implemented here).'''
         if np.isscalar(field):
             return field
         #  Check to see if column vector needs to be replicated over latitude

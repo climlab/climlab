@@ -1,3 +1,4 @@
+from __future__ import division
 import numpy as np
 from climlab import constants as const
 
@@ -10,44 +11,44 @@ axis_types = ['lev', 'lat', 'lon', 'depth', 'abstract']
 
 class Axis(object):
     """Creates a new climlab Axis object.
-    
+
     An :class:`~climlab.domain.axis.Axis` is an object where information of a
     spacial dimension of a :class:`~climlab.domain.domain._Domain` are specified.
 
-    These include the `type` of the axis, the `number of points`, location of 
+    These include the `type` of the axis, the `number of points`, location of
     `points` and `bounds` on the spatial dimension, magnitude of bounds
     differences `delta` as well as their `unit`.
 
     The `axes` of a :class:`~climlab.domain.domain._Domain` are stored in the
-    dictionary axes, so they can be accessed through ``dom.axes`` if ``dom`` 
+    dictionary axes, so they can be accessed through ``dom.axes`` if ``dom``
     is an instance of :class:`~climlab.domain.domain._Domain`.
 
-    
+
     **Initialization parameters** \n
-        
-    An instance of ``Axis`` is initialized with the following 
+
+    An instance of ``Axis`` is initialized with the following
     arguments *(for detailed information see Object attributes below)*:
-    
-    :param str axis_type:   information about the type of axis 
+
+    :param str axis_type:   information about the type of axis
                             [default: 'abstract']
     :param int num_points:  number of points on axis
                             [default: 10]
     :param array points:    array with specific points (optional)
     :param array bounds:    array with specific bounds between points (optional)
     :raises: :exc:`ValueError`
-                            if ``axis_type`` is not one of the valid types or 
+                            if ``axis_type`` is not one of the valid types or
                             their euqivalents (see below).
     :raises: :exc:`ValueError`
                             if ``points`` are given and not array-like.
     :raises: :exc:`ValueError`
                             if ``bounds`` are given and not array-like.
-    
+
     **Object attributes** \n
-    
+
     Following object attributes are generated during initialization:
-        
-    :ivar str axis_type:    Information about the type of axis. Valid axis types are: 
-    
+
+    :ivar str axis_type:    Information about the type of axis. Valid axis types are:
+
                                 * ``'lev'``
                                 * ``'lat'``
                                 * ``'lon'``
@@ -55,18 +56,18 @@ class Axis(object):
                                 * ``'abstract'`` (default)
 
     :ivar int num_points:   number of points on axis
-    :ivar str units:        Unit of the axis. During intialization the unit is 
+    :ivar str units:        Unit of the axis. During intialization the unit is
                             chosen from the ``defaultUnits`` dictionary (see below).
     :ivar array points:     array with all points of the axis (grid)
     :ivar array bounds:     array with all bounds between points (staggered grid)
     :ivar array delta:      array with spatial differences between bounds
-    
+
 
     **Axis Types** \n
-    
+
     A couple of differing axis type strings are rendered to valid axis types.
     Alternate forms are listed here:
-    
+
     * ``'lev'``
         * ``'p'``
         * ``'press'``
@@ -84,18 +85,18 @@ class Axis(object):
         * ``'Depth'``
         * ``'waterDepth'``
         * ``'water_depth'``
-        * ``'slab'``    
+        * ``'slab'``
 
-    
+
     The **default units** are::
-        
+
         defaultUnits = {'lev': 'mb',
                         'lat': 'degrees',
                         'lon': 'degrees',
                         'depth': 'meters',
                         'abstract': 'none'}
-    
-    If bounds are not given during initialization, **default end points** 
+
+    If bounds are not given during initialization, **default end points**
     are used::
 
         defaultEndPoints = {'lev': (0., climlab.constants.ps),
@@ -103,14 +104,14 @@ class Axis(object):
                             'lon': (0., 360.),
                             'depth': (0., 10.),
                             'abstract': (0, num_points)}
-                                          
-    :Example: 
-        
+
+    :Example:
+
         Creation of a standalone Axis::
-            
+
             >>> import climlab
             >>> ax = climlab.domain.Axis(axis_type='Latitude', num_points=36)
-            
+
             >>> print ax
             Axis of type lat with 36 points.
 
@@ -129,8 +130,8 @@ class Axis(object):
             >>> ax.delta
             array([ 5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,
                     5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,
-                    5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.])   
-                
+                    5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.,  5.])
+
     """
     def __str__(self):
         return ("Axis of type " + self.axis_type + " with " +

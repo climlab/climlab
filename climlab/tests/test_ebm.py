@@ -1,3 +1,4 @@
+from __future__ import division
 import numpy as np
 import climlab
 import pytest
@@ -57,9 +58,9 @@ def test_decreased_S0(EBM_iceline):
     EBM_iceline.subprocess['insolation'].S0 = 1200.
     EBM_iceline.integrate_years(5.)
     assert np.all(EBM_iceline.icelat == np.array([-0.,  0.]))
-    
+
 def test_float():
-    '''Check that we can step forward the model after setting the state 
+    '''Check that we can step forward the model after setting the state
     variable with an ndarray of integers through 2 different methods'''
     from climlab.domain import initial
     from climlab.domain.field import Field
@@ -71,9 +72,9 @@ def test_float():
     k = climlab.EBM(num_lat=4)
     k.set_state('Ts', Field([10,15,15,10], domain=k.domains['Ts']))
     k.step_forward()
-    
+
 def test_albedo():
-    '''Check that we can integrate forward a model after changing the albedo 
+    '''Check that we can integrate forward a model after changing the albedo
     subprocess and get the expected icelat'''
     import numpy as np
     from climlab.surface import albedo
@@ -84,7 +85,9 @@ def test_albedo():
     m.add_subprocess('albedo', albedo.StepFunctionAlbedo(state=m.state, **m.param))
     m.integrate_years(1)
     assert np.all(m.icelat == np.array([-70.,  70.]))
-    m.add_subprocess('albedo', albedo.ConstantAlbedo(state=m.state, **m.param))
-    m.integrate_years(1)
-    assert m.icelat == None
-    
+    assert np.all(m.icelat == m.subprocess.albedo.subprocess.iceline.icelat)
+    #  What is the expected behavior if we swap out a subprocess for another
+    #  and they have different diagnostics???
+    #m.add_subprocess('albedo', albedo.ConstantAlbedo(state=m.state, **m.param))
+    #m.integrate_years(1)
+    #assert m.icelat == None

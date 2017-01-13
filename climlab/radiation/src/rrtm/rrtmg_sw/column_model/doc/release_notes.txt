@@ -1,0 +1,425 @@
+!     path:      $Source: /storm/rc1/cvsroot/rc/rrtmg_sw/doc/release_notes.txt,v $
+!     author:    $Author: mike $
+!     revision:  $Revision: 1.9 $
+!     created:   $Date: 2009/05/22 22:22:21 $
+!------------------------------------------------------------------------
+
+RRTMG_SW Release Notes
+
+NOTE: ** CVS rtags can't accept "." in strings, substitute "_"
+
+
+May 22, 2009:
+
+	Release_3_8
+
+        New option added to input absorption coefficient data either through 
+        original source statements or through a netCDF data file. Choice of 
+        input source is selected in the makefile. 
+
+        Publicly released on AER RT web site in May 2009.
+
+        - Added option for obtaining input absorption coefficient data either
+          through a netCDF file or through the original source statements. 
+          Global attributes of netCDF file header include detail on RRTM_SW
+          source version of k-distribution data and water continuum version. 
+        - Changed lower bound of allowable liquid droplet effective radius from
+          1.5 to 2.5 microns for the inflag=2/liqflag=1 cloud input option.
+
+
+February 9, 2009:
+
+	Release_3_7
+
+        Modified setting of the single scattering albedo threshold that selects
+        between the general 2-stream scattering solution (for most SSA values)
+        and a simpler, conservative scattering solution when SSA is close to 1.0.
+        The new more restrictive threhold generates improved results within 
+        multi-layer, highly scattering clouds when the SSA is just under one. 
+        This change will affect fluxes and will significantly affect heating rates
+        within highly scattering clouds, especially those that extend over multiple
+        layers. Also made several changes that prevent exception problems under
+        single precision.  A new flag was installed (idelm) that is used to
+        select between either unscaled 'true' direct and diffuse fluxes or
+        delta-scaled direct and diffuse fluxes.  Total fluxes continue to be
+        provided as delta-scaled quantities only.  
+
+        Publicly released on AER RT web site in February 2009.
+
+        - Revised value of variable zwcrit in rrtmg_sw_reftra.f90 from 0.9995 to
+          0.9999995.  This variable selects between the general 2-stream scattering
+          solution and a conservative scattering solution that is used when the SSA 
+          approaches 1.0.  The more restrictive threshold improves fluxes in heating
+          rates in multi-layer, highly scattering clouds.  Results may also change
+          slightly in other cloud or aerosol cases and may change negligibly due to 
+          Rayleigh scattering in clear sky. 
+        - Added flag idelm to GCM version of code to switch output direct and diffuse
+          fluxes between delta-scaled and unscaled 'true' flux values.  The flag is
+          set to 1 by default to output delta-scaled direct and diffuse fluxes in the
+          GCM version of the code. Total fluxes continue to be output only as delta-
+          scaled values. The idelm input flag in the column version of the code has 
+          also been activated and is set to 0 by default to provide unscaled direct
+          and diffuse fluxes.  See rrtmg_sw_instructions.txt for more information. 
+        - Made several code changes in rrtmg_sw_reftra.f90 to prevent possible 
+          divide by zero exception problems when the code is compiled with single
+          precision.  
+        - Removed an unnecessary module use association to module rrtmg_sw_cldprop
+          in main module rrtmg_sw_rad. 
+        - Converted declarations of arrays pref, prefd, ptra, and ptrad from 
+          intent(out) to intent(inout) in module rrtmg_sw_reftra.f90.
+        - Modified use associations related to rrsw_kgnn.f90 modules in source 
+          files rrtmg_sw_taumol.f90 and rrtmg_sw_init.f90 for compatibility with
+          gfortran and ifort compilers.  This has no affect on results. 
+        - Added makefile in build directory for IBM XL platforms. 
+        - Added a few updates to the file rrtmg_sw_instructions.txt. 
+
+
+September 17, 2008:
+
+        Release_3_61
+
+        Modified input of ice particle effective size to require input of value
+        appropriate for the selected ice optics parameterization. Previous scaling
+        that was applied internally to convert ice effective radius to generalized
+        effective size for the Fu parameterization has been removed.  Any necessary
+        scaling needed to provide the proper ice particle size must be done before
+        input to the radiation in the GCM version of the code.  This is consistent 
+        with the input requirement for the column version of the model.  Note that
+        the internal ice optics parameterizations are effective over specific ranges
+        of particle size.  Results may be different from previous versions if the
+        Fu parameterization is used in the GCM version of the code. 
+
+        Publicly released on AER RT web site in September 2008.
+
+
+August 29, 2008:
+
+	Release_3_6
+
+        Revised cloud property input to require in-cloud averaged cloud optical
+        depth or in-cloud averaged cloud ice and liquid water paths in both the 
+        single-column and gcm versions of the code. In earlier versions of the gcm
+        code, input grid-averaged cloud properties were scaled by the cloud fraction
+        internally to generate in-cloud averaged properties.  This change requires
+        that this scaling be performed during the interfacing if necessary.  The
+        minor structural modifications to the code have no effect on the results,
+        though a minor change to the factor used to convert flux to heating rate
+        will have a negligible effect on the heating rates. 
+
+        Publicly released on AER RT web site in August 2008.
+
+        - Added requirement that cloud properties be input as in-cloud averages
+          rather than grid-averaged values in GCM code.
+        - Renamed rrtmg_sw.f90 to rrtmg_sw_rad.f90 and renamed rrtmg_sw.nomcica.f90
+          to rrtmg_sw_rad.nomcica.f90 for consistency between file names and
+          module names. 
+        - Replaced several 'where' statements with traditional loops in module
+          mcica_subcol_gen_sw to improve computational performance on some systems.
+        - Moved subroutine swcldpr, which contains cloud absorption coefficient
+          data, from module rrtmg_sw_cldprop.f90 to rrtmg_sw_init.f90.
+        - Removed unnecessary use association of module mcica_subcol_gen_sw
+          from rrtmg_sw_rad.nomcica.f90. 
+        - Revised definition and naming of integer and real kind type parameters. 
+        - Changed setting of flag for selecting random number generator (irng) for
+          McICA to make it a required input variable. Available options are kissvec 
+          or Mersenne Twister.
+        - Increased precision of heatfac by changing it from a hard-wired value to 
+          a calculated value and changed code to require input of specific heat of 
+          dry air into init module (rrtmg_sw_init.f90) for heatfac calculation.   
+        - Oxygen volume mixing ratio was changed from a hard-wired parameter to
+          a required input array. 
+        - Forward scattering fraction was added as required input array when cloud
+          optical properties are input directly (inflag=0 option).  This was 
+          previously set as the square of the asymmetry parameter internally.
+          This change was made to enhance the code flexibility to allow this value
+          to be defined by the host GCM when cloud optical properties are provided.  
+        - In the column version of the code, increased the number of digits required 
+          to input variable solvar from INPUT_RRTM input file from three (f5.3) to
+          five (f7.5) to improve code flexibility. 
+
+
+January 3, 2008:
+
+	Release_3_5
+
+        Corrected calculation of cloud optical property stochastic arrays when
+        cloud optical properties are input directly (inflgsw=0). Initialized
+        asymmetry parameter to zero and single scattering albedo to one 
+        uniformly throughout the code.  
+
+        Publicly released on AER RT web site in January 2008.
+
+
+September 9, 2007:
+
+	Release_3_4
+
+        Modified use of ice particle size variables rei/reicmc to utilize separate 
+        variable names (dge/dgesmc) when units of generalized effective size are 
+        required for iceflag=3 option. This allowed use of ice particle size in
+        units of effective radius to parameterize cloud absorptivity using a basic
+        approach when ice particle sizes are larger than the permitted range for
+        the iceflag=3 option. Results may be minimally affected when ice particle
+        sizes exceed 90 microns and iceflag=3 option is used. Also modified several
+        local arrays in top-level subroutine module to accomodate an extra model 
+        layer if this feature is utilized. 
+
+        Publicly released on AER RT web site in September 2007.
+
+
+September 4, 2007:
+
+	Release_3_3
+
+        Cleaned up use of column dimension in some arrays in top level module of 
+        subroutine version of the model.  Also added solar constant (scon) as input 
+        array in subroutine version of the model to allow scaling from default value
+        in rrtmg_sw.  There was no impact on results from these changes in the column 
+        version of the model.
+
+        Publicly released on AER RT web site in September 2007.
+
+
+August 29, 2007:
+
+	Release_3_2
+
+        Minor changes to makefile for AIX. Corrected use of variables icld 
+        and nlay in top level source files for the subroutine version of code and
+        for the McICA sub-column generator.  There was no impact on results from
+        these changes in the column version of the model.
+
+        Publicly released on AER RT web site in August 2007.
+
+
+August 23, 2007:
+
+	Release_3_1
+
+        Made structural changes to modify code to use assumed-shape arrays
+        rather than explicit-shape arrays throughout the model.  There was
+        no impact on results from this changes.  Also implemented a 10000 
+        point exponential lookup table for transmittance, similar to that
+        used in the LW.  There were only negligible changes in results due
+        to use of the lookup table. 
+
+        Publicly released on AER RT web site in August 2007.
+
+        - Converted explicit-shape arrays to assumed-shape arrays. 
+        - Added exponential lookup table to improve computational performance.
+        - Modified top level subroutine to a module and converted most of the
+          other subroutines to modules.
+        - Modified makefiles to clean up handling of compiled modules.
+        - Added new makefile for AIX platforms.
+        - Fixed calculation of pi and added calculation of pdp in modules 
+          rrtmg_sw.f90 and rrtmg_sw.nomcica.f90, which did not affect the
+          top level program for the column version of the model.
+        - Added build directory for makefiles and doc directory for 
+          documentation to main model directory for consistency with other
+          AER RT model archives.  
+
+
+April 17, 2007:
+
+	Release_3_0
+
+        Major source code format revisions and addition of McICA capability.
+
+        Not publicly released. Released to Robert Pincus/NOAA on 18 April 2007
+        and to Yu-Tai Hou/NCEP on 30 April 2007.
+
+        - Reformatted entire model for consistency with RRTMG_LW to use modules
+          and subroutine call array passing.  Excluded from the reformatting
+          are files rrtatm.f, extra.f, and util_*.f, which are shared with and
+          retain the formatting of RRTM_SW.
+        - Code package can be used as a stand-alone column model or as a callable
+          subroutine (such as in a GCM).
+        - McICA capability has been added for stochastic representation of sub-grid
+          cloud variability such as cloud fraction and cloud overlap.
+        - Sub-column generator for McICA is called from within main source module
+          in column mode, but it must be called prior to RRTMG_SW in GCM mode.
+        - Installed two options for the random number generator required for 
+          McICA (selected by changing the hard-wired flag irnd). 
+        - Modified code to accept either cloud physical properties or cloud optical
+          properties when using McICA.
+        - Created makefiles consistent RRTMG_LW for SGI, SUN, LINUX (pgi) and 
+          OS_X (g95) platforms.
+       
+
+October 21, 2005:
+
+	Release_2_6_1 
+
+        This version contains minor modifications to exclude
+        an extraneous variable and to update the instructions file.
+
+        This version was not publicly released.
+
+
+August 4, 2005:
+
+	Release_2_6 - This version contains modifications to include some
+                of the updates added to RRTM_SW_V2.5 and RRTM_SW_V2.6.
+                Release number raised to 2.6 for consistency with RRTM_SW.
+
+		This version was not publicly released.
+
+                * Improved cloud properties routine to:
+
+                  a) include scattering properties of spheres, based on the
+                     parameterization by Key et al. in the STREAMER v3.0 RT code.
+
+                  b) convert cloud properties for Fu parameterization to a
+                     finer grid.
+
+                * Updated to rrtatm.f, which is compatible with lblatm.f CVS 
+                  revision 9.3.
+
+                * Increased number of significant digits in the net flux
+                  output in OUTPUT_RRTM for the stand-alone version in
+                  src file rrtmg_sw.F90.
+
+                * Updated makefiles to compile with r8 and i8.  Modified 
+                  F90-style integer type set in rrtmg_sw modules and source
+                  files for consistency with i8.
+
+                * Updated digits in value of PI to be consistent with rrtmg_lw. 
+ 
+                * Changed CO2, N2O, and CH4 mixing ratio arrays to be dimensioned
+                  on both longitude and layer in rrtmg_sw_112.F90, the callable 
+                  subroutine version of RRTMG_SW for interfacing to a GCM. 
+ 
+                * Added patent statement to each src file.
+
+
+March 8, 2005:
+
+	Release_2_3_1 - This version fixes a bug in the calculation
+                of the total sky asymmetry parameter in file 
+                rrtmg_sw_spcvrt.F90 when the routine cldprop is
+                used to provide scaled cloud properties.  This only
+                affected calculations that included both clouds and
+                aerosols.
+
+		This release was distributed to J.-J. Morcrette at ECMWF,
+                Yu-Tai Hou at NCEP, Jimy Dudhia at NCAR, Dave Hogan
+                for NPOESS applications, and it was provided to
+                Tim Shippert (PNL) for BBHRP applications.
+
+
+January 27, 2005:
+
+	Release_2_3 - This version contains modifications to include 
+                a bug fix related to delta scaling in cloudy profiles
+                when cldprop is used and to add the capability of
+                computed non-delta scaled direct and diffuse fluxes.
+
+                1) Routine rrtmg_sw_spcvrt.F90 was modified to remove
+                delta scaling in cloud profiles if subroutine cldprop
+                was used to compute cloud properties and to apply scaling.
+
+                2) Routines rrtmg_sw.F90 and rrtmg_sw_spcvrt.F90 were
+                modified to output downward direct and diffuse fluxes.
+                If not needed, this capability can be turned off to save 
+                time by commenting code in rrtmg_sw_spcvrt.F90.
+
+                3) Instruction manual was updated to specify that the 
+                IDELM=0 option (unscaled "true" direct and diffuse flux)
+                is the default and that the IDELM=1 option is not 
+                available. 
+
+		This release was distributed to J.-J. Morcrette at ECMWF,
+                Yu-Tai Hou at NCEP, and Dave Hogan for NPOESS applications, 
+                and it was distributed (in 224 g-point mode) to Tim Shippert 
+                (PNL) for BBHRP applications.
+
+
+December 15, 2004:
+
+	Release_2_2 - This version contains modifications to include 
+                some of the updates added to RRTM_SW V2.5 and includes
+                a bug fix to module rrtmg_sw_spcvrt.F90.
+
+                1) Changed module rdprof.f to accomodate updated version
+                of rrtatm.f (that is shared with RRTM_SW).
+
+                2) Added new solar variability option (ISOLVAR)
+
+                3) Changed format statement in subroutine readaer to allow
+                more than 4 aerosol layers (naer, format statement 9010).
+
+                4) Updated instruction manual.
+
+                5) Modified module rrtmg_sw_spcvrt.F90 to apply bug fix
+                that adds delta-scaling to clear sky calculations, which
+                has most significant impact in profiles with aerosols 
+                having moderate to high optical depth. 
+
+		This release was distributed to Yu-Tai Hou at NCEP, and 
+                Dave Hogan for NPOESS applications.
+
+
+November 24, 2004:
+
+	Release_2_1 - This version contains minor bug fixes that affect
+                the subroutine (GCM) version of the code only, including
+                changing the parameter NMOL from 6 to 7 to include oxygen.  
+
+		This release (in 224 g-point mode) was distributed to 
+                Tim Shippert for BBHRP applications.
+
+
+April 21, 2004:
+
+	Release_2_0 - This version uses a reduced set of 112 g-points for
+                improved computational efficiency.  Other minor modifications
+                were also made to enhance performance.  The original 224
+                g-point set can be restored by swapping code in one source
+                file and two modules.  Two bug fixes were made to the source
+                file rrtmg_sw_reftra.F90 to correct the computation of
+                reflectivity and transmissivity in the presence of aerosols. 
+                This fix was accomplished by restoring the syntax in this F90 
+                version of the code to that used in the original F77 source.  
+                An additional bug fix corrects the use of the parallel and
+                direct components of the surface albedo, PALBP and PALBD.
+
+		This release was distributed to Jimy Dudhia at NCAR for
+		testing in their mesoscale model (MM5) and the Weather
+		Research and Forecasting (WRF) model, to Yu-Tai Hou (NCEP)
+                for testing in the GFS model, and to Kerry Emanuel (MIT). 
+
+	
+November 18, 2003:
+
+	Release_1_1 - Includes two bug fixes that prevent execution of the
+		code with a solar zenith angle of exactly zero (a small
+		epsilon is substituted) and corrects variable assignments of
+		the seperate diffuse and direct values of surface albedo.
+		No reference
+
+		This release was distributed to Jimy Dudhia at NCAR for
+		testing in their mesoscale model (MM5) and the Weather
+		Research and Forecasting (WRF) model.
+
+
+October 17, 2003:
+
+	RRTMG_SW is now being officially archived in CVS.  This code
+	evolved from the standard RRTM_SW release, and it is intended for 
+	application to GCMs. It includes modifications to replace DISORT 
+	with a two-stream radiative transfer method, and the code has been 
+	converted to F90 format.  Both a column version and callable 
+	subroutine version of this code are archived.
+
+	Release_1_0 - Initial release version.  This version uses only
+		a two-stream radiative transfer method, and it uses the
+                the full compliment of 224 g-points of the standard RRTM_SW.
+		No reference
+
+		This release was distributed to Ken Campana and Yu-Tai Hou
+		(NCEP) for testing in their global forecast (GFS) model.
+		The subroutine version was distributed to Kerry Emanuel (MIT) 
+		for use in the MIT radiative-convective single column model.
+                ECMWF did the conversion to F90 and added the 2-stream code
+                starting from RRTM_SW_v2.4, and they are testing a version
+                of this release in their forecast model. 

@@ -1,3 +1,4 @@
+from __future__ import division
 import numpy as np
 # experimental...  this is not well documented!
 from numpy.core.umath_tests import matrix_multiply
@@ -8,7 +9,7 @@ Testing multi-dimensional column radiation
 :Example:
 
     .. code-block:: python
-    
+
         import numpy as np
         import climlab
         sfc, atm = climlab.domain.zonal_mean_column()
@@ -29,49 +30,49 @@ class Transmissivity(object):
     It is assumed that the last dimension is vertical levels.
 
     Attributes: (all stored as numpy arrays):
-    
+
     * N: number of levels
     * absorptivity: level absorptivity (N)
     * transmissivity: level transmissivity (N)
     * Tup: transmissivity matrix for upwelling beam (N+1, N+1)
     * Tdown: transmissivity matrix for downwelling beam (N+1, N+1)
-    
+
 
     Example for N = 3 atmospheric layers:
 
     tau is a vector of transmissivities
-    
+
     .. math::
-        
+
         \\tau = \\left[ 1, \\tau_0, \\tau_1, \\tau_2 \\right]
-        
+
     A is a matrix
-    
+
     .. math::
-    
+
         A= \\left[ \\begin{array}{cccc}
         1       & 1         & 1         & 1         \\\\
         \\tau_0 & 1         & 1         & 1         \\\\
         \\tau_0 & \\tau_1   & 1         & 1         \\\\
         \\tau_0 & \\tau_1   & \\tau_2   & 1         \\\\
-        \\end{array} \\right] 
-             
+        \\end{array} \\right]
+
     We then take the cumulative product along columns,
     and finally take the lower triangle of the result to get
 
     .. math::
-    
+
         Tup= \\left[ \\begin{array}{cccc}
-                               1 &               0 &       0 &  0   \\\\ 
+                               1 &               0 &       0 &  0   \\\\
                          \\tau_0 &               1 &       0 &  0   \\\\
                  \\tau_1 \\tau_0 &         \\tau_1 &       1 &  0   \\\\
         \\tau_2 \\tau_1 \\tau_00 & \\tau_2 \\tau_1 & \\tau_2 &  1   \\\\
-        \\end{array} \\right] 
+        \\end{array} \\right]
 
     and Tdown = transpose(Tup)
 
     Construct an emission vector for the downwelling beam:
-    
+
     Edown = [E0, E1, E2, fromspace]
 
     Now we can get the downwelling beam by matrix multiplication:
@@ -120,7 +121,7 @@ class Transmissivity(object):
         '''Compute downwelling radiative flux at interfaces between layers.
 
         Inputs:
-        
+
             * fluxDownTop: flux down at top
             * emission: emission from atmospheric levels (N)
               defaults to zero if not given
@@ -148,15 +149,15 @@ class Transmissivity(object):
         '''Compute upwelling radiative flux at interfaces between layers.
 
         Inputs:
-        
+
             * fluxUpBottom: flux up from bottom
             * emission: emission from atmospheric levels (N)
               defaults to zero if not given
-              
+
         Returns:
             * vector of upwelling radiative flux between levels (N+1)
               element N is the flux up to space.
-        
+
         '''
         if emission is None:
             emission = np.zeros_like(self.absorptivity)

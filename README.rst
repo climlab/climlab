@@ -65,9 +65,10 @@ appropriate collection of sub-processes.
 Currently, ``climlab`` has out-of-the-box support and documented examples for
 
 - 1D radiative and radiative-convective single column models, with various radiation schemes:
+    - RRTMG (a widely used radiative transfer code)
+    - CAM3  (from the NCAR GCM)
     - Grey Gas
     - Simplified band-averaged models (4 bands each in longwave and shortwave)
-    - One GCM-level radiation module (CAM3)
 - 1D diffusive energy balance models
 - Seasonal and steady-state models
 - Arbitrary combinations of the above, for example:
@@ -113,6 +114,9 @@ It also includes the CAM3 radiation module.
 
 Version 0.4 was released in October 2016. It includes comprehensive documentation,
 an automated test suite, support for latitude-longitude grids, and numerous small enhancements and bug fixes.
+
+Version 0.4.2 (released January 2017) introduces the RRTMG radiation scheme, a much-improved build process for the Fortran extension,
+and numerous enhancements and simplifications to the API.
 
 The documentation_ was first created by Moritz Kreuzer (Potsdam Institut for Climate Impact Research) as part of a thesis project in Spring 2016.
 

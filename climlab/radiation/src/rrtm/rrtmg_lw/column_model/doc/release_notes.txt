@@ -1,0 +1,341 @@
+!     path:      $Source: /storm/rc1/cvsroot/rc/rrtmg_lw/doc/release_notes.txt,v $
+!     author:    $Author: miacono $
+!     revision:  $Revision: 1.15 $
+!     created:   $Date: 2011/04/08 20:25:00 $
+!------------------------------------------------------------------------
+
+RRTMG_LW Release Notes
+
+NOTE: ** CVS rtags can't accept "." in strings, substitute "_"
+
+
+April 8, 2011:
+
+        Release_4_85
+
+        A minor fix was made to rrtmg_lw_taumol.f90 to the code introduced in 
+        v4.82 to correct 'specparm' to read 'specparm1' at line 1513 in band 7.
+        This change has no impact in moderate to high moisture profiles such as 
+        mid-latitude summer and tropical. The largest impact will occur in cold, 
+        dry profiles such as mid-latitude winter, or sub-arctic winter. In these 
+        profiles, the impact is generally less than 0.05 Wm-2 in flux and less 
+        than 0.06 Kd-1 in heating rate. Other minor changes were made to improve 
+        code compatibility with g95 compilers that have no effect on output. 
+
+        Internal release only. 
+
+
+November 16, 2009:
+
+        Release_4_84
+
+        An optional feature was added to the model to provide the vertical 
+        profile of the change in upward flux with respect to surface temperature.
+        This option is controlled by a new flag, idrv.  Setting this flag to one
+        will output dF/dT for total sky and clear sky in GCM mode in new output
+        arrays duflx_dt and duflxc_dt.  These can be utilized to approximate the
+        change in upward flux for a change in surface temperature only at time
+        intervals between full radiation calls.  In single column mode, setting
+        idrv to 1 requires the extra input of a dT change in surface temperature
+        relative to the input surface temperature, and the provided dT will be
+        applied to the flux derivative to output a modified upward flux profile
+        for that dT change in surface temperature.  Setting idrv to 0 provides 
+        the original forward radiative transfer calculation.  
+
+        Publicly released on AER RT web site in November 2009.
+
+
+October 20, 2009:
+
+        Release_4_82
+
+        Installed code fix to module rrtmg_lw_taumol.f90 to revise definition
+        and use of the key species ratio parameter (eta) in some spectral bands.
+        Results are changed in profiles with low water vapor and low temperature.
+        Downward surface fluxes are typically increased by this change by about 
+        0.1 W m-2, with downward flux in some layers increased by as much as
+        0.5 W m-2 in some profiles.  Upward flux changes are smaller.  Heating 
+        rate changes are generally negligible.  There are no changes in flux or 
+        heating rate in profiles with moderate to high water vapor such as 
+        mid-latitude summer or tropical. 
+
+        Publicly released on AER RT web site in October 2009.
+
+
+May 22, 2009:
+
+        Release_4_8
+
+        Added fix for internal cloud property option (iceflag=1) to correct the
+        integer index that accesses the input coefficient arrays that are used to  
+        calculate the ice cloud absorption for this option.  Other cloud optical 
+        property options are unaffected.  Also reduced several input data array
+        dimensions containing the Planck fractions to remove unused array 
+        elements.  Several minor code changes were made to allow the model to
+        compile and run under single precision.  New option added to input
+        absorption coefficient data either through original source statements
+        or through a netCDF data file. Choice of input source is selected in
+        the makefile. 
+
+        Publicly released on AER RT web site in May 2009.
+
+        - Added option for obtaining input absorption coefficient data either
+          through a netCDF file or through the original source statements. 
+          Global attributes of netCDF file header include detail on RRTM_LW
+          source version of k-distribution data and water continuum version. 
+        - Fixed integer index that accesses the cloud absorption data arrays for 
+          the iceflag=1 cloud property option in rrtmg_lw_cldprmc.f90. 
+        - Changed declarations of fracfefao and fracrefa in module rrlw_kg03.f90 
+          and of fracrefbo and fracrefb in module rrlw_kg04.f90 to remove unused
+          array elements.
+        - Made several minor code changes, which do not affect results, to allow 
+          better compilation and running of model with single precision.  
+        - Modified use associations related to rrlw_kgnn.f90 modules in source 
+          files rrtmg_lw_taumol.f90 and rrtmg_lw_init.f90 for compatibility with
+          gfortran and ifort compilers.  This has no affect on results. 
+        - Added makefile in build directory for IBM XL platforms. 
+        - Changed lower bound of allowable liquid droplet effective radius from 
+          1.5 to 2.5 microns for the inflag=2/liqflag=1 cloud input option. 
+        - Added a few updates to the file rrtmg_lw_instructions.txt. 
+
+
+September 17, 2008:
+
+        Release_4_71
+
+        Modified input of ice particle effective size to require input of value
+        appropriate for the selected ice optics parameterization. Previous scaling
+        that was applied internally to convert ice effective radius to generalized
+        effective size for the Fu parameterization has been removed.  Any necessary
+        scaling needed to provide the proper ice particle size must be done before
+        input to the radiation in the GCM version of the code.  This is consistent 
+        with the input requirement for the column version of the model.  Note that
+        the internal ice optics parameterizations are effective over specific ranges
+        of particle size.  Results may be different from previous versions if the
+        Fu parameterization is used in the GCM version of the code.  Also fixed 
+        the definition of the secant of the diffusivity angle, which varies as a
+        function of the water column amount.  This change only affects results in 
+        profiles with more than eight precipitable cm of water vapor.  
+
+        Publicly released on AER RT web site in September 2008.
+
+
+August 29, 2008:
+
+        Release_4_7
+
+        Revised cloud property input to require in-cloud averaged cloud optical
+        depth or in-cloud averaged cloud ice and liquid water paths in both the
+        single-column and gcm versions of the code. In earlier versions of the gcm
+        code, input grid-averaged cloud properties were scaled by the cloud fraction
+        internally to generate in-cloud averaged properties.  This change requires 
+        that this scaling be performed during the interfacing if necessary.  The
+        minor structural modifications to the code have no effect on the results,
+        though a minor change to the factor used to convert flux to heating rate
+        will have a negligible effect on the heating rates. 
+
+        Publicly released on AER RT web site in August 2008.
+
+        - Added requirement that cloud properties be input as in-cloud averages
+          rather than grid-averaged values in GCM code.
+        - Renamed rrtmg_lw.f90 to rrtmg_lw_rad.f90 and renamed rrtmg_lw.nomcica.f90
+          to rrtmg_lw_rad.nomcica.f90 for consistency between file names and
+          module names. 
+        - Replaced several 'where' statements with traditional loops in module
+          mcica_subcol_gen_lw to improve computational performance on some systems.
+        - Moved subroutine lwcldpr, which contains cloud absorption coefficient
+          data, from module rrtmg_lw_cldprop.f90 to rrtmg_lw_init.f90.
+        - Removed unnecessary use association of module mcica_subcol_gen_lw
+          from rrtmg_lw_rad.nomcica.f90. 
+        - Corrected arrays wavenum1 and wavenum2 in rrtmg_lw_init.f90 to change 
+          the boundary between spectral band 14 and 15 from 2390 to 2380 cm-1. 
+          These arrays are not used in the calculation, and the functional array
+          delwave containing the band intervals was correct, so this change has
+          no effect on results.
+        - Revised definition and naming of integer and real kind type parameters. 
+        - Changed setting of flag for selecting random number generator (irng) for
+          McICA to make it a required input variable. Available options are kissvec 
+          or Mersenne Twister. 
+        - Increased precision of heatfac by changing it from a hard-wired value to 
+          a calculated value and changed code to require input of specific heat of 
+          dry air into init module (rrtmg_lw_init.f90) for heatfac calculation.   
+        - Oxygen volume mixing ratio was changed from a hard-wired parameter to
+          a required input array. 
+
+
+April 24, 2008:
+
+        Release_4_5
+
+        Added capability to treat longwave aerosol absorption and added use of 
+        input file IN_AER_RRTM to read in aerosol optical depths following the
+        application of this file in RRTMG_SW.  Aerosol scattering is not presently 
+        available in the longwave, so the required input is limited to the aerosol 
+        optical depth by layer at the mid-point of each of the 16 spectral bands. 
+
+        Publicly released on AER RT web site in April 2008.
+
+
+September 7, 2007:
+
+        Release_4_4
+
+        Modified use of ice particle size variables rei/reicmc to utilize separate 
+        variable names (dge/dgesmc) when units of generalized effective size are 
+        required for iceflag=3 option. This allowed use of ice particle size in
+        units of effective radius to parameterize cloud absorptivity using a basic
+        approach when ice particle sizes are larger than the permitted range for
+        the iceflag=3 option. Results may be minimally affected when ice particle
+        sizes exceed 90 microns and iceflag=3 option is used. Also modified several
+        local arrays in top-level subroutine module to accomodate an extra model 
+        layer if this feature is utilized. 
+
+        Publicly released on AER RT web site in September 2007.
+
+
+August 28, 2007:
+
+        Release_4_3
+
+        Minor changes to makefile for AIX.  Corrected use of variables icld
+        and nlay in top level source files for the subroutine version of code and
+        for the McICA sub-column generator. There was no impact on results from
+        these changes in the column version of the model. 
+
+        Publicly released on AER RT web site in August 2007.
+
+
+August 22, 2007:
+
+        Release_4_1
+
+        Made structural changes to modify code to use assumed-shape arrays
+        rather than explicit-shape arrays throughout the model.  There was 
+        no impact on results from these changes. 
+
+        Publicly released on AER RT web site in August 2007.
+
+        - Converted explicit-shape arrays to assumed-shape arrays.
+        - Modified top level subroutine to a module and converted most of the
+          other subroutines to modules.
+        - Modified makefiles to clean up handling of compiled modules.
+        - Added new makefile for AIX platforms.
+        - Changed the name of the exponential lookup table arrays for 
+          consistency with RRTMG_SW.
+        - Added build directory for makefiles and doc directory for
+          documentation to main model directory for consistency with other
+          AER RT model archives.
+
+
+April 27, 2007:
+
+        Release_4_02
+
+        Made kind type suffix changes.
+
+        Not publicly released. Released to Yu-Tau Hou/NCEP on 30 April 2007.
+
+
+        - Added several missing kind type suffixes to real constants in a few 
+          source modules.
+        - Made minor changes to README file.  
+
+
+April 26, 2007:
+
+        Release_4_01
+
+        Minor bug fix and other minor changes.
+
+        Not publicly released. 
+
+        - Fixed dimensions of arrays abscoice and abscoliq from nbands to ngpt
+          in source module rrtmg_lw_cldprmc.f90.  This did not affect results in
+          most situations, but caused a fault in some cases on some compilers. 
+
+
+April 17, 2007:
+
+        Release_4_0
+
+        Major source code format revisions and addition of McICA capability. 
+
+        Not publicly released. Released to Robert Pincus/NOAA on 18 April 2007.
+
+        - Reformatted entire model to utilize more FORTRAN90 coding features.
+          All COMMON blocks have been removed.  Arrays are declared and dimensioned
+          in modules, and array passing is done through subroutine calls.
+          Excluded from the reformatting are files rrtatm.f, extra.f, and util_*.f,
+          which are shared with and retain the formatting of RRTM_LW. 
+        - Code package can be used as a stand-alone column model or as a callable
+          subroutine (such as in a GCM).
+        - McICA capability has been added for stochastic representation of sub-grid
+          cloud variability such as cloud fraction and cloud overlap.
+        - Sub-column generator for McICA is called from within main source module
+          in column mode, but it must be called prior to RRTMG_LW in GCM mode.
+        - Installed two options for the random number generator required for
+          McICA (selected by changing the hard-wired flag irnd).
+        - Modified code to accept either cloud physical properties or cloud optical
+          properties when using McICA. 
+        - Created makefiles consistent with RRTMG_SW for SGI, SUN, LINUX (pgi) and
+          OS_X (g95) platforms.
+       
+
+August 26, 2005:
+
+        Release_3_21
+
+        Added several minor code changes that do not affect results.
+
+        Not publicly released.
+        This version was utilized to test McICA in RRTMG_LW.
+
+        - Converted several trace gases from scalars to arrays in rrtmg_lw_140.f
+        - Corrected use of index IBND in rrtmg_lw_rtrn.f and rrtmg_lw_rtrnmr.f
+
+July 28, 2005:
+
+        Release_3_2
+
+        Updating code to maintain consistency with RRTM_LW.
+        Not publicly released.
+
+        - Fixed minor bugs in taumol and setcoef as reported by NCEP
+        - Added WV continuum coefficients inadvertantly left out of k_gB15.f in the original
+          RRTM_LW_v3.0 release
+        - Updated rrtatm.f to be compatible with CVS revision 9.3 lblrtm.f
+        - Fixed bug in the digits of PI in rrtmg_lw.f
+        - Modified cldprop for updated ice properties
+                * Updated the cldprop spheres to use latest streamer version 3.0.
+                * Remade Fu properties on finer grid.
+        - Added patent statement to all modules
+        - Changed number of digits printed out in net flux in rrtmg_lw.f
+        - Updated revision number format to be consistent with RRTM_SW/LBLRTM
+
+April 22, 2004:
+	
+	Release_3_01 
+
+        Not publicly released.
+
+        - Source file names were changed for consistency to use the prefix rrtmg_lw. 
+          The README file and makefile were also updated.
+
+October 16, 2003:
+
+	Release_3_0 
+
+	RRTMG_LW is now being officially archived in CVS.  This code evolved from the standard 
+        RRTM_LW release.  It includes modifications to enhance performance such as a reduced 
+        g-point	set, and it is intended for application to GCMs.  Both a column version and a 
+        subroutine version of this code are archived.
+
+        This version was distributed to Kerry Emanuel (MIT) for use in the MIT radiative-convective 
+        single column model.
+        
+        - Initial release version.  This version includes modifications to implement a spectrally 
+               varying diffusivity angle based on the column precipitable water amount.
+
+
+
+

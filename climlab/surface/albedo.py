@@ -1,3 +1,4 @@
+from __future__ import division
 import numpy as np
 from climlab.process.diagnostic import DiagnosticProcess
 from climlab.utils.legendre import P2
@@ -40,29 +41,31 @@ class ConstantAlbedo(DiagnosticProcess):
     def __init__(self, albedo=0.33, **kwargs):
         '''Uniform prescribed albedo.'''
         super(ConstantAlbedo, self).__init__(**kwargs)
-        self.albedo = albedo
-
-    @property
-    def albedo(self):
-        """Property of albedo value.
-
-        :getter:    Returns the albedo value which is stored in diagnostic dict
-                    ``self.diagnostic['albedo']``
-        :setter:    * sets albedo which is addressed as ``diagnostics['albedo']``
-                      to the new value through creating a Field on the basis
-                      of domain ``self.domain['default']``
-                    * updates the parameter dictionary ``self.param['albedo']``
-        :type:      Field
-
-        """
-        return self.diagnostics['albedo']
-    @albedo.setter
-    def albedo(self, value):
-        #dom = self.domains['default']
-        #  this is a more robust way to get the single value from dictionary:
         dom = self.domains.itervalues().next()
-        self.diagnostics['albedo'] = Field(value, domain=dom)
-        self.param['albedo'] = value
+        self.add_diagnostic('albedo', Field(albedo, domain=dom))
+        #self.albedo = albedo
+
+    # @property
+    # def albedo(self):
+    #     """Property of albedo value.
+    #
+    #     :getter:    Returns the albedo value which is stored in diagnostic dict
+    #                 ``self.diagnostic['albedo']``
+    #     :setter:    * sets albedo which is addressed as ``diagnostics['albedo']``
+    #                   to the new value through creating a Field on the basis
+    #                   of domain ``self.domain['default']``
+    #                 * updates the parameter dictionary ``self.param['albedo']``
+    #     :type:      Field
+    #
+    #     """
+    #     return self.diagnostics['albedo']
+    # @albedo.setter
+    # def albedo(self, value):
+    #     #dom = self.domains['default']
+    #     #  this is a more robust way to get the single value from dictionary:
+    #     dom = self.domains.itervalues().next()
+    #     self.diagnostics['albedo'] = Field(value, domain=dom)
+    #     self.param['albedo'] = value
 
 
 class P2Albedo(DiagnosticProcess):
@@ -130,7 +133,7 @@ class P2Albedo(DiagnosticProcess):
         super(P2Albedo, self).__init__(**kwargs)
         self.a0 = a0
         self.a2 = a2
-        self.init_diagnostic('albedo')
+        self.add_diagnostic('albedo')
         self._compute_fixed()
 
     @property
@@ -224,8 +227,8 @@ class Iceline(DiagnosticProcess):
     def __init__(self, Tf=-10., **kwargs):
         super(DiagnosticProcess, self).__init__(**kwargs)
         self.param['Tf'] = Tf
-        self.init_diagnostic('icelat')
-        self.init_diagnostic('ice_area')
+        self.add_diagnostic('icelat')
+        self.add_diagnostic('ice_area')
 
     def find_icelines(self):
         """Finds iceline according to the surface temperature.
@@ -357,7 +360,7 @@ class StepFunctionAlbedo(DiagnosticProcess):
         self.add_subprocess('warm_albedo', P2Albedo(a0=a0, a2=a2, domains=sfc))
         self.add_subprocess('cold_albedo', ConstantAlbedo(albedo=ai, domains=sfc))
         self.topdown = False  # call subprocess compute methods first
-        self.init_diagnostic('albedo')
+        self.add_diagnostic('albedo')
 
     def _get_current_albedo(self):
         '''Simple step-function albedo based on ice line at temperature Tf.'''

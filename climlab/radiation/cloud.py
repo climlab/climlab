@@ -11,6 +11,7 @@ W = w * deltaz
 
 unfinished...
 '''
+from __future__ import division
 import numpy as np
 
 def compute_tauN(W):

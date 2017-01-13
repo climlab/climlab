@@ -1,6 +1,6 @@
 """This module defines the class :class:`OrbitalTable` which holds orbital data,
-and includes a method :func:`~OrbitalTable.lookup_parameters` 
-which interpolates the orbital data for a specific year 
+and includes a method :func:`~OrbitalTable.lookup_parameters`
+which interpolates the orbital data for a specific year
 (- works equally well for arrays of years).
 
 The base class :class:`OrbitalTable()` is designed to work with 5 Myears of orbital data
@@ -10,12 +10,13 @@ Data will be read from the file orbit91, which was originally obtained from
 ftp://ftp.ncdc.noaa.gov/pub/data/paleo/insolation/
 If the file isn't found locally, the module will attempt to read it remotely
 from the above URL.
-    
-A subclass :class:`LongOrbitalTable()` works with La2004 orbital data for 
+
+A subclass :class:`LongOrbitalTable()` works with La2004 orbital data for
 -51 to +21 Myears as calculated by :cite:`Laskar_2004`.
 See http://vo.imcce.fr/insola/earth/online/earth/La2004/README.TXT
 
 """
+from __future__ import division
 import numpy as np
 from scipy import interpolate
 import os
@@ -23,22 +24,22 @@ import os
 class OrbitalTable:
     """Invoking OrbitalTable() will load 5 million years of orbital data
     from :cite:`Berger_1991` and compute linear interpolants.
-    
+
     The data can be accessed through the method :func:`lookup_parameters()`.
-     
-    
+
+
     **Object attributes** \n
-    
+
     Following object attributes are generated during initialization:
-        
-    :ivar array kyear:          time table with negative values are before present 
-                                (*unit:* kyears)                              
+
+    :ivar array kyear:          time table with negative values are before present
+                                (*unit:* kyears)
     :ivar array ecc:            eccentricity over time (*unit:* dimensionless)
     :ivar array long_peri:      longitude of perihelion (precession angle) (*unit:* degrees)
     :ivar array obliquity:      obliquity angle (*unit:* degrees)
     :ivar float kyear_min:      minimum value of time table (*unit:* kyears)
     :ivar float kyear_max:      maximum value of time table (*unit:* kyears)
-    
+
     """
     def __init__(self):
         self.kyear = None
@@ -55,35 +56,35 @@ class OrbitalTable:
 
     def lookup_parameters( self, kyear = 0 ):
         """Look up orbital parameters for given kyear measured from present.
-        
+
         .. note::
-        
+
             Input ``kyear`` is thousands of years after present.
             For years before present, use ``kyear < 0``.
-            
-        **Function-call argument** \n        
-        
-        :param array kyear:     Time for which oribtal parameters should be given.     
+
+        **Function-call argument** \n
+
+        :param array kyear:     Time for which oribtal parameters should be given.
                                 Will handle scalar or vector input (for multiple years).
                                 [default: 0]
-    
-        :returns:               a three-member dictionary of orbital parameters: 
-                                
+
+        :returns:               a three-member dictionary of orbital parameters:
+
                                     * ``'ecc'``: eccentricity (dimensionless)
-                                    * ``'long_peri'``: longitude of perihelion 
+                                    * ``'long_peri'``: longitude of perihelion
                                       relative to vernal equinox (degrees)
                                     * ``'obliquity'``: obliquity angle or axial tilt (degrees).
-                                
+
                                 Each member is an array of same size as kyear.
-        :rtype:                 dict                    
-        
+        :rtype:                 dict
+
         """
         #  linear interpolation:
         this_ecc = self.f_ecc(kyear)
         this_obliquity = self.f_obliquity(kyear)
         this_long_peri = self.f_long_peri(kyear)
         #  convert long_peri to an angle (in degrees) between 0 and 360
-        long_peri_converted = this_long_peri % 360.   
+        long_peri_converted = this_long_peri % 360.
         # Build a dictionary of all the parameters
         orb = {'ecc':this_ecc, 'long_peri':long_peri_converted, 'obliquity':this_obliquity}
         return orb
@@ -115,7 +116,7 @@ class OrbitalTable:
                 print 'Reading file ' + past_file
             except:
                 raise StandardError('Failed to load the data via remote ftp.')
-    
+
         #  loop through each line of the file, read it into numpy array
         #  skip first three lines of header
         toskip = 3
@@ -130,10 +131,10 @@ class OrbitalTable:
             self.long_peri[index] = thisdata[2]
             self.obliquity[index] = thisdata[3]
         record.close()
-    
+
     def _compute_interpolants(self):
         # add 180 degrees to long_peri (see lambda definition, Berger 1978 Appendix)
-        long_peri0rad = np.deg2rad(self.long_peri + 180.) 
+        long_peri0rad = np.deg2rad(self.long_peri + 180.)
         long_peri0 = np.rad2deg( np.unwrap( long_peri0rad ) ) # remove discontinuities (360 degree jumps)
         #  calculate linear interpolants
         self.f_ecc = interpolate.interp1d(self.kyear, self.ecc)
@@ -143,27 +144,27 @@ class OrbitalTable:
 
 class LongOrbitalTable(OrbitalTable):
     """Loads orbital parameter tables for -51 to +21 Myears.
-    
+
     Based on calculations by :cite:`Laskar_2004`
         http://vo.imcce.fr/insola/earth/online/earth/La2004/README.TXT
-    
+
     Usage is identical to parent class :class:`OrbitalTable()`.
-    
+
     """
     def _get_data(self):
         base_url = 'http://vo.imcce.fr/insola/earth/online/earth/La2004/'
         past_file = 'INSOLN.LA2004.BTL.ASC'
         future_file = 'INSOLP.LA2004.BTL.ASC'
-    
+
         num_lines_past = 51001
         num_lines_future = 21001
         num_columns = 4
         data_past = np.empty((num_lines_past,num_columns))
         data_future = np.empty((num_lines_future, num_columns))
-    
+
         print 'Attempting to access La2004 orbital data from ' + base_url
         #  loop through each line of the file, read it into numpy array
-        for (data,filename) in zip((data_past,data_future), 
+        for (data,filename) in zip((data_past,data_future),
                             (past_file,future_file)):
             try:
                 import urllib2
@@ -176,7 +177,7 @@ class LongOrbitalTable(OrbitalTable):
                 record.close()
             except:
                 raise StandardError('Failed to access file ' + filename )
-    
+
         #  need to flip it so the data runs from past to present
         data_past = np.flipud(data_past)
         # and expunge the first line of the future data because it repeats year 0

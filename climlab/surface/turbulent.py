@@ -1,3 +1,4 @@
+from __future__ import division
 import numpy as np
 from climlab.utils.thermo import qsat
 from climlab import constants as const
@@ -9,10 +10,8 @@ class SurfaceFlux(EnergyBudget):
         super(SurfaceFlux, self).__init__(**kwargs)
         self.Cd = Cd
         self.heating_rate['Tatm'] = np.zeros_like(self.Tatm)
-        newinput = ['U',]
-        self.add_input(newinput)
         #  fixed wind speed (for now)
-        self.U = 5. * np.ones_like(self.Ts)
+        self.add_input('U', 5. * np.ones_like(self.Ts))
         #  retrieving surface pressure from model grid
         self.ps = self.lev_bounds[-1]
 
@@ -29,7 +28,7 @@ class SurfaceFlux(EnergyBudget):
 class SensibleHeatFlux(SurfaceFlux):
     def __init__(self, Cd=3E-3, **kwargs):
         super(SensibleHeatFlux, self).__init__(Cd=Cd, **kwargs)
-        self.init_diagnostic('SHF')
+        self.add_diagnostic('SHF')
 
     def _compute_flux(self):
         # this ensure same dimensions as Ts
@@ -46,7 +45,7 @@ class SensibleHeatFlux(SurfaceFlux):
 class LatentHeatFlux(SurfaceFlux):
     def __init__(self, Cd=3E-3, **kwargs):
         super(LatentHeatFlux, self).__init__(Cd=Cd, **kwargs)
-        self.init_diagnostic('LHF')
+        self.add_diagnostic('LHF')
 
     def _compute_flux(self):
         #  specific humidity at lowest model level

@@ -1,3 +1,4 @@
+from __future__ import division
 import numpy as np
 from climlab.process.diagnostic import DiagnosticProcess
 from climlab import constants as const
@@ -21,12 +22,12 @@ class FixedRelativeHumidity(DiagnosticProcess):
         newinput = ['relative_humidity',
                     'qStrat',
                     'RH_profile',]
-        self.add_input(newinput)
+        self.declare_input(newinput)
         self.relative_humidity = relative_humidity
         self.qStrat = qStrat
         self.RH_profile = self.relative_humidity * np.ones_like(self.Tatm)
         #  go ahead and set the initial q based on initial temperature
-        self.init_diagnostic('q', 0.*self.Tatm)
+        self.add_diagnostic('q', 0.*self.Tatm)
         self._compute()
 
     def _compute(self):

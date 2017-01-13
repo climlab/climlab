@@ -11,9 +11,9 @@ Here is an example to implement seasonal insolation at 45 degrees North
     :Example:
 
         .. code-block:: python
-        
+
             import climlab
-            
+
             #  create the column model object
             col = climlab.GreyRadiationModel()
 
@@ -34,6 +34,7 @@ This model is now a single column with seasonally varying insolation
 calculated for 45N.
 
 """
+from __future__ import division
 import numpy as np
 from climlab import constants as const
 from climlab.process.time_dependent_process import TimeDependentProcess
@@ -100,7 +101,7 @@ class GreyRadiationModel(TimeDependentProcess):
                     'SW_down_TOA',
                     'planetary_albedo']
         for name in newdiags:
-            self.init_diagnostic(name)
+            self.add_diagnostic(name)
         # This process has to handle the coupling between
         # insolation and column radiation
         self.subprocess['SW'].flux_from_space = \
@@ -157,7 +158,7 @@ class BandRCModel(RadiativeConvectiveModel):
         # q is an input field for this process, which is set by subproc
         #  (though in this sense it is actually diagnostic...)
         newinput = ['q']
-        self.add_input(newinput)
+        self.add_input('q')
         self.q = self.subprocess['H2O'].q
 
         #  initialize radiatively active gas inventories
@@ -180,7 +181,7 @@ class BandRCModel(RadiativeConvectiveModel):
         # insolation and column radiation
         self.subprocess['SW'].flux_from_space = \
             self.subprocess['insolation'].diagnostics['insolation']
-        
+
 
 def compute_layer_absorptivity(abs_coeff, dp):
     '''Compute layer absorptivity from a constant absorption coefficient.'''

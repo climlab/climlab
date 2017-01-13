@@ -1,3 +1,4 @@
+from __future__ import division
 import numpy as np
 from climlab import constants as const
 from climlab.process.time_dependent_process import TimeDependentProcess
@@ -267,6 +268,6 @@ def Akamaev_adjustment(theta, q, beta, n_k, theta_k, s_k, t_k):
 try:
     from numba import jit
     Akamaev_adjustment = jit(signature_or_function=Akamaev_adjustment)
-    print 'Compiling Akamaev_adjustment() with numba.'
+    #print 'Compiling Akamaev_adjustment() with numba.'
 except:
     pass

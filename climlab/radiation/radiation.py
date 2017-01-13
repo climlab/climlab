@@ -16,14 +16,15 @@ Diagnostics (minimum)
 - absorbed
 - absorbed_total
 '''
+from __future__ import division
 import numpy as np
-from climlab.process.energy_budget import EnergyBudget
+from climlab.process import EnergyBudget
 
 
 class Radiation(EnergyBudget):
     '''Base class for radiation models.
 
-    The following boundary values need to be specified by user or parent process:
+    The following input values need to be specified by user or parent process:
     - flux_from_space
 
     The following values are computed are stored in the .diagnostics dictionary:
@@ -36,15 +37,13 @@ class Radiation(EnergyBudget):
     '''
     def __init__(self, **kwargs):
         super(Radiation, self).__init__(**kwargs)
-        newinput = ['flux_from_space',]
-        self.add_input(newinput)
-        self.flux_from_space = 0. * self.Ts
+        self.add_input('flux_from_space', 0. * self.Ts)
         #  initialize all diagnostics to zero
-        self.init_diagnostic('flux_from_sfc', 0. * self.Ts)
-        self.init_diagnostic('flux_to_sfc', 0. * self.Ts)
-        self.init_diagnostic('flux_to_space', 0. * self.Ts)
-        self.init_diagnostic('absorbed', 0. * self.Tatm)
-        self.init_diagnostic('absorbed_total', 0. * self.Ts)
+        self.add_diagnostic('flux_from_sfc', 0. * self.Ts)
+        self.add_diagnostic('flux_to_sfc', 0. * self.Ts)
+        self.add_diagnostic('flux_to_space', 0. * self.Ts)
+        self.add_diagnostic('absorbed', 0. * self.Tatm)
+        self.add_diagnostic('absorbed_total', 0. * self.Ts)
 
     def _compute_radiative_heating(self):
         '''Compute radiative fluxes and heating rates.

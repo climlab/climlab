@@ -1,6 +1,4 @@
-#  new domain class
-#  every process should exist in the context of a domain
-
+from __future__ import division
 from climlab.domain.axis import Axis
 from climlab.utils import heat_capacity
 

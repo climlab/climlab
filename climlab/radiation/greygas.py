@@ -1,3 +1,4 @@
+from __future__ import division
 import numpy as np
 from climlab.utils.thermo import blackbody_emission
 from climlab.radiation.transmissivity import Transmissivity
@@ -41,7 +42,7 @@ class GreyGas(Radiation):
                     'absorptivity',
                     'emissivity_sfc',
                     'albedo_sfc',]
-        self.add_input(newinput)
+        self.declare_input(newinput)
         if reflectivity is None:
             reflectivity = np.zeros_like(self.Tatm)
         if absorptivity is None:
@@ -51,9 +52,9 @@ class GreyGas(Radiation):
         self.emissivity_sfc = emissivity_sfc * np.ones_like(self.Ts)
         self.albedo_sfc = albedo_sfc * np.ones_like(self.Ts)
         #  Initialize diagnostics
-        self.init_diagnostic('emission', 0. * self.Tatm)
-        self.init_diagnostic('emission_sfc', 0. * self.Ts)
-        self.init_diagnostic('flux_reflected_up')
+        self.add_diagnostic('emission', 0. * self.Tatm)
+        self.add_diagnostic('emission_sfc', 0. * self.Ts)
+        self.add_diagnostic('flux_reflected_up')
 
     @property
     def absorptivity(self):
