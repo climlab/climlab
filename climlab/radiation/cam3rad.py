@@ -272,6 +272,12 @@ class CAM3Radiation_LW(CAM3Radiation):
         super(CAM3Radiation_LW, self).__init__(**kwargs)
         self.do_sw = 0  # '1=do, 0=do not compute SW'
         self.do_lw = 1  # '1=do, 0=do not compute LW'
+        #  Albedo needs to be set to 1 currently, otherwise
+        #  the CAM code computes solar heating of surface.
+        self.asdif = 0.*self.Ts + 1.
+        self.asdir = 0.*self.Ts + 1.
+        self.aldif = 0.*self.Ts + 1.
+        self.aldir = 0.*self.Ts + 1.
 
 
 class CAM3Radiation_SW(CAM3Radiation):
@@ -279,3 +285,6 @@ class CAM3Radiation_SW(CAM3Radiation):
         super(CAM3Radiation_SW, self).__init__(**kwargs)
         self.do_sw = 1  # '1=do, 0=do not compute SW'
         self.do_lw = 0  # '1=do, 0=do not compute LW'
+
+##  Better to seperate out the LW and SW schemes into seperate Fortran drivers,
+## like for RRTM. Among other things, this will help avoid name conflicts.
