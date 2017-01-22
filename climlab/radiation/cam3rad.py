@@ -276,6 +276,6 @@ class CAM3Radiation_LW(CAM3Radiation):
 
 class CAM3Radiation_SW(CAM3Radiation):
     def __init__(self, **kwargs):
-        super(CAM3Radiation_LW, self).__init__(**kwargs)
+        super(CAM3Radiation_SW, self).__init__(**kwargs)
         self.do_sw = 1  # '1=do, 0=do not compute SW'
         self.do_lw = 0  # '1=do, 0=do not compute LW'
