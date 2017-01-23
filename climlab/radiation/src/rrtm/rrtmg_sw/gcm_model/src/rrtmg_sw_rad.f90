@@ -58,7 +58,7 @@
       use rrsw_vsn
       use mcica_subcol_gen_sw, only: mcica_subcol_sw
       use rrtmg_sw_cldprmc, only: cldprmc_sw
-! *** Move the required call to rrtmg_sw_ini below and the following 
+! *** Move the required call to rrtmg_sw_ini below and the following
 ! use association to GCM initialization area ***
 !      use rrtmg_sw_init, only: rrtmg_sw_ini
       use rrtmg_sw_setcoef, only: setcoef_sw
@@ -91,23 +91,23 @@
 
 ! ------- Description -------
 
-! This program is the driver for RRTMG_SW, the AER SW radiation model for 
+! This program is the driver for RRTMG_SW, the AER SW radiation model for
 !  application to GCMs, that has been adapted from RRTM_SW for improved
 !  efficiency and to provide fractional cloudiness and cloud overlap
 !  capability using McICA.
 !
-! Note: The call to RRTMG_SW_INI should be moved to the GCM initialization 
-!  area, since this has to be called only once. 
+! Note: The call to RRTMG_SW_INI should be moved to the GCM initialization
+!  area, since this has to be called only once.
 !
 ! This routine
 !    b) calls INATM_SW to read in the atmospheric profile;
-!       all layering in RRTMG is ordered from surface to toa. 
+!       all layering in RRTMG is ordered from surface to toa.
 !    c) calls CLDPRMC_SW to set cloud optical depth for McICA based
 !       on input cloud properties
-!    d) calls SETCOEF_SW to calculate various quantities needed for 
+!    d) calls SETCOEF_SW to calculate various quantities needed for
 !       the radiative transfer algorithm
-!    e) calls SPCVMC to call the two-stream model that in turn 
-!       calls TAUMOL to calculate gaseous optical depths for each 
+!    e) calls SPCVMC to call the two-stream model that in turn
+!       calls TAUMOL to calculate gaseous optical depths for each
 !       of the 16 spectral bands and to perform the radiative transfer
 !       using McICA, the Monte-Carlo Independent Column Approximation,
 !       to represent sub-grid scale cloud variability
@@ -117,9 +117,9 @@
 !     The mode is chosen by using either rrtmg_sw.nomcica.f90 (to not use
 !     McICA) or rrtmg_sw.f90 (to use McICA) to interface with a GCM.
 !
-!    1) Standard, single forward model calculation (imca = 0); this is 
+!    1) Standard, single forward model calculation (imca = 0); this is
 !       valid only for clear sky or fully overcast clouds
-!    2) Monte Carlo Independent Column Approximation (McICA, Pincus et al., 
+!    2) Monte Carlo Independent Column Approximation (McICA, Pincus et al.,
 !       JC, 2003) method is applied to the forward model calculation (imca = 1)
 !       This method is valid for clear sky or partial cloud conditions.
 !
@@ -129,19 +129,19 @@
 !     on the RRTMG quadrature point (ngptsw) dimension.
 !
 ! Two methods of cloud property input are possible:
-!     Cloud properties can be input in one of two ways (controlled by input 
+!     Cloud properties can be input in one of two ways (controlled by input
 !     flags inflag, iceflag and liqflag; see text file rrtmg_sw_instructions
 !     and subroutine rrtmg_sw_cldprmc.f90 for further details):
 !
-!    1) Input cloud fraction, cloud optical depth, single scattering albedo 
+!    1) Input cloud fraction, cloud optical depth, single scattering albedo
 !       and asymmetry parameter directly (inflgsw = 0)
 !    2) Input cloud fraction and cloud physical properties: ice fracion,
-!       ice and liquid particle sizes (inflgsw = 1 or 2);  
+!       ice and liquid particle sizes (inflgsw = 1 or 2);
 !       cloud optical properties are calculated by cldprmc based
 !       on input settings of iceflgsw and liqflgsw
 !
 ! Two methods of aerosol property input are possible:
-!     Aerosol properties can be input in one of two ways (controlled by input 
+!     Aerosol properties can be input in one of two ways (controlled by input
 !     flag iaer, see text file rrtmg_sw_instructions for further details):
 !
 !    1) Input aerosol optical depth, single scattering albedo and asymmetry
@@ -153,7 +153,7 @@
 ! ------- Modifications -------
 !
 ! This version of RRTMG_SW has been modified from RRTM_SW to use a reduced
-! set of g-point intervals and a two-stream model for application to GCMs. 
+! set of g-point intervals and a two-stream model for application to GCMs.
 !
 !-- Original version (derived from RRTM_SW)
 !     2002: AER. Inc.
@@ -162,10 +162,10 @@
 !-- Additional modifications for GCM application
 !     Aug 2003: M. J. Iacono, AER Inc.
 !-- Total number of g-points reduced from 224 to 112.  Original
-!   set of 224 can be restored by exchanging code in module parrrsw.f90 
+!   set of 224 can be restored by exchanging code in module parrrsw.f90
 !   and in file rrtmg_sw_init.f90.
 !     Apr 2004: M. J. Iacono, AER, Inc.
-!-- Modifications to include output for direct and diffuse 
+!-- Modifications to include output for direct and diffuse
 !   downward fluxes.  There are output as "true" fluxes without
 !   any delta scaling applied.  Code can be commented to exclude
 !   this calculation in source file rrtmg_sw_spcvrt.f90.
@@ -174,10 +174,10 @@
 !     Nov 2005: M. J. Iacono, AER, Inc.
 !-- Reformatted for consistency with rrtmg_lw.
 !     Feb 2007: M. J. Iacono, AER, Inc.
-!-- Modifications to formatting to use assumed-shape arrays. 
+!-- Modifications to formatting to use assumed-shape arrays.
 !     Aug 2007: M. J. Iacono, AER, Inc.
 !-- Modified to output direct and diffuse fluxes either with or without
-!   delta scaling based on setting of idelm flag. 
+!   delta scaling based on setting of idelm flag.
 !     Dec 2008: M. J. Iacono, AER, Inc.
 
 ! --------- Modules ---------
@@ -192,8 +192,8 @@
 
 ! ----- Input -----
 ! Note: All volume mixing ratios are in dimensionless units of mole fraction obtained
-! by scaling mass mixing ratio (g/g) with the appropriate molecular weights (g/mol) 
-      integer(kind=im), intent(in) :: ncol            ! Number of horizontal columns     
+! by scaling mass mixing ratio (g/g) with the appropriate molecular weights (g/mol)
+      integer(kind=im), intent(in) :: ncol            ! Number of horizontal columns
       integer(kind=im), intent(in) :: nlay            ! Number of model layers
       integer(kind=im), intent(inout) :: icld         ! Cloud overlap method
                                                       !    0: Clear only
@@ -261,7 +261,7 @@
                                                       !    Dimensions: (ncol,nlay)
                                                       ! specific definition of reicmcl depends on setting of iceflgsw:
                                                       ! iceflgsw = 0: (inactive)
-                                                      ! 
+                                                      !
                                                       ! iceflgsw = 1: ice effective radius, r_ec, (Ebert and Curry, 1992),
                                                       !               r_ec range is limited to 13.0 to 130.0 microns
                                                       ! iceflgsw = 2: ice effective radius, r_k, (Key, Streamer Ref. Manual, 1996)
@@ -273,16 +273,16 @@
                                                       !    Dimensions: (ncol,nlay)
       real(kind=rb), intent(in) :: tauaer(:,:,:)      ! Aerosol optical depth (iaer=10 only)
                                                       !    Dimensions: (ncol,nlay,nbndsw)
-                                                      ! (non-delta scaled)      
+                                                      ! (non-delta scaled)
       real(kind=rb), intent(in) :: ssaaer(:,:,:)      ! Aerosol single scattering albedo (iaer=10 only)
                                                       !    Dimensions: (ncol,nlay,nbndsw)
-                                                      ! (non-delta scaled)      
+                                                      ! (non-delta scaled)
       real(kind=rb), intent(in) :: asmaer(:,:,:)      ! Aerosol asymmetry parameter (iaer=10 only)
                                                       !    Dimensions: (ncol,nlay,nbndsw)
-                                                      ! (non-delta scaled)      
+                                                      ! (non-delta scaled)
       real(kind=rb), intent(in) :: ecaer(:,:,:)       ! Aerosol optical depth at 0.55 micron (iaer=6 only)
                                                       !    Dimensions: (ncol,nlay,naerec)
-                                                      ! (non-delta scaled)      
+                                                      ! (non-delta scaled)
 
 ! ----- Output -----
 
@@ -325,7 +325,7 @@
       real(kind=rb) :: zdpgcp                 ! flux to heating conversion ratio
 
 ! Atmosphere
-      real(kind=rb) :: pavel(nlay+1)          ! layer pressures (mb) 
+      real(kind=rb) :: pavel(nlay+1)          ! layer pressures (mb)
       real(kind=rb) :: tavel(nlay+1)          ! layer temperatures (K)
       real(kind=rb) :: pz(0:nlay+1)           ! level (interface) pressures (hPa, mb)
       real(kind=rb) :: tz(0:nlay+1)           ! level (interface) temperatures (K)
@@ -350,7 +350,7 @@
       integer(kind=im) :: laytrop             ! tropopause layer index
       integer(kind=im) :: layswtch            ! tropopause layer index
       integer(kind=im) :: laylow              ! tropopause layer index
-      integer(kind=im) :: jp(nlay+1)          ! 
+      integer(kind=im) :: jp(nlay+1)          !
       integer(kind=im) :: jt(nlay+1)          !
       integer(kind=im) :: jt1(nlay+1)         !
 
@@ -361,7 +361,7 @@
       real(kind=rb) :: colch4(nlay+1)         ! column amount (ch4)
       real(kind=rb) :: colo2(nlay+1)          ! column amount (o2)
       real(kind=rb) :: colmol(nlay+1)         ! column amount
-      real(kind=rb) :: co2mult(nlay+1)        ! column amount 
+      real(kind=rb) :: co2mult(nlay+1)        ! column amount
 
       integer(kind=im) :: indself(nlay+1)
       integer(kind=im) :: indfor(nlay+1)
@@ -372,7 +372,7 @@
 
       real(kind=rb) :: &                      !
                          fac00(nlay+1), fac01(nlay+1), &
-                         fac10(nlay+1), fac11(nlay+1) 
+                         fac10(nlay+1), fac11(nlay+1)
 
 ! Atmosphere/clouds - cldprop
       integer(kind=im) :: ncbands             ! number of cloud spectral bands
@@ -410,17 +410,17 @@
 ! Atmosphere/clouds/aerosol - spcvrt,spcvmc
       real(kind=rb) :: ztauc(nlay+1,nbndsw)     ! cloud optical depth
       real(kind=rb) :: ztaucorig(nlay+1,nbndsw) ! unscaled cloud optical depth
-      real(kind=rb) :: zasyc(nlay+1,nbndsw)     ! cloud asymmetry parameter 
+      real(kind=rb) :: zasyc(nlay+1,nbndsw)     ! cloud asymmetry parameter
                                                 !  (first moment of phase function)
       real(kind=rb) :: zomgc(nlay+1,nbndsw)     ! cloud single scattering albedo
       real(kind=rb) :: ztaua(nlay+1,nbndsw)     ! total aerosol optical depth
-      real(kind=rb) :: zasya(nlay+1,nbndsw)     ! total aerosol asymmetry parameter 
+      real(kind=rb) :: zasya(nlay+1,nbndsw)     ! total aerosol asymmetry parameter
       real(kind=rb) :: zomga(nlay+1,nbndsw)     ! total aerosol single scattering albedo
 
       real(kind=rb) :: zcldfmc(nlay+1,ngptsw)   ! cloud fraction [mcica]
       real(kind=rb) :: ztaucmc(nlay+1,ngptsw)   ! cloud optical depth [mcica]
       real(kind=rb) :: ztaormc(nlay+1,ngptsw)   ! unscaled cloud optical depth [mcica]
-      real(kind=rb) :: zasycmc(nlay+1,ngptsw)   ! cloud asymmetry parameter [mcica] 
+      real(kind=rb) :: zasycmc(nlay+1,ngptsw)   ! cloud asymmetry parameter [mcica]
       real(kind=rb) :: zomgcmc(nlay+1,ngptsw)   ! cloud single scattering albedo [mcica]
 
       real(kind=rb) :: zbbfu(nlay+2)          ! temporary upward shortwave flux (w/m2)
@@ -438,13 +438,13 @@
       real(kind=rb) :: znifddir(nlay+2)       ! temporary near-IR downward direct shortwave flux (w/m2)
       real(kind=rb) :: znicddir(nlay+2)       ! temporary clear sky near-IR downward direct shortwave flux (w/m2)
 
-! Optional output fields 
+! Optional output fields
       real(kind=rb) :: swnflx(nlay+2)         ! Total sky shortwave net flux (W/m2)
       real(kind=rb) :: swnflxc(nlay+2)        ! Clear sky shortwave net flux (W/m2)
       real(kind=rb) :: dirdflux(nlay+2)       ! Direct downward shortwave surface flux
       real(kind=rb) :: difdflux(nlay+2)       ! Diffuse downward shortwave surface flux
-      real(kind=rb) :: uvdflx(nlay+2)         ! Total sky downward shortwave flux, UV/vis  
-      real(kind=rb) :: nidflx(nlay+2)         ! Total sky downward shortwave flux, near-IR 
+      real(kind=rb) :: uvdflx(nlay+2)         ! Total sky downward shortwave flux, UV/vis
+      real(kind=rb) :: nidflx(nlay+2)         ! Total sky downward shortwave flux, near-IR
       real(kind=rb) :: dirdnuv(nlay+2)        ! Direct downward shortwave flux, UV/vis
       real(kind=rb) :: difdnuv(nlay+2)        ! Diffuse downward shortwave flux, UV/vis
       real(kind=rb) :: dirdnir(nlay+2)        ! Direct downward shortwave flux, near-IR
@@ -498,7 +498,7 @@
 ! iaer = 0, no aerosols
 ! iaer = 6, use six ECMWF aerosol types
 !           input aerosol optical depth at 0.55 microns for each aerosol type (ecaer)
-! iaer = 10, input total aerosol optical depth, single scattering albedo 
+! iaer = 10, input total aerosol optical depth, single scattering albedo
 !            and asymmetry parameter (tauaer, ssaaer, asmaer) directly
       iaer = 10
 
@@ -515,7 +515,7 @@
 ! coefficient data and other arrays.
 !
 ! In a GCM this call should be placed in the model initialization
-! area, since this has to be called only once.  
+! area, since this has to be called only once.
 !      call rrtmg_sw_ini(cpdair)
 
 ! This is the main longitude/column loop in RRTMG.
@@ -541,14 +541,14 @@
 !  input cloud physical properties.  Select method based on choices described
 !  in cldprmc.  Cloud fraction, water path, liquid droplet and ice particle
 !  effective radius must be passed in cldprmc.  Cloud fraction and cloud
-!  optical properties are transferred to rrtmg_sw arrays in cldprmc.  
+!  optical properties are transferred to rrtmg_sw arrays in cldprmc.
 
          call cldprmc_sw(nlayers, inflag, iceflag, liqflag, cldfmc, &
                          ciwpmc, clwpmc, reicmc, relqmc, &
                          taormc, taucmc, ssacmc, asmcmc, fsfcmc)
          icpr = 1
 
-! Calculate coefficients for the temperature and pressure dependence of the 
+! Calculate coefficients for the temperature and pressure dependence of the
 ! molecular absorption coefficients by interpolating data from stored
 ! reference atmospheres.
 
@@ -559,15 +559,15 @@
                          selffac, selffrac, indself, forfac, forfrac, indfor)
 
 
-! Cosine of the solar zenith angle 
-!  Prevent using value of zero; ideally, SW model is not called from host model when sun 
+! Cosine of the solar zenith angle
+!  Prevent using value of zero; ideally, SW model is not called from host model when sun
 !  is below horizon
 
          cossza = coszen(iplon)
          if (cossza .lt. zepzen) cossza = zepzen
 
 
-! Transfer albedo, cloud and aerosol properties into arrays for 2-stream radiative transfer 
+! Transfer albedo, cloud and aerosol properties into arrays for 2-stream radiative transfer
 
 ! Surface albedo
 !  Near-IR bands 16-24 and 29 (1-9 and 14), 820-16000 cm-1, 0.625-12.195 microns
@@ -604,7 +604,7 @@
                enddo
             enddo
 
-         endif   
+         endif
 
 ! Aerosol
 ! IAER = 0: no aerosols
@@ -615,7 +615,7 @@
             zomga(:,:) = 1._rb
 
 ! IAER = 6: Use ECMWF six aerosol types. See rrsw_aer.f90 for details.
-! Input aerosol optical thickness at 0.55 micron for each aerosol type (ecaer), 
+! Input aerosol optical thickness at 0.55 micron for each aerosol type (ecaer),
 ! or set manually here for each aerosol and layer.
          elseif (iaer.eq.6) then
 
@@ -684,14 +684,14 @@
              (nlayers, istart, iend, icpr, idelm, iout, &
               pavel, tavel, pz, tz, tbound, albdif, albdir, &
               zcldfmc, ztaucmc, zasycmc, zomgcmc, ztaormc, &
-              ztaua, zasya, zomga, cossza, coldry, wkl, adjflux, &	 
+              ztaua, zasya, zomga, cossza, coldry, wkl, adjflux, &
               laytrop, layswtch, laylow, jp, jt, jt1, &
               co2mult, colch4, colco2, colh2o, colmol, coln2o, colo2, colo3, &
               fac00, fac01, fac10, fac11, &
               selffac, selffrac, indself, forfac, forfrac, indfor, &
               zbbfd, zbbfu, zbbcd, zbbcu, zuvfd, zuvcd, znifd, znicd, &
               zbbfddir, zbbcddir, zuvfddir, zuvcddir, znifddir, znicddir)
-              
+
 ! Transfer up and down, clear and total sky fluxes to output arrays.
 ! Vertical indexing goes from bottom to top; reverse here for GCM if necessary.
          do i = 1, nlayers+1
@@ -724,8 +724,11 @@
             swhrc(iplon,i) = (swnflxc(i+1) - swnflxc(i)) * zdpgcp
             swhr(iplon,i) = (swnflx(i+1) - swnflx(i)) * zdpgcp
          enddo
-         swhrc(iplon,nlayers) = 0._rb
-         swhr(iplon,nlayers) = 0._rb
+         !  CLIMLAB ... I don't understand why these are zeroed out
+         !    there should be heating wherever there is flux divergence
+         !swhrc(iplon,nlayers) = 0._rb
+         !swhr(iplon,nlayers) = 0._rb
+         !  CLIMLAB ... end of modification
 
 ! End longitude loop
       enddo
@@ -773,7 +776,7 @@
 !***************************************************************************
 !
 !  Input atmospheric profile from GCM, and prepare it for use in RRTMG_SW.
-!  Set other RRTMG_SW input parameters.  
+!  Set other RRTMG_SW input parameters.
 !
 !***************************************************************************
 
@@ -788,7 +791,7 @@
 
 ! ----- Input -----
 ! Note: All volume mixing ratios are in dimensionless units of mole fraction obtained
-! by scaling mass mixing ratio (g/g) with the appropriate molecular weights (g/mol) 
+! by scaling mass mixing ratio (g/g) with the appropriate molecular weights (g/mol)
       integer(kind=im), intent(in) :: iplon           ! column loop index
       integer(kind=im), intent(in) :: nlay            ! number of model layers
       integer(kind=im), intent(in) :: icld            ! clear/cloud and cloud overlap flag
@@ -855,7 +858,7 @@
 ! Atmosphere
       integer(kind=im), intent(out) :: nlayers        ! number of layers
 
-      real(kind=rb), intent(out) :: pavel(:)          ! layer pressures (mb) 
+      real(kind=rb), intent(out) :: pavel(:)          ! layer pressures (mb)
                                                       ! Dimensions: (nlay)
       real(kind=rb), intent(out) :: tavel(:)          ! layer temperatures (K)
                                                       ! Dimensions: (nlay)
@@ -928,7 +931,7 @@
       real(kind=rb), parameter :: sbc = 5.67e-08_rb   ! Stefan-Boltzmann constant (W/m2K4)
 
       integer(kind=im) :: isp, l, ix, n, imol, ib, ig   ! Loop indices
-      real(kind=rb) :: amm, summol                      ! 
+      real(kind=rb) :: amm, summol                      !
       real(kind=rb) :: adjflx                           ! flux adjustment for Earth/Sun distance
 !      real(kind=rb) :: earth_sun                        ! function for Earth/Sun distance adjustment
 
@@ -951,26 +954,26 @@
        taua(:,:) = 0.0_rb
        ssaa(:,:) = 1.0_rb
        asma(:,:) = 0.0_rb
- 
+
 ! Set flux adjustment for current Earth/Sun distance (two options).
 ! 1) Use Earth/Sun distance flux adjustment provided by GCM (input as adjes);
        adjflx = adjes
 !
 ! 2) Calculate Earth/Sun distance from DYOFYR, the cumulative day of the year.
-!    (Set adjflx to 1. to use constant Earth/Sun distance of 1 AU). 
+!    (Set adjflx to 1. to use constant Earth/Sun distance of 1 AU).
       if (dyofyr .gt. 0) then
          adjflx = earth_sun(dyofyr)
       endif
-       
+
 ! Set incoming solar flux adjustment to include adjustment for
 ! current Earth/Sun distance (ADJFLX) and scaling of default internal
-! solar constant (rrsw_scon = 1368.22 Wm-2) by band (SOLVAR).  SOLVAR can be set 
-! to a single scaling factor as needed, or to a different value in each 
-! band, which may be necessary for paleoclimate simulations. 
-! 
+! solar constant (rrsw_scon = 1368.22 Wm-2) by band (SOLVAR).  SOLVAR can be set
+! to a single scaling factor as needed, or to a different value in each
+! band, which may be necessary for paleoclimate simulations.
+!
       do ib = jpb1,jpb2
 !         solvar(ib) = 1._rb
-         solvar(ib) = scon / rrsw_scon 
+         solvar(ib) = scon / rrsw_scon
          adjflux(ib) = adjflx * solvar(ib)
       enddo
 
@@ -978,15 +981,15 @@
       tbound = tsfc(iplon)
 
 !  Install input GCM arrays into RRTMG_SW arrays for pressure, temperature,
-!  and molecular amounts.  
+!  and molecular amounts.
 !  Pressures are input in mb, or are converted to mb here.
-!  Molecular amounts are input in volume mixing ratio, or are converted from 
+!  Molecular amounts are input in volume mixing ratio, or are converted from
 !  mass mixing ratio (or specific humidity for h2o) to volume mixing ratio
-!  here. These are then converted to molecular amount (molec/cm2) below.  
-!  The dry air column COLDRY (in molec/cm2) is calculated from the level 
-!  pressures, pz (in mb), based on the hydrostatic equation and includes a 
-!  correction to account for h2o in the layer.  The molecular weight of moist 
-!  air (amm) is calculated for each layer.  
+!  here. These are then converted to molecular amount (molec/cm2) below.
+!  The dry air column COLDRY (in molec/cm2) is calculated from the level
+!  pressures, pz (in mb), based on the hydrostatic equation and includes a
+!  correction to account for h2o in the layer.  The molecular weight of moist
+!  air (amm) is calculated for each layer.
 !  Note: In RRTMG, layer indexing goes from bottom to top, and coding below
 !  assumes GCM input fields are also bottom to top. Input layer indexing
 !  from GCM fields should be reversed here if necessary.
@@ -1010,18 +1013,18 @@
          wkl(4,l) = n2ovmr(iplon,l)
          wkl(6,l) = ch4vmr(iplon,l)
          wkl(7,l) = o2vmr(iplon,l)
-         amm = (1._rb - wkl(1,l)) * amd + wkl(1,l) * amw            
+         amm = (1._rb - wkl(1,l)) * amd + wkl(1,l) * amw
          coldry(l) = (pz(l-1)-pz(l)) * 1.e3_rb * avogad / &
                      (1.e2_rb * grav * amm * (1._rb + wkl(1,l)))
       enddo
 
 ! The following section can be used to set values for an additional layer (from
-! the GCM top level to 1.e-4 mb) for improved calculation of TOA fluxes. 
-! Temperature and molecular amounts in the extra model layer are set to 
+! the GCM top level to 1.e-4 mb) for improved calculation of TOA fluxes.
+! Temperature and molecular amounts in the extra model layer are set to
 ! their values in the top GCM model layer, though these can be modified
-! here if necessary. 
+! here if necessary.
 ! If this feature is utilized, increase nlayers by one above, limit the two
-! loops above to (nlayers-1), and set the top most (nlayers) layer values here. 
+! loops above to (nlayers-1), and set the top most (nlayers) layer values here.
 
 !      pavel(nlayers) = 0.5_rb * pz(nlayers-1)
 !      tavel(nlayers) = tavel(nlayers-1)
@@ -1039,8 +1042,8 @@
 !      coldry(nlayers) = (pz(nlayers-1)) * 1.e3_rb * avogad / &
 !                        (1.e2_rb * grav * amm * (1._rb + wkl(1,nlayers-1)))
 
-! At this point all molecular amounts in wkl are in volume mixing ratio; 
-! convert to molec/cm2 based on coldry for use in rrtm.  
+! At this point all molecular amounts in wkl are in volume mixing ratio;
+! convert to molec/cm2 based on coldry for use in rrtm.
 
       do l = 1, nlayers
          do imol = 1, nmol
@@ -1051,7 +1054,7 @@
 ! Transfer aerosol optical properties to RRTM variables;
 ! modify to reverse layer indexing here if necessary.
 
-      if (iaer .ge. 1) then 
+      if (iaer .ge. 1) then
          do l = 1, nlayers
             do ib = 1, nbndsw
                taua(l,ib) = tauaer(iplon,l,ib)
@@ -1063,7 +1066,7 @@
 
 ! Transfer cloud fraction and cloud optical properties to RRTM variables;
 ! modify to reverse layer indexing here if necessary.
-      if (icld .ge. 1) then 
+      if (icld .ge. 1) then
          inflag = inflgsw
          iceflag = iceflgsw
          liqflag = liqflgsw
@@ -1096,11 +1099,9 @@
 !         clwpmc(:,nlayers) = 0.0_rb
 !         reicmc(nlayers) = 0.0_rb
 !         relqmc(nlayers) = 0.0_rb
-      
+
       endif
 
       end subroutine inatm_sw
 
       end module rrtmg_sw_rad
-
-
