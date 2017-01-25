@@ -71,11 +71,8 @@ def test_radiative_forcing():
     rcm.add_subprocess('Convection', conv)
 
     rcm.integrate_years(5.)
-    #assert np.abs(rcm.ASR - rcm.OLR) < 0.1  # close to energy balance
-    #  There is currently a problem with energy conservation in the RRTM module, need to look into this.
+    assert np.abs(rcm.ASR - rcm.OLR) < 0.1  # close to energy balance
     rcm2 = climlab.process_like(rcm)
     rcm2.subprocess['Radiation'].co2vmr *= 2.
     rcm2.compute_diagnostics()
-    #assert (rcm2.ASR - rcm2.OLR) > 1.  # positive radiative forcing
-    #  For now this test just checks whether the API calls work without error.
-    #  We will reinstate the physical checks after fixing the energy bug.
+    assert (rcm2.ASR - rcm2.OLR) > 1.  # positive radiative forcing
