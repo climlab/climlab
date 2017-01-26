@@ -43,7 +43,7 @@
 !
 !  Purpose:  For a given atmosphere, calculate the indices and
 !  fractions related to the pressure and temperature interpolations.
-!  Also calculate the values of the integrated Planck functions 
+!  Also calculate the values of the integrated Planck functions
 !  for each band at the level and layer temperatures.
 
 ! ------- Declarations -------
@@ -53,7 +53,7 @@
       integer(kind=im), intent(in) :: istart          ! beginning band of calculation
       integer(kind=im), intent(in) :: idrv            ! Planck derivative option flag
 
-      real(kind=rb), intent(in) :: pavel(:)           ! layer pressures (mb) 
+      real(kind=rb), intent(in) :: pavel(:)           ! layer pressures (mb)
                                                       !    Dimensions: (nlayers)
       real(kind=rb), intent(in) :: tavel(:)           ! layer temperatures (K)
                                                       !    Dimensions: (nlayers)
@@ -71,19 +71,19 @@
 
 ! ----- Output -----
       integer(kind=im), intent(out) :: laytrop        ! tropopause layer index
-      integer(kind=im), intent(out) :: jp(:)          ! 
+      integer(kind=im), intent(out) :: jp(:)          !
                                                       !    Dimensions: (nlayers)
       integer(kind=im), intent(out) :: jt(:)          !
                                                       !    Dimensions: (nlayers)
       integer(kind=im), intent(out) :: jt1(:)         !
                                                       !    Dimensions: (nlayers)
-      real(kind=rb), intent(out) :: planklay(:,:)     ! 
+      real(kind=rb), intent(out) :: planklay(:,:)     !
                                                       !    Dimensions: (nlayers,nbndlw)
-      real(kind=rb), intent(out) :: planklev(0:,:)    ! 
+      real(kind=rb), intent(out) :: planklev(0:,:)    !
                                                       !    Dimensions: (0:nlayers,nbndlw)
-      real(kind=rb), intent(out) :: plankbnd(:)       ! 
+      real(kind=rb), intent(out) :: plankbnd(:)       !
                                                       !    Dimensions: (nbndlw)
-      real(kind=rb), intent(out) :: dplankbnd_dt(:)   ! 
+      real(kind=rb), intent(out) :: dplankbnd_dt(:)   !
                                                       !    Dimensions: (nbndlw)
 
       real(kind=rb), intent(out) :: colh2o(:)         ! column amount (h2o)
@@ -127,8 +127,8 @@
 
       real(kind=rb), intent(out) :: &                 !
                        fac00(:), fac01(:), &          !    Dimensions: (nlayers)
-                       fac10(:), fac11(:) 
-                                                        
+                       fac10(:), fac11(:)
+
       real(kind=rb), intent(out) :: &                 !
                        rat_h2oco2(:),rat_h2oco2_1(:), &
                        rat_h2oo3(:),rat_h2oo3_1(:), & !    Dimensions: (nlayers)
@@ -136,7 +136,7 @@
                        rat_h2och4(:),rat_h2och4_1(:), &
                        rat_n2oco2(:),rat_n2oco2_1(:), &
                        rat_o3co2(:),rat_o3co2_1(:)
-                                                        
+
 
 ! ----- Local -----
       integer(kind=im) :: indbound, indlev0
@@ -167,7 +167,7 @@
       t0frac = tz(0) - 159._rb - real(indlev0)
       laytrop = 0
 
-! Begin layer loop 
+! Begin layer loop
 !  Calculate the integrated Planck functions for each band at the
 !  surface, level, and layer temperatures.
       do lay = 1, nlayers
@@ -186,7 +186,7 @@
          endif
          tlevfrac = tz(lay) - 159._rb - real(indlev)
 
-! Begin spectral band loop 
+! Begin spectral band loop
          do iband = 1, 15
             if (lay.eq.1) then
                dbdtlev = totplnk(indbound+1,iband) - totplnk(indbound,iband)
@@ -194,7 +194,7 @@
                    (totplnk(indbound,iband) + tbndfrac * dbdtlev)
                dbdtlev = totplnk(indlev0+1,iband)-totplnk(indlev0,iband)
                planklev(0,iband) = totplnk(indlev0,iband) + t0frac * dbdtlev
-               if (idrv .eq. 1) then 
+               if (idrv .eq. 1) then
                   dbdtlev = totplnkderiv(indbound+1,iband) - totplnkderiv(indbound,iband)
                   dplankbnd_dt(iband) = semiss(iband) * &
                       (totplnkderiv(indbound,iband) + tbndfrac * dbdtlev)
@@ -207,7 +207,7 @@
          enddo
 
 !  For band 16, if radiative transfer will be performed on just
-!  this band, use integrated Planck values up to 3250 cm-1.  
+!  this band, use integrated Planck values up to 3250 cm-1.
 !  If radiative transfer will be performed across all 16 bands,
 !  then include in the integrated Planck values for this band
 !  contributions from 2600 cm-1 to infinity.
@@ -235,7 +235,7 @@
                dbdtlev = totplnk(indbound+1,iband) - totplnk(indbound,iband)
                plankbnd(iband) = semiss(iband) * &
                     (totplnk(indbound,iband) + tbndfrac * dbdtlev)
-               if (idrv .eq. 1) then 
+               if (idrv .eq. 1) then
                   dbdtlev = totplnkderiv(indbound+1,iband) - totplnkderiv(indbound,iband)
                   dplankbnd_dt(iband) = semiss(iband) * &
                        (totplnkderiv(indbound,iband) + tbndfrac * dbdtlev)
@@ -254,7 +254,9 @@
 !  fraction of the difference (in ln(pressure)) between these
 !  two values that the layer pressure lies.
 !         plog = alog(pavel(lay))
-         plog = dlog(pavel(lay))
+!  CLIMLAB change dlog to log here
+         !plog = dlog(pavel(lay))
+         plog = log(pavel(lay))
          jp(lay) = int(36._rb - 5*(plog+0.04_rb))
          if (jp(lay) .lt. 1) then
             jp(lay) = 1
@@ -265,11 +267,11 @@
          fp = 5._rb *(preflog(jp(lay)) - plog)
 
 !  Determine, for each reference pressure (JP and JP1), which
-!  reference temperature (these are different for each  
+!  reference temperature (these are different for each
 !  reference pressure) is nearest the layer temperature but does
 !  not exceed it.  Store these indices in JT and JT1, resp.
 !  Store in FT (resp. FT1) the fraction of the way between JT
-!  (JT1) and the next highest reference temperature that the 
+!  (JT1) and the next highest reference temperature that the
 !  layer temperature falls.
          jt(lay) = int(3._rb + (tavel(lay)-tref(jp(lay)))/15._rb)
          if (jt(lay) .lt. 1) then
@@ -361,7 +363,7 @@
 
 !  Set up factors needed to separately include the minor gases
 !  in the calculation of absorption coefficient
-         scaleminor(lay) = pavel(lay)/tavel(lay)         
+         scaleminor(lay) = pavel(lay)/tavel(lay)
          scaleminorn2(lay) = (pavel(lay)/tavel(lay)) &
              * (wbroad(lay)/(coldry(lay)+wkl(1,lay)))
          factor = (tavel(lay)-180.8_rb)/7.2_rb
@@ -371,10 +373,10 @@
 !  Setup reference ratio to be used in calculation of binary
 !  species parameter in upper atmosphere.
          rat_h2oco2(lay)=chi_mls(1,jp(lay))/chi_mls(2,jp(lay))
-         rat_h2oco2_1(lay)=chi_mls(1,jp(lay)+1)/chi_mls(2,jp(lay)+1)         
+         rat_h2oco2_1(lay)=chi_mls(1,jp(lay)+1)/chi_mls(2,jp(lay)+1)
 
          rat_o3co2(lay)=chi_mls(3,jp(lay))/chi_mls(2,jp(lay))
-         rat_o3co2_1(lay)=chi_mls(3,jp(lay)+1)/chi_mls(2,jp(lay)+1)         
+         rat_o3co2_1(lay)=chi_mls(3,jp(lay)+1)/chi_mls(2,jp(lay)+1)
 
 !  Calculate needed column amounts.
          colh2o(lay) = 1.e-20_rb * wkl(1,lay)
@@ -393,9 +395,9 @@
  5400    continue
 
 !  We have now isolated the layer ln pressure and temperature,
-!  between two reference pressures and two reference temperatures 
-!  (for each reference pressure).  We multiply the pressure 
-!  fraction FP with the appropriate temperature fractions to get 
+!  between two reference pressures and two reference temperatures
+!  (for each reference pressure).  We multiply the pressure
+!  fraction FP with the appropriate temperature fractions to get
 !  the factors that will be needed for the interpolation that yields
 !  the optical depths (performed in routines TAUGBn for band n).`
 
@@ -419,7 +421,7 @@
 !***************************************************************************
 
       save
- 
+
 ! These pressures are chosen such that the ln of the first pressure
 ! has only a few non-zero digits (i.e. ln(PREF(1)) = 6.96000) and
 ! each subsequent ln(pressure) differs from the previous one by 0.2.
@@ -452,8 +454,8 @@
           -3.0400e+00_rb,-3.2400e+00_rb,-3.4400e+00_rb,-3.6400e+00_rb,-3.8400e+00_rb, &
           -4.0400e+00_rb,-4.2400e+00_rb,-4.4400e+00_rb,-4.6400e+00_rb/)
 
-! These are the temperatures associated with the respective 
-! pressures for the mls standard atmosphere. 
+! These are the temperatures associated with the respective
+! pressures for the mls standard atmosphere.
 
       tref(:) = (/ &
            2.9420e+02_rb, 2.8799e+02_rb, 2.7894e+02_rb, 2.6925e+02_rb, 2.5983e+02_rb, &
@@ -582,7 +584,7 @@
 !***************************************************************************
 
       save
- 
+
       totplnk(1:50,  1) = (/ &
       0.14783e-05_rb,0.15006e-05_rb,0.15230e-05_rb,0.15455e-05_rb,0.15681e-05_rb, &
       0.15908e-05_rb,0.16136e-05_rb,0.16365e-05_rb,0.16595e-05_rb,0.16826e-05_rb, &
@@ -1288,7 +1290,7 @@
 !***************************************************************************
 
       save
- 
+
       totplnkderiv(1:50,  1) = (/ &
       2.22125e-08_rb,2.23245e-08_rb,2.24355e-08_rb,2.25435e-08_rb,2.26560e-08_rb, &
       2.27620e-08_rb,2.28690e-08_rb,2.29760e-08_rb,2.30775e-08_rb,2.31800e-08_rb, &
@@ -1990,4 +1992,3 @@
       end subroutine lwavplankderiv
 
       end module rrtmg_lw_setcoef
-

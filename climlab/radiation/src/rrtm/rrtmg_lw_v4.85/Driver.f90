@@ -7,6 +7,8 @@
 !  Brian Rose
 !  brose@albany.edu
 !  (inspired by CliMT code by Rodrigo Caballero)
+!
+!  Updated for the latest version RRTMG_LW v4.85
 
 subroutine driver &
     (ncol, nlay, icld, permuteseed, irng, idrv, cpdair, &
