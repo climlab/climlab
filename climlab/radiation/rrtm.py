@@ -354,10 +354,17 @@ class RRTMG_SW(_RRTM):
         (aldif,aldir,asdif,asdir,coszen,tauc,ssac,asmc,
          fsfc,tauaer,ssaaer,asmaer,ecaer) = self._prepare_sw_arguments(ncol, nlay)
 
+         #  new arguments for version 4.0
+        isolvar = 0
+        indsolvar = np.zeros(2)
+        bndsolvar = np.zeros(nbndsw)
+        solcycfrac = 0.
+
         args = [ncol, nlay, icld, permuteseed, irng, idrv, const.cp,
                 play, plev, tlay, tlev, tsfc,
                 h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr,
-                aldif, aldir, asdif, asdir, coszen, adjes, dyofyr, scon,
+                aldif, aldir, asdif, asdir, coszen, adjes, dyofyr, scon, isolvar,
+                indsolvar, bndsolvar, solcycfrac,
                 inflgsw, iceflgsw, liqflgsw,
                 cldfrac, ciwp, clwp, reic, relq, tauc, ssac, asmc, fsfc,
                 tauaer, ssaaer, asmaer, ecaer,]
