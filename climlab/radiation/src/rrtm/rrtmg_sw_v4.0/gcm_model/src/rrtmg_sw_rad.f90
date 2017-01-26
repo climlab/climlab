@@ -315,14 +315,15 @@
                                                       !        scaled to scon and solar variability defined
                                                       !        (optional) by setting non-zero scale factors
                                                       !        for each band in bndsolvar
-      real(kind=rb), intent(in), optional :: indsolvar(:) ! Facular and sunspot amplitude
+      !  CLIMLAB change intent(in) to intent(inout) for the following three variables
+      real(kind=rb), intent(inout), optional :: indsolvar(:) ! Facular and sunspot amplitude
                                                           ! scale factors (isolvar=1), or
                                                           ! Mg and SB indices (isolvar=2)
                                                           !    Dimensions: (2)
-      real(kind=rb), intent(in), optional :: bndsolvar(:) ! Solar variability scale factors
+      real(kind=rb), intent(inout), optional :: bndsolvar(:) ! Solar variability scale factors
                                                           ! for each shortwave band
                                                           !    Dimensions: (nbndsw=14)
-      real(kind=rb), intent(in), optional :: solcycfrac   ! Fraction of averaged solar cycle (0-1)
+      real(kind=rb), intent(inout), optional :: solcycfrac   ! Fraction of averaged solar cycle (0-1)
                                                           !    at current time (isolvar=1)
 
       integer(kind=im), intent(in) :: inflgsw         ! Flag for cloud optical properties
@@ -980,16 +981,17 @@
                                                       !        scaled to scon and solar variability defined
                                                       !        (optional) by setting non-zero scale factors
                                                       !        for each band in bndsolvar
-      real(kind=rb), intent(in), optional :: bndsolvar(:) ! Band scale factors for modeling spectral
+      !  CLIMLAB change intent(in) to intent(inout) for the following three variables
+      real(kind=rb), intent(inout), optional :: bndsolvar(:) ! Band scale factors for modeling spectral
                                                           ! variation of solar cycle for each shortwave band
                                                           ! for Kurucz solar constant (isolvar=-1), or
                                                           ! averaged NRLSSI2 model solar cycle (isolvar=3)
                                                           !    Dimensions: (nbndsw=14)
-      real(kind=rb), intent(in), optional :: indsolvar(:) ! Facular and sunspot amplitude
+      real(kind=rb), intent(inout), optional :: indsolvar(:) ! Facular and sunspot amplitude
                                                           ! scale factors (isolvar=1), or
                                                           ! Mg and SB indices (isolvar=2)
                                                           !    Dimensions: (2)
-      real(kind=rb), intent(in), optional :: solcycfrac   ! Fraction of averaged solar cycle (0-1)
+      real(kind=rb), intent(inout), optional :: solcycfrac   ! Fraction of averaged solar cycle (0-1)
                                                           !    at current time (isolvar=1)
 
       integer(kind=im), intent(in) :: inflgsw         ! Flag for cloud optical properties

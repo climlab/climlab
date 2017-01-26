@@ -123,14 +123,14 @@ subroutine driver &
                                                     !        scaled to scon and solar variability defined
                                                     !        (optional) by setting non-zero scale factors
                                                     !        for each band in bndsolvar
-    real(kind=rb), intent(in) :: indsolvar(2) ! Facular and sunspot amplitude
+    real(kind=rb), intent(inout) :: indsolvar(2) ! Facular and sunspot amplitude
                                               ! scale factors (isolvar=1), or
                                               ! Mg and SB indices (isolvar=2)
                                               !    Dimensions: (2)
-    real(kind=rb), intent(in) :: bndsolvar(nbndsw) ! Solar variability scale factors
+    real(kind=rb), intent(inout) :: bndsolvar(nbndsw) ! Solar variability scale factors
                                                    ! for each shortwave band
                                                    !    Dimensions: (nbndsw=14)
-    real(kind=rb), intent(in) :: solcycfrac   ! Fraction of averaged solar cycle (0-1)
+    real(kind=rb), intent(inout) :: solcycfrac   ! Fraction of averaged solar cycle (0-1)
                                               !    at current time (isolvar=1)
 
     integer(kind=im), intent(in) :: inflgsw         ! Flag for cloud optical properties
