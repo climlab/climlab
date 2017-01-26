@@ -831,8 +831,9 @@
             swhrc(iplon,i) = (swnflxc(i+1) - swnflxc(i)) * zdpgcp
             swhr(iplon,i) = (swnflx(i+1) - swnflx(i)) * zdpgcp
          enddo
-         swhrc(iplon,nlayers) = 0._rb
-         swhr(iplon,nlayers) = 0._rb
+      !  CLIMLAB -- don't zero out the heating rate in top-most level
+         !swhrc(iplon,nlayers) = 0._rb
+         !swhr(iplon,nlayers) = 0._rb
 
 ! End longitude loop
       enddo
