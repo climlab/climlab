@@ -193,6 +193,37 @@ class RRTMG(_RRTM):
                 **kwargs):
         super(RRTMG, self).__init__(**kwargs)
 
+        LW = RRTMG_LW(permuteseed = permuteseed_lw,
+                      emis = emis,
+                      inflglw = inflglw,
+                      iceflglw = iceflglw,
+                      liqflglw = liqflglw,
+                      tauc = tauc_lw,
+                      tauaer = tauaer_lw,
+                      **kwargs)
+        SW = RRTMG_SW(permute = permuteseed_sw,
+                      aldif = aldif,
+                      aldir = aldir,
+                      asdif = asdif,
+                      asdir = asdir,
+                      coszen = coszen,
+                      adjes = adjes,
+                      dyofyr = dyofyr,
+                      scon = scon,
+                      inflgsw = inflgsw,
+                      iceflgsw = iceflgsw,
+                      tauc = tauc_sw,
+                      ssac = ssac_sw,
+                      asmc = asmc_sw,
+                      fsfc = fsfc_sw,
+                      tauaer = tauc_sw,
+                      ssaaer = ssaaer_sw,
+                      asmaer = asmaer_sw,
+                      ecaer = ecaer_sw,
+                      **kwargs)
+        self.add_subprocess('SW', SW)
+        self.add_subprocess('LW', LW )
+
         self.add_input('permuteseed_sw', permuteseed_sw)
         self.add_input('permuteseed_lw', permuteseed_lw)
         self.add_input('aldif', aldif)
@@ -221,36 +252,30 @@ class RRTMG(_RRTM):
         self.add_input('ecaer_sw', ecaer_sw)
         self.add_input('tauaer_lw', tauaer_lw)
 
-        LW = RRTMG_LW(permuteseed = self.permuteseed_lw,
-                      emis = self.emis,
-                      inflglw = self.inflglw,
-                      iceflglw = self.iceflglw,
-                      liqflglw = self.liqflglw,
-                      tauc = self.tauc_lw,
-                      tauaer = self.tauaer_lw,
-                      **kwargs)
-        SW = RRTMG_SW(permute = self.permuteseed_sw,
-                      aldif = self.aldif,
-                      aldir = self.aldir,
-                      asdif = self.asdif,
-                      asdir = self.asdir,
-                      coszen = self.coszen,
-                      adjes = self.adjes,
-                      dyofyr = self.dyofyr,
-                      scon = self.scon,
-                      inflgsw = self.inflgsw,
-                      iceflgsw = self.iceflgsw,
-                      tauc = self.tauc_sw,
-                      ssac = self.ssac_sw,
-                      asmc = self.asmc_sw,
-                      fsfc = self.fsfc_sw,
-                      tauaer = self.tauc_sw,
-                      ssaaer = self.ssaaer_sw,
-                      asmaer = self.asmaer_sw,
-                      ecaer = self.ecaer_sw,
-                      **kwargs)
-        self.add_subprocess('SW', SW)
-        self.add_subprocess('LW', LW )
+
+    #  All the input values are defined as class properties so that
+    #  user changes will be passed to LW and/or SW subprocesses
+    @property
+    def permuteseed_sw(self):
+        return self._permuteseed_sw
+    @permuteseed_sw.setter
+    def permuteseed_sw(self, value):
+        self._permuteseed_sw = value
+        self.subprocess['SW'].permuteseed = value
+    @property
+    def co2vmr(self):
+        return self._co2vmr
+    @co2vmr.setter
+    def co2vmr(self, value):
+        self._co2vmr = value
+        try:
+            self.subprocess['SW'].co2vmr = value
+        except:
+            pass
+        try:
+            self.subprocess['LW'].co2vmr = value
+        except:
+            pass
 
 
 class RRTMG_SW(_RRTM):
