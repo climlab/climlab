@@ -490,9 +490,8 @@ class Process(object):
 
     @property
     def diagnostics(self):
-        """dictionary with all diagnostic variables
+        """Dictionary access to all diagnostic variables
 
-        :getter:    Returns the content of ``self._diag_vars``.
         :type:      dict
 
         """
@@ -500,17 +499,18 @@ class Process(object):
                 if key in self._diag_vars }
     @property
     def input(self):
-        """dictionary with all input variables
+        """Dictionary access to all input variables
 
         That can be boundary conditions and other gridded quantities
         independent of the `process`
 
-        :getter:    Returns the content of ``self._input_vars``.
         :type:      dict
 
         """
-        return { key:value for key, value in self.__dict__.items()
+        return { key:getattr(self,key) for key in dir(self)
                  if key in self._input_vars }
+        #return { key:value for key, value in self.__dict__.items()
+        #         if key in self._input_vars }
 
     # Some handy shortcuts... only really make sense when there is only
     # a single axis of that type in the process.
