@@ -495,7 +495,7 @@ class Process(object):
         :type:      dict
 
         """
-        return { key:value for key, value in self.__dict__.items()
+        return { key:getattr(self,key) for key in dir(self)
                 if key in self._diag_vars }
     @property
     def input(self):
