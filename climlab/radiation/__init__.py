@@ -5,11 +5,11 @@ from radiation import Radiation
 #from three_band import ThreeBandSW
 from nband import NbandRadiation, ThreeBandSW
 from water_vapor import ManabeWaterVapor
-#  CAM3Radiation requires netCDF4
+#  CAM3 requires netCDF4
 try:
-    from cam3rad import CAM3Radiation, CAM3Radiation_LW, CAM3Radiation_SW
+    from cam3 import CAM3, CAM3_LW, CAM3_SW
 except:
-    print 'CAM3Radiation module not available.'
+    print 'CAM3 Radiation module not available.'
 try:
     from rrtm import RRTMG, RRTMG_LW, RRTMG_SW
 except:

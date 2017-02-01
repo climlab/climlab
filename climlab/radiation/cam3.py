@@ -6,11 +6,10 @@ import numpy as np
 import netCDF4 as nc
 from climlab import constants as const
 from climlab.radiation import Radiation
-#import _cam3_interface
 import os
 from scipy.interpolate import interp1d, interp2d
 #  the compiled fortran extension
-import _cam3_radiation
+import _cam3
 
 ToExtension = ['do_sw','do_lw','p','dp','ps','Tatm','Ts','q','O3','cldf','clwp',
                'ciwp', 'in_cld','aldif','aldir','asdif','asdir','cosZen',
@@ -23,19 +22,19 @@ FromExtension = ['TdotRad','SrfRadFlx','swhr','lwhr','swflx','lwflx','SwToaCf',
 
 # Initialise absorptivity / emissivity data
 here = os.path.dirname(__file__)
-datadir = os.path.abspath(os.path.join(here, os.pardir, 'data', 'cam3rad'))
+datadir = os.path.abspath(os.path.join(here, os.pardir, 'data', 'cam3'))
 AbsEmsDataFile = os.path.join(datadir, 'abs_ems_factors_fastvx.c030508.nc')
 #  Open the absorption data file
 data = nc.Dataset(AbsEmsDataFile)
 #  The fortran module that holds the data
-mod = _cam3_radiation.absems
+mod = _cam3.absems
 #  Populate storage arrays with values from netcdf file
 for field in ['ah2onw', 'eh2onw', 'ah2ow', 'ln_ah2ow', 'cn_ah2ow', 'ln_eh2ow', 'cn_eh2ow']:
     setattr(mod, field, data.variables[field][:].T)
 data.close()
 
 
-class CAM3Radiation(Radiation):
+class CAM3(Radiation):
     '''
     climlab wrapper for the CAM3 radiation code.
 
@@ -94,7 +93,7 @@ class CAM3Radiation(Radiation):
                  O3init = False,
                  O3file = 'apeozone_cam3_5_54.nc',
                  **kwargs):
-        super(CAM3Radiation, self).__init__(**kwargs)
+        super(CAM3, self).__init__(**kwargs)
         ###  Declare all input variables
         #  Specific humidity in kg/kg
         if q is None:
@@ -241,7 +240,7 @@ class CAM3Radiation(Radiation):
             else:
                 args.append(self._climlab_to_cam3(value))
         #  new concept -- extension is NOT an attribute of the climlab process
-        OutputValues = _cam3_radiation.driver(*args)
+        OutputValues = _cam3.driver(*args)
         Output = dict( zip(FromExtension, OutputValues ))
         self.Output = Output
         #for name, value in Output.iteritems():
@@ -267,9 +266,9 @@ class CAM3Radiation(Radiation):
         self.TdotSW = self._cam3_to_climlab(Output['swhr']) * KperDayFactor
 
 
-class CAM3Radiation_LW(CAM3Radiation):
+class CAM3_LW(CAM3):
     def __init__(self, **kwargs):
-        super(CAM3Radiation_LW, self).__init__(**kwargs)
+        super(CAM3_LW, self).__init__(**kwargs)
         self.do_sw = 0  # '1=do, 0=do not compute SW'
         self.do_lw = 1  # '1=do, 0=do not compute LW'
         #  Albedo needs to be set to 1 currently, otherwise
@@ -280,9 +279,9 @@ class CAM3Radiation_LW(CAM3Radiation):
         self.aldir = 0.*self.Ts + 1.
 
 
-class CAM3Radiation_SW(CAM3Radiation):
+class CAM3_SW(CAM3):
     def __init__(self, **kwargs):
-        super(CAM3Radiation_SW, self).__init__(**kwargs)
+        super(CAM3_SW, self).__init__(**kwargs)
         self.do_sw = 1  # '1=do, 0=do not compute SW'
         self.do_lw = 0  # '1=do, 0=do not compute LW'
 

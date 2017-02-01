@@ -2,7 +2,6 @@ from __future__ import division
 import numpy as np
 import climlab
 import pytest
-#from climlab.radiation import RRTMG, RRTMG_LW, RRTMG_SW, CAM3Radiation_LW
 from climlab.radiation.rrtm import _climlab_to_rrtm, _rrtm_to_climlab
 
 num_lev = 30
@@ -36,7 +35,7 @@ def test_swap_component():
     #  Swap out the longwave model for CAM3
     rad.remove_subprocess('LW')
     rad.step_forward()
-    rad.add_subprocess('LW', climlab.radiation.CAM3Radiation_LW(state=state))
+    rad.add_subprocess('LW', climlab.radiation.CAM3_LW(state=state))
     rad.step_forward()
     assert hasattr(rad, 'OLR')
 
@@ -51,7 +50,7 @@ def test_multidim():
     assert rad.OLR.shape == rad.Ts.shape
 
 def test_radiative_forcing():
-    '''Run a single-column radiative-convective model with CAM3 radiation
+    '''Run a single-column radiative-convective model with RRTMG radiation
     out to equilibrium. Clone the model, double CO2 and measure the instantaneous
     change in TOA flux. It should be positive net downward flux.'''
     #  State variables (Air and surface temperature)

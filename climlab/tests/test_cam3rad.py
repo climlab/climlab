@@ -19,7 +19,7 @@ def rcm():
     convadj = climlab.convection.ConvectiveAdjustment(state=state,
                                                       adj_lapse_rate=6.5)
     # CAM3 radiation with default parameters and interactive water vapor
-    rad = climlab.radiation.CAM3Radiation(state=state, O3init=True,
+    rad = climlab.radiation.CAM3(state=state, O3init=True,
                                      aldif=alb, aldir=alb, asdif=alb, asdir=alb)
     rad.q = h2o.q
     # Couple the models
@@ -57,7 +57,7 @@ def test_radiative_forcing(rcm):
 
 def test_cam3_multidim():
     state = climlab.column_state(num_lev=40, num_lat=3, water_depth=5.)
-    rad = climlab.radiation.CAM3Radiation(state=state)
+    rad = climlab.radiation.CAM3(state=state)
     # Can we integrate?
     rad.step_forward()
     assert rad.OLR.shape == rad.Ts.shape

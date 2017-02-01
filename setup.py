@@ -94,7 +94,7 @@ def _patch_extension_rpath(name, verbose=False):
 climlab_root = os.path.abspath(os.path.dirname(__file__))
 #  List of all fortran extensions to be compiled
 Extensions = [
-    {'name': '_cam3_radiation',
+    {'name': '_cam3',
      'srcdir': os.path.join('climlab','radiation','src','cam3'),
      'targetdir': os.path.join('climlab','radiation')},
     {'name': '_rrtmg_lw',
