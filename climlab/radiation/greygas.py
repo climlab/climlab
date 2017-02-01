@@ -2,10 +2,10 @@ from __future__ import division
 import numpy as np
 from climlab.utils.thermo import blackbody_emission
 from climlab.radiation.transmissivity import Transmissivity
-from climlab.radiation.radiation import Radiation
+from climlab.process import EnergyBudget
 
 
-class GreyGas(Radiation):
+class GreyGas(EnergyBudget):
     '''Base class for all band radiation models,
     including grey and semi-grey model.
 
@@ -38,6 +38,14 @@ class GreyGas(Radiation):
     def __init__(self, absorptivity=None, reflectivity=None, emissivity_sfc=1.,
                  albedo_sfc=0., **kwargs):
         super(GreyGas, self).__init__(**kwargs)
+        self.add_input('flux_from_space', 0. * self.Ts)
+        #  initialize all diagnostics to zero
+        self.add_diagnostic('flux_from_sfc', 0. * self.Ts)
+        self.add_diagnostic('flux_to_sfc', 0. * self.Ts)
+        self.add_diagnostic('flux_to_space', 0. * self.Ts)
+        self.add_diagnostic('absorbed', 0. * self.Tatm)
+        self.add_diagnostic('absorbed_total', 0. * self.Ts)
+
         newinput = ['reflectivity',
                     'absorptivity',
                     'emissivity_sfc',
@@ -145,6 +153,10 @@ class GreyGas(Radiation):
 
     def _flux_convergence_sfc(self):
         return ( self.flux_to_sfc - self.flux_from_sfc )
+
+    def _compute_heating_rates(self):
+        '''Compute energy flux convergences to get heating rates in :math:`W/m^2`.'''
+        self._compute_radiative_heating()
 
     def _compute_radiative_heating(self):
         self._compute_fluxes()

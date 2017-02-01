@@ -5,7 +5,7 @@ from __future__ import division
 import numpy as np
 import netCDF4 as nc
 from climlab import constants as const
-from climlab.radiation import Radiation
+from climlab.process import EnergyBudget
 import os
 from scipy.interpolate import interp1d, interp2d
 #  the compiled fortran extension
@@ -34,7 +34,7 @@ for field in ['ah2onw', 'eh2onw', 'ah2ow', 'ln_ah2ow', 'cn_ah2ow', 'ln_eh2ow', '
 data.close()
 
 
-class CAM3(Radiation):
+class CAM3(EnergyBudget):
     '''
     climlab wrapper for the CAM3 radiation code.
 
@@ -229,7 +229,7 @@ class CAM3(Radiation):
         else:
             return np.squeeze(field)
 
-    def _compute_radiative_heating(self):
+    def _compute_heating_rates(self):
         # List of arguments to be passed to extension
         #args = [ getattr(self,key) for key in self.ToExtension ]
         args = []
