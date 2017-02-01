@@ -30,7 +30,8 @@ print rcm.ASR - rcm.OLR
 '''
 from __future__ import division
 import numpy as np
-from climlab.process import EnergyBudget, TimeDependentProcess
+from climlab.process import TimeDependentProcess
+from climlab.radiation import Radiation
 from climlab import constants as const
 import _rrtmg_lw, _rrtmg_sw
 from scipy.interpolate import interp1d
@@ -42,7 +43,7 @@ naerec = int(_rrtmg_sw.parrrsw.naerec)
 nbndlw = int(_rrtmg_lw.parrrtm.nbndlw)
 
 
-class RRTMG(EnergyBudget):
+class RRTMG(Radiation):
     '''Container to drive combined LW and SW radiation models.'''
     def __init__(self,
             # GENERAL, used in both SW and LW
@@ -236,7 +237,7 @@ class RRTMG(EnergyBudget):
         self.subprocess['LW'].co2vmr = value
     #  Should add other gases and parameters here
 
-class RRTMG_SW(EnergyBudget):
+class RRTMG_SW(Radiation):
     def __init__(self,
             # GENERAL, used in both SW and LW
             icld = 1,    # Cloud overlap method, 0: Clear only, 1: Random, 2,  Maximum/random] 3: Maximum
@@ -420,7 +421,7 @@ class RRTMG_SW(EnergyBudget):
         self.TdotSWclr = _rrtm_to_climlab(swhrc)
 
 
-class RRTMG_LW(EnergyBudget):
+class RRTMG_LW(Radiation):
     def __init__(self,
             # GENERAL, used in both SW and LW
             icld = 1,    # Cloud overlap method, 0: Clear only, 1: Random, 2,  Maximum/random] 3: Maximum
