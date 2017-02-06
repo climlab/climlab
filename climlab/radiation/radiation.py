@@ -12,32 +12,115 @@ Input (specified or provided by parent process):
 - (fix this up)
 
 Shortave processes should define these diagnostics (minimum):
-- ASR (net absorbed shortwave radiation)
-- SW_down_TOA
-- SW_up_TOA
-- SW_net_from_space
-- SW_flux_to_sfc (downwelling flux to surface)
-- SW_flux_from_sfc (upwelling flux from surface)
-- SW_net_to_sfc (net absorbed at surface)
-- TdotSW
+- ASR (W/m2, net absorbed shortwave radiation)
+- SW_flux_up   (W/m2, defined at pressure level interfaces)
+- SW_flux_down (W/m2, defined at pressure level interfaces)
+- SW_degrees_per_day   (K/day, radiative heating rate)
 
-May also have all the same diagnostics for clear-sky, e.g. ASR_clr
- ....
+May also have all the same diagnostics for clear-sky,
+e.g. ASR_clr, SW_flux_up_clr, etc.
 
- work in progress
+Longwave processes should define these diagnostics (minimum):
+- OLR (W/m2, net outgoing longwave radiation at TOA)
+- LW_flux_up
+- LW_flux_down
+- LW_degrees_per_day
 
-Longwave processes should define
+and may also have the same diagnostics for clear-sky.
+
+
+WORK IN PROGRESS....
 '''
 from __future__ import division
 import numpy as np
 from climlab.process import EnergyBudget
+from climlab.radiation import ManabeWaterVapor
+import netCDF4 as nc
 
+
+def default_absorbers(Tatm):
+    '''Initialize a dictionary of radiatively active gases.
+    All values are volumetric mixing ratios.
+
+    Ozone is set to a climatology
+    Water vapor is set based on a prescribed relative humidity profile.
+
+    All other gases are assumed well-mixed.
+
+    Specific values are based on the AquaPlanet Experiment protocols.'''
+    absorber_vmr = {}
+    absorber_vmr['CO2']   = 348. / 1E6
+    absorber_vmr['CH4']   = 1650. / 1E9
+    absorber_vmr['N2O']   = 306. / 1E9
+    absorber_vmr['O2']    = 0.
+    absorber_vmr['CFC11'] = 0.
+    absorber_vmr['CFC12'] = 0.
+    absorber_vmr['CFC22'] = 0.
+    absorber_vmr['CCL4']  = 0.
+
+    h2o = ManabeWaterVapor(state={'Tatm': Tatm})
+    #  should be converting from specific humidity to volume mixing ratio here...
+    absorber_vmr['H2O'] = h2o.q
+
+    datadir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data', 'ozone'))
+    O3filepath = os.path.join(datadir, O3file)
+    #  Open the ozone data file
+    print 'Getting ozone data from', O3filepath
+    O3data = nc.Dataset(O3filepath)
+    O3lev = O3data.variables['lev'][:]
+    O3lat = O3data.variables['lat'][:]
+    #  zonal and time average
+    O3zon = np.mean(O3data.variables['OZONE'], axis=(0,3))
+    O3global = np.average(O3zon, weights=np.cos(np.deg2rad(O3lat)), axis=1)
+    lev = Tatm.domain.axes['lev'].points
+    if Tatm.shape == lev.shape:
+        # 1D interpolation on pressure levels using global average data
+        f = interp1d(O3lev, O3global)
+        #  interpolate data to model levels
+        absorber_vmr['O3'] = f(lev)
+    else:
+        #  Attempt 2D interpolation in pressure and latitude
+        f2d = interp2d(O3lat, O3lev, O3zon)
+        try:
+            lat = Tatm.domain.axes['lat'].points
+            f2d = interp2d(O3lat, O3lev, O3zon)
+            absorber_vmr['O3'] = f2d(lat, lev).transpose()
+        except:
+            print 'Interpolation of ozone data failed.'
+            print 'Reverting to default O3.'
+            absorber_vmr['O3'] = np.zeros_like(Tatm)
+    return absorber_vmr
 
 class Radiation(EnergyBudget):
     '''Base class for radiation models (currently CAM3 and RRTMG).
     '''
-    def __init__(self, **kwargs):
+    def __init__(self,
+            #  Absorbing gases, volume mixing ratios
+            absorber_vmr = None,
+            cldfrac = 0.,  # layer cloud fraction
+            clwp = 0.,     # in-cloud liquid water path (g/m2)
+            ciwp = 0.,     # in-cloud ice water path (g/m2)
+            r_liq = 0.,    # Cloud water drop effective radius (microns)
+            r_ice = 0.,    # Cloud ice particle effective size (microns)
+            **kwargs):
         super(Radiation, self).__init__(**kwargs)
         #  Define inputs, default values, diagnostics
+        self.add_input('absorber_vmr', default_absorbers(self.Tatm))
+        # self.add_input('H2Ovmr', H2Ovmr)
+        # self.add_input('O3vmr', O3vmr)
+        # self.add_input('CO2vmr', CO2vmr)
+        # self.add_input('CH4vmr', CH4vmr)
+        # self.add_input('N2Ovmr', N2Ovmr)
+        # self.add_input('O2vmr', O2vmr)
+        # self.add_input('CFC11vmr', CFC11vmr)
+        # self.add_input('CFC12vmr', CFC12vmr)
+        # self.add_input('CFC22vmr', CFC22vmr)
+        # self.add_input('CCL4vmr', CCL4vmr)
+        self.add_input('cldfrac', cldfrac)
+        self.add_input('clwp', clwp)
+        self.add_input('ciwp', ciwp)
+        self.add_input('r_liq', r_liq)
+        self.add_input('r_ice', r_ice)
+
         #  Mechanism for setting up sensible ozone distribution
         #  Or any other prescribed gas.

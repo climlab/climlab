@@ -11,10 +11,13 @@ from scipy.interpolate import interp1d, interp2d
 #  the compiled fortran extension
 import _cam3
 
-ToExtension = ['do_sw','do_lw','p','dp','ps','Tatm','Ts','q','O3','cldf','clwp',
-               'ciwp', 'in_cld','aldif','aldir','asdif','asdir','cosZen',
-               'insolation','flus','r_liq','r_ice','CO2','N2O','CH4','CFC11',
-               'CFC12','g','Cpd','epsilon','stebol']
+ToExtension = ['do_sw','do_lw','p','dp','ps','Tatm','Ts',
+               'H2Ovmr','O3vmr',
+               'cldfrac','clwp','ciwp', 'in_cld',
+               'aldif','aldir','asdif','asdir','cosZen',
+               'insolation','flus','r_liq','r_ice',
+               'CO2vmr','N2Ovmr','CH4vmr','CFC11vmr',
+               'CFC12vmr','g','Cpd','epsilon','stebol']
 
 FromExtension = ['TdotRad','SrfRadFlx','swhr','lwhr','swflx','lwflx','SwToaCf',
                  'SwSrfCf','LwToaCf','LwSrfCf','LwToa','LwSrf','SwToa','SwSrf',
@@ -77,13 +80,6 @@ class CAM3(Radiation):
     See the code for examples of how to translate these quantities in climlab format.
     '''
     def __init__(self,
-                 CO2=380.,
-                 N2O=1.E-9,
-                 CH4=1.E-9,
-                 CFC11=1.E-9,
-                 CFC12=1.E-9,
-                 O3=1.E-9,
-                 q=None,
                  cosZen=1.,
                  insolation=const.S0/4.,
                  asdir=0.07,
@@ -95,26 +91,27 @@ class CAM3(Radiation):
                  **kwargs):
         super(CAM3, self).__init__(**kwargs)
         ###  Declare all input variables
-        #  Specific humidity in kg/kg
-        if q is None:
-            q = 1.e-8*np.ones_like(self.Tatm)  # Driver.f90 expect q in kg/kg
-        self.add_input('q', q)
+        # #  Specific humidity in kg/kg
+        #self.H2Ovmr *= np.ones_like(self.Tatm)
+        # if q is None:
+        #     q = 1.e-8*np.ones_like(self.Tatm)  # Driver.f90 expect q in kg/kg
+        # self.add_input('q', q)
         # well-mixed absorbing gases in ppmv (scalars)
-        self.add_input('CO2', CO2)
-        self.add_input('N2O', N2O)
-        self.add_input('CH4', CH4)
-        self.add_input('CFC11', CFC11)
-        self.add_input('CFC12', CFC12)
-        # initalize ozone
-        self.add_input('O3', np.ones_like(self.Tatm) * O3)
-        # Cloud frac
-        self.add_input('cldf', 0.*self.Tatm )
-        # Cloud water / ice path
-        self.add_input('clwp', 0.*self.Tatm)
-        self.add_input('ciwp', 0.*self.Tatm)
-        # Effective radius cloud drops
-        self.add_input('r_liq', 0.*self.Tatm + 10.)
-        self.add_input('r_ice', 0.*self.Tatm + 30.)
+        # # self.add_input('CO2', CO2)
+        # # self.add_input('N2O', N2O)
+        # # self.add_input('CH4', CH4)
+        # # self.add_input('CFC11', CFC11)
+        # # self.add_input('CFC12', CFC12)
+        # # # initalize ozone
+        # # self.add_input('O3', np.ones_like(self.Tatm) * O3)
+        # # Cloud frac
+        # self.add_input('cldf', 0.*self.Tatm )
+        # # Cloud water / ice path
+        # self.add_input('clwp', 0.*self.Tatm)
+        # self.add_input('ciwp', 0.*self.Tatm)
+        # # Effective radius cloud drops
+        # self.add_input('r_liq', 0.*self.Tatm + 10.)
+        # self.add_input('r_ice', 0.*self.Tatm + 30.)
         # Albedos
         self.add_input('asdir', 0.*self.Ts + asdir)
         self.add_input('asdif', 0.*self.Ts + asdif)
@@ -176,18 +173,18 @@ class CAM3(Radiation):
             #  zonal and time average
             O3zon = np.mean(O3data.variables['OZONE'], axis=(0,3))
             O3global = np.average(O3zon, weights=np.cos(np.deg2rad(O3lat)), axis=1)
-            if self.O3.shape == self.lev.shape:
+            if self.O3vmr.shape == self.lev.shape:
                 # 1D interpolation on pressure levels using global average data
                 f = interp1d(O3lev, O3global)
                 #  interpolate data to model levels
-                self.O3 = f(self.lev)
+                self.O3vmr = f(self.lev)
             else:
                 #  Attempt 2D interpolation in pressure and latitude
                 f2d = interp2d(O3lat, O3lev, O3zon)
-                self.O3 = f2d(self.lat, self.lev).transpose()
+                self.O3vmr = f2d(self.lat, self.lev).transpose()
                 try:
                     f2d = interp2d(O3lat, O3lev, O3zon)
-                    self.O3 = f2d(self.lat, self.lev).transpose()
+                    self.O3vmr = f2d(self.lat, self.lev).transpose()
                 except:
                     print 'Interpolation of ozone data failed.'
                     print 'Reverting to default O3.'

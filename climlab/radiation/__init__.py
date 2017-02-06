@@ -1,9 +1,9 @@
 from aplusbt import AplusBT, AplusBT_CO2
 from boltzmann import Boltzmann
 from insolation import FixedInsolation, P2Insolation, AnnualMeanInsolation, DailyInsolation
-from radiation import Radiation
 from nband import NbandRadiation, ThreeBandSW
 from water_vapor import ManabeWaterVapor
+from radiation import Radiation
 #  CAM3 requires netCDF4
 try:
     from cam3 import CAM3, CAM3_LW, CAM3_SW
