@@ -38,6 +38,7 @@ from climlab.radiation import ManabeWaterVapor
 import netCDF4 as nc
 import os
 from scipy.interpolate import interp1d, interp2d
+from climlab import constants as const
 
 
 def default_absorbers(Tatm, ozone_file = 'apeozone_cam3_5_54.nc'):
@@ -128,5 +129,27 @@ class Radiation(EnergyBudget):
         self.add_input('r_liq', r_liq)
         self.add_input('r_ice', r_ice)
 
-        #  Mechanism for setting up sensible ozone distribution
-        #  Or any other prescribed gas.
+
+class Radiation_SW(Radiation):
+    def __init__(self,
+                aldif = 0.3,
+                aldir = 0.3,
+                asdif = 0.3,
+                asdir = 0.3,
+                insolation = const.S0/4.,
+                cosZen = 0.5,    # cosine of the solar zenith angle
+                 **kwargs):
+        super(Radiation_SW, self).__init__(**kwargs)
+        self.add_input('insolation', insolation)
+        self.add_input('cosZen', cosZen)
+        self.add_input('aldif', aldif)
+        self.add_input('aldir', aldir)
+        self.add_input('asdif', asdif)
+        self.add_input('asdir', asdir)
+
+
+class Radiation_LW(Radiation):
+    def __init__(self,
+                 **kwargs):
+        super(Radiation_LW, self).__init__(**kwargs)
+        

@@ -7,7 +7,7 @@ import netCDF4 as nc
 from climlab import constants as const
 from climlab.radiation import Radiation
 import os
-from scipy.interpolate import interp1d, interp2d
+#rom scipy.interpolate import interp1d, interp2d
 #  the compiled fortran extension
 import _cam3
 
@@ -86,8 +86,8 @@ class CAM3(Radiation):
                  asdif=0.07,
                  aldir=0.07,
                  aldif=0.07,
-                 O3init = False,
-                 O3file = 'apeozone_cam3_5_54.nc',
+                 #O3init = False,
+                 #O3file = 'apeozone_cam3_5_54.nc',
                  **kwargs):
         super(CAM3, self).__init__(**kwargs)
         ###  Declare all input variables
@@ -161,33 +161,33 @@ class CAM3(Radiation):
         self.add_diagnostic('TdotLW', 0. * self.Tatm)
         self.add_diagnostic('TdotSW', 0. * self.Tatm)
 
-        # automatic ozone data initialization
-        if O3init:
-            datadir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data', 'ozone'))
-            O3filepath = os.path.join(datadir, O3file)
-            #  Open the ozone data file
-            print 'Getting ozone data from', O3filepath
-            O3data = nc.Dataset(O3filepath)
-            O3lev = O3data.variables['lev'][:]
-            O3lat = O3data.variables['lat'][:]
-            #  zonal and time average
-            O3zon = np.mean(O3data.variables['OZONE'], axis=(0,3))
-            O3global = np.average(O3zon, weights=np.cos(np.deg2rad(O3lat)), axis=1)
-            if self.O3vmr.shape == self.lev.shape:
-                # 1D interpolation on pressure levels using global average data
-                f = interp1d(O3lev, O3global)
-                #  interpolate data to model levels
-                self.O3vmr = f(self.lev)
-            else:
-                #  Attempt 2D interpolation in pressure and latitude
-                f2d = interp2d(O3lat, O3lev, O3zon)
-                self.O3vmr = f2d(self.lat, self.lev).transpose()
-                try:
-                    f2d = interp2d(O3lat, O3lev, O3zon)
-                    self.O3vmr = f2d(self.lat, self.lev).transpose()
-                except:
-                    print 'Interpolation of ozone data failed.'
-                    print 'Reverting to default O3.'
+        # # automatic ozone data initialization
+        # if O3init:
+        #     datadir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data', 'ozone'))
+        #     O3filepath = os.path.join(datadir, O3file)
+        #     #  Open the ozone data file
+        #     print 'Getting ozone data from', O3filepath
+        #     O3data = nc.Dataset(O3filepath)
+        #     O3lev = O3data.variables['lev'][:]
+        #     O3lat = O3data.variables['lat'][:]
+        #     #  zonal and time average
+        #     O3zon = np.mean(O3data.variables['OZONE'], axis=(0,3))
+        #     O3global = np.average(O3zon, weights=np.cos(np.deg2rad(O3lat)), axis=1)
+        #     if self.O3vmr.shape == self.lev.shape:
+        #         # 1D interpolation on pressure levels using global average data
+        #         f = interp1d(O3lev, O3global)
+        #         #  interpolate data to model levels
+        #         self.O3vmr = f(self.lev)
+        #     else:
+        #         #  Attempt 2D interpolation in pressure and latitude
+        #         f2d = interp2d(O3lat, O3lev, O3zon)
+        #         self.O3vmr = f2d(self.lat, self.lev).transpose()
+        #         try:
+        #             f2d = interp2d(O3lat, O3lev, O3zon)
+        #             self.O3vmr = f2d(self.lat, self.lev).transpose()
+        #         except:
+        #             print 'Interpolation of ozone data failed.'
+        #             print 'Reverting to default O3.'
 
     def _climlab_to_cam3(self, field):
         '''Prepare field with proper dimension order.
