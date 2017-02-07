@@ -72,6 +72,6 @@ def test_radiative_forcing():
     rcm.integrate_years(5.)
     assert np.abs(rcm.ASR - rcm.OLR) < 0.1  # close to energy balance
     rcm2 = climlab.process_like(rcm)
-    rcm2.subprocess['Radiation'].co2vmr *= 2.
+    rcm2.subprocess['Radiation'].absorber_vmr['CO2'] *= 2.
     rcm2.compute_diagnostics()
     assert (rcm2.ASR - rcm2.OLR) > 1.  # positive radiative forcing

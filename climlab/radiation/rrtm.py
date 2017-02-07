@@ -51,22 +51,22 @@ class RRTMG(Radiation):
             irng = 1,  # more monte carlo stuff
             idrv = 0,  # whether to also calculate the derivative of flux with respect to surface temp
             # GASES, used in both SW and LW
-            h2ovmr = 1E-9,
-            o3vmr = 1E-9,
-            co2vmr = 380./1E6,
-            ch4vmr = 1E-9,
-            n2ovmr = 1E-9,
-            o2vmr = 1E-9,
-            cfc11vmr = 1E-9,
-            cfc12vmr = 1E-9,
-            cfc22vmr = 1E-9,
-            ccl4vmr = 1E-9,
+            # h2ovmr = 1E-9,
+            # o3vmr = 1E-9,
+            # co2vmr = 380./1E6,
+            # ch4vmr = 1E-9,
+            # n2ovmr = 1E-9,
+            # o2vmr = 1E-9,
+            # cfc11vmr = 1E-9,
+            # cfc12vmr = 1E-9,
+            # cfc22vmr = 1E-9,
+            # ccl4vmr = 1E-9,
             #  Cloud parameters
-            cldfrac = 0.,  # layer cloud fraction
-            ciwp = 0.,     # in-cloud ice water path (g/m2)
-            clwp = 0.,     # in-cloud liquid water path (g/m2)
-            relq = 0.,     # Cloud water drop effective radius (microns)
-            reic = 0.,     # Cloud ice particle effective size (microns)
+            # cldfrac = 0.,  # layer cloud fraction
+            # ciwp = 0.,     # in-cloud ice water path (g/m2)
+            # clwp = 0.,     # in-cloud liquid water path (g/m2)
+            # relq = 0.,     # Cloud water drop effective radius (microns)
+            # reic = 0.,     # Cloud ice particle effective size (microns)
                            # specific definition of reicmcl depends on setting of iceflglw:
                            # iceflglw = 0,  ice effective radius, r_ec, (Ebert and Curry, 1992)]
                            #               r_ec must be >= 10.0 microns
@@ -140,55 +140,67 @@ class RRTMG(Radiation):
             **kwargs):
         super(RRTMG, self).__init__(**kwargs)
 
-        LW = RRTMG_LW(permuteseed = permuteseed_lw,
-                      emis = emis,
-                      inflglw = inflglw,
-                      iceflglw = iceflglw,
-                      liqflglw = liqflglw,
-                      tauc = tauc_lw,
-                      tauaer = tauaer_lw,
-                      **kwargs)
-        SW = RRTMG_SW(permute = permuteseed_sw,
-                      aldif = aldif,
-                      aldir = aldir,
-                      asdif = asdif,
-                      asdir = asdir,
-                      coszen = coszen,
-                      adjes = adjes,
-                      dyofyr = dyofyr,
-                      scon = scon,
-                      inflgsw = inflgsw,
-                      iceflgsw = iceflgsw,
-                      tauc = tauc_sw,
-                      ssac = ssac_sw,
-                      asmc = asmc_sw,
-                      fsfc = fsfc_sw,
-                      tauaer = tauc_sw,
-                      ssaaer = ssaaer_sw,
-                      asmaer = asmaer_sw,
-                      ecaer = ecaer_sw,
-                      **kwargs)
+        LW = RRTMG_LW(absorber_vmr = self.absorber_vmr,
+                     cldfrac = self.cldfrac,
+                     clwp = self.clwp,
+                     ciwp = self.ciwp,
+                     r_liq = self.r_liq,
+                     r_ice = self.r_ice,
+                     permuteseed = permuteseed_lw,
+                     emis = emis,
+                     inflglw = inflglw,
+                     iceflglw = iceflglw,
+                     liqflglw = liqflglw,
+                     tauc = tauc_lw,
+                     tauaer = tauaer_lw,
+                     **kwargs)
+        SW = RRTMG_SW(absorber_vmr = self.absorber_vmr,
+                     cldfrac = self.cldfrac,
+                     clwp = self.clwp,
+                     ciwp = self.ciwp,
+                     r_liq = self.r_liq,
+                     r_ice = self.r_ice,
+                     permute = permuteseed_sw,
+                     aldif = aldif,
+                     aldir = aldir,
+                     asdif = asdif,
+                     asdir = asdir,
+                     coszen = coszen,
+                     adjes = adjes,
+                     dyofyr = dyofyr,
+                     scon = scon,
+                     inflgsw = inflgsw,
+                     iceflgsw = iceflgsw,
+                     tauc = tauc_sw,
+                     ssac = ssac_sw,
+                     asmc = asmc_sw,
+                     fsfc = fsfc_sw,
+                     tauaer = tauc_sw,
+                     ssaaer = ssaaer_sw,
+                     asmaer = asmaer_sw,
+                     ecaer = ecaer_sw,
+                     **kwargs)
         self.add_subprocess('SW', SW)
         self.add_subprocess('LW', LW )
 
         self.add_input('icld', icld)
         self.add_input('irng', irng)
         self.add_input('idrv', idrv)
-        self.add_input('h2ovmr', h2ovmr)
-        self.add_input('o3vmr', o3vmr)
-        self.add_input('co2vmr', co2vmr)
-        self.add_input('ch4vmr', ch4vmr)
-        self.add_input('n2ovmr', n2ovmr)
-        self.add_input('o2vmr', o2vmr)
-        self.add_input('cfc11vmr', cfc11vmr)
-        self.add_input('cfc12vmr', cfc12vmr)
-        self.add_input('cfc22vmr', cfc22vmr)
-        self.add_input('ccl4vmr', ccl4vmr)
-        self.add_input('cldfrac', cldfrac)
-        self.add_input('ciwp', ciwp)
-        self.add_input('clwp', clwp)
-        self.add_input('relq', relq)
-        self.add_input('reic', reic)
+        # self.add_input('h2ovmr', h2ovmr)
+        # self.add_input('o3vmr', o3vmr)
+        # self.add_input('co2vmr', co2vmr)
+        # self.add_input('ch4vmr', ch4vmr)
+        # self.add_input('n2ovmr', n2ovmr)
+        # self.add_input('o2vmr', o2vmr)
+        # self.add_input('cfc11vmr', cfc11vmr)
+        # self.add_input('cfc12vmr', cfc12vmr)
+        # self.add_input('cfc22vmr', cfc22vmr)
+        # self.add_input('ccl4vmr', ccl4vmr)
+        # self.add_input('cldfrac', cldfrac)
+        # self.add_input('ciwp', ciwp)
+        # self.add_input('clwp', clwp)
+        # self.add_input('relq', relq)
+        # self.add_input('reic', reic)
         self.add_input('permuteseed_sw', permuteseed_sw)
         self.add_input('permuteseed_lw', permuteseed_lw)
         self.add_input('aldif', aldif)
@@ -227,15 +239,16 @@ class RRTMG(Radiation):
     def permuteseed_sw(self, value):
         self._permuteseed_sw = value
         self.subprocess['SW'].permuteseed = value
-    @property
-    def co2vmr(self):
-        return self._co2vmr
-    @co2vmr.setter
-    def co2vmr(self, value):
-        self._co2vmr = value
-        self.subprocess['SW'].co2vmr = value
-        self.subprocess['LW'].co2vmr = value
+    # @property
+    # def co2vmr(self):
+    #     return self._co2vmr
+    # @co2vmr.setter
+    # def co2vmr(self, value):
+    #     self._co2vmr = value
+    #     self.subprocess['SW'].co2vmr = value
+    #     self.subprocess['LW'].co2vmr = value
     #  Should add other gases and parameters here
+
 
 class RRTMG_SW(Radiation):
     def __init__(self,
@@ -244,22 +257,22 @@ class RRTMG_SW(Radiation):
             irng = 1,  # more monte carlo stuff
             idrv = 0,  # whether to also calculate the derivative of flux with respect to surface temp
             # GASES, used in both SW and LW
-            h2ovmr = 1E-9,
-            o3vmr = 1E-9,
-            co2vmr = 380./1E6,
-            ch4vmr = 1E-9,
-            n2ovmr = 1E-9,
-            o2vmr = 1E-9,
-            cfc11vmr = 1E-9,
-            cfc12vmr = 1E-9,
-            cfc22vmr = 1E-9,
-            ccl4vmr = 1E-9,
-            #  Cloud parameters
-            cldfrac = 0.,  # layer cloud fraction
-            ciwp = 0.,     # in-cloud ice water path (g/m2)
-            clwp = 0.,     # in-cloud liquid water path (g/m2)
-            relq = 0.,     # Cloud water drop effective radius (microns)
-            reic = 0.,     # Cloud ice particle effective size (microns)
+            # h2ovmr = 1E-9,
+            # o3vmr = 1E-9,
+            # co2vmr = 380./1E6,
+            # ch4vmr = 1E-9,
+            # n2ovmr = 1E-9,
+            # o2vmr = 1E-9,
+            # cfc11vmr = 1E-9,
+            # cfc12vmr = 1E-9,
+            # cfc22vmr = 1E-9,
+            # ccl4vmr = 1E-9,
+            # #  Cloud parameters
+            # cldfrac = 0.,  # layer cloud fraction
+            # ciwp = 0.,     # in-cloud ice water path (g/m2)
+            # clwp = 0.,     # in-cloud liquid water path (g/m2)
+            # relq = 0.,     # Cloud water drop effective radius (microns)
+            # reic = 0.,     # Cloud ice particle effective size (microns)
                            # specific definition of reicmcl depends on setting of iceflglw:
                            # iceflglw = 0,  ice effective radius, r_ec, (Ebert and Curry, 1992)]
                            #               r_ec must be >= 10.0 microns
@@ -297,21 +310,21 @@ class RRTMG_SW(Radiation):
         self.add_input('icld', icld)
         self.add_input('irng', irng)
         self.add_input('idrv', idrv)
-        self.add_input('h2ovmr', h2ovmr)
-        self.add_input('o3vmr', o3vmr)
-        self.add_input('co2vmr', co2vmr)
-        self.add_input('ch4vmr', ch4vmr)
-        self.add_input('n2ovmr', n2ovmr)
-        self.add_input('o2vmr', o2vmr)
-        self.add_input('cfc11vmr', cfc11vmr)
-        self.add_input('cfc12vmr', cfc12vmr)
-        self.add_input('cfc22vmr', cfc22vmr)
-        self.add_input('ccl4vmr', ccl4vmr)
-        self.add_input('cldfrac', cldfrac)
-        self.add_input('ciwp', ciwp)
-        self.add_input('clwp', clwp)
-        self.add_input('relq', relq)
-        self.add_input('reic', reic)
+        # self.add_input('h2ovmr', h2ovmr)
+        # self.add_input('o3vmr', o3vmr)
+        # self.add_input('co2vmr', co2vmr)
+        # self.add_input('ch4vmr', ch4vmr)
+        # self.add_input('n2ovmr', n2ovmr)
+        # self.add_input('o2vmr', o2vmr)
+        # self.add_input('cfc11vmr', cfc11vmr)
+        # self.add_input('cfc12vmr', cfc12vmr)
+        # self.add_input('cfc22vmr', cfc22vmr)
+        # self.add_input('ccl4vmr', ccl4vmr)
+        # self.add_input('cldfrac', cldfrac)
+        # self.add_input('ciwp', ciwp)
+        # self.add_input('clwp', clwp)
+        # self.add_input('relq', relq)
+        # self.add_input('reic', reic)
         self.add_input('permuteseed', permuteseed)
         self.add_input('aldif', aldif)
         self.add_input('aldir', aldir)
@@ -428,22 +441,22 @@ class RRTMG_LW(Radiation):
             irng = 1,  # more monte carlo stuff
             idrv = 0,  # whether to also calculate the derivative of flux with respect to surface temp
             # GASES, used in both SW and LW
-            h2ovmr = 1E-9,
-            o3vmr = 1E-9,
-            co2vmr = 380./1E6,
-            ch4vmr = 1E-9,
-            n2ovmr = 1E-9,
-            o2vmr = 1E-9,
-            cfc11vmr = 1E-9,
-            cfc12vmr = 1E-9,
-            cfc22vmr = 1E-9,
-            ccl4vmr = 1E-9,
-            #  Cloud parameters
-            cldfrac = 0.,  # layer cloud fraction
-            ciwp = 0.,     # in-cloud ice water path (g/m2)
-            clwp = 0.,     # in-cloud liquid water path (g/m2)
-            relq = 0.,     # Cloud water drop effective radius (microns)
-            reic = 0.,     # Cloud ice particle effective size (microns)
+            # h2ovmr = 1E-9,
+            # o3vmr = 1E-9,
+            # co2vmr = 380./1E6,
+            # ch4vmr = 1E-9,
+            # n2ovmr = 1E-9,
+            # o2vmr = 1E-9,
+            # cfc11vmr = 1E-9,
+            # cfc12vmr = 1E-9,
+            # cfc22vmr = 1E-9,
+            # ccl4vmr = 1E-9,
+            # #  Cloud parameters
+            # cldfrac = 0.,  # layer cloud fraction
+            # ciwp = 0.,     # in-cloud ice water path (g/m2)
+            # clwp = 0.,     # in-cloud liquid water path (g/m2)
+            # relq = 0.,     # Cloud water drop effective radius (microns)
+            # reic = 0.,     # Cloud ice particle effective size (microns)
                            # specific definition of reicmcl depends on setting of iceflglw:
                            # iceflglw = 0,  ice effective radius, r_ec, (Ebert and Curry, 1992)]
                            #               r_ec must be >= 10.0 microns
@@ -467,21 +480,21 @@ class RRTMG_LW(Radiation):
         self.add_input('icld', icld)
         self.add_input('irng', irng)
         self.add_input('idrv', idrv)
-        self.add_input('h2ovmr', h2ovmr)
-        self.add_input('o3vmr', o3vmr)
-        self.add_input('co2vmr', co2vmr)
-        self.add_input('ch4vmr', ch4vmr)
-        self.add_input('n2ovmr', n2ovmr)
-        self.add_input('o2vmr', o2vmr)
-        self.add_input('cfc11vmr', cfc11vmr)
-        self.add_input('cfc12vmr', cfc12vmr)
-        self.add_input('cfc22vmr', cfc22vmr)
-        self.add_input('ccl4vmr', ccl4vmr)
-        self.add_input('cldfrac', cldfrac)
-        self.add_input('ciwp', ciwp)
-        self.add_input('clwp', clwp)
-        self.add_input('relq', relq)
-        self.add_input('reic', reic)
+        # self.add_input('h2ovmr', h2ovmr)
+        # self.add_input('o3vmr', o3vmr)
+        # self.add_input('co2vmr', co2vmr)
+        # self.add_input('ch4vmr', ch4vmr)
+        # self.add_input('n2ovmr', n2ovmr)
+        # self.add_input('o2vmr', o2vmr)
+        # self.add_input('cfc11vmr', cfc11vmr)
+        # self.add_input('cfc12vmr', cfc12vmr)
+        # self.add_input('cfc22vmr', cfc22vmr)
+        # self.add_input('ccl4vmr', ccl4vmr)
+        # self.add_input('cldfrac', cldfrac)
+        # self.add_input('ciwp', ciwp)
+        # self.add_input('clwp', clwp)
+        # self.add_input('relq', relq)
+        # self.add_input('reic', reic)
         self.add_input('permuteseed', permuteseed)
         self.add_input('emis', emis)
         self.add_input('inflglw', inflglw)
@@ -561,22 +574,22 @@ def _prepare_general_arguments(RRTMGobject):
     ncol, nlay = tlay.shape
     tsfc = _climlab_to_rrtm_sfc(RRTMGobject.Ts)
     # GASES -- put them in proper dimensions
-    h2ovmr   = _climlab_to_rrtm(RRTMGobject.h2ovmr * np.ones_like(RRTMGobject.Tatm))
-    o3vmr    = _climlab_to_rrtm(RRTMGobject.o3vmr * np.ones_like(RRTMGobject.Tatm))
-    co2vmr   = _climlab_to_rrtm(RRTMGobject.co2vmr * np.ones_like(RRTMGobject.Tatm))
-    ch4vmr   = _climlab_to_rrtm(RRTMGobject.ch4vmr * np.ones_like(RRTMGobject.Tatm))
-    n2ovmr   = _climlab_to_rrtm(RRTMGobject.n2ovmr * np.ones_like(RRTMGobject.Tatm))
-    o2vmr    = _climlab_to_rrtm(RRTMGobject.o2vmr * np.ones_like(RRTMGobject.Tatm))
-    cfc11vmr = _climlab_to_rrtm(RRTMGobject.cfc11vmr * np.ones_like(RRTMGobject.Tatm))
-    cfc12vmr = _climlab_to_rrtm(RRTMGobject.cfc12vmr * np.ones_like(RRTMGobject.Tatm))
-    cfc22vmr = _climlab_to_rrtm(RRTMGobject.cfc22vmr * np.ones_like(RRTMGobject.Tatm))
-    ccl4vmr  = _climlab_to_rrtm(RRTMGobject.ccl4vmr * np.ones_like(RRTMGobject.Tatm))
+    h2ovmr   = _climlab_to_rrtm(RRTMGobject.absorber_vmr['H2O'] * np.ones_like(RRTMGobject.Tatm))
+    o3vmr    = _climlab_to_rrtm(RRTMGobject.absorber_vmr['O3'] * np.ones_like(RRTMGobject.Tatm))
+    co2vmr   = _climlab_to_rrtm(RRTMGobject.absorber_vmr['CO2'] * np.ones_like(RRTMGobject.Tatm))
+    ch4vmr   = _climlab_to_rrtm(RRTMGobject.absorber_vmr['CH4'] * np.ones_like(RRTMGobject.Tatm))
+    n2ovmr   = _climlab_to_rrtm(RRTMGobject.absorber_vmr['N2O'] * np.ones_like(RRTMGobject.Tatm))
+    o2vmr    = _climlab_to_rrtm(RRTMGobject.absorber_vmr['O2'] * np.ones_like(RRTMGobject.Tatm))
+    cfc11vmr = _climlab_to_rrtm(RRTMGobject.absorber_vmr['CFC11'] * np.ones_like(RRTMGobject.Tatm))
+    cfc12vmr = _climlab_to_rrtm(RRTMGobject.absorber_vmr['CFC12'] * np.ones_like(RRTMGobject.Tatm))
+    cfc22vmr = _climlab_to_rrtm(RRTMGobject.absorber_vmr['CFC22'] * np.ones_like(RRTMGobject.Tatm))
+    ccl4vmr  = _climlab_to_rrtm(RRTMGobject.absorber_vmr['CCL4'] * np.ones_like(RRTMGobject.Tatm))
     #  Cloud parameters
     cldfrac = _climlab_to_rrtm(RRTMGobject.cldfrac * np.ones_like(RRTMGobject.Tatm))
     ciwp = _climlab_to_rrtm(RRTMGobject.ciwp * np.ones_like(RRTMGobject.Tatm))
     clwp = _climlab_to_rrtm(RRTMGobject.clwp * np.ones_like(RRTMGobject.Tatm))
-    relq = _climlab_to_rrtm(RRTMGobject.relq * np.ones_like(RRTMGobject.Tatm))
-    reic = _climlab_to_rrtm(RRTMGobject.reic * np.ones_like(RRTMGobject.Tatm))
+    relq = _climlab_to_rrtm(RRTMGobject.r_liq * np.ones_like(RRTMGobject.Tatm))
+    reic = _climlab_to_rrtm(RRTMGobject.r_ice * np.ones_like(RRTMGobject.Tatm))
 
     return (ncol, nlay, play, plev, tlay, tlev, tsfc,
             h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr, cfc11vmr,

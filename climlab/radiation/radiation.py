@@ -36,9 +36,11 @@ import numpy as np
 from climlab.process import EnergyBudget
 from climlab.radiation import ManabeWaterVapor
 import netCDF4 as nc
+import os
+from scipy.interpolate import interp1d, interp2d
 
 
-def default_absorbers(Tatm):
+def default_absorbers(Tatm, ozone_file = 'apeozone_cam3_5_54.nc'):
     '''Initialize a dictionary of radiatively active gases.
     All values are volumetric mixing ratios.
 
@@ -63,27 +65,27 @@ def default_absorbers(Tatm):
     absorber_vmr['H2O'] = h2o.q
 
     datadir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data', 'ozone'))
-    O3filepath = os.path.join(datadir, O3file)
+    ozonefilepath = os.path.join(datadir, ozone_file)
     #  Open the ozone data file
-    print 'Getting ozone data from', O3filepath
-    O3data = nc.Dataset(O3filepath)
-    O3lev = O3data.variables['lev'][:]
-    O3lat = O3data.variables['lat'][:]
+    print 'Getting ozone data from', ozonefilepath
+    ozonedata = nc.Dataset(ozonefilepath)
+    ozone_lev = ozonedata.variables['lev'][:]
+    ozone_lat = ozonedata.variables['lat'][:]
     #  zonal and time average
-    O3zon = np.mean(O3data.variables['OZONE'], axis=(0,3))
-    O3global = np.average(O3zon, weights=np.cos(np.deg2rad(O3lat)), axis=1)
+    ozone_zon = np.mean(ozonedata.variables['OZONE'], axis=(0,3))
+    ozone_global = np.average(ozone_zon, weights=np.cos(np.deg2rad(ozone_lat)), axis=1)
     lev = Tatm.domain.axes['lev'].points
     if Tatm.shape == lev.shape:
         # 1D interpolation on pressure levels using global average data
-        f = interp1d(O3lev, O3global)
+        f = interp1d(ozone_lev, ozone_global)
         #  interpolate data to model levels
         absorber_vmr['O3'] = f(lev)
     else:
         #  Attempt 2D interpolation in pressure and latitude
-        f2d = interp2d(O3lat, O3lev, O3zon)
+        f2d = interp2d(ozone_lat, ozone_lev, ozone_zon)
         try:
             lat = Tatm.domain.axes['lat'].points
-            f2d = interp2d(O3lat, O3lev, O3zon)
+            f2d = interp2d(ozone_lat, ozone_lev, ozone_zon)
             absorber_vmr['O3'] = f2d(lat, lev).transpose()
         except:
             print 'Interpolation of ozone data failed.'
@@ -102,10 +104,14 @@ class Radiation(EnergyBudget):
             ciwp = 0.,     # in-cloud ice water path (g/m2)
             r_liq = 0.,    # Cloud water drop effective radius (microns)
             r_ice = 0.,    # Cloud ice particle effective size (microns)
+            ozone_file = 'apeozone_cam3_5_54.nc',
             **kwargs):
         super(Radiation, self).__init__(**kwargs)
         #  Define inputs, default values, diagnostics
-        self.add_input('absorber_vmr', default_absorbers(self.Tatm))
+        if absorber_vmr is None:
+            self.add_input('absorber_vmr', default_absorbers(self.Tatm, ozone_file))
+        else:
+            self.add_input('absorber_vmr', absorber_vmr)
         # self.add_input('H2Ovmr', H2Ovmr)
         # self.add_input('O3vmr', O3vmr)
         # self.add_input('CO2vmr', CO2vmr)
