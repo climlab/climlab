@@ -11,17 +11,17 @@ import os
 #  the compiled fortran extension
 import _cam3
 
-ToExtension = ['do_sw','do_lw','p','dp','ps','Tatm','Ts',
-               'H2Ovmr','O3vmr',
-               'cldfrac','clwp','ciwp', 'in_cld',
-               'aldif','aldir','asdif','asdir','cosZen',
-               'insolation','flus','r_liq','r_ice',
-               'CO2vmr','N2Ovmr','CH4vmr','CFC11vmr',
-               'CFC12vmr','g','Cpd','epsilon','stebol']
-
-FromExtension = ['TdotRad','SrfRadFlx','swhr','lwhr','swflx','lwflx','SwToaCf',
-                 'SwSrfCf','LwToaCf','LwSrfCf','LwToa','LwSrf','SwToa','SwSrf',
-                 'lwuflx','lwdflx']
+# ToExtension = ['do_sw','do_lw','p','dp','ps','Tatm','Ts',
+#                'H2Ovmr','O3vmr',
+#                'cldfrac','clwp','ciwp', 'in_cld',
+#                'aldif','aldir','asdif','asdir','cosZen',
+#                'insolation','flus','r_liq','r_ice',
+#                'CO2vmr','N2Ovmr','CH4vmr','CFC11vmr',
+#                'CFC12vmr','g','Cpd','epsilon','stebol']
+#
+# FromExtension = ['TdotRad','SrfRadFlx','swhr','lwhr','swflx','lwflx','SwToaCf',
+#                  'SwSrfCf','LwToaCf','LwSrfCf','LwToa','LwSrf','SwToa','SwSrf',
+#                  'lwuflx','lwdflx']
 
 # Initialise absorptivity / emissivity data
 here = os.path.dirname(__file__)
@@ -37,7 +37,7 @@ for field in ['ah2onw', 'eh2onw', 'ah2ow', 'ln_ah2ow', 'cn_ah2ow', 'ln_eh2ow', '
 data.close()
 
 
-class CAM3(_Radiation):
+class CAM3(_Radiation_SW, _Radiation_LW):
     '''
     climlab wrapper for the CAM3 radiation code.
 
@@ -135,22 +135,22 @@ class CAM3(_Radiation):
         self.do_lw = 1  # '1=do, 0=do not compute LW'
         self.in_cld = 0 # '1=in-cloud, 0=grid avg cloud water path'
         #  Set up some useful defaults, mostly following climt/state.py
-        self.shape3D = (self.KM, self.JM, self.IM)
-        self.shape2D = self.shape3D[1:]
+        #self.shape3D = (self.KM, self.JM, self.IM)
+        #self.shape2D = self.shape3D[1:]
         #self.ps = const.ps * np.ones(self.shape2D)
         #  surface pressure should correspond to model domain!
-        self.ps = self.lev_bounds[-1] * np.ones(self.shape2D)
-        self.p = self.lev
+        #self.ps = self.lev_bounds[-1] * np.ones(self.shape2D)
+        #self.p = self.lev
         #   why are we passing missing instead of the actual layer thicknesses?
-        self.dp = np.zeros_like(self.p) - 99. # set as missing
+        #self.dp = np.zeros_like(self.p) - 99. # set as missing
 
         # Surface upwelling LW
-        self.flus = np.zeros_like(self.Ts) - 99. # set to missing as default
+        #self.flus = np.zeros_like(self.Ts) - 99. # set to missing as default
         # physical constants
-        self.g = const.g
-        self.Cpd = const.cp
-        self.epsilon = const.Rd / const.Rv
-        self.stebol = const.sigma
+        #self.g = const.g
+        #self.Cpd = const.cp
+        #self.epsilon = const.Rd / const.Rv
+        #self.stebol = const.sigma
 
         # initialize diagnostics
         self.add_diagnostic('ASR', 0. * self.Ts)
@@ -226,41 +226,98 @@ class CAM3(_Radiation):
         else:
             return np.squeeze(field)
 
+    def _prepare_arguments(self):
+        # scalar integer arguments
+        KM = self.KM
+        JM = self.JM
+        IM = self.IM
+        do_sw = self.do_sw
+        do_lw = self.do_lw
+        in_cld = self.in_cld
+        # scalar real arguments
+        g = const.g
+        Cpd = const.cp
+        epsilon = const.Rd / const.Rv
+        stebol = const.sigma
+        #  Well-mixed greenhouse gases -- scalar values
+        CO2vmr = self.absorber_vmr['CO2']
+        N2Ovmr = self.absorber_vmr['N2O']
+        CH4vmr = self.absorber_vmr['CH4']
+        CFC11vmr = self.absorber_vmr['CFC11']
+        CFC12vmr = self.absorber_vmr['CFC12']
+        # array input
+        Tatm = self._climlab_to_cam3(self.Tatm)
+        Ts = self._climlab_to_cam3(self.Ts)
+        insolation = self._climlab_to_cam3(self.insolation * np.ones_like(self.Ts))
+        cosZen = self._climlab_to_cam3(self.cosZen * np.ones_like(self.Ts))
+        aldif = self._climlab_to_cam3(self.aldif * np.ones_like(self.Ts))
+        aldir = self._climlab_to_cam3(self.aldir * np.ones_like(self.Ts))
+        asdif = self._climlab_to_cam3(self.asdif * np.ones_like(self.Ts))
+        asdir = self._climlab_to_cam3(self.asdir * np.ones_like(self.Ts))
+        #  surface pressure should correspond to model domain!
+        ps = self._climlab_to_cam3(self.lev_bounds[-1] * np.ones_like(self.Ts))
+        p = self._climlab_to_cam3(self.lev * np.ones_like(self.Tatm))
+        #   why are we passing missing instead of the actual layer thicknesses?
+        dp = np.zeros_like(p) - 99. # set as missing
+        # Surface upwelling LW
+        flus = self._climlab_to_cam3(np.zeros_like(self.Ts) - 99.) # set to missing as default
+        # spatially varying gases
+        H2Ovmr = self._climlab_to_cam3(self.absorber_vmr['H2O'] * np.ones_like(self.Tatm))
+        O3vmr = self._climlab_to_cam3(self.absorber_vmr['O3'] * np.ones_like(self.Tatm))
+        # cloud fields
+        cldfrac = self._climlab_to_cam3(self.cldfrac * np.ones_like(self.Tatm))
+        clwp = self._climlab_to_cam3(self.clwp * np.ones_like(self.Tatm))
+        ciwp = self._climlab_to_cam3(self.ciwp * np.ones_like(self.Tatm))
+        r_liq = self._climlab_to_cam3(self.r_liq * np.ones_like(self.Tatm))
+        r_ice = self._climlab_to_cam3(self.r_ice * np.ones_like(self.Tatm))
+        #  The ordered list of input fields needed by the CAM3 driver
+        args = [KM, JM, IM, do_sw, do_lw, p, dp, ps, Tatm, Ts,
+                H2Ovmr, O3vmr, cldfrac, clwp, ciwp, in_cld,
+                aldif, aldir, asdif, asdir, cosZen,
+                insolation, flus, r_liq, r_ice,
+                CO2vmr, N2Ovmr, CH4vmr, CFC11vmr,
+                CFC12vmr, g, Cpd, epsilon, stebol]
+        return args
+
     def _compute_heating_rates(self):
         # List of arguments to be passed to extension
+        args = self._prepare_arguments()
+        (TdotRad, SrfRadFlx, swhr, lwhr, swflx, lwflx, SwToaCf,
+            SwSrfCf, LwToaCf, LwSrfCf, LwToa, LwSrf, SwToa, SwSrf,
+            lwuflx, lwdflx) = _cam3.driver(*args)
         #args = [ getattr(self,key) for key in self.ToExtension ]
-        args = []
-        for key in ToExtension:
-            value = getattr(self, key)
-            if np.isscalar(value):
-                args.append(value)
-            else:
-                args.append(self._climlab_to_cam3(value))
+        #args = []
+        #for key in ToExtension:
+        #    value = getattr(self, key)
+        #    if np.isscalar(value):
+        #        args.append(value)
+        #    else:
+        #        args.append(self._climlab_to_cam3(value))
         #  new concept -- extension is NOT an attribute of the climlab process
-        OutputValues = _cam3.driver(*args)
-        Output = dict( zip(FromExtension, OutputValues ))
-        self.Output = Output
+        #OutputValues = _cam3.driver(*args)
+        #Output = dict( zip(FromExtension, OutputValues ))
+        #self.Output = Output
         #for name, value in Output.iteritems():
         #    setattr(self, name, value)
         #  SrfRadFlx is net downward flux at surface
-        self.heating_rate['Ts'] = self._cam3_to_climlab(Output['SrfRadFlx'])
+        self.heating_rate['Ts'] = self._cam3_to_climlab(SrfRadFlx)
         # lwhr and swhr are heating rates in W/kg
         #  (qrl and qrs in CAM3 code)
         #  TdotRad is the sum lwhr + swhr, also in W/kg
         #  Need to set to W/m2
         Catm = self.Tatm.domain.heat_capacity
-        self.heating_rate['Tatm'] = (self._cam3_to_climlab(Output['TdotRad']) *
+        self.heating_rate['Tatm'] = (self._cam3_to_climlab(TdotRad) *
                                      (Catm / const.cp))
         #  Set some diagnostics (minimal for now!)
-        self.OLR = -self._cam3_to_climlab(Output['LwToa'])
-        self.OLRcld = -self._cam3_to_climlab(Output['LwToaCf'])
-        self.ASR = self._cam3_to_climlab(Output['SwToa'])
-        self.ASRcld = self._cam3_to_climlab(Output['SwToaCf'])
+        self.OLR = -self._cam3_to_climlab(LwToa)
+        self.OLRcld = -self._cam3_to_climlab(LwToaCf)
+        self.ASR = self._cam3_to_climlab(SwToa)
+        self.ASRcld = self._cam3_to_climlab(SwToaCf)
         #  radiative heating rates in K / day
         KperDayFactor = const.seconds_per_day / const.cp
-        self.TdotRad = self._cam3_to_climlab(Output['TdotRad']) * KperDayFactor
-        self.TdotLW = self._cam3_to_climlab(Output['lwhr']) * KperDayFactor
-        self.TdotSW = self._cam3_to_climlab(Output['swhr']) * KperDayFactor
+        self.TdotRad = self._cam3_to_climlab(TdotRad) * KperDayFactor
+        self.TdotLW = self._cam3_to_climlab(lwhr) * KperDayFactor
+        self.TdotSW = self._cam3_to_climlab(swhr) * KperDayFactor
 
 
 class CAM3_LW(CAM3):

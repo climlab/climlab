@@ -19,8 +19,7 @@ def rcm():
     convadj = climlab.convection.ConvectiveAdjustment(state=state,
                                                       adj_lapse_rate=6.5)
     # CAM3 radiation with default parameters and interactive water vapor
-    rad = climlab.radiation.CAM3(state=state, O3init=True,
-                                     aldif=alb, aldir=alb, asdif=alb, asdir=alb)
+    rad = climlab.radiation.CAM3(state=state, albedo=alb)
     rad.H2Ovmr = h2o.q
     # Couple the models
     rcm.add_subprocess('Radiation', rad)
@@ -44,7 +43,7 @@ def test_radiative_forcing(rcm):
     rcm.integrate_years(5.)
     assert np.abs(rcm.ASR - rcm.OLR) < 0.1  # close to energy balance
     rcm2 = climlab.process_like(rcm)
-    rcm2.subprocess['Radiation'].CO2vmr *= 2.
+    rcm2.subprocess['Radiation'].absorber_vmr['CO2'] *= 2.
     rcm2.compute_diagnostics()
     assert (rcm2.ASR - rcm2.OLR) > 1.  # positive radiative forcing
 

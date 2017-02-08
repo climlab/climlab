@@ -91,7 +91,6 @@ subroutine driver(  &
   real*8, intent(in) :: cpair
   real*8, intent(in) :: epsilo
   real*8, intent(in) :: stebol
-  !f2py intent(in,hide)  km,jm,im
 
 ! Output
   real*8, intent(out) :: tdot(km,jm,im)
@@ -110,6 +109,12 @@ subroutine driver(  &
   real*8, intent(out) :: sw_toa(jm,im)
   real*8, intent(out) :: sw_srf(jm,im)
   real*8, intent(out) :: srfflx(jm,im)
+
+  !  These are not comments! Necessary directives to f2py to handle array dimensions
+  !f2py depend(jm,im) aldif,aldir,asdif,asdir,coszen,scon,flus,ps,tg
+  !f2py depend(km,jm,im) cldf,clwp,ciwp,o3mmr,r_liq,r_ice,pmid,dp,q,t
+  !f2py depend(jm,im) sw_cf_toa,sw_cf_srf,lw_cf_toa,lw_cf_srf,lw_toa,lw_srf,sw_toa,sw_srf,srfflx
+  !f2py depend(km,jm,im) swflx_out,lwflx_out,lwup_out,lwdn_out,tdot,qrs,qrl
 
 ! Local
   real*8 swflx(km+1)
