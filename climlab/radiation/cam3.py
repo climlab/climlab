@@ -7,21 +7,9 @@ import netCDF4 as nc
 from climlab import constants as const
 from climlab.radiation.radiation import _Radiation, _Radiation_SW, _Radiation_LW
 import os
-#rom scipy.interpolate import interp1d, interp2d
 #  the compiled fortran extension
 import _cam3
 
-# ToExtension = ['do_sw','do_lw','p','dp','ps','Tatm','Ts',
-#                'H2Ovmr','O3vmr',
-#                'cldfrac','clwp','ciwp', 'in_cld',
-#                'aldif','aldir','asdif','asdir','cosZen',
-#                'insolation','flus','r_liq','r_ice',
-#                'CO2vmr','N2Ovmr','CH4vmr','CFC11vmr',
-#                'CFC12vmr','g','Cpd','epsilon','stebol']
-#
-# FromExtension = ['TdotRad','SrfRadFlx','swhr','lwhr','swflx','lwflx','SwToaCf',
-#                  'SwSrfCf','LwToaCf','LwSrfCf','LwToa','LwSrf','SwToa','SwSrf',
-#                  'lwuflx','lwdflx']
 
 # Initialise absorptivity / emissivity data
 here = os.path.dirname(__file__)
@@ -80,47 +68,8 @@ class CAM3(_Radiation_SW, _Radiation_LW):
     See the code for examples of how to translate these quantities in climlab format.
     '''
     def __init__(self,
-                 #cosZen=1.,
-                 #insolation=const.S0/4.,
-                 #asdir=0.07,
-                 #asdif=0.07,
-                 #aldir=0.07,
-                 #aldif=0.07,
-                 #O3init = False,
-                 #O3file = 'apeozone_cam3_5_54.nc',
                  **kwargs):
         super(CAM3, self).__init__(**kwargs)
-        ###  Declare all input variables
-        # #  Specific humidity in kg/kg
-        #self.H2Ovmr *= np.ones_like(self.Tatm)
-        # if q is None:
-        #     q = 1.e-8*np.ones_like(self.Tatm)  # Driver.f90 expect q in kg/kg
-        # self.add_input('q', q)
-        # well-mixed absorbing gases in ppmv (scalars)
-        # # self.add_input('CO2', CO2)
-        # # self.add_input('N2O', N2O)
-        # # self.add_input('CH4', CH4)
-        # # self.add_input('CFC11', CFC11)
-        # # self.add_input('CFC12', CFC12)
-        # # # initalize ozone
-        # # self.add_input('O3', np.ones_like(self.Tatm) * O3)
-        # # Cloud frac
-        # self.add_input('cldf', 0.*self.Tatm )
-        # # Cloud water / ice path
-        # self.add_input('clwp', 0.*self.Tatm)
-        # self.add_input('ciwp', 0.*self.Tatm)
-        # # Effective radius cloud drops
-        # self.add_input('r_liq', 0.*self.Tatm + 10.)
-        # self.add_input('r_ice', 0.*self.Tatm + 30.)
-        # Albedos
-        #self.add_input('asdir', 0.*self.Ts + asdir)
-        #self.add_input('asdif', 0.*self.Ts + asdif)
-        #self.add_input('aldir', 0.*self.Ts + asdir)
-        #self.add_input('aldif', 0.*self.Ts + asdif)
-        # cosine of the average zenith angle
-        #self.add_input('cosZen', 0.*self.Ts + cosZen)
-        # Insolation in W/m2
-        #self.add_input('insolation', 0.*self.Ts + insolation)
 
         self.KM = self.lev.size
         try:
@@ -134,24 +83,6 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         self.do_sw = 1  # '1=do, 0=do not compute SW'
         self.do_lw = 1  # '1=do, 0=do not compute LW'
         self.in_cld = 0 # '1=in-cloud, 0=grid avg cloud water path'
-        #  Set up some useful defaults, mostly following climt/state.py
-        #self.shape3D = (self.KM, self.JM, self.IM)
-        #self.shape2D = self.shape3D[1:]
-        #self.ps = const.ps * np.ones(self.shape2D)
-        #  surface pressure should correspond to model domain!
-        #self.ps = self.lev_bounds[-1] * np.ones(self.shape2D)
-        #self.p = self.lev
-        #   why are we passing missing instead of the actual layer thicknesses?
-        #self.dp = np.zeros_like(self.p) - 99. # set as missing
-
-        # Surface upwelling LW
-        #self.flus = np.zeros_like(self.Ts) - 99. # set to missing as default
-        # physical constants
-        #self.g = const.g
-        #self.Cpd = const.cp
-        #self.epsilon = const.Rd / const.Rv
-        #self.stebol = const.sigma
-
         # initialize diagnostics
         self.add_diagnostic('ASR', 0. * self.Ts)
         self.add_diagnostic('ASRcld', 0. * self.Ts)
@@ -160,34 +91,6 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         self.add_diagnostic('TdotRad', 0. * self.Tatm)
         self.add_diagnostic('TdotLW', 0. * self.Tatm)
         self.add_diagnostic('TdotSW', 0. * self.Tatm)
-
-        # # automatic ozone data initialization
-        # if O3init:
-        #     datadir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data', 'ozone'))
-        #     O3filepath = os.path.join(datadir, O3file)
-        #     #  Open the ozone data file
-        #     print 'Getting ozone data from', O3filepath
-        #     O3data = nc.Dataset(O3filepath)
-        #     O3lev = O3data.variables['lev'][:]
-        #     O3lat = O3data.variables['lat'][:]
-        #     #  zonal and time average
-        #     O3zon = np.mean(O3data.variables['OZONE'], axis=(0,3))
-        #     O3global = np.average(O3zon, weights=np.cos(np.deg2rad(O3lat)), axis=1)
-        #     if self.O3vmr.shape == self.lev.shape:
-        #         # 1D interpolation on pressure levels using global average data
-        #         f = interp1d(O3lev, O3global)
-        #         #  interpolate data to model levels
-        #         self.O3vmr = f(self.lev)
-        #     else:
-        #         #  Attempt 2D interpolation in pressure and latitude
-        #         f2d = interp2d(O3lat, O3lev, O3zon)
-        #         self.O3vmr = f2d(self.lat, self.lev).transpose()
-        #         try:
-        #             f2d = interp2d(O3lat, O3lev, O3zon)
-        #             self.O3vmr = f2d(self.lat, self.lev).transpose()
-        #         except:
-        #             print 'Interpolation of ozone data failed.'
-        #             print 'Reverting to default O3.'
 
     def _climlab_to_cam3(self, field):
         '''Prepare field with proper dimension order.
@@ -259,6 +162,8 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         p = self._climlab_to_cam3(self.lev * np.ones_like(self.Tatm))
         #   why are we passing missing instead of the actual layer thicknesses?
         dp = np.zeros_like(p) - 99. # set as missing
+        #dp = np.diff(self.lev_bounds)
+        #dp = self._climlab_to_cam3(dp * np.ones_like(self.Tatm))
         # Surface upwelling LW
         flus = self._climlab_to_cam3(np.zeros_like(self.Ts) - 99.) # set to missing as default
         # spatially varying gases
