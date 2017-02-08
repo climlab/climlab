@@ -87,7 +87,7 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
             # asdif = 0.3,
             # asdir = 0.3,
             # LW
-            emis = 1.,
+            #emis = 1.,
             # THE SUN - SW
             #coszen = 0.5,    # cosine of the solar zenith angle
             adjes = 1.,       # flux adjustment for earth/sun distance (if not dyofyr)
@@ -147,7 +147,7 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
                      r_liq = self.r_liq,
                      r_ice = self.r_ice,
                      permuteseed = permuteseed_lw,
-                     emis = emis,
+                     emissivity = self.emissivity,
                      inflglw = inflglw,
                      iceflglw = iceflglw,
                      liqflglw = liqflglw,
@@ -208,7 +208,7 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
         # self.add_input('aldir', aldir)
         # self.add_input('asdif', asdif)
         # self.add_input('asdir', asdir)
-        self.add_input('emis', emis)
+        #self.add_input('emis', emis)
         # self.add_input('coszen', coszen)
         self.add_input('adjes', adjes)
         self.add_input('dyofyr', dyofyr)
@@ -469,7 +469,7 @@ class RRTMG_LW(_Radiation_LW):
                            #               dge range is limited to 5.0 to 140.0 microns
                            #               [dge = 1.0315 * r_ec]
             permuteseed =  300,
-            emis = 1.,
+            #emis = 1.,
             inflglw  = 2,
             iceflglw = 1,
             liqflglw = 1,
@@ -497,7 +497,7 @@ class RRTMG_LW(_Radiation_LW):
         # self.add_input('relq', relq)
         # self.add_input('reic', reic)
         self.add_input('permuteseed', permuteseed)
-        self.add_input('emis', emis)
+        #self.add_input('emis', emis)
         self.add_input('inflglw', inflglw)
         self.add_input('iceflglw', iceflglw)
         self.add_input('liqflglw', liqflglw)
@@ -524,7 +524,7 @@ class RRTMG_LW(_Radiation_LW):
         cfc12vmr, cfc12vmr, cfc22vmr, ccl4vmr,
         cldfrac, ciwp, clwp, relq, reic) = _prepare_general_arguments(self)
         # surface emissivity
-        emis = self.emis * np.ones((ncol,nbndlw))
+        emis = self.emissivity * np.ones((ncol,nbndlw))
         #  THE REST OF THESE ARGUMENTS ARE STILL BEING HARD CODED.
         #   NEED TO FIX THIS UP...
 

@@ -156,5 +156,7 @@ class _Radiation_SW(_Radiation):
 
 class _Radiation_LW(_Radiation):
     def __init__(self,
+                 emissivity = 1.,  # surface emissivity
                  **kwargs):
         super(_Radiation_LW, self).__init__(**kwargs)
+        self.add_input('emissivity', emissivity)
