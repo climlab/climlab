@@ -31,7 +31,7 @@ print rcm.ASR - rcm.OLR
 from __future__ import division
 import numpy as np
 from climlab.process import TimeDependentProcess
-from climlab.radiation import Radiation
+from climlab.radiation.radiation import _Radiation, _Radiation_SW, _Radiation_LW
 from climlab import constants as const
 import _rrtmg_lw, _rrtmg_sw
 from scipy.interpolate import interp1d
@@ -43,7 +43,7 @@ naerec = int(_rrtmg_sw.parrrsw.naerec)
 nbndlw = int(_rrtmg_lw.parrrtm.nbndlw)
 
 
-class RRTMG(Radiation):
+class RRTMG(_Radiation_SW, _Radiation_LW):
     '''Container to drive combined LW and SW radiation models.'''
     def __init__(self,
             # GENERAL, used in both SW and LW
@@ -82,17 +82,17 @@ class RRTMG(Radiation):
             permuteseed_lw =  300,  # learn about these later...
             # SURFACE OPTICAL PROPERTIES
             # SW
-            aldif = 0.3,
-            aldir = 0.3,
-            asdif = 0.3,
-            asdir = 0.3,
+            # aldif = 0.3,
+            # aldir = 0.3,
+            # asdif = 0.3,
+            # asdir = 0.3,
             # LW
             emis = 1.,
             # THE SUN - SW
-            coszen = 0.5,    # cosine of the solar zenith angle
+            #coszen = 0.5,    # cosine of the solar zenith angle
             adjes = 1.,       # flux adjustment for earth/sun distance (if not dyofyr)
             dyofyr = 0,       # day of the year used to get Earth/Sun distance (if not adjes)
-            scon = const.S0/4,  # solar constant...  RRTMG_SW code has been modified to expect TOA insolation instead.
+            #scon = const.S0/4,  # solar constant...  RRTMG_SW code has been modified to expect TOA insolation instead.
             # CLOUDS, SW see http://www.arm.gov/publications/proceedings/conf16/extended_abs/iacono_mj.pdf
             inflgsw  = 2, # Flag for cloud optical properties
                         # INFLAG = 0 direct specification of optical depths of clouds;
@@ -161,14 +161,15 @@ class RRTMG(Radiation):
                      r_liq = self.r_liq,
                      r_ice = self.r_ice,
                      permute = permuteseed_sw,
-                     aldif = aldif,
-                     aldir = aldir,
-                     asdif = asdif,
-                     asdir = asdir,
-                     coszen = coszen,
+                     aldif = self.aldif,
+                     aldir = self.aldir,
+                     asdif = self.asdif,
+                     asdir = self.asdir,
+                     cosZen = self.cosZen,
                      adjes = adjes,
                      dyofyr = dyofyr,
-                     scon = scon,
+                     insolation = self.insolation,
+                     #scon = scon,
                      inflgsw = inflgsw,
                      iceflgsw = iceflgsw,
                      tauc = tauc_sw,
@@ -203,15 +204,15 @@ class RRTMG(Radiation):
         # self.add_input('reic', reic)
         self.add_input('permuteseed_sw', permuteseed_sw)
         self.add_input('permuteseed_lw', permuteseed_lw)
-        self.add_input('aldif', aldif)
-        self.add_input('aldir', aldir)
-        self.add_input('asdif', asdif)
-        self.add_input('asdir', asdir)
+        # self.add_input('aldif', aldif)
+        # self.add_input('aldir', aldir)
+        # self.add_input('asdif', asdif)
+        # self.add_input('asdir', asdir)
         self.add_input('emis', emis)
-        self.add_input('coszen', coszen)
+        # self.add_input('coszen', coszen)
         self.add_input('adjes', adjes)
         self.add_input('dyofyr', dyofyr)
-        self.add_input('scon', scon)
+        #self.add_input('scon', scon)
         self.add_input('inflgsw', inflgsw)
         self.add_input('inflglw', inflglw)
         self.add_input('iceflgsw', iceflgsw)
@@ -250,7 +251,7 @@ class RRTMG(Radiation):
     #  Should add other gases and parameters here
 
 
-class RRTMG_SW(Radiation):
+class RRTMG_SW(_Radiation_SW):
     def __init__(self,
             # GENERAL, used in both SW and LW
             icld = 1,    # Cloud overlap method, 0: Clear only, 1: Random, 2,  Maximum/random] 3: Maximum
@@ -284,14 +285,14 @@ class RRTMG_SW(Radiation):
                            #               dge range is limited to 5.0 to 140.0 microns
                            #               [dge = 1.0315 * r_ec]
             permuteseed = 150,
-            aldif = 0.3,
-            aldir = 0.3,
-            asdif = 0.3,
-            asdir = 0.3,
-            coszen = 0.5,    # cosine of the solar zenith angle
+            # aldif = 0.3,
+            # aldir = 0.3,
+            # asdif = 0.3,
+            # asdir = 0.3,
+            # coszen = 0.5,    # cosine of the solar zenith angle
             adjes = 1.,       # flux adjustment for earth/sun distance (if not dyofyr)
             dyofyr = 0,       # day of the year used to get Earth/Sun distance (if not adjes)
-            scon = const.S0/4,  # solar constant...  RRTMG_SW code has been modified to expect TOA insolation instead.
+            #scon = const.S0/4,  # solar constant...  RRTMG_SW code has been modified to expect TOA insolation instead.
             inflgsw  = 2,
             iceflgsw = 1,
             liqflgsw = 1,
@@ -326,14 +327,14 @@ class RRTMG_SW(Radiation):
         # self.add_input('relq', relq)
         # self.add_input('reic', reic)
         self.add_input('permuteseed', permuteseed)
-        self.add_input('aldif', aldif)
-        self.add_input('aldir', aldir)
-        self.add_input('asdif', asdif)
-        self.add_input('asdir', asdir)
-        self.add_input('coszen', coszen)
+        # self.add_input('aldif', aldif)
+        # self.add_input('aldir', aldir)
+        # self.add_input('asdif', asdif)
+        # self.add_input('asdir', asdir)
+        # self.add_input('coszen', coszen)
         self.add_input('adjes', adjes)
         self.add_input('dyofyr', dyofyr)
-        self.add_input('scon', scon)
+        # self.add_input('scon', scon)
         self.add_input('inflgsw', inflgsw)
         self.add_input('iceflgsw', iceflgsw)
         self.add_input('liqflgsw', liqflgsw)
@@ -363,7 +364,7 @@ class RRTMG_SW(Radiation):
         dyofyr = self.dyofyr
         #  scalar real arguments
         adjes = self.adjes
-        scon = self.scon
+        scon = self.insolation  # THIS IS A PROBLEM! RRTMG WANTS A SCALAR HERE, NOT AN ARRAY
 
         (ncol, nlay, play, plev, tlay, tlev, tsfc,
         h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr, cfc11vmr,
@@ -374,7 +375,7 @@ class RRTMG_SW(Radiation):
         aldir = _climlab_to_rrtm_sfc(self.aldir * np.ones_like(self.Ts))
         asdif = _climlab_to_rrtm_sfc(self.asdif * np.ones_like(self.Ts))
         asdir = _climlab_to_rrtm_sfc(self.asdir * np.ones_like(self.Ts))
-        coszen = _climlab_to_rrtm_sfc(self.coszen * np.ones_like(self.Ts))
+        coszen = _climlab_to_rrtm_sfc(self.cosZen * np.ones_like(self.Ts))
         #  THE REST OF THESE ARGUMENTS ARE STILL BEING HARD CODED.
         #   NEED TO FIX THIS UP...
 
@@ -434,7 +435,7 @@ class RRTMG_SW(Radiation):
         self.TdotSWclr = _rrtm_to_climlab(swhrc)
 
 
-class RRTMG_LW(Radiation):
+class RRTMG_LW(_Radiation_LW):
     def __init__(self,
             # GENERAL, used in both SW and LW
             icld = 1,    # Cloud overlap method, 0: Clear only, 1: Random, 2,  Maximum/random] 3: Maximum
