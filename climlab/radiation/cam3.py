@@ -5,7 +5,7 @@ from __future__ import division
 import numpy as np
 import netCDF4 as nc
 from climlab import constants as const
-from climlab.radiation import Radiation
+from climlab.radiation.radiation import _Radiation, _Radiation_SW, _Radiation_LW
 import os
 #rom scipy.interpolate import interp1d, interp2d
 #  the compiled fortran extension
@@ -37,7 +37,7 @@ for field in ['ah2onw', 'eh2onw', 'ah2ow', 'ln_ah2ow', 'cn_ah2ow', 'ln_eh2ow', '
 data.close()
 
 
-class CAM3(Radiation):
+class CAM3(_Radiation):
     '''
     climlab wrapper for the CAM3 radiation code.
 
@@ -80,12 +80,12 @@ class CAM3(Radiation):
     See the code for examples of how to translate these quantities in climlab format.
     '''
     def __init__(self,
-                 cosZen=1.,
-                 insolation=const.S0/4.,
-                 asdir=0.07,
-                 asdif=0.07,
-                 aldir=0.07,
-                 aldif=0.07,
+                 #cosZen=1.,
+                 #insolation=const.S0/4.,
+                 #asdir=0.07,
+                 #asdif=0.07,
+                 #aldir=0.07,
+                 #aldif=0.07,
                  #O3init = False,
                  #O3file = 'apeozone_cam3_5_54.nc',
                  **kwargs):
@@ -113,14 +113,14 @@ class CAM3(Radiation):
         # self.add_input('r_liq', 0.*self.Tatm + 10.)
         # self.add_input('r_ice', 0.*self.Tatm + 30.)
         # Albedos
-        self.add_input('asdir', 0.*self.Ts + asdir)
-        self.add_input('asdif', 0.*self.Ts + asdif)
-        self.add_input('aldir', 0.*self.Ts + asdir)
-        self.add_input('aldif', 0.*self.Ts + asdif)
+        #self.add_input('asdir', 0.*self.Ts + asdir)
+        #self.add_input('asdif', 0.*self.Ts + asdif)
+        #self.add_input('aldir', 0.*self.Ts + asdir)
+        #self.add_input('aldif', 0.*self.Ts + asdif)
         # cosine of the average zenith angle
-        self.add_input('cosZen', 0.*self.Ts + cosZen)
+        #self.add_input('cosZen', 0.*self.Ts + cosZen)
         # Insolation in W/m2
-        self.add_input('insolation', 0.*self.Ts + insolation)
+        #self.add_input('insolation', 0.*self.Ts + insolation)
 
         self.KM = self.lev.size
         try:
