@@ -5,6 +5,8 @@
 !  change units of q from g/kg to kg/kg
 !   pass cosine of zenith angle rather than angle itself
 !  Pass grid dimensions as input argument using dynamic arrays
+!
+!  Pass greenhouse gas amounts as absolute volume mixing ratios (ppp) instead of ppm
 
 ! This is a driver code for CAM3 radiation written for CliMT; it replaces the
 ! analogous driver found in Zender's CCM3 CRM
@@ -320,7 +322,7 @@ subroutine crm(  &
   cfc12 = mwf12/mwdry * f12vmr
   ! -- set value of CO2 vol mix ratio (this is picked up later by radae)
   !call chem_surfvals_set_co2(co2vmr*1.e-6) ! ppm -> ppp
-  call chem_surfvals_set_co2(co2vmr) 
+  call chem_surfvals_set_co2(co2vmr)
 
   ! Initialize rad routines
   call radsw_init(gravit)
