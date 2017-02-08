@@ -309,12 +309,18 @@ subroutine crm(  &
   ! -- compute GHG mass mix ratios
   !    NOTE: in CliMT, assume trace gases are well mixed everywhere
   !    (CAM3 has vertical and meridional variation in stratosphere)
-  n2o = mwn2o/mwdry * n2ovmr * 1.e-6 ! ppm->ppp
-  ch4 = mwch4/mwdry * ch4vmr * 1.e-6
-  cfc11 = mwf11/mwdry * f11vmr * 1.e-6
-  cfc12 = mwf12/mwdry * f12vmr * 1.e-6
+  !  climlab -- assume values are actual volume mixing ratios (ppp)
+  !n2o = mwn2o/mwdry * n2ovmr * 1.e-6 ! ppm->ppp
+  !ch4 = mwch4/mwdry * ch4vmr * 1.e-6
+  !cfc11 = mwf11/mwdry * f11vmr * 1.e-6
+  !cfc12 = mwf12/mwdry * f12vmr * 1.e-6
+  n2o = mwn2o/mwdry * n2ovmr
+  ch4 = mwch4/mwdry * ch4vmr
+  cfc11 = mwf11/mwdry * f11vmr
+  cfc12 = mwf12/mwdry * f12vmr
   ! -- set value of CO2 vol mix ratio (this is picked up later by radae)
-  call chem_surfvals_set_co2(co2vmr*1.e-6) ! ppm -> ppp
+  !call chem_surfvals_set_co2(co2vmr*1.e-6) ! ppm -> ppp
+  call chem_surfvals_set_co2(co2vmr) 
 
   ! Initialize rad routines
   call radsw_init(gravit)
