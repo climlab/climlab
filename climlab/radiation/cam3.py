@@ -5,6 +5,7 @@ from __future__ import division
 import numpy as np
 import netCDF4 as nc
 from climlab import constants as const
+from climlab import thermo
 from climlab.radiation.radiation import _Radiation_SW, _Radiation_LW
 import os
 #  the compiled fortran extension
@@ -167,11 +168,11 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         # Surface upwelling LW
         flus = self._climlab_to_cam3(np.zeros_like(self.Ts) - 99.) # set to missing as default
         # spatially varying gases
-        H2Ovmr = self._climlab_to_cam3(self.absorber_vmr['H2O'] * np.ones_like(self.Tatm))
+        q = self._climlab_to_cam3(self.specific_humidity * np.ones_like(self.Tatm))
         O3vmr = self._climlab_to_cam3(self.absorber_vmr['O3'] * np.ones_like(self.Tatm))
         # convert to mass mixing ratio (needed by CAM3 driver)
         #  The conversion factor is m_o3 / m_air = 48.0 g/mol / 28.97 g/mol
-        O3mmr = O3vmr * 48./28.97
+        O3mmr = thermo.vmr_to_mmr(O3vmr, gas='O3')
         # cloud fields
         cldfrac = self._climlab_to_cam3(self.cldfrac * np.ones_like(self.Tatm))
         clwp = self._climlab_to_cam3(self.clwp * np.ones_like(self.Tatm))

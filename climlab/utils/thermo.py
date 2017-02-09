@@ -158,3 +158,17 @@ def Planck_wavelength(l, T):
     k = const.kBoltzmann
     u = h*c/l/k/T
     return 2*k**5*T**5/h**4/c**3*u**5/(np.exp(u)-1)
+
+def vmr_to_mmr(vmr, gas):
+    '''
+    Convert volume mixing ratio to mass mixing ratio for named gas.
+    ( molecular weights are specific in climlab.utils.constants.py )
+    '''
+    return vmr * const.molecular_weight[gas] / const.molecular_weight['dry air']
+
+def mmr_to_vmr(mmr, gas):
+    '''
+    Convert mass mixing ratio to volume mixing ratio for named gas.
+    ( molecular weights are specific in climlab.utils.constants.py )
+    '''
+    return mmr * const.molecular_weight['dry air'] / const.molecular_weight[gas]
