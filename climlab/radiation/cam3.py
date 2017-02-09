@@ -5,7 +5,7 @@ from __future__ import division
 import numpy as np
 import netCDF4 as nc
 from climlab import constants as const
-from climlab.radiation.radiation import _Radiation, _Radiation_SW, _Radiation_LW
+from climlab.radiation.radiation import _Radiation_SW, _Radiation_LW
 import os
 #  the compiled fortran extension
 import _cam3

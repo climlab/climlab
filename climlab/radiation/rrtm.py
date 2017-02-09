@@ -31,7 +31,7 @@ print rcm.ASR - rcm.OLR
 from __future__ import division
 import numpy as np
 from climlab.process import TimeDependentProcess
-from climlab.radiation.radiation import _Radiation, _Radiation_SW, _Radiation_LW
+from climlab.radiation.radiation import _Radiation_SW, _Radiation_LW
 from climlab import constants as const
 import _rrtmg_lw, _rrtmg_sw
 from scipy.interpolate import interp1d
