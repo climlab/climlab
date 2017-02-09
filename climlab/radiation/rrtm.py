@@ -377,14 +377,15 @@ class RRTMG_LW(_Radiation_LW):
         cldfrac, ciwp, clwp, relq, reic) = _prepare_general_arguments(self)
         # surface emissivity
         emis = self.emissivity * np.ones((ncol,nbndlw))
-        #  THE REST OF THESE ARGUMENTS ARE STILL BEING HARD CODED.
-        #   NEED TO FIX THIS UP...
-
         #  These arrays have an extra dimension for number of bands
-        #tauc = _climlab_to_rrtm(self.tauc * np.ones_like(self.Tatm))
-        tauc = np.zeros([nbndlw,ncol,nlay]) # in-cloud optical depth
-        tauaer = np.zeros([ncol,nlay,nbndlw])   # Aerosol optical depth at mid-point of LW spectral bands
-        #return emis, tauc, tauaer
+        # in-cloud optical depth [nbndlw,ncol,nlay]
+        tauc = _climlab_to_rrtm(self.tauc * np.ones_like(self.Tatm))
+        #  broadcase to get [nbndlw,ncol,nlay]
+        tauc = tauc * np.ones([nbndlw,ncol,nlay])
+        # Aerosol optical depth at mid-point of LW spectral bands [ncol,nlay,nbndlw]
+        tauaer = _climlab_to_rrtm(self.tauaer * np.ones_like(self.Tatm))
+        #  broadcast and transpose to get [ncol,nlay,nbndlw]
+        tauaer = np.transpose(tauaer * np.ones([nbndlw,ncol,nlay]), (1,2,0))
         args = [ncol, nlay, icld, permuteseed, irng, idrv, const.cp,
                 play, plev, tlay, tlev, tsfc,
                 h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr,
