@@ -60,7 +60,8 @@ def test_radiative_forcing():
     #  Fixed relative humidity
     h2o = climlab.radiation.ManabeWaterVapor(state=state)
     #  Couple water vapor to radiation
-    rad = climlab.radiation.RRTMG(state=state, h2ovmr=h2o.q)
+    rad = climlab.radiation.RRTMG(state=state)
+    rad.absorber_vmr['H2O'] = h2o.q
     #  Convective adjustment
     conv = climlab.convection.ConvectiveAdjustment(state=state,
                                                    adj_lapse_rate=6.5)
