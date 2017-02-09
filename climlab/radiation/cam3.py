@@ -169,6 +169,9 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         # spatially varying gases
         H2Ovmr = self._climlab_to_cam3(self.absorber_vmr['H2O'] * np.ones_like(self.Tatm))
         O3vmr = self._climlab_to_cam3(self.absorber_vmr['O3'] * np.ones_like(self.Tatm))
+        # convert to mass mixing ratio (needed by CAM3 driver)
+        #  The conversion factor is m_o3 / m_air = 48.0 g/mol / 28.97 g/mol
+        O3mmr = O3vmr * 48./28.97
         # cloud fields
         cldfrac = self._climlab_to_cam3(self.cldfrac * np.ones_like(self.Tatm))
         clwp = self._climlab_to_cam3(self.clwp * np.ones_like(self.Tatm))
@@ -177,7 +180,7 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         r_ice = self._climlab_to_cam3(self.r_ice * np.ones_like(self.Tatm))
         #  The ordered list of input fields needed by the CAM3 driver
         args = [KM, JM, IM, do_sw, do_lw, p, dp, ps, Tatm, Ts,
-                H2Ovmr, O3vmr, cldfrac, clwp, ciwp, in_cld,
+                q, O3mmr, cldfrac, clwp, ciwp, in_cld,
                 aldif, aldir, asdif, asdir, cosZen,
                 insolation, flus, r_liq, r_ice,
                 CO2vmr, N2Ovmr, CH4vmr, CFC11vmr,
