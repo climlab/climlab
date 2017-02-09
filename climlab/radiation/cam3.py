@@ -5,7 +5,7 @@ from __future__ import division
 import numpy as np
 import netCDF4 as nc
 from climlab import constants as const
-from climlab import thermo
+from climlab.utils.thermo import vmr_to_mmr
 from climlab.radiation.radiation import _Radiation_SW, _Radiation_LW
 import os
 #  the compiled fortran extension
@@ -29,6 +29,8 @@ data.close()
 class CAM3(_Radiation_SW, _Radiation_LW):
     '''
     climlab wrapper for the CAM3 radiation code.
+
+    THIS IS ALL OUT OF DATE AND NEEDS FIXING
 
     Scalar input values:
     - Well-mixed greenhouse gases in ppmv (all default to zero except CO2):
@@ -63,10 +65,6 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         - TdotLW  (longwave radiative heating rate, K / day)
         - TdotSW  (shortwave radiative heating rate, K / day)
 
-    Many other quantities are available in a slightly different format
-    from the CAM3 wrapper, stored in self.Output.
-
-    See the code for examples of how to translate these quantities in climlab format.
     '''
     def __init__(self,
                  **kwargs):
@@ -172,7 +170,7 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         O3vmr = self._climlab_to_cam3(self.absorber_vmr['O3'] * np.ones_like(self.Tatm))
         # convert to mass mixing ratio (needed by CAM3 driver)
         #  The conversion factor is m_o3 / m_air = 48.0 g/mol / 28.97 g/mol
-        O3mmr = thermo.vmr_to_mmr(O3vmr, gas='O3')
+        O3mmr = vmr_to_mmr(O3vmr, gas='O3')
         # cloud fields
         cldfrac = self._climlab_to_cam3(self.cldfrac * np.ones_like(self.Tatm))
         clwp = self._climlab_to_cam3(self.clwp * np.ones_like(self.Tatm))

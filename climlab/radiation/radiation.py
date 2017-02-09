@@ -41,12 +41,16 @@ from scipy.interpolate import interp1d, interp2d
 from climlab import constants as const
 
 
+def default_specific_humidity(Tatm):
+    h2o = ManabeWaterVapor(state={'Tatm': Tatm})
+    #  should be converting from specific humidity to volume mixing ratio here...
+    return h2o.q
+
 def default_absorbers(Tatm, ozone_file = 'apeozone_cam3_5_54.nc'):
-    '''Initialize a dictionary of radiatively active gases.
+    '''Initialize a dictionary of radiatively active gases
     All values are volumetric mixing ratios.
 
-    Ozone is set to a climatology
-    Water vapor is set based on a prescribed relative humidity profile.
+    Ozone is set to a climatology.
 
     All other gases are assumed well-mixed.
 
@@ -63,10 +67,6 @@ def default_absorbers(Tatm, ozone_file = 'apeozone_cam3_5_54.nc'):
     absorber_vmr['CFC12'] = 0.
     absorber_vmr['CFC22'] = 0.
     absorber_vmr['CCL4']  = 0.
-
-    h2o = ManabeWaterVapor(state={'Tatm': Tatm})
-    #  should be converting from specific humidity to volume mixing ratio here...
-    absorber_vmr['H2O'] = h2o.q
 
     datadir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data', 'ozone'))
     ozonefilepath = os.path.join(datadir, ozone_file)
@@ -101,6 +101,7 @@ class _Radiation(EnergyBudget):
     '''Base class for radiation models (currently CAM3 and RRTMG).
     '''
     def __init__(self,
+            specific_humidity = None,
             #  Absorbing gases, volume mixing ratios
             absorber_vmr = None,
             cldfrac = 0.,  # layer cloud fraction
@@ -111,17 +112,19 @@ class _Radiation(EnergyBudget):
             ozone_file = 'apeozone_cam3_5_54.nc',
             **kwargs):
         super(_Radiation, self).__init__(**kwargs)
-        #  Define inputs, default values, diagnostics
+        #  Define inputs
+        if specific_humidity is None:
+            specific_humidity = default_specific_humidity(self.Tatm)
+        self.add_input('specific_humidity', specific_humidity)
         if absorber_vmr is None:
-            self.add_input('absorber_vmr', default_absorbers(self.Tatm, ozone_file))
-        else:
-            self.add_input('absorber_vmr', absorber_vmr)
+            absorber_vmr = default_absorbers(self.Tatm, ozone_file)
+        self.add_input('absorber_vmr', absorber_vmr)
         self.add_input('cldfrac', cldfrac)
         self.add_input('clwp', clwp)
         self.add_input('ciwp', ciwp)
         self.add_input('r_liq', r_liq)
         self.add_input('r_ice', r_ice)
-
+        #  Define diagnostics
 
 class _Radiation_SW(_Radiation):
     def __init__(self,

@@ -19,8 +19,7 @@ def rcm():
     convadj = climlab.convection.ConvectiveAdjustment(state=state,
                                                       adj_lapse_rate=6.5)
     # CAM3 radiation with default parameters and interactive water vapor
-    rad = climlab.radiation.CAM3(state=state, albedo=alb)
-    rad.H2Ovmr = h2o.q
+    rad = climlab.radiation.CAM3(state=state, albedo=alb, specific_humidity=h2o.q)
     # Couple the models
     rcm.add_subprocess('Radiation', rad)
     rcm.add_subprocess('ConvectiveAdjustment', convadj)

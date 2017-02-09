@@ -12,11 +12,9 @@ rcm = climlab.TimeDependentProcess(state=state)
 #  Fixed relative humidity
 h2o = climlab.radiation.ManabeWaterVapor(state=state)
 #  Couple water vapor to radiation
-rad = climlab.radiation.RRTMG(state=state, h2ovmr=h2o.q,
-                              aldir=alb, aldif=alb, asdir=alb, asdif=alb)
+rad = climlab.radiation.RRTMG(state=state, specific_humidity=h2o.q, albedo=alb)
 #  Convective adjustment
-conv = climlab.convection.ConvectiveAdjustment(state=state,
-                                               adj_lapse_rate=6.5)
+conv = climlab.convection.ConvectiveAdjustment(state=state, adj_lapse_rate=6.5)
 #  Couple everything together
 rcm.add_subprocess('Radiation', rad)
 rcm.add_subprocess('WaterVapor', h2o)
@@ -33,6 +31,7 @@ import numpy as np
 from climlab.process import TimeDependentProcess
 from climlab.radiation.radiation import _Radiation_SW, _Radiation_LW
 from climlab import constants as const
+from climlab.utils.thermo import mmr_to_vmr
 import _rrtmg_lw, _rrtmg_sw
 from scipy.interpolate import interp1d
 
@@ -427,8 +426,9 @@ def _prepare_general_arguments(RRTMGobject):
     plev = _climlab_to_rrtm(RRTMGobject.lev_bounds * np.ones_like(tlev))
     ncol, nlay = tlay.shape
     tsfc = _climlab_to_rrtm_sfc(RRTMGobject.Ts)
-    # GASES -- put them in proper dimensions
-    h2ovmr   = _climlab_to_rrtm(RRTMGobject.absorber_vmr['H2O'] * np.ones_like(RRTMGobject.Tatm))
+    # GASES -- put them in proper dimensions and units
+    vapor_mixing_ratio = mmr_to_vmr(RRTMGobject.specific_humidity, gas='H2O')
+    h2ovmr   = _climlab_to_rrtm(vapor_mixing_ratio * np.ones_like(RRTMGobject.Tatm))
     o3vmr    = _climlab_to_rrtm(RRTMGobject.absorber_vmr['O3'] * np.ones_like(RRTMGobject.Tatm))
     co2vmr   = _climlab_to_rrtm(RRTMGobject.absorber_vmr['CO2'] * np.ones_like(RRTMGobject.Tatm))
     ch4vmr   = _climlab_to_rrtm(RRTMGobject.absorber_vmr['CH4'] * np.ones_like(RRTMGobject.Tatm))
