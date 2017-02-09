@@ -50,12 +50,15 @@ def default_absorbers(Tatm, ozone_file = 'apeozone_cam3_5_54.nc'):
 
     All other gases are assumed well-mixed.
 
-    Specific values are based on the AquaPlanet Experiment protocols.'''
+    Specific values are based on the AquaPlanet Experiment protocols,
+    except for O2 which is set the realistic value 0.21
+    (affects the RRTMG scheme).
+    '''
     absorber_vmr = {}
     absorber_vmr['CO2']   = 348. / 1E6
     absorber_vmr['CH4']   = 1650. / 1E9
     absorber_vmr['N2O']   = 306. / 1E9
-    absorber_vmr['O2']    = 0.
+    absorber_vmr['O2']    = 0.21
     absorber_vmr['CFC11'] = 0.
     absorber_vmr['CFC12'] = 0.
     absorber_vmr['CFC22'] = 0.
