@@ -50,49 +50,10 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
             icld = 1,    # Cloud overlap method, 0: Clear only, 1: Random, 2,  Maximum/random] 3: Maximum
             irng = 1,  # more monte carlo stuff
             idrv = 0,  # whether to also calculate the derivative of flux with respect to surface temp
-            # GASES, used in both SW and LW
-            # h2ovmr = 1E-9,
-            # o3vmr = 1E-9,
-            # co2vmr = 380./1E6,
-            # ch4vmr = 1E-9,
-            # n2ovmr = 1E-9,
-            # o2vmr = 1E-9,
-            # cfc11vmr = 1E-9,
-            # cfc12vmr = 1E-9,
-            # cfc22vmr = 1E-9,
-            # ccl4vmr = 1E-9,
-            #  Cloud parameters
-            # cldfrac = 0.,  # layer cloud fraction
-            # ciwp = 0.,     # in-cloud ice water path (g/m2)
-            # clwp = 0.,     # in-cloud liquid water path (g/m2)
-            # relq = 0.,     # Cloud water drop effective radius (microns)
-            # reic = 0.,     # Cloud ice particle effective size (microns)
-                           # specific definition of reicmcl depends on setting of iceflglw:
-                           # iceflglw = 0,  ice effective radius, r_ec, (Ebert and Curry, 1992)]
-                           #               r_ec must be >= 10.0 microns
-                           # iceflglw = 1,  ice effective radius, r_ec, (Ebert and Curry, 1992)]
-                           #               r_ec range is limited to 13.0 to 130.0 microns
-                           # iceflglw = 2,  ice effective radius, r_k, (Key, Streamer Ref. Manual] 1996)
-                           #               r_k range is limited to 5.0 to 131.0 microns
-                           # iceflglw = 3,  generalized effective size, dge, (Fu, 1996)]
-                           #               dge range is limited to 5.0 to 140.0 microns
-                           #               [dge = 1.0315 * r_ec]
-
             permuteseed_sw =  150,  # used for monte carlo clouds; must differ from permuteseed_lw by number of subcolumns
             permuteseed_lw =  300,  # learn about these later...
-            # SURFACE OPTICAL PROPERTIES
-            # SW
-            # aldif = 0.3,
-            # aldir = 0.3,
-            # asdif = 0.3,
-            # asdir = 0.3,
-            # LW
-            #emis = 1.,
-            # THE SUN - SW
-            #coszen = 0.5,    # cosine of the solar zenith angle
             adjes = 1.,       # flux adjustment for earth/sun distance (if not dyofyr)
             dyofyr = 0,       # day of the year used to get Earth/Sun distance (if not adjes)
-            #scon = const.S0/4,  # solar constant...  RRTMG_SW code has been modified to expect TOA insolation instead.
             # CLOUDS, SW see http://www.arm.gov/publications/proceedings/conf16/extended_abs/iacono_mj.pdf
             inflgsw  = 2, # Flag for cloud optical properties
                         # INFLAG = 0 direct specification of optical depths of clouds;
@@ -119,6 +80,17 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
                         #                         of water clouds due to Hu and Stamnes (see below).
                         #             = 3 the optical depths (non-gray) due to ice clouds are computed by a method
                         # based on the parameterization given in Fu et al., J. Clim.,11,2223-2237 (1998).
+                           # specific definition of reic depends on setting of iceflglw:
+                           # iceflglw = 0,  ice effective radius, r_ec, (Ebert and Curry, 1992)]
+                           #               r_ec must be >= 10.0 microns
+                           # iceflglw = 1,  ice effective radius, r_ec, (Ebert and Curry, 1992)]
+                           #               r_ec range is limited to 13.0 to 130.0 microns
+                           # iceflglw = 2,  ice effective radius, r_k, (Key, Streamer Ref. Manual] 1996)
+                           #               r_k range is limited to 5.0 to 131.0 microns
+                           # iceflglw = 3,  generalized effective size, dge, (Fu, 1996)]
+                           #               dge range is limited to 5.0 to 140.0 microns
+                           #               [dge = 1.0315 * r_ec]
+
             iceflglw = 1,
             liqflgsw = 1,  # Flag for liquid droplet specification
                         # LIQFLAG = 0 the optical depths (gray) due to water clouds are computed as in CCM3.
@@ -169,7 +141,6 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
                      adjes = adjes,
                      dyofyr = dyofyr,
                      insolation = self.insolation,
-                     #scon = scon,
                      inflgsw = inflgsw,
                      iceflgsw = iceflgsw,
                      tauc = tauc_sw,
@@ -187,32 +158,10 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
         self.add_input('icld', icld)
         self.add_input('irng', irng)
         self.add_input('idrv', idrv)
-        # self.add_input('h2ovmr', h2ovmr)
-        # self.add_input('o3vmr', o3vmr)
-        # self.add_input('co2vmr', co2vmr)
-        # self.add_input('ch4vmr', ch4vmr)
-        # self.add_input('n2ovmr', n2ovmr)
-        # self.add_input('o2vmr', o2vmr)
-        # self.add_input('cfc11vmr', cfc11vmr)
-        # self.add_input('cfc12vmr', cfc12vmr)
-        # self.add_input('cfc22vmr', cfc22vmr)
-        # self.add_input('ccl4vmr', ccl4vmr)
-        # self.add_input('cldfrac', cldfrac)
-        # self.add_input('ciwp', ciwp)
-        # self.add_input('clwp', clwp)
-        # self.add_input('relq', relq)
-        # self.add_input('reic', reic)
         self.add_input('permuteseed_sw', permuteseed_sw)
         self.add_input('permuteseed_lw', permuteseed_lw)
-        # self.add_input('aldif', aldif)
-        # self.add_input('aldir', aldir)
-        # self.add_input('asdif', asdif)
-        # self.add_input('asdir', asdir)
-        #self.add_input('emis', emis)
-        # self.add_input('coszen', coszen)
         self.add_input('adjes', adjes)
         self.add_input('dyofyr', dyofyr)
-        #self.add_input('scon', scon)
         self.add_input('inflgsw', inflgsw)
         self.add_input('inflglw', inflglw)
         self.add_input('iceflgsw', iceflgsw)
@@ -233,13 +182,14 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
 
     #  Some input values are defined as class properties so that
     #  user changes will be passed to LW and/or SW subprocesses
-    @property
-    def permuteseed_sw(self):
-        return self._permuteseed_sw
-    @permuteseed_sw.setter
-    def permuteseed_sw(self, value):
-        self._permuteseed_sw = value
-        self.subprocess['SW'].permuteseed = value
+    #  NOT NEEDED ANYMORE BECAUSE OF HOW THE SUBPROCESSES ARE CREATED
+    # @property
+    # def permuteseed_sw(self):
+    #     return self._permuteseed_sw
+    # @permuteseed_sw.setter
+    # def permuteseed_sw(self, value):
+    #     self._permuteseed_sw = value
+    #     self.subprocess['SW'].permuteseed = value
     # @property
     # def co2vmr(self):
     #     return self._co2vmr
@@ -257,39 +207,7 @@ class RRTMG_SW(_Radiation_SW):
             icld = 1,    # Cloud overlap method, 0: Clear only, 1: Random, 2,  Maximum/random] 3: Maximum
             irng = 1,  # more monte carlo stuff
             idrv = 0,  # whether to also calculate the derivative of flux with respect to surface temp
-            # GASES, used in both SW and LW
-            # h2ovmr = 1E-9,
-            # o3vmr = 1E-9,
-            # co2vmr = 380./1E6,
-            # ch4vmr = 1E-9,
-            # n2ovmr = 1E-9,
-            # o2vmr = 1E-9,
-            # cfc11vmr = 1E-9,
-            # cfc12vmr = 1E-9,
-            # cfc22vmr = 1E-9,
-            # ccl4vmr = 1E-9,
-            # #  Cloud parameters
-            # cldfrac = 0.,  # layer cloud fraction
-            # ciwp = 0.,     # in-cloud ice water path (g/m2)
-            # clwp = 0.,     # in-cloud liquid water path (g/m2)
-            # relq = 0.,     # Cloud water drop effective radius (microns)
-            # reic = 0.,     # Cloud ice particle effective size (microns)
-                           # specific definition of reicmcl depends on setting of iceflglw:
-                           # iceflglw = 0,  ice effective radius, r_ec, (Ebert and Curry, 1992)]
-                           #               r_ec must be >= 10.0 microns
-                           # iceflglw = 1,  ice effective radius, r_ec, (Ebert and Curry, 1992)]
-                           #               r_ec range is limited to 13.0 to 130.0 microns
-                           # iceflglw = 2,  ice effective radius, r_k, (Key, Streamer Ref. Manual] 1996)
-                           #               r_k range is limited to 5.0 to 131.0 microns
-                           # iceflglw = 3,  generalized effective size, dge, (Fu, 1996)]
-                           #               dge range is limited to 5.0 to 140.0 microns
-                           #               [dge = 1.0315 * r_ec]
             permuteseed = 150,
-            # aldif = 0.3,
-            # aldir = 0.3,
-            # asdif = 0.3,
-            # asdir = 0.3,
-            # coszen = 0.5,    # cosine of the solar zenith angle
             adjes = 1.,       # flux adjustment for earth/sun distance (if not dyofyr)
             dyofyr = 0,       # day of the year used to get Earth/Sun distance (if not adjes)
             #scon = const.S0/4,  # solar constant...  RRTMG_SW code has been modified to expect TOA insolation instead.
@@ -311,30 +229,9 @@ class RRTMG_SW(_Radiation_SW):
         self.add_input('icld', icld)
         self.add_input('irng', irng)
         self.add_input('idrv', idrv)
-        # self.add_input('h2ovmr', h2ovmr)
-        # self.add_input('o3vmr', o3vmr)
-        # self.add_input('co2vmr', co2vmr)
-        # self.add_input('ch4vmr', ch4vmr)
-        # self.add_input('n2ovmr', n2ovmr)
-        # self.add_input('o2vmr', o2vmr)
-        # self.add_input('cfc11vmr', cfc11vmr)
-        # self.add_input('cfc12vmr', cfc12vmr)
-        # self.add_input('cfc22vmr', cfc22vmr)
-        # self.add_input('ccl4vmr', ccl4vmr)
-        # self.add_input('cldfrac', cldfrac)
-        # self.add_input('ciwp', ciwp)
-        # self.add_input('clwp', clwp)
-        # self.add_input('relq', relq)
-        # self.add_input('reic', reic)
         self.add_input('permuteseed', permuteseed)
-        # self.add_input('aldif', aldif)
-        # self.add_input('aldir', aldir)
-        # self.add_input('asdif', asdif)
-        # self.add_input('asdir', asdir)
-        # self.add_input('coszen', coszen)
         self.add_input('adjes', adjes)
         self.add_input('dyofyr', dyofyr)
-        # self.add_input('scon', scon)
         self.add_input('inflgsw', inflgsw)
         self.add_input('iceflgsw', iceflgsw)
         self.add_input('liqflgsw', liqflgsw)
@@ -441,35 +338,7 @@ class RRTMG_LW(_Radiation_LW):
             icld = 1,    # Cloud overlap method, 0: Clear only, 1: Random, 2,  Maximum/random] 3: Maximum
             irng = 1,  # more monte carlo stuff
             idrv = 0,  # whether to also calculate the derivative of flux with respect to surface temp
-            # GASES, used in both SW and LW
-            # h2ovmr = 1E-9,
-            # o3vmr = 1E-9,
-            # co2vmr = 380./1E6,
-            # ch4vmr = 1E-9,
-            # n2ovmr = 1E-9,
-            # o2vmr = 1E-9,
-            # cfc11vmr = 1E-9,
-            # cfc12vmr = 1E-9,
-            # cfc22vmr = 1E-9,
-            # ccl4vmr = 1E-9,
-            # #  Cloud parameters
-            # cldfrac = 0.,  # layer cloud fraction
-            # ciwp = 0.,     # in-cloud ice water path (g/m2)
-            # clwp = 0.,     # in-cloud liquid water path (g/m2)
-            # relq = 0.,     # Cloud water drop effective radius (microns)
-            # reic = 0.,     # Cloud ice particle effective size (microns)
-                           # specific definition of reicmcl depends on setting of iceflglw:
-                           # iceflglw = 0,  ice effective radius, r_ec, (Ebert and Curry, 1992)]
-                           #               r_ec must be >= 10.0 microns
-                           # iceflglw = 1,  ice effective radius, r_ec, (Ebert and Curry, 1992)]
-                           #               r_ec range is limited to 13.0 to 130.0 microns
-                           # iceflglw = 2,  ice effective radius, r_k, (Key, Streamer Ref. Manual] 1996)
-                           #               r_k range is limited to 5.0 to 131.0 microns
-                           # iceflglw = 3,  generalized effective size, dge, (Fu, 1996)]
-                           #               dge range is limited to 5.0 to 140.0 microns
-                           #               [dge = 1.0315 * r_ec]
             permuteseed =  300,
-            #emis = 1.,
             inflglw  = 2,
             iceflglw = 1,
             liqflglw = 1,
@@ -481,23 +350,7 @@ class RRTMG_LW(_Radiation_LW):
         self.add_input('icld', icld)
         self.add_input('irng', irng)
         self.add_input('idrv', idrv)
-        # self.add_input('h2ovmr', h2ovmr)
-        # self.add_input('o3vmr', o3vmr)
-        # self.add_input('co2vmr', co2vmr)
-        # self.add_input('ch4vmr', ch4vmr)
-        # self.add_input('n2ovmr', n2ovmr)
-        # self.add_input('o2vmr', o2vmr)
-        # self.add_input('cfc11vmr', cfc11vmr)
-        # self.add_input('cfc12vmr', cfc12vmr)
-        # self.add_input('cfc22vmr', cfc22vmr)
-        # self.add_input('ccl4vmr', ccl4vmr)
-        # self.add_input('cldfrac', cldfrac)
-        # self.add_input('ciwp', ciwp)
-        # self.add_input('clwp', clwp)
-        # self.add_input('relq', relq)
-        # self.add_input('reic', reic)
         self.add_input('permuteseed', permuteseed)
-        #self.add_input('emis', emis)
         self.add_input('inflglw', inflglw)
         self.add_input('iceflglw', iceflglw)
         self.add_input('liqflglw', liqflglw)

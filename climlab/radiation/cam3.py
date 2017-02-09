@@ -190,20 +190,6 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         (TdotRad, SrfRadFlx, swhr, lwhr, swflx, lwflx, SwToaCf,
             SwSrfCf, LwToaCf, LwSrfCf, LwToa, LwSrf, SwToa, SwSrf,
             lwuflx, lwdflx) = _cam3.driver(*args)
-        #args = [ getattr(self,key) for key in self.ToExtension ]
-        #args = []
-        #for key in ToExtension:
-        #    value = getattr(self, key)
-        #    if np.isscalar(value):
-        #        args.append(value)
-        #    else:
-        #        args.append(self._climlab_to_cam3(value))
-        #  new concept -- extension is NOT an attribute of the climlab process
-        #OutputValues = _cam3.driver(*args)
-        #Output = dict( zip(FromExtension, OutputValues ))
-        #self.Output = Output
-        #for name, value in Output.iteritems():
-        #    setattr(self, name, value)
         #  SrfRadFlx is net downward flux at surface
         self.heating_rate['Ts'] = self._cam3_to_climlab(SrfRadFlx)
         # lwhr and swhr are heating rates in W/kg
