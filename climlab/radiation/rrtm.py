@@ -26,6 +26,17 @@ print rcm.ASR - rcm.OLR
 ```
 
 '''
+
+###  Developer notes:
+#      Need to change how we handle insolation and zenith angle
+#      RRTGM_SW code expects a single scalar scon for solar constant
+#      and an array of zenith angles
+#      which makes sense for doing instantaneous calculations with a diurnal cycle
+#
+#    CLIMLAB is set up to supply daily-average TOA insolation
+#
+#    Need to make this work. Convert insolation to solar constant and (average) zenith angle
+
 from __future__ import division
 import numpy as np
 from climlab.process import TimeDependentProcess
@@ -229,26 +240,6 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
         self.add_input('indsolvar', indsolvar)
         self.add_input('bndsolvar', bndsolvar)
         self.add_input('solcycfrac', solcycfrac)
-
-    #  Some input values are defined as class properties so that
-    #  user changes will be passed to LW and/or SW subprocesses
-    #  NOT NEEDED ANYMORE BECAUSE OF HOW THE SUBPROCESSES ARE CREATED
-    # @property
-    # def permuteseed_sw(self):
-    #     return self._permuteseed_sw
-    # @permuteseed_sw.setter
-    # def permuteseed_sw(self, value):
-    #     self._permuteseed_sw = value
-    #     self.subprocess['SW'].permuteseed = value
-    # @property
-    # def co2vmr(self):
-    #     return self._co2vmr
-    # @co2vmr.setter
-    # def co2vmr(self, value):
-    #     self._co2vmr = value
-    #     self.subprocess['SW'].co2vmr = value
-    #     self.subprocess['LW'].co2vmr = value
-    #  Should add other gases and parameters here
 
 
 class RRTMG_SW(_Radiation_SW):
