@@ -3,8 +3,8 @@ from climlab.process.time_dependent_process import TimeDependentProcess
 
 
 class DiagnosticProcess(TimeDependentProcess):
-    """A parent class for all processes that are strictly diagnostic, namely
-    no time dependence.
+    """A parent class for all processes that are strictly diagnostic,
+    namely that do **not** contribute directly to tendencies of state variables.
 
     During initialization following attribute is set:
 
