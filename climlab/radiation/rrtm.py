@@ -26,6 +26,17 @@ print rcm.ASR - rcm.OLR
 ```
 
 '''
+
+###  Developer notes:
+#      Need to change how we handle insolation and zenith angle
+#      RRTGM_SW code expects a single scalar scon for solar constant
+#      and an array of zenith angles
+#      which makes sense for doing instantaneous calculations with a diurnal cycle
+#
+#    CLIMLAB is set up to supply daily-average TOA insolation
+#
+#    Need to make this work. Convert insolation to solar constant and (average) zenith angle
+
 from __future__ import division
 import numpy as np
 from climlab.process import TimeDependentProcess
@@ -51,7 +62,8 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
             idrv = 0,  # whether to also calculate the derivative of flux with respect to surface temp
             permuteseed_sw =  150,  # used for monte carlo clouds; must differ from permuteseed_lw by number of subcolumns
             permuteseed_lw =  300,  # learn about these later...
-            adjes = 1.,       # flux adjustment for earth/sun distance (if not dyofyr)
+            #S0 = const.S0,    #  solar constant (scalar)
+            #adjes = 1.,       # flux adjustment for earth/sun distance (if not dyofyr)
             dyofyr = 0,       # day of the year used to get Earth/Sun distance (if not adjes)
             # CLOUDS, SW see http://www.arm.gov/publications/proceedings/conf16/extended_abs/iacono_mj.pdf
             inflgsw  = 2, # Flag for cloud optical properties
@@ -108,8 +120,61 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
             asmaer_sw = 0.,   # Aerosol asymmetry parameter (iaer=10 only), Dimensions,  (ncol,nlay,nbndsw)] #  (non-delta scaled)
             ecaer_sw  = 0.,   # Aerosol optical depth at 0.55 micron (iaer=6 only), Dimensions,  (ncol,nlay,naerec)] #  (non-delta scaled)
             tauaer_lw = 0.,   # Aerosol optical depth at mid-point of LW spectral bands
+            # new arguments for RRTMG_SW version 4.0
+            isolvar = 0,    # ! Flag for solar variability method
+                            # !   -1 = (when scon .eq. 0.0): No solar variability
+                            # !        and no solar cycle (Kurucz solar irradiance
+                            # !        of 1368.22 Wm-2 only);
+                            # !        (when scon .ne. 0.0): Kurucz solar irradiance
+                            # !        scaled to scon and solar variability defined
+                            # !        (optional) by setting non-zero scale factors
+                            # !        for each band in bndsolvar
+                            # !    0 = (when SCON .eq. 0.0): No solar variability
+                            # !        and no solar cycle (NRLSSI2 solar constant of
+                            # !        1360.85 Wm-2 for the 100-50000 cm-1 spectral
+                            # !        range only), with facular and sunspot effects
+                            # !        fixed to the mean of Solar Cycles 13-24;
+                            # !        (when SCON .ne. 0.0): No solar variability
+                            # !        and no solar cycle (NRLSSI2 solar constant of
+                            # !        1360.85 Wm-2 for the 100-50000 cm-1 spectral
+                            # !        range only), is scaled to SCON
+                            # !    1 = Solar variability (using NRLSSI2  solar
+                            # !        model) with solar cycle contribution
+                            # !        determined by fraction of solar cycle
+                            # !        with facular and sunspot variations
+                            # !        fixed to their mean variations over the
+                            # !        average of Solar Cycles 13-24;
+                            # !        two amplitude scale factors allow
+                            # !        facular and sunspot adjustments from
+                            # !        mean solar cycle as defined by indsolvar
+                            # !    2 = Solar variability (using NRLSSI2 solar
+                            # !        model) over solar cycle determined by
+                            # !        direct specification of Mg (facular)
+                            # !        and SB (sunspot) indices provided
+                            # !        in indsolvar (scon = 0.0 only)
+                            # !    3 = (when scon .eq. 0.0): No solar variability
+                            # !        and no solar cycle (NRLSSI2 solar irradiance
+                            # !        of 1360.85 Wm-2 only);
+                            # !        (when scon .ne. 0.0): NRLSSI2 solar irradiance
+                            # !        scaled to scon and solar variability defined
+                            # !        (optional) by setting non-zero scale factors
+                            # !        for each band in bndsolvar
+            indsolvar = np.zeros(2),      # Facular and sunspot amplitude scale factors (isolvar=1),
+                                          # or Mg and SB indices (isolvar=2)
+            bndsolvar = np.zeros(nbndsw), # Solar variability scale factors for each shortwave band
+            solcycfrac = 0.,              # Fraction of averaged solar cycle (0-1) at current time (isolvar=1)
+
             **kwargs):
         super(RRTMG, self).__init__(**kwargs)
+
+        # Remove specific inputs from kwargs dictionary.
+        #  We want any changes implemented in the parent __init__ method to be preserved here
+        remove_list = ['absorber_vmr','cldfrac','clwp','ciwp','r_liq','r_ice',
+                       'emissivity','aldif','aldir','asdif','asdir','S0','coszen',
+                       'eccentricity_factor','insolation',]
+        for item in remove_list:
+            if item in kwargs:
+                ignored = kwargs.pop(item)
 
         LW = RRTMG_LW(absorber_vmr = self.absorber_vmr,
                      cldfrac = self.cldfrac,
@@ -136,8 +201,10 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
                      aldir = self.aldir,
                      asdif = self.asdif,
                      asdir = self.asdir,
-                     cosZen = self.cosZen,
-                     adjes = adjes,
+                     S0 = self.S0,
+                     coszen = self.coszen,
+                     eccentricity_factor = self.eccentricity_factor,
+                     #adjes = adjes,
                      dyofyr = dyofyr,
                      insolation = self.insolation,
                      inflgsw = inflgsw,
@@ -150,6 +217,10 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
                      ssaaer = ssaaer_sw,
                      asmaer = asmaer_sw,
                      ecaer = ecaer_sw,
+                     isolvar = isolvar,
+                     indsolvar = indsolvar,
+                     bndsolvar = bndsolvar,
+                     solcycfrac = solcycfrac,
                      **kwargs)
         self.add_subprocess('SW', SW)
         self.add_subprocess('LW', LW )
@@ -159,7 +230,8 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
         self.add_input('idrv', idrv)
         self.add_input('permuteseed_sw', permuteseed_sw)
         self.add_input('permuteseed_lw', permuteseed_lw)
-        self.add_input('adjes', adjes)
+        #self.add_input('S0', S0)
+        #self.add_input('adjes', adjes)
         self.add_input('dyofyr', dyofyr)
         self.add_input('inflgsw', inflgsw)
         self.add_input('inflglw', inflglw)
@@ -177,27 +249,10 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
         self.add_input('asmaer_sw', asmaer_sw)
         self.add_input('ecaer_sw', ecaer_sw)
         self.add_input('tauaer_lw', tauaer_lw)
-
-
-    #  Some input values are defined as class properties so that
-    #  user changes will be passed to LW and/or SW subprocesses
-    #  NOT NEEDED ANYMORE BECAUSE OF HOW THE SUBPROCESSES ARE CREATED
-    # @property
-    # def permuteseed_sw(self):
-    #     return self._permuteseed_sw
-    # @permuteseed_sw.setter
-    # def permuteseed_sw(self, value):
-    #     self._permuteseed_sw = value
-    #     self.subprocess['SW'].permuteseed = value
-    # @property
-    # def co2vmr(self):
-    #     return self._co2vmr
-    # @co2vmr.setter
-    # def co2vmr(self, value):
-    #     self._co2vmr = value
-    #     self.subprocess['SW'].co2vmr = value
-    #     self.subprocess['LW'].co2vmr = value
-    #  Should add other gases and parameters here
+        self.add_input('isolvar', isolvar)
+        self.add_input('indsolvar', indsolvar)
+        self.add_input('bndsolvar', bndsolvar)
+        self.add_input('solcycfrac', solcycfrac)
 
 
 class RRTMG_SW(_Radiation_SW):
@@ -207,9 +262,9 @@ class RRTMG_SW(_Radiation_SW):
             irng = 1,  # more monte carlo stuff
             idrv = 0,  # whether to also calculate the derivative of flux with respect to surface temp
             permuteseed = 150,
-            adjes = 1.,       # flux adjustment for earth/sun distance (if not dyofyr)
+            #S0 = const.S0,    # solar constant
+            #adjes = 1.,       # flux adjustment for earth/sun distance (if not dyofyr)
             dyofyr = 0,       # day of the year used to get Earth/Sun distance (if not adjes)
-            #scon = const.S0/4,  # solar constant...  RRTMG_SW code has been modified to expect TOA insolation instead.
             inflgsw  = 2,
             iceflgsw = 1,
             liqflgsw = 1,
@@ -222,6 +277,49 @@ class RRTMG_SW(_Radiation_SW):
             ssaaer = 0.,   # Aerosol single scattering albedo (iaer=10 only), Dimensions,  (ncol,nlay,nbndsw)] #  (non-delta scaled)
             asmaer = 0.,   # Aerosol asymmetry parameter (iaer=10 only), Dimensions,  (ncol,nlay,nbndsw)] #  (non-delta scaled)
             ecaer  = 0.,   # Aerosol optical depth at 0.55 micron (iaer=6 only), Dimensions,  (ncol,nlay,naerec)] #  (non-delta scaled)
+            # new arguments for RRTMG_SW version 4.0
+            isolvar = 0,    # ! Flag for solar variability method
+                            # !   -1 = (when scon .eq. 0.0): No solar variability
+                            # !        and no solar cycle (Kurucz solar irradiance
+                            # !        of 1368.22 Wm-2 only);
+                            # !        (when scon .ne. 0.0): Kurucz solar irradiance
+                            # !        scaled to scon and solar variability defined
+                            # !        (optional) by setting non-zero scale factors
+                            # !        for each band in bndsolvar
+                            # !    0 = (when SCON .eq. 0.0): No solar variability
+                            # !        and no solar cycle (NRLSSI2 solar constant of
+                            # !        1360.85 Wm-2 for the 100-50000 cm-1 spectral
+                            # !        range only), with facular and sunspot effects
+                            # !        fixed to the mean of Solar Cycles 13-24;
+                            # !        (when SCON .ne. 0.0): No solar variability
+                            # !        and no solar cycle (NRLSSI2 solar constant of
+                            # !        1360.85 Wm-2 for the 100-50000 cm-1 spectral
+                            # !        range only), is scaled to SCON
+                            # !    1 = Solar variability (using NRLSSI2  solar
+                            # !        model) with solar cycle contribution
+                            # !        determined by fraction of solar cycle
+                            # !        with facular and sunspot variations
+                            # !        fixed to their mean variations over the
+                            # !        average of Solar Cycles 13-24;
+                            # !        two amplitude scale factors allow
+                            # !        facular and sunspot adjustments from
+                            # !        mean solar cycle as defined by indsolvar
+                            # !    2 = Solar variability (using NRLSSI2 solar
+                            # !        model) over solar cycle determined by
+                            # !        direct specification of Mg (facular)
+                            # !        and SB (sunspot) indices provided
+                            # !        in indsolvar (scon = 0.0 only)
+                            # !    3 = (when scon .eq. 0.0): No solar variability
+                            # !        and no solar cycle (NRLSSI2 solar irradiance
+                            # !        of 1360.85 Wm-2 only);
+                            # !        (when scon .ne. 0.0): NRLSSI2 solar irradiance
+                            # !        scaled to scon and solar variability defined
+                            # !        (optional) by setting non-zero scale factors
+                            # !        for each band in bndsolvar
+            indsolvar = np.zeros(2),      # Facular and sunspot amplitude scale factors (isolvar=1),
+                                          # or Mg and SB indices (isolvar=2)
+            bndsolvar = np.zeros(nbndsw), # Solar variability scale factors for each shortwave band
+            solcycfrac = 0.,              # Fraction of averaged solar cycle (0-1) at current time (isolvar=1)
             **kwargs):
         super(RRTMG_SW, self).__init__(**kwargs)
         #  define INPUTS
@@ -229,7 +327,8 @@ class RRTMG_SW(_Radiation_SW):
         self.add_input('irng', irng)
         self.add_input('idrv', idrv)
         self.add_input('permuteseed', permuteseed)
-        self.add_input('adjes', adjes)
+        #self.add_input('S0', S0)
+        #self.add_input('adjes', adjes)
         self.add_input('dyofyr', dyofyr)
         self.add_input('inflgsw', inflgsw)
         self.add_input('iceflgsw', iceflgsw)
@@ -242,6 +341,10 @@ class RRTMG_SW(_Radiation_SW):
         self.add_input('ssaaer', ssaaer)
         self.add_input('asmaer', asmaer)
         self.add_input('ecaer', ecaer)
+        self.add_input('isolvar', isolvar)
+        self.add_input('indsolvar', indsolvar)
+        self.add_input('bndsolvar', bndsolvar)
+        self.add_input('solcycfrac', solcycfrac)
         #  define diagnostics
         self.add_diagnostic('ASR', 0.*self.Ts)
         self.add_diagnostic('ASRclr', 0.*self.Ts)
@@ -249,6 +352,17 @@ class RRTMG_SW(_Radiation_SW):
         self.add_diagnostic('TdotSWclr', 0.*self.Tatm)
 
     def _prepare_sw_arguments(self):
+        #  prepare insolation
+        #  CLIMLAB provides local insolation, solar constant and
+        #  (optionally, maybe, not yet implemented) the adjustment factor for Sun-Earth distance
+        #  which is (dbar / d)^2 in Hartmann's notation
+        #   the factor by which the total irradiance differs from mean annual solar constant
+        #   due to time of year and elliptical orbit
+        #
+        #  RRTMG_SW expects solar constant, adjustment factor, and cosine of zenith angle
+        #
+        #  actually for now let's just let all these things be specified as inputs
+
         #  scalar integer arguments
         icld = self.icld
         irng = self.irng
@@ -258,9 +372,14 @@ class RRTMG_SW(_Radiation_SW):
         iceflgsw = self.iceflgsw
         liqflgsw = self.liqflgsw
         dyofyr = self.dyofyr
+        isolvar = self.isolvar
+        solcycfrac = self.solcycfrac
         #  scalar real arguments
-        adjes = self.adjes
-        scon = self.insolation  # THIS IS A PROBLEM! RRTMG WANTS A SCALAR HERE, NOT AN ARRAY
+        #adjes = self.adjes
+        adjes = self.eccentricity_factor
+        scon = self.S0
+        indsolvar = self.indsolvar
+        bndsolvar = self.bndsolvar
 
         (ncol, nlay, play, plev, tlay, tlev, tsfc,
         h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr, cfc11vmr,
@@ -271,7 +390,7 @@ class RRTMG_SW(_Radiation_SW):
         aldir = _climlab_to_rrtm_sfc(self.aldir * np.ones_like(self.Ts))
         asdif = _climlab_to_rrtm_sfc(self.asdif * np.ones_like(self.Ts))
         asdir = _climlab_to_rrtm_sfc(self.asdir * np.ones_like(self.Ts))
-        coszen = _climlab_to_rrtm_sfc(self.cosZen * np.ones_like(self.Ts))
+        coszen = _climlab_to_rrtm_sfc(self.coszen * np.ones_like(self.Ts))
         #  THE REST OF THESE ARGUMENTS ARE STILL BEING HARD CODED.
         #   NEED TO FIX THIS UP...
 
@@ -288,12 +407,6 @@ class RRTMG_SW(_Radiation_SW):
         ssaaer = np.zeros(dim_sw2)   # Aerosol single scattering albedo (iaer=10 only), Dimensions,  (ncol,nlay,nbndsw)] #  (non-delta scaled)
         asmaer = np.zeros(dim_sw2)   # Aerosol asymmetry parameter (iaer=10 only), Dimensions,  (ncol,nlay,nbndsw)] #  (non-delta scaled)
         ecaer  = np.zeros([ncol,nlay,naerec])   # Aerosol optical depth at 0.55 micron (iaer=6 only), Dimensions,  (ncol,nlay,naerec)] #  (non-delta scaled)
-
-         #  new arguments for version 4.0
-        isolvar = 0
-        indsolvar = np.zeros(2)
-        bndsolvar = np.zeros(nbndsw)
-        solcycfrac = 0.
 
         args = [ncol, nlay, icld, permuteseed, irng, idrv, const.cp,
                 play, plev, tlay, tlev, tsfc,

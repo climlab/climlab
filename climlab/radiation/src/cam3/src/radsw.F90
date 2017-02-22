@@ -1001,10 +1001,7 @@ subroutine radcswmx(pcols, pver, pverp,                           &
 !
 ! Define solar incident radiation and interface pressures:
 !
-!!++CliMT
-!         solin(i)  = scon*eccf*coszrs(i)
-         solin(i)  = scon ! input already has eccf and coszrs factored in
-!!--CliMT
+         solin(i)  = scon*eccf*coszrs(i)
          pflx(i,0) = 0._r8
 !
 ! Compute optical paths:
