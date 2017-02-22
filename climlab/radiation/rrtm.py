@@ -173,10 +173,8 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
                        'emissivity','aldif','aldir','asdif','asdir','S0','coszen',
                        'eccentricity_factor','insolation',]
         for item in remove_list:
-            try:
+            if item in kwargs:
                 ignored = kwargs.pop(item)
-            except:
-                pass
 
         LW = RRTMG_LW(absorber_vmr = self.absorber_vmr,
                      cldfrac = self.cldfrac,
