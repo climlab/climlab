@@ -4,6 +4,7 @@
 !
 !  change units of q from g/kg to kg/kg
 !   pass cosine of zenith angle rather than angle itself
+!   and also pass eccentricity factor
 !  Pass grid dimensions as input argument using dynamic arrays
 !
 !  Pass greenhouse gas amounts as absolute volume mixing ratios (ppp) instead of ppm
@@ -31,6 +32,7 @@ subroutine crm(  &
      aldir,  &
      asdif,  &
      asdir,  &
+     eccf,   &
      coszrs,  &
      solin_in,  &
      flus,  &
@@ -97,7 +99,8 @@ subroutine crm(  &
   real(r8), intent(in) ::  asdif(pcols)
   real(r8), intent(in) ::  asdir(pcols)
   !real(r8), intent(in) ::  zen
-  !  driver now expects cosine of zenith angle (climlab)
+  !  driver now expects cosine of zenith angle and eccentricity factor (climlab)
+  real(r8), intent(in) ::  eccf
   real(r8), intent(in) ::  coszrs(pcols)
   real(r8), intent(in) ::  solin_in
   real(r8), intent(in) ::  flus
@@ -163,7 +166,7 @@ subroutine crm(  &
   real(r8) :: emis(pver) ! cloud emissivity
   real(r8) :: pmxrgn(pverp) ! Maximum pressure for each max overlapped region
   integer  :: nmxrgn(pcols)       ! Number of maximally overlapped regions
-  real(r8) :: eccf  ! eccentricity factor
+  !real(r8) :: eccf  ! eccentricity factor
   !real(r8) :: coszrs(pcols)  ! cosine zenith angle
   real(r8) :: lwupcgs(pcols)  ! upward surface LW flux (CGS)
   real(r8) :: aerosol(pver,naer_all) ! aerosol mass mix ratio
@@ -232,7 +235,8 @@ subroutine crm(  &
   solincgs = solin_in * 1.e3 ! MKS -> CGS
   !driver now expects cosine of zenith angle (climlab)
   !coszrs = cos(zen*abs(acos(-1.))/180.) ! zenith angle specified by user
-  eccf = 1.    ! eccen factor already in solin
+  !eccf = 1.    ! eccen factor already in solin
+  ! driver now expects eccf as input
   aerosol = 1.e-16 ! aerosols disabled in CliMT
   do k=1,pver
      if (o3mmr_in(k).le.0.) then

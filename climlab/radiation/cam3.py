@@ -141,6 +141,8 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         Cpd = const.cp
         epsilon = const.Rd / const.Rv
         stebol = const.sigma
+        scon = self.S0
+        eccf = self.eccentricity_factor
         #  Well-mixed greenhouse gases -- scalar values
         CO2vmr = self.absorber_vmr['CO2']
         N2Ovmr = self.absorber_vmr['N2O']
@@ -150,7 +152,7 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         # array input
         Tatm = self._climlab_to_cam3(self.Tatm)
         Ts = self._climlab_to_cam3(self.Ts)
-        insolation = self._climlab_to_cam3(self.insolation * np.ones_like(self.Ts))
+        #insolation = self._climlab_to_cam3(self.insolation * np.ones_like(self.Ts))
         coszen = self._climlab_to_cam3(self.coszen * np.ones_like(self.Ts))
         aldif = self._climlab_to_cam3(self.aldif * np.ones_like(self.Ts))
         aldir = self._climlab_to_cam3(self.aldir * np.ones_like(self.Ts))
@@ -180,8 +182,8 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         #  The ordered list of input fields needed by the CAM3 driver
         args = [KM, JM, IM, do_sw, do_lw, p, dp, ps, Tatm, Ts,
                 q, O3mmr, cldfrac, clwp, ciwp, in_cld,
-                aldif, aldir, asdif, asdir, coszen,
-                insolation, flus, r_liq, r_ice,
+                aldif, aldir, asdif, asdir, eccf, coszen,
+                scon, flus, r_liq, r_ice,
                 CO2vmr, N2Ovmr, CH4vmr, CFC11vmr,
                 CFC12vmr, g, Cpd, epsilon, stebol]
         return args

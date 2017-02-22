@@ -7,6 +7,8 @@
 !   remove output Tinc
 !  Change units of outputs qrl, qrs, Tdot from J/kg/day to J/kg/s or W/kg
 !  pass cosine of zenith angle rather than angle itself
+!   and also pass eccentricity factor
+!   and solar constant rather than insolation
 !  Pass grid dimensions as input arguments rather than global variables
 !  set at compile time
 
@@ -31,6 +33,7 @@ subroutine driver(  &
      aldir,   &
      asdif,   &
      asdir,   &
+     eccf,    &
      coszen,   &
      scon,   &
      flus,   &
@@ -67,8 +70,9 @@ subroutine driver(  &
   real*8, intent(in) :: aldir(jm,im)
   real*8, intent(in) :: asdif(jm,im)
   real*8, intent(in) :: asdir(jm,im)
+  real*8, intent(in) :: eccf
   real*8, intent(in) :: coszen(jm,im)
-  real*8, intent(in) :: scon(jm,im)
+  real*8, intent(in) :: scon
   real*8, intent(in) :: flus(jm,im)
   real*8, intent(in) :: cldf(km,jm,im)
   real*8, intent(in) :: clwp(km,jm,im)
@@ -111,7 +115,7 @@ subroutine driver(  &
   real*8, intent(out) :: srfflx(jm,im)
 
   !  These are not comments! Necessary directives to f2py to handle array dimensions
-  !f2py depend(jm,im) aldif,aldir,asdif,asdir,coszen,scon,flus,ps,tg
+  !f2py depend(jm,im) aldif,aldir,asdif,asdir,coszen,flus,ps,tg
   !f2py depend(km,jm,im) cldf,clwp,ciwp,o3mmr,r_liq,r_ice,pmid,dp,q,t
   !f2py depend(jm,im) sw_cf_toa,sw_cf_srf,lw_cf_toa,lw_cf_srf,lw_toa,lw_srf,sw_toa,sw_srf,srfflx
   !f2py depend(km,jm,im) swflx_out,lwflx_out,lwup_out,lwdn_out,tdot,qrs,qrl
@@ -144,9 +148,10 @@ subroutine driver(  &
              aldir(j,i),  &
              asdif(j,i),  &
              asdir(j,i),  &
-             coszen(j,i),  &
-             scon(j,i),  &
-             flus(j,i),  &
+             eccf,        &
+             coszen(j,i), &
+             scon,        &
+             flus(j,i),   &
              cldf(1,j,i),  &
              clwp(1,j,i),  &
              ciwp(1,j,i),  &
