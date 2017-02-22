@@ -133,17 +133,21 @@ class _Radiation_SW(_Radiation):
                  aldir = 0.3,
                  asdif = 0.3,
                  asdir = 0.3,
+                 S0    = const.S0,
                  insolation = const.S0/4.,
                  coszen = None,    # cosine of the solar zenith angle
+                 eccentricity_factor = 1.,  # instantaneous irradiance = S0 * eccentricity_factor
                  **kwargs):
         super(_Radiation_SW, self).__init__(**kwargs)
         #  coszen is cosine of solar zenith angle
         #  If unspecified, infer it from the insolation
         #  (assuming a circular orbit and standard solar constant)
         if coszen is None:
-            coszen = insolation / const.S0
+            coszen = insolation / S0
+        self.add_input('S0', S0)
         self.add_input('insolation', insolation)
         self.add_input('coszen', coszen)
+        self.add_input('eccentricity_factor', eccentricity_factor)
         if albedo is not None:
             aldif = albedo
             aldir = albedo
