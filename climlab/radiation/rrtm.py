@@ -62,6 +62,7 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
             idrv = 0,  # whether to also calculate the derivative of flux with respect to surface temp
             permuteseed_sw =  150,  # used for monte carlo clouds; must differ from permuteseed_lw by number of subcolumns
             permuteseed_lw =  300,  # learn about these later...
+            S0 = const.S0,    #  solar constant (scalar)
             adjes = 1.,       # flux adjustment for earth/sun distance (if not dyofyr)
             dyofyr = 0,       # day of the year used to get Earth/Sun distance (if not adjes)
             # CLOUDS, SW see http://www.arm.gov/publications/proceedings/conf16/extended_abs/iacono_mj.pdf
@@ -191,6 +192,7 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
                      aldir = self.aldir,
                      asdif = self.asdif,
                      asdir = self.asdir,
+                     S0 = S0,
                      #coszen = self.coszen,
                      adjes = adjes,
                      dyofyr = dyofyr,
@@ -218,6 +220,7 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
         self.add_input('idrv', idrv)
         self.add_input('permuteseed_sw', permuteseed_sw)
         self.add_input('permuteseed_lw', permuteseed_lw)
+        self.add_input('S0', S0)
         self.add_input('adjes', adjes)
         self.add_input('dyofyr', dyofyr)
         self.add_input('inflgsw', inflgsw)
@@ -249,9 +252,9 @@ class RRTMG_SW(_Radiation_SW):
             irng = 1,  # more monte carlo stuff
             idrv = 0,  # whether to also calculate the derivative of flux with respect to surface temp
             permuteseed = 150,
+            S0 = const.S0,    # solar constant
             adjes = 1.,       # flux adjustment for earth/sun distance (if not dyofyr)
             dyofyr = 0,       # day of the year used to get Earth/Sun distance (if not adjes)
-            #scon = const.S0/4,  # solar constant...  RRTMG_SW code has been modified to expect TOA insolation instead.
             inflgsw  = 2,
             iceflgsw = 1,
             liqflgsw = 1,
@@ -314,6 +317,7 @@ class RRTMG_SW(_Radiation_SW):
         self.add_input('irng', irng)
         self.add_input('idrv', idrv)
         self.add_input('permuteseed', permuteseed)
+        self.add_input('S0', S0)
         self.add_input('adjes', adjes)
         self.add_input('dyofyr', dyofyr)
         self.add_input('inflgsw', inflgsw)
@@ -338,6 +342,17 @@ class RRTMG_SW(_Radiation_SW):
         self.add_diagnostic('TdotSWclr', 0.*self.Tatm)
 
     def _prepare_sw_arguments(self):
+        #  prepare insolation
+        #  CLIMLAB provides local insolation, solar constant and
+        #  (optionally, maybe, not yet implemented) the adjustment factor for Sun-Earth distance
+        #  which is (dbar / d)^2 in Hartmann's notation
+        #   the factor by which the total irradiance differs from mean annual solar constant
+        #   due to time of year and elliptical orbit
+        #
+        #  RRTMG_SW expects solar constant, adjustment factor, and cosine of zenith angle
+        #
+        #  actually for now let's just let all these things be specified as inputs
+
         #  scalar integer arguments
         icld = self.icld
         irng = self.irng
@@ -351,7 +366,7 @@ class RRTMG_SW(_Radiation_SW):
         solcycfrac = self.solcycfrac
         #  scalar real arguments
         adjes = self.adjes
-        scon = self.insolation  # THIS IS A PROBLEM! RRTMG WANTS A SCALAR HERE, NOT AN ARRAY
+        scon = self.S0
         indsolvar = self.indsolvar
         bndsolvar = self.bndsolvar
 
