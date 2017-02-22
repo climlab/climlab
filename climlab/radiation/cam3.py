@@ -40,7 +40,7 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         - CFC11
         - CFC12
     Input values with same dimension as Ts:
-        - cosZen (cosine of solar zenith angle, default = 1.)
+        - coszen (cosine of solar zenith angle, default = 1.)
         - insolation (W/m2, default = const.S0/4)
         - surface albedos (all default to 0.07):
             - asdir (shortwave direct)
@@ -151,7 +151,7 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         Tatm = self._climlab_to_cam3(self.Tatm)
         Ts = self._climlab_to_cam3(self.Ts)
         insolation = self._climlab_to_cam3(self.insolation * np.ones_like(self.Ts))
-        cosZen = self._climlab_to_cam3(self.cosZen * np.ones_like(self.Ts))
+        coszen = self._climlab_to_cam3(self.coszen * np.ones_like(self.Ts))
         aldif = self._climlab_to_cam3(self.aldif * np.ones_like(self.Ts))
         aldir = self._climlab_to_cam3(self.aldir * np.ones_like(self.Ts))
         asdif = self._climlab_to_cam3(self.asdif * np.ones_like(self.Ts))
@@ -180,7 +180,7 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         #  The ordered list of input fields needed by the CAM3 driver
         args = [KM, JM, IM, do_sw, do_lw, p, dp, ps, Tatm, Ts,
                 q, O3mmr, cldfrac, clwp, ciwp, in_cld,
-                aldif, aldir, asdif, asdir, cosZen,
+                aldif, aldir, asdif, asdir, coszen,
                 insolation, flus, r_liq, r_ice,
                 CO2vmr, N2Ovmr, CH4vmr, CFC11vmr,
                 CFC12vmr, g, Cpd, epsilon, stebol]

@@ -191,7 +191,7 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
                      aldir = self.aldir,
                      asdif = self.asdif,
                      asdir = self.asdir,
-                     cosZen = self.cosZen,
+                     #coszen = self.coszen,
                      adjes = adjes,
                      dyofyr = dyofyr,
                      #insolation = self.insolation,
@@ -364,7 +364,7 @@ class RRTMG_SW(_Radiation_SW):
         aldir = _climlab_to_rrtm_sfc(self.aldir * np.ones_like(self.Ts))
         asdif = _climlab_to_rrtm_sfc(self.asdif * np.ones_like(self.Ts))
         asdir = _climlab_to_rrtm_sfc(self.asdir * np.ones_like(self.Ts))
-        coszen = _climlab_to_rrtm_sfc(self.cosZen * np.ones_like(self.Ts))
+        coszen = _climlab_to_rrtm_sfc(self.coszen * np.ones_like(self.Ts))
         #  THE REST OF THESE ARGUMENTS ARE STILL BEING HARD CODED.
         #   NEED TO FIX THIS UP...
 

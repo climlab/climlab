@@ -134,7 +134,7 @@ class _Radiation_SW(_Radiation):
                  asdif = 0.3,
                  asdir = 0.3,
                  insolation = const.S0/4.,
-                 cosZen = 0.5,    # cosine of the solar zenith angle
+                 coszen = 0.5,    # cosine of the solar zenith angle
                  **kwargs):
         super(_Radiation_SW, self).__init__(**kwargs)
         self.add_input('insolation', insolation)
