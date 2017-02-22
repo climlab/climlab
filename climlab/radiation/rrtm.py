@@ -167,6 +167,17 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
             **kwargs):
         super(RRTMG, self).__init__(**kwargs)
 
+        # Remove specific inputs from kwargs dictionary.
+        #  We want any changes implemented in the parent __init__ method to be preserved here
+        remove_list = ['absorber_vmr','cldfrac','clwp','ciwp','r_liq','r_ice',
+                       'emissivity','aldif','aldir','asdif','asdir','S0','coszen',
+                       'eccentricity_factor','insolation',]
+        for item in remove_list:
+            try:
+                ignored = kwargs.pop(item)
+            except:
+                pass
+
         LW = RRTMG_LW(absorber_vmr = self.absorber_vmr,
                      cldfrac = self.cldfrac,
                      clwp = self.clwp,
@@ -174,7 +185,7 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
                      r_liq = self.r_liq,
                      r_ice = self.r_ice,
                      permuteseed = permuteseed_lw,
-                     #emissivity = self.emissivity,
+                     emissivity = self.emissivity,
                      inflglw = inflglw,
                      iceflglw = iceflglw,
                      liqflglw = liqflglw,
@@ -192,11 +203,12 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
                      aldir = self.aldir,
                      asdif = self.asdif,
                      asdir = self.asdir,
-                     #S0 = S0,
-                     #coszen = self.coszen,
+                     S0 = self.S0,
+                     coszen = self.coszen,
+                     eccentricity_factor = self.eccentricity_factor,
                      #adjes = adjes,
                      dyofyr = dyofyr,
-                     #insolation = self.insolation,
+                     insolation = self.insolation,
                      inflgsw = inflgsw,
                      iceflgsw = iceflgsw,
                      tauc = tauc_sw,
