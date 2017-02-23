@@ -52,8 +52,6 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
             idrv = 0,  # whether to also calculate the derivative of flux with respect to surface temp
             permuteseed_sw =  150,  # used for monte carlo clouds; must differ from permuteseed_lw by number of subcolumns
             permuteseed_lw =  300,  # learn about these later...
-            #S0 = const.S0,    #  solar constant (scalar)
-            #adjes = 1.,       # flux adjustment for earth/sun distance (if not dyofyr)
             dyofyr = 0,       # day of the year used to get Earth/Sun distance (if not adjes)
             # CLOUDS, SW see http://www.arm.gov/publications/proceedings/conf16/extended_abs/iacono_mj.pdf
             inflgsw  = 2, # Flag for cloud optical properties
@@ -194,7 +192,6 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
                      S0 = self.S0,
                      coszen = self.coszen,
                      eccentricity_factor = self.eccentricity_factor,
-                     #adjes = adjes,
                      dyofyr = dyofyr,
                      insolation = self.insolation,
                      inflgsw = inflgsw,
@@ -220,8 +217,6 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
         self.add_input('idrv', idrv)
         self.add_input('permuteseed_sw', permuteseed_sw)
         self.add_input('permuteseed_lw', permuteseed_lw)
-        #self.add_input('S0', S0)
-        #self.add_input('adjes', adjes)
         self.add_input('dyofyr', dyofyr)
         self.add_input('inflgsw', inflgsw)
         self.add_input('inflglw', inflglw)
@@ -252,8 +247,6 @@ class RRTMG_SW(_Radiation_SW):
             irng = 1,  # more monte carlo stuff
             idrv = 0,  # whether to also calculate the derivative of flux with respect to surface temp
             permuteseed = 150,
-            #S0 = const.S0,    # solar constant
-            #adjes = 1.,       # flux adjustment for earth/sun distance (if not dyofyr)
             dyofyr = 0,       # day of the year used to get Earth/Sun distance (if not adjes)
             inflgsw  = 2,
             iceflgsw = 1,
@@ -317,8 +310,6 @@ class RRTMG_SW(_Radiation_SW):
         self.add_input('irng', irng)
         self.add_input('idrv', idrv)
         self.add_input('permuteseed', permuteseed)
-        #self.add_input('S0', S0)
-        #self.add_input('adjes', adjes)
         self.add_input('dyofyr', dyofyr)
         self.add_input('inflgsw', inflgsw)
         self.add_input('iceflgsw', iceflgsw)
@@ -365,7 +356,6 @@ class RRTMG_SW(_Radiation_SW):
         isolvar = self.isolvar
         solcycfrac = self.solcycfrac
         #  scalar real arguments
-        #adjes = self.adjes
         adjes = self.eccentricity_factor
         scon = self.S0
         indsolvar = self.indsolvar
@@ -483,7 +473,7 @@ class RRTMG_LW(_Radiation_LW):
         #  These arrays have an extra dimension for number of bands
         # in-cloud optical depth [nbndlw,ncol,nlay]
         tauc = _climlab_to_rrtm(self.tauc * np.ones_like(self.Tatm))
-        #  broadcase to get [nbndlw,ncol,nlay]
+        #  broadcast to get [nbndlw,ncol,nlay]
         tauc = tauc * np.ones([nbndlw,ncol,nlay])
         # Aerosol optical depth at mid-point of LW spectral bands [ncol,nlay,nbndlw]
         tauaer = _climlab_to_rrtm(self.tauaer * np.ones_like(self.Tatm))
