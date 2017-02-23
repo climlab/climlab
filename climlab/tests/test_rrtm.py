@@ -75,3 +75,30 @@ def test_radiative_forcing():
     rcm2.subprocess['Radiation'].absorber_vmr['CO2'] *= 2.
     rcm2.compute_diagnostics()
     assert (rcm2.ASR - rcm2.OLR) > 1.  # positive radiative forcing
+
+def test_latitude():
+    '''
+    Run a radiative equilibrum model with RRTMG radiation out to equilibrium
+    with an annual mean insolation profile as a function of latitude.
+    '''
+    num_lat = 8
+    #  State variables (Air and surface temperature)
+    state = climlab.column_state(num_lev=30, num_lat=num_lat, water_depth=1.)
+    #  Parent model process
+    model = climlab.TimeDependentProcess(state=state)
+    #  insolation
+    sol = climlab.radiation.AnnualMeanInsolation(domains=model.Ts.domain)
+    #
+    rad = climlab.radiation.RRTMG(state=state, S0=sol.S0, insolation=sol.insolation)
+    #  Couple everything together
+    model.add_subprocess('Radiation', rad)
+    model.add_subprocess('Insolation', sol)
+    #  Run out to equilibrium
+    model.integrate_years(2.)
+    #  Test for energy balance
+    assert np.all(np.abs(model.ASR - model.OLR) < 0.1)
+    #  Test for reasonable surface temperature gradient
+    #  reversal of gradient at equator
+    grad = np.diff(model.Ts, axis=0)
+    assert np.all(grad[0:(num_lat/2-1)] > 0.)
+    assert np.all(grad[(num_lat/2+2):] < 0.)
