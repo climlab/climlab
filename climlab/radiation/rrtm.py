@@ -371,22 +371,27 @@ class RRTMG_SW(_Radiation_SW):
         asdif = _climlab_to_rrtm_sfc(self.asdif * np.ones_like(self.Ts))
         asdir = _climlab_to_rrtm_sfc(self.asdir * np.ones_like(self.Ts))
         coszen = _climlab_to_rrtm_sfc(self.coszen * np.ones_like(self.Ts))
-        #  THE REST OF THESE ARGUMENTS ARE STILL BEING HARD CODED.
-        #   NEED TO FIX THIS UP...
-
         #  These arrays have an extra dimension for number of bands
-        dim_sw1 = [nbndsw,ncol,nlay]     # [nbndsw,ncol,nlay]
-        dim_sw2 = [ncol,nlay,nbndsw]  # [ncol,nlay,nbndsw]
-        tauc = np.zeros(dim_sw1) # In-cloud optical depth
-        ssac = np.zeros(dim_sw1) # In-cloud single scattering albedo
-        asmc = np.zeros(dim_sw1) # In-cloud asymmetry parameter
-        fsfc = np.zeros(dim_sw1) # In-cloud forward scattering fraction (delta function pointing forward "forward peaked scattering")
-
-        # AEROSOLS
-        tauaer = np.zeros(dim_sw2)   # Aerosol optical depth (iaer=10 only), Dimensions,  (ncol,nlay,nbndsw)] #  (non-delta scaled)
-        ssaaer = np.zeros(dim_sw2)   # Aerosol single scattering albedo (iaer=10 only), Dimensions,  (ncol,nlay,nbndsw)] #  (non-delta scaled)
-        asmaer = np.zeros(dim_sw2)   # Aerosol asymmetry parameter (iaer=10 only), Dimensions,  (ncol,nlay,nbndsw)] #  (non-delta scaled)
-        ecaer  = np.zeros([ncol,nlay,naerec])   # Aerosol optical depth at 0.55 micron (iaer=6 only), Dimensions,  (ncol,nlay,naerec)] #  (non-delta scaled)
+        # in-cloud optical depth [nbndsw,ncol,nlay]
+        tauc = _climlab_to_rrtm(self.tauc * np.ones_like(self.Tatm))
+        #  broadcast to get [nbndsw,ncol,nlay]
+        tauc = tauc * np.ones([nbndsw,ncol,nlay])
+        # In-cloud single scattering albedo, same operation
+        ssac = _climlab_to_rrtm(self.ssac * np.ones_like(self.Tatm)) * np.ones([nbndsw,ncol,nlay])
+        # In-cloud asymmetry parameter
+        asmc = _climlab_to_rrtm(self.asmc * np.ones_like(self.Tatm)) * np.ones([nbndsw,ncol,nlay])
+        # In-cloud forward scattering fraction (delta function pointing forward "forward peaked scattering")
+        fsfc = _climlab_to_rrtm(self.fsfc * np.ones_like(self.Tatm)) * np.ones([nbndsw,ncol,nlay])
+        # Aerosol optical depth (iaer=10 only), (ncol,nlay,nbndsw)] #  (non-delta scaled)
+        tauaer = _climlab_to_rrtm(self.tauaer * np.ones_like(self.Tatm))
+        #  broadcast and transpose to get [ncol,nlay,nbndsw]
+        tauaer = np.transpose(tauaer * np.ones([nbndsw,ncol,nlay]), (1,2,0))
+        # Aerosol single scattering albedo (iaer=10 only), Dimensions,  (ncol,nlay,nbndsw)] #  (non-delta scaled)
+        ssaaer = np.transpose(_climlab_to_rrtm(self.ssaaer * np.ones_like(self.Tatm)) * np.ones([nbndsw,ncol,nlay]), (1,2,0))
+        # Aerosol asymmetry parameter (iaer=10 only), Dimensions,  (ncol,nlay,nbndsw)] #  (non-delta scaled)
+        asmaer = np.transpose(_climlab_to_rrtm(self.asmaer * np.ones_like(self.Tatm)) * np.ones([nbndsw,ncol,nlay]), (1,2,0))
+        # Aerosol optical depth at 0.55 micron (iaer=6 only), Dimensions,  (ncol,nlay,naerec)] #  (non-delta scaled)
+        ecaer = np.transpose(_climlab_to_rrtm(self.ecaer * np.ones_like(self.Tatm)) * np.ones([naerec,ncol,nlay]), (1,2,0))
 
         args = [ncol, nlay, icld, permuteseed, irng, idrv, const.cp,
                 play, plev, tlay, tlev, tsfc,
