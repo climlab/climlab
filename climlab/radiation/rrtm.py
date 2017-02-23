@@ -27,16 +27,6 @@ print rcm.ASR - rcm.OLR
 
 '''
 
-###  Developer notes:
-#      Need to change how we handle insolation and zenith angle
-#      RRTGM_SW code expects a single scalar scon for solar constant
-#      and an array of zenith angles
-#      which makes sense for doing instantaneous calculations with a diurnal cycle
-#
-#    CLIMLAB is set up to supply daily-average TOA insolation
-#
-#    Need to make this work. Convert insolation to solar constant and (average) zenith angle
-
 from __future__ import division
 import numpy as np
 from climlab.process import TimeDependentProcess
