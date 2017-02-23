@@ -11,12 +11,14 @@ requirements:
     - python
     - setuptools
     - numpy
-    - scipy
-    - netcdf4
     - pytest
 
   run:
     - python
+    - numpy
+    - scipy
+    - netcdf4
+    - pytest
 
 test:
   imports:
