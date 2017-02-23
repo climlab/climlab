@@ -88,7 +88,7 @@ def test_latitude():
     model = climlab.TimeDependentProcess(state=state)
     #  insolation
     sol = climlab.radiation.AnnualMeanInsolation(domains=model.Ts.domain)
-    #
+    #  radiation module with insolation as input
     rad = climlab.radiation.RRTMG(state=state, S0=sol.S0, insolation=sol.insolation)
     #  Couple everything together
     model.add_subprocess('Radiation', rad)
@@ -101,4 +101,4 @@ def test_latitude():
     #  reversal of gradient at equator
     grad = np.diff(model.Ts, axis=0)
     assert np.all(grad[0:(num_lat/2-1)] > 0.)
-    assert np.all(grad[(num_lat/2+2):] < 0.)
+    assert np.all(grad[(num_lat/2):] < 0.)
