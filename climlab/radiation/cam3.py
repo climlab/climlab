@@ -195,6 +195,10 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         Catm = self.Tatm.domain.heat_capacity
         self.heating_rate['Tatm'] = (self._cam3_to_climlab(TdotRad) *
                                      (Catm / const.cp))
+        #  positive down, consistent with ASR
+        self.SW_flux_net = self._cam3_to_climlab(swflx)
+        #  positive up, consistent with OLR
+        self.LW_flux_net = self._cam3_to_climlab(-lwflx)
         #  Set some diagnostics
         self.OLR = -self._cam3_to_climlab(LwToa) * np.ones_like(self.Ts)
         self.OLRcld = -self._cam3_to_climlab(LwToaCf) * np.ones_like(self.Ts)
@@ -208,6 +212,8 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         self.TdotLW = self._cam3_to_climlab(lwhr) * KperDayFactor * np.ones_like(self.Tatm)
         #self.TdotLWclr = self._cam3_to_climlab(lwhr) * KperDayFactor
         self.TdotSW = self._cam3_to_climlab(swhr) * KperDayFactor * np.ones_like(self.Tatm)
+        #  fluxes at layer interfaces
+
 
 
 class CAM3_LW(CAM3):

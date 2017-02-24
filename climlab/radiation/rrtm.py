@@ -406,21 +406,22 @@ class RRTMG_SW(_Radiation_SW):
         #  Call the RRTM code!
         swuflx, swdflx, swhr, swuflxc, swdflxc, swhrc = _rrtmg_sw.driver(*args)
         #  Output is all (ncol,nlay+1) or (ncol,nlay)
-        self.flux_up = _rrtm_to_climlab(swuflx)
-        self.flux_down = _rrtm_to_climlab(swdflx)
-        self.flux_up_clr = _rrtm_to_climlab(swuflxc)
-        self.flux_down_clr = _rrtm_to_climlab(swdflxc)
+        self.SW_flux_up = _rrtm_to_climlab(swuflx)
+        self.SW_flux_down = _rrtm_to_climlab(swdflx)
+        self.SW_flux_up_clr = _rrtm_to_climlab(swuflxc)
+        self.SW_flux_down_clr = _rrtm_to_climlab(swdflxc)
+        #  SW net flux defined positive DOWN, consistent with ASR
+        self.SW_flux_net = self.SW_flux_down - self.SW_flux_up
+        self.SW_flux_net_clr = self.SW_flux_down_clr - self.SW_flux_up_clr
+        #  Compute quantities derived from fluxes
+        self._compute_SW_flux_diagnostics()
         #  hr is the heating rate in K/day from RRTMG_SW
         #  Need to set to W/m2
         Catm = self.Tatm.domain.heat_capacity
         self.heating_rate['Tatm'] = _rrtm_to_climlab(swhr) / const.seconds_per_day * Catm
         #  calculate slab ocean heating rate from flux divergence
-        self.heating_rate['Ts'] = (self.flux_down[..., -1, np.newaxis] -
-                                   self.flux_up[..., -1, np.newaxis])
-        #  Set some diagnostics
-        self.ASR = self.flux_down[..., 0, np.newaxis] - self.flux_up[..., 0, np.newaxis]
-        self.ASRclr = self.flux_down_clr[..., 0, np.newaxis] - self.flux_up_clr[..., 0, np.newaxis]
-        self.ASRcld = self.ASR - self.ASRclr
+        self.heating_rate['Ts'] = (self.SW_flux_down[..., -1, np.newaxis] -
+                                   self.SW_flux_up[..., -1, np.newaxis])
         self.TdotSW = _rrtm_to_climlab(swhr)  # heating rate in K/day
         self.TdotSWclr = _rrtm_to_climlab(swhrc)
 
@@ -490,24 +491,24 @@ class RRTMG_LW(_Radiation_LW):
         #  Call the RRTM code!
         uflx, dflx, hr, uflxc, dflxc, hrc, duflx_dt, duflxc_dt = _rrtmg_lw.driver(*args)
         #  Output is all (ncol,nlay+1) or (ncol,nlay)
-        self.flux_up = _rrtm_to_climlab(uflx)
-        self.flux_down = _rrtm_to_climlab(dflx)
-        self.flux_up_clr = _rrtm_to_climlab(uflxc)
-        self.flux_down_clr = _rrtm_to_climlab(dflxc)
+        self.LW_flux_up = _rrtm_to_climlab(uflx)
+        self.LW_flux_down = _rrtm_to_climlab(dflx)
+        self.LW_flux_up_clr = _rrtm_to_climlab(uflxc)
+        self.LW_flux_down_clr = _rrtm_to_climlab(dflxc)
+        #  LW net flux defined positive UP, consistent with OLR
+        self.LW_flux_net = self.LW_flux_up - self.LW_flux_down
+        self.LW_flux_net_clr = self.LW_flux_up_clr - self.LW_flux_down_clr
         #  hr is the heating rate in K/day from RRTMG_LW
         #  Need to set to W/m2
         Catm = self.Tatm.domain.heat_capacity
         self.heating_rate['Tatm'] = _rrtm_to_climlab(hr) / const.seconds_per_day * Catm
         #  calculate slab ocean heating rate from flux divergence
-        self.heating_rate['Ts'] = (self.flux_down[..., -1, np.newaxis] -
-                                   self.flux_up[..., -1, np.newaxis])
-        #  Set some diagnostics
-        self.OLR = self.flux_up[..., 0, np.newaxis]
-        self.OLRclr = self.flux_up_clr[..., 0, np.newaxis]
-        self.OLRcld = self.OLR - self.OLRclr
+        self.heating_rate['Ts'] = (self.LW_flux_down[..., -1, np.newaxis] -
+                                   self.LW_flux_up[..., -1, np.newaxis])
         self.TdotLW = _rrtm_to_climlab(hr)  # heating rate in K/day
         self.TdotLWclr = _rrtm_to_climlab(hrc)  # heating rate in K/day
-
+        #  Compute TOA diagnostics, including OLR
+        self._compute_LW_flux_diagnostics()
 
 def _prepare_general_arguments(RRTMGobject):
     '''Prepare arguments needed for both RRTMG_SW and RRTMG_LW with correct dimensions.'''

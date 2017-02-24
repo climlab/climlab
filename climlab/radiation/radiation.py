@@ -163,6 +163,20 @@ class _Radiation_SW(_Radiation):
         self.add_diagnostic('ASRcld', 0. * self.Ts)
         self.add_diagnostic('TdotSW', 0. * self.Tatm)
         self.add_diagnostic('TdotSWclr', 0.*self.Tatm)
+        #  Flux diagnostics at layer interfaces
+        #   actually these need an extra vertical level ... bad initialization
+        self.add_diagnostic('SW_flux_up', 0. * self.Tatm)
+        self.add_diagnostic('SW_flux_down', 0. * self.Tatm)
+        self.add_diagnostic('SW_flux_net', 0. * self.Tatm)
+        self.add_diagnostic('SW_flux_up_clr', 0. * self.Tatm)
+        self.add_diagnostic('SW_flux_down_clr', 0. * self.Tatm)
+        self.add_diagnostic('SW_flux_net_clr', 0. * self.Tatm)
+
+    def _compute_SW_flux_diagnostics(self):
+        #  TOA diagnostics
+        self.ASR = self.SW_flux_net[..., 0, np.newaxis]
+        self.ASRclr = self.SW_flux_net_clr[..., 0, np.newaxis]
+        self.ASRcld = self.ASR - self.ASRclr
 
 
 class _Radiation_LW(_Radiation):
@@ -177,3 +191,17 @@ class _Radiation_LW(_Radiation):
         self.add_diagnostic('OLRcld', 0. * self.Ts)
         self.add_diagnostic('TdotLW', 0. * self.Tatm)
         self.add_diagnostic('TdotLWclr', 0.*self.Tatm)
+        #  Flux diagnostics at layer interfaces
+        #   actually these need an extra vertical level ... bad initialization
+        self.add_diagnostic('LW_flux_up', 0. * self.Tatm)
+        self.add_diagnostic('LW_flux_down', 0. * self.Tatm)
+        self.add_diagnostic('LW_flux_net', 0. * self.Tatm)
+        self.add_diagnostic('LW_flux_up_clr', 0. * self.Tatm)
+        self.add_diagnostic('LW_flux_down_clr', 0. * self.Tatm)
+        self.add_diagnostic('LW_flux_net_clr', 0. * self.Tatm)
+
+    def _compute_LW_flux_diagnostics(self):
+        #  TOA diagnostics
+        self.OLR = self.LW_flux_net[..., 0, np.newaxis]
+        self.OLRclr = self.LW_flux_net_clr[..., 0, np.newaxis]
+        self.OLRcld = self.OLR - self.OLRclr
