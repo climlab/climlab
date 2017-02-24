@@ -195,19 +195,19 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         Catm = self.Tatm.domain.heat_capacity
         self.heating_rate['Tatm'] = (self._cam3_to_climlab(TdotRad) *
                                      (Catm / const.cp))
-        #  Set some diagnostics (minimal for now!)
-        self.OLR = -self._cam3_to_climlab(LwToa)
-        self.OLRcld = -self._cam3_to_climlab(LwToaCf)
+        #  Set some diagnostics
+        self.OLR = -self._cam3_to_climlab(LwToa) * np.ones_like(self.Ts)
+        self.OLRcld = -self._cam3_to_climlab(LwToaCf) * np.ones_like(self.Ts)
         self.OLRclr = self.OLR - self.OLRcld
-        self.ASR = self._cam3_to_climlab(SwToa)
-        self.ASRcld = self._cam3_to_climlab(SwToaCf)
+        self.ASR = self._cam3_to_climlab(SwToa) * np.ones_like(self.Ts)
+        self.ASRcld = self._cam3_to_climlab(SwToaCf) * np.ones_like(self.Ts)
         self.ASRclr = self.ASR - self.ASRcld
         #  radiative heating rates in K / day
         KperDayFactor = const.seconds_per_day / const.cp
         #self.TdotRad = self._cam3_to_climlab(TdotRad) * KperDayFactor
-        self.TdotLW = self._cam3_to_climlab(lwhr) * KperDayFactor
+        self.TdotLW = self._cam3_to_climlab(lwhr) * KperDayFactor * np.ones_like(self.Tatm)
         #self.TdotLWclr = self._cam3_to_climlab(lwhr) * KperDayFactor
-        self.TdotSW = self._cam3_to_climlab(swhr) * KperDayFactor
+        self.TdotSW = self._cam3_to_climlab(swhr) * KperDayFactor * np.ones_like(self.Tatm)
 
 
 class CAM3_LW(CAM3):
