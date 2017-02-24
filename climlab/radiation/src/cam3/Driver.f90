@@ -11,6 +11,8 @@
 !   and solar constant rather than insolation
 !  Pass grid dimensions as input arguments rather than global variables
 !  set at compile time
+!
+!  Return flux at layer interfaces rather than averaging to get flux at layer centers
 
 subroutine driver(  &
      km,   &
@@ -100,10 +102,10 @@ subroutine driver(  &
   real*8, intent(out) :: tdot(km,jm,im)
   real*8, intent(out) :: qrs(km,jm,im)
   real*8, intent(out) :: qrl(km,jm,im)
-  real*8, intent(out) :: swflx_out(km,jm,im)
-  real*8, intent(out) :: lwflx_out(km,jm,im)
-  real*8, intent(out) :: lwup_out(km,jm,im)
-  real*8, intent(out) :: lwdn_out(km,jm,im)
+  real*8, intent(out) :: swflx_out(km+1,jm,im)
+  real*8, intent(out) :: lwflx_out(km+1,jm,im)
+  real*8, intent(out) :: lwup_out(km+1,jm,im)
+  real*8, intent(out) :: lwdn_out(km+1,jm,im)
   real*8, intent(out) :: sw_cf_toa(jm,im)
   real*8, intent(out) :: sw_cf_srf(jm,im)
   real*8, intent(out) :: lw_cf_toa(jm,im)
@@ -191,10 +193,16 @@ subroutine driver(  &
              lwup,lwdn &
              )
 
-        swflx_out(:,j,i) = (swflx(1:km)+swflx(2:km+1))/2.
-        lwflx_out(:,j,i) = (lwflx(1:km)+lwflx(2:km+1))/2.
-        lwup_out(:,j,i) = (lwup(1:km)+lwup(2:km+1))/2.
-        lwdn_out(:,j,i) = (lwdn(1:km)+lwdn(2:km+1))/2.
+        !  The CliMT version takes averages to get flux at center of layers
+        !swflx_out(:,j,i) = (swflx(1:km)+swflx(2:km+1))/2.
+        !lwflx_out(:,j,i) = (lwflx(1:km)+lwflx(2:km+1))/2.
+        !lwup_out(:,j,i) = (lwup(1:km)+lwup(2:km+1))/2.
+        !lwdn_out(:,j,i) = (lwdn(1:km)+lwdn(2:km+1))/2.
+        !  CLIMLAB instead we will report the actual flux at interfaces
+        swflx_out(:,j,i) = swflx
+        lwflx_out(:,j,i) = lwflx
+        lwup_out(:,j,i) = lwup
+        lwdn_out(:,j,i) = lwdn
         srfflx(j,i) = sw_srf(j,i) + lw_srf(j,i)
      enddo
   enddo
