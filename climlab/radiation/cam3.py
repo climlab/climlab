@@ -82,14 +82,6 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         self.do_sw = 1  # '1=do, 0=do not compute SW'
         self.do_lw = 1  # '1=do, 0=do not compute LW'
         self.in_cld = 0 # '1=in-cloud, 0=grid avg cloud water path'
-        # initialize diagnostics
-        self.add_diagnostic('ASR', 0. * self.Ts)
-        self.add_diagnostic('ASRcld', 0. * self.Ts)
-        self.add_diagnostic('OLR', 0. * self.Ts)
-        self.add_diagnostic('OLRcld', 0. * self.Ts)
-        self.add_diagnostic('TdotRad', 0. * self.Tatm)
-        self.add_diagnostic('TdotLW', 0. * self.Tatm)
-        self.add_diagnostic('TdotSW', 0. * self.Tatm)
 
     def _climlab_to_cam3(self, field):
         '''Prepare field with proper dimension order.
@@ -206,12 +198,15 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         #  Set some diagnostics (minimal for now!)
         self.OLR = -self._cam3_to_climlab(LwToa)
         self.OLRcld = -self._cam3_to_climlab(LwToaCf)
+        self.OLRclr = self.OLR - self.OLRcld
         self.ASR = self._cam3_to_climlab(SwToa)
         self.ASRcld = self._cam3_to_climlab(SwToaCf)
+        self.ASRclr = self.ASR - self.ASRcld
         #  radiative heating rates in K / day
         KperDayFactor = const.seconds_per_day / const.cp
-        self.TdotRad = self._cam3_to_climlab(TdotRad) * KperDayFactor
+        #self.TdotRad = self._cam3_to_climlab(TdotRad) * KperDayFactor
         self.TdotLW = self._cam3_to_climlab(lwhr) * KperDayFactor
+        #self.TdotLWclr = self._cam3_to_climlab(lwhr) * KperDayFactor
         self.TdotSW = self._cam3_to_climlab(swhr) * KperDayFactor
 
 

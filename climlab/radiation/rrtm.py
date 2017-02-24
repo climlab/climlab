@@ -326,11 +326,6 @@ class RRTMG_SW(_Radiation_SW):
         self.add_input('indsolvar', indsolvar)
         self.add_input('bndsolvar', bndsolvar)
         self.add_input('solcycfrac', solcycfrac)
-        #  define diagnostics
-        self.add_diagnostic('ASR', 0.*self.Ts)
-        self.add_diagnostic('ASRclr', 0.*self.Ts)
-        self.add_diagnostic('TdotSW', 0.*self.Tatm)
-        self.add_diagnostic('TdotSWclr', 0.*self.Tatm)
 
     def _prepare_sw_arguments(self):
         #  prepare insolation
@@ -425,6 +420,7 @@ class RRTMG_SW(_Radiation_SW):
         #  Set some diagnostics
         self.ASR = self.flux_down[..., 0, np.newaxis] - self.flux_up[..., 0, np.newaxis]
         self.ASRclr = self.flux_down_clr[..., 0, np.newaxis] - self.flux_up_clr[..., 0, np.newaxis]
+        self.ASRcld = self.ASR - self.ASRclr
         self.TdotSW = _rrtm_to_climlab(swhr)  # heating rate in K/day
         self.TdotSWclr = _rrtm_to_climlab(swhrc)
 
@@ -453,11 +449,6 @@ class RRTMG_LW(_Radiation_LW):
         self.add_input('liqflglw', liqflglw)
         self.add_input('tauc', tauc)
         self.add_input('tauaer', tauaer)
-        #  define diagnostics
-        self.add_diagnostic('OLR', 0.*self.Ts)
-        self.add_diagnostic('OLRclr', 0.*self.Ts)
-        self.add_diagnostic('TdotLW', 0.*self.Tatm)
-        self.add_diagnostic('TdotLWclr', 0.*self.Tatm)
 
     def _prepare_lw_arguments(self):
         #  scalar integer arguments
@@ -513,6 +504,7 @@ class RRTMG_LW(_Radiation_LW):
         #  Set some diagnostics
         self.OLR = self.flux_up[..., 0, np.newaxis]
         self.OLRclr = self.flux_up_clr[..., 0, np.newaxis]
+        self.OLRcld = self.OLR - self.OLRclr
         self.TdotLW = _rrtm_to_climlab(hr)  # heating rate in K/day
         self.TdotLWclr = _rrtm_to_climlab(hrc)  # heating rate in K/day
 

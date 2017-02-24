@@ -124,7 +124,7 @@ class _Radiation(EnergyBudget):
         self.add_input('ciwp', ciwp)
         self.add_input('r_liq', r_liq)
         self.add_input('r_ice', r_ice)
-        #  Define diagnostics
+
 
 class _Radiation_SW(_Radiation):
     def __init__(self,
@@ -157,6 +157,12 @@ class _Radiation_SW(_Radiation):
         self.add_input('aldir', aldir)
         self.add_input('asdif', asdif)
         self.add_input('asdir', asdir)
+        # initialize diagnostics
+        self.add_diagnostic('ASR', 0. * self.Ts)
+        self.add_diagnostic('ASRclr', 0. * self.Ts)
+        self.add_diagnostic('ASRcld', 0. * self.Ts)
+        self.add_diagnostic('TdotSW', 0. * self.Tatm)
+        self.add_diagnostic('TdotSWclr', 0.*self.Tatm)
 
 
 class _Radiation_LW(_Radiation):
@@ -165,3 +171,9 @@ class _Radiation_LW(_Radiation):
                  **kwargs):
         super(_Radiation_LW, self).__init__(**kwargs)
         self.add_input('emissivity', emissivity)
+        # initialize diagnostics
+        self.add_diagnostic('OLR', 0. * self.Ts)
+        self.add_diagnostic('OLRclr', 0. * self.Ts)
+        self.add_diagnostic('OLRcld', 0. * self.Ts)
+        self.add_diagnostic('TdotLW', 0. * self.Tatm)
+        self.add_diagnostic('TdotLWclr', 0.*self.Tatm)
