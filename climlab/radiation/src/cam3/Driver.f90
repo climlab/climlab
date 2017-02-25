@@ -222,7 +222,7 @@ subroutine driver(  &
         lwupc_out(:,j,i) = lwupc
         lwdnc_out(:,j,i) = lwdnc
 
-        srfflx(j,i) = sw_srf(j,i) + lw_srf(j,i)
+        srfflx(j,i) = sw_srf(j,i) - lw_srf(j,i)
      enddo
   enddo
 
