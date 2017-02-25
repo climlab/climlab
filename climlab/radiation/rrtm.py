@@ -415,15 +415,11 @@ class RRTMG_SW(_Radiation_SW):
         self.SW_flux_net_clr = self.SW_flux_down_clr - self.SW_flux_up_clr
         #  Compute quantities derived from fluxes
         self._compute_SW_flux_diagnostics()
-        #  hr is the heating rate in K/day from RRTMG_SW
-        #  Need to set to W/m2
-        Catm = self.Tatm.domain.heat_capacity
-        self.heating_rate['Tatm'] = _rrtm_to_climlab(swhr) / const.seconds_per_day * Catm
-        #  calculate slab ocean heating rate from flux divergence
-        self.heating_rate['Ts'] = (self.SW_flux_down[..., -1, np.newaxis] -
-                                   self.SW_flux_up[..., -1, np.newaxis])
+        #  calculate heating rates from flux divergence
+        self.heating_rate['Ts'] = self.SW_flux_net[..., -1, np.newaxis]
+        self.heating_rate['Tatm'] = -np.diff(self.SW_flux_net, axis=-1)
         self.TdotSW = _rrtm_to_climlab(swhr)  # heating rate in K/day
-        self.TdotSWclr = _rrtm_to_climlab(swhrc)
+        self.TdotSW_clr = _rrtm_to_climlab(swhrc)  # clear-sky heating rate in K/day
 
 
 class RRTMG_LW(_Radiation_LW):
@@ -498,14 +494,11 @@ class RRTMG_LW(_Radiation_LW):
         #  LW net flux defined positive UP, consistent with OLR
         self.LW_flux_net = self.LW_flux_up - self.LW_flux_down
         self.LW_flux_net_clr = self.LW_flux_up_clr - self.LW_flux_down_clr
-        #  hr is the heating rate in K/day from RRTMG_LW
-        #  Need to set to W/m2
-        Catm = self.Tatm.domain.heat_capacity
-        self.heating_rate['Tatm'] = _rrtm_to_climlab(hr) / const.seconds_per_day * Catm
-        #  calculate slab ocean heating rate from flux divergence
+        #  calculate heating rates from flux divergence
         self.heating_rate['Ts'] = -self.LW_flux_net[..., -1, np.newaxis]
+        self.heating_rate['Tatm'] = np.diff(self.LW_flux_net, axis=-1)
         self.TdotLW = _rrtm_to_climlab(hr)  # heating rate in K/day
-        self.TdotLWclr = _rrtm_to_climlab(hrc)  # heating rate in K/day
+        self.TdotLW_clr = _rrtm_to_climlab(hrc)  # clear-sky heating rate in K/day
         #  Compute TOA diagnostics, including OLR
         self._compute_LW_flux_diagnostics()
 

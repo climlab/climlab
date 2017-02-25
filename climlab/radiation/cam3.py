@@ -197,19 +197,18 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         #  positive down, consistent with ASR
         self.SW_flux_net = self._cam3_to_climlab(swflx)
         self.SW_flux_net_clr = self._cam3_to_climlab(swflxc)
-        #  SrfRadFlx is net downward flux at surface
-        #self.heating_rate['Ts'] = self._cam3_to_climlab(SrfRadFlx)
-        #  calculate slab ocean heating rate from flux divergence
-        total_flux = self.SW_flux_net - self.LW_flux_net
-        self.heating_rate['Ts'] = total_flux[..., -1, np.newaxis]
-
+        #  calculate heating rates from flux divergence
+        #   this is the total UPWARD flux
+        total_flux = self.LW_flux_net - self.SW_flux_net
+        self.heating_rate['Ts'] = -total_flux[..., -1, np.newaxis]
+        self.heating_rate['Tatm'] = np.diff(total_flux, axis=-1)
         # lwhr and swhr are heating rates in W/kg
         #  (qrl and qrs in CAM3 code)
         #  TdotRad is the sum lwhr + swhr, also in W/kg
         #  Need to set to W/m2
-        Catm = self.Tatm.domain.heat_capacity
-        self.heating_rate['Tatm'] = (self._cam3_to_climlab(TdotRad) *
-                                     (Catm / const.cp))
+        #Catm = self.Tatm.domain.heat_capacity
+        #self.heating_rate['Tatm'] = (self._cam3_to_climlab(TdotRad) *
+        #                             (Catm / const.cp))
         #  Set some diagnostics
         self.OLR = self._cam3_to_climlab(LwToa) * np.ones_like(self.Ts)
         self.OLRcld = self._cam3_to_climlab(LwToaCf) * np.ones_like(self.Ts)
