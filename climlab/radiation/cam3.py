@@ -192,19 +192,14 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         self.LW_flux_down = self._cam3_to_climlab(lwdflx)
         self.LW_flux_up_clr = self._cam3_to_climlab(lwuflxc)
         self.LW_flux_down_clr = self._cam3_to_climlab(lwdflxc)
-        #  LW net flux defined positive UP, consistent with OLR
-        self.LW_flux_net = self.LW_flux_up - self.LW_flux_down
-        self.LW_flux_net_clr = self.LW_flux_up_clr - self.LW_flux_down_clr
         #  fluxes at layer interfaces
         self.SW_flux_up = self._cam3_to_climlab(swuflx)
         self.SW_flux_down = self._cam3_to_climlab(swdflx)
         self.SW_flux_up_clr = self._cam3_to_climlab(swuflxc)
         self.SW_flux_down_clr = self._cam3_to_climlab(swdflxc)
-        #  positive down, consistent with ASR
-        self.SW_flux_net = self.SW_flux_down - self.SW_flux_up
-        self.SW_flux_net_clr = self.SW_flux_down_clr - self.SW_flux_up_clr
-        #self.SW_flux_net = self._cam3_to_climlab(swflx)
-        #self.SW_flux_net_clr = self._cam3_to_climlab(swflxc)
+        #  Compute quantities derived from fluxes
+        self._compute_SW_flux_diagnostics()
+        self._compute_LW_flux_diagnostics()
         #  calculate heating rates from flux divergence
         #   this is the total UPWARD flux
         total_flux = self.LW_flux_net - self.SW_flux_net
@@ -213,18 +208,7 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         # lwhr and swhr are heating rates in W/kg
         #  (qrl and qrs in CAM3 code)
         #  TdotRad is the sum lwhr + swhr, also in W/kg
-        #  Need to set to W/m2
-        #Catm = self.Tatm.domain.heat_capacity
-        #self.heating_rate['Tatm'] = (self._cam3_to_climlab(TdotRad) *
-        #                             (Catm / const.cp))
-        #  Set some diagnostics
-        self.OLR = self._cam3_to_climlab(LwToa) * np.ones_like(self.Ts)
-        self.OLRcld = self._cam3_to_climlab(LwToaCf) * np.ones_like(self.Ts)
-        self.OLRclr = self.OLR - self.OLRcld
-        self.ASR = self._cam3_to_climlab(SwToa) * np.ones_like(self.Ts)
-        self.ASRcld = self._cam3_to_climlab(SwToaCf) * np.ones_like(self.Ts)
-        self.ASRclr = self.ASR - self.ASRcld
-        #  radiative heating rates in K / day
+        #  Store radiative heating rates in K / day
         KperDayFactor = const.seconds_per_day / const.cp
         #self.TdotRad = self._cam3_to_climlab(TdotRad) * KperDayFactor
         self.TdotLW = self._cam3_to_climlab(lwhr) * KperDayFactor * np.ones_like(self.Tatm)

@@ -410,10 +410,7 @@ class RRTMG_SW(_Radiation_SW):
         self.SW_flux_down = _rrtm_to_climlab(swdflx)
         self.SW_flux_up_clr = _rrtm_to_climlab(swuflxc)
         self.SW_flux_down_clr = _rrtm_to_climlab(swdflxc)
-        #  SW net flux defined positive DOWN, consistent with ASR
-        self.SW_flux_net = self.SW_flux_down - self.SW_flux_up
-        self.SW_flux_net_clr = self.SW_flux_down_clr - self.SW_flux_up_clr
-        #  Compute quantities derived from fluxes
+        #  Compute quantities derived from fluxes, including ASR
         self._compute_SW_flux_diagnostics()
         #  calculate heating rates from flux divergence
         self.heating_rate['Ts'] = self.SW_flux_net[..., -1, np.newaxis]
@@ -491,16 +488,13 @@ class RRTMG_LW(_Radiation_LW):
         self.LW_flux_down = _rrtm_to_climlab(dflx)
         self.LW_flux_up_clr = _rrtm_to_climlab(uflxc)
         self.LW_flux_down_clr = _rrtm_to_climlab(dflxc)
-        #  LW net flux defined positive UP, consistent with OLR
-        self.LW_flux_net = self.LW_flux_up - self.LW_flux_down
-        self.LW_flux_net_clr = self.LW_flux_up_clr - self.LW_flux_down_clr
+        #  Compute quantities derived from fluxes, including OLR
+        self._compute_LW_flux_diagnostics()
         #  calculate heating rates from flux divergence
         self.heating_rate['Ts'] = -self.LW_flux_net[..., -1, np.newaxis]
         self.heating_rate['Tatm'] = np.diff(self.LW_flux_net, axis=-1)
         self.TdotLW = _rrtm_to_climlab(hr)  # heating rate in K/day
         self.TdotLW_clr = _rrtm_to_climlab(hrc)  # clear-sky heating rate in K/day
-        #  Compute TOA diagnostics, including OLR
-        self._compute_LW_flux_diagnostics()
 
 def _prepare_general_arguments(RRTMGobject):
     '''Prepare arguments needed for both RRTMG_SW and RRTMG_LW with correct dimensions.'''

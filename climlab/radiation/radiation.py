@@ -173,6 +173,9 @@ class _Radiation_SW(_Radiation):
         self.add_diagnostic('SW_flux_net_clr', 0. * self.Tatm)
 
     def _compute_SW_flux_diagnostics(self):
+        #  positive down, consistent with ASR
+        self.SW_flux_net = self.SW_flux_down - self.SW_flux_up
+        self.SW_flux_net_clr = self.SW_flux_down_clr - self.SW_flux_up_clr
         #  TOA diagnostics
         self.ASR = self.SW_flux_net[..., 0, np.newaxis]
         self.ASRclr = self.SW_flux_net_clr[..., 0, np.newaxis]
@@ -201,6 +204,9 @@ class _Radiation_LW(_Radiation):
         self.add_diagnostic('LW_flux_net_clr', 0. * self.Tatm)
 
     def _compute_LW_flux_diagnostics(self):
+        #  LW net flux defined positive UP, consistent with OLR
+        self.LW_flux_net = self.LW_flux_up - self.LW_flux_down
+        self.LW_flux_net_clr = self.LW_flux_up_clr - self.LW_flux_down_clr
         #  TOA diagnostics
         self.OLR = self.LW_flux_net[..., 0, np.newaxis]
         self.OLRclr = self.LW_flux_net_clr[..., 0, np.newaxis]
