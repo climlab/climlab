@@ -185,6 +185,7 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         args = self._prepare_arguments()
         (TdotRad, SrfRadFlx, swhr, lwhr, swflx, swflxc, lwflx, lwflxc, SwToaCf,
             SwSrfCf, LwToaCf, LwSrfCf, LwToa, LwSrf, SwToa, SwSrf,
+            swuflx, swdflx, swuflxc, swdflxc,
             lwuflx, lwdflx, lwuflxc, lwdflxc) = _cam3.driver(*args)
         #  fluxes at layer interfaces
         self.LW_flux_up = self._cam3_to_climlab(lwuflx)
@@ -194,9 +195,16 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         #  LW net flux defined positive UP, consistent with OLR
         self.LW_flux_net = self.LW_flux_up - self.LW_flux_down
         self.LW_flux_net_clr = self.LW_flux_up_clr - self.LW_flux_down_clr
+        #  fluxes at layer interfaces
+        self.SW_flux_up = self._cam3_to_climlab(swuflx)
+        self.SW_flux_down = self._cam3_to_climlab(swdflx)
+        self.SW_flux_up_clr = self._cam3_to_climlab(swuflxc)
+        self.SW_flux_down_clr = self._cam3_to_climlab(swdflxc)
         #  positive down, consistent with ASR
-        self.SW_flux_net = self._cam3_to_climlab(swflx)
-        self.SW_flux_net_clr = self._cam3_to_climlab(swflxc)
+        self.SW_flux_net = self.SW_flux_down - self.SW_flux_up
+        self.SW_flux_net_clr = self.SW_flux_down_clr - self.SW_flux_up_clr
+        #self.SW_flux_net = self._cam3_to_climlab(swflx)
+        #self.SW_flux_net_clr = self._cam3_to_climlab(swflxc)
         #  calculate heating rates from flux divergence
         #   this is the total UPWARD flux
         total_flux = self.LW_flux_net - self.SW_flux_net

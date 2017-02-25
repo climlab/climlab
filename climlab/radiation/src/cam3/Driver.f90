@@ -68,6 +68,7 @@ subroutine driver(  &
      lw_srf,  &
      sw_toa,  &
      sw_srf, &
+     swup_out, swdn_out, swupc_out, swdnc_out, &
      lwup_out, lwdn_out, lwupc_out, lwdnc_out)
 
 ! Input
@@ -108,6 +109,10 @@ subroutine driver(  &
   real*8, intent(out) :: qrl(km,jm,im)
   real*8, intent(out) :: swflx_out(km+1,jm,im)
   real*8, intent(out) :: swflxc_out(km+1,jm,im)
+  real*8, intent(out) :: swup_out(km+1,jm,im)
+  real*8, intent(out) :: swdn_out(km+1,jm,im)
+  real*8, intent(out) :: swupc_out(km+1,jm,im)
+  real*8, intent(out) :: swdnc_out(km+1,jm,im)
   real*8, intent(out) :: lwflx_out(km+1,jm,im)
   real*8, intent(out) :: lwflxc_out(km+1,jm,im)
   real*8, intent(out) :: lwup_out(km+1,jm,im)
@@ -133,6 +138,10 @@ subroutine driver(  &
 ! Local
   real*8 swflx(km+1)
   real*8 swflxc(km+1)
+  real*8 swup(km+1)
+  real*8 swdn(km+1)
+  real*8 swupc(km+1)
+  real*8 swdnc(km+1)
   real*8 lwflx(km+1)
   real*8 lwflxc(km+1)
   real*8 lwup(km+1)
@@ -204,17 +213,17 @@ subroutine driver(  &
              lw_srf(j,i),  &
              sw_toa(j,i),  &
              sw_srf(j,i), &
+             swup, swdn, swupc, swdnc, &
              lwup,lwdn, lwupc, lwdnc &
              )
 
-        !  The CliMT version takes averages to get flux at center of layers
-        !swflx_out(:,j,i) = (swflx(1:km)+swflx(2:km+1))/2.
-        !lwflx_out(:,j,i) = (lwflx(1:km)+lwflx(2:km+1))/2.
-        !lwup_out(:,j,i) = (lwup(1:km)+lwup(2:km+1))/2.
-        !lwdn_out(:,j,i) = (lwdn(1:km)+lwdn(2:km+1))/2.
-        !  CLIMLAB instead we will report the actual flux at interfaces
+        !  CLIMLAB differs from CliMT here ... we will report the actual flux at interfaces
         swflx_out(:,j,i)  = swflx
         swflxc_out(:,j,i) = swflxc
+        swup_out(:,j,i) = swup
+        swdn_out(:,j,i) = swdn
+        swupc_out(:,j,i) = swupc
+        swdnc_out(:,j,i) = swdnc
         lwflx_out(:,j,i)  = lwflx
         lwflxc_out(:,j,i) = lwflxc
         lwup_out(:,j,i) = lwup

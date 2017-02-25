@@ -43,7 +43,10 @@ subroutine radcswmx(pcols, pver, pverp,                           &
                     fsnsc   ,fsdsc   ,fsds    ,sols    ,soll    , &
                     solsd   ,solld   ,frc_day ,                   &
                     aertau  ,aerssa  ,aerasm  ,aerfwd  ,fns     , &
-                    fcns)
+                    fcns, &
+!+++ CLIMLAB  return the up and down fluxes
+                    fus,fds,fusc,fdsc)
+!--- CLIMLAB
 !-----------------------------------------------------------------------
 !
 ! Purpose:
@@ -788,12 +791,13 @@ subroutine radcswmx(pcols, pver, pverp,                           &
    real(r8) tdifc(nspint,pcols,0:pver) ! Clear Layer trans. to diffuse rad
    real(r8) explayc(nspint,pcols,0:pver) ! Solar beam exp trans. clear layer
 
-#if ( defined SCAM )
+! CLIMLAB we want these fluxes with SCAM undefined
+!#if ( defined SCAM )
    real(r8) fus(pcols,pverp)   ! Upward flux (added for CRM)
    real(r8) fds(pcols,pverp)   ! Downward flux (added for CRM)
    real(r8) fusc(pcols,pverp)  ! Upward clear-sky flux (added for CRM)
    real(r8) fdsc(pcols,pverp) ! Downward clear-sky flux (added for CRM)
-#endif
+!#endif
 
    real(r8) flxdiv           ! Flux divergence for layer
 
@@ -915,12 +919,13 @@ subroutine radcswmx(pcols, pver, pverp,                           &
    qrs(1:ncol,1:pver) = 0.0_r8
    fns(1:ncol,1:pverp) = 0.0_r8
    fcns(1:ncol,1:pverp) = 0.0_r8
-#if ( defined SCAM )
+! CLIMLAB we want these fluxes with SCAM undefined
+!#if ( defined SCAM )
    fus(1:ncol,1:pverp) = 0.0_r8
    fds(1:ncol,1:pverp) = 0.0_r8
    fusc(:ncol,:pverp) = 0.0_r8
    fdsc(:ncol,:pverp) = 0.0_r8
-#endif
+!#endif
 
    ! initialize aerosol diagnostic fields to 0.0
    ! Average can be obtained by dividing <aerod>/<frc_day>
@@ -2312,10 +2317,11 @@ subroutine radcswmx(pcols, pver, pverp,                           &
                fswdn(i,kp1) = fswdn(i,kp1) + solflx(i)*fluxdn(ns,kp1,i)
                fswup(i,kp1) = fswup(i,kp1) + solflx(i)*fluxup(ns,kp1,i)
                fns(i,kp1)   = fswdn(i,kp1) - fswup(i,kp1)
-#if ( defined SCAM )
+! CLIMLAB we want these fluxes with SCAM undefined
+!#if ( defined SCAM )
                fus(i,kp1)=fswup(i,kp1)
                fds(i,kp1)=fswdn(i,kp1)
-#endif
+!#endif
             end do
             end do
 !
@@ -2391,12 +2397,13 @@ subroutine radcswmx(pcols, pver, pverp,                           &
             fsnsc(i)    = fsnsc(i)+solflx(i)*(fluxdn(ns,pverp,i)-fluxup(ns,pverp,i))
             fsdsc(i)    = fsdsc(i)+solflx(i)*(fluxdn(ns,pverp,i))
             fsnrtoac(i) = fsnrtoac(i)+wgtint*solflx(i)*(fluxdn(ns,0,i)-fluxup(ns,0,i))
-#if ( defined SCAM )
+! CLIMLAB we want these fluxes with SCAM undefined
+!#if ( defined SCAM )
             do k = 1,pverp
                fusc(i,k)=fusc(i,k) + solflx(i) * fluxup(ns,k,i)
                fdsc(i,k)=fdsc(i,k) + solflx(i) * fluxdn(ns,k,i)
             enddo
-#endif
+!#endif
 !
 ! End do i=1,Nday
 !

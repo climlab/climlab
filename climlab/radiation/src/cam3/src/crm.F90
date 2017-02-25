@@ -76,6 +76,7 @@ subroutine crm(  &
      lw_srf,  &
      sw_toa,  &
      sw_srf, &
+     swup, swdn, swupc, swdnc, &
      lwup,lwdn,lwupc,lwdnc)
 
 
@@ -137,6 +138,10 @@ subroutine crm(  &
   real(r8), intent(out) ::  qrl(pver)
   real(r8), intent(out) ::  swflx(pverp)
   real(r8), intent(out) ::  swflxc(pverp)
+  real(r8), intent(out) ::  swup(pverp)
+  real(r8), intent(out) ::  swdn(pverp)
+  real(r8), intent(out) ::  swupc(pverp)
+  real(r8), intent(out) ::  swdnc(pverp)
   real(r8), intent(out) ::  lwflx(pverp)
   real(r8), intent(out) ::  lwflxc(pverp)
   real(r8), intent(out) ::  lwup(pverp)
@@ -354,9 +359,14 @@ subroutine crm(  &
           fsnsc   ,fsdsc   ,fsds    ,sols    ,soll    , &
           solsd   ,solld   ,frc_day ,                   &
           aertau  ,aerssa  ,aerasm  ,aerfwd  ,swflx   , &
-          fcns)
+          fcns, swup, swdn, swupc, swdnc)
      swflx=swflx*1.e-3 ! CGS->MKS for output
      swflxc = fcns*1.e-3
+     swup   = swup*1.e-3
+     swdn   = swdn*1.e-3
+     swupc  = swupc*1.e-3
+     swdnc  = swdnc*1.e-3
+
      !qrs = qrs*1.e-3  ! qrs already in MKS units, see radsw.F90
      sw_cf_srf = (fsns(1) - fsnsc(1))*1.e-3
      sw_cf_toa = (fsnt(1) - fsntc(1))*1.e-3
