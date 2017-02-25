@@ -133,7 +133,10 @@ subroutine driver(  &
   !f2py depend(jm,im) aldif,aldir,asdif,asdir,coszen,flus,ps,tg
   !f2py depend(km,jm,im) cldf,clwp,ciwp,o3mmr,r_liq,r_ice,pmid,dp,q,t
   !f2py depend(jm,im) sw_cf_toa,sw_cf_srf,lw_cf_toa,lw_cf_srf,lw_toa,lw_srf,sw_toa,sw_srf,srfflx
-  !f2py depend(km,jm,im) swflx_out,swflxc_out,lwflx_out,lwflxc_out,lwup_out,lwdn_out,tdot,qrs,qrl
+  !f2py depend(km,jm,im) swflx_out,swflxc_out,lwflx_out,lwflxc_out
+  !f2py depend(km,jm,im) swup_out,swdn_out,swupc_out,swdnc_out
+  !f2py depend(km,jm,im) lwup_out,lwdn_out,lwupc_out,lwdnc_out
+  !f2py depend(km,jm,im) tdot,qrs,qrl
 
 ! Local
   real*8 swflx(km+1)
