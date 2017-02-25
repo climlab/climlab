@@ -40,9 +40,9 @@ subroutine radclwmx(pcols, pver, pverp,                           &
                     flns    ,flnt    ,flnsc   ,flntc   ,flwds   , &
                     flut    ,flutc   , &
                     aer_mass,fnl     ,fcnl, &
-!+++CliMT
-                    ful,fdl)
-!---CliMT
+!+++CliMT and CLIMLAB
+                    ful,fdl,fsul,fsdl)
+!---CliMT and CLIMLAB
 !-----------------------------------------------------------------------
 !
 ! Purpose:

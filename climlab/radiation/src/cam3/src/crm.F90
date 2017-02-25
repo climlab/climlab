@@ -76,7 +76,7 @@ subroutine crm(  &
      lw_srf,  &
      sw_toa,  &
      sw_srf, &
-     lwup,lwdn)
+     lwup,lwdn,lwupc,lwdnc)
 
 
   use shr_kind_mod,        only: r8 => shr_kind_r8
@@ -141,6 +141,8 @@ subroutine crm(  &
   real(r8), intent(out) ::  lwflxc(pverp)
   real(r8), intent(out) ::  lwup(pverp)
   real(r8), intent(out) ::  lwdn(pverp)
+  real(r8), intent(out) ::  lwupc(pverp)
+  real(r8), intent(out) ::  lwdnc(pverp)
   real(r8), intent(out) ::  sw_cf_toa
   real(r8), intent(out) ::  sw_cf_srf
   real(r8), intent(out) ::  lw_cf_toa
@@ -379,12 +381,14 @@ subroutine crm(  &
           cfc11, cfc12, cldf, emis, pmxrgn,    &
           nmxrgn, qrl, flns, flnt, flnsc,     &
           flntc, flwds, flut, flutc, aerosol(:,1), &
-          lwflx, fcnl,lwup,lwdn)
+          lwflx, fcnl,lwup,lwdn,lwupc,lwdnc)
      ! CGS->MKS for output;
      lwflx  = lwflx*1.e-3
      lwflxc = fcnl*1.e-3
      lwup   = lwup*1.e-3
      lwdn   = lwdn*1.e-3
+     lwupc  = lwupc*1.e-3
+     lwdnc  = lwdn*1.e-3
      !qrl = qrl*1.e-3  ! qrl already in MKS units, see radlw.F90
      !  climlab -- do not change signs here
      lw_cf_srf = (flns(1) - flnsc(1))*1.e-3

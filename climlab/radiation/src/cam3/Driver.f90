@@ -13,6 +13,8 @@
 !  set at compile time
 !
 !  Return flux at layer interfaces rather than averaging to get flux at layer centers
+!
+!  Return clear-sky fluxes too
 
 subroutine driver(  &
      km,   &
@@ -66,7 +68,7 @@ subroutine driver(  &
      lw_srf,  &
      sw_toa,  &
      sw_srf, &
-     lwup_out, lwdn_out)
+     lwup_out, lwdn_out, lwupc_out, lwdnc_out)
 
 ! Input
   integer, intent(in) :: km,jm,im,idosw,idolw,in_cld
@@ -110,6 +112,8 @@ subroutine driver(  &
   real*8, intent(out) :: lwflxc_out(km+1,jm,im)
   real*8, intent(out) :: lwup_out(km+1,jm,im)
   real*8, intent(out) :: lwdn_out(km+1,jm,im)
+  real*8, intent(out) :: lwupc_out(km+1,jm,im)
+  real*8, intent(out) :: lwdnc_out(km+1,jm,im)
   real*8, intent(out) :: sw_cf_toa(jm,im)
   real*8, intent(out) :: sw_cf_srf(jm,im)
   real*8, intent(out) :: lw_cf_toa(jm,im)
@@ -133,6 +137,8 @@ subroutine driver(  &
   real*8 lwflxc(km+1)
   real*8 lwup(km+1)
   real*8 lwdn(km+1)
+  real*8 lwupc(km+1)
+  real*8 lwdnc(km+1)
 
   ! CLIMLAB: take this code from ppgrid.F90
   ! Grid point resolution parameters
@@ -198,7 +204,7 @@ subroutine driver(  &
              lw_srf(j,i),  &
              sw_toa(j,i),  &
              sw_srf(j,i), &
-             lwup,lwdn &
+             lwup,lwdn, lwupc, lwdnc &
              )
 
         !  The CliMT version takes averages to get flux at center of layers
@@ -213,6 +219,9 @@ subroutine driver(  &
         lwflxc_out(:,j,i) = lwflxc
         lwup_out(:,j,i) = lwup
         lwdn_out(:,j,i) = lwdn
+        lwupc_out(:,j,i) = lwupc
+        lwdnc_out(:,j,i) = lwdnc
+
         srfflx(j,i) = sw_srf(j,i) + lw_srf(j,i)
      enddo
   enddo

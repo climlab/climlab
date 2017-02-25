@@ -185,7 +185,7 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         args = self._prepare_arguments()
         (TdotRad, SrfRadFlx, swhr, lwhr, swflx, swflxc, lwflx, lwflxc, SwToaCf,
             SwSrfCf, LwToaCf, LwSrfCf, LwToa, LwSrf, SwToa, SwSrf,
-            lwuflx, lwdflx) = _cam3.driver(*args)
+            lwuflx, lwdflx, lwuflxc, lwdflxc) = _cam3.driver(*args)
         #  SrfRadFlx is net downward flux at surface
         self.heating_rate['Ts'] = self._cam3_to_climlab(SrfRadFlx)
         # lwhr and swhr are heating rates in W/kg
