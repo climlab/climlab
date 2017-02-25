@@ -388,7 +388,7 @@ subroutine crm(  &
      lwup   = lwup*1.e-3
      lwdn   = lwdn*1.e-3
      lwupc  = lwupc*1.e-3
-     lwdnc  = lwdn*1.e-3
+     lwdnc  = lwdnc*1.e-3
      !qrl = qrl*1.e-3  ! qrl already in MKS units, see radlw.F90
      !  climlab -- do not change signs here
      lw_cf_srf = (flns(1) - flnsc(1))*1.e-3

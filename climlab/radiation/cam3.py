@@ -186,8 +186,23 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         (TdotRad, SrfRadFlx, swhr, lwhr, swflx, swflxc, lwflx, lwflxc, SwToaCf,
             SwSrfCf, LwToaCf, LwSrfCf, LwToa, LwSrf, SwToa, SwSrf,
             lwuflx, lwdflx, lwuflxc, lwdflxc) = _cam3.driver(*args)
+        #  fluxes at layer interfaces
+        self.LW_flux_up = self._cam3_to_climlab(lwuflx)
+        self.LW_flux_down = self._cam3_to_climlab(lwdflx)
+        self.LW_flux_up_clr = self._cam3_to_climlab(lwuflxc)
+        self.LW_flux_down_clr = self._cam3_to_climlab(lwdflxc)
+        #  LW net flux defined positive UP, consistent with OLR
+        self.LW_flux_net = self.LW_flux_up - self.LW_flux_down
+        self.LW_flux_net_clr = self.LW_flux_up_clr - self.LW_flux_down_clr
+        #  positive down, consistent with ASR
+        self.SW_flux_net = self._cam3_to_climlab(swflx)
+        self.SW_flux_net_clr = self._cam3_to_climlab(swflxc)
         #  SrfRadFlx is net downward flux at surface
-        self.heating_rate['Ts'] = self._cam3_to_climlab(SrfRadFlx)
+        #self.heating_rate['Ts'] = self._cam3_to_climlab(SrfRadFlx)
+        #  calculate slab ocean heating rate from flux divergence
+        total_flux = self.SW_flux_net - self.LW_flux_net
+        self.heating_rate['Ts'] = total_flux[..., -1, np.newaxis]
+
         # lwhr and swhr are heating rates in W/kg
         #  (qrl and qrs in CAM3 code)
         #  TdotRad is the sum lwhr + swhr, also in W/kg
@@ -195,15 +210,6 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         Catm = self.Tatm.domain.heat_capacity
         self.heating_rate['Tatm'] = (self._cam3_to_climlab(TdotRad) *
                                      (Catm / const.cp))
-        #  positive down, consistent with ASR
-        self.SW_flux_net = self._cam3_to_climlab(swflx)
-        self.SW_flux_net_clr = self._cam3_to_climlab(swflxc)
-        #  positive up, consistent with OLR
-        self.LW_flux_net = self._cam3_to_climlab(lwflx)
-        self.LW_flux_net_clr = self._cam3_to_climlab(lwflxc)
-        #  fluxes at layer interfaces
-        self.LW_flux_up = self._cam3_to_climlab(lwuflx)
-        self.LW_flux_down = self._cam3_to_climlab(lwdflx)
         #  Set some diagnostics
         self.OLR = self._cam3_to_climlab(LwToa) * np.ones_like(self.Ts)
         self.OLRcld = self._cam3_to_climlab(LwToaCf) * np.ones_like(self.Ts)

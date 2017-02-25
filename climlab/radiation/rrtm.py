@@ -503,8 +503,7 @@ class RRTMG_LW(_Radiation_LW):
         Catm = self.Tatm.domain.heat_capacity
         self.heating_rate['Tatm'] = _rrtm_to_climlab(hr) / const.seconds_per_day * Catm
         #  calculate slab ocean heating rate from flux divergence
-        self.heating_rate['Ts'] = (self.LW_flux_down[..., -1, np.newaxis] -
-                                   self.LW_flux_up[..., -1, np.newaxis])
+        self.heating_rate['Ts'] = -self.LW_flux_net[..., -1, np.newaxis]
         self.TdotLW = _rrtm_to_climlab(hr)  # heating rate in K/day
         self.TdotLWclr = _rrtm_to_climlab(hrc)  # heating rate in K/day
         #  Compute TOA diagnostics, including OLR
