@@ -491,10 +491,16 @@ class RRTMG_LW(_Radiation_LW):
         #  Compute quantities derived from fluxes, including OLR
         self._compute_LW_flux_diagnostics()
         #  calculate heating rates from flux divergence
+        LWheating_Wm2 = np.diff(self.LW_flux_net, axis=-1)
+        LWheating_clr_Wm2 = np.diff(self.LW_flux_net_clr, axis=-1)
         self.heating_rate['Ts'] = -self.LW_flux_net[..., -1, np.newaxis]
-        self.heating_rate['Tatm'] = np.diff(self.LW_flux_net, axis=-1)
-        self.TdotLW = _rrtm_to_climlab(hr)  # heating rate in K/day
-        self.TdotLW_clr = _rrtm_to_climlab(hrc)  # clear-sky heating rate in K/day
+        self.heating_rate['Tatm'] = LWheating_Wm2
+        #  Convert to K / day
+        Catm = self.Tatm.domain.heat_capacity
+        self.TdotLW = LWheating_Wm2 / Catm * const.seconds_per_day
+        self.TdotLW_clr = LWheating_clr_Wm2 / Catm * const.seconds_per_day
+        #self.TdotLW = _rrtm_to_climlab(hr)  # heating rate in K/day
+        #self.TdotLW_clr = _rrtm_to_climlab(hrc)  # clear-sky heating rate in K/day
 
 def _prepare_general_arguments(RRTMGobject):
     '''Prepare arguments needed for both RRTMG_SW and RRTMG_LW with correct dimensions.'''

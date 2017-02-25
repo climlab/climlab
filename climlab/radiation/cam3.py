@@ -183,10 +183,13 @@ class CAM3(_Radiation_SW, _Radiation_LW):
     def _compute_heating_rates(self):
         # List of arguments to be passed to extension
         args = self._prepare_arguments()
-        (TdotRad, SrfRadFlx, swhr, lwhr, swflx, swflxc, lwflx, lwflxc, SwToaCf,
+        (TdotRad, SrfRadFlx, qrs, qrl, swflx, swflxc, lwflx, lwflxc, SwToaCf,
             SwSrfCf, LwToaCf, LwSrfCf, LwToa, LwSrf, SwToa, SwSrf,
             swuflx, swdflx, swuflxc, swdflxc,
             lwuflx, lwdflx, lwuflxc, lwdflxc) = _cam3.driver(*args)
+        # most of these output fields are unnecessary here
+        #  we compute everything from the up and downwelling fluxes
+        #  Should probably simplify the fortran wrapper
         #  fluxes at layer interfaces
         self.LW_flux_up = self._cam3_to_climlab(lwuflx)
         self.LW_flux_down = self._cam3_to_climlab(lwdflx)
@@ -203,18 +206,19 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         #  calculate heating rates from flux divergence
         #   this is the total UPWARD flux
         total_flux = self.LW_flux_net - self.SW_flux_net
+        LWheating_Wm2 = np.diff(self.LW_flux_net, axis=-1)
+        LWheating_clr_Wm2 = np.diff(self.LW_flux_net_clr, axis=-1)
+        SWheating_Wm2 = -np.diff(self.SW_flux_net, axis=-1)
+        SWheating_clr_Wm2 = -np.diff(self.SW_flux_net_clr, axis=-1)
         self.heating_rate['Ts'] = -total_flux[..., -1, np.newaxis]
-        self.heating_rate['Tatm'] = np.diff(total_flux, axis=-1)
-        # lwhr and swhr are heating rates in W/kg
-        #  (qrl and qrs in CAM3 code)
-        #  TdotRad is the sum lwhr + swhr, also in W/kg
-        #  Store radiative heating rates in K / day
-        KperDayFactor = const.seconds_per_day / const.cp
-        #self.TdotRad = self._cam3_to_climlab(TdotRad) * KperDayFactor
-        self.TdotLW = self._cam3_to_climlab(lwhr) * KperDayFactor * np.ones_like(self.Tatm)
-        #self.TdotLWclr = self._cam3_to_climlab(lwhr) * KperDayFactor
-        self.TdotSW = self._cam3_to_climlab(swhr) * KperDayFactor * np.ones_like(self.Tatm)
-
+        self.heating_rate['Tatm'] = LWheating_Wm2 + SWheating_Wm2
+        #  Convert to K / day
+        Catm = self.Tatm.domain.heat_capacity
+        self.TdotLW = LWheating_Wm2 / Catm * const.seconds_per_day
+        self.TdotLW_clr = LWheating_clr_Wm2 / Catm * const.seconds_per_day
+        self.TdotSW = SWheating_Wm2 / Catm * const.seconds_per_day
+        self.TdotSW_clr = SWheating_clr_Wm2 / Catm * const.seconds_per_day
+        
 
 class CAM3_LW(CAM3):
     def __init__(self, **kwargs):
