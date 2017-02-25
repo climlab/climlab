@@ -8,7 +8,9 @@
 !  Pass grid dimensions as input argument using dynamic arrays
 !
 !  Pass greenhouse gas amounts as absolute volume mixing ratios (ppp) instead of ppm
-
+!
+!  Don't change sign of upwelling LW flux ... it should be positive
+!
 ! This is a driver code for CAM3 radiation written for CliMT; it replaces the
 ! analogous driver found in Zender's CCM3 CRM
 
@@ -372,15 +374,16 @@ subroutine crm(  &
           nmxrgn, qrl, flns, flnt, flnsc,     &
           flntc, flwds, flut, flutc, aerosol(:,1), &
           lwflx, fcnl,lwup,lwdn)
-     ! CGS->MKS for output; change sign to give +ve downwards
-     lwflx=-lwflx*1.e-3
-     lwup = -lwup*1.e-3
+     ! CGS->MKS for output;
+     lwflx= lwflx*1.e-3
+     lwup = lwup*1.e-3
      lwdn = lwdn*1.e-3
      !qrl = qrl*1.e-3  ! qrl already in MKS units, see radlw.F90
-     lw_cf_srf = -(flns(1) - flnsc(1))*1.e-3
-     lw_cf_toa = -(flnt(1) - flntc(1))*1.e-3
-     lw_toa = -flnt(1)*1.e-3
-     lw_srf = -flns(1)*1.e-3
+     !  climlab -- do not change signs here
+     lw_cf_srf = (flns(1) - flnsc(1))*1.e-3
+     lw_cf_toa = (flnt(1) - flntc(1))*1.e-3
+     lw_toa = flnt(1)*1.e-3
+     lw_srf = flns(1)*1.e-3
   endif
 
 end subroutine crm
