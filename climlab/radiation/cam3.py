@@ -183,7 +183,7 @@ class CAM3(_Radiation_SW, _Radiation_LW):
     def _compute_heating_rates(self):
         # List of arguments to be passed to extension
         args = self._prepare_arguments()
-        (TdotRad, SrfRadFlx, swhr, lwhr, swflx, lwflx, SwToaCf,
+        (TdotRad, SrfRadFlx, swhr, lwhr, swflx, swflxc, lwflx, lwflxc, SwToaCf,
             SwSrfCf, LwToaCf, LwSrfCf, LwToa, LwSrf, SwToa, SwSrf,
             lwuflx, lwdflx) = _cam3.driver(*args)
         #  SrfRadFlx is net downward flux at surface
@@ -197,11 +197,16 @@ class CAM3(_Radiation_SW, _Radiation_LW):
                                      (Catm / const.cp))
         #  positive down, consistent with ASR
         self.SW_flux_net = self._cam3_to_climlab(swflx)
+        self.SW_flux_net_clr = self._cam3_to_climlab(swflxc)
         #  positive up, consistent with OLR
-        self.LW_flux_net = self._cam3_to_climlab(-lwflx)
+        self.LW_flux_net = self._cam3_to_climlab(lwflx)
+        self.LW_flux_net_clr = self._cam3_to_climlab(lwflxc)
+        #  fluxes at layer interfaces
+        self.LW_flux_up = self._cam3_to_climlab(lwuflx)
+        self.LW_flux_down = self._cam3_to_climlab(lwdflx)
         #  Set some diagnostics
-        self.OLR = -self._cam3_to_climlab(LwToa) * np.ones_like(self.Ts)
-        self.OLRcld = -self._cam3_to_climlab(LwToaCf) * np.ones_like(self.Ts)
+        self.OLR = self._cam3_to_climlab(LwToa) * np.ones_like(self.Ts)
+        self.OLRcld = self._cam3_to_climlab(LwToaCf) * np.ones_like(self.Ts)
         self.OLRclr = self.OLR - self.OLRcld
         self.ASR = self._cam3_to_climlab(SwToa) * np.ones_like(self.Ts)
         self.ASRcld = self._cam3_to_climlab(SwToaCf) * np.ones_like(self.Ts)
@@ -212,8 +217,6 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         self.TdotLW = self._cam3_to_climlab(lwhr) * KperDayFactor * np.ones_like(self.Tatm)
         #self.TdotLWclr = self._cam3_to_climlab(lwhr) * KperDayFactor
         self.TdotSW = self._cam3_to_climlab(swhr) * KperDayFactor * np.ones_like(self.Tatm)
-        #  fluxes at layer interfaces
-
 
 
 class CAM3_LW(CAM3):

@@ -55,7 +55,9 @@ subroutine driver(  &
      qrs,   &
      qrl,   &
      swflx_out,   &
+     swflxc_out,  &
      lwflx_out,   &
+     lwflxc_out,  &
      sw_cf_toa,   &
      sw_cf_srf,   &
      lw_cf_toa,   &
@@ -103,7 +105,9 @@ subroutine driver(  &
   real*8, intent(out) :: qrs(km,jm,im)
   real*8, intent(out) :: qrl(km,jm,im)
   real*8, intent(out) :: swflx_out(km+1,jm,im)
+  real*8, intent(out) :: swflxc_out(km+1,jm,im)
   real*8, intent(out) :: lwflx_out(km+1,jm,im)
+  real*8, intent(out) :: lwflxc_out(km+1,jm,im)
   real*8, intent(out) :: lwup_out(km+1,jm,im)
   real*8, intent(out) :: lwdn_out(km+1,jm,im)
   real*8, intent(out) :: sw_cf_toa(jm,im)
@@ -120,11 +124,13 @@ subroutine driver(  &
   !f2py depend(jm,im) aldif,aldir,asdif,asdir,coszen,flus,ps,tg
   !f2py depend(km,jm,im) cldf,clwp,ciwp,o3mmr,r_liq,r_ice,pmid,dp,q,t
   !f2py depend(jm,im) sw_cf_toa,sw_cf_srf,lw_cf_toa,lw_cf_srf,lw_toa,lw_srf,sw_toa,sw_srf,srfflx
-  !f2py depend(km,jm,im) swflx_out,lwflx_out,lwup_out,lwdn_out,tdot,qrs,qrl
+  !f2py depend(km,jm,im) swflx_out,swflxc_out,lwflx_out,lwflxc_out,lwup_out,lwdn_out,tdot,qrs,qrl
 
 ! Local
   real*8 swflx(km+1)
+  real*8 swflxc(km+1)
   real*8 lwflx(km+1)
+  real*8 lwflxc(km+1)
   real*8 lwup(km+1)
   real*8 lwdn(km+1)
 
@@ -181,7 +187,9 @@ subroutine driver(  &
              qrs(1,j,i),  &
              qrl(1,j,i),  &
              swflx,  &
+             swflxc, &
              lwflx,  &
+             lwflxc, &
              sw_cf_toa(j,i),  &
              sw_cf_srf(j,i),  &
              lw_cf_toa(j,i),  &
@@ -199,8 +207,10 @@ subroutine driver(  &
         !lwup_out(:,j,i) = (lwup(1:km)+lwup(2:km+1))/2.
         !lwdn_out(:,j,i) = (lwdn(1:km)+lwdn(2:km+1))/2.
         !  CLIMLAB instead we will report the actual flux at interfaces
-        swflx_out(:,j,i) = swflx
-        lwflx_out(:,j,i) = lwflx
+        swflx_out(:,j,i)  = swflx
+        swflxc_out(:,j,i) = swflxc
+        lwflx_out(:,j,i)  = lwflx
+        lwflxc_out(:,j,i) = lwflxc
         lwup_out(:,j,i) = lwup
         lwdn_out(:,j,i) = lwdn
         srfflx(j,i) = sw_srf(j,i) + lw_srf(j,i)
