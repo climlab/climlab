@@ -67,7 +67,8 @@ def _build_extension(name=None, srcdir=None, targetdir=None,
     if sys.platform == 'darwin':
         _patch_extension_rpath(target)
     # delete signature file
-    os.remove('{}.pyf'.format(name))
+    #os.remove('{}.pyf'.format(name))
+    #  No, actually leave the signature file in place
     # Move shared object file to target directory
     print targetdir
     os.rename(target, os.path.join(targetdir, target))
