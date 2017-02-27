@@ -98,8 +98,8 @@ climlab_root = os.path.abspath(os.path.dirname(__file__))
 #  List of all fortran extensions to be compiled
 Extensions = [
     {'name': '_cam3',
-     'srcdir': os.path.join('climlab','radiation','src','cam3'),
-     'targetdir': os.path.join('climlab','radiation')},
+     'srcdir': os.path.join('climlab','radiation','cam3'),
+     'targetdir': os.path.join('climlab','radiation','cam3')},
     {'name': '_rrtmg_lw',
      'srcdir': os.path.join('climlab','radiation','src','rrtm','rrtmg_lw_v4.85'),
      'targetdir': os.path.join('climlab','radiation')},

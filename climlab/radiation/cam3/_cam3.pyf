@@ -3,7 +3,7 @@
 
 python module _cam3 ! in 
     interface  ! in :_cam3
-        module shr_kind_mod ! in :_cam3:/Users/br546577/code/climlab/climlab/radiation/src/cam3/src/shr_kind_mod.F90
+        module shr_kind_mod ! in :_cam3:/Users/br546577/code/climlab/climlab/radiation/cam3/src/shr_kind_mod.F90
             integer, public,parameter,optional :: shr_kind_r4=selected_real_kind(6)
             integer, public,parameter,optional :: shr_kind_i8=selected_int_kind(13)
             integer, public,parameter,optional :: shr_kind_r8=selected_real_kind(12)
@@ -14,7 +14,7 @@ python module _cam3 ! in
             integer, public,parameter,optional :: shr_kind_r16=selected_real_kind(24)
             integer, public,parameter,optional :: shr_kind_rn=kind(1.0)
         end module shr_kind_mod
-        module absems ! in :_cam3:/Users/br546577/code/climlab/climlab/radiation/src/cam3/src/absems.F90
+        module absems ! in :_cam3:/Users/br546577/code/climlab/climlab/radiation/cam3/src/absems.F90
             use shr_kind_mod, only: r8=>shr_kind_r8
             integer, parameter,optional :: n_te=21
             real(kind=r8) dimension(10,10,25,21,7) :: cn_ah2ow
@@ -29,7 +29,7 @@ python module _cam3 ! in
             integer, parameter,optional :: n_tp=10
             real(kind=r8) dimension(10,10,25,21,7) :: ah2onw
         end module absems
-        subroutine driver(km,jm,im,idosw,idolw,pmid,dp,ps,t,tg,q,o3mmr,cldf,clwp,ciwp,in_cld,aldif,aldir,asdif,asdir,eccf,coszen,scon,flus,r_liq,r_ice,co2vmr,n2ovmr,ch4vmr,f11vmr,f12vmr,gravit,cpair,epsilo,stebol,tdot,srfflx,qrs,qrl,swflx_out,swflxc_out,lwflx_out,lwflxc_out,sw_cf_toa,sw_cf_srf,lw_cf_toa,lw_cf_srf,lw_toa,lw_srf,sw_toa,sw_srf,swup_out,swdn_out,swupc_out,swdnc_out,lwup_out,lwdn_out,lwupc_out,lwdnc_out) ! in :_cam3:/Users/br546577/code/climlab/climlab/radiation/src/cam3/Driver.f90
+        subroutine driver(km,jm,im,idosw,idolw,pmid,dp,ps,t,tg,q,o3mmr,cldf,clwp,ciwp,in_cld,aldif,aldir,asdif,asdir,eccf,coszen,scon,flus,r_liq,r_ice,co2vmr,n2ovmr,ch4vmr,f11vmr,f12vmr,gravit,cpair,epsilo,stebol,tdot,srfflx,qrs,qrl,swflx_out,swflxc_out,lwflx_out,lwflxc_out,sw_cf_toa,sw_cf_srf,lw_cf_toa,lw_cf_srf,lw_toa,lw_srf,sw_toa,sw_srf,swup_out,swdn_out,swupc_out,swdnc_out,lwup_out,lwdn_out,lwupc_out,lwdnc_out) ! in :_cam3:/Users/br546577/code/climlab/climlab/radiation/cam3/Driver.f90
             integer intent(in) :: km
             integer intent(in) :: jm
             integer intent(in) :: im
