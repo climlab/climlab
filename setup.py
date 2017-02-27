@@ -1,21 +1,44 @@
-from setuptools import setup, find_packages
+#from setuptools import setup, find_packages
 import os, sys, subprocess, string
 from numpy.distutils import fcompiler
-from setuptools.extension import Extension
+#from setuptools.extension import Extension
 #  or use the numpy versions?
-#from numpy.distutils.core import setup
-#from numpy.distutils.extension import Extension
+from numpy.distutils.core import setup
+from numpy.distutils.extension import Extension
+
+path = os.path.join('climlab','radiation','src','cam3')
+sourcelistfile = os.path.join(path,'sources_in_order_of_compilation')
+sourcelist = [line.rstrip() for line in open(sourcelistfile)]
+sourcelist.append('_cam3.pyf')
+ext1 = Extension(name = '_cam3',
+                 sources = sourcelist,
+                 f2py_options = '--fcompiler={} --noopt'.format(fcompiler.get_default_fcompiler()))
+
+
+path = os.path.join('climlab','radiation','src','rrtm','rrtmg_lw_v4.85')
+sourcelistfile = os.path.join(path,'sources_in_order_of_compilation')
+sourcelist = [line.rstrip() for line in open(sourcelistfile)]
+sourcelist.append('_rrtmg_lw.pyf')
+print sourcelist
+ext2 = Extension(name = '_rrtmg_lw',
+                 sources = sourcelist)
+
+#ext2 = Extension(name = 'fib2',
+#                 sources = ['fib2.pyf', 'fib1.f'])
+
+
 
 def readme():
     with open('README.rst') as f:
         return f.read()
 
 #import build_fortran_extensions
-import climlab
+#import climlab
 
 #  Set up climlab with call to setuptools
 setup(name='climlab',
-      version=climlab.__version__,
+      #version=climlab.__version__,
+      version='0.4.3.dev0',
       description='Package for process-oriented climate modeling',
       long_description=readme(),
       classifiers=[
@@ -65,4 +88,5 @@ setup(name='climlab',
       setup_requires=['pytest-runner'],
       tests_require=['pytest'],
       include_package_data=True,
-      zip_safe=False)
+      zip_safe=False,
+      ext_modules = [ext2])
