@@ -1,6 +1,5 @@
-import os
-
 def configuration(parent_package='', top_path=None):
+    import os
     from numpy.distutils.misc_util import Configuration
     from numpy.distutils import fcompiler
 

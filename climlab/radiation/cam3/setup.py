@@ -33,13 +33,6 @@ def configuration(parent_package='', top_path=None):
     config.add_data_files(os.path.join('data', 'abs_ems_factors_fastvx.c030508.nc'))
     return config
 
-
-print '\n HI!!!!! \n'
-
 if __name__ == '__main__':
     from numpy.distutils.core import setup
-    #setup(**configuration(top_path='').todict())
     setup(configuration=configuration)
-
-# from numpy.distutils.core import setup
-# setup(**configuration(top_path='').todict())

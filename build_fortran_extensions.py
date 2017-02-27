@@ -4,6 +4,13 @@ for the fortran components
 (currently CAM3, RRTMG_LW and RRTGM_SW)
 
 Should not be necessary to run this script with the new build procedure.
+But the new build procedure is not yet working!
+
+To build and install, do this:
+```
+python build_fortran_extensions.py
+python setup.py install
+```
 '''
 import os, sys, subprocess, string
 from numpy.distutils import fcompiler
