@@ -104,8 +104,8 @@ Extensions = [
      'srcdir': os.path.join('climlab','radiation','rrtm','_rrtmg_lw'),
      'targetdir': os.path.join('climlab','radiation','rrtm','_rrtmg_lw')},
     {'name': '_rrtmg_sw',
-     'srcdir': os.path.join('climlab','radiation','src','rrtm','rrtmg_sw_v4.0'),
-     'targetdir': os.path.join('climlab','radiation')}
+     'srcdir': os.path.join('climlab','radiation','rrtm','_rrtmg_sw'),
+     'targetdir': os.path.join('climlab','radiation','rrtm','_rrtmg_sw')}
 
     ]
 
