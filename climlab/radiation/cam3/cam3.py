@@ -4,7 +4,27 @@ from climlab import constants as const
 from climlab.utils.thermo import vmr_to_mmr
 from climlab.radiation.radiation import _Radiation_SW, _Radiation_LW
 #  the compiled fortran extension
-from _cam3 import driver as cam3driver
+import _cam3
+import netCDF4 as nc
+import os
+
+
+def init_cam3(mod):
+    # Initialise absorptivity / emissivity data
+    here = os.path.dirname(__file__)
+    #datadir = os.path.abspath(os.path.join(here, os.pardir, 'data', 'cam3'))
+    datadir = os.path.join(here, 'data')
+    AbsEmsDataFile = os.path.join(datadir, 'abs_ems_factors_fastvx.c030508.nc')
+    #  Open the absorption data file
+    data = nc.Dataset(AbsEmsDataFile)
+    #  The fortran module that holds the data
+    #mod = _cam3.absems
+    #  Populate storage arrays with values from netcdf file
+    for field in ['ah2onw', 'eh2onw', 'ah2ow', 'ln_ah2ow', 'cn_ah2ow', 'ln_eh2ow', 'cn_eh2ow']:
+        setattr(mod, field, data.variables[field][:].T)
+    data.close()
+
+init_cam3(_cam3.absems)
 
 
 class CAM3(_Radiation_SW, _Radiation_LW):
@@ -167,7 +187,7 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         (TdotRad, SrfRadFlx, qrs, qrl, swflx, swflxc, lwflx, lwflxc, SwToaCf,
             SwSrfCf, LwToaCf, LwSrfCf, LwToa, LwSrf, SwToa, SwSrf,
             swuflx, swdflx, swuflxc, swdflxc,
-            lwuflx, lwdflx, lwuflxc, lwdflxc) = cam3driver(*args)
+            lwuflx, lwdflx, lwuflxc, lwdflxc) = _cam3.driver(*args)
         # most of these output fields are unnecessary here
         #  we compute everything from the up and downwelling fluxes
         #  Should probably simplify the fortran wrapper
