@@ -3,7 +3,7 @@
 
 python module _rrtmg_lw ! in 
     interface  ! in :_rrtmg_lw
-        module parkind ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/modules/parkind.f90
+        module parkind ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/modules/parkind.f90
             integer, parameter,optional :: kind_im=selected_int_kind(6)
             integer, parameter,optional :: kind_in=kind(1)
             integer, parameter,optional :: kind_rm=selected_real_kind(6)
@@ -11,7 +11,7 @@ python module _rrtmg_lw ! in
             integer, parameter,optional :: kind_rb=selected_real_kind(12)
             integer, parameter,optional :: kind_ib=selected_int_kind(13)
         end module parkind
-        module parrrtm ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/modules/parrrtm.f90
+        module parrrtm ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/modules/parrrtm.f90
             use parkind, only: im=>kind_im
             integer(kind=im), parameter,optional :: nbndlw=16
             integer(kind=im), parameter,optional :: ng4=14
@@ -53,7 +53,7 @@ python module _rrtmg_lw ! in
             integer(kind=im), parameter,optional :: ng8=8
             integer(kind=im), parameter,optional :: ng9=12
         end module parrrtm
-        module rrlw_cld ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/modules/rrlw_cld.f90
+        module rrlw_cld ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/modules/rrlw_cld.f90
             use parkind, only: rb=>kind_rb
             real(kind=rb) dimension(2) :: absice0
             real(kind=rb) dimension(2,5) :: absice1
@@ -63,7 +63,7 @@ python module _rrtmg_lw ! in
             real(kind=rb) :: absliq0
             real(kind=rb) :: abscld1
         end module rrlw_cld
-        module rrlw_con ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/modules/rrlw_con.f90
+        module rrlw_con ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/modules/rrlw_con.f90
             use parkind, only: rb=>kind_rb
             real(kind=rb) :: heatfac
             real(kind=rb) :: alosmt
@@ -81,7 +81,7 @@ python module _rrtmg_lw ! in
             real(kind=rb) :: radcn2
             real(kind=rb) :: secdy
         end module rrlw_con
-        module rrlw_kg01 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg01.f90
+        module rrlw_kg01 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg01.f90
             use parkind, only: im=>kind_im,rb=>kind_rb
             real(kind=rb) dimension(5,47,16) :: kbo
             real(kind=rb) dimension(10,10) :: selfref
@@ -104,7 +104,7 @@ python module _rrtmg_lw ! in
             real(kind=rb) dimension(19,10) :: kb_mn2
             integer(kind=im), parameter,optional :: ng1=10
         end module rrlw_kg01
-        module rrlw_kg02 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg02.f90
+        module rrlw_kg02 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg02.f90
             use parkind, only: im=>kind_im,rb=>kind_rb
             real(kind=rb) dimension(5,47,16) :: kbo
             real(kind=rb) dimension(10,12) :: selfref
@@ -124,7 +124,7 @@ python module _rrtmg_lw ! in
             real(kind=rb) dimension(16) :: fracrefbo
             integer(kind=im), parameter,optional :: ng2=12
         end module rrlw_kg02
-        module rrlw_kg03 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg03.f90
+        module rrlw_kg03 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg03.f90
             use parkind, only: im=>kind_im,rb=>kind_rb
             real(kind=rb) dimension(5,19,16) :: kbo_mn2o
             real(kind=rb) dimension(5,5,47,16) :: kbo
@@ -147,7 +147,7 @@ python module _rrtmg_lw ! in
             real(kind=rb) dimension(4,16) :: forrefo
             real(kind=rb) dimension(16,5) :: fracrefbo
         end module rrlw_kg03
-        module rrlw_kg04 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg04.f90
+        module rrlw_kg04 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg04.f90
             use parkind, only: im=>kind_im,rb=>kind_rb
             real(kind=rb) dimension(5,5,47,16) :: kbo
             real(kind=rb) dimension(10,14) :: selfref
@@ -166,7 +166,7 @@ python module _rrtmg_lw ! in
             real(kind=rb) dimension(4,16) :: forrefo
             real(kind=rb) dimension(16,5) :: fracrefbo
         end module rrlw_kg04
-        module rrlw_kg05 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg05.f90
+        module rrlw_kg05 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg05.f90
             use parkind, only: im=>kind_im,rb=>kind_rb
             real(kind=rb) dimension(5,5,47,16) :: kbo
             real(kind=rb) dimension(10,16) :: selfref
@@ -189,7 +189,7 @@ python module _rrtmg_lw ! in
             real(kind=rb) dimension(4,16) :: forrefo
             real(kind=rb) dimension(16,5) :: fracrefbo
         end module rrlw_kg05
-        module rrlw_kg06 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg06.f90
+        module rrlw_kg06 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg06.f90
             use parkind, only: im=>kind_im,rb=>kind_rb
             real(kind=rb) dimension(16) :: cfc12o
             real(kind=rb) dimension(10,8) :: selfref
@@ -209,7 +209,7 @@ python module _rrtmg_lw ! in
             real(kind=rb) dimension(4,16) :: forrefo
             real(kind=rb) dimension(16) :: cfc11adjo
         end module rrlw_kg06
-        module rrlw_kg07 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg07.f90
+        module rrlw_kg07 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg07.f90
             use parkind, only: im=>kind_im,rb=>kind_rb
             real(kind=rb) dimension(5,47,16) :: kbo
             real(kind=rb) dimension(10,12) :: selfref
@@ -232,7 +232,7 @@ python module _rrtmg_lw ! in
             real(kind=rb) dimension(19,12) :: kb_mco2
             real(kind=rb) dimension(16) :: fracrefbo
         end module rrlw_kg07
-        module rrlw_kg08 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg08.f90
+        module rrlw_kg08 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg08.f90
             use parkind, only: im=>kind_im,rb=>kind_rb
             real(kind=rb) dimension(16) :: cfc12o
             real(kind=rb) dimension(19,16) :: kbo_mn2o
@@ -265,7 +265,7 @@ python module _rrtmg_lw ! in
             integer(kind=im), parameter,optional :: ng8=8
             real(kind=rb) dimension(65,8) :: absa
         end module rrlw_kg08
-        module rrlw_kg09 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg09.f90
+        module rrlw_kg09 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg09.f90
             use parkind, only: im=>kind_im,rb=>kind_rb
             real(kind=rb) dimension(19,16) :: kbo_mn2o
             real(kind=rb) dimension(5,47,16) :: kbo
@@ -288,7 +288,7 @@ python module _rrtmg_lw ! in
             real(kind=rb) dimension(16) :: fracrefbo
             integer(kind=im), parameter,optional :: ng9=12
         end module rrlw_kg09
-        module rrlw_kg10 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg10.f90
+        module rrlw_kg10 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg10.f90
             use parkind, only: im=>kind_im,rb=>kind_rb
             real(kind=rb) dimension(5,47,16) :: kbo
             real(kind=rb) dimension(10,6) :: selfref
@@ -307,7 +307,7 @@ python module _rrtmg_lw ! in
             real(kind=rb) dimension(4,16) :: forrefo
             real(kind=rb) dimension(16) :: fracrefbo
         end module rrlw_kg10
-        module rrlw_kg11 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg11.f90
+        module rrlw_kg11 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg11.f90
             use parkind, only: im=>kind_im,rb=>kind_rb
             real(kind=rb) dimension(5,47,16) :: kbo
             real(kind=rb) dimension(10,8) :: selfref
@@ -330,7 +330,7 @@ python module _rrtmg_lw ! in
             real(kind=rb) dimension(4,16) :: forrefo
             real(kind=rb) dimension(16) :: fracrefbo
         end module rrlw_kg11
-        module rrlw_kg12 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg12.f90
+        module rrlw_kg12 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg12.f90
             use parkind, only: im=>kind_im,rb=>kind_rb
             real(kind=rb) dimension(9,5,13,8) :: ka
             real(kind=rb) dimension(10,16) :: selfrefo
@@ -344,7 +344,7 @@ python module _rrtmg_lw ! in
             real(kind=rb) dimension(4,16) :: forrefo
             real(kind=rb) dimension(8,9) :: fracrefa
         end module rrlw_kg12
-        module rrlw_kg13 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg13.f90
+        module rrlw_kg13 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg13.f90
             use parkind, only: im=>kind_im,rb=>kind_rb
             real(kind=rb) dimension(10,4) :: selfref
             real(kind=rb) dimension(9,5,13,16) :: kao
@@ -366,7 +366,7 @@ python module _rrtmg_lw ! in
             real(kind=rb) dimension(4,16) :: forrefo
             real(kind=rb) dimension(16) :: fracrefbo
         end module rrlw_kg13
-        module rrlw_kg14 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg14.f90
+        module rrlw_kg14 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg14.f90
             use parkind, only: im=>kind_im,rb=>kind_rb
             real(kind=rb) dimension(5,47,16) :: kbo
             real(kind=rb) dimension(10,2) :: selfref
@@ -385,7 +385,7 @@ python module _rrtmg_lw ! in
             real(kind=rb) dimension(4,16) :: forrefo
             real(kind=rb) dimension(16) :: fracrefbo
         end module rrlw_kg14
-        module rrlw_kg15 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg15.f90
+        module rrlw_kg15 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg15.f90
             use parkind, only: im=>kind_im,rb=>kind_rb
             real(kind=rb) dimension(9,5,13,2) :: ka
             real(kind=rb) dimension(10,16) :: selfrefo
@@ -401,7 +401,7 @@ python module _rrtmg_lw ! in
             real(kind=rb) dimension(4,2) :: forref
             real(kind=rb) dimension(4,16) :: forrefo
         end module rrlw_kg15
-        module rrlw_kg16 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg16.f90
+        module rrlw_kg16 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/modules/rrlw_kg16.f90
             use parkind, only: im=>kind_im,rb=>kind_rb
             real(kind=rb) dimension(5,47,16) :: kbo
             real(kind=rb) dimension(10,2) :: selfref
@@ -420,7 +420,7 @@ python module _rrtmg_lw ! in
             real(kind=rb) dimension(4,16) :: forrefo
             real(kind=rb) dimension(16) :: fracrefbo
         end module rrlw_kg16
-        module rrlw_ncpar ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/modules/rrlw_ncpar.f90
+        module rrlw_ncpar ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/modules/rrlw_ncpar.f90
             use parkind, only: im=>kind_im,rb=>kind_rb
             integer(kind=im), parameter,optional :: maxabsorbernamelength=5
             integer(kind=im) dimension(40) :: status
@@ -442,19 +442,19 @@ python module _rrtmg_lw ! in
             real(kind=rb), parameter,optional :: cpdair=1003.5
             integer(kind=im), parameter,optional :: tforeign=4
             integer(kind=im), parameter,optional :: t=19
-            subroutine getabsorberindex(absorbername,absorberindex) ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/modules/rrlw_ncpar.f90:rrlw_ncpar
+            subroutine getabsorberindex(absorbername,absorberindex) ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/modules/rrlw_ncpar.f90:rrlw_ncpar
                 character*(*) intent(in) :: absorbername
                 integer(kind=im) intent(out) :: absorberindex
             end subroutine getabsorberindex
         end module rrlw_ncpar
-        module rrlw_ref ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/modules/rrlw_ref.f90
+        module rrlw_ref ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/modules/rrlw_ref.f90
             use parkind, only: im=>kind_im,rb=>kind_rb
             real(kind=rb) dimension(59) :: pref
             real(kind=rb) dimension(59) :: preflog
             real(kind=rb) dimension(7,59) :: chi_mls
             real(kind=rb) dimension(59) :: tref
         end module rrlw_ref
-        module rrlw_tbl ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/modules/rrlw_tbl.f90
+        module rrlw_tbl ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/modules/rrlw_tbl.f90
             use parkind, only: im=>kind_im,rb=>kind_rb
             integer(kind=im), parameter,optional :: ntbl=10000
             real(kind=rb) dimension(10001) :: tfn_tbl
@@ -464,7 +464,7 @@ python module _rrtmg_lw ! in
             real(kind=rb) dimension(10001) :: exp_tbl
             real(kind=rb), parameter,optional :: tblint=10000.0_rb
         end module rrlw_tbl
-        module rrlw_vsn ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/modules/rrlw_vsn.f90
+        module rrlw_vsn ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/modules/rrlw_vsn.f90
             character*20 :: hnamcld
             character*20 :: hnamrtm
             character*18 :: hvrrtc
@@ -492,7 +492,7 @@ python module _rrtmg_lw ! in
             character*20 :: hnamset
             character*20 :: hnamrtx
         end module rrlw_vsn
-        module rrlw_wvn ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/modules/rrlw_wvn.f90
+        module rrlw_wvn ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/modules/rrlw_wvn.f90
             use parkind, only: im=>kind_im,rb=>kind_rb
             use parrrtm, only: maxinpx,mg,nbndlw,ngptlw
             integer(kind=im) dimension(16) :: nspb
@@ -515,93 +515,93 @@ python module _rrtmg_lw ! in
             real(kind=rb) dimension(16) :: delwave
             real(kind=rb) dimension(256) :: rwgt
         end module rrlw_wvn
-        module rrtmg_lw_init ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90
+        module rrtmg_lw_init ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90
             use rrlw_wvn
             use rrtmg_lw_setcoef, only: lwavplankderiv,lwavplank,lwatmref
             use parkind, only: im=>kind_im,rb=>kind_rb
-            subroutine rrtmg_lw_ini(cpdair) ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
+            subroutine rrtmg_lw_ini(cpdair) ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
                 use rrlw_tbl, only: ntbl,tfn_tbl,pade,bpade,exp_tbl,tau_tbl,tblint
                 use rrlw_vsn, only: hvrini,hnamini
                 use parrrtm, only: mg,nbndlw,ngptlw
                 real(kind=rb) intent(in) :: cpdair
             end subroutine rrtmg_lw_ini
-            subroutine lwdatinit(cpdair) ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
+            subroutine lwdatinit(cpdair) ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
                 use rrlw_vsn
                 use rrlw_con, only: heatfac,alosmt,gascon,boltz,avogad,radcn1,sbcnst,grav,clight,planck,radcn2,secdy
                 use parrrtm, only: maxinpx,maxxsec
                 real(kind=rb) intent(in) :: cpdair
             end subroutine lwdatinit
-            subroutine lwcmbdat ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
+            subroutine lwcmbdat ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
             end subroutine lwcmbdat
-            subroutine cmbgb1 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
+            subroutine cmbgb1 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
                 use rrlw_kg01, only: kb,ka,selfrefo,kbo,selfref,kao_mn2,kao,forref,ka_mn2,fracrefao,fracrefa,absa,absb,fracrefb,forrefo,fracrefbo,kb_mn2,kbo_mn2
                 use parrrtm, only: mg,nbndlw,ngptlw,ng1
             end subroutine cmbgb1
-            subroutine cmbgb2 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
+            subroutine cmbgb2 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
                 use rrlw_kg02, only: kb,ka,selfrefo,kbo,selfref,kao,forref,fracrefao,fracrefa,absa,absb,fracrefb,forrefo,fracrefbo
                 use parrrtm, only: mg,nbndlw,ngptlw,ng2
             end subroutine cmbgb2
-            subroutine cmbgb3 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
+            subroutine cmbgb3 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
                 use rrlw_kg03, only: kbo_mn2o,ka,selfrefo,kbo,selfref,kb,kao_mn2o,kao,forref,ka_mn2o,fracrefao,fracrefa,absa,absb,fracrefb,forrefo,kb_mn2o,fracrefbo
                 use parrrtm, only: mg,nbndlw,ngptlw,ng3
             end subroutine cmbgb3
-            subroutine cmbgb4 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
+            subroutine cmbgb4 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
                 use rrlw_kg04, only: kb,ka,selfrefo,kbo,selfref,kao,forref,fracrefao,fracrefa,absa,absb,fracrefb,forrefo,fracrefbo
                 use parrrtm, only: ng4,mg,nbndlw,ngptlw
             end subroutine cmbgb4
-            subroutine cmbgb5 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
+            subroutine cmbgb5 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
                 use rrlw_kg05, only: kb,ka,selfrefo,kbo,ccl4,ka_mo3,kao,ccl4o,forref,kao_mo3,fracrefao,fracrefa,absa,absb,fracrefb,forrefo,fracrefbo,selfref
                 use parrrtm, only: ng5,mg,nbndlw,ngptlw
             end subroutine cmbgb5
-            subroutine cmbgb6 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
+            subroutine cmbgb6 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
                 use rrlw_kg06, only: cfc12o,ka,selfrefo,selfref,cfc12,cfc11adj,kao,kao_mco2,fracrefao,fracrefa,absa,forref,ka_mco2,forrefo,cfc11adjo
                 use parrrtm, only: mg,nbndlw,ngptlw,ng6
             end subroutine cmbgb6
-            subroutine cmbgb7 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
+            subroutine cmbgb7 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
                 use rrlw_kg07, only: kb,ka,selfrefo,kbo,selfref,forref,ka_mco2,kao,kbo_mco2,kao_mco2,fracrefao,fracrefa,absa,absb,fracrefb,forrefo,kb_mco2,fracrefbo
                 use parrrtm, only: mg,nbndlw,ngptlw,ng7
             end subroutine cmbgb7
-            subroutine cmbgb8 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
+            subroutine cmbgb8 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
                 use rrlw_kg08, only: kbo_mn2o,kbo,selfref,kb_mn2o,selfrefo,cfc12,ka_mo3,kao_mn2o,fracrefao,cfc22adjo,forrefo,cfc22adj,fracrefbo,cfc12o,forref,kao,ka_mn2o,fracrefa,fracrefb,kb,ka,kao_mo3,kao_mco2,kbo_mco2,absa,absb,ka_mco2,kb_mco2
                 use parrrtm, only: ng8,mg,nbndlw,ngptlw
             end subroutine cmbgb8
-            subroutine cmbgb9 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
+            subroutine cmbgb9 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
                 use rrlw_kg09, only: kbo_mn2o,ka,selfrefo,kbo,selfref,kb,kao_mn2o,kao,forref,ka_mn2o,fracrefao,fracrefa,absa,absb,fracrefb,forrefo,kb_mn2o,fracrefbo
                 use parrrtm, only: mg,nbndlw,ngptlw,ng9
             end subroutine cmbgb9
-            subroutine cmbgb10 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
+            subroutine cmbgb10 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
                 use rrlw_kg10, only: kb,ka,selfrefo,kbo,selfref,kao,forref,fracrefao,fracrefa,absa,absb,fracrefb,forrefo,fracrefbo
                 use parrrtm, only: mg,nbndlw,ngptlw,ng10
             end subroutine cmbgb10
-            subroutine cmbgb11 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
+            subroutine cmbgb11 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
                 use rrlw_kg11, only: kb,ka,selfrefo,kbo,kbo_mo2,ka_mo2,forref,kao,kb_mo2,kao_mo2,fracrefao,fracrefa,absa,absb,fracrefb,forrefo,fracrefbo,selfref
                 use parrrtm, only: mg,nbndlw,ngptlw,ng11
             end subroutine cmbgb11
-            subroutine cmbgb12 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
+            subroutine cmbgb12 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
                 use rrlw_kg12, only: ka,selfrefo,selfref,kao,fracrefao,fracrefa,absa,forref,forrefo
                 use parrrtm, only: ng12,mg,nbndlw,ngptlw
             end subroutine cmbgb12
-            subroutine cmbgb13 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
+            subroutine cmbgb13 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
                 use rrlw_kg13, only: ka,selfrefo,selfref,kbo_mo3,ka_mco2,kao,ka_mco,kao_mco2,fracrefao,kb_mo3,fracrefa,absa,forref,fracrefb,forrefo,fracrefbo,kao_mco
                 use parrrtm, only: mg,nbndlw,ngptlw,ng13
             end subroutine cmbgb13
-            subroutine cmbgb14 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
+            subroutine cmbgb14 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
                 use rrlw_kg14, only: kb,ka,selfrefo,kbo,selfref,kao,forref,fracrefao,fracrefa,absa,absb,fracrefb,forrefo,fracrefbo
                 use parrrtm, only: mg,nbndlw,ngptlw,ng14
             end subroutine cmbgb14
-            subroutine cmbgb15 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
+            subroutine cmbgb15 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
                 use rrlw_kg15, only: ka,selfrefo,selfref,kao_mn2,kao,ka_mn2,fracrefao,fracrefa,absa,forref,forrefo
                 use parrrtm, only: mg,nbndlw,ngptlw,ng15
             end subroutine cmbgb15
-            subroutine cmbgb16 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
+            subroutine cmbgb16 ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
                 use rrlw_kg16, only: kb,ka,selfrefo,kbo,selfref,kao,forref,fracrefao,fracrefa,absa,absb,fracrefb,forrefo,fracrefbo
                 use parrrtm, only: ng16,mg,nbndlw,ngptlw
             end subroutine cmbgb16
-            subroutine lwcldpr ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
+            subroutine lwcldpr ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90:rrtmg_lw_init
                 use rrlw_cld, only: absice0,absice1,absice2,absice3,absliq1,absliq0,abscld1
             end subroutine lwcldpr
         end module rrtmg_lw_init
-        subroutine driver(ncol,nlay,icld,permuteseed,irng,idrv,cpdair,play,plev,tlay,tlev,tsfc,h2ovmr,o3vmr,co2vmr,ch4vmr,n2ovmr,o2vmr,cfc11vmr,cfc12vmr,cfc22vmr,ccl4vmr,emis,inflglw,iceflglw,liqflglw,cldfrac,ciwp,clwp,reic,relq,tauc,tauaer,uflx,dflx,hr,uflxc,dflxc,hrc,duflx_dt,duflxc_dt) ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/src/rrtm/rrtmg_lw_v4.85/Driver.f90
+        subroutine driver(ncol,nlay,icld,permuteseed,irng,idrv,cpdair,play,plev,tlay,tlev,tsfc,h2ovmr,o3vmr,co2vmr,ch4vmr,n2ovmr,o2vmr,cfc11vmr,cfc12vmr,cfc22vmr,ccl4vmr,emis,inflglw,iceflglw,liqflglw,cldfrac,ciwp,clwp,reic,relq,tauc,tauaer,uflx,dflx,hr,uflxc,dflxc,hrc,duflx_dt,duflxc_dt) ! in :_rrtmg_lw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_lw/Driver.f90
             use rrtmg_lw_rad, only: rrtmg_lw
             use rrtmg_lw_init, only: rrtmg_lw_ini
             use mcica_subcol_gen_lw, only: mcica_subcol_lw
