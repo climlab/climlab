@@ -10,7 +10,7 @@ def readme():
     with open('README.rst') as f:
         return f.read()
 
-import build_fortran_extensions
+#import build_fortran_extensions
 import climlab
 
 #  Set up climlab with call to setuptools
