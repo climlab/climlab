@@ -3,14 +3,13 @@ Script to manually build signature files and .so extensions
 for the fortran components
 (currently CAM3, RRTMG_LW and RRTGM_SW)
 
-Should not be necessary to run this script with the new build procedure.
-But the new build procedure is not yet working!
-
-To build and install, do this:
+Currently this is called automatically when you run
 ```
-python build_fortran_extensions.py
 python setup.py install
 ```
+
+Hopefully in the future we will get the build procedure fully automated
+with setuptools 
 '''
 import os, sys, subprocess, string
 from numpy.distutils import fcompiler
