@@ -1,4 +1,4 @@
-radiation
+climlab.radiation.radiation
 ---------
 
 .. inheritance-diagram:: climlab.radiation.radiation
@@ -7,5 +7,6 @@ radiation
 
 .. automodule:: climlab.radiation.radiation
     :members:
-    :undoc-members: 
+    :private-members:
+    :undoc-members:
     :show-inheritance:

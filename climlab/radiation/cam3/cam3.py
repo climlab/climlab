@@ -1,3 +1,33 @@
+'''
+climlab wrappers for the NCAR CAM3 radiation code
+
+    :Example:
+
+        Here is a quick example of setting up a single-column
+        Radiative-Convective model with fixed relative humdity::
+
+            import climlab
+            alb = 0.25
+            #  State variables (Air and surface temperature)
+            state = climlab.column_state(num_lev=30)
+            #  Parent model process
+            rcm = climlab.TimeDependentProcess(state=state)
+            #  Fixed relative humidity
+            h2o = climlab.radiation.ManabeWaterVapor(state=state)
+            #  Couple water vapor to radiation
+            rad = climlab.radiation.CAM3(state=state, specific_humidity=h2o.q, albedo=alb)
+            #  Convective adjustment
+            conv = climlab.convection.ConvectiveAdjustment(state=state, adj_lapse_rate=6.5)
+            #  Couple everything together
+            rcm.add_subprocess('Radiation', rad)
+            rcm.add_subprocess('WaterVapor', h2o)
+            rcm.add_subprocess('Convection', conv)
+            #  Run the model
+            rcm.integrate_years(1)
+            #  Check for energy balance
+            print rcm.ASR - rcm.OLR
+
+'''
 from __future__ import division
 import numpy as np
 from climlab import constants as const

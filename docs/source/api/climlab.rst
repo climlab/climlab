@@ -1,7 +1,11 @@
 Climlab Reference
 =================
 
-This chapter documents the source code of the ``climlab`` package. The focus is on the methods and functions that the user invokes while using the package. Nevertheless also the underlying code of the ``climlab`` architecture has been documented for a comprehensive understanding and traceability.
+This chapter documents the source code of the ``climlab`` package.
+The focus is on the methods and functions that the user invokes
+while using the package.
+Nevertheless also the underlying code of the ``climlab`` architecture
+has been documented for a comprehensive understanding and traceability.
 
 
 .. automodule:: climlab
@@ -10,8 +14,9 @@ Subpackages
 -----------
 
 .. toctree::
-    :maxdepth: 3
-    
+    :maxdepth: 4
+
+    climlab.convection
     climlab.domain
     climlab.dynamics
     climlab.model
@@ -26,7 +31,7 @@ Subpackages
 Inheritance Diagram
 -------------------
 
-.. inheritance-diagram:: 
+.. inheritance-diagram::
 	climlab.domain.axis
 	climlab.domain.domain
 	climlab.domain.field
@@ -38,8 +43,8 @@ Inheritance Diagram
 	climlab.process.implicit
 	climlab.process.process
 	climlab.process.time_dependent_process
-	climlab.radiation.AplusBT
-	climlab.radiation.Boltzmann
+	climlab.radiation.aplusbt
+	climlab.radiation.boltzmann
 	climlab.radiation.insolation
 	climlab.solar.insolation
 	climlab.solar.orbital_cycles
@@ -47,5 +52,3 @@ Inheritance Diagram
 	climlab.surface.albedo
    :parts: 1
    :private-bases:
-
-

@@ -1,14 +1,18 @@
 climlab.radiation
 =================
 
-.. toctree::
+These modules implement radiative transfer in vertical columns.
 
-   climlab.radiation.AplusBT
-   climlab.radiation.Boltzmann
-   climlab.radiation.cam3rad
+.. toctree::
+    :maxdepth: 3
+
+   climlab.radiation.aplusbt
+   climlab.radiation.boltzmann
+   climlab.radiation.cam3.cam3
    climlab.radiation.greygas
    climlab.radiation.insolation
    climlab.radiation.nband
    climlab.radiation.radiation
+   climlab.radiation.rrtm
    climlab.radiation.transmissivity
    climlab.radiation.water_vapor
