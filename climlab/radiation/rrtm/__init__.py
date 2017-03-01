@@ -43,10 +43,10 @@ try:
     naerec = int(_rrtmg_sw.parrrsw.naerec)
     nbndlw = int(_rrtmg_lw.parrrtm.nbndlw)
 except:
-    nbndsw = None
-    naerec = None
-    nbndlw = None
-    print 'Cannot import compiled Fortran extension, this module will not be functional.'
+    nbndsw = 1
+    naerec = 1
+    nbndlw = 1
+    print 'Cannot import compiled RRTMG Fortran extensions, this module will not be functional.'
 from rrtmg import RRTMG
 from rrtmg_lw import RRTMG_LW
 from rrtmg_sw import RRTMG_SW
