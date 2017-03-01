@@ -72,10 +72,13 @@ from __future__ import division
 import numpy as np
 from climlab.process import EnergyBudget
 from climlab.radiation import ManabeWaterVapor
-import netCDF4 as nc
 import os
 from scipy.interpolate import interp1d, interp2d
 from climlab import constants as const
+try:
+    import netCDF4 as nc
+except:
+    print 'Cannot import netCDF4 interface. Will not be able to initialize ozone from data file.'
 
 
 def default_specific_humidity(Tatm):
