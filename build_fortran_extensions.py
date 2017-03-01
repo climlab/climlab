@@ -140,6 +140,7 @@ else:
     print 'Compiler {} not supported, proceed at your own risk!'.format(compiler)
 
 # Build all extensions
+here = os.getcwd()
 for ext in Extensions:
     try:
         # relative to absolute path
@@ -152,3 +153,5 @@ for ext in Extensions:
     except:
         print 'Something went wrong building Fortran extension:'
         print ext['name']
+        #  Make sure we are back to original working directory
+        os.chdir(here)
