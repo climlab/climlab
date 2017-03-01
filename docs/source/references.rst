@@ -1,6 +1,6 @@
 .. highlight:: rst
 
-Bibliography
+References
 ==========
 
 .. bibliography:: bibliography.bib

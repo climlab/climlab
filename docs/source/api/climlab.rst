@@ -1,17 +1,7 @@
-Reference
+climlab package reference
 =================
 
-This chapter documents the source code of the ``climlab`` package.
-The focus is on the methods and functions that the user invokes
-while using the package.
-Nevertheless also the underlying code of the ``climlab`` architecture
-has been documented for a comprehensive understanding and traceability.
-
-
 .. automodule:: climlab
-
-climlab subpackages
------------
 
 .. toctree::
     :maxdepth: 4
