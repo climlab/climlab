@@ -1,0 +1,433 @@
+# $Id: make_rrtmg_lw_OS_X_g95,v 1.13 2011/04/08 20:25:00 miacono Exp $
+# Makefile for rrtmg_lw - OS X platform (g95 compiler)
+
+SHELL  = /bin/sh
+
+##############################################################
+# Select rrtmg_lw input data option
+# KGSRC = dat : Input absorption coefficients from source data
+# KGSRC = nc  : Input absorption coefficients from netCDF file
+##############################################################
+
+# KGSRC = dat
+KGSRC = nc
+
+################################
+# Set variables
+################################
+
+PLATFORM = OS_X_g95
+VERSION = v4.85
+
+##############################################################
+# Set location of netCDF libraries
+#
+# They must be compiled with the same compiler and at the same 
+# precision as rrtmg_lw
+##############################################################
+
+ifeq ($(KGSRC),nc)
+   LIB_NETCDF = /usr/local/netcdf/3.6.3/ibmxl64/lib
+   INC_NETCDF = /usr/local/netcdf/3.6.3/ibmxl64/include
+endif
+
+##################################
+# Options for the FORTRAN compiler
+##################################
+
+FC = g95
+ifeq ($(KGSRC),nc)
+   FCOPTS = -O3 -r8 -i8 -I$(INC_NETCDF)
+   LDFLAGS = -L$(LIB_NETCDF) -lnetcdf
+else
+   FCOPTS = -O3 -r8 -i8
+# Compile absorption coefficient data without optimization
+   FCOPTK = -r8 -i8
+endif
+
+#################
+# Executable name
+#################
+
+OUTPUT = rrtmg_lw_$(VERSION)_$(PLATFORM)
+
+###########################################
+# Source, module and object names and paths
+###########################################
+
+MPATH = ../modules
+CPATH = ../src
+CDOTO = $(PLATFORM)_$(FC)_dbl.obj
+
+MPRK = parkind
+MPAR = parrrtm
+MCLD = rrlw_cld
+MCON = rrlw_con
+MK01 = rrlw_kg01
+MK02 = rrlw_kg02
+MK03 = rrlw_kg03
+MK04 = rrlw_kg04
+MK05 = rrlw_kg05
+MK06 = rrlw_kg06
+MK07 = rrlw_kg07
+MK08 = rrlw_kg08
+MK09 = rrlw_kg09
+MK10 = rrlw_kg10
+MK11 = rrlw_kg11
+MK12 = rrlw_kg12
+MK13 = rrlw_kg13
+MK14 = rrlw_kg14
+MK15 = rrlw_kg15
+MK16 = rrlw_kg16
+ifeq ($(KGSRC),nc)
+   MNCP = rrlw_ncpar
+endif
+MREF = rrlw_ref
+MTBL = rrlw_tbl
+MVSN = rrlw_vsn
+MWVN = rrlw_wvn
+
+CRTM = rrtmg_lw.1col
+CCLD = rrtmg_lw_cldprop
+CCMC = rrtmg_lw_cldprmc
+CINI = rrtmg_lw_init
+ifeq ($(KGSRC),nc)
+   CKGS = rrtmg_lw_read_nc
+else
+   CKGS = rrtmg_lw_k_g
+endif
+CRTR = rrtmg_lw_rtrn
+CRMR = rrtmg_lw_rtrnmr
+CRMC = rrtmg_lw_rtrnmc
+CSET = rrtmg_lw_setcoef
+CTAU = rrtmg_lw_taumol
+CMRN = mcica_random_numbers
+CMSC = mcica_subcol_gen_lw.1col
+CATM = rrtatm
+CEXT = extra
+CUTL = util_$(PLATFORM)
+
+OBJFIL = $(CCLD).o \
+         $(CCMC).o \
+         $(CKGS).o \
+         $(CRTR).o \
+         $(CRMR).o \
+         $(CRMC).o \
+         $(CSET).o \
+         $(CTAU).o \
+         $(CMRN).o \
+         $(CMSC).o \
+         $(CINI).o \
+         $(CRTM).o \
+         $(CATM).o \
+         $(CEXT).o \
+         $(CUTL).o
+
+OBJPTH = $(CDOTO)/$(CMRN).o \
+         $(CDOTO)/$(CMSC).o \
+         $(CDOTO)/$(CCLD).o \
+         $(CDOTO)/$(CCMC).o \
+         $(CDOTO)/$(CKGS).o \
+         $(CDOTO)/$(CRTR).o \
+         $(CDOTO)/$(CRMR).o \
+         $(CDOTO)/$(CRMC).o \
+         $(CDOTO)/$(CSET).o \
+         $(CDOTO)/$(CTAU).o \
+         $(CDOTO)/$(CINI).o \
+         $(CDOTO)/$(CRTM).o \
+         $(CDOTO)/$(CATM).o \
+         $(CDOTO)/$(CEXT).o \
+         $(CDOTO)/$(CUTL).o
+
+ifeq ($(KGSRC),nc)
+OBMPTH = $(CDOTO)/$(MPRK).o \
+         $(CDOTO)/$(MPAR).o \
+         $(CDOTO)/$(MCLD).o \
+         $(CDOTO)/$(MCON).o \
+         $(CDOTO)/$(MK01).o \
+         $(CDOTO)/$(MK02).o \
+         $(CDOTO)/$(MK03).o \
+         $(CDOTO)/$(MK04).o \
+         $(CDOTO)/$(MK05).o \
+         $(CDOTO)/$(MK06).o \
+         $(CDOTO)/$(MK07).o \
+         $(CDOTO)/$(MK08).o \
+         $(CDOTO)/$(MK09).o \
+         $(CDOTO)/$(MK10).o \
+         $(CDOTO)/$(MK11).o \
+         $(CDOTO)/$(MK12).o \
+         $(CDOTO)/$(MK13).o \
+         $(CDOTO)/$(MK14).o \
+         $(CDOTO)/$(MK15).o \
+         $(CDOTO)/$(MK16).o \
+         $(CDOTO)/$(MNCP).o \
+         $(CDOTO)/$(MREF).o \
+         $(CDOTO)/$(MTBL).o \
+         $(CDOTO)/$(MVSN).o \
+         $(CDOTO)/$(MWVN).o
+else
+OBMPTH = $(CDOTO)/$(MPRK).o \
+         $(CDOTO)/$(MPAR).o \
+         $(CDOTO)/$(MCLD).o \
+         $(CDOTO)/$(MCON).o \
+         $(CDOTO)/$(MK01).o \
+         $(CDOTO)/$(MK02).o \
+         $(CDOTO)/$(MK03).o \
+         $(CDOTO)/$(MK04).o \
+         $(CDOTO)/$(MK05).o \
+         $(CDOTO)/$(MK06).o \
+         $(CDOTO)/$(MK07).o \
+         $(CDOTO)/$(MK08).o \
+         $(CDOTO)/$(MK09).o \
+         $(CDOTO)/$(MK10).o \
+         $(CDOTO)/$(MK11).o \
+         $(CDOTO)/$(MK12).o \
+         $(CDOTO)/$(MK13).o \
+         $(CDOTO)/$(MK14).o \
+         $(CDOTO)/$(MK15).o \
+         $(CDOTO)/$(MK16).o \
+         $(CDOTO)/$(MREF).o \
+         $(CDOTO)/$(MTBL).o \
+         $(CDOTO)/$(MVSN).o \
+         $(CDOTO)/$(MWVN).o
+endif
+
+#################
+# Load line
+#################
+
+ifeq ($(KGSRC),nc)
+$(OUTPUT) : \
+	intro makedir $(OBMPTH) $(OBJPTH) conclude
+	$(FC) $(FCOPTS) -I$(CDOTO) -o $(OUTPUT) $(OBMPTH) $(OBJPTH) $(LDFLAGS)
+else
+$(OUTPUT) : \
+	intro makedir $(OBMPTH) $(OBJPTH) conclude
+	$(FC) $(FCOPTS) -I$(CDOTO) -o $(OUTPUT) $(OBMPTH) $(OBJPTH)
+endif
+
+#################
+# Compile modules
+#################
+
+$(CDOTO)/$(MPRK).o : $(MPATH)/$(MPRK).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(MPATH)/$(MPRK).f90
+	\mv $(MPRK).o *.mod $(CDOTO)
+
+$(CDOTO)/$(MPAR).o : $(MPATH)/$(MPAR).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(MPATH)/$(MPAR).f90
+	\mv $(MPAR).o *.mod $(CDOTO)
+
+$(CDOTO)/$(MCLD).o : $(MPATH)/$(MCLD).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(MPATH)/$(MCLD).f90
+	\mv $(MCLD).o *.mod $(CDOTO)
+
+$(CDOTO)/$(MCON).o : $(MPATH)/$(MCON).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(MPATH)/$(MCON).f90
+	\mv $(MCON).o *.mod $(CDOTO)
+
+$(CDOTO)/$(MK01).o : $(MPATH)/$(MK01).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(MPATH)/$(MK01).f90
+	\mv $(MK01).o *.mod $(CDOTO)
+
+$(CDOTO)/$(MK02).o : $(MPATH)/$(MK02).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(MPATH)/$(MK02).f90
+	\mv $(MK02).o *.mod $(CDOTO)
+
+$(CDOTO)/$(MK03).o : $(MPATH)/$(MK03).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(MPATH)/$(MK03).f90
+	\mv $(MK03).o *.mod $(CDOTO)
+
+$(CDOTO)/$(MK04).o : $(MPATH)/$(MK04).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(MPATH)/$(MK04).f90
+	\mv $(MK04).o *.mod $(CDOTO)
+
+$(CDOTO)/$(MK05).o : $(MPATH)/$(MK05).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(MPATH)/$(MK05).f90
+	\mv $(MK05).o *.mod $(CDOTO)
+
+$(CDOTO)/$(MK06).o : $(MPATH)/$(MK06).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(MPATH)/$(MK06).f90
+	\mv $(MK06).o *.mod $(CDOTO)
+
+$(CDOTO)/$(MK07).o : $(MPATH)/$(MK07).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(MPATH)/$(MK07).f90
+	\mv $(MK07).o *.mod $(CDOTO)
+
+$(CDOTO)/$(MK08).o : $(MPATH)/$(MK08).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(MPATH)/$(MK08).f90
+	\mv $(MK08).o *.mod $(CDOTO)
+
+$(CDOTO)/$(MK09).o : $(MPATH)/$(MK09).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(MPATH)/$(MK09).f90
+	\mv $(MK09).o *.mod $(CDOTO)
+
+$(CDOTO)/$(MK10).o : $(MPATH)/$(MK10).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(MPATH)/$(MK10).f90
+	\mv $(MK10).o *.mod $(CDOTO)
+
+$(CDOTO)/$(MK11).o : $(MPATH)/$(MK11).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(MPATH)/$(MK11).f90
+	\mv $(MK11).o *.mod $(CDOTO)
+
+$(CDOTO)/$(MK12).o : $(MPATH)/$(MK12).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(MPATH)/$(MK12).f90
+	\mv $(MK12).o *.mod $(CDOTO)
+
+$(CDOTO)/$(MK13).o : $(MPATH)/$(MK13).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(MPATH)/$(MK13).f90
+	\mv $(MK13).o *.mod $(CDOTO)
+
+$(CDOTO)/$(MK14).o : $(MPATH)/$(MK14).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(MPATH)/$(MK14).f90
+	\mv $(MK14).o *.mod $(CDOTO)
+
+$(CDOTO)/$(MK15).o : $(MPATH)/$(MK15).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(MPATH)/$(MK15).f90
+	\mv $(MK15).o *.mod $(CDOTO)
+
+$(CDOTO)/$(MK16).o : $(MPATH)/$(MK16).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(MPATH)/$(MK16).f90
+	\mv $(MK16).o *.mod $(CDOTO)
+
+ifeq ($(KGSRC),nc)
+$(CDOTO)/$(MNCP).o : $(MPATH)/$(MNCP).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(MPATH)/$(MNCP).f90
+	\mv $(MNCP).o *.mod $(CDOTO)
+endif
+
+$(CDOTO)/$(MREF).o : $(MPATH)/$(MREF).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(MPATH)/$(MREF).f90
+	\mv $(MREF).o *.mod $(CDOTO)
+
+$(CDOTO)/$(MTBL).o : $(MPATH)/$(MTBL).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(MPATH)/$(MTBL).f90
+	\mv $(MTBL).o *.mod $(CDOTO)
+
+$(CDOTO)/$(MVSN).o : $(MPATH)/$(MVSN).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(MPATH)/$(MVSN).f90
+	\mv $(MVSN).o *.mod $(CDOTO)
+
+$(CDOTO)/$(MWVN).o : $(MPATH)/$(MWVN).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(MPATH)/$(MWVN).f90
+	\mv $(MWVN).o *.mod $(CDOTO)
+
+#################
+# Compile source
+#################
+
+$(CDOTO)/$(CMRN).o : $(CPATH)/$(CMRN).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(CPATH)/$(CMRN).f90
+	\mv $(CMRN).o *.mod $(CDOTO)
+
+$(CDOTO)/$(CMSC).o : $(CPATH)/$(CMSC).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(CPATH)/$(CMSC).f90
+	\mv $(CMSC).o *.mod $(CDOTO)
+
+$(CDOTO)/$(CCLD).o : $(CPATH)/$(CCLD).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(CPATH)/$(CCLD).f90
+	\mv $(CCLD).o *.mod $(CDOTO)
+
+$(CDOTO)/$(CCMC).o : $(CPATH)/$(CCMC).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(CPATH)/$(CCMC).f90
+	\mv $(CCMC).o *.mod $(CDOTO)
+
+ifeq ($(KGSRC), nc)
+$(CDOTO)/$(CKGS).o : $(CPATH)/$(CKGS).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(CPATH)/$(CKGS).f90 $(LDFLAGS)
+	\mv $(CKGS).o $(CDOTO)
+else
+$(CDOTO)/$(CKGS).o : $(CPATH)/$(CKGS).f90
+	$(FC) $(FCOPTK) -I$(CDOTO) -c $(CPATH)/$(CKGS).f90
+	\mv $(CKGS).o $(CDOTO)
+endif
+
+$(CDOTO)/$(CRTR).o : $(CPATH)/$(CRTR).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(CPATH)/$(CRTR).f90
+	\mv $(CRTR).o *.mod $(CDOTO)
+
+$(CDOTO)/$(CRMR).o : $(CPATH)/$(CRMR).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(CPATH)/$(CRMR).f90
+	\mv $(CRMR).o *.mod $(CDOTO)
+
+$(CDOTO)/$(CRMC).o : $(CPATH)/$(CRMC).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(CPATH)/$(CRMC).f90
+	\mv $(CRMC).o *.mod $(CDOTO)
+
+$(CDOTO)/$(CSET).o : $(CPATH)/$(CSET).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(CPATH)/$(CSET).f90
+	\mv $(CSET).o *.mod $(CDOTO)
+
+$(CDOTO)/$(CTAU).o : $(CPATH)/$(CTAU).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(CPATH)/$(CTAU).f90
+	\mv $(CTAU).o *.mod $(CDOTO)
+
+$(CDOTO)/$(CINI).o : $(CPATH)/$(CINI).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(CPATH)/$(CINI).f90
+	\mv $(CINI).o *.mod $(CDOTO)
+
+$(CDOTO)/$(CRTM).o : $(CPATH)/$(CRTM).f90
+	$(FC) $(FCOPTS) -I$(CDOTO) -c $(CPATH)/$(CRTM).f90
+	\mv $(CRTM).o $(CDOTO)
+
+$(CDOTO)/$(CATM).o : $(CPATH)/$(CATM).f
+	$(FC) $(FCOPTS) -c $(CPATH)/$(CATM).f
+	\mv $(CATM).o $(CDOTO)
+
+$(CDOTO)/$(CEXT).o : $(CPATH)/$(CEXT).f
+	$(FC) $(FCOPTS) -c $(CPATH)/$(CEXT).f
+	\mv $(CEXT).o $(CDOTO)
+
+$(CDOTO)/$(CUTL).o : $(CPATH)/$(CUTL).f
+	$(FC) $(FCOPTS) -c $(CPATH)/$(CUTL).f
+	\mv $(CUTL).o $(CDOTO)
+
+###########################################
+# Create object file directory if necessary
+###########################################
+
+makedir :
+	if [ ! -d $(CDOTO) ] ; \
+	then \
+	   mkdir $(CDOTO) ; \
+	fi
+
+###################
+# Intro information
+###################
+
+.SILENT:
+intro :
+	echo
+	echo '-----------------'
+	echo '  $(OUTPUT) makefile'
+	echo '-----------------'
+	echo
+	echo 'This makefile was designed for the $(PLATFORM) platform.'
+	echo
+	echo 'It uses the $(FC) compiler, with the following options:'
+	echo '      $(FCOPTS)'
+	echo 'except for the absorption coefficient data file which is'
+	echo 'compiled without optimization (-O0) to improve compile time.'
+	echo
+	echo 'The object files used are as follows:'
+	echo
+	echo '      $(OBJFIL)'
+	echo
+	echo
+	echo '$(OUTPUT) make is in progress ...'
+	echo
+
+###############################
+# Concluding information
+###############################
+
+conclude :
+
+	echo
+	echo '================='
+	echo '  makefile done  '
+	echo '================='
+	echo
+
+

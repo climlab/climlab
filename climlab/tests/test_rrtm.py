@@ -2,7 +2,6 @@ from __future__ import division
 import numpy as np
 import climlab
 import pytest
-#from climlab.radiation import RRTMG, RRTMG_LW, RRTMG_SW, CAM3Radiation_LW
 from climlab.radiation.rrtm import _climlab_to_rrtm, _rrtm_to_climlab
 
 num_lev = 30
@@ -36,7 +35,7 @@ def test_swap_component():
     #  Swap out the longwave model for CAM3
     rad.remove_subprocess('LW')
     rad.step_forward()
-    rad.add_subprocess('LW', climlab.radiation.CAM3Radiation_LW(state=state))
+    rad.add_subprocess('LW', climlab.radiation.CAM3_LW(state=state))
     rad.step_forward()
     assert hasattr(rad, 'OLR')
 
@@ -51,7 +50,7 @@ def test_multidim():
     assert rad.OLR.shape == rad.Ts.shape
 
 def test_radiative_forcing():
-    '''Run a single-column radiative-convective model with CAM3 radiation
+    '''Run a single-column radiative-convective model with RRTMG radiation
     out to equilibrium. Clone the model, double CO2 and measure the instantaneous
     change in TOA flux. It should be positive net downward flux.'''
     #  State variables (Air and surface temperature)
@@ -61,7 +60,7 @@ def test_radiative_forcing():
     #  Fixed relative humidity
     h2o = climlab.radiation.ManabeWaterVapor(state=state)
     #  Couple water vapor to radiation
-    rad = climlab.radiation.RRTMG(state=state, h2ovmr=h2o.q)
+    rad = climlab.radiation.RRTMG(state=state, specific_humidity=h2o.q)
     #  Convective adjustment
     conv = climlab.convection.ConvectiveAdjustment(state=state,
                                                    adj_lapse_rate=6.5)
@@ -71,11 +70,35 @@ def test_radiative_forcing():
     rcm.add_subprocess('Convection', conv)
 
     rcm.integrate_years(5.)
-    #assert np.abs(rcm.ASR - rcm.OLR) < 0.1  # close to energy balance
-    #  There is currently a problem with energy conservation in the RRTM module, need to look into this.
+    assert np.abs(rcm.ASR - rcm.OLR) < 0.1  # close to energy balance
     rcm2 = climlab.process_like(rcm)
-    rcm2.subprocess['Radiation'].co2vmr *= 2.
+    rcm2.subprocess['Radiation'].absorber_vmr['CO2'] *= 2.
     rcm2.compute_diagnostics()
-    #assert (rcm2.ASR - rcm2.OLR) > 1.  # positive radiative forcing
-    #  For now this test just checks whether the API calls work without error.
-    #  We will reinstate the physical checks after fixing the energy bug.
+    assert (rcm2.ASR - rcm2.OLR) > 1.  # positive radiative forcing
+
+def test_latitude():
+    '''
+    Run a radiative equilibrum model with RRTMG radiation out to equilibrium
+    with an annual mean insolation profile as a function of latitude.
+    '''
+    num_lat = 8
+    #  State variables (Air and surface temperature)
+    state = climlab.column_state(num_lev=30, num_lat=num_lat, water_depth=1.)
+    #  Parent model process
+    model = climlab.TimeDependentProcess(state=state)
+    #  insolation
+    sol = climlab.radiation.AnnualMeanInsolation(domains=model.Ts.domain)
+    #  radiation module with insolation as input
+    rad = climlab.radiation.RRTMG(state=state, S0=sol.S0, insolation=sol.insolation)
+    #  Couple everything together
+    model.add_subprocess('Radiation', rad)
+    model.add_subprocess('Insolation', sol)
+    #  Run out to equilibrium
+    model.integrate_years(2.)
+    #  Test for energy balance
+    assert np.all(np.abs(model.ASR - model.OLR) < 0.1)
+    #  Test for reasonable surface temperature gradient
+    #  reversal of gradient at equator
+    grad = np.diff(model.Ts, axis=0)
+    assert np.all(grad[0:(num_lat/2-1)] > 0.)
+    assert np.all(grad[(num_lat/2):] < 0.)

@@ -1,0 +1,30 @@
+package:
+  name: climlab
+  version: '0.5.0.dev0'
+
+source:
+  git_rev: v0.5.0.dev0
+  git_url: https://github.com/brian-rose/climlab.git
+
+requirements:
+  build:
+    - python
+    - setuptools
+    - numpy
+    - pytest
+
+  run:
+    - python
+    - numpy
+    - scipy
+    - netcdf4
+    - pytest
+
+test:
+  imports:
+    - climlab
+
+about:
+  home: https://github.com/brian-rose/climlab
+  license: MIT
+  license_file: LICENSE

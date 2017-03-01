@@ -1,0 +1,97 @@
+!    -*- f90 -*-
+! Note: the context of this file is case sensitive.
+
+python module _cam3 ! in 
+    interface  ! in :_cam3
+        module shr_kind_mod ! in :_cam3:/Users/br546577/code/climlab/climlab/radiation/cam3/src/shr_kind_mod.F90
+            integer, public,parameter,optional :: shr_kind_r4=selected_real_kind(6)
+            integer, public,parameter,optional :: shr_kind_i8=selected_int_kind(13)
+            integer, public,parameter,optional :: shr_kind_r8=selected_real_kind(12)
+            integer, public,parameter,optional :: shr_kind_i4=selected_int_kind(6)
+            integer, public,parameter,optional :: shr_kind_cl=256
+            integer, public,parameter,optional :: shr_kind_cs=80
+            integer, public,parameter,optional :: shr_kind_in=kind(1)
+            integer, public,parameter,optional :: shr_kind_r16=selected_real_kind(24)
+            integer, public,parameter,optional :: shr_kind_rn=kind(1.0)
+        end module shr_kind_mod
+        module absems ! in :_cam3:/Users/br546577/code/climlab/climlab/radiation/cam3/src/absems.F90
+            use shr_kind_mod, only: r8=>shr_kind_r8
+            integer, parameter,optional :: n_te=21
+            real(kind=r8) dimension(10,10,25,21,7) :: cn_ah2ow
+            integer, parameter,optional :: n_u=25
+            real(kind=r8) dimension(10,10,25,21,7) :: ln_ah2ow
+            integer, parameter,optional :: n_rh=7
+            integer, parameter,optional :: n_p=10
+            real(kind=r8) dimension(10,10,25,21,7) :: ln_eh2ow
+            real(kind=r8) dimension(10,10,25,21,7) :: ah2ow
+            real(kind=r8) dimension(10,10,25,21,7) :: eh2onw
+            real(kind=r8) dimension(10,10,25,21,7) :: cn_eh2ow
+            integer, parameter,optional :: n_tp=10
+            real(kind=r8) dimension(10,10,25,21,7) :: ah2onw
+        end module absems
+        subroutine driver(km,jm,im,idosw,idolw,pmid,dp,ps,t,tg,q,o3mmr,cldf,clwp,ciwp,in_cld,aldif,aldir,asdif,asdir,eccf,coszen,scon,flus,r_liq,r_ice,co2vmr,n2ovmr,ch4vmr,f11vmr,f12vmr,gravit,cpair,epsilo,stebol,tdot,srfflx,qrs,qrl,swflx_out,swflxc_out,lwflx_out,lwflxc_out,sw_cf_toa,sw_cf_srf,lw_cf_toa,lw_cf_srf,lw_toa,lw_srf,sw_toa,sw_srf,swup_out,swdn_out,swupc_out,swdnc_out,lwup_out,lwdn_out,lwupc_out,lwdnc_out) ! in :_cam3:/Users/br546577/code/climlab/climlab/radiation/cam3/Driver.f90
+            integer intent(in) :: km
+            integer intent(in) :: jm
+            integer intent(in) :: im
+            integer intent(in) :: idosw
+            integer intent(in) :: idolw
+            real*8 dimension(km,jm,im),intent(in),depend(km,jm,im) :: pmid
+            real*8 dimension(km,jm,im),intent(in),depend(km,jm,im) :: dp
+            real*8 dimension(jm,im),intent(in),depend(jm,im) :: ps
+            real*8 dimension(km,jm,im),intent(in),depend(km,jm,im) :: t
+            real*8 dimension(jm,im),intent(in),depend(jm,im) :: tg
+            real*8 dimension(km,jm,im),intent(in),depend(km,jm,im) :: q
+            real*8 dimension(km,jm,im),intent(in),depend(km,jm,im) :: o3mmr
+            real*8 dimension(km,jm,im),intent(in),depend(km,jm,im) :: cldf
+            real*8 dimension(km,jm,im),intent(in),depend(km,jm,im) :: clwp
+            real*8 dimension(km,jm,im),intent(in),depend(km,jm,im) :: ciwp
+            integer intent(in) :: in_cld
+            real*8 dimension(jm,im),intent(in),depend(jm,im) :: aldif
+            real*8 dimension(jm,im),intent(in),depend(jm,im) :: aldir
+            real*8 dimension(jm,im),intent(in),depend(jm,im) :: asdif
+            real*8 dimension(jm,im),intent(in),depend(jm,im) :: asdir
+            real*8 intent(in) :: eccf
+            real*8 dimension(jm,im),intent(in),depend(jm,im) :: coszen
+            real*8 intent(in) :: scon
+            real*8 dimension(jm,im),intent(in),depend(jm,im) :: flus
+            real*8 dimension(km,jm,im),intent(in),depend(km,jm,im) :: r_liq
+            real*8 dimension(km,jm,im),intent(in),depend(km,jm,im) :: r_ice
+            real*8 intent(in) :: co2vmr
+            real*8 intent(in) :: n2ovmr
+            real*8 intent(in) :: ch4vmr
+            real*8 intent(in) :: f11vmr
+            real*8 intent(in) :: f12vmr
+            real*8 intent(in) :: gravit
+            real*8 intent(in) :: cpair
+            real*8 intent(in) :: epsilo
+            real*8 intent(in) :: stebol
+            real*8 dimension(km,jm,im),intent(out),depend(km,jm,im) :: tdot
+            real*8 dimension(jm,im),intent(out),depend(jm,im) :: srfflx
+            real*8 dimension(km,jm,im),intent(out),depend(km,jm,im) :: qrs
+            real*8 dimension(km,jm,im),intent(out),depend(km,jm,im) :: qrl
+            real*8 dimension(km + 1,jm,im),intent(out),depend(km,jm,im) :: swflx_out
+            real*8 dimension(km + 1,jm,im),intent(out),depend(km,jm,im) :: swflxc_out
+            real*8 dimension(km + 1,jm,im),intent(out),depend(km,jm,im) :: lwflx_out
+            real*8 dimension(km + 1,jm,im),intent(out),depend(km,jm,im) :: lwflxc_out
+            real*8 dimension(jm,im),intent(out),depend(jm,im) :: sw_cf_toa
+            real*8 dimension(jm,im),intent(out),depend(jm,im) :: sw_cf_srf
+            real*8 dimension(jm,im),intent(out),depend(jm,im) :: lw_cf_toa
+            real*8 dimension(jm,im),intent(out),depend(jm,im) :: lw_cf_srf
+            real*8 dimension(jm,im),intent(out),depend(jm,im) :: lw_toa
+            real*8 dimension(jm,im),intent(out),depend(jm,im) :: lw_srf
+            real*8 dimension(jm,im),intent(out),depend(jm,im) :: sw_toa
+            real*8 dimension(jm,im),intent(out),depend(jm,im) :: sw_srf
+            real*8 dimension(km + 1,jm,im),intent(out),depend(km,jm,im) :: swup_out
+            real*8 dimension(km + 1,jm,im),intent(out),depend(km,jm,im) :: swdn_out
+            real*8 dimension(km + 1,jm,im),intent(out),depend(km,jm,im) :: swupc_out
+            real*8 dimension(km + 1,jm,im),intent(out),depend(km,jm,im) :: swdnc_out
+            real*8 dimension(km + 1,jm,im),intent(out),depend(km,jm,im) :: lwup_out
+            real*8 dimension(km + 1,jm,im),intent(out),depend(km,jm,im) :: lwdn_out
+            real*8 dimension(km + 1,jm,im),intent(out),depend(km,jm,im) :: lwupc_out
+            real*8 dimension(km + 1,jm,im),intent(out),depend(km,jm,im) :: lwdnc_out
+        end subroutine driver
+    end interface 
+end python module _cam3
+
+! This file was auto-generated with f2py (version:2).
+! See http://cens.ioc.ee/projects/f2py2e/

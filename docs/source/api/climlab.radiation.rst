@@ -1,14 +1,26 @@
 climlab.radiation
 =================
 
-.. toctree::
+.. inheritance-diagram:: climlab.radiation
+   :parts: 1
+   :private-bases:
 
-   climlab.radiation.AplusBT
-   climlab.radiation.Boltzmann
-   climlab.radiation.cam3rad
+.. automodule:: climlab.radiation
+   :members:
+   :private-members:
+   :undoc-members:
+   :show-inheritance:
+
+.. toctree::
+   :maxdepth: 3
+
+   climlab.radiation.aplusbt
+   climlab.radiation.boltzmann
+   climlab.radiation.cam3.cam3
    climlab.radiation.greygas
    climlab.radiation.insolation
    climlab.radiation.nband
    climlab.radiation.radiation
+   climlab.radiation.rrtm
    climlab.radiation.transmissivity
    climlab.radiation.water_vapor

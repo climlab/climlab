@@ -75,8 +75,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'climlab'
-copyright = u'2016 (licensed under MIT License), Brian E. J. Rose & Moritz Kreuzer'
-author = u'Brian E. J. Rose & Moritz Kreuzer'
+copyright = u'2017 Brian E. J. Rose, University at Albany (MIT License)'
+author = u'Brian E. J. Rose'
 
 
 # The version info for the project you're documenting, acts as replacement for

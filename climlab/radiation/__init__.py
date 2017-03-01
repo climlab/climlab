@@ -1,15 +1,19 @@
+'''
+Modules for radiative transfer in vertical columns,
+along with processes for insolation and fixed relative humidity.
+'''
+
 from aplusbt import AplusBT, AplusBT_CO2
 from boltzmann import Boltzmann
 from insolation import FixedInsolation, P2Insolation, AnnualMeanInsolation, DailyInsolation
-from radiation import Radiation
-#from three_band import ThreeBandSW
 from nband import NbandRadiation, ThreeBandSW
 from water_vapor import ManabeWaterVapor
-#  CAM3Radiation requires netCDF4
+#from radiation import Radiation, Radiation_SW, Radiation_LW
+#  CAM3 requires netCDF4
 try:
-    from cam3rad import CAM3Radiation, CAM3Radiation_LW, CAM3Radiation_SW
+    from cam3 import CAM3, CAM3_LW, CAM3_SW
 except:
-    print 'CAM3Radiation module not available.'
+    print 'CAM3 Radiation module not available.'
 try:
     from rrtm import RRTMG, RRTMG_LW, RRTMG_SW
 except:
