@@ -8,6 +8,7 @@ dependencies:
     - matplotlib
     - ipython
     - jupyter
+    - sphinx_rtd_theme
     - pip:
         - nbsphinx
         - sphinxcontrib-bibtex
