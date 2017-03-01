@@ -42,6 +42,7 @@ class _Insolation(DiagnosticProcess):
 
     :ivar array insolation: the array is initialized with zeros of the size of
                             ``self.domains['sfc']`` or ``self.domains['default']``.
+    :ivar array coszen:     cosine of the solar zenith angle
     :ivar float S0:         initialized with given argument ``S0``
     :ivar dict diagnostics: key ``'insolation'`` initialized with value:
                             :class:`~climlab.domain.field.Field` of zeros
@@ -63,13 +64,19 @@ class _Insolation(DiagnosticProcess):
     # CAUTION: changing self.param['S0'] will not work!
     def __init__(self, S0=const.S0, **kwargs):
         super(_Insolation, self).__init__(**kwargs)
-        #  initialize diagnostic with correct shape
+        #  initialize diagnostics with correct shape
         self.add_diagnostic('insolation')
+        self.add_diagnostic('coszen')
         try:
             self.insolation = np.zeros(self.domains['sfc'].shape)
         except:
             self.insolation = np.zeros(self.domains['default'].shape)
+        self.coszen = np.zeros_like(self.insolation)
+        self.declare_diagnostics(['insolation','coszen'])
         self.S0 = S0
+        #  Now that we have a value for self.S0 we can compute the correct coszen
+        self.coszen = self._coszen_from_insolation()
+        self.declare_input(['S0'])
 
     @property
     def S0(self):
@@ -95,6 +102,9 @@ class _Insolation(DiagnosticProcess):
         self._S0 = value
         self.param['S0'] = value
         self._compute_fixed()
+
+    def _coszen_from_insolation(self):
+        return self.insolation / self.S0
 
     def _compute_fixed(self):
         '''Recompute any fixed quantities after a change in parameters'''
@@ -145,6 +155,7 @@ class FixedInsolation(_Insolation):
         #ins_adjustment = self.S0 - self.insolation
         #self.insolation += ins_adjustment
         self.insolation[:] = self.S0
+        self.coszen[:] = self._coszen_from_insolation()
 
 
 class P2Insolation(_Insolation):
@@ -229,6 +240,7 @@ class P2Insolation(_Insolation):
             # make sure that the diagnostic has the correct field dimensions.
             #self.insolation = Field(insolation, domain=dom)
             self.insolation[:] = Field(insolation, domain=dom)
+            self.coszen[:] = self._coszen_from_insolation()
         #  Silent fail only for attribute error: _s2 is not an attribute of self
         #  but s2 parameter is being stored in self._s2
         except AttributeError:
@@ -282,10 +294,11 @@ class AnnualMeanInsolation(_Insolation):
     Additional to the parent class :class:`~climlab.radiation.insolation._Insolation`
     following object attributes are generated and updated during initialization:
 
-    :ivar insolation:       the solar distribution is calculated as a Field on
-                            the basis of the ``self.domains['default']`` domain
-                            and stored in the attribute ``self.insolation``.
+    :ivar insolation:       Current insolation in W/m2
     :vartype insolation:    Field
+
+    :ivar coszen:           Cosine of the current solar zenith angle
+    :vartype coszen:    Field
 
     :ivar dict orb:         initialized with given argument ``orb``
 
@@ -397,6 +410,7 @@ class AnnualMeanInsolation(_Insolation):
                 self.insolation[:] = insolation
             except:
                 self.insolation[:] = Field(insolation, domain=dom)
+            self.coszen[:] = self._coszen_from_insolation()
         #  Silent fail only for attribute error: _orb is not an attribute of self
         #  but orb parameter is being stored in self._orb
         except AttributeError:
@@ -442,9 +456,11 @@ class DailyInsolation(AnnualMeanInsolation):
     Additional to the parent class :class:`~climlab.radiation.insolation._Insolation`
     following object attributes are generated and updated during initialization:
 
-    :ivar Field insolation: the solar distribution is calculated as a Field on
-                            the basis of the ``self.domains['default']`` domain
-                            and stored in the attribute ``self.insolation``.
+    :ivar insolation:       Current insolation in W/m2
+    :vartype insolation:    Field
+
+    :ivar coszen:           Cosine of the current solar zenith angle
+    :vartype coszen:    Field
 
     :ivar dict orb:         initialized with given argument ``orb``
 
@@ -520,3 +536,4 @@ class DailyInsolation(AnnualMeanInsolation):
         time_index = self.time['day_of_year_index']   # THIS ONLY WORKS IF self IS THE MASTER PROCESS
         insolation = insolation_array[..., time_index]
         self.insolation[:] = Field(insolation, domain=dom)
+        self.coszen[:] = self._coszen_from_insolation()

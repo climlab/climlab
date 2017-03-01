@@ -455,6 +455,11 @@ class Process(object):
         for name in inputlist:
             self._input_vars.append(name)
 
+    def declare_diagnostics(self, diaglist):
+        '''Add the variable names in ``inputlist`` to the list of diagnostics.'''
+        for name in diaglist:
+            self._diag_vars.append(name)
+
     def remove_diagnostic(self, name):
         """	Removes a diagnostic from the ``process.diagnostic`` dictionary
         and also delete the associated process attribute.
