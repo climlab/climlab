@@ -27,6 +27,7 @@ climlab wrappers for the NCAR CAM3 radiation code
             #  Check for energy balance
             print rcm.ASR - rcm.OLR
 
+
 '''
 from __future__ import division
 import numpy as np
