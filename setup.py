@@ -5,7 +5,11 @@ def readme():
         return f.read()
 
 #  Run the manual f2py build script
-import build_fortran_extensions
+try:
+    compiler = fcompiler.get_default_fcompiler()
+    import build_fortran_extensions
+except:
+    print 'Cannot find a Fortran compiler, not building Fortran components.'
 
 if __name__ == '__main__':
     #  Set up climlab with call to setuptools
