@@ -13,6 +13,18 @@ State:
     - Ts (surface radiative temperature)
     - Tatm (air temperature)
 
+Input arguments (both LW and SW):
+
+    - specific_humidity (kg/kg)
+    - absorber_vmr (dict of volumetric mixing ratios)
+    - cldfrac      (layer cloud fraction
+    - clwp         (in-cloud liquid water path (g/m2))
+    - ciwp = 0.,     # in-cloud ice water path (g/m2)
+    - r_liq = 0.,    # Cloud water drop effective radius (microns)
+    - r_ice = 0.,    # Cloud ice particle effective size (microns)
+    - ozone_file = 'apeozone_cam3_5_54.nc',
+
+
 Shortave processes compute these diagnostics (minimum):
 
     - ASR (W/m2, net Absorbed Shortwave Radiation at TOA, **positive down**)
