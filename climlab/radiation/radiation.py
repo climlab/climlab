@@ -22,8 +22,22 @@ Input arguments (both LW and SW):
     - ciwp = 0.,     # in-cloud ice water path (g/m2)
     - r_liq = 0.,    # Cloud water drop effective radius (microns)
     - r_ice = 0.,    # Cloud ice particle effective size (microns)
-    - ozone_file = 'apeozone_cam3_5_54.nc',
+    - ozone_file = 'apeozone_cam3_5_54.nc'  (file with ozone distribution)
 
+Additional input arguments for SW:
+
+     - albedo = None  (optional, single parameter to set all 4 albedo values)
+     - aldif = 0.3,   (near-infrared albedo, diffuse)
+     - aldir = 0.3,   (near-infrared albedo, direct)
+     - asdif = 0.3,   (shortwave albedo, diffuse)
+     - asdir = 0.3,   (shortwave albedo, direct)
+     - S0    = const.S0,  (solar constant, W/m2)
+     - insolation = const.S0/4.,  (time-mean insolaltion, W/m2)
+     - coszen = None,    # cosine of the solar zenith angle
+     - eccentricity_factor = 1.,  # instantaneous irradiance = S0 * eccentricity_factor
+
+Additional input arguments for LW:
+    - emissivity = 1.,  # surface emissivity
 
 Shortave processes compute these diagnostics (minimum):
 

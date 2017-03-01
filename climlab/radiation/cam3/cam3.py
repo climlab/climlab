@@ -61,41 +61,7 @@ class CAM3(_Radiation_SW, _Radiation_LW):
     '''
     climlab wrapper for the CAM3 radiation code.
 
-    THIS IS ALL OUT OF DATE AND NEEDS FIXING
-
-    Scalar input values:
-    - Well-mixed greenhouse gases in ppmv (all default to zero except CO2):
-        - CO2 (380.)
-        - N2O
-        - CH4
-        - CFC11
-        - CFC12
-    Input values with same dimension as Ts:
-        - coszen (cosine of solar zenith angle, default = 1.)
-        - insolation (W/m2, default = const.S0/4)
-        - surface albedos (all default to 0.07):
-            - asdir (shortwave direct)
-            - asdif (shortwave diffuse)
-            - aldir (near-infrared, direct)
-            - aldif (near-infrared, diffuse)
-    Input values with same dimension as Tatm:
-        - O3 (ozone mass mixing ratio)
-        - q (specific humidity in kg/kg)
-        - cldf (cloud fraction, default is zero)
-        - clwp (cloud liquid water path, default is zero)
-        - ciwp (cloud ice water path, default is zero)
-        - r_liq (liquid effective drop size, microns, default is 10.)
-        - r_ice (ice effective drop size, microns, default is 30.)
-
-    Diagnostics:
-        - ASR (absorbed solar radiation, W/m2)
-        - ASRcld (shortwave cloud radiative effect, all-sky - clear-sky flux, W/m2)
-        - OLR (outgoing longwave radiation, W/m2)
-        - OLRcld (longwave cloud radiative effect, all-sky - clear-sky flux, W/m2)
-        - TdotRad (net radiative heating rate,  K / day)
-        - TdotLW  (longwave radiative heating rate, K / day)
-        - TdotSW  (shortwave radiative heating rate, K / day)
-
+    For some details about inputs and diagnostics, see the `radiation` module.
     '''
     def __init__(self,
                  **kwargs):

@@ -1,6 +1,8 @@
 radiation
 ---------
 
+.. _radiation:
+
 .. inheritance-diagram:: climlab.radiation.radiation
    :parts: 1
    :private-bases:

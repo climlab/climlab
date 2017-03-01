@@ -8,7 +8,10 @@ from . import nbndsw
 
 
 class RRTMG(_Radiation_SW, _Radiation_LW):
-    '''Container to drive combined LW and SW radiation models.'''
+    '''Container to drive combined LW and SW radiation models.
+
+    For some details about inputs and diagnostics, see the `radiation` module.
+    '''
     def __init__(self,
             # GENERAL, used in both SW and LW
             icld = 1,    # Cloud overlap method, 0: Clear only, 1: Random, 2,  Maximum/random] 3: Maximum
