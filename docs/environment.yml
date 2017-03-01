@@ -7,7 +7,6 @@ dependencies:
     - sphinx
     - matplotlib
     - ipython
-    - gcc
     - pip:
         - nbsphinx
         - sphinxcontrib-bibtex

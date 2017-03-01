@@ -9,7 +9,7 @@ python setup.py install
 ```
 
 Hopefully in the future we will get the build procedure fully automated
-with setuptools 
+with setuptools
 '''
 import os, sys, subprocess, string
 from numpy.distutils import fcompiler
@@ -120,7 +120,11 @@ cppflags = ''
 f77flags = ''
 f90flags = ''
 # figure out which compiler we're going to use
-compiler = fcompiler.get_default_fcompiler()
+try:
+    compiler = fcompiler.get_default_fcompiler()
+except:
+    compiler = None
+    print 'Something went wrong with finding a Fortran compiler.'
 # set some fortran compiler-dependent flags (following CliMT code here)
 if compiler == 'gnu95':
     f77flags='-ffixed-line-length-132 -fdefault-real-8'
