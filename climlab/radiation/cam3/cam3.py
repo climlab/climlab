@@ -33,10 +33,16 @@ import numpy as np
 from climlab import constants as const
 from climlab.utils.thermo import vmr_to_mmr
 from climlab.radiation.radiation import _Radiation_SW, _Radiation_LW
-#  the compiled fortran extension
-import _cam3
-import netCDF4 as nc
 import os
+#  Wrapping these imports in try/except to avoid failures during documentation building on readthedocs
+try:
+    import _cam3
+except:
+    print 'Cannot import compiled Fortran extension, this module will not be functional.'
+try:
+    import netCDF4 as nc
+except:
+    print 'Cannot import netCDF4 interface. Will not be able to properly initialize the CAM3 module.'
 
 
 def init_cam3(mod):

@@ -5,7 +5,11 @@ from climlab.radiation.radiation import _Radiation_SW
 from utils import _prepare_general_arguments
 from utils import _climlab_to_rrtm, _climlab_to_rrtm_sfc, _rrtm_to_climlab
 from . import nbndsw, naerec
-from _rrtmg_sw import driver as swdriver
+try:
+    from _rrtmg_sw import driver as swdriver
+except:
+    print 'Cannot import compiled _rrtmg_sw driver.'
+
 
 class RRTMG_SW(_Radiation_SW):
     def __init__(self,
