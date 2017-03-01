@@ -6,6 +6,7 @@ def readme():
 
 #  Run the manual f2py build script
 try:
+    from numpy.distutils import fcompiler
     compiler = fcompiler.get_default_fcompiler()
     import build_fortran_extensions
 except:
