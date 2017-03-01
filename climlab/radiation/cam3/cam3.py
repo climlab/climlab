@@ -39,7 +39,7 @@ import os
 try:
     import _cam3
 except:
-    print 'Cannot import compiled Fortran extension, this module will not be functional.'
+    print 'Cannot import compiled Fortran extension, CAM3 module will not be functional.'
 try:
     import netCDF4 as nc
 except:
@@ -61,8 +61,10 @@ def init_cam3(mod):
         setattr(mod, field, data.variables[field][:].T)
     data.close()
 
-init_cam3(_cam3.absems)
-
+try:
+    init_cam3(_cam3.absems)
+except:
+    print 'Cannot initialize the CAM3 module.'
 
 class CAM3(_Radiation_SW, _Radiation_LW):
     '''
