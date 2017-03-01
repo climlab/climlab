@@ -1,4 +1,4 @@
-climlab.radiation.cam3.cam3
+cam3
 ---------
 
 .. inheritance-diagram:: climlab.radiation.cam3.cam3

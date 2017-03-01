@@ -1,4 +1,4 @@
-climlab.radiation.rrtm.rrtmg
+rrtmg
 ---------
 
 .. inheritance-diagram:: climlab.radiation.rrtm.rrtmg

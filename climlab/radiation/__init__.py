@@ -1,3 +1,8 @@
+'''
+Modules for radiative transfer in vertical columns,
+along with processes for insolation and fixed relative humidity.
+'''
+
 from aplusbt import AplusBT, AplusBT_CO2
 from boltzmann import Boltzmann
 from insolation import FixedInsolation, P2Insolation, AnnualMeanInsolation, DailyInsolation

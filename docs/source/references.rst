@@ -1,9 +1,7 @@
 .. highlight:: rst
 
-References
+Bibliography
 ==========
 
 .. bibliography:: bibliography.bib
    :list: bullet
-
-

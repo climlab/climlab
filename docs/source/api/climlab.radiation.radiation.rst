@@ -1,4 +1,4 @@
-climlab.radiation.radiation
+radiation
 ---------
 
 .. inheritance-diagram:: climlab.radiation.radiation

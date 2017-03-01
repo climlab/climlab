@@ -1,4 +1,4 @@
-Climlab Reference
+Reference
 =================
 
 This chapter documents the source code of the ``climlab`` package.
@@ -10,7 +10,7 @@ has been documented for a comprehensive understanding and traceability.
 
 .. automodule:: climlab
 
-Subpackages
+climlab subpackages
 -----------
 
 .. toctree::

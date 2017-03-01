@@ -1,10 +1,18 @@
 climlab.radiation
 =================
 
-These modules implement radiative transfer in vertical columns.
+.. inheritance-diagram:: climlab.radiation
+   :parts: 1
+   :private-bases:
+
+.. automodule:: climlab.radiation
+   :members:
+   :private-members:
+   :undoc-members:
+   :show-inheritance:
 
 .. toctree::
-    :maxdepth: 3
+   :maxdepth: 3
 
    climlab.radiation.aplusbt
    climlab.radiation.boltzmann
