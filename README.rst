@@ -26,13 +26,24 @@ Links
 
 Installation
 ----------------
+Currently the only way to install is to build from source.
+To get the latest stable version, do
+
+``git clone https://github.com/brian-rose/climlab.git``
+
+Then from the `climlab` directory, do
+
 ``python setup.py install``
 
     or, if you are developing new code
 
 ``python setup.py develop``
 
-This will trigger the build process for the Fortran components.
+This will trigger the build process for the Fortran components,
+assuming you have a Fortran compiler available on your system.
+
+The Fortran compiler is necessary for the CAM3 and RRTMG radiation modules.
+Other `climlab` components will be fully functional without it.
 
 Dependencies
 -----------------
@@ -64,7 +75,7 @@ appropriate collection of sub-processes.
 
 Currently, ``climlab`` has out-of-the-box support and documented examples for
 
-- 1D radiative and radiative-convective single column models, with various radiation schemes:
+- Radiative and radiative-convective column models, with various radiation schemes:
     - RRTMG (a widely used radiative transfer code)
     - CAM3  (from the NCAR GCM)
     - Grey Gas
@@ -73,13 +84,13 @@ Currently, ``climlab`` has out-of-the-box support and documented examples for
 - Seasonal and steady-state models
 - Arbitrary combinations of the above, for example:
     - 2D latitude-pressure models with radiation, horizontal diffusion, and fixed relative humidity
-- orbital / insolation calculations
-- boundary layer sensible and latent heat fluxes
+- Orbital / insolation calculations
+- Boundary layer sensible and latent heat fluxes
 
 
 Documentation and Examples
 ------------------
-Full user manual is available here_. 
+Full user manual is available here_.
 
 The directory ``climlab/courseware/`` also contains a collection of Jupyter
 notebooks (*.ipynb) used for teaching some basics of climate science,
@@ -115,8 +126,12 @@ It also includes the CAM3 radiation module.
 Version 0.4 was released in October 2016. It includes comprehensive documentation,
 an automated test suite, support for latitude-longitude grids, and numerous small enhancements and bug fixes.
 
-Version 0.4.2 (released January 2017) introduces the RRTMG radiation scheme, a much-improved build process for the Fortran extension,
+Version 0.4.2 (released January 2017) introduces the RRTMG radiation scheme,
+a much-improved build process for the Fortran extension,
 and numerous enhancements and simplifications to the API.
+
+Version 0.5 (released March 2017) provides bug fixes and full functionality for the RRTMG module,
+an improved common API for all radiation modules, and better documentation.
 
 The documentation_ was first created by Moritz Kreuzer (Potsdam Institut for Climate Impact Research) as part of a thesis project in Spring 2016.
 
