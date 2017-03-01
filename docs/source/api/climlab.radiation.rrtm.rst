@@ -1,10 +1,6 @@
 rrtm
 ---------
 
-.. inheritance-diagram:: climlab.radiation.rrtm
-   :parts: 1
-   :private-bases:
-
 .. toctree::
    :maxdepth: 3
 

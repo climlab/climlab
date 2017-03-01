@@ -32,6 +32,7 @@ See <http://rtweb.aer.com/rrtm_frame.html> for more information about the RRTMG 
             rcm.integrate_years(1)
             #  Check for energy balance
             print rcm.ASR - rcm.OLR
+
 '''
 from __future__ import division
 import _rrtmg_lw, _rrtmg_sw
