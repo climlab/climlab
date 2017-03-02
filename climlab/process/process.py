@@ -455,6 +455,11 @@ class Process(object):
         for name in inputlist:
             self._input_vars.append(name)
 
+    def declare_diagnostics(self, diaglist):
+        '''Add the variable names in ``inputlist`` to the list of diagnostics.'''
+        for name in diaglist:
+            self._diag_vars.append(name)
+
     def remove_diagnostic(self, name):
         """	Removes a diagnostic from the ``process.diagnostic`` dictionary
         and also delete the associated process attribute.
@@ -516,7 +521,7 @@ class Process(object):
     # a single axis of that type in the process.
     @property
     def lat(self):
-        """Property of latitudinal points of the process.
+        """Latitude of grid centers (degrees North)
 
         :getter:    Returns the points of axis ``'lat'`` if availible in the
                     process's domains.
@@ -536,7 +541,7 @@ class Process(object):
             raise ValueError('Can\'t resolve a lat axis.')
     @property
     def lat_bounds(self):
-        """Property of latitudinal bounds of the process.
+        """Latitude of grid interfaces (degrees North)
 
         :getter:    Returns the bounds of axis ``'lat'`` if availible in the
                     process's domains.
@@ -556,7 +561,7 @@ class Process(object):
             raise ValueError('Can\'t resolve a lat axis.')
     @property
     def lon(self):
-        """Property of longitudinal points of the process.
+        """Longitude of grid centers (degrees)
 
         :getter:    Returns the points of axis ``'lon'`` if availible in the
                     process's domains.
@@ -576,7 +581,7 @@ class Process(object):
             raise ValueError('Can\'t resolve a lon axis.')
     @property
     def lon_bounds(self):
-        """Property of longitudinal bounds of the process.
+        """Longitude of grid interfaces (degrees)
 
         :getter:    Returns the bounds of axis ``'lon'`` if availible in the
                     process's domains.
@@ -596,7 +601,7 @@ class Process(object):
             raise ValueError('Can\'t resolve a lon axis.')
     @property
     def lev(self):
-        """Property of altitudinal points of the process.
+        """Pressure levels at grid centers (hPa or mb)
 
         :getter:    Returns the points of axis ``'lev'`` if availible in the
                     process's domains.
@@ -616,7 +621,7 @@ class Process(object):
             raise ValueError('Can\'t resolve a lev axis.')
     @property
     def lev_bounds(self):
-        """Property of altitudinal bounds of the process.
+        """Pressure levels at grid interfaces (hPa or mb)
 
         :getter:    Returns the bounds of axis ``'lev'`` if availible in the
                     process's domains.
@@ -636,7 +641,7 @@ class Process(object):
             raise ValueError('Can\'t resolve a lev axis.')
     @property
     def depth(self):
-        """Property of depth points of the process.
+        """Depth at grid centers (m)
 
         :getter:    Returns the points of axis ``'depth'`` if availible in the
                     process's domains.
@@ -656,7 +661,7 @@ class Process(object):
             raise ValueError('Can\'t resolve a depth axis.')
     @property
     def depth_bounds(self):
-        """Property of depth bounds of the process.
+        """Depth at grid interfaces (m)
 
         :getter:    Returns the bounds of axis ``'depth'`` if availible in the
                     process's domains.
@@ -677,7 +682,7 @@ class Process(object):
 
 
 def process_like(proc):
-    """Copys the given process.
+    """Make an exact clone of a process, including state and all subprocesses.
 
     The creation date is updated.
 

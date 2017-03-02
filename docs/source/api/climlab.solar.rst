@@ -1,6 +1,11 @@
 climlab.solar
 =============
 
+.. automodule:: climlab.solar
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 .. toctree::
 
    climlab.solar.insolation

@@ -16,23 +16,61 @@ Author
 | brose@albany.edu
 
 
+About climlab
+--------------
+``climlab`` is a flexible engine for process-oriented climate modeling.
+It is based on a very general concept of a model as a collection of individual,
+interacting processes. ``climlab`` defines a base class called ``Process``, which
+can contain an arbitrarily complex tree of sub-processes (each also some
+sub-class of ``Process``). Every climate process (radiative, dynamical,
+physical, turbulent, convective, chemical, etc.) can be simulated as a stand-alone
+process model given appropriate input, or as a sub-process of a more complex model.
+New classes of model can easily be defined and run interactively by putting together an
+appropriate collection of sub-processes.
+
+Currently, ``climlab`` has out-of-the-box support and documented examples for
+
+- Radiative and radiative-convective column models, with various radiation schemes:
+    - RRTMG (a widely used radiative transfer code)
+    - CAM3  (from the NCAR GCM)
+    - Grey Gas
+    - Simplified band-averaged models (4 bands each in longwave and shortwave)
+- 1D diffusive energy balance models
+- Seasonal and steady-state models
+- Arbitrary combinations of the above, for example:
+    - 2D latitude-pressure models with radiation, horizontal diffusion, and fixed relative humidity
+- Orbital / insolation calculations
+- Boundary layer sensible and latent heat fluxes
+
+
 Links
 -----
 
--  HTML documentation: http://climlab.readthedocs.io/en/latest
+-  HTML documentation: http://climlab.readthedocs.io/en/latest/intro.html
 -  Issue tracker: http://github.com/brian-rose/climlab/issues
 -  Source code: http://github.com/brian-rose/climlab
 
 
 Installation
 ----------------
+Currently the only way to install is to build from source.
+To get the latest stable version, do
+
+``git clone https://github.com/brian-rose/climlab.git``
+
+Then from the `climlab` directory, do
+
 ``python setup.py install``
 
     or, if you are developing new code
 
 ``python setup.py develop``
 
-This will trigger the build process for the Fortran components.
+This will trigger the build process for the Fortran components,
+assuming you have a Fortran compiler available on your system.
+
+The Fortran compiler is necessary for the CAM3 and RRTMG radiation modules.
+Other `climlab` components will be fully functional without it.
 
 Dependencies
 -----------------
@@ -50,36 +88,10 @@ Recommended for full functionality
 
 Anaconda Python is highly recommended and will provide everything you need.
 
-About climlab
---------------
-``climlab`` is a flexible engine for process-oriented climate modeling.
-It is based on a very general concept of a model as a collection of individual,
-interacting processes. ``climlab`` defines a base class called ``Process``, which
-can contain an arbitrarily complex tree of sub-processes (each also some
-sub-class of ``Process``). Every climate process (radiative, dynamical,
-physical, turbulent, convective, chemical, etc.) can be simulated as a stand-alone
-process model given appropriate input, or as a sub-process of a more complex model.
-New classes of model can easily be defined and run interactively by putting together an
-appropriate collection of sub-processes.
-
-Currently, ``climlab`` has out-of-the-box support and documented examples for
-
-- 1D radiative and radiative-convective single column models, with various radiation schemes:
-    - RRTMG (a widely used radiative transfer code)
-    - CAM3  (from the NCAR GCM)
-    - Grey Gas
-    - Simplified band-averaged models (4 bands each in longwave and shortwave)
-- 1D diffusive energy balance models
-- Seasonal and steady-state models
-- Arbitrary combinations of the above, for example:
-    - 2D latitude-pressure models with radiation, horizontal diffusion, and fixed relative humidity
-- orbital / insolation calculations
-- boundary layer sensible and latent heat fluxes
-
 
 Documentation and Examples
 ------------------
-Full user manual is available here_. 
+Full user manual is available here_.
 
 The directory ``climlab/courseware/`` also contains a collection of Jupyter
 notebooks (*.ipynb) used for teaching some basics of climate science,
@@ -115,8 +127,12 @@ It also includes the CAM3 radiation module.
 Version 0.4 was released in October 2016. It includes comprehensive documentation,
 an automated test suite, support for latitude-longitude grids, and numerous small enhancements and bug fixes.
 
-Version 0.4.2 (released January 2017) introduces the RRTMG radiation scheme, a much-improved build process for the Fortran extension,
+Version 0.4.2 (released January 2017) introduces the RRTMG radiation scheme,
+a much-improved build process for the Fortran extension,
 and numerous enhancements and simplifications to the API.
+
+Version 0.5 (released March 2017) provides bug fixes and full functionality for the RRTMG module,
+an improved common API for all radiation modules, and better documentation.
 
 The documentation_ was first created by Moritz Kreuzer (Potsdam Institut for Climate Impact Research) as part of a thesis project in Spring 2016.
 
@@ -143,7 +159,7 @@ See the accompanying LICENSE file.
 .. |DOI| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.163527.svg
    :target: https://doi.org/10.5281/zenodo.163527
 .. |docs| image:: http://readthedocs.org/projects/climlab/badge/?version=latest
-   :target: http://climlab.readthedocs.io/en/latest/?badge=latest
+   :target: http://climlab.readthedocs.io/en/latest/intro.html
    :alt: Documentation Status
 =======
 

@@ -1,36 +1,73 @@
-'''
-_Radiation is the base class for radiation processes
-currently CAM3 and RRTMG
+'''_Radiation, _Radiation_SW and _Radiation_LW
+are the base classes for radiative transfer modules
+
+Currently this includes :class:`~climlab.radiation.cam3.CAM3`,
+:class:`~climlab.radiation.rrtm.RRTMG`,
+:class:`~climlab.radiation.rrtm.RRTMG_LW`, and
+:class:`~climlab.radiation.rrtm.RRTMG_SW`
 
 Basic characteristics:
 
 State:
-- Ts (surface radiative temperature)
-- Tatm (air temperature)
 
-Input (specified or provided by parent process):
-- (fix this up)
+    - Ts (surface radiative temperature)
+    - Tatm (air temperature)
 
-Shortave processes should define these diagnostics (minimum):
-- ASR (W/m2, net absorbed shortwave radiation)
-- SW_flux_up   (W/m2, defined at pressure level interfaces)
-- SW_flux_down (W/m2, defined at pressure level interfaces)
-- SW_degrees_per_day   (K/day, radiative heating rate)
+Input arguments (both LW and SW):
 
-May also have all the same diagnostics for clear-sky,
-e.g. ASR_clr, SW_flux_up_clr, etc.
+    - specific_humidity (kg/kg)
+    - absorber_vmr (dict of volumetric mixing ratios)
+    - cldfrac      (layer cloud fraction
+    - clwp         (in-cloud liquid water path (g/m2))
+    - ciwp = 0.,     # in-cloud ice water path (g/m2)
+    - r_liq = 0.,    # Cloud water drop effective radius (microns)
+    - r_ice = 0.,    # Cloud ice particle effective size (microns)
+    - ozone_file = 'apeozone_cam3_5_54.nc'  (file with ozone distribution)
 
-Longwave processes should define these diagnostics (minimum):
-- OLR (W/m2, net outgoing longwave radiation at TOA)
-- LW_flux_up
-- LW_flux_down
-- LW_degrees_per_day
+Additional input arguments for SW:
 
-and may also have the same diagnostics for clear-sky.
+     - albedo = None  (optional, single parameter to set all 4 albedo values)
+     - aldif = 0.3,   (near-infrared albedo, diffuse)
+     - aldir = 0.3,   (near-infrared albedo, direct)
+     - asdif = 0.3,   (shortwave albedo, diffuse)
+     - asdir = 0.3,   (shortwave albedo, direct)
+     - S0    = const.S0,  (solar constant, W/m2)
+     - insolation = const.S0/4.,  (time-mean insolaltion, W/m2)
+     - coszen = None,    # cosine of the solar zenith angle
+     - eccentricity_factor = 1.,  # instantaneous irradiance = S0 * eccentricity_factor
 
+Additional input arguments for LW:
+    - emissivity = 1.,  # surface emissivity
 
-WORK IN PROGRESS....
+Shortave processes compute these diagnostics (minimum):
+
+    - ASR (W/m2, net Absorbed Shortwave Radiation at TOA, **positive down**)
+    - ASRclr (clear-sky component)
+    - ASRcld (cloud component, all-sky minus clear-sky)
+    - SW_flux_up   (W/m2, defined at pressure level interfaces)
+    - SW_flux_down (W/m2, defined at pressure level interfaces)
+    - SW_flux_net  (W/m2 **downward** net flux at pressure level interfaces)
+    - SW_flux_up_clr  (clear-sky flux)
+    - SW_flux_down_clr (clear-sky flux)
+    - SW_flux_net_clr  (clear-sky flux)
+    - TdotSW   (K/day, radiative heating rate)
+    - TdotSW_clr (clear-sky heating rate)
+
+Longwave processes compute these diagnostics (minimum):
+
+    - OLR (W/m2, net Outgoing Longwave radiation at TOA, **positive up**)
+    - OLRclr (clear-sky component)
+    - OLRcld (cloud component, all-sky minus clear-sky)
+    - LW_flux_up   (W/m2, defined at pressure level interfaces)
+    - LW_flux_down (W/m2, defined at pressure level interfaces)
+    - LW_flux_net  (W/m2 **upward** net flux at pressure level interfaces)
+    - LW_flux_up_clr  (clear-sky flux)
+    - LW_flux_down_clr (clear-sky flux)
+    - LW_flux_net_clr  (clear-sky flux)
+    - TdotLW   (K/day, radiative heating rate)
+    - TdotLW_clr (clear-sky heating rate)
 '''
+
 from __future__ import division
 import numpy as np
 from climlab.process import EnergyBudget
@@ -42,17 +79,32 @@ from climlab import constants as const
 
 
 def default_specific_humidity(Tatm):
+    '''Initialize a specific humidity distribution
+    based on a prescribed relative humidity profile.
+
+    Input is air temperature array
+
+    Output is specific humidity on same grid
+    '''
     h2o = ManabeWaterVapor(state={'Tatm': Tatm})
-    #  should be converting from specific humidity to volume mixing ratio here...
     return h2o.q
 
 def default_absorbers(Tatm, ozone_file = 'apeozone_cam3_5_54.nc'):
-    '''Initialize a dictionary of radiatively active gases
+    '''Initialize a dictionary of well-mixed radiatively active gases
     All values are volumetric mixing ratios.
 
     Ozone is set to a climatology.
 
-    All other gases are assumed well-mixed.
+    All other gases are assumed well-mixed:
+
+        - CO2
+        - CH4
+        - N2O
+        - O2
+        - CFC11
+        - CFC12
+        - CFC22
+        - CCL4
 
     Specific values are based on the AquaPlanet Experiment protocols,
     except for O2 which is set the realistic value 0.21
@@ -98,7 +150,7 @@ def default_absorbers(Tatm, ozone_file = 'apeozone_cam3_5_54.nc'):
     return absorber_vmr
 
 class _Radiation(EnergyBudget):
-    '''Base class for radiation models (currently CAM3 and RRTMG).
+    '''Abstact base class for SW and LW radiation processes.
     '''
     def __init__(self,
             specific_humidity = None,
@@ -127,6 +179,8 @@ class _Radiation(EnergyBudget):
 
 
 class _Radiation_SW(_Radiation):
+    '''Parent class for SW radiation modules
+    '''
     def __init__(self,
                  albedo = None,
                  aldif = 0.3,

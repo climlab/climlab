@@ -1,3 +1,8 @@
+'''
+Modules for radiative transfer in vertical columns,
+along with processes for insolation and fixed relative humidity.
+'''
+
 from aplusbt import AplusBT, AplusBT_CO2
 from boltzmann import Boltzmann
 from insolation import FixedInsolation, P2Insolation, AnnualMeanInsolation, DailyInsolation
@@ -8,8 +13,8 @@ from water_vapor import ManabeWaterVapor
 try:
     from cam3 import CAM3, CAM3_LW, CAM3_SW
 except:
-    print 'CAM3 Radiation module not available.'
+    print 'CAM3 radiation module not available.'
 try:
     from rrtm import RRTMG, RRTMG_LW, RRTMG_SW
 except:
-    print 'RRTM module not available.'
+    print 'RRTMG radiation module not available.'

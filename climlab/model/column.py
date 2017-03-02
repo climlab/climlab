@@ -120,6 +120,8 @@ class GreyRadiationModel(TimeDependentProcess):
         '''Set all the diagnostics from long and shortwave radiation.'''
         self.OLR = self.subprocess['LW'].flux_to_space
         self.LW_down_sfc = self.subprocess['LW'].flux_to_sfc
+        self.LW_up_sfc = self.subprocess['LW'].flux_from_sfc
+        self.LW_absorbed_sfc = self.LW_down_sfc - self.LW_up_sfc
         self.LW_absorbed_atm = self.subprocess['LW'].absorbed
         self.LW_emission = self.subprocess['LW'].emission
             #  contributions to OLR from surface and atm. levels
@@ -132,6 +134,7 @@ class GreyRadiationModel(TimeDependentProcess):
         self.SW_absorbed_atm = self.subprocess['SW'].absorbed
         self.SW_down_sfc = self.subprocess['SW'].flux_to_sfc
         self.SW_up_sfc = self.subprocess['SW'].flux_from_sfc
+        self.SW_absorbed_sfc = self.SW_down_sfc - self.SW_up_sfc
         self.SW_up_TOA = self.subprocess['SW'].flux_to_space
         self.SW_down_TOA = self.subprocess['SW'].flux_from_space
         self.planetary_albedo = (self.subprocess['SW'].flux_to_space /

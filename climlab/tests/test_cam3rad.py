@@ -19,7 +19,8 @@ def rcm():
     convadj = climlab.convection.ConvectiveAdjustment(state=state,
                                                       adj_lapse_rate=6.5)
     # CAM3 radiation with default parameters and interactive water vapor
-    rad = climlab.radiation.CAM3(state=state, albedo=alb, specific_humidity=h2o.q)
+    #rad = climlab.radiation.CAM3(state=state, albedo=alb, specific_humidity=h2o.q)
+    rad = climlab.radiation.CAM3(state=state, albedo=alb)
     # Couple the models
     rcm.add_subprocess('Radiation', rad)
     rcm.add_subprocess('ConvectiveAdjustment', convadj)
@@ -35,7 +36,17 @@ def test_rce(rcm):
     #rcm.integrate_years(5)
     #assert(np.isclose(rcm.Ts, ))
 
-def test_radiative_forcing(rcm):
+def test_re_radiative_forcing():
+    state = climlab.column_state(num_lev=num_lev)
+    rad = climlab.radiation.CAM3(state=state)
+    rad.integrate_years(2)
+    assert np.abs(rad.ASR - rad.OLR) < 0.1  # close to energy balance
+    rad2 = climlab.process_like(rad)
+    rad2.absorber_vmr['CO2'] *= 2.
+    rad2.compute_diagnostics()
+    assert (rad2.ASR - rad2.OLR) > 1.  # positive radiative forcing
+
+def test_rce_radiative_forcing(rcm):
     '''Run a single-column radiative-convective model with CAM3 radiation
     out to equilibrium. Clone the model, double CO2 and measure the instantaneous
     change in TOA flux. It should be positive net downward flux.'''

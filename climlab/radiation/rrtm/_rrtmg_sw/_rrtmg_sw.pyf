@@ -1,0 +1,125 @@
+!    -*- f90 -*-
+! Note: the context of this file is case sensitive.
+
+python module _rrtmg_sw ! in 
+    interface  ! in :_rrtmg_sw
+        module parkind ! in :_rrtmg_sw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_sw/rrtmg_sw_v4.0/gcm_model/modules/parkind.f90
+            integer, parameter,optional :: kind_im=selected_int_kind(6)
+            integer, parameter,optional :: kind_in=kind(1)
+            integer, parameter,optional :: kind_rm=selected_real_kind(6)
+            integer, parameter,optional :: kind_rn=kind(1.0)
+            integer, parameter,optional :: kind_rb=selected_real_kind(12)
+            integer, parameter,optional :: kind_ib=selected_int_kind(13)
+        end module parkind
+        module parrrsw ! in :_rrtmg_sw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_sw/rrtmg_sw_v4.0/gcm_model/modules/parrrsw.f90
+            use parkind, only: im=>kind_im,rb=>kind_rb
+            integer(kind=im), parameter,optional :: jmumu=32
+            integer(kind=im), parameter,optional :: mxlay=203
+            integer(kind=im), parameter,optional :: jpb1=16
+            integer(kind=im), parameter,optional :: jmxstr=16
+            integer(kind=im), parameter,optional :: jpb2=29
+            integer(kind=im), parameter,optional :: naerec=6
+            integer(kind=im), parameter,optional :: jmcmu=32
+            integer(kind=im), parameter,optional :: jmphi=3
+            integer(kind=im), parameter,optional :: ng29=12
+            integer(kind=im), parameter,optional :: ng28=6
+            integer(kind=im), parameter,optional :: ng23=10
+            integer(kind=im), parameter,optional :: ng22=2
+            integer(kind=im), parameter,optional :: ng21=10
+            integer(kind=im), parameter,optional :: ng20=10
+            integer(kind=im), parameter,optional :: ng27=8
+            integer(kind=im), parameter,optional :: ng26=6
+            integer(kind=im), parameter,optional :: ng25=6
+            integer(kind=im), parameter,optional :: ng24=8
+            integer(kind=im), parameter,optional :: nbndsw=14
+            integer(kind=im), parameter,optional :: ngs29=112
+            integer(kind=im), parameter,optional :: ngs28=100
+            integer(kind=im), parameter,optional :: ngs27=94
+            integer(kind=im), parameter,optional :: jmxang=4
+            integer(kind=im), parameter,optional :: ngs25=80
+            integer(kind=im), parameter,optional :: ngs24=74
+            integer(kind=im), parameter,optional :: ngs23=66
+            integer(kind=im), parameter,optional :: ngs22=56
+            integer(kind=im), parameter,optional :: ngs21=54
+            integer(kind=im), parameter,optional :: ngs20=44
+            integer(kind=im), parameter,optional :: mxmol=38
+            integer(kind=im), parameter,optional :: ng16=6
+            integer(kind=im), parameter,optional :: ng17=12
+            integer(kind=im), parameter,optional :: ngs26=86
+            integer(kind=im), parameter,optional :: ng18=8
+            integer(kind=im), parameter,optional :: ng19=8
+            integer(kind=im), parameter,optional :: mg=16
+            real(kind=rb), parameter,optional :: rrsw_scon=1368.22
+            integer(kind=im), parameter,optional :: nmol=7
+            integer(kind=im), parameter,optional :: nstr=2
+            integer(kind=im), parameter,optional :: jpband=29
+            integer(kind=im), parameter,optional :: ngptsw=112
+            integer(kind=im), parameter,optional :: ngs16=6
+            integer(kind=im), parameter,optional :: ngs17=18
+            integer(kind=im), parameter,optional :: ngs18=26
+            integer(kind=im), parameter,optional :: ngs19=34
+        end module parrrsw
+        subroutine driver(ncol,nlay,icld,permuteseed,irng,idrv,cpdair,play,plev,tlay,tlev,tsfc,h2ovmr,o3vmr,co2vmr,ch4vmr,n2ovmr,o2vmr,aldif,aldir,asdif,asdir,coszen,adjes,dyofyr,scon,isolvar,indsolvar,bndsolvar,solcycfrac,inflgsw,iceflgsw,liqflgsw,cldfrac,ciwp,clwp,reic,relq,tauc,ssac,asmc,fsfc,tauaer,ssaaer,asmaer,ecaer,swuflx,swdflx,swhr,swuflxc,swdflxc,swhrc) ! in :_rrtmg_sw:/Users/br546577/code/climlab/climlab/radiation/rrtm/_rrtmg_sw/Driver.f90
+            use parrrsw, only: naerec,ngptsw,nbndsw
+            use rrtmg_sw_init, only: rrtmg_sw_ini
+            use mcica_subcol_gen_sw, only: mcica_subcol_sw
+            use parkind, only: im=>kind_im
+            use rrtmg_sw_rad, only: rrtmg_sw
+            integer(kind=im) intent(in) :: ncol
+            integer(kind=im) intent(in) :: nlay
+            integer(kind=im) intent(inout) :: icld
+            integer(kind=im) intent(in) :: permuteseed
+            integer(kind=im) intent(inout) :: irng
+            integer(kind=im) intent(in) :: idrv
+            real(kind=8) intent(in) :: cpdair
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: play
+            real(kind=8) dimension(ncol,nlay + 1),intent(in),depend(ncol,nlay) :: plev
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: tlay
+            real(kind=8) dimension(ncol,nlay + 1),intent(in),depend(ncol,nlay) :: tlev
+            real(kind=8) dimension(ncol),intent(in),depend(ncol) :: tsfc
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: h2ovmr
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: o3vmr
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: co2vmr
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: ch4vmr
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: n2ovmr
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: o2vmr
+            real(kind=8) dimension(ncol),intent(in),depend(ncol) :: aldif
+            real(kind=8) dimension(ncol),intent(in),depend(ncol) :: aldir
+            real(kind=8) dimension(ncol),intent(in),depend(ncol) :: asdif
+            real(kind=8) dimension(ncol),intent(in),depend(ncol) :: asdir
+            real(kind=8) dimension(ncol),intent(in),depend(ncol) :: coszen
+            real(kind=8) intent(in) :: adjes
+            integer(kind=im) intent(in) :: dyofyr
+            real(kind=8) intent(in) :: scon
+            integer(kind=im) intent(in) :: isolvar
+            real(kind=8) dimension(2),intent(inout) :: indsolvar
+            real(kind=8) dimension(14),intent(inout) :: bndsolvar
+            real(kind=8) intent(inout) :: solcycfrac
+            integer(kind=im) intent(in) :: inflgsw
+            integer(kind=im) intent(in) :: iceflgsw
+            integer(kind=im) intent(in) :: liqflgsw
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: cldfrac
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: ciwp
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: clwp
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: reic
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: relq
+            real(kind=8) dimension(14,ncol,nlay),intent(in),depend(ncol,nlay) :: tauc
+            real(kind=8) dimension(14,ncol,nlay),intent(in),depend(ncol,nlay) :: ssac
+            real(kind=8) dimension(14,ncol,nlay),intent(in),depend(ncol,nlay) :: asmc
+            real(kind=8) dimension(14,ncol,nlay),intent(in),depend(ncol,nlay) :: fsfc
+            real(kind=8) dimension(ncol,nlay,14),intent(in),depend(ncol,nlay) :: tauaer
+            real(kind=8) dimension(ncol,nlay,14),intent(in),depend(ncol,nlay) :: ssaaer
+            real(kind=8) dimension(ncol,nlay,14),intent(in),depend(ncol,nlay) :: asmaer
+            real(kind=8) dimension(ncol,nlay,6),intent(in),depend(ncol,nlay) :: ecaer
+            real(kind=8) dimension(ncol,nlay + 1),intent(out),depend(ncol,nlay) :: swuflx
+            real(kind=8) dimension(ncol,nlay + 1),intent(out),depend(ncol,nlay) :: swdflx
+            real(kind=8) dimension(ncol,nlay),intent(out),depend(ncol,nlay) :: swhr
+            real(kind=8) dimension(ncol,nlay + 1),intent(out),depend(ncol,nlay) :: swuflxc
+            real(kind=8) dimension(ncol,nlay + 1),intent(out),depend(ncol,nlay) :: swdflxc
+            real(kind=8) dimension(ncol,nlay),intent(out),depend(ncol,nlay) :: swhrc
+        end subroutine driver
+    end interface 
+end python module _rrtmg_sw
+
+! This file was auto-generated with f2py (version:2).
+! See http://cens.ioc.ee/projects/f2py2e/

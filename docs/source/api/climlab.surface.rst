@@ -1,14 +1,13 @@
 climlab.surface
 ===============
 
-albedo
-------
-
-.. inheritance-diagram:: climlab.surface.albedo
-   :parts: 1
-   :private-bases:
-
-.. automodule:: climlab.surface.albedo
+.. automodule:: climlab.surface
     :members:
+    :private-members:
     :undoc-members:
     :show-inheritance:
+
+.. toctree::
+
+    climlab.surface.albedo
+    climlab.surface.turbulent

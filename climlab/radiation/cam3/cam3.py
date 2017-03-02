@@ -1,70 +1,76 @@
 '''
-climlab wrap of the CAM3 radiation code
+climlab wrappers for the NCAR CAM3 radiation code
+
+    :Example:
+
+        Here is a quick example of setting up a single-column
+        Radiative-Convective model with fixed relative humdity::
+
+            import climlab
+            alb = 0.25
+            #  State variables (Air and surface temperature)
+            state = climlab.column_state(num_lev=30)
+            #  Parent model process
+            rcm = climlab.TimeDependentProcess(state=state)
+            #  Fixed relative humidity
+            h2o = climlab.radiation.ManabeWaterVapor(state=state)
+            #  Couple water vapor to radiation
+            rad = climlab.radiation.CAM3(state=state, specific_humidity=h2o.q, albedo=alb)
+            #  Convective adjustment
+            conv = climlab.convection.ConvectiveAdjustment(state=state, adj_lapse_rate=6.5)
+            #  Couple everything together
+            rcm.add_subprocess('Radiation', rad)
+            rcm.add_subprocess('WaterVapor', h2o)
+            rcm.add_subprocess('Convection', conv)
+            #  Run the model
+            rcm.integrate_years(1)
+            #  Check for energy balance
+            print rcm.ASR - rcm.OLR
+
+
 '''
 from __future__ import division
 import numpy as np
-import netCDF4 as nc
 from climlab import constants as const
 from climlab.utils.thermo import vmr_to_mmr
 from climlab.radiation.radiation import _Radiation_SW, _Radiation_LW
 import os
-#  the compiled fortran extension
-import _cam3
+#  Wrapping these imports in try/except to avoid failures during documentation building on readthedocs
+try:
+    import _cam3
+except:
+    print 'Cannot import compiled Fortran extension, CAM3 module will not be functional.'
+try:
+    import netCDF4 as nc
+except:
+    print 'Cannot import netCDF4 interface. Will not be able to properly initialize the CAM3 module.'
 
 
-# Initialise absorptivity / emissivity data
-here = os.path.dirname(__file__)
-datadir = os.path.abspath(os.path.join(here, os.pardir, 'data', 'cam3'))
-AbsEmsDataFile = os.path.join(datadir, 'abs_ems_factors_fastvx.c030508.nc')
-#  Open the absorption data file
-data = nc.Dataset(AbsEmsDataFile)
-#  The fortran module that holds the data
-mod = _cam3.absems
-#  Populate storage arrays with values from netcdf file
-for field in ['ah2onw', 'eh2onw', 'ah2ow', 'ln_ah2ow', 'cn_ah2ow', 'ln_eh2ow', 'cn_eh2ow']:
-    setattr(mod, field, data.variables[field][:].T)
-data.close()
+def init_cam3(mod):
+    # Initialise absorptivity / emissivity data
+    here = os.path.dirname(__file__)
+    #datadir = os.path.abspath(os.path.join(here, os.pardir, 'data', 'cam3'))
+    datadir = os.path.join(here, 'data')
+    AbsEmsDataFile = os.path.join(datadir, 'abs_ems_factors_fastvx.c030508.nc')
+    #  Open the absorption data file
+    data = nc.Dataset(AbsEmsDataFile)
+    #  The fortran module that holds the data
+    #mod = _cam3.absems
+    #  Populate storage arrays with values from netcdf file
+    for field in ['ah2onw', 'eh2onw', 'ah2ow', 'ln_ah2ow', 'cn_ah2ow', 'ln_eh2ow', 'cn_eh2ow']:
+        setattr(mod, field, data.variables[field][:].T)
+    data.close()
 
+try:
+    init_cam3(_cam3.absems)
+except:
+    print 'Cannot initialize the CAM3 module.'
 
 class CAM3(_Radiation_SW, _Radiation_LW):
     '''
     climlab wrapper for the CAM3 radiation code.
 
-    THIS IS ALL OUT OF DATE AND NEEDS FIXING
-
-    Scalar input values:
-    - Well-mixed greenhouse gases in ppmv (all default to zero except CO2):
-        - CO2 (380.)
-        - N2O
-        - CH4
-        - CFC11
-        - CFC12
-    Input values with same dimension as Ts:
-        - coszen (cosine of solar zenith angle, default = 1.)
-        - insolation (W/m2, default = const.S0/4)
-        - surface albedos (all default to 0.07):
-            - asdir (shortwave direct)
-            - asdif (shortwave diffuse)
-            - aldir (near-infrared, direct)
-            - aldif (near-infrared, diffuse)
-    Input values with same dimension as Tatm:
-        - O3 (ozone mass mixing ratio)
-        - q (specific humidity in kg/kg)
-        - cldf (cloud fraction, default is zero)
-        - clwp (cloud liquid water path, default is zero)
-        - ciwp (cloud ice water path, default is zero)
-        - r_liq (liquid effective drop size, microns, default is 10.)
-        - r_ice (ice effective drop size, microns, default is 30.)
-
-    Diagnostics:
-        - ASR (absorbed solar radiation, W/m2)
-        - ASRcld (shortwave cloud radiative effect, all-sky - clear-sky flux, W/m2)
-        - OLR (outgoing longwave radiation, W/m2)
-        - OLRcld (longwave cloud radiative effect, all-sky - clear-sky flux, W/m2)
-        - TdotRad (net radiative heating rate,  K / day)
-        - TdotLW  (longwave radiative heating rate, K / day)
-        - TdotSW  (shortwave radiative heating rate, K / day)
-
+    For some details about inputs and diagnostics, see the `radiation` module.
     '''
     def __init__(self,
                  **kwargs):
@@ -218,7 +224,7 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         self.TdotLW_clr = LWheating_clr_Wm2 / Catm * const.seconds_per_day
         self.TdotSW = SWheating_Wm2 / Catm * const.seconds_per_day
         self.TdotSW_clr = SWheating_clr_Wm2 / Catm * const.seconds_per_day
-        
+
 
 class CAM3_LW(CAM3):
     def __init__(self, **kwargs):
