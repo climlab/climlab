@@ -9,12 +9,5 @@ from insolation import FixedInsolation, P2Insolation, AnnualMeanInsolation, Dail
 from nband import NbandRadiation, ThreeBandSW
 from water_vapor import ManabeWaterVapor
 #from radiation import Radiation, Radiation_SW, Radiation_LW
-#  CAM3 requires netCDF4
-try:
-    from cam3 import CAM3, CAM3_LW, CAM3_SW
-except:
-    print 'CAM3 radiation module not available.'
-try:
-    from rrtm import RRTMG, RRTMG_LW, RRTMG_SW
-except:
-    print 'RRTMG radiation module not available.'
+from cam3 import CAM3, CAM3_LW, CAM3_SW
+from rrtm import RRTMG, RRTMG_LW, RRTMG_SW

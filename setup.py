@@ -1,16 +1,19 @@
 import os, sys
+from numpy.distutils import fcompiler
+from numpy.distutils.fcompiler import CompilerNotFound
+
 
 def readme():
     with open('README.rst') as f:
         return f.read()
 
 #  Run the manual f2py build script
-# try:
-#     from numpy.distutils import fcompiler
-#     compiler = fcompiler.get_default_fcompiler()
-#     import build_fortran_extensions
-# except:
-#     print 'Cannot find a Fortran compiler, not building Fortran components!'
+try:
+    from numpy.distutils import fcompiler
+    compiler = fcompiler.get_default_fcompiler()
+    import build_fortran_extensions
+except CompilerNotFound:
+    print 'Cannot find a Fortran compiler, not building Fortran components!'
 
 if __name__ == '__main__':
     #  Set up climlab with call to setuptools
