@@ -68,8 +68,8 @@ if __name__ == '__main__':
             'climlab.radiation.rrtm._rrtmg_sw': ['_rrtmg_sw.so'], # make sure compiled .so files are included
             'climlab.radiation.rrtm._rrtmg_lw': ['_rrtmg_lw.so'],
             },
-          setup_requires=['pytest-runner'],
-          tests_require=['pytest'],
+          #setup_requires=['pytest-runner'],
+          #tests_require=['pytest'],
           include_package_data=True,
           zip_safe=False,
           )
