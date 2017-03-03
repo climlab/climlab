@@ -52,12 +52,12 @@ if __name__ == '__main__':
             'climlab.tests',
             'climlab.utils',
           ],
-          install_requires=[
-              'numpy',
-              'scipy',
-              'netcdf4',
-              'pytest'
-          ],
+        #   install_requires=[
+        #       'numpy',
+        #       'scipy',
+        #       'netcdf4',
+        #       'pytest'
+        #   ],
           package_data={
             'climlab': [os.path.join('data','ozone','apeozone_cam3_5_54.nc')],
             'climlab.solar': ['orbit91'],
