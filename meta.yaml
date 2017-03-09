@@ -8,15 +8,15 @@ source:
 
 requirements:
   build:
-    - python=2.7
+    - python 2.7
     - setuptools
-    - numpy=1.11
+    - numpy 1.11
     - scipy
     - pytest
 
   run:
-    - python=2.7
-    - numpy=1.11
+    - python 2.7
+    - numpy 1.11
     - scipy
     - netcdf4
     - pytest
