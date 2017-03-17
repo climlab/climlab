@@ -14,19 +14,19 @@ subroutine f90wrap_mcica_subcol_lw(iplon, ncol, nlay, icld, permuteseed, irng, &
     integer(4), intent(in) :: icld
     integer(4), intent(in) :: permuteseed
     integer(4), intent(inout) :: irng
-    real(4), intent(in), dimension(n0,n1) :: play
-    real(4), intent(in), dimension(n2,n3) :: cldfrac
-    real(4), intent(in), dimension(n4,n5) :: ciwp
-    real(4), intent(in), dimension(n6,n7) :: clwp
-    real(4), intent(in), dimension(n8,n9) :: rei
-    real(4), intent(in), dimension(n10,n11) :: rel
-    real(4), intent(in), dimension(n12,n13,n14) :: tauc
-    real(4), intent(inout), dimension(n15,n16,n17) :: cldfmcl
-    real(4), intent(inout), dimension(n18,n19,n20) :: ciwpmcl
-    real(4), intent(inout), dimension(n21,n22,n23) :: clwpmcl
-    real(4), intent(inout), dimension(n24,n25) :: reicmcl
-    real(4), intent(inout), dimension(n26,n27) :: relqmcl
-    real(4), intent(inout), dimension(n28,n29,n30) :: taucmcl
+    real(8), intent(in), dimension(n0,n1) :: play
+    real(8), intent(in), dimension(n2,n3) :: cldfrac
+    real(8), intent(in), dimension(n4,n5) :: ciwp
+    real(8), intent(in), dimension(n6,n7) :: clwp
+    real(8), intent(in), dimension(n8,n9) :: rei
+    real(8), intent(in), dimension(n10,n11) :: rel
+    real(8), intent(in), dimension(n12,n13,n14) :: tauc
+    real(8), intent(inout), dimension(n15,n16,n17) :: cldfmcl
+    real(8), intent(inout), dimension(n18,n19,n20) :: ciwpmcl
+    real(8), intent(inout), dimension(n21,n22,n23) :: clwpmcl
+    real(8), intent(inout), dimension(n24,n25) :: reicmcl
+    real(8), intent(inout), dimension(n26,n27) :: relqmcl
+    real(8), intent(inout), dimension(n28,n29,n30) :: taucmcl
     integer :: n0
     !f2py intent(hide), depend(play) :: n0 = shape(play,0)
     integer :: n1
@@ -107,15 +107,15 @@ subroutine f90wrap_generate_stochastic_clouds(ncol, nlay, nsubcol, icld, irng, &
     integer(4), intent(in) :: nsubcol
     integer(4), intent(in) :: icld
     integer(4), intent(inout) :: irng
-    real(4), intent(in), dimension(n0,n1) :: pmid
-    real(4), intent(in), dimension(n2,n3) :: cld
-    real(4), intent(in), dimension(n4,n5) :: clwp
-    real(4), intent(in), dimension(n6,n7) :: ciwp
-    real(4), intent(in), dimension(n8,n9,n10) :: tauc
-    real(4), intent(inout), dimension(n11,n12,n13) :: cld_stoch
-    real(4), intent(inout), dimension(n14,n15,n16) :: clwp_stoch
-    real(4), intent(inout), dimension(n17,n18,n19) :: ciwp_stoch
-    real(4), intent(inout), dimension(n20,n21,n22) :: tauc_stoch
+    real(8), intent(in), dimension(n0,n1) :: pmid
+    real(8), intent(in), dimension(n2,n3) :: cld
+    real(8), intent(in), dimension(n4,n5) :: clwp
+    real(8), intent(in), dimension(n6,n7) :: ciwp
+    real(8), intent(in), dimension(n8,n9,n10) :: tauc
+    real(8), intent(inout), dimension(n11,n12,n13) :: cld_stoch
+    real(8), intent(inout), dimension(n14,n15,n16) :: clwp_stoch
+    real(8), intent(inout), dimension(n17,n18,n19) :: ciwp_stoch
+    real(8), intent(inout), dimension(n20,n21,n22) :: tauc_stoch
     integer(4), optional, intent(in) :: changeseed
     integer :: n0
     !f2py intent(hide), depend(pmid) :: n0 = shape(pmid,0)
@@ -178,7 +178,7 @@ subroutine f90wrap_kissvec(seed1, seed2, seed3, seed4, ran_arr, n0, n1, n2, n3, 
     integer(4), intent(inout), dimension(n1) :: seed2
     integer(4), intent(inout), dimension(n2) :: seed3
     integer(4), intent(inout), dimension(n3) :: seed4
-    real(4), intent(inout), dimension(n4) :: ran_arr
+    real(8), intent(inout), dimension(n4) :: ran_arr
     integer :: n0
     !f2py intent(hide), depend(seed1) :: n0 = shape(seed1,0)
     integer :: n1

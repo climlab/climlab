@@ -16,40 +16,40 @@ subroutine f90wrap_rrtmg_lw(ncol, nlay, icld, idrv, play, plev, tlay, tlev, &
     integer(4), intent(in) :: nlay
     integer(4), intent(inout) :: icld
     integer(4), intent(in) :: idrv
-    real(4), intent(in), dimension(n0,n1) :: play
-    real(4), intent(in), dimension(n2,n3) :: plev
-    real(4), intent(in), dimension(n4,n5) :: tlay
-    real(4), intent(in), dimension(n6,n7) :: tlev
-    real(4), intent(in), dimension(n8) :: tsfc
-    real(4), intent(in), dimension(n9,n10) :: h2ovmr
-    real(4), intent(in), dimension(n11,n12) :: o3vmr
-    real(4), intent(in), dimension(n13,n14) :: co2vmr
-    real(4), intent(in), dimension(n15,n16) :: ch4vmr
-    real(4), intent(in), dimension(n17,n18) :: n2ovmr
-    real(4), intent(in), dimension(n19,n20) :: o2vmr
-    real(4), intent(in), dimension(n21,n22) :: cfc11vmr
-    real(4), intent(in), dimension(n23,n24) :: cfc12vmr
-    real(4), intent(in), dimension(n25,n26) :: cfc22vmr
-    real(4), intent(in), dimension(n27,n28) :: ccl4vmr
-    real(4), intent(in), dimension(n29,n30) :: emis
+    real(8), intent(in), dimension(n0,n1) :: play
+    real(8), intent(in), dimension(n2,n3) :: plev
+    real(8), intent(in), dimension(n4,n5) :: tlay
+    real(8), intent(in), dimension(n6,n7) :: tlev
+    real(8), intent(in), dimension(n8) :: tsfc
+    real(8), intent(in), dimension(n9,n10) :: h2ovmr
+    real(8), intent(in), dimension(n11,n12) :: o3vmr
+    real(8), intent(in), dimension(n13,n14) :: co2vmr
+    real(8), intent(in), dimension(n15,n16) :: ch4vmr
+    real(8), intent(in), dimension(n17,n18) :: n2ovmr
+    real(8), intent(in), dimension(n19,n20) :: o2vmr
+    real(8), intent(in), dimension(n21,n22) :: cfc11vmr
+    real(8), intent(in), dimension(n23,n24) :: cfc12vmr
+    real(8), intent(in), dimension(n25,n26) :: cfc22vmr
+    real(8), intent(in), dimension(n27,n28) :: ccl4vmr
+    real(8), intent(in), dimension(n29,n30) :: emis
     integer(4), intent(in) :: inflglw
     integer(4), intent(in) :: iceflglw
     integer(4), intent(in) :: liqflglw
-    real(4), intent(in), dimension(n31,n32,n33) :: cldfmcl
-    real(4), intent(in), dimension(n34,n35,n36) :: taucmcl
-    real(4), intent(in), dimension(n37,n38,n39) :: ciwpmcl
-    real(4), intent(in), dimension(n40,n41,n42) :: clwpmcl
-    real(4), intent(in), dimension(n43,n44) :: reicmcl
-    real(4), intent(in), dimension(n45,n46) :: relqmcl
-    real(4), intent(in), dimension(n47,n48,n49) :: tauaer
-    real(4), intent(inout), dimension(n50,n51) :: uflx
-    real(4), intent(inout), dimension(n52,n53) :: dflx
-    real(4), intent(inout), dimension(n54,n55) :: hr
-    real(4), intent(inout), dimension(n56,n57) :: uflxc
-    real(4), intent(inout), dimension(n58,n59) :: dflxc
-    real(4), intent(inout), dimension(n60,n61) :: hrc
-    real(4), optional, intent(inout), dimension(n62,n63) :: duflx_dt
-    real(4), optional, intent(inout), dimension(n64,n65) :: duflxc_dt
+    real(8), intent(in), dimension(n31,n32,n33) :: cldfmcl
+    real(8), intent(in), dimension(n34,n35,n36) :: taucmcl
+    real(8), intent(in), dimension(n37,n38,n39) :: ciwpmcl
+    real(8), intent(in), dimension(n40,n41,n42) :: clwpmcl
+    real(8), intent(in), dimension(n43,n44) :: reicmcl
+    real(8), intent(in), dimension(n45,n46) :: relqmcl
+    real(8), intent(in), dimension(n47,n48,n49) :: tauaer
+    real(8), intent(inout), dimension(n50,n51) :: uflx
+    real(8), intent(inout), dimension(n52,n53) :: dflx
+    real(8), intent(inout), dimension(n54,n55) :: hr
+    real(8), intent(inout), dimension(n56,n57) :: uflxc
+    real(8), intent(inout), dimension(n58,n59) :: dflxc
+    real(8), intent(inout), dimension(n60,n61) :: hrc
+    real(8), optional, intent(inout), dimension(n62,n63) :: duflx_dt
+    real(8), optional, intent(inout), dimension(n64,n65) :: duflxc_dt
     integer :: n0
     !f2py intent(hide), depend(play) :: n0 = shape(play,0)
     integer :: n1
@@ -210,54 +210,54 @@ subroutine f90wrap_inatm(iplon, nlay, icld, iaer, play, plev, tlay, tlev, tsfc, 
     integer(4), intent(in) :: nlay
     integer(4), intent(in) :: icld
     integer(4), intent(in) :: iaer
-    real(4), intent(in), dimension(n0,n1) :: play
-    real(4), intent(in), dimension(n2,n3) :: plev
-    real(4), intent(in), dimension(n4,n5) :: tlay
-    real(4), intent(in), dimension(n6,n7) :: tlev
-    real(4), intent(in), dimension(n8) :: tsfc
-    real(4), intent(in), dimension(n9,n10) :: h2ovmr
-    real(4), intent(in), dimension(n11,n12) :: o3vmr
-    real(4), intent(in), dimension(n13,n14) :: co2vmr
-    real(4), intent(in), dimension(n15,n16) :: ch4vmr
-    real(4), intent(in), dimension(n17,n18) :: n2ovmr
-    real(4), intent(in), dimension(n19,n20) :: o2vmr
-    real(4), intent(in), dimension(n21,n22) :: cfc11vmr
-    real(4), intent(in), dimension(n23,n24) :: cfc12vmr
-    real(4), intent(in), dimension(n25,n26) :: cfc22vmr
-    real(4), intent(in), dimension(n27,n28) :: ccl4vmr
-    real(4), intent(in), dimension(n29,n30) :: emis
+    real(8), intent(in), dimension(n0,n1) :: play
+    real(8), intent(in), dimension(n2,n3) :: plev
+    real(8), intent(in), dimension(n4,n5) :: tlay
+    real(8), intent(in), dimension(n6,n7) :: tlev
+    real(8), intent(in), dimension(n8) :: tsfc
+    real(8), intent(in), dimension(n9,n10) :: h2ovmr
+    real(8), intent(in), dimension(n11,n12) :: o3vmr
+    real(8), intent(in), dimension(n13,n14) :: co2vmr
+    real(8), intent(in), dimension(n15,n16) :: ch4vmr
+    real(8), intent(in), dimension(n17,n18) :: n2ovmr
+    real(8), intent(in), dimension(n19,n20) :: o2vmr
+    real(8), intent(in), dimension(n21,n22) :: cfc11vmr
+    real(8), intent(in), dimension(n23,n24) :: cfc12vmr
+    real(8), intent(in), dimension(n25,n26) :: cfc22vmr
+    real(8), intent(in), dimension(n27,n28) :: ccl4vmr
+    real(8), intent(in), dimension(n29,n30) :: emis
     integer(4), intent(in) :: inflglw
     integer(4), intent(in) :: iceflglw
     integer(4), intent(in) :: liqflglw
-    real(4), intent(in), dimension(n31,n32,n33) :: cldfmcl
-    real(4), intent(in), dimension(n34,n35,n36) :: taucmcl
-    real(4), intent(in), dimension(n37,n38,n39) :: ciwpmcl
-    real(4), intent(in), dimension(n40,n41,n42) :: clwpmcl
-    real(4), intent(in), dimension(n43,n44) :: reicmcl
-    real(4), intent(in), dimension(n45,n46) :: relqmcl
-    real(4), intent(in), dimension(n47,n48,n49) :: tauaer
+    real(8), intent(in), dimension(n31,n32,n33) :: cldfmcl
+    real(8), intent(in), dimension(n34,n35,n36) :: taucmcl
+    real(8), intent(in), dimension(n37,n38,n39) :: ciwpmcl
+    real(8), intent(in), dimension(n40,n41,n42) :: clwpmcl
+    real(8), intent(in), dimension(n43,n44) :: reicmcl
+    real(8), intent(in), dimension(n45,n46) :: relqmcl
+    real(8), intent(in), dimension(n47,n48,n49) :: tauaer
     integer(4), intent(out) :: nlayers
-    real(4), intent(inout), dimension(n50) :: pavel
-    real(4), intent(inout), dimension(n51) :: pz
-    real(4), intent(inout), dimension(n52) :: tavel
-    real(4), intent(inout), dimension(n53) :: tz
-    real(4), intent(out) :: tbound
-    real(4), intent(inout), dimension(n54) :: semiss
-    real(4), intent(inout), dimension(n55) :: coldry
-    real(4), intent(inout), dimension(n56,n57) :: wkl
-    real(4), intent(inout), dimension(n58) :: wbrodl
-    real(4), intent(inout), dimension(n59,n60) :: wx
-    real(4), intent(out) :: pwvcm
+    real(8), intent(inout), dimension(n50) :: pavel
+    real(8), intent(inout), dimension(n51) :: pz
+    real(8), intent(inout), dimension(n52) :: tavel
+    real(8), intent(inout), dimension(n53) :: tz
+    real(8), intent(out) :: tbound
+    real(8), intent(inout), dimension(n54) :: semiss
+    real(8), intent(inout), dimension(n55) :: coldry
+    real(8), intent(inout), dimension(n56,n57) :: wkl
+    real(8), intent(inout), dimension(n58) :: wbrodl
+    real(8), intent(inout), dimension(n59,n60) :: wx
+    real(8), intent(out) :: pwvcm
     integer(4), intent(out) :: inflag
     integer(4), intent(out) :: iceflag
     integer(4), intent(out) :: liqflag
-    real(4), intent(inout), dimension(n61,n62) :: cldfmc
-    real(4), intent(inout), dimension(n63,n64) :: taucmc
-    real(4), intent(inout), dimension(n65,n66) :: ciwpmc
-    real(4), intent(inout), dimension(n67,n68) :: clwpmc
-    real(4), intent(inout), dimension(n69) :: reicmc
-    real(4), intent(inout), dimension(n70) :: relqmc
-    real(4), intent(inout), dimension(n71,n72) :: taua
+    real(8), intent(inout), dimension(n61,n62) :: cldfmc
+    real(8), intent(inout), dimension(n63,n64) :: taucmc
+    real(8), intent(inout), dimension(n65,n66) :: ciwpmc
+    real(8), intent(inout), dimension(n67,n68) :: clwpmc
+    real(8), intent(inout), dimension(n69) :: reicmc
+    real(8), intent(inout), dimension(n70) :: relqmc
+    real(8), intent(inout), dimension(n71,n72) :: taua
     integer :: n0
     !f2py intent(hide), depend(play) :: n0 = shape(play,0)
     integer :: n1

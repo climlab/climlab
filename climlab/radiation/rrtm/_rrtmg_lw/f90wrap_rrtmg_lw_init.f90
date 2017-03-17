@@ -4,7 +4,7 @@ subroutine f90wrap_rrtmg_lw_ini(cpdair)
     use rrtmg_lw_init, only: rrtmg_lw_ini
     implicit none
     
-    real(4), intent(in) :: cpdair
+    real(8), intent(in) :: cpdair
     call rrtmg_lw_ini(cpdair=cpdair)
 end subroutine f90wrap_rrtmg_lw_ini
 
@@ -12,7 +12,7 @@ subroutine f90wrap_lwdatinit(cpdair)
     use rrtmg_lw_init, only: lwdatinit
     implicit none
     
-    real(4), intent(in) :: cpdair
+    real(8), intent(in) :: cpdair
     call lwdatinit(cpdair=cpdair)
 end subroutine f90wrap_lwdatinit
 
