@@ -11,29 +11,29 @@ def driver(ncol, nlay, icld, permuteseed, irng, idrv, cpdair,
         cldfrac, ciwp, clwp, reic, relq, tauc, tauaer,):
     #    ! Call the Monte Carlo Independent Column Approximation
     #    !   (McICA, Pincus et al., JC, 2003)
-    cldfmcl = np.zeros((ngptlw,ncol,nlay))
-    ciwpmcl = np.zeros((ngptlw,ncol,nlay))
-    clwpmcl = np.zeros((ngptlw,ncol,nlay))
-    reicmcl = np.zeros((ncol,nlay))
-    relqmcl = np.zeros((ncol,nlay))
-    taucmcl = np.zeros((ngptlw,ncol,nlay))
+    cldfmcl = np.zeros((ngptlw,ncol,nlay), order='F')
+    ciwpmcl = np.zeros((ngptlw,ncol,nlay), order='F')
+    clwpmcl = np.zeros((ngptlw,ncol,nlay), order='F')
+    reicmcl = np.zeros((ncol,nlay), order='F')
+    relqmcl = np.zeros((ncol,nlay), order='F')
+    taucmcl = np.zeros((ngptlw,ncol,nlay), order='F')
     mcica_subcol_gen_lw.mcica_subcol_gen_lw.mcica_subcol_lw(1, ncol, nlay, icld, permuteseed, irng, play,
                        cldfrac, ciwp, clwp, reic, relq, tauc, cldfmcl,
                        ciwpmcl, clwpmcl, reicmcl, relqmcl, taucmcl)
 
     #! In principle the init routine should not need to be called every timestep
     #!  But calling it from Python is not working... heatfac is not getting set properly
-    rrtmg_lw.rrtmg_lw_init.rrtmg_lw_ini(cpdair)
+    rrtmg_lw_init.rrtmg_lw_init.rrtmg_lw_ini(cpdair)
 
     #  Initialize return arrays
-    uflx = np.zeros((ncol,nlay+1))
-    dflx = np.zeros((ncol,nlay+1))
-    hr = np.zeros((ncol,nlay))
-    uflxc = np.zeros((ncol,nlay+1))
-    dflxc = np.zeros((ncol,nlay+1))
-    hrc = np.zeros(ncol,nlay)
-    duflx_dt = np.zeros(ncol,nlay+1)
-    duflxc_dt = np.zeros(ncol,nlay+1)
+    uflx = np.zeros((ncol,nlay+1), order='F')
+    dflx = np.zeros((ncol,nlay+1), order='F')
+    hr = np.zeros((ncol,nlay), order='F')
+    uflxc = np.zeros((ncol,nlay+1), order='F')
+    dflxc = np.zeros((ncol,nlay+1), order='F')
+    hrc = np.zeros((ncol,nlay), order='F')
+    duflx_dt = np.zeros((ncol,nlay+1), order='F')
+    duflxc_dt = np.zeros((ncol,nlay+1), order='F')
 
     #!  Call the RRTMG_LW driver to compute radiative fluxes
     rrtmg_lw_rad.rrtmg_lw_rad.rrtmg_lw(ncol    ,nlay    ,icld    ,idrv    ,
