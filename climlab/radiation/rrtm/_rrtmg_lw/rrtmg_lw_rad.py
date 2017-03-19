@@ -7,23 +7,24 @@ class Rrtmg_Lw_Rad(f90wrap.runtime.FortranModule):
     Module rrtmg_lw_rad
     
     
-    Defined at rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_rad.f90 lines 7-906
+    Defined at rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_rad.f90 lines 7-910
     
     """
     @staticmethod
-    def rrtmg_lw(ncol, nlay, icld, idrv, play, plev, tlay, tlev, tsfc, h2ovmr, \
-        o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr, cfc11vmr, cfc12vmr, cfc22vmr, ccl4vmr, \
-        emis, inflglw, iceflglw, liqflglw, cldfmcl, taucmcl, ciwpmcl, clwpmcl, \
-        reicmcl, relqmcl, tauaer, uflx, dflx, hr, uflxc, dflxc, hrc, duflx_dt=None, \
-        duflxc_dt=None):
+    def rrtmg_lw(ncol, nlay, icld, idrv, cpdair, play, plev, tlay, tlev, tsfc, \
+        h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr, cfc11vmr, cfc12vmr, cfc22vmr, \
+        ccl4vmr, emis, inflglw, iceflglw, liqflglw, cldfmcl, taucmcl, ciwpmcl, \
+        clwpmcl, reicmcl, relqmcl, tauaer, uflx, dflx, hr, uflxc, dflxc, hrc, \
+        duflx_dt=None, duflxc_dt=None):
         """
-        rrtmg_lw(ncol, nlay, icld, idrv, play, plev, tlay, tlev, tsfc, h2ovmr, o3vmr, \
-            co2vmr, ch4vmr, n2ovmr, o2vmr, cfc11vmr, cfc12vmr, cfc22vmr, ccl4vmr, emis, \
-            inflglw, iceflglw, liqflglw, cldfmcl, taucmcl, ciwpmcl, clwpmcl, reicmcl, \
-            relqmcl, tauaer, uflx, dflx, hr, uflxc, dflxc, hrc[, duflx_dt, duflxc_dt])
+        rrtmg_lw(ncol, nlay, icld, idrv, cpdair, play, plev, tlay, tlev, tsfc, h2ovmr, \
+            o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr, cfc11vmr, cfc12vmr, cfc22vmr, ccl4vmr, \
+            emis, inflglw, iceflglw, liqflglw, cldfmcl, taucmcl, ciwpmcl, clwpmcl, \
+            reicmcl, relqmcl, tauaer, uflx, dflx, hr, uflxc, dflxc, hrc[, duflx_dt, \
+            duflxc_dt])
         
         
-        Defined at rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_rad.f90 lines 89-576
+        Defined at rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_rad.f90 lines 81-581
         
         Parameters
         ----------
@@ -31,6 +32,7 @@ class Rrtmg_Lw_Rad(f90wrap.runtime.FortranModule):
         nlay : int
         icld : int
         idrv : int
+        cpdair : float
         play : float array
         plev : float array
         tlay : float array
@@ -68,13 +70,13 @@ class Rrtmg_Lw_Rad(f90wrap.runtime.FortranModule):
         
         """
         _rrtmg_lw_rad.f90wrap_rrtmg_lw(ncol=ncol, nlay=nlay, icld=icld, idrv=idrv, \
-            play=play, plev=plev, tlay=tlay, tlev=tlev, tsfc=tsfc, h2ovmr=h2ovmr, \
-            o3vmr=o3vmr, co2vmr=co2vmr, ch4vmr=ch4vmr, n2ovmr=n2ovmr, o2vmr=o2vmr, \
-            cfc11vmr=cfc11vmr, cfc12vmr=cfc12vmr, cfc22vmr=cfc22vmr, ccl4vmr=ccl4vmr, \
-            emis=emis, inflglw=inflglw, iceflglw=iceflglw, liqflglw=liqflglw, \
-            cldfmcl=cldfmcl, taucmcl=taucmcl, ciwpmcl=ciwpmcl, clwpmcl=clwpmcl, \
-            reicmcl=reicmcl, relqmcl=relqmcl, tauaer=tauaer, uflx=uflx, dflx=dflx, \
-            hr=hr, uflxc=uflxc, dflxc=dflxc, hrc=hrc, duflx_dt=duflx_dt, \
+            cpdair=cpdair, play=play, plev=plev, tlay=tlay, tlev=tlev, tsfc=tsfc, \
+            h2ovmr=h2ovmr, o3vmr=o3vmr, co2vmr=co2vmr, ch4vmr=ch4vmr, n2ovmr=n2ovmr, \
+            o2vmr=o2vmr, cfc11vmr=cfc11vmr, cfc12vmr=cfc12vmr, cfc22vmr=cfc22vmr, \
+            ccl4vmr=ccl4vmr, emis=emis, inflglw=inflglw, iceflglw=iceflglw, \
+            liqflglw=liqflglw, cldfmcl=cldfmcl, taucmcl=taucmcl, ciwpmcl=ciwpmcl, \
+            clwpmcl=clwpmcl, reicmcl=reicmcl, relqmcl=relqmcl, tauaer=tauaer, uflx=uflx, \
+            dflx=dflx, hr=hr, uflxc=uflxc, dflxc=dflxc, hrc=hrc, duflx_dt=duflx_dt, \
             duflxc_dt=duflxc_dt)
     
     @staticmethod
@@ -92,7 +94,7 @@ class Rrtmg_Lw_Rad(f90wrap.runtime.FortranModule):
             ciwpmc, clwpmc, reicmc, relqmc, taua)
         
         
-        Defined at rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_rad.f90 lines 586-905
+        Defined at rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_rad.f90 lines 591-910
         
         Parameters
         ----------
