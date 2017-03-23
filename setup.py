@@ -2,6 +2,7 @@ import os, sys
 from numpy.distutils import fcompiler
 from numpy.distutils.fcompiler import CompilerNotFound
 
+VERSION = '0.5.0'
 
 def readme():
     with open('README.rst') as f:
@@ -35,7 +36,8 @@ if __name__ == '__main__':
     #  Set up climlab with call to setuptools
     #from setuptools import setup
     from numpy.distutils.core import setup
-    from climlab import __version__
+    #from climlab import __version__
+    __version__ = VERSION
     setup(name='climlab',
           version=__version__,
           description='Package for process-oriented climate modeling',
@@ -69,12 +71,12 @@ if __name__ == '__main__':
         #     'climlab.tests',
         #     'climlab.utils',
         #   ],
-          install_requires=[
-              'numpy',
-              'scipy',
-              'netcdf4',
-              'pytest'
-          ],
+        #   install_requires=[
+        #       'numpy',
+        #       'scipy',
+        #       'netcdf4',
+        #       'pytest'
+        #   ],
           package_data={
             'climlab': [os.path.join('data','ozone','apeozone_cam3_5_54.nc')],
             'climlab.solar': ['orbit91'],
@@ -85,9 +87,9 @@ if __name__ == '__main__':
             #'climlab.radiation.rrtm._rrtmg_sw': ['_rrtmg_sw.so'], # make sure compiled .so files are included
             #'climlab.radiation.rrtm._rrtmg_lw': ['_rrtmg_lw.so'],
             },
-          setup_requires=['pytest-runner'],
-          tests_require=['pytest'],
-          include_package_data=True,
-          zip_safe=False,
+        #   setup_requires=['pytest-runner'],
+        #   tests_require=['pytest'],
+        #   include_package_data=True,
+        #   zip_safe=False,
           configuration=configuration,
           )
