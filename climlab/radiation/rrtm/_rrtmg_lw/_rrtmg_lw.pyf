@@ -159,6 +159,96 @@ python module _rrtmg_lw ! in
             use parrrtm, only: parrrtm_ngs15=>ngs15
             integer(kind=4) intent(out) :: f90wrap_ngs15
         end subroutine f90wrap_parrrtm__get__ngs15
+        subroutine f90wrap_getabsorberindex(absorbername,absorberindex) ! in :_rrtmg_lw:f90wrap_rrlw_ncpar.f90
+            use rrlw_ncpar, only: getabsorberindex
+            character*1024 intent(in) :: absorbername
+            integer(kind=4) intent(out) :: absorberindex
+        end subroutine f90wrap_getabsorberindex
+        subroutine f90wrap_rrlw_ncpar__get__cpdair(f90wrap_cpdair) ! in :_rrtmg_lw:f90wrap_rrlw_ncpar.f90
+            use rrlw_ncpar, only: rrlw_ncpar_cpdair=>cpdair
+            real(kind=8) intent(out) :: f90wrap_cpdair
+        end subroutine f90wrap_rrlw_ncpar__get__cpdair
+        subroutine f90wrap_rrlw_ncpar__get__maxabsorbernamelength(f90wrap_maxabsorbernamelength) ! in :_rrtmg_lw:f90wrap_rrlw_ncpar.f90
+            use rrlw_ncpar, only: rrlw_ncpar_maxabsorbernamelength=>maxabsorbernamelength
+            integer(kind=4) intent(out) :: f90wrap_maxabsorbernamelength
+        end subroutine f90wrap_rrlw_ncpar__get__maxabsorbernamelength
+        subroutine f90wrap_rrlw_ncpar__get__absorber(f90wrap_absorber) ! in :_rrtmg_lw:f90wrap_rrlw_ncpar.f90
+            use rrlw_ncpar, only: rrlw_ncpar_absorber=>absorber
+            integer(kind=4) intent(out) :: f90wrap_absorber
+        end subroutine f90wrap_rrlw_ncpar__get__absorber
+        subroutine f90wrap_rrlw_ncpar__array__status(dummy_this,nd,dtype,dshape,dloc) ! in :_rrtmg_lw:f90wrap_rrlw_ncpar.f90
+            use parkind
+            use rrlw_ncpar, only: rrlw_ncpar_status=>status
+            integer dimension(2),intent(in) :: dummy_this
+            integer intent(out) :: nd
+            integer intent(out) :: dtype
+            integer dimension(10),intent(out) :: dshape
+            integer*8 intent(out) :: dloc
+        end subroutine f90wrap_rrlw_ncpar__array__status
+        subroutine f90wrap_rrlw_ncpar__get__i(f90wrap_i) ! in :_rrtmg_lw:f90wrap_rrlw_ncpar.f90
+            use rrlw_ncpar, only: rrlw_ncpar_i=>i
+            integer(kind=4) intent(out) :: f90wrap_i
+        end subroutine f90wrap_rrlw_ncpar__get__i
+        subroutine f90wrap_rrlw_ncpar__set__i(f90wrap_i) ! in :_rrtmg_lw:f90wrap_rrlw_ncpar.f90
+            use rrlw_ncpar, only: rrlw_ncpar_i=>i
+            integer(kind=4) intent(in) :: f90wrap_i
+        end subroutine f90wrap_rrlw_ncpar__set__i
+        subroutine f90wrap_rrlw_ncpar__get__keylower(f90wrap_keylower) ! in :_rrtmg_lw:f90wrap_rrlw_ncpar.f90
+            use rrlw_ncpar, only: rrlw_ncpar_keylower=>keylower
+            integer(kind=4) intent(out) :: f90wrap_keylower
+        end subroutine f90wrap_rrlw_ncpar__get__keylower
+        subroutine f90wrap_rrlw_ncpar__get__keyupper(f90wrap_keyupper) ! in :_rrtmg_lw:f90wrap_rrlw_ncpar.f90
+            use rrlw_ncpar, only: rrlw_ncpar_keyupper=>keyupper
+            integer(kind=4) intent(out) :: f90wrap_keyupper
+        end subroutine f90wrap_rrlw_ncpar__get__keyupper
+        subroutine f90wrap_rrlw_ncpar__get__tdiff(f90wrap_tdiff) ! in :_rrtmg_lw:f90wrap_rrlw_ncpar.f90
+            use rrlw_ncpar, only: rrlw_ncpar_tdiff=>tdiff
+            integer(kind=4) intent(out) :: f90wrap_tdiff
+        end subroutine f90wrap_rrlw_ncpar__get__tdiff
+        subroutine f90wrap_rrlw_ncpar__get__ps(f90wrap_ps) ! in :_rrtmg_lw:f90wrap_rrlw_ncpar.f90
+            use rrlw_ncpar, only: rrlw_ncpar_ps=>ps
+            integer(kind=4) intent(out) :: f90wrap_ps
+        end subroutine f90wrap_rrlw_ncpar__get__ps
+        subroutine f90wrap_rrlw_ncpar__get__plower(f90wrap_plower) ! in :_rrtmg_lw:f90wrap_rrlw_ncpar.f90
+            use rrlw_ncpar, only: rrlw_ncpar_plower=>plower
+            integer(kind=4) intent(out) :: f90wrap_plower
+        end subroutine f90wrap_rrlw_ncpar__get__plower
+        subroutine f90wrap_rrlw_ncpar__get__pupper(f90wrap_pupper) ! in :_rrtmg_lw:f90wrap_rrlw_ncpar.f90
+            use rrlw_ncpar, only: rrlw_ncpar_pupper=>pupper
+            integer(kind=4) intent(out) :: f90wrap_pupper
+        end subroutine f90wrap_rrlw_ncpar__get__pupper
+        subroutine f90wrap_rrlw_ncpar__get__tself(f90wrap_tself) ! in :_rrtmg_lw:f90wrap_rrlw_ncpar.f90
+            use rrlw_ncpar, only: rrlw_ncpar_tself=>tself
+            integer(kind=4) intent(out) :: f90wrap_tself
+        end subroutine f90wrap_rrlw_ncpar__get__tself
+        subroutine f90wrap_rrlw_ncpar__get__tforeign(f90wrap_tforeign) ! in :_rrtmg_lw:f90wrap_rrlw_ncpar.f90
+            use rrlw_ncpar, only: rrlw_ncpar_tforeign=>tforeign
+            integer(kind=4) intent(out) :: f90wrap_tforeign
+        end subroutine f90wrap_rrlw_ncpar__get__tforeign
+        subroutine f90wrap_rrlw_ncpar__get__pforeign(f90wrap_pforeign) ! in :_rrtmg_lw:f90wrap_rrlw_ncpar.f90
+            use rrlw_ncpar, only: rrlw_ncpar_pforeign=>pforeign
+            integer(kind=4) intent(out) :: f90wrap_pforeign
+        end subroutine f90wrap_rrlw_ncpar__get__pforeign
+        subroutine f90wrap_rrlw_ncpar__get__t(f90wrap_t) ! in :_rrtmg_lw:f90wrap_rrlw_ncpar.f90
+            use rrlw_ncpar, only: rrlw_ncpar_t=>t
+            integer(kind=4) intent(out) :: f90wrap_t
+        end subroutine f90wrap_rrlw_ncpar__get__t
+        subroutine f90wrap_rrlw_ncpar__get__tplanck(f90wrap_tplanck) ! in :_rrtmg_lw:f90wrap_rrlw_ncpar.f90
+            use rrlw_ncpar, only: rrlw_ncpar_tplanck=>tplanck
+            integer(kind=4) intent(out) :: f90wrap_tplanck
+        end subroutine f90wrap_rrlw_ncpar__get__tplanck
+        subroutine f90wrap_rrlw_ncpar__get__band(f90wrap_band) ! in :_rrtmg_lw:f90wrap_rrlw_ncpar.f90
+            use rrlw_ncpar, only: rrlw_ncpar_band=>band
+            integer(kind=4) intent(out) :: f90wrap_band
+        end subroutine f90wrap_rrlw_ncpar__get__band
+        subroutine f90wrap_rrlw_ncpar__get__gpoint(f90wrap_gpoint) ! in :_rrtmg_lw:f90wrap_rrlw_ncpar.f90
+            use rrlw_ncpar, only: rrlw_ncpar_gpoint=>gpoint
+            integer(kind=4) intent(out) :: f90wrap_gpoint
+        end subroutine f90wrap_rrlw_ncpar__get__gpoint
+        subroutine f90wrap_rrlw_ncpar__get__gpointset(f90wrap_gpointset) ! in :_rrtmg_lw:f90wrap_rrlw_ncpar.f90
+            use rrlw_ncpar, only: rrlw_ncpar_gpointset=>gpointset
+            integer(kind=4) intent(out) :: f90wrap_gpointset
+        end subroutine f90wrap_rrlw_ncpar__get__gpointset
         subroutine f90wrap_mcica_subcol_lw(iplon,ncol,nlay,icld,permuteseed,irng,play,cldfrac,ciwp,clwp,rei,rel,tauc,cldfmcl,ciwpmcl,clwpmcl,reicmcl,relqmcl,taucmcl,n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22,n23,n24,n25,n26,n27,n28,n29,n30) ! in :_rrtmg_lw:f90wrap_mcica_subcol_gen_lw.f90
             use mcica_subcol_gen_lw, only: mcica_subcol_lw
             integer(kind=4) intent(in) :: iplon

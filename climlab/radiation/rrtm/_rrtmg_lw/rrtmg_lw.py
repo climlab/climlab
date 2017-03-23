@@ -527,6 +527,308 @@ class Parrrtm(f90wrap.runtime.FortranModule):
 
 parrrtm = Parrrtm()
 
+class Rrlw_Ncpar(f90wrap.runtime.FortranModule):
+    """
+    Module rrlw_ncpar
+    
+    
+    Defined at rrtmg_lw_v4.85/gcm_model/modules/rrlw_ncpar.f90 lines 1-64
+    
+    """
+    @staticmethod
+    def getabsorberindex(absorbername):
+        """
+        absorberindex = getabsorberindex(absorbername)
+        
+        
+        Defined at rrtmg_lw_v4.85/gcm_model/modules/rrlw_ncpar.f90 lines 48-64
+        
+        Parameters
+        ----------
+        absorbername : str
+        
+        Returns
+        -------
+        absorberindex : int
+        
+        """
+        absorberindex = _rrtmg_lw.f90wrap_getabsorberindex(absorbername=absorbername)
+        return absorberindex
+    
+    @property
+    def cpdair(self):
+        """
+        Element cpdair ftype=real(kind=rb) pytype=float
+        
+        
+        Defined at rrtmg_lw_v4.85/gcm_model/modules/rrlw_ncpar.f90 line 7
+        
+        """
+        return _rrtmg_lw.f90wrap_rrlw_ncpar__get__cpdair()
+    
+    @property
+    def maxabsorbernamelength(self):
+        """
+        Element maxabsorbernamelength ftype=integer(kind=im) pytype=int
+        
+        
+        Defined at rrtmg_lw_v4.85/gcm_model/modules/rrlw_ncpar.f90 line 13
+        
+        """
+        return _rrtmg_lw.f90wrap_rrlw_ncpar__get__maxabsorbernamelength()
+    
+    @property
+    def absorber(self):
+        """
+        Element absorber ftype=integer(kind=im) pytype=int
+        
+        
+        Defined at rrtmg_lw_v4.85/gcm_model/modules/rrlw_ncpar.f90 line 13
+        
+        """
+        return _rrtmg_lw.f90wrap_rrlw_ncpar__get__absorber()
+    
+    @property
+    def status(self):
+        """
+        Element status ftype=integer(kind=im) pytype=int
+        
+        
+        Defined at rrtmg_lw_v4.85/gcm_model/modules/rrlw_ncpar.f90 line 29
+        
+        """
+        array_ndim, array_type, array_shape, array_handle = \
+            _rrtmg_lw.f90wrap_rrlw_ncpar__array__status(f90wrap.runtime.empty_handle)
+        if array_handle in self._arrays:
+            status = self._arrays[array_handle]
+        else:
+            status = f90wrap.runtime.get_array(f90wrap.runtime.sizeof_fortran_t,
+                                    f90wrap.runtime.empty_handle,
+                                    _rrtmg_lw.f90wrap_rrlw_ncpar__array__status)
+            self._arrays[array_handle] = status
+        return status
+    
+    @status.setter
+    def status(self, status):
+        self.status[...] = status
+    
+    @property
+    def i(self):
+        """
+        Element i ftype=integer(kind=im) pytype=int
+        
+        
+        Defined at rrtmg_lw_v4.85/gcm_model/modules/rrlw_ncpar.f90 line 30
+        
+        """
+        return _rrtmg_lw.f90wrap_rrlw_ncpar__get__i()
+    
+    @i.setter
+    def i(self, i):
+        _rrtmg_lw.f90wrap_rrlw_ncpar__set__i(i)
+    
+    @property
+    def keylower(self):
+        """
+        Element keylower ftype=integer(kind=im) pytype=int
+        
+        
+        Defined at rrtmg_lw_v4.85/gcm_model/modules/rrlw_ncpar.f90 line 44
+        
+        """
+        return _rrtmg_lw.f90wrap_rrlw_ncpar__get__keylower()
+    
+    @property
+    def keyupper(self):
+        """
+        Element keyupper ftype=integer(kind=im) pytype=int
+        
+        
+        Defined at rrtmg_lw_v4.85/gcm_model/modules/rrlw_ncpar.f90 line 44
+        
+        """
+        return _rrtmg_lw.f90wrap_rrlw_ncpar__get__keyupper()
+    
+    @property
+    def tdiff(self):
+        """
+        Element tdiff ftype=integer(kind=im) pytype=int
+        
+        
+        Defined at rrtmg_lw_v4.85/gcm_model/modules/rrlw_ncpar.f90 line 44
+        
+        """
+        return _rrtmg_lw.f90wrap_rrlw_ncpar__get__tdiff()
+    
+    @property
+    def ps(self):
+        """
+        Element ps ftype=integer(kind=im) pytype=int
+        
+        
+        Defined at rrtmg_lw_v4.85/gcm_model/modules/rrlw_ncpar.f90 line 44
+        
+        """
+        return _rrtmg_lw.f90wrap_rrlw_ncpar__get__ps()
+    
+    @property
+    def plower(self):
+        """
+        Element plower ftype=integer(kind=im) pytype=int
+        
+        
+        Defined at rrtmg_lw_v4.85/gcm_model/modules/rrlw_ncpar.f90 line 44
+        
+        """
+        return _rrtmg_lw.f90wrap_rrlw_ncpar__get__plower()
+    
+    @property
+    def pupper(self):
+        """
+        Element pupper ftype=integer(kind=im) pytype=int
+        
+        
+        Defined at rrtmg_lw_v4.85/gcm_model/modules/rrlw_ncpar.f90 line 44
+        
+        """
+        return _rrtmg_lw.f90wrap_rrlw_ncpar__get__pupper()
+    
+    @property
+    def tself(self):
+        """
+        Element tself ftype=integer(kind=im) pytype=int
+        
+        
+        Defined at rrtmg_lw_v4.85/gcm_model/modules/rrlw_ncpar.f90 line 44
+        
+        """
+        return _rrtmg_lw.f90wrap_rrlw_ncpar__get__tself()
+    
+    @property
+    def tforeign(self):
+        """
+        Element tforeign ftype=integer(kind=im) pytype=int
+        
+        
+        Defined at rrtmg_lw_v4.85/gcm_model/modules/rrlw_ncpar.f90 line 44
+        
+        """
+        return _rrtmg_lw.f90wrap_rrlw_ncpar__get__tforeign()
+    
+    @property
+    def pforeign(self):
+        """
+        Element pforeign ftype=integer(kind=im) pytype=int
+        
+        
+        Defined at rrtmg_lw_v4.85/gcm_model/modules/rrlw_ncpar.f90 line 44
+        
+        """
+        return _rrtmg_lw.f90wrap_rrlw_ncpar__get__pforeign()
+    
+    @property
+    def t(self):
+        """
+        Element t ftype=integer(kind=im) pytype=int
+        
+        
+        Defined at rrtmg_lw_v4.85/gcm_model/modules/rrlw_ncpar.f90 line 44
+        
+        """
+        return _rrtmg_lw.f90wrap_rrlw_ncpar__get__t()
+    
+    @property
+    def tplanck(self):
+        """
+        Element tplanck ftype=integer(kind=im) pytype=int
+        
+        
+        Defined at rrtmg_lw_v4.85/gcm_model/modules/rrlw_ncpar.f90 line 44
+        
+        """
+        return _rrtmg_lw.f90wrap_rrlw_ncpar__get__tplanck()
+    
+    @property
+    def band(self):
+        """
+        Element band ftype=integer(kind=im) pytype=int
+        
+        
+        Defined at rrtmg_lw_v4.85/gcm_model/modules/rrlw_ncpar.f90 line 44
+        
+        """
+        return _rrtmg_lw.f90wrap_rrlw_ncpar__get__band()
+    
+    @property
+    def gpoint(self):
+        """
+        Element gpoint ftype=integer(kind=im) pytype=int
+        
+        
+        Defined at rrtmg_lw_v4.85/gcm_model/modules/rrlw_ncpar.f90 line 44
+        
+        """
+        return _rrtmg_lw.f90wrap_rrlw_ncpar__get__gpoint()
+    
+    @property
+    def gpointset(self):
+        """
+        Element gpointset ftype=integer(kind=im) pytype=int
+        
+        
+        Defined at rrtmg_lw_v4.85/gcm_model/modules/rrlw_ncpar.f90 line 44
+        
+        """
+        return _rrtmg_lw.f90wrap_rrlw_ncpar__get__gpointset()
+    
+    def __str__(self):
+        ret = ['<rrlw_ncpar>{\n']
+        ret.append('    cpdair : ')
+        ret.append(repr(self.cpdair))
+        ret.append(',\n    maxabsorbernamelength : ')
+        ret.append(repr(self.maxabsorbernamelength))
+        ret.append(',\n    absorber : ')
+        ret.append(repr(self.absorber))
+        ret.append(',\n    status : ')
+        ret.append(repr(self.status))
+        ret.append(',\n    i : ')
+        ret.append(repr(self.i))
+        ret.append(',\n    keylower : ')
+        ret.append(repr(self.keylower))
+        ret.append(',\n    keyupper : ')
+        ret.append(repr(self.keyupper))
+        ret.append(',\n    tdiff : ')
+        ret.append(repr(self.tdiff))
+        ret.append(',\n    ps : ')
+        ret.append(repr(self.ps))
+        ret.append(',\n    plower : ')
+        ret.append(repr(self.plower))
+        ret.append(',\n    pupper : ')
+        ret.append(repr(self.pupper))
+        ret.append(',\n    tself : ')
+        ret.append(repr(self.tself))
+        ret.append(',\n    tforeign : ')
+        ret.append(repr(self.tforeign))
+        ret.append(',\n    pforeign : ')
+        ret.append(repr(self.pforeign))
+        ret.append(',\n    t : ')
+        ret.append(repr(self.t))
+        ret.append(',\n    tplanck : ')
+        ret.append(repr(self.tplanck))
+        ret.append(',\n    band : ')
+        ret.append(repr(self.band))
+        ret.append(',\n    gpoint : ')
+        ret.append(repr(self.gpoint))
+        ret.append(',\n    gpointset : ')
+        ret.append(repr(self.gpointset))
+        ret.append('}')
+        return ''.join(ret)
+    
+    _dt_array_initialisers = []
+    
+
+rrlw_ncpar = Rrlw_Ncpar()
+
 class Mcica_Subcol_Gen_Lw(f90wrap.runtime.FortranModule):
     """
     Module mcica_subcol_gen_lw
