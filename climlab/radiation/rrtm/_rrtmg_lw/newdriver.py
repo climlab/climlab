@@ -24,6 +24,10 @@ def driver(ncol, nlay, icld, permuteseed, irng, idrv, cpdair,
                        cldfrac, ciwp, clwp, reic, relq, tauc, cldfmcl,
                        ciwpmcl, clwpmcl, reicmcl, relqmcl, taucmcl)
 
+    #  Python-based initialization of absorption data from netcdf file
+    from _rrtm_radiation_init import read_lw_abs_data
+    read_lw_abs_data(rrtmg_lw)
+
     #! In principle the init routine should not need to be called every timestep
     #!  But calling it from Python is not working... heatfac is not getting set properly
     rrtmg_lw.rrtmg_lw_init.rrtmg_lw_ini(cpdair)
