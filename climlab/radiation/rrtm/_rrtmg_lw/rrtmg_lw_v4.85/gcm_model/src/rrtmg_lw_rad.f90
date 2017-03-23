@@ -60,7 +60,7 @@
       use rrtmg_lw_cldprmc, only: cldprmc
 ! *** Move the required call to rrtmg_lw_ini below and the following
 ! use association to the GCM initialization area ***
-      use rrtmg_lw_init, only: rrtmg_lw_ini
+      !use rrtmg_lw_init, only: rrtmg_lw_ini
       use rrtmg_lw_rtrnmc, only: rtrnmc
       use rrtmg_lw_setcoef, only: setcoef
       use rrtmg_lw_taumol, only: taumol
@@ -78,8 +78,8 @@
 ! Public subroutines
 !------------------------------------------------------------------
 
-      subroutine rrtmg_lw &  ! CLIMLAB adding cpdair as input here
-            (ncol    ,nlay    ,icld    ,idrv    , cpdair,  &
+      subroutine rrtmg_lw &
+            (ncol    ,nlay    ,icld    ,idrv    ,  &
              play    ,plev    ,tlay    ,tlev    ,tsfc    , &
              h2ovmr  ,o3vmr   ,co2vmr  ,ch4vmr  ,n2ovmr  ,o2vmr , &
              cfc11vmr,cfc12vmr,cfc22vmr,ccl4vmr ,emis    , &
@@ -209,11 +209,6 @@
                                                       !    1: Normal forward calculation with
                                                       !       duflx_dt and duflxc_dt output
 
-      !  CLIMLAB  adding cpdair as input arugment for call to rrtmg_lw_ini
-      real(kind=rb), intent(in) :: cpdair     ! Specific heat capacity of dry air
-                                              ! at constant pressure at 273 K
-                                              ! (J kg-1 K-1)
-      !  CLIMLAB end
       real(kind=rb), intent(in) :: play(:,:)          ! Layer pressures (hPa, mb)
                                                       !    Dimensions: (ncol,nlay)
       real(kind=rb), intent(in) :: plev(:,:)          ! Interface pressures (hPa, mb)
@@ -467,7 +462,7 @@
 !
 ! In a GCM this call should be placed in the model initialization
 ! area, since this has to be called only once.
-      call rrtmg_lw_ini(cpdair)
+!      call rrtmg_lw_ini(cpdair)
 
 !  This is the main longitude/column loop within RRTMG.
       do iplon = 1, ncol

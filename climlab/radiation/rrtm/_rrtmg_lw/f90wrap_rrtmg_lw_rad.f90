@@ -1,14 +1,14 @@
 ! Module rrtmg_lw_rad defined in file rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_rad.f90
 
-subroutine f90wrap_rrtmg_lw(ncol, nlay, icld, idrv, cpdair, play, plev, tlay, &
-    tlev, tsfc, h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr, cfc11vmr, &
-    cfc12vmr, cfc22vmr, ccl4vmr, emis, inflglw, iceflglw, liqflglw, cldfmcl, &
-    taucmcl, ciwpmcl, clwpmcl, reicmcl, relqmcl, tauaer, uflx, dflx, hr, uflxc, &
-    dflxc, hrc, duflx_dt, duflxc_dt, n0, n1, n2, n3, n4, n5, n6, n7, n8, n9, &
-    n10, n11, n12, n13, n14, n15, n16, n17, n18, n19, n20, n21, n22, n23, n24, &
-    n25, n26, n27, n28, n29, n30, n31, n32, n33, n34, n35, n36, n37, n38, n39, &
-    n40, n41, n42, n43, n44, n45, n46, n47, n48, n49, n50, n51, n52, n53, n54, &
-    n55, n56, n57, n58, n59, n60, n61, n62, n63, n64, n65)
+subroutine f90wrap_rrtmg_lw(ncol, nlay, icld, idrv, play, plev, tlay, tlev, &
+    tsfc, h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr, cfc11vmr, cfc12vmr, &
+    cfc22vmr, ccl4vmr, emis, inflglw, iceflglw, liqflglw, cldfmcl, taucmcl, &
+    ciwpmcl, clwpmcl, reicmcl, relqmcl, tauaer, uflx, dflx, hr, uflxc, dflxc, &
+    hrc, duflx_dt, duflxc_dt, n0, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, &
+    n12, n13, n14, n15, n16, n17, n18, n19, n20, n21, n22, n23, n24, n25, n26, &
+    n27, n28, n29, n30, n31, n32, n33, n34, n35, n36, n37, n38, n39, n40, n41, &
+    n42, n43, n44, n45, n46, n47, n48, n49, n50, n51, n52, n53, n54, n55, n56, &
+    n57, n58, n59, n60, n61, n62, n63, n64, n65)
     use rrtmg_lw_rad, only: rrtmg_lw
     implicit none
     
@@ -16,7 +16,6 @@ subroutine f90wrap_rrtmg_lw(ncol, nlay, icld, idrv, cpdair, play, plev, tlay, &
     integer(4), intent(in) :: nlay
     integer(4), intent(inout) :: icld
     integer(4), intent(in) :: idrv
-    real(8), intent(in) :: cpdair
     real(8), intent(in), dimension(n0,n1) :: play
     real(8), intent(in), dimension(n2,n3) :: plev
     real(8), intent(in), dimension(n4,n5) :: tlay
@@ -183,15 +182,14 @@ subroutine f90wrap_rrtmg_lw(ncol, nlay, icld, idrv, cpdair, play, plev, tlay, &
     !f2py intent(hide), depend(duflxc_dt) :: n64 = shape(duflxc_dt,0)
     integer :: n65
     !f2py intent(hide), depend(duflxc_dt) :: n65 = shape(duflxc_dt,1)
-    call rrtmg_lw(ncol=ncol, nlay=nlay, icld=icld, idrv=idrv, cpdair=cpdair, &
-        play=play, plev=plev, tlay=tlay, tlev=tlev, tsfc=tsfc, h2ovmr=h2ovmr, &
-        o3vmr=o3vmr, co2vmr=co2vmr, ch4vmr=ch4vmr, n2ovmr=n2ovmr, o2vmr=o2vmr, &
-        cfc11vmr=cfc11vmr, cfc12vmr=cfc12vmr, cfc22vmr=cfc22vmr, ccl4vmr=ccl4vmr, &
-        emis=emis, inflglw=inflglw, iceflglw=iceflglw, liqflglw=liqflglw, &
-        cldfmcl=cldfmcl, taucmcl=taucmcl, ciwpmcl=ciwpmcl, clwpmcl=clwpmcl, &
-        reicmcl=reicmcl, relqmcl=relqmcl, tauaer=tauaer, uflx=uflx, dflx=dflx, &
-        hr=hr, uflxc=uflxc, dflxc=dflxc, hrc=hrc, duflx_dt=duflx_dt, &
-        duflxc_dt=duflxc_dt)
+    call rrtmg_lw(ncol=ncol, nlay=nlay, icld=icld, idrv=idrv, play=play, plev=plev, &
+        tlay=tlay, tlev=tlev, tsfc=tsfc, h2ovmr=h2ovmr, o3vmr=o3vmr, co2vmr=co2vmr, &
+        ch4vmr=ch4vmr, n2ovmr=n2ovmr, o2vmr=o2vmr, cfc11vmr=cfc11vmr, &
+        cfc12vmr=cfc12vmr, cfc22vmr=cfc22vmr, ccl4vmr=ccl4vmr, emis=emis, &
+        inflglw=inflglw, iceflglw=iceflglw, liqflglw=liqflglw, cldfmcl=cldfmcl, &
+        taucmcl=taucmcl, ciwpmcl=ciwpmcl, clwpmcl=clwpmcl, reicmcl=reicmcl, &
+        relqmcl=relqmcl, tauaer=tauaer, uflx=uflx, dflx=dflx, hr=hr, uflxc=uflxc, &
+        dflxc=dflxc, hrc=hrc, duflx_dt=duflx_dt, duflxc_dt=duflxc_dt)
 end subroutine f90wrap_rrtmg_lw
 
 subroutine f90wrap_inatm(iplon, nlay, icld, iaer, play, plev, tlay, tlev, tsfc, &
