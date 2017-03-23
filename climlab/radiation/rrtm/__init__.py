@@ -35,25 +35,6 @@ See <http://rtweb.aer.com/rrtm_frame.html> for more information about the RRTMG 
 
 '''
 from __future__ import division
-#  Wrapping these imports in try/except to avoid failures during documentation building on readthedocs
-try:
-    #import _rrtmg_lw, _rrtmg_sw
-    import _rrtmg_sw
-    #  Get number of bands from fortran modules
-    nbndsw = int(_rrtmg_sw.parrrsw.nbndsw)
-    naerec = int(_rrtmg_sw.parrrsw.naerec)
-    #nbndlw = int(_rrtmg_lw.parrrtm.nbndlw)
-except:
-    nbndsw = 1
-    naerec = 1
-    nbndlw = 1
-    print 'Cannot import compiled RRTMG Fortran extensions, this module will not be functional.'
-#  Get nbndlw from the new f90wrap module
-#from _rrtmg_lw.parrrtm.parrrtm import nbndlw
-#import _rrtmg_lw.parrrtm
-#nbndlw = _rrtmg_lw.parrrtm.parrrtm.nbndlw
-import _rrtmg_lw
-nbndlw = _rrtmg_lw.parrrtm.nbndlw
 from rrtmg import RRTMG
 from rrtmg_lw import RRTMG_LW
 from rrtmg_sw import RRTMG_SW

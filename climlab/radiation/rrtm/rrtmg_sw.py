@@ -4,11 +4,13 @@ from climlab import constants as const
 from climlab.radiation.radiation import _Radiation_SW
 from utils import _prepare_general_arguments
 from utils import _climlab_to_rrtm, _climlab_to_rrtm_sfc, _rrtm_to_climlab
-from . import nbndsw, naerec
+import _rrtmg_init
 try:
-    from _rrtmg_sw import driver as swdriver
+    import _rrtmg_sw
+    nbndsw = _rrtmg_sw.parrrsw.nbndsw
+    naerec = _rrtmg_sw.parrrsw.naerec
 except:
-    print 'Cannot import compiled _rrtmg_sw driver.'
+    raise ImportError('Cannot import the RRTMG_SW driver, this module will not be functional.')
 
 
 class RRTMG_SW(_Radiation_SW):
