@@ -27,8 +27,8 @@ def read_lw_abs_data(fort):
     but removes dependency on compiled netcdf libraries.
     input argument: fortran object _rrtm_radiation_fortran
     '''
-    ClimtDir = os.path.dirname( __file__ )
-    ncfilepath = os.path.join(ClimtDir,'rrtmg_lw_v4.85', 'gcm_model', 'data', 'rrtmg_lw.nc')
+    here = os.path.dirname( __file__ )
+    ncfilepath = os.path.join(here, '_rrtmg_lw', 'rrtmg_lw_v4.85', 'gcm_model', 'data', 'rrtmg_lw.nc')
     data = nc.Dataset(ncfilepath)
     # Following code in `CliMT/src/radiation/rrtm/src/rrtmg_lw/gcm_model/src/rrtmg_lw_read_nc.f90`
     gPointSetNumber = 1

@@ -5,7 +5,11 @@ from climlab.radiation.radiation import _Radiation_LW
 from utils import _prepare_general_arguments
 from utils import _climlab_to_rrtm, _climlab_to_rrtm_sfc, _rrtm_to_climlab
 from . import nbndlw, naerec
-from _rrtmg_lw.newdriver import driver as lwdriver
+import _rrtmg_lw
+nbndlw = _rrtmg_lw.parrrtm.nbndlw
+ngptlw = _rrtmg_lw.parrrtm.ngptlw
+
+#from _rrtmg_lw.newdriver import driver as lwdriver
 #try:
 #    from _rrtmg_lw import driver as lwdriver
 #except:
@@ -36,6 +40,11 @@ class RRTMG_LW(_Radiation_LW):
         self.add_input('liqflglw', liqflglw)
         self.add_input('tauc', tauc)
         self.add_input('tauaer', tauaer)
+        #  Python-based initialization of absorption data from netcdf file
+        from _rrtmg_init import read_lw_abs_data
+        read_lw_abs_data(_rrtmg_lw)
+        _rrtmg_lw.rrtmg_lw_init.rrtmg_lw_ini(const.cp)
+
 
     def _prepare_lw_arguments(self):
         #  scalar integer arguments
@@ -73,9 +82,48 @@ class RRTMG_LW(_Radiation_LW):
     def _compute_heating_rates(self):
         '''Prepare arguments and call the RRTGM_LW driver to calculate
         radiative fluxes and heating rates'''
-        args = self._prepare_lw_arguments()
+        #args = self._prepare_lw_arguments()
+        (ncol, nlay, icld, permuteseed, irng, idrv, cp,
+                play, plev, tlay, tlev, tsfc,
+                h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr,
+                cfc11vmr, cfc12vmr, cfc22vmr, ccl4vmr, emis,
+                inflglw, iceflglw, liqflglw,
+                cldfrac, ciwp, clwp, reic, relq, tauc, tauaer,) = self._prepare_lw_arguments()
+
+        #    ! Call the Monte Carlo Independent Column Approximation
+        #    !   (McICA, Pincus et al., JC, 2003)
+        cldfmcl = np.zeros((ngptlw,ncol,nlay), order='F')
+        ciwpmcl = np.zeros((ngptlw,ncol,nlay), order='F')
+        clwpmcl = np.zeros((ngptlw,ncol,nlay), order='F')
+        reicmcl = np.zeros((ncol,nlay), order='F')
+        relqmcl = np.zeros((ncol,nlay), order='F')
+        taucmcl = np.zeros((ngptlw,ncol,nlay), order='F')
+        _rrtmg_lw.mcica_subcol_gen_lw.mcica_subcol_lw(1, ncol, nlay, icld, permuteseed, irng, play,
+                           cldfrac, ciwp, clwp, reic, relq, tauc, cldfmcl,
+                           ciwpmcl, clwpmcl, reicmcl, relqmcl, taucmcl)
+        #  Initialize return arrays
+        uflx = np.zeros((ncol,nlay+1), order='F')
+        dflx = np.zeros((ncol,nlay+1), order='F')
+        hr = np.zeros((ncol,nlay), order='F')
+        uflxc = np.zeros((ncol,nlay+1), order='F')
+        dflxc = np.zeros((ncol,nlay+1), order='F')
+        hrc = np.zeros((ncol,nlay), order='F')
+        duflx_dt = np.zeros((ncol,nlay+1), order='F')
+        duflxc_dt = np.zeros((ncol,nlay+1), order='F')
+
+        #!  Call the RRTMG_LW driver to compute radiative fluxes
+        _rrtmg_lw.rrtmg_lw_rad.rrtmg_lw(ncol    ,nlay    ,icld    ,idrv    ,
+                 play    , plev    , tlay    , tlev    , tsfc    ,
+                 h2ovmr  , o3vmr   , co2vmr  , ch4vmr  , n2ovmr  , o2vmr ,
+                 cfc11vmr, cfc12vmr, cfc22vmr, ccl4vmr , emis    ,
+                 inflglw , iceflglw, liqflglw, cldfmcl ,
+                 taucmcl , ciwpmcl , clwpmcl , reicmcl , relqmcl ,
+                 tauaer  ,
+                 uflx    , dflx    , hr      , uflxc   , dflxc,  hrc,
+                 duflx_dt,duflxc_dt )
+
         #  Call the RRTM code!
-        uflx, dflx, hr, uflxc, dflxc, hrc, duflx_dt, duflxc_dt = lwdriver(*args)
+        #uflx, dflx, hr, uflxc, dflxc, hrc, duflx_dt, duflxc_dt = lwdriver(*args)
         #  Output is all (ncol,nlay+1) or (ncol,nlay)
         self.LW_flux_up = _rrtm_to_climlab(uflx)
         self.LW_flux_down = _rrtm_to_climlab(dflx)
