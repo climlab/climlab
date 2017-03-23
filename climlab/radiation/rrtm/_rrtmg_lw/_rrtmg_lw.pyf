@@ -3,6 +3,162 @@
 
 python module _rrtmg_lw ! in 
     interface  ! in :_rrtmg_lw
+        subroutine f90wrap_parrrtm__get__mxlay(f90wrap_mxlay) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_mxlay=>mxlay
+            integer(kind=4) intent(out) :: f90wrap_mxlay
+        end subroutine f90wrap_parrrtm__get__mxlay
+        subroutine f90wrap_parrrtm__get__mg(f90wrap_mg) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_mg=>mg
+            integer(kind=4) intent(out) :: f90wrap_mg
+        end subroutine f90wrap_parrrtm__get__mg
+        subroutine f90wrap_parrrtm__get__nbndlw(f90wrap_nbndlw) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_nbndlw=>nbndlw
+            integer(kind=4) intent(out) :: f90wrap_nbndlw
+        end subroutine f90wrap_parrrtm__get__nbndlw
+        subroutine f90wrap_parrrtm__get__maxxsec(f90wrap_maxxsec) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_maxxsec=>maxxsec
+            integer(kind=4) intent(out) :: f90wrap_maxxsec
+        end subroutine f90wrap_parrrtm__get__maxxsec
+        subroutine f90wrap_parrrtm__get__mxmol(f90wrap_mxmol) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_mxmol=>mxmol
+            integer(kind=4) intent(out) :: f90wrap_mxmol
+        end subroutine f90wrap_parrrtm__get__mxmol
+        subroutine f90wrap_parrrtm__get__maxinpx(f90wrap_maxinpx) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_maxinpx=>maxinpx
+            integer(kind=4) intent(out) :: f90wrap_maxinpx
+        end subroutine f90wrap_parrrtm__get__maxinpx
+        subroutine f90wrap_parrrtm__get__nmol(f90wrap_nmol) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_nmol=>nmol
+            integer(kind=4) intent(out) :: f90wrap_nmol
+        end subroutine f90wrap_parrrtm__get__nmol
+        subroutine f90wrap_parrrtm__get__ngptlw(f90wrap_ngptlw) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ngptlw=>ngptlw
+            integer(kind=4) intent(out) :: f90wrap_ngptlw
+        end subroutine f90wrap_parrrtm__get__ngptlw
+        subroutine f90wrap_parrrtm__get__ng1(f90wrap_ng1) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ng1=>ng1
+            integer(kind=4) intent(out) :: f90wrap_ng1
+        end subroutine f90wrap_parrrtm__get__ng1
+        subroutine f90wrap_parrrtm__get__ng2(f90wrap_ng2) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ng2=>ng2
+            integer(kind=4) intent(out) :: f90wrap_ng2
+        end subroutine f90wrap_parrrtm__get__ng2
+        subroutine f90wrap_parrrtm__get__ng3(f90wrap_ng3) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ng3=>ng3
+            integer(kind=4) intent(out) :: f90wrap_ng3
+        end subroutine f90wrap_parrrtm__get__ng3
+        subroutine f90wrap_parrrtm__get__ng4(f90wrap_ng4) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ng4=>ng4
+            integer(kind=4) intent(out) :: f90wrap_ng4
+        end subroutine f90wrap_parrrtm__get__ng4
+        subroutine f90wrap_parrrtm__get__ng5(f90wrap_ng5) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ng5=>ng5
+            integer(kind=4) intent(out) :: f90wrap_ng5
+        end subroutine f90wrap_parrrtm__get__ng5
+        subroutine f90wrap_parrrtm__get__ng6(f90wrap_ng6) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ng6=>ng6
+            integer(kind=4) intent(out) :: f90wrap_ng6
+        end subroutine f90wrap_parrrtm__get__ng6
+        subroutine f90wrap_parrrtm__get__ng7(f90wrap_ng7) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ng7=>ng7
+            integer(kind=4) intent(out) :: f90wrap_ng7
+        end subroutine f90wrap_parrrtm__get__ng7
+        subroutine f90wrap_parrrtm__get__ng8(f90wrap_ng8) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ng8=>ng8
+            integer(kind=4) intent(out) :: f90wrap_ng8
+        end subroutine f90wrap_parrrtm__get__ng8
+        subroutine f90wrap_parrrtm__get__ng9(f90wrap_ng9) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ng9=>ng9
+            integer(kind=4) intent(out) :: f90wrap_ng9
+        end subroutine f90wrap_parrrtm__get__ng9
+        subroutine f90wrap_parrrtm__get__ng10(f90wrap_ng10) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ng10=>ng10
+            integer(kind=4) intent(out) :: f90wrap_ng10
+        end subroutine f90wrap_parrrtm__get__ng10
+        subroutine f90wrap_parrrtm__get__ng11(f90wrap_ng11) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ng11=>ng11
+            integer(kind=4) intent(out) :: f90wrap_ng11
+        end subroutine f90wrap_parrrtm__get__ng11
+        subroutine f90wrap_parrrtm__get__ng12(f90wrap_ng12) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ng12=>ng12
+            integer(kind=4) intent(out) :: f90wrap_ng12
+        end subroutine f90wrap_parrrtm__get__ng12
+        subroutine f90wrap_parrrtm__get__ng13(f90wrap_ng13) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ng13=>ng13
+            integer(kind=4) intent(out) :: f90wrap_ng13
+        end subroutine f90wrap_parrrtm__get__ng13
+        subroutine f90wrap_parrrtm__get__ng14(f90wrap_ng14) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ng14=>ng14
+            integer(kind=4) intent(out) :: f90wrap_ng14
+        end subroutine f90wrap_parrrtm__get__ng14
+        subroutine f90wrap_parrrtm__get__ng15(f90wrap_ng15) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ng15=>ng15
+            integer(kind=4) intent(out) :: f90wrap_ng15
+        end subroutine f90wrap_parrrtm__get__ng15
+        subroutine f90wrap_parrrtm__get__ng16(f90wrap_ng16) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ng16=>ng16
+            integer(kind=4) intent(out) :: f90wrap_ng16
+        end subroutine f90wrap_parrrtm__get__ng16
+        subroutine f90wrap_parrrtm__get__ngs1(f90wrap_ngs1) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ngs1=>ngs1
+            integer(kind=4) intent(out) :: f90wrap_ngs1
+        end subroutine f90wrap_parrrtm__get__ngs1
+        subroutine f90wrap_parrrtm__get__ngs2(f90wrap_ngs2) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ngs2=>ngs2
+            integer(kind=4) intent(out) :: f90wrap_ngs2
+        end subroutine f90wrap_parrrtm__get__ngs2
+        subroutine f90wrap_parrrtm__get__ngs3(f90wrap_ngs3) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ngs3=>ngs3
+            integer(kind=4) intent(out) :: f90wrap_ngs3
+        end subroutine f90wrap_parrrtm__get__ngs3
+        subroutine f90wrap_parrrtm__get__ngs4(f90wrap_ngs4) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ngs4=>ngs4
+            integer(kind=4) intent(out) :: f90wrap_ngs4
+        end subroutine f90wrap_parrrtm__get__ngs4
+        subroutine f90wrap_parrrtm__get__ngs5(f90wrap_ngs5) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ngs5=>ngs5
+            integer(kind=4) intent(out) :: f90wrap_ngs5
+        end subroutine f90wrap_parrrtm__get__ngs5
+        subroutine f90wrap_parrrtm__get__ngs6(f90wrap_ngs6) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ngs6=>ngs6
+            integer(kind=4) intent(out) :: f90wrap_ngs6
+        end subroutine f90wrap_parrrtm__get__ngs6
+        subroutine f90wrap_parrrtm__get__ngs7(f90wrap_ngs7) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ngs7=>ngs7
+            integer(kind=4) intent(out) :: f90wrap_ngs7
+        end subroutine f90wrap_parrrtm__get__ngs7
+        subroutine f90wrap_parrrtm__get__ngs8(f90wrap_ngs8) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ngs8=>ngs8
+            integer(kind=4) intent(out) :: f90wrap_ngs8
+        end subroutine f90wrap_parrrtm__get__ngs8
+        subroutine f90wrap_parrrtm__get__ngs9(f90wrap_ngs9) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ngs9=>ngs9
+            integer(kind=4) intent(out) :: f90wrap_ngs9
+        end subroutine f90wrap_parrrtm__get__ngs9
+        subroutine f90wrap_parrrtm__get__ngs10(f90wrap_ngs10) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ngs10=>ngs10
+            integer(kind=4) intent(out) :: f90wrap_ngs10
+        end subroutine f90wrap_parrrtm__get__ngs10
+        subroutine f90wrap_parrrtm__get__ngs11(f90wrap_ngs11) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ngs11=>ngs11
+            integer(kind=4) intent(out) :: f90wrap_ngs11
+        end subroutine f90wrap_parrrtm__get__ngs11
+        subroutine f90wrap_parrrtm__get__ngs12(f90wrap_ngs12) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ngs12=>ngs12
+            integer(kind=4) intent(out) :: f90wrap_ngs12
+        end subroutine f90wrap_parrrtm__get__ngs12
+        subroutine f90wrap_parrrtm__get__ngs13(f90wrap_ngs13) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ngs13=>ngs13
+            integer(kind=4) intent(out) :: f90wrap_ngs13
+        end subroutine f90wrap_parrrtm__get__ngs13
+        subroutine f90wrap_parrrtm__get__ngs14(f90wrap_ngs14) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ngs14=>ngs14
+            integer(kind=4) intent(out) :: f90wrap_ngs14
+        end subroutine f90wrap_parrrtm__get__ngs14
+        subroutine f90wrap_parrrtm__get__ngs15(f90wrap_ngs15) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
+            use parrrtm, only: parrrtm_ngs15=>ngs15
+            integer(kind=4) intent(out) :: f90wrap_ngs15
+        end subroutine f90wrap_parrrtm__get__ngs15
         subroutine f90wrap_mcica_subcol_lw(iplon,ncol,nlay,icld,permuteseed,irng,play,cldfrac,ciwp,clwp,rei,rel,tauc,cldfmcl,ciwpmcl,clwpmcl,reicmcl,relqmcl,taucmcl,n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22,n23,n24,n25,n26,n27,n28,n29,n30) ! in :_rrtmg_lw:f90wrap_mcica_subcol_gen_lw.f90
             use mcica_subcol_gen_lw, only: mcica_subcol_lw
             integer(kind=4) intent(in) :: iplon

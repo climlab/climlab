@@ -2,9 +2,9 @@ import numpy as np
 #import parrrtm, rrtmg_lw_init, mcica_subcol_gen_lw, rrtmg_lw_rad
 #import parrrtm, mcica_subcol_gen_lw, rrtmg_lw_rad
 #import parrrtm, mcica_subcol_gen_lw, rrtmg_lw
-import parrrtm, rrtmg_lw
-nbndlw = parrrtm.parrrtm.nbndlw
-ngptlw = parrrtm.parrrtm.ngptlw
+import rrtmg_lw
+nbndlw = rrtmg_lw.parrrtm.nbndlw
+ngptlw = rrtmg_lw.parrrtm.ngptlw
 
 def driver(ncol, nlay, icld, permuteseed, irng, idrv, cpdair,
         play, plev, tlay, tlev, tsfc,

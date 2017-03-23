@@ -50,8 +50,10 @@ except:
     print 'Cannot import compiled RRTMG Fortran extensions, this module will not be functional.'
 #  Get nbndlw from the new f90wrap module
 #from _rrtmg_lw.parrrtm.parrrtm import nbndlw
-import _rrtmg_lw.parrrtm
-nbndlw = _rrtmg_lw.parrrtm.parrrtm.nbndlw
+#import _rrtmg_lw.parrrtm
+#nbndlw = _rrtmg_lw.parrrtm.parrrtm.nbndlw
+import _rrtmg_lw.rrtmg_lw
+nbndlw = _rrtmg_lw.rrtmg_lw.parrrtm.nbndlw
 from rrtmg import RRTMG
 from rrtmg_lw import RRTMG_LW
 from rrtmg_sw import RRTMG_SW
