@@ -3,6 +3,113 @@
 
 python module _rrtmg_lw ! in 
     interface  ! in :_rrtmg_lw
+        subroutine f90wrap_mcica_subcol_lw(iplon,ncol,nlay,icld,permuteseed,irng,play,cldfrac,ciwp,clwp,rei,rel,tauc,cldfmcl,ciwpmcl,clwpmcl,reicmcl,relqmcl,taucmcl,n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22,n23,n24,n25,n26,n27,n28,n29,n30) ! in :_rrtmg_lw:f90wrap_mcica_subcol_gen_lw.f90
+            use mcica_subcol_gen_lw, only: mcica_subcol_lw
+            integer(kind=4) intent(in) :: iplon
+            integer(kind=4) intent(in) :: ncol
+            integer(kind=4) intent(in) :: nlay
+            integer(kind=4) intent(in) :: icld
+            integer(kind=4) intent(in) :: permuteseed
+            integer(kind=4) intent(inout) :: irng
+            real(kind=8) dimension(n0,n1),intent(in) :: play
+            real(kind=8) dimension(n2,n3),intent(in) :: cldfrac
+            real(kind=8) dimension(n4,n5),intent(in) :: ciwp
+            real(kind=8) dimension(n6,n7),intent(in) :: clwp
+            real(kind=8) dimension(n8,n9),intent(in) :: rei
+            real(kind=8) dimension(n10,n11),intent(in) :: rel
+            real(kind=8) dimension(n12,n13,n14),intent(in) :: tauc
+            real(kind=8) dimension(n15,n16,n17),intent(inout) :: cldfmcl
+            real(kind=8) dimension(n18,n19,n20),intent(inout) :: ciwpmcl
+            real(kind=8) dimension(n21,n22,n23),intent(inout) :: clwpmcl
+            real(kind=8) dimension(n24,n25),intent(inout) :: reicmcl
+            real(kind=8) dimension(n26,n27),intent(inout) :: relqmcl
+            real(kind=8) dimension(n28,n29,n30),intent(inout) :: taucmcl
+            integer, optional,intent(hide),check(shape(play,0)==n0),depend(play) :: n0=shape(play,0)
+            integer, optional,intent(hide),check(shape(play,1)==n1),depend(play) :: n1=shape(play,1)
+            integer, optional,intent(hide),check(shape(cldfrac,0)==n2),depend(cldfrac) :: n2=shape(cldfrac,0)
+            integer, optional,intent(hide),check(shape(cldfrac,1)==n3),depend(cldfrac) :: n3=shape(cldfrac,1)
+            integer, optional,intent(hide),check(shape(ciwp,0)==n4),depend(ciwp) :: n4=shape(ciwp,0)
+            integer, optional,intent(hide),check(shape(ciwp,1)==n5),depend(ciwp) :: n5=shape(ciwp,1)
+            integer, optional,intent(hide),check(shape(clwp,0)==n6),depend(clwp) :: n6=shape(clwp,0)
+            integer, optional,intent(hide),check(shape(clwp,1)==n7),depend(clwp) :: n7=shape(clwp,1)
+            integer, optional,intent(hide),check(shape(rei,0)==n8),depend(rei) :: n8=shape(rei,0)
+            integer, optional,intent(hide),check(shape(rei,1)==n9),depend(rei) :: n9=shape(rei,1)
+            integer, optional,intent(hide),check(shape(rel,0)==n10),depend(rel) :: n10=shape(rel,0)
+            integer, optional,intent(hide),check(shape(rel,1)==n11),depend(rel) :: n11=shape(rel,1)
+            integer, optional,intent(hide),check(shape(tauc,0)==n12),depend(tauc) :: n12=shape(tauc,0)
+            integer, optional,intent(hide),check(shape(tauc,1)==n13),depend(tauc) :: n13=shape(tauc,1)
+            integer, optional,intent(hide),check(shape(tauc,2)==n14),depend(tauc) :: n14=shape(tauc,2)
+            integer, optional,intent(hide),check(shape(cldfmcl,0)==n15),depend(cldfmcl) :: n15=shape(cldfmcl,0)
+            integer, optional,intent(hide),check(shape(cldfmcl,1)==n16),depend(cldfmcl) :: n16=shape(cldfmcl,1)
+            integer, optional,intent(hide),check(shape(cldfmcl,2)==n17),depend(cldfmcl) :: n17=shape(cldfmcl,2)
+            integer, optional,intent(hide),check(shape(ciwpmcl,0)==n18),depend(ciwpmcl) :: n18=shape(ciwpmcl,0)
+            integer, optional,intent(hide),check(shape(ciwpmcl,1)==n19),depend(ciwpmcl) :: n19=shape(ciwpmcl,1)
+            integer, optional,intent(hide),check(shape(ciwpmcl,2)==n20),depend(ciwpmcl) :: n20=shape(ciwpmcl,2)
+            integer, optional,intent(hide),check(shape(clwpmcl,0)==n21),depend(clwpmcl) :: n21=shape(clwpmcl,0)
+            integer, optional,intent(hide),check(shape(clwpmcl,1)==n22),depend(clwpmcl) :: n22=shape(clwpmcl,1)
+            integer, optional,intent(hide),check(shape(clwpmcl,2)==n23),depend(clwpmcl) :: n23=shape(clwpmcl,2)
+            integer, optional,intent(hide),check(shape(reicmcl,0)==n24),depend(reicmcl) :: n24=shape(reicmcl,0)
+            integer, optional,intent(hide),check(shape(reicmcl,1)==n25),depend(reicmcl) :: n25=shape(reicmcl,1)
+            integer, optional,intent(hide),check(shape(relqmcl,0)==n26),depend(relqmcl) :: n26=shape(relqmcl,0)
+            integer, optional,intent(hide),check(shape(relqmcl,1)==n27),depend(relqmcl) :: n27=shape(relqmcl,1)
+            integer, optional,intent(hide),check(shape(taucmcl,0)==n28),depend(taucmcl) :: n28=shape(taucmcl,0)
+            integer, optional,intent(hide),check(shape(taucmcl,1)==n29),depend(taucmcl) :: n29=shape(taucmcl,1)
+            integer, optional,intent(hide),check(shape(taucmcl,2)==n30),depend(taucmcl) :: n30=shape(taucmcl,2)
+        end subroutine f90wrap_mcica_subcol_lw
+        subroutine f90wrap_generate_stochastic_clouds(ncol,nlay,nsubcol,icld,irng,pmid,cld,clwp,ciwp,tauc,cld_stoch,clwp_stoch,ciwp_stoch,tauc_stoch,changeseed,n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22) ! in :_rrtmg_lw:f90wrap_mcica_subcol_gen_lw.f90
+            use mcica_subcol_gen_lw, only: generate_stochastic_clouds
+            integer(kind=4) intent(in) :: ncol
+            integer(kind=4) intent(in) :: nlay
+            integer(kind=4) intent(in) :: nsubcol
+            integer(kind=4) intent(in) :: icld
+            integer(kind=4) intent(inout) :: irng
+            real(kind=8) dimension(n0,n1),intent(in) :: pmid
+            real(kind=8) dimension(n2,n3),intent(in) :: cld
+            real(kind=8) dimension(n4,n5),intent(in) :: clwp
+            real(kind=8) dimension(n6,n7),intent(in) :: ciwp
+            real(kind=8) dimension(n8,n9,n10),intent(in) :: tauc
+            real(kind=8) dimension(n11,n12,n13),intent(inout) :: cld_stoch
+            real(kind=8) dimension(n14,n15,n16),intent(inout) :: clwp_stoch
+            real(kind=8) dimension(n17,n18,n19),intent(inout) :: ciwp_stoch
+            real(kind=8) dimension(n20,n21,n22),intent(inout) :: tauc_stoch
+            integer(kind=4), optional,intent(in) :: changeseed
+            integer, optional,intent(hide),check(shape(pmid,0)==n0),depend(pmid) :: n0=shape(pmid,0)
+            integer, optional,intent(hide),check(shape(pmid,1)==n1),depend(pmid) :: n1=shape(pmid,1)
+            integer, optional,intent(hide),check(shape(cld,0)==n2),depend(cld) :: n2=shape(cld,0)
+            integer, optional,intent(hide),check(shape(cld,1)==n3),depend(cld) :: n3=shape(cld,1)
+            integer, optional,intent(hide),check(shape(clwp,0)==n4),depend(clwp) :: n4=shape(clwp,0)
+            integer, optional,intent(hide),check(shape(clwp,1)==n5),depend(clwp) :: n5=shape(clwp,1)
+            integer, optional,intent(hide),check(shape(ciwp,0)==n6),depend(ciwp) :: n6=shape(ciwp,0)
+            integer, optional,intent(hide),check(shape(ciwp,1)==n7),depend(ciwp) :: n7=shape(ciwp,1)
+            integer, optional,intent(hide),check(shape(tauc,0)==n8),depend(tauc) :: n8=shape(tauc,0)
+            integer, optional,intent(hide),check(shape(tauc,1)==n9),depend(tauc) :: n9=shape(tauc,1)
+            integer, optional,intent(hide),check(shape(tauc,2)==n10),depend(tauc) :: n10=shape(tauc,2)
+            integer, optional,intent(hide),check(shape(cld_stoch,0)==n11),depend(cld_stoch) :: n11=shape(cld_stoch,0)
+            integer, optional,intent(hide),check(shape(cld_stoch,1)==n12),depend(cld_stoch) :: n12=shape(cld_stoch,1)
+            integer, optional,intent(hide),check(shape(cld_stoch,2)==n13),depend(cld_stoch) :: n13=shape(cld_stoch,2)
+            integer, optional,intent(hide),check(shape(clwp_stoch,0)==n14),depend(clwp_stoch) :: n14=shape(clwp_stoch,0)
+            integer, optional,intent(hide),check(shape(clwp_stoch,1)==n15),depend(clwp_stoch) :: n15=shape(clwp_stoch,1)
+            integer, optional,intent(hide),check(shape(clwp_stoch,2)==n16),depend(clwp_stoch) :: n16=shape(clwp_stoch,2)
+            integer, optional,intent(hide),check(shape(ciwp_stoch,0)==n17),depend(ciwp_stoch) :: n17=shape(ciwp_stoch,0)
+            integer, optional,intent(hide),check(shape(ciwp_stoch,1)==n18),depend(ciwp_stoch) :: n18=shape(ciwp_stoch,1)
+            integer, optional,intent(hide),check(shape(ciwp_stoch,2)==n19),depend(ciwp_stoch) :: n19=shape(ciwp_stoch,2)
+            integer, optional,intent(hide),check(shape(tauc_stoch,0)==n20),depend(tauc_stoch) :: n20=shape(tauc_stoch,0)
+            integer, optional,intent(hide),check(shape(tauc_stoch,1)==n21),depend(tauc_stoch) :: n21=shape(tauc_stoch,1)
+            integer, optional,intent(hide),check(shape(tauc_stoch,2)==n22),depend(tauc_stoch) :: n22=shape(tauc_stoch,2)
+        end subroutine f90wrap_generate_stochastic_clouds
+        subroutine f90wrap_kissvec(seed1,seed2,seed3,seed4,ran_arr,n0,n1,n2,n3,n4) ! in :_rrtmg_lw:f90wrap_mcica_subcol_gen_lw.f90
+            use mcica_subcol_gen_lw, only: kissvec
+            integer(kind=4) dimension(n0),intent(inout) :: seed1
+            integer(kind=4) dimension(n1),intent(inout) :: seed2
+            integer(kind=4) dimension(n2),intent(inout) :: seed3
+            integer(kind=4) dimension(n3),intent(inout) :: seed4
+            real(kind=8) dimension(n4),intent(inout) :: ran_arr
+            integer, optional,intent(hide),check(len(seed1)>=n0),depend(seed1) :: n0=len(seed1)
+            integer, optional,intent(hide),check(len(seed2)>=n1),depend(seed2) :: n1=len(seed2)
+            integer, optional,intent(hide),check(len(seed3)>=n2),depend(seed3) :: n2=len(seed3)
+            integer, optional,intent(hide),check(len(seed4)>=n3),depend(seed4) :: n3=len(seed4)
+            integer, optional,intent(hide),check(len(ran_arr)>=n4),depend(ran_arr) :: n4=len(ran_arr)
+        end subroutine f90wrap_kissvec
         subroutine f90wrap_rrtmg_lw_ini(cpdair) ! in :_rrtmg_lw:f90wrap_rrtmg_lw_init.f90
             use rrtmg_lw_init, only: rrtmg_lw_ini
             real(kind=8) intent(in) :: cpdair

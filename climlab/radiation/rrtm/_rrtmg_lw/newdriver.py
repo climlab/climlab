@@ -1,7 +1,8 @@
 import numpy as np
 #import parrrtm, rrtmg_lw_init, mcica_subcol_gen_lw, rrtmg_lw_rad
 #import parrrtm, mcica_subcol_gen_lw, rrtmg_lw_rad
-import parrrtm, mcica_subcol_gen_lw, rrtmg_lw
+#import parrrtm, mcica_subcol_gen_lw, rrtmg_lw
+import parrrtm, rrtmg_lw
 nbndlw = parrrtm.parrrtm.nbndlw
 ngptlw = parrrtm.parrrtm.ngptlw
 
@@ -19,7 +20,7 @@ def driver(ncol, nlay, icld, permuteseed, irng, idrv, cpdair,
     reicmcl = np.zeros((ncol,nlay), order='F')
     relqmcl = np.zeros((ncol,nlay), order='F')
     taucmcl = np.zeros((ngptlw,ncol,nlay), order='F')
-    mcica_subcol_gen_lw.mcica_subcol_gen_lw.mcica_subcol_lw(1, ncol, nlay, icld, permuteseed, irng, play,
+    rrtmg_lw.mcica_subcol_gen_lw.mcica_subcol_lw(1, ncol, nlay, icld, permuteseed, irng, play,
                        cldfrac, ciwp, clwp, reic, relq, tauc, cldfmcl,
                        ciwpmcl, clwpmcl, reicmcl, relqmcl, taucmcl)
 
