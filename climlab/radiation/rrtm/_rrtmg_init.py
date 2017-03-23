@@ -275,8 +275,8 @@ def read_sw_abs_data(fort):
     but removes dependency on compiled netcdf libraries.
     input argument: fortran object _rrtm_radiation_fortran
     '''
-    ClimtDir = os.path.dirname( __file__ )
-    ncfilepath = os.path.join(ClimtDir,'data', 'rrtm', 'rrtmg_sw.nc')
+    here = os.path.dirname( __file__ )
+    ncfilepath = os.path.join(here, '_rrtmg_sw', 'rrtmg_sw_v4.0', 'gcm_model', 'data', 'rrtmg_sw.nc')
     data = nc.Dataset(ncfilepath)
     gPointSetNumber = 1
     numGPoints = 16
