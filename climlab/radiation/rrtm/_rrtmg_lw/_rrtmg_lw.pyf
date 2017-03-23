@@ -110,30 +110,6 @@ python module _rrtmg_lw ! in
             integer, optional,intent(hide),check(len(seed4)>=n3),depend(seed4) :: n3=len(seed4)
             integer, optional,intent(hide),check(len(ran_arr)>=n4),depend(ran_arr) :: n4=len(ran_arr)
         end subroutine f90wrap_kissvec
-        subroutine f90wrap_parkind__get__kind_ib(f90wrap_kind_ib) ! in :_rrtmg_lw:f90wrap_parkind.f90
-            use parkind, only: parkind_kind_ib=>kind_ib
-            integer intent(out) :: f90wrap_kind_ib
-        end subroutine f90wrap_parkind__get__kind_ib
-        subroutine f90wrap_parkind__get__kind_im(f90wrap_kind_im) ! in :_rrtmg_lw:f90wrap_parkind.f90
-            use parkind, only: parkind_kind_im=>kind_im
-            integer intent(out) :: f90wrap_kind_im
-        end subroutine f90wrap_parkind__get__kind_im
-        subroutine f90wrap_parkind__get__kind_in(f90wrap_kind_in) ! in :_rrtmg_lw:f90wrap_parkind.f90
-            use parkind, only: parkind_kind_in=>kind_in
-            integer intent(out) :: f90wrap_kind_in
-        end subroutine f90wrap_parkind__get__kind_in
-        subroutine f90wrap_parkind__get__kind_rb(f90wrap_kind_rb) ! in :_rrtmg_lw:f90wrap_parkind.f90
-            use parkind, only: parkind_kind_rb=>kind_rb
-            integer intent(out) :: f90wrap_kind_rb
-        end subroutine f90wrap_parkind__get__kind_rb
-        subroutine f90wrap_parkind__get__kind_rm(f90wrap_kind_rm) ! in :_rrtmg_lw:f90wrap_parkind.f90
-            use parkind, only: parkind_kind_rm=>kind_rm
-            integer intent(out) :: f90wrap_kind_rm
-        end subroutine f90wrap_parkind__get__kind_rm
-        subroutine f90wrap_parkind__get__kind_rn(f90wrap_kind_rn) ! in :_rrtmg_lw:f90wrap_parkind.f90
-            use parkind, only: parkind_kind_rn=>kind_rn
-            integer intent(out) :: f90wrap_kind_rn
-        end subroutine f90wrap_parkind__get__kind_rn
         subroutine f90wrap_parrrtm__get__mxlay(f90wrap_mxlay) ! in :_rrtmg_lw:f90wrap_parrrtm.f90
             use parrrtm, only: parrrtm_mxlay=>mxlay
             integer(kind=4) intent(out) :: f90wrap_mxlay
