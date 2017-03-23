@@ -52,8 +52,8 @@ except:
 #from _rrtmg_lw.parrrtm.parrrtm import nbndlw
 #import _rrtmg_lw.parrrtm
 #nbndlw = _rrtmg_lw.parrrtm.parrrtm.nbndlw
-import _rrtmg_lw.rrtmg_lw
-nbndlw = _rrtmg_lw.rrtmg_lw.parrrtm.nbndlw
+import _rrtmg_lw
+nbndlw = _rrtmg_lw.parrrtm.nbndlw
 from rrtmg import RRTMG
 from rrtmg_lw import RRTMG_LW
 from rrtmg_sw import RRTMG_SW
