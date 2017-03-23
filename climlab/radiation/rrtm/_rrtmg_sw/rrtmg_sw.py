@@ -8774,13 +8774,15 @@ class Rrtmg_Sw_Rad(f90wrap.runtime.FortranModule):
         o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr, asdir, asdif, aldir, aldif, coszen, \
         adjes, dyofyr, scon, isolvar, inflgsw, iceflgsw, liqflgsw, cldfmcl, taucmcl, \
         ssacmcl, asmcmcl, fsfcmcl, ciwpmcl, clwpmcl, reicmcl, relqmcl, tauaer, \
-        ssaaer, asmaer, ecaer, swuflx, swdflx, swhr, swuflxc, swdflxc, swhrc):
+        ssaaer, asmaer, ecaer, swuflx, swdflx, swhr, swuflxc, swdflxc, swhrc, \
+        bndsolvar=None, indsolvar=None, solcycfrac=None):
         """
         rrtmg_sw(ncol, nlay, icld, iaer, play, plev, tlay, tlev, tsfc, h2ovmr, o3vmr, \
             co2vmr, ch4vmr, n2ovmr, o2vmr, asdir, asdif, aldir, aldif, coszen, adjes, \
             dyofyr, scon, isolvar, inflgsw, iceflgsw, liqflgsw, cldfmcl, taucmcl, \
             ssacmcl, asmcmcl, fsfcmcl, ciwpmcl, clwpmcl, reicmcl, relqmcl, tauaer, \
-            ssaaer, asmaer, ecaer, swuflx, swdflx, swhr, swuflxc, swdflxc, swhrc)
+            ssaaer, asmaer, ecaer, swuflx, swdflx, swhr, swuflxc, swdflxc, swhrc[, \
+            bndsolvar, indsolvar, solcycfrac])
         
         
         Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_rad.f90 lines 110-841
@@ -8833,6 +8835,9 @@ class Rrtmg_Sw_Rad(f90wrap.runtime.FortranModule):
         swuflxc : float array
         swdflxc : float array
         swhrc : float array
+        bndsolvar : float array
+        indsolvar : float array
+        solcycfrac : float
         
         """
         _rrtmg_sw.f90wrap_rrtmg_sw(ncol=ncol, nlay=nlay, icld=icld, iaer=iaer, \
@@ -8844,7 +8849,8 @@ class Rrtmg_Sw_Rad(f90wrap.runtime.FortranModule):
             ssacmcl=ssacmcl, asmcmcl=asmcmcl, fsfcmcl=fsfcmcl, ciwpmcl=ciwpmcl, \
             clwpmcl=clwpmcl, reicmcl=reicmcl, relqmcl=relqmcl, tauaer=tauaer, \
             ssaaer=ssaaer, asmaer=asmaer, ecaer=ecaer, swuflx=swuflx, swdflx=swdflx, \
-            swhr=swhr, swuflxc=swuflxc, swdflxc=swdflxc, swhrc=swhrc)
+            swhr=swhr, swuflxc=swuflxc, swdflxc=swdflxc, swhrc=swhrc, \
+            bndsolvar=bndsolvar, indsolvar=indsolvar, solcycfrac=solcycfrac)
     
     @staticmethod
     def earth_sun(idn):

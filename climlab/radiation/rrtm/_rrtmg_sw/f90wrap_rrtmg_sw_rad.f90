@@ -5,12 +5,12 @@ subroutine f90wrap_rrtmg_sw(ncol, nlay, icld, iaer, play, plev, tlay, tlev, &
     aldif, coszen, adjes, dyofyr, scon, isolvar, inflgsw, iceflgsw, liqflgsw, &
     cldfmcl, taucmcl, ssacmcl, asmcmcl, fsfcmcl, ciwpmcl, clwpmcl, reicmcl, &
     relqmcl, tauaer, ssaaer, asmaer, ecaer, swuflx, swdflx, swhr, swuflxc, &
-    swdflxc, swhrc, n0, n1, n2, n3, n4, n5, n6, n7, n8, n9, n10, n11, n12, n13, &
-    n14, n15, n16, n17, n18, n19, n20, n21, n22, n23, n24, n25, n26, n27, n28, &
-    n29, n30, n31, n32, n33, n34, n35, n36, n37, n38, n39, n40, n41, n42, n43, &
-    n44, n45, n46, n47, n48, n49, n50, n51, n52, n53, n54, n55, n56, n57, n58, &
-    n59, n60, n61, n62, n63, n64, n65, n66, n67, n68, n69, n70, n71, n72, n73, &
-    n74)
+    swdflxc, swhrc, bndsolvar, indsolvar, solcycfrac, n0, n1, n2, n3, n4, n5, &
+    n6, n7, n8, n9, n10, n11, n12, n13, n14, n15, n16, n17, n18, n19, n20, n21, &
+    n22, n23, n24, n25, n26, n27, n28, n29, n30, n31, n32, n33, n34, n35, n36, &
+    n37, n38, n39, n40, n41, n42, n43, n44, n45, n46, n47, n48, n49, n50, n51, &
+    n52, n53, n54, n55, n56, n57, n58, n59, n60, n61, n62, n63, n64, n65, n66, &
+    n67, n68, n69, n70, n71, n72, n73, n74, n75, n76)
     use rrtmg_sw_rad, only: rrtmg_sw
     implicit none
     
@@ -60,6 +60,9 @@ subroutine f90wrap_rrtmg_sw(ncol, nlay, icld, iaer, play, plev, tlay, tlev, &
     real(8), intent(inout), dimension(n69,n70) :: swuflxc
     real(8), intent(inout), dimension(n71,n72) :: swdflxc
     real(8), intent(inout), dimension(n73,n74) :: swhrc
+    real(8), intent(inout), optional, dimension(n75) :: bndsolvar
+    real(8), intent(inout), optional, dimension(n76) :: indsolvar
+    real(8), intent(inout), optional :: solcycfrac
     integer :: n0
     !f2py intent(hide), depend(play) :: n0 = shape(play,0)
     integer :: n1
@@ -210,6 +213,10 @@ subroutine f90wrap_rrtmg_sw(ncol, nlay, icld, iaer, play, plev, tlay, tlev, &
     !f2py intent(hide), depend(swhrc) :: n73 = shape(swhrc,0)
     integer :: n74
     !f2py intent(hide), depend(swhrc) :: n74 = shape(swhrc,1)
+    integer :: n75
+    !f2py intent(hide), depend(bndsolvar) :: n75 = shape(bndsolvar,0)
+    integer :: n76
+    !f2py intent(hide), depend(indsolvar) :: n76 = shape(indsolvar,0)
     call rrtmg_sw(ncol=ncol, nlay=nlay, icld=icld, iaer=iaer, play=play, plev=plev, &
         tlay=tlay, tlev=tlev, tsfc=tsfc, h2ovmr=h2ovmr, o3vmr=o3vmr, co2vmr=co2vmr, &
         ch4vmr=ch4vmr, n2ovmr=n2ovmr, o2vmr=o2vmr, asdir=asdir, asdif=asdif, &
@@ -219,7 +226,8 @@ subroutine f90wrap_rrtmg_sw(ncol, nlay, icld, iaer, play, plev, tlay, tlev, &
         asmcmcl=asmcmcl, fsfcmcl=fsfcmcl, ciwpmcl=ciwpmcl, clwpmcl=clwpmcl, &
         reicmcl=reicmcl, relqmcl=relqmcl, tauaer=tauaer, ssaaer=ssaaer, &
         asmaer=asmaer, ecaer=ecaer, swuflx=swuflx, swdflx=swdflx, swhr=swhr, &
-        swuflxc=swuflxc, swdflxc=swdflxc, swhrc=swhrc)
+        swuflxc=swuflxc, swdflxc=swdflxc, swhrc=swhrc, bndsolvar=bndsolvar, &
+        indsolvar=indsolvar, solcycfrac=solcycfrac)
 end subroutine f90wrap_rrtmg_sw
 
 subroutine f90wrap_earth_sun(ret_earth_sun, idn)

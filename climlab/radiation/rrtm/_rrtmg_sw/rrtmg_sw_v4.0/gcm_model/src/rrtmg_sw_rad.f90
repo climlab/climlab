@@ -107,8 +107,8 @@
              ciwpmcl ,clwpmcl ,reicmcl ,relqmcl , &
              tauaer  ,ssaaer  ,asmaer  ,ecaer   , &
              swuflx  ,swdflx  ,swhr    ,swuflxc ,swdflxc ,swhrc, &
-! optional I/O
              bndsolvar,indsolvar,solcycfrac)
+! last line is optional I/O ... CLIMLAB moved this comment line
 
 ! ------- Description -------
 

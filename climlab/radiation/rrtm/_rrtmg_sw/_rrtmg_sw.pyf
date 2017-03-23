@@ -3204,7 +3204,7 @@ python module _rrtmg_sw ! in
         subroutine f90wrap_swcldpr ! in :_rrtmg_sw:f90wrap_rrtmg_sw_init.f90
             use rrtmg_sw_init, only: swcldpr
         end subroutine f90wrap_swcldpr
-        subroutine f90wrap_rrtmg_sw(ncol,nlay,icld,iaer,play,plev,tlay,tlev,tsfc,h2ovmr,o3vmr,co2vmr,ch4vmr,n2ovmr,o2vmr,asdir,asdif,aldir,aldif,coszen,adjes,dyofyr,scon,isolvar,inflgsw,iceflgsw,liqflgsw,cldfmcl,taucmcl,ssacmcl,asmcmcl,fsfcmcl,ciwpmcl,clwpmcl,reicmcl,relqmcl,tauaer,ssaaer,asmaer,ecaer,swuflx,swdflx,swhr,swuflxc,swdflxc,swhrc,n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22,n23,n24,n25,n26,n27,n28,n29,n30,n31,n32,n33,n34,n35,n36,n37,n38,n39,n40,n41,n42,n43,n44,n45,n46,n47,n48,n49,n50,n51,n52,n53,n54,n55,n56,n57,n58,n59,n60,n61,n62,n63,n64,n65,n66,n67,n68,n69,n70,n71,n72,n73,n74) ! in :_rrtmg_sw:f90wrap_rrtmg_sw_rad.f90
+        subroutine f90wrap_rrtmg_sw(ncol,nlay,icld,iaer,play,plev,tlay,tlev,tsfc,h2ovmr,o3vmr,co2vmr,ch4vmr,n2ovmr,o2vmr,asdir,asdif,aldir,aldif,coszen,adjes,dyofyr,scon,isolvar,inflgsw,iceflgsw,liqflgsw,cldfmcl,taucmcl,ssacmcl,asmcmcl,fsfcmcl,ciwpmcl,clwpmcl,reicmcl,relqmcl,tauaer,ssaaer,asmaer,ecaer,swuflx,swdflx,swhr,swuflxc,swdflxc,swhrc,bndsolvar,indsolvar,solcycfrac,n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15,n16,n17,n18,n19,n20,n21,n22,n23,n24,n25,n26,n27,n28,n29,n30,n31,n32,n33,n34,n35,n36,n37,n38,n39,n40,n41,n42,n43,n44,n45,n46,n47,n48,n49,n50,n51,n52,n53,n54,n55,n56,n57,n58,n59,n60,n61,n62,n63,n64,n65,n66,n67,n68,n69,n70,n71,n72,n73,n74,n75,n76) ! in :_rrtmg_sw:f90wrap_rrtmg_sw_rad.f90
             use rrtmg_sw_rad, only: rrtmg_sw
             integer(kind=4) intent(in) :: ncol
             integer(kind=4) intent(in) :: nlay
@@ -3252,6 +3252,9 @@ python module _rrtmg_sw ! in
             real(kind=8) dimension(n69,n70),intent(inout) :: swuflxc
             real(kind=8) dimension(n71,n72),intent(inout) :: swdflxc
             real(kind=8) dimension(n73,n74),intent(inout) :: swhrc
+            real(kind=8), optional,dimension(n75),intent(inout) :: bndsolvar
+            real(kind=8), optional,dimension(n76),intent(inout) :: indsolvar
+            real(kind=8), optional,intent(inout) :: solcycfrac
             integer, optional,intent(hide),check(shape(play,0)==n0),depend(play) :: n0=shape(play,0)
             integer, optional,intent(hide),check(shape(play,1)==n1),depend(play) :: n1=shape(play,1)
             integer, optional,intent(hide),check(shape(plev,0)==n2),depend(plev) :: n2=shape(plev,0)
@@ -3327,6 +3330,8 @@ python module _rrtmg_sw ! in
             integer, optional,intent(hide),check(shape(swdflxc,1)==n72),depend(swdflxc) :: n72=shape(swdflxc,1)
             integer, optional,intent(hide),check(shape(swhrc,0)==n73),depend(swhrc) :: n73=shape(swhrc,0)
             integer, optional,intent(hide),check(shape(swhrc,1)==n74),depend(swhrc) :: n74=shape(swhrc,1)
+            integer, optional,intent(hide),check(len(bndsolvar)>=n75),depend(bndsolvar) :: n75=len(bndsolvar)
+            integer, optional,intent(hide),check(len(indsolvar)>=n76),depend(indsolvar) :: n76=len(indsolvar)
         end subroutine f90wrap_rrtmg_sw
         subroutine f90wrap_earth_sun(ret_earth_sun,idn) ! in :_rrtmg_sw:f90wrap_rrtmg_sw_rad.f90
             use rrtmg_sw_rad, only: earth_sun
