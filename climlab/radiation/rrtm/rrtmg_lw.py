@@ -4,16 +4,11 @@ from climlab import constants as const
 from climlab.radiation.radiation import _Radiation_LW
 from utils import _prepare_general_arguments
 from utils import _climlab_to_rrtm, _climlab_to_rrtm_sfc, _rrtm_to_climlab
+import _rrtmg_init
 from . import nbndlw, naerec
 import _rrtmg_lw
 nbndlw = _rrtmg_lw.parrrtm.nbndlw
 ngptlw = _rrtmg_lw.parrrtm.ngptlw
-
-#from _rrtmg_lw.newdriver import driver as lwdriver
-#try:
-#    from _rrtmg_lw import driver as lwdriver
-#except:
-#    print 'Cannot import compiled _rrtmg_lw driver.'
 
 
 class RRTMG_LW(_Radiation_LW):
@@ -41,10 +36,7 @@ class RRTMG_LW(_Radiation_LW):
         self.add_input('tauc', tauc)
         self.add_input('tauaer', tauaer)
         #  Python-based initialization of absorption data from netcdf file
-        from _rrtmg_init import read_lw_abs_data
-        read_lw_abs_data(_rrtmg_lw)
-        _rrtmg_lw.rrtmg_lw_init.rrtmg_lw_ini(const.cp)
-
+        _rrtmg_init.init_lw(_rrtmg_lw)
 
     def _prepare_lw_arguments(self):
         #  scalar integer arguments
