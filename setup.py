@@ -82,7 +82,7 @@ if __name__ == '__main__':
                         os.path.join('data','abs_ems_factors_fastvx.c030508.nc'),
                         '_cam3.so',
                                       ],
-            'climlab.radiation.rrtm._rrtmg_sw': ['_rrtmg_sw.so'], # make sure compiled .so files are included
+            #'climlab.radiation.rrtm._rrtmg_sw': ['_rrtmg_sw.so'], # make sure compiled .so files are included
             #'climlab.radiation.rrtm._rrtmg_lw': ['_rrtmg_lw.so'],
             },
           setup_requires=['pytest-runner'],

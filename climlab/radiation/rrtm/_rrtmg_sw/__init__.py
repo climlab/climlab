@@ -1,2 +1,2 @@
 #  import everything from the fortran object
-from _rrtmg_sw import *
+from rrtmg_sw import *
