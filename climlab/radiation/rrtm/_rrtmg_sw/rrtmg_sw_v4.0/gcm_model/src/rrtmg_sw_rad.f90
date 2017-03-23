@@ -630,10 +630,12 @@
               adjflux, inflag, iceflag, liqflag, cldfmc, taucmc, &
               ssacmc, asmcmc, fsfcmc, ciwpmc, clwpmc, reicmc, relqmc, &
               taua, ssaa, asma, &
-! solar variability
               svar_f, svar_s, svar_i, svar_f_bnd, svar_s_bnd, svar_i_bnd, &
-! optional
               bndsolvar,indsolvar,solcycfrac)
+! CLIMLAB second-last time is solar variability
+! CLIMLAB last line is optional
+! CLIMLAB moved comment lines out of subroutine call
+
 
 !  For cloudy atmosphere, use cldprmc to set cloud optical properties based on
 !  input cloud physical properties.  Select method based on choices described

@@ -8766,7 +8766,7 @@ class Rrtmg_Sw_Rad(f90wrap.runtime.FortranModule):
     Module rrtmg_sw_rad
     
     
-    Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_rad.f90 lines 7-1568
+    Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_rad.f90 lines 7-1570
     
     """
     @staticmethod
@@ -8785,7 +8785,7 @@ class Rrtmg_Sw_Rad(f90wrap.runtime.FortranModule):
             bndsolvar, indsolvar, solcycfrac])
         
         
-        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_rad.f90 lines 110-841
+        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_rad.f90 lines 110-843
         
         Parameters
         ----------
@@ -8858,7 +8858,7 @@ class Rrtmg_Sw_Rad(f90wrap.runtime.FortranModule):
         earth_sun = earth_sun(idn)
         
         
-        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_rad.f90 lines 844-868
+        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_rad.f90 lines 846-870
         
         Parameters
         ----------
@@ -8891,7 +8891,7 @@ class Rrtmg_Sw_Rad(f90wrap.runtime.FortranModule):
             svar_i_bnd[, bndsolvar, indsolvar, solcycfrac])
         
         
-        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_rad.f90 lines 883-1568
+        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_rad.f90 lines 885-1570
         
         Parameters
         ----------
