@@ -7,13 +7,13 @@ def readme():
     with open('README.rst') as f:
         return f.read()
 
-# #  Run the manual f2py build script
-# try:
-#     from numpy.distutils import fcompiler
-#     compiler = fcompiler.get_default_fcompiler()
-#     import build_fortran_extensions
-# except CompilerNotFound:
-#     print 'Cannot find a Fortran compiler, not building Fortran components!'
+#  Run the manual f2py build script
+try:
+    from numpy.distutils import fcompiler
+    compiler = fcompiler.get_default_fcompiler()
+    import build_fortran_extensions
+except CompilerNotFound:
+    print 'Cannot find a Fortran compiler, not building Fortran components!'
 
 def configuration(parent_package='',top_path=None):
     from numpy.distutils.misc_util import Configuration
