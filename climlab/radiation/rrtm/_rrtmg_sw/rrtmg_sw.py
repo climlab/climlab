@@ -8459,7 +8459,7 @@ class Rrtmg_Sw_Init(f90wrap.runtime.FortranModule):
     Module rrtmg_sw_init
     
     
-    Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 6-3516
+    Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 6-3515
     
     """
     @staticmethod
@@ -8468,7 +8468,7 @@ class Rrtmg_Sw_Init(f90wrap.runtime.FortranModule):
         rrtmg_sw_ini(cpdair)
         
         
-        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 47-173
+        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 47-174
         
         Parameters
         ----------
@@ -8483,7 +8483,7 @@ class Rrtmg_Sw_Init(f90wrap.runtime.FortranModule):
         swdatinit(cpdair)
         
         
-        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 176-260
+        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 177-261
         
         Parameters
         ----------
@@ -8498,7 +8498,7 @@ class Rrtmg_Sw_Init(f90wrap.runtime.FortranModule):
         swcmbdat()
         
         
-        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 263-386
+        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 264-387
         
         
         """
@@ -8510,7 +8510,7 @@ class Rrtmg_Sw_Init(f90wrap.runtime.FortranModule):
         swaerpr()
         
         
-        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 389-489
+        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 390-490
         
         
         """
@@ -8522,7 +8522,7 @@ class Rrtmg_Sw_Init(f90wrap.runtime.FortranModule):
         cmbgb16s()
         
         
-        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 492-594
+        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 493-595
         
         
         -----------------------------------------------------------------------
@@ -8535,7 +8535,7 @@ class Rrtmg_Sw_Init(f90wrap.runtime.FortranModule):
         cmbgb17()
         
         
-        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 597-690
+        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 598-691
         
         
         -----------------------------------------------------------------------
@@ -8548,7 +8548,7 @@ class Rrtmg_Sw_Init(f90wrap.runtime.FortranModule):
         cmbgb18()
         
         
-        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 693-784
+        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 694-785
         
         
         -----------------------------------------------------------------------
@@ -8561,7 +8561,7 @@ class Rrtmg_Sw_Init(f90wrap.runtime.FortranModule):
         cmbgb19()
         
         
-        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 787-878
+        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 788-879
         
         
         -----------------------------------------------------------------------
@@ -8574,7 +8574,7 @@ class Rrtmg_Sw_Init(f90wrap.runtime.FortranModule):
         cmbgb20()
         
         
-        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 881-968
+        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 882-969
         
         
         -----------------------------------------------------------------------
@@ -8587,7 +8587,7 @@ class Rrtmg_Sw_Init(f90wrap.runtime.FortranModule):
         cmbgb21()
         
         
-        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 971-1064
+        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 972-1065
         
         
         -----------------------------------------------------------------------
@@ -8600,7 +8600,7 @@ class Rrtmg_Sw_Init(f90wrap.runtime.FortranModule):
         cmbgb22()
         
         
-        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 1067-1158
+        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 1068-1159
         
         
         -----------------------------------------------------------------------
@@ -8613,7 +8613,7 @@ class Rrtmg_Sw_Init(f90wrap.runtime.FortranModule):
         cmbgb23()
         
         
-        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 1161-1237
+        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 1162-1238
         
         
         -----------------------------------------------------------------------
@@ -8626,7 +8626,7 @@ class Rrtmg_Sw_Init(f90wrap.runtime.FortranModule):
         cmbgb24()
         
         
-        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 1240-1352
+        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 1241-1353
         
         
         -----------------------------------------------------------------------
@@ -8639,7 +8639,7 @@ class Rrtmg_Sw_Init(f90wrap.runtime.FortranModule):
         cmbgb25()
         
         
-        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 1355-1415
+        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 1356-1416
         
         
         -----------------------------------------------------------------------
@@ -8652,7 +8652,7 @@ class Rrtmg_Sw_Init(f90wrap.runtime.FortranModule):
         cmbgb26()
         
         
-        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 1418-1456
+        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 1419-1457
         
         
         -----------------------------------------------------------------------
@@ -8665,7 +8665,7 @@ class Rrtmg_Sw_Init(f90wrap.runtime.FortranModule):
         cmbgb27()
         
         
-        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 1459-1522
+        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 1460-1523
         
         
         -----------------------------------------------------------------------
@@ -8678,7 +8678,7 @@ class Rrtmg_Sw_Init(f90wrap.runtime.FortranModule):
         cmbgb28()
         
         
-        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 1525-1594
+        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 1526-1595
         
         
         -----------------------------------------------------------------------
@@ -8691,7 +8691,7 @@ class Rrtmg_Sw_Init(f90wrap.runtime.FortranModule):
         cmbgb29()
         
         
-        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 1597-1689
+        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 1598-1690
         
         
         -----------------------------------------------------------------------
@@ -8704,7 +8704,7 @@ class Rrtmg_Sw_Init(f90wrap.runtime.FortranModule):
         swcldpr()
         
         
-        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 1692-3514
+        Defined at rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90 lines 1693-3515
         
         
         -----------------------------------------------------------------------
