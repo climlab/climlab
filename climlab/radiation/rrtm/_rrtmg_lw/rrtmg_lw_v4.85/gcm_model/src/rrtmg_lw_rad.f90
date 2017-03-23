@@ -55,7 +55,8 @@
 ! -------- Modules --------
       use parkind, only : im => kind_im, rb => kind_rb
       use rrlw_vsn
-      use mcica_subcol_gen_lw, only: mcica_subcol_lw
+      ! CLIMLAB comment this out, will call mcica routines from Python
+      !use mcica_subcol_gen_lw, only: mcica_subcol_lw
       use rrtmg_lw_cldprmc, only: cldprmc
 ! *** Move the required call to rrtmg_lw_ini below and the following
 ! use association to the GCM initialization area ***

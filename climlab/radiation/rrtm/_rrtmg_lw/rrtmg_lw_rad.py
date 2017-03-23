@@ -7,7 +7,7 @@ class Rrtmg_Lw_Rad(f90wrap.runtime.FortranModule):
     Module rrtmg_lw_rad
     
     
-    Defined at rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_rad.f90 lines 7-910
+    Defined at rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_rad.f90 lines 7-911
     
     """
     @staticmethod
@@ -24,7 +24,7 @@ class Rrtmg_Lw_Rad(f90wrap.runtime.FortranModule):
             duflxc_dt])
         
         
-        Defined at rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_rad.f90 lines 81-581
+        Defined at rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_rad.f90 lines 82-582
         
         Parameters
         ----------
@@ -94,7 +94,7 @@ class Rrtmg_Lw_Rad(f90wrap.runtime.FortranModule):
             ciwpmc, clwpmc, reicmc, relqmc, taua)
         
         
-        Defined at rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_rad.f90 lines 591-910
+        Defined at rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_rad.f90 lines 592-911
         
         Parameters
         ----------
