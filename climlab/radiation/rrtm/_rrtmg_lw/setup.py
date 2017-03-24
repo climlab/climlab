@@ -82,10 +82,10 @@ def configuration(parent_package='', top_path=None):
     config = Configuration(package_name='_rrtmg_lw', parent_name=parent_package, top_path=top_path)
     config.add_extension(name='_rrtmg_lw',
                          sources=sourcelist,
-                         extra_f90_compile_args=f90flags,)
-                         #f2py_options=['-c',])
-    #config.add_include_dirs([os.path.join(here,'rrtmg_lw_v4.85','gcm_model','src'),
-    #                         os.path.join(here,'rrtmg_lw_v4.85','gcm_model','modules')])
+                         extra_f90_compile_args=f90flags,
+                         #f2py_options=['-c',],
+                         )
+    config.add_data_files(os.path.join('rrtmg_lw_v4.85', 'gcm_model', 'data', 'rrtmg_lw.nc'))
     return config
 
 if __name__ == '__main__':

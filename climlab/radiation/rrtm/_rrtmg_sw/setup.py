@@ -44,6 +44,7 @@ def configuration(parent_package='', top_path=None):
                   'rrtmg_sw_v4.0/gcm_model/modules/rrsw_kg28.f90',
                   'rrtmg_sw_v4.0/gcm_model/modules/rrsw_kg29.f90',
                   'rrtmg_sw_v4.0/gcm_model/modules/rrsw_ncpar.f90',
+                  'rrtmg_sw_k_g_climlab.f90',
                   'rrtmg_sw_v4.0/gcm_model/modules/rrsw_ref.f90',
                   'rrtmg_sw_v4.0/gcm_model/modules/rrsw_tbl.f90',
                   'rrtmg_sw_v4.0/gcm_model/modules/rrsw_vsn.f90',
@@ -81,8 +82,11 @@ def configuration(parent_package='', top_path=None):
     config = Configuration(package_name='_rrtmg_sw', parent_name=parent_package, top_path=top_path)
     config.add_extension(name='_rrtmg_sw',
                          sources=sourcelist,
-                         extra_f90_compile_args=f90flags,)
-                         #f2py_options=['-c',])
+                         extra_f90_compile_args=f90flags,
+                         #f2py_options=['-c',],
+                         )
+    config.add_data_files(os.path.join('rrtmg_sw_v4.0', 'gcm_model', 'data', 'rrtmg_sw.nc'))
+
     return config
 
 if __name__ == '__main__':
