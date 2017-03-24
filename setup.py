@@ -28,7 +28,6 @@ def configuration(parent_package='',top_path=None):
     config.add_subpackage('climlab')
 
     #config.get_version('numpy/version.py') # sets config.version
-
     return config
 
 
