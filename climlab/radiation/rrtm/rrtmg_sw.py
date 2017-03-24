@@ -38,7 +38,7 @@ class RRTMG_SW(_Radiation_SW):
             asmaer = 0.,   # Aerosol asymmetry parameter (iaer=10 only), Dimensions,  (ncol,nlay,nbndsw)] #  (non-delta scaled)
             ecaer  = 0.,   # Aerosol optical depth at 0.55 micron (iaer=6 only), Dimensions,  (ncol,nlay,naerec)] #  (non-delta scaled)
             # new arguments for RRTMG_SW version 4.0
-            isolvar = 0,    # ! Flag for solar variability method
+            isolvar = -1,    # ! Flag for solar variability method
                             # !   -1 = (when scon .eq. 0.0): No solar variability
                             # !        and no solar cycle (Kurucz solar irradiance
                             # !        of 1368.22 Wm-2 only);
@@ -76,10 +76,10 @@ class RRTMG_SW(_Radiation_SW):
                             # !        scaled to scon and solar variability defined
                             # !        (optional) by setting non-zero scale factors
                             # !        for each band in bndsolvar
-            indsolvar = np.zeros(2),      # Facular and sunspot amplitude scale factors (isolvar=1),
-                                          # or Mg and SB indices (isolvar=2)
-            bndsolvar = np.zeros(nbndsw), # Solar variability scale factors for each shortwave band
-            solcycfrac = 0.,              # Fraction of averaged solar cycle (0-1) at current time (isolvar=1)
+            indsolvar = np.ones(2),      # Facular and sunspot amplitude scale factors (isolvar=1),
+                                         # or Mg and SB indices (isolvar=2)
+            bndsolvar = np.ones(nbndsw), # Solar variability scale factors for each shortwave band
+            solcycfrac = 1.,              # Fraction of averaged solar cycle (0-1) at current time (isolvar=1)
             **kwargs):
         super(RRTMG_SW, self).__init__(**kwargs)
         #  define INPUTS
@@ -105,8 +105,6 @@ class RRTMG_SW(_Radiation_SW):
         self.add_input('solcycfrac', solcycfrac)
         #  Python-based initialization of absorption data from netcdf file
         _rrtmg_init.init_sw(_rrtmg_sw)
-        # DEBUG
-        self._rrtmg_sw = _rrtmg_sw
 
     def _prepare_sw_arguments(self):
         #  prepare insolation
@@ -228,12 +226,8 @@ class RRTMG_SW(_Radiation_SW):
              ciwpmcl ,clwpmcl ,reicmcl ,relqmcl ,
              tauaer  ,ssaaer  ,asmaer  ,ecaer   ,
              swuflx  ,swdflx  ,swhr    ,swuflxc ,swdflxc ,swhrc,
-             bndsolvar,indsolvar,solcycfrac)
-
-        # DEBUG
-        self.swuflx = swuflx
-        self.swdflx = swdflx
-        self.swhr = swhr
+             bndsolvar,indsolvar,solcycfrac
+             )
         #  Call the RRTM code!
         #swuflx, swdflx, swhr, swuflxc, swdflxc, swhrc = swdriver(*args)
         #  Output is all (ncol,nlay+1) or (ncol,nlay)

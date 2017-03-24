@@ -91,21 +91,25 @@
       call swaerpr               ! aerosol optical properties
       call swcldpr               ! cloud optical properties
       call swatmref              ! reference MLS profile
-      ! CLIMLAB commenting these out because we will read data in Python
-      !call sw_kgb16              ! molecular absorption coefficients
-      !call sw_kgb17
-      !call sw_kgb18
-      !call sw_kgb19
-      !call sw_kgb20
-      !call sw_kgb21
-      !call sw_kgb22
-      !call sw_kgb23
-      !call sw_kgb24
-      !call sw_kgb25
-      !call sw_kgb26
-      !call sw_kgb27
-      !call sw_kgb28
-      !call sw_kgb29
+      ! CLIMLAB these actually call modified subroutines from
+      ! rrtmg_sw_k_g_climlab.f90
+      ! to initialize just the solar variability data
+      !  All other fields are initialized by reading the data file rrtmg_sw.nc
+      !  which is implemented at Python level
+      call sw_kgb16              ! molecular absorption coefficients
+      call sw_kgb17
+      call sw_kgb18
+      call sw_kgb19
+      call sw_kgb20
+      call sw_kgb21
+      call sw_kgb22
+      call sw_kgb23
+      call sw_kgb24
+      call sw_kgb25
+      call sw_kgb26
+      call sw_kgb27
+      call sw_kgb28
+      call sw_kgb29
 
 ! Define exponential lookup tables for transmittance. Tau is
 ! computed as a function of the tau transition function, and transmittance
