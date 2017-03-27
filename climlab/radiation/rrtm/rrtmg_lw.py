@@ -4,17 +4,12 @@ from climlab import constants as const
 from climlab.radiation.radiation import _Radiation_LW
 from utils import _prepare_general_arguments
 from utils import _climlab_to_rrtm, _climlab_to_rrtm_sfc, _rrtm_to_climlab
-import _rrtmg_init
-# try:
-#     import _rrtmg_lw
-#     nbndlw = _rrtmg_lw.parrrtm.nbndlw
-#     ngptlw = _rrtmg_lw.parrrtm.ngptlw
-# except:
-#     raise ImportError('Cannot import the RRTMG_LW driver, this module will not be functional.')
+#  The compiled fortran extension module
 import _rrtmg_lw
-nbndlw = _rrtmg_lw.parrrtm.nbndlw
-ngptlw = _rrtmg_lw.parrrtm.ngptlw
+nbndlw = int(_rrtmg_lw.parrrtm.nbndlw)
+ngptlw = int(_rrtmg_lw.parrrtm.ngptlw)
 #  Python-based initialization of absorption data from netcdf file
+import _rrtmg_init
 _rrtmg_init.init_lw(_rrtmg_lw)
 
 
@@ -95,7 +90,7 @@ class RRTMG_LW(_Radiation_LW):
         reicmcl = np.zeros((ncol,nlay), order='F')
         relqmcl = np.zeros((ncol,nlay), order='F')
         taucmcl = np.zeros((ngptlw,ncol,nlay), order='F')
-        _rrtmg_lw.climlab_mcica_subcol_lw(1, ncol, nlay, icld, permuteseed, irng, play,
+        _rrtmg_lw.climlab_mcica_subcol_lw(ncol, nlay, icld, permuteseed, irng, play,
                            cldfrac, ciwp, clwp, reic, relq, tauc, cldfmcl,
                            ciwpmcl, clwpmcl, reicmcl, relqmcl, taucmcl)
         #  Initialize return arrays

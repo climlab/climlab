@@ -59,25 +59,7 @@ def configuration(parent_package='', top_path=None):
                   'rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90',
                   'rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_cldprmc.f90',
                   'rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_rad.f90',
-                  'f90wrap_parrrsw.f90',
-                  'f90wrap_rrsw_kg16.f90',
-                  'f90wrap_rrsw_kg17.f90',
-                  'f90wrap_rrsw_kg18.f90',
-                  'f90wrap_rrsw_kg19.f90',
-                  'f90wrap_rrsw_kg20.f90',
-                  'f90wrap_rrsw_kg21.f90',
-                  'f90wrap_rrsw_kg22.f90',
-                  'f90wrap_rrsw_kg23.f90',
-                  'f90wrap_rrsw_kg24.f90',
-                  'f90wrap_rrsw_kg25.f90',
-                  'f90wrap_rrsw_kg26.f90',
-                  'f90wrap_rrsw_kg27.f90',
-                  'f90wrap_rrsw_kg28.f90',
-                  'f90wrap_rrsw_kg29.f90',
-                  'f90wrap_rrsw_ncpar.f90',
-                  'f90wrap_mcica_subcol_gen_sw.f90',
-                  'f90wrap_rrtmg_sw_init.f90',
-                  'f90wrap_rrtmg_sw_rad.f90']
+                  'Driver.f90']
 
     config = Configuration(package_name='_rrtmg_sw', parent_name=parent_package, top_path=top_path)
     config.add_extension(name='_rrtmg_sw',

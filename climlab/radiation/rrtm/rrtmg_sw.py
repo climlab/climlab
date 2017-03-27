@@ -4,14 +4,14 @@ from climlab import constants as const
 from climlab.radiation.radiation import _Radiation_SW
 from utils import _prepare_general_arguments
 from utils import _climlab_to_rrtm, _climlab_to_rrtm_sfc, _rrtm_to_climlab
+#  The compiled fortran extension module
+import _rrtmg_sw
+nbndsw = int(_rrtmg_sw.parrrsw.nbndsw)
+naerec = int(_rrtmg_sw.parrrsw.naerec)
+ngptsw = int(_rrtmg_sw.parrrsw.ngptsw)
+#  Python-based initialization of absorption data from netcdf file
 import _rrtmg_init
-try:
-    import _rrtmg_sw
-    nbndsw = _rrtmg_sw.parrrsw.nbndsw
-    naerec = _rrtmg_sw.parrrsw.naerec
-    ngptsw = _rrtmg_sw.parrrsw.ngptsw
-except:
-    raise ImportError('Cannot import the RRTMG_SW driver, this module will not be functional.')
+_rrtmg_init.init_sw(_rrtmg_sw)
 
 
 class RRTMG_SW(_Radiation_SW):
@@ -103,8 +103,6 @@ class RRTMG_SW(_Radiation_SW):
         self.add_input('indsolvar', indsolvar)
         self.add_input('bndsolvar', bndsolvar)
         self.add_input('solcycfrac', solcycfrac)
-        #  Python-based initialization of absorption data from netcdf file
-        _rrtmg_init.init_sw(_rrtmg_sw)
 
     def _prepare_sw_arguments(self):
         #  prepare insolation
@@ -201,7 +199,7 @@ class RRTMG_SW(_Radiation_SW):
         ssacmcl = np.zeros((ngptsw,ncol,nlay), order='F')
         asmcmcl = np.zeros((ngptsw,ncol,nlay), order='F')
         fsfcmcl = np.zeros((ngptsw,ncol,nlay), order='F')
-        _rrtmg_sw.mcica_subcol_gen_sw.mcica_subcol_sw(1, ncol, nlay, icld, permuteseed, irng, play,
+        _rrtmg_sw.climlab_mcica_subcol_sw(ncol, nlay, icld, permuteseed, irng, play,
                            cldfrac, ciwp, clwp, reic, relq, tauc, ssac, asmc, fsfc,
                            cldfmcl, ciwpmcl, clwpmcl, reicmcl, relqmcl, taucmcl,
                            ssacmcl, asmcmcl, fsfcmcl)
@@ -215,7 +213,7 @@ class RRTMG_SW(_Radiation_SW):
         swhrc = np.zeros((ncol,nlay), order='F')
 
         #!  Call the RRTMG_SW driver to compute radiative fluxes
-        _rrtmg_sw.rrtmg_sw_rad.rrtmg_sw(
+        _rrtmg_sw.climlab_rrtmg_sw(
              ncol    ,nlay    ,icld    ,iaer    ,
              play    ,plev    ,tlay    ,tlev    ,tsfc   ,
              h2ovmr , o3vmr   ,co2vmr  ,ch4vmr  ,n2ovmr ,o2vmr ,
