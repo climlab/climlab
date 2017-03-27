@@ -190,42 +190,61 @@ class RRTMG_SW(_Radiation_SW):
          tauaer, ssaaer, asmaer, ecaer,) = self._prepare_sw_arguments()
 
     # ! Call the Monte Carlo Independent Column Approximation
-        cldfmcl = np.zeros((ngptsw,ncol,nlay), order='F')
-        ciwpmcl = np.zeros((ngptsw,ncol,nlay), order='F')
-        clwpmcl = np.zeros((ngptsw,ncol,nlay), order='F')
-        reicmcl = np.zeros((ncol,nlay), order='F')
-        relqmcl = np.zeros((ncol,nlay), order='F')
-        taucmcl = np.zeros((ngptsw,ncol,nlay), order='F')
-        ssacmcl = np.zeros((ngptsw,ncol,nlay), order='F')
-        asmcmcl = np.zeros((ngptsw,ncol,nlay), order='F')
-        fsfcmcl = np.zeros((ngptsw,ncol,nlay), order='F')
-        _rrtmg_sw.climlab_mcica_subcol_sw(ncol, nlay, icld, permuteseed, irng, play,
-                           cldfrac, ciwp, clwp, reic, relq, tauc, ssac, asmc, fsfc,
-                           cldfmcl, ciwpmcl, clwpmcl, reicmcl, relqmcl, taucmcl,
-                           ssacmcl, asmcmcl, fsfcmcl)
+        # cldfmcl = np.zeros((ngptsw,ncol,nlay), order='F')
+        # ciwpmcl = np.zeros((ngptsw,ncol,nlay), order='F')
+        # clwpmcl = np.zeros((ngptsw,ncol,nlay), order='F')
+        # reicmcl = np.zeros((ncol,nlay), order='F')
+        # relqmcl = np.zeros((ncol,nlay), order='F')
+        # taucmcl = np.zeros((ngptsw,ncol,nlay), order='F')
+        # ssacmcl = np.zeros((ngptsw,ncol,nlay), order='F')
+        # asmcmcl = np.zeros((ngptsw,ncol,nlay), order='F')
+        # fsfcmcl = np.zeros((ngptsw,ncol,nlay), order='F')
+        #_rrtmg_sw.climlab_mcica_subcol_sw(ncol, nlay, icld, permuteseed, irng, play,
+        #                   cldfrac, ciwp, clwp, reic, relq, tauc, ssac, asmc, fsfc,
+        #                   cldfmcl, ciwpmcl, clwpmcl, reicmcl, relqmcl, taucmcl,
+        #                   ssacmcl, asmcmcl, fsfcmcl)
+        (cldfmcl, ciwpmcl, clwpmcl, reicmcl, relqmcl, taucmcl,
+        ssacmcl, asmcmcl, fsfcmcl) = _rrtmg_sw.climlab_mcica_subcol_sw(
+                        ncol, nlay, icld, permuteseed, irng, play,
+                        cldfrac, ciwp, clwp, reic, relq, tauc, ssac, asmc, fsfc)
 
-        #  Initialize return arrays
-        swuflx = np.zeros((ncol,nlay+1), order='F')
-        swdflx = np.zeros((ncol,nlay+1), order='F')
-        swhr = np.zeros((ncol,nlay), order='F')
-        swuflxc = np.zeros((ncol,nlay+1), order='F')
-        swdflxc = np.zeros((ncol,nlay+1), order='F')
-        swhrc = np.zeros((ncol,nlay), order='F')
+        # #  Initialize return arrays
+        # swuflx = np.zeros((ncol,nlay+1), order='F')
+        # swdflx = np.zeros((ncol,nlay+1), order='F')
+        # swhr = np.zeros((ncol,nlay), order='F')
+        # swuflxc = np.zeros((ncol,nlay+1), order='F')
+        # swdflxc = np.zeros((ncol,nlay+1), order='F')
+        # swhrc = np.zeros((ncol,nlay), order='F')
 
-        #!  Call the RRTMG_SW driver to compute radiative fluxes
-        _rrtmg_sw.climlab_rrtmg_sw(
-             ncol    ,nlay    ,icld    ,iaer    ,
-             play    ,plev    ,tlay    ,tlev    ,tsfc   ,
-             h2ovmr , o3vmr   ,co2vmr  ,ch4vmr  ,n2ovmr ,o2vmr ,
-             asdir   ,asdif   ,aldir   ,aldif   ,
-             coszen  ,adjes   ,dyofyr  ,scon    ,isolvar,
-             inflgsw ,iceflgsw,liqflgsw,cldfmcl ,
-             taucmcl ,ssacmcl ,asmcmcl ,fsfcmcl ,
-             ciwpmcl ,clwpmcl ,reicmcl ,relqmcl ,
-             tauaer  ,ssaaer  ,asmaer  ,ecaer   ,
-             swuflx  ,swdflx  ,swhr    ,swuflxc ,swdflxc ,swhrc,
-             bndsolvar,indsolvar,solcycfrac
-             )
+        # bndsolvar = bndsolvar.astype('float64', order='F')
+        # indsolvar = indsolvar.astype('float64', order='F')
+        # print bndsolvar, indsolvar, solcycfrac
+        #  Call the RRTMG_SW driver to compute radiative fluxes
+        print tauaer.shape
+        (swuflx  ,swdflx  ,swhr    ,swuflxc ,swdflxc ,swhrc,) = \
+            _rrtmg_sw.climlab_rrtmg_sw(ncol    ,nlay    ,icld    ,iaer    ,
+                play    ,plev    ,tlay    ,tlev    ,tsfc   ,
+                h2ovmr , o3vmr   ,co2vmr  ,ch4vmr  ,n2ovmr ,o2vmr ,
+                asdir   ,asdif   ,aldir   ,aldif   ,
+                coszen  ,adjes   ,dyofyr  ,scon    ,isolvar,
+                inflgsw ,iceflgsw,liqflgsw,cldfmcl ,
+                taucmcl ,ssacmcl ,asmcmcl ,fsfcmcl ,
+                ciwpmcl ,clwpmcl ,reicmcl ,relqmcl ,
+                tauaer  ,ssaaer  ,asmaer  ,ecaer )
+
+        # _rrtmg_sw.climlab_rrtmg_sw(
+        #      ncol    ,nlay    ,icld    ,iaer    ,
+        #      play    ,plev    ,tlay    ,tlev    ,tsfc   ,
+        #      h2ovmr , o3vmr   ,co2vmr  ,ch4vmr  ,n2ovmr ,o2vmr ,
+        #      asdir   ,asdif   ,aldir   ,aldif   ,
+        #      coszen  ,adjes   ,dyofyr  ,scon    ,isolvar,
+        #      inflgsw ,iceflgsw,liqflgsw,cldfmcl ,
+        #      taucmcl ,ssacmcl ,asmcmcl ,fsfcmcl ,
+        #      ciwpmcl ,clwpmcl ,reicmcl ,relqmcl ,
+        #      tauaer  ,ssaaer  ,asmaer  ,ecaer   ,
+        #      swuflx  ,swdflx  ,swhr    ,swuflxc ,swdflxc ,swhrc,
+        #      bndsolvar,indsolvar,solcycfrac
+        #      )
         #  Call the RRTM code!
         #swuflx, swdflx, swhr, swuflxc, swdflxc, swhrc = swdriver(*args)
         #  Output is all (ncol,nlay+1) or (ncol,nlay)

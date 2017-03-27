@@ -12,9 +12,10 @@
 
 subroutine climlab_rrtmg_sw_ini(cpdair)
     ! Modules
-    use parkind, only : rb => kind_rb
+    !use parkind, only : rb => kind_rb
     use rrtmg_sw_init, only: rrtmg_sw_ini
     ! Input
+    integer, parameter :: rb = selected_real_kind(12)
     real(kind=rb), intent(in) :: cpdair    ! Specific heat capacity of dry air
                                             ! at constant pressure at 273 K
                                             ! (J kg-1 K-1)
@@ -30,11 +31,13 @@ subroutine climlab_mcica_subcol_sw &
    taucmcl, ssacmcl, asmcmcl, fsfcmcl)
 
 ! Modules
-  use parkind, only : im => kind_im, rb => kind_rb
+  !use parkind, only : im => kind_im, rb => kind_rb
+  use parkind, only : im => kind_im
   use mcica_subcol_gen_sw, only: mcica_subcol_sw
   use parrrsw, only: nbndsw, ngptsw, naerec
 
 ! Input
+  integer, parameter :: rb = selected_real_kind(12)
   integer(kind=im), intent(in) :: ncol            ! number of columns
   integer(kind=im), intent(in) :: nlay            ! number of model layers
   integer(kind=im), intent(inout) :: icld         ! Cloud overlap method
@@ -60,23 +63,22 @@ subroutine climlab_mcica_subcol_sw &
   real(kind=rb), intent(in) :: asmc(nbndsw,ncol,nlay)    ! in-cloud asymmetry parameter (non-delta scaled)
   real(kind=rb), intent(in) :: fsfc(nbndsw,ncol,nlay)    ! in-cloud forward scattering fraction (non-delta scaled)
   ! Output
-  !  (declared here as intent(inout) so we can pre-allocate storage from Python)
   !   These quantities are computed by McICA
-  real(kind=rb), intent(inout) :: cldfmcl(ngptsw,ncol,nlay)   ! cloud fraction [mcica]
-  real(kind=rb), intent(inout) :: ciwpmcl(ngptsw,ncol,nlay)   ! in-cloud ice water path [mcica]
-  real(kind=rb), intent(inout) :: clwpmcl(ngptsw,ncol,nlay)   ! in-cloud liquid water path [mcica]
-  real(kind=rb), intent(inout) :: reicmcl(ncol,nlay)          ! ice partcle size (microns)
-  real(kind=rb), intent(inout) :: relqmcl(ncol,nlay)          ! liquid particle size (microns)
-  real(kind=rb), intent(inout) :: taucmcl(ngptsw,ncol,nlay)   ! in-cloud optical depth [mcica]
-  real(kind=rb), intent(inout) :: ssacmcl(ngptsw,ncol,nlay)   ! in-cloud single scattering albedo [mcica]
-  real(kind=rb), intent(inout) :: asmcmcl(ngptsw,ncol,nlay)   ! in-cloud asymmetry parameter [mcica]
-  real(kind=rb), intent(inout) :: fsfcmcl(ngptsw,ncol,nlay)   ! in-cloud forward scattering fraction [mcica]
+  real(kind=rb), intent(out) :: cldfmcl(ngptsw,ncol,nlay)   ! cloud fraction [mcica]
+  real(kind=rb), intent(out) :: ciwpmcl(ngptsw,ncol,nlay)   ! in-cloud ice water path [mcica]
+  real(kind=rb), intent(out) :: clwpmcl(ngptsw,ncol,nlay)   ! in-cloud liquid water path [mcica]
+  real(kind=rb), intent(out) :: reicmcl(ncol,nlay)          ! ice partcle size (microns)
+  real(kind=rb), intent(out) :: relqmcl(ncol,nlay)          ! liquid particle size (microns)
+  real(kind=rb), intent(out) :: taucmcl(ngptsw,ncol,nlay)   ! in-cloud optical depth [mcica]
+  real(kind=rb), intent(out) :: ssacmcl(ngptsw,ncol,nlay)   ! in-cloud single scattering albedo [mcica]
+  real(kind=rb), intent(out) :: asmcmcl(ngptsw,ncol,nlay)   ! in-cloud asymmetry parameter [mcica]
+  real(kind=rb), intent(out) :: fsfcmcl(ngptsw,ncol,nlay)   ! in-cloud forward scattering fraction [mcica]
 !  These are not comments! Necessary directives to f2py to handle array dimensions
 !f2py depend(ncol,nlay) play,
 !f2py depend(ncol,nlay) cldfrac,ciwp,clwp,reic,relq,tauc
-!f2py depend(ncol,nlay,ngptsw) tauc,ssac,asmc,fsfc
+!f2py depend(ncol,nlay) tauc,ssac,asmc,fsfc
 !f2py depend(ncol,nlay) reicmcl,relqmcl
-!f2py depend(ncol,nlay,ngptsw) cldfmcl,ciwpmcl,clwpmcl,taucmcl,ssacmcl,asmcmcl,fsfcmcl
+!f2py depend(ncol,nlay) cldfmcl,ciwpmcl,clwpmcl,taucmcl,ssacmcl,asmcmcl,fsfcmcl
 
   ! Call the Monte Carlo Independent Column Approximation
   !   (McICA, Pincus et al., JC, 2003)
@@ -98,15 +100,16 @@ subroutine climlab_rrtmg_sw &
     taucmcl ,ssacmcl ,asmcmcl ,fsfcmcl , &
     ciwpmcl ,clwpmcl ,reicmcl ,relqmcl , &
     tauaer  ,ssaaer  ,asmaer  ,ecaer   , &
-    swuflx  ,swdflx  ,swhr    ,swuflxc ,swdflxc ,swhrc, &
-    bndsolvar,indsolvar,solcycfrac)
+    swuflx, swdflx, swhr, swuflxc, swdflxc, swhrc)
 
 ! Modules
-    use parkind, only : im => kind_im, rb => kind_rb
+    !use parkind, only : im => kind_im, rb => kind_rb
+    use parkind, only : im => kind_im
     use parrrsw, only: nbndsw, ngptsw, naerec
     use rrtmg_sw_rad, only: rrtmg_sw
 
 ! Input
+    integer, parameter :: rb = selected_real_kind(12)
     integer(kind=im), intent(in) :: ncol            ! number of columns
     integer(kind=im), intent(in) :: nlay            ! number of model layers
     integer(kind=im), intent(inout) :: icld         ! Cloud overlap method
@@ -187,16 +190,16 @@ subroutine climlab_rrtmg_sw &
                                                     !        scaled to scon and solar variability defined
                                                     !        (optional) by setting non-zero scale factors
                                                     !        for each band in bndsolvar
-    real(kind=rb), intent(inout) :: indsolvar(2) ! Facular and sunspot amplitude
-                                              ! scale factors (isolvar=1), or
-                                              ! Mg and SB indices (isolvar=2)
-                                              !    Dimensions: (2)
-    real(kind=rb), intent(inout) :: bndsolvar(nbndsw) ! Solar variability scale factors
-                                                   ! for each shortwave band
-                                                   !    Dimensions: (nbndsw=14)
-    real(kind=rb), intent(inout) :: solcycfrac   ! Fraction of averaged solar cycle (0-1)
-                                              !    at current time (isolvar=1)
-
+    ! real(kind=rb), intent(inout), optional :: indsolvar(2) ! Facular and sunspot amplitude
+    !                                           ! scale factors (isolvar=1), or
+    !                                           ! Mg and SB indices (isolvar=2)
+    !                                           !    Dimensions: (2)
+    ! real(kind=rb), intent(inout), optional :: bndsolvar(nbndsw) ! Solar variability scale factors
+    !                                                ! for each shortwave band
+    !                                                !    Dimensions: (nbndsw=14)
+    ! real(kind=rb), intent(inout), optional :: solcycfrac   ! Fraction of averaged solar cycle (0-1)
+    !                                           !    at current time (isolvar=1)
+    !
     integer(kind=im), intent(in) :: inflgsw         ! Flag for cloud optical properties
     integer(kind=im), intent(in) :: iceflgsw        ! Flag for ice particle specification
     integer(kind=im), intent(in) :: liqflgsw        ! Flag for liquid droplet specification
@@ -225,13 +228,12 @@ subroutine climlab_rrtmg_sw &
     real(kind=rb), intent(in) :: ecaer(ncol,nlay,naerec)   ! Aerosol optical depth at 0.55 micron (iaer=6 only)
 
 ! Output
-!  Declared here as intent(inout) so we can pre-allocate storage from Python
-    real(kind=rb), intent(inout) :: swuflx(ncol,nlay+1)    ! Total sky shortwave upward flux (W/m2)
-    real(kind=rb), intent(inout) :: swdflx(ncol,nlay+1)    ! Total sky shortwave downward flux (W/m2)
-    real(kind=rb), intent(inout) :: swhr(ncol,nlay)        ! Total sky shortwave radiative heating rate (K/d)
-    real(kind=rb), intent(inout) :: swuflxc(ncol,nlay+1)   ! Clear sky shortwave upward flux (W/m2)
-    real(kind=rb), intent(inout) :: swdflxc(ncol,nlay+1)   ! Clear sky shortwave downward flux (W/m2)
-    real(kind=rb), intent(inout) :: swhrc(ncol,nlay)       ! Clear sky shortwave radiative heating rate (K/d)
+    real(kind=rb), intent(out) :: swuflx(ncol,nlay+1)    ! Total sky shortwave upward flux (W/m2)
+    real(kind=rb), intent(out) :: swdflx(ncol,nlay+1)    ! Total sky shortwave downward flux (W/m2)
+    real(kind=rb), intent(out) :: swhr(ncol,nlay)        ! Total sky shortwave radiative heating rate (K/d)
+    real(kind=rb), intent(out) :: swuflxc(ncol,nlay+1)   ! Clear sky shortwave upward flux (W/m2)
+    real(kind=rb), intent(out) :: swdflxc(ncol,nlay+1)   ! Clear sky shortwave downward flux (W/m2)
+    real(kind=rb), intent(out) :: swhrc(ncol,nlay)       ! Clear sky shortwave radiative heating rate (K/d)
 
 !  These are not comments! Necessary directives to f2py to handle array dimensions
 !f2py depend(ncol,nlay) play, plev, tlay, tlev
@@ -251,7 +253,6 @@ subroutine climlab_rrtmg_sw &
               taucmcl ,ssacmcl ,asmcmcl ,fsfcmcl , &
               ciwpmcl ,clwpmcl ,reicmcl ,relqmcl , &
               tauaer  ,ssaaer  ,asmaer  ,ecaer   , &
-              swuflx  ,swdflx  ,swhr    ,swuflxc ,swdflxc ,swhrc, &
-              bndsolvar,indsolvar,solcycfrac)
+              swuflx  ,swdflx  ,swhr    ,swuflxc ,swdflxc ,swhrc)
 
 end subroutine climlab_rrtmg_sw
