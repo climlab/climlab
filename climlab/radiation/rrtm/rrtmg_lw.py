@@ -81,15 +81,14 @@ class RRTMG_LW(_Radiation_LW):
                 cfc11vmr, cfc12vmr, cfc22vmr, ccl4vmr, emis,
                 inflglw, iceflglw, liqflglw,
                 cldfrac, ciwp, clwp, reic, relq, tauc, tauaer,) = self._prepare_lw_arguments()
-
         #    ! Call the Monte Carlo Independent Column Approximation
         #    !   (McICA, Pincus et al., JC, 2003)
-        cldfmcl = np.zeros((ngptlw,ncol,nlay), dtype='float64', order='F')
-        ciwpmcl = np.zeros((ngptlw,ncol,nlay), dtype='float64', order='F')
-        clwpmcl = np.zeros((ngptlw,ncol,nlay), dtype='float64', order='F')
-        reicmcl = np.zeros((ncol,nlay), dtype='float64', order='F')
-        relqmcl = np.zeros((ncol,nlay), dtype='float64', order='F')
-        taucmcl = np.zeros((ngptlw,ncol,nlay), dtype='float64', order='F')
+        #cldfmcl = np.zeros((ngptlw,ncol,nlay), dtype='float64', order='F')
+        #ciwpmcl = np.zeros((ngptlw,ncol,nlay), dtype='float64', order='F')
+        #clwpmcl = np.zeros((ngptlw,ncol,nlay), dtype='float64', order='F')
+        #reicmcl = np.zeros((ncol,nlay), dtype='float64', order='F')
+        #relqmcl = np.zeros((ncol,nlay), dtype='float64', order='F')
+        #taucmcl = np.zeros((ngptlw,ncol,nlay), dtype='float64', order='F')
         #ncol = np.array(ncol, dtype='int32', order='F')
         #nlay = np.array(nlay, dtype='int32', order='F')
         #icld = np.atleast_1d(icld).astype('int16', order='F')
@@ -104,29 +103,62 @@ class RRTMG_LW(_Radiation_LW):
         # reic = reic.astype('float32', order='F')
         # relq = relq.astype('float32', order='F')
         # tauc = tauc.astype('float32', order='F')
-        _rrtmg_lw.climlab_mcica_subcol_lw(ncol, nlay, icld, permuteseed, irng, play,
-                           cldfrac, ciwp, clwp, reic, relq, tauc, cldfmcl,
-                           ciwpmcl, clwpmcl, reicmcl, relqmcl, taucmcl)
-        #  Initialize return arrays
-        uflx = np.zeros((ncol,nlay+1), dtype='float64', order='F')
-        dflx = np.zeros((ncol,nlay+1), dtype='float64', order='F')
-        hr = np.zeros((ncol,nlay), dtype='float64', order='F')
-        uflxc = np.zeros((ncol,nlay+1), dtype='float64', order='F')
-        dflxc = np.zeros((ncol,nlay+1), dtype='float64', order='F')
-        hrc = np.zeros((ncol,nlay), dtype='float64', order='F')
-        duflx_dt = np.zeros((ncol,nlay+1), dtype='float64', order='F')
-        duflxc_dt = np.zeros((ncol,nlay+1), dtype='float64', order='F')
+        # _rrtmg_lw.climlab_mcica_subcol_lw(ncol, nlay, icld, permuteseed, irng, play,
+        #                    cldfrac, ciwp, clwp, reic, relq, tauc, cldfmcl,
+        #                    ciwpmcl, clwpmcl, reicmcl, relqmcl, taucmcl)
+        (cldfmcl, ciwpmcl, clwpmcl, reicmcl, relqmcl, taucmcl) = \
+            _rrtmg_lw.climlab_mcica_subcol_lw(ncol, nlay, icld,
+                                              permuteseed, irng, play,
+                                              cldfrac, ciwp, clwp, reic, relq, tauc)
+        # #  Initialize return arrays
+        # uflx = np.zeros((ncol,nlay+1), dtype='float64', order='F')
+        # dflx = np.zeros((ncol,nlay+1), dtype='float64', order='F')
+        # hr = np.zeros((ncol,nlay), dtype='float64', order='F')
+        # uflxc = np.zeros((ncol,nlay+1), dtype='float64', order='F')
+        # dflxc = np.zeros((ncol,nlay+1), dtype='float64', order='F')
+        # hrc = np.zeros((ncol,nlay), dtype='float64', order='F')
+        # duflx_dt = np.zeros((ncol,nlay+1), dtype='float64', order='F')
+        # duflxc_dt = np.zeros((ncol,nlay+1), dtype='float64', order='F')
 
         #!  Call the RRTMG_LW driver to compute radiative fluxes
-        _rrtmg_lw.climlab_rrtmg_lw(ncol    ,nlay    ,icld    ,idrv    ,
+        # _rrtmg_lw.climlab_rrtmg_lw(ncol    ,nlay    ,icld    ,idrv    ,
+        #          play    , plev    , tlay    , tlev    , tsfc    ,
+        #          h2ovmr  , o3vmr   , co2vmr  , ch4vmr  , n2ovmr  , o2vmr ,
+        #          cfc11vmr, cfc12vmr, cfc22vmr, ccl4vmr , emis    ,
+        #          inflglw , iceflglw, liqflglw, cldfmcl ,
+        #          taucmcl , ciwpmcl , clwpmcl , reicmcl , relqmcl ,
+        #          tauaer  ,
+        #          uflx    , dflx    , hr      , uflxc   , dflxc,  hrc,
+        #          duflx_dt,duflxc_dt )
+
+        # cldfmcl = np.zeros((ngptlw,ncol,nlay), dtype='float64', order='F')
+        # ciwpmcl = np.zeros((ngptlw,ncol,nlay), dtype='float64', order='F')
+        # clwpmcl = np.zeros((ngptlw,ncol,nlay), dtype='float64', order='F')
+        # reicmcl = np.zeros((ncol,nlay), dtype='float64', order='F')
+        # relqmcl = np.zeros((ncol,nlay), dtype='float64', order='F')
+        # taucmcl = np.zeros((ngptlw,ncol,nlay), dtype='float64', order='F')
+        # cldfmcl_ = cldfmcl.astype('float64', order='F')
+        # taucmcl = taucmcl.astype('float64', order='F')
+        # ciwpmcl = ciwpmcl.astype('float64', order='F')
+        # clwpmcl = clwpmcl.astype('float64', order='F')
+        # reicmcl = reicmcl.astype('float64', order='F')
+        # relqmcl = relqmcl.astype('float64', order='F')
+
+        # cldfmcl = cldfmcl_out.copy()
+        # taucmcl = taucmcl_out.copy()
+        # ciwpmcl = ciwpmcl_out.copy()
+        # clwpmcl = clwpmcl_out.copy()
+        # reicmcl = reicmcl_out.copy()
+        # relqmcl = relqmcl_out.copy()
+
+        (uflx, dflx, hr, uflxc, dflxc, hrc, duflx_dt, duflxc_dt) = \
+            _rrtmg_lw.climlab_rrtmg_lw(ncol    ,nlay    ,icld    ,idrv    ,
                  play    , plev    , tlay    , tlev    , tsfc    ,
                  h2ovmr  , o3vmr   , co2vmr  , ch4vmr  , n2ovmr  , o2vmr ,
                  cfc11vmr, cfc12vmr, cfc22vmr, ccl4vmr , emis    ,
                  inflglw , iceflglw, liqflglw, cldfmcl ,
                  taucmcl , ciwpmcl , clwpmcl , reicmcl , relqmcl ,
-                 tauaer  ,
-                 uflx    , dflx    , hr      , uflxc   , dflxc,  hrc,
-                 duflx_dt,duflxc_dt )
+                 tauaer )
 
         #  Call the RRTM code!
         #uflx, dflx, hr, uflxc, dflxc, hrc, duflx_dt, duflxc_dt = lwdriver(*args)

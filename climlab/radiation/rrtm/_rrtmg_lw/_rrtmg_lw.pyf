@@ -413,74 +413,73 @@ python module _rrtmg_lw ! in
         end module rrlw_ncpar
         subroutine climlab_rrtmg_lw_ini(cpdair) ! in :_rrtmg_lw:Driver.f90
             use rrtmg_lw_init, only: rrtmg_lw_ini
-            use parkind, only: rb=>kind_rb
-            real(kind=rb) intent(in) :: cpdair
+            real(kind=8) intent(in) :: cpdair
         end subroutine climlab_rrtmg_lw_ini
         subroutine climlab_mcica_subcol_lw(ncol,nlay,icld,permuteseed,irng,play,cldfrac,ciwp,clwp,reic,relq,tauc,cldfmcl,ciwpmcl,clwpmcl,reicmcl,relqmcl,taucmcl) ! in :_rrtmg_lw:Driver.f90
             use mcica_subcol_gen_lw, only: mcica_subcol_lw
-            use parkind, only: im=>kind_im,rb=>kind_rb
+            use parkind, only: im=>kind_im
             use parrrtm, only: nbndlw,ngptlw
-            integer(kind=im), optional,intent(in),check(shape(cldfmcl,1)==ncol),depend(cldfmcl) :: ncol=shape(cldfmcl,1)
-            integer(kind=im), optional,intent(in),check(shape(cldfmcl,2)==nlay),depend(cldfmcl) :: nlay=shape(cldfmcl,2)
+            integer(kind=im) intent(in) :: ncol
+            integer(kind=im) intent(in) :: nlay
             integer(kind=im) intent(inout) :: icld
             integer(kind=im) intent(in) :: permuteseed
             integer(kind=im) intent(inout) :: irng
-            real(kind=rb) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: play
-            real(kind=rb) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: cldfrac
-            real(kind=rb) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: ciwp
-            real(kind=rb) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: clwp
-            real(kind=rb) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: reic
-            real(kind=rb) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: relq
-            real(kind=rb) dimension(16,ncol,nlay),intent(in),depend(ncol,nlay,nbndlw) :: tauc
-            real(kind=rb) dimension(140,ncol,nlay),intent(inout) :: cldfmcl
-            real(kind=rb) dimension(140,ncol,nlay),intent(inout),depend(ncol,nlay) :: ciwpmcl
-            real(kind=rb) dimension(140,ncol,nlay),intent(inout),depend(ncol,nlay) :: clwpmcl
-            real(kind=rb) dimension(ncol,nlay),intent(inout),depend(ncol,nlay) :: reicmcl
-            real(kind=rb) dimension(ncol,nlay),intent(inout),depend(ncol,nlay) :: relqmcl
-            real(kind=rb) dimension(140,ncol,nlay),intent(inout),depend(ncol,nlay) :: taucmcl
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: play
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: cldfrac
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: ciwp
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: clwp
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: reic
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: relq
+            real(kind=8) dimension(16,ncol,nlay),intent(in),depend(ncol,nlay) :: tauc
+            real(kind=8) dimension(140,ncol,nlay),intent(out),depend(ncol,nlay) :: cldfmcl
+            real(kind=8) dimension(140,ncol,nlay),intent(out),depend(ncol,nlay) :: ciwpmcl
+            real(kind=8) dimension(140,ncol,nlay),intent(out),depend(ncol,nlay) :: clwpmcl
+            real(kind=8) dimension(ncol,nlay),intent(out),depend(ncol,nlay) :: reicmcl
+            real(kind=8) dimension(ncol,nlay),intent(out),depend(ncol,nlay) :: relqmcl
+            real(kind=8) dimension(140,ncol,nlay),intent(out),depend(ncol,nlay) :: taucmcl
         end subroutine climlab_mcica_subcol_lw
         subroutine climlab_rrtmg_lw(ncol,nlay,icld,idrv,play,plev,tlay,tlev,tsfc,h2ovmr,o3vmr,co2vmr,ch4vmr,n2ovmr,o2vmr,cfc11vmr,cfc12vmr,cfc22vmr,ccl4vmr,emis,inflglw,iceflglw,liqflglw,cldfmcl,taucmcl,ciwpmcl,clwpmcl,reicmcl,relqmcl,tauaer,uflx,dflx,hr,uflxc,dflxc,hrc,duflx_dt,duflxc_dt) ! in :_rrtmg_lw:Driver.f90
             use rrtmg_lw_rad, only: rrtmg_lw
-            use parkind, only: im=>kind_im,rb=>kind_rb
+            use parkind, only: im=>kind_im
             use parrrtm, only: nbndlw,ngptlw
             integer(kind=im) intent(in) :: ncol
             integer(kind=im) intent(in) :: nlay
             integer :: icld
             integer(kind=im) intent(in) :: idrv
-            real(kind=rb) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: play
-            real(kind=rb) dimension(ncol,nlay + 1),intent(in),depend(ncol,nlay) :: plev
-            real(kind=rb) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: tlay
-            real(kind=rb) dimension(ncol,nlay + 1),intent(in),depend(ncol,nlay) :: tlev
-            real(kind=rb) dimension(ncol),intent(in),depend(ncol) :: tsfc
-            real(kind=rb) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: h2ovmr
-            real(kind=rb) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: o3vmr
-            real(kind=rb) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: co2vmr
-            real(kind=rb) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: ch4vmr
-            real(kind=rb) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: n2ovmr
-            real(kind=rb) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: o2vmr
-            real(kind=rb) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: cfc11vmr
-            real(kind=rb) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: cfc12vmr
-            real(kind=rb) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: cfc22vmr
-            real(kind=rb) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: ccl4vmr
-            real(kind=rb) dimension(ncol,16),intent(in),depend(ncol) :: emis
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: play
+            real(kind=8) dimension(ncol,nlay + 1),intent(in),depend(ncol,nlay) :: plev
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: tlay
+            real(kind=8) dimension(ncol,nlay + 1),intent(in),depend(ncol,nlay) :: tlev
+            real(kind=8) dimension(ncol),intent(in),depend(ncol) :: tsfc
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: h2ovmr
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: o3vmr
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: co2vmr
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: ch4vmr
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: n2ovmr
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: o2vmr
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: cfc11vmr
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: cfc12vmr
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: cfc22vmr
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: ccl4vmr
+            real(kind=8) dimension(ncol,16),intent(in),depend(ncol) :: emis
             integer(kind=im) intent(in) :: inflglw
             integer(kind=im) intent(in) :: iceflglw
             integer(kind=im) intent(in) :: liqflglw
-            real(kind=rb) dimension(140,ncol,nlay),intent(in),depend(ncol,nlay,ngptlw) :: cldfmcl
-            real(kind=rb) dimension(140,ncol,nlay),intent(in),depend(ncol,nlay,ngptlw) :: taucmcl
-            real(kind=rb) dimension(140,ncol,nlay),intent(in),depend(ncol,nlay,ngptlw) :: ciwpmcl
-            real(kind=rb) dimension(140,ncol,nlay),intent(in),depend(ncol,nlay,ngptlw) :: clwpmcl
-            real(kind=rb) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: reicmcl
-            real(kind=rb) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: relqmcl
-            real(kind=rb) dimension(ncol,nlay,16),intent(in),depend(ncol,nlay) :: tauaer
-            real(kind=rb) dimension(ncol,nlay + 1),intent(inout),depend(ncol,nlay) :: uflx
-            real(kind=rb) dimension(ncol,nlay + 1),intent(inout),depend(ncol,nlay) :: dflx
-            real(kind=rb) dimension(ncol,nlay),intent(inout),depend(ncol,nlay) :: hr
-            real(kind=rb) dimension(ncol,nlay + 1),intent(inout),depend(ncol,nlay) :: uflxc
-            real(kind=rb) dimension(ncol,nlay + 1),intent(inout),depend(ncol,nlay) :: dflxc
-            real(kind=rb) dimension(ncol,nlay),intent(inout),depend(ncol,nlay) :: hrc
-            real(kind=rb) dimension(ncol,nlay + 1),intent(inout),depend(ncol,nlay) :: duflx_dt
-            real(kind=rb) dimension(ncol,nlay + 1),intent(inout),depend(ncol,nlay) :: duflxc_dt
+            real(kind=8) dimension(140,ncol,nlay),intent(in),depend(ncol,nlay) :: cldfmcl
+            real(kind=8) dimension(140,ncol,nlay),intent(in),depend(ncol,nlay) :: taucmcl
+            real(kind=8) dimension(140,ncol,nlay),intent(in),depend(ncol,nlay) :: ciwpmcl
+            real(kind=8) dimension(140,ncol,nlay),intent(in),depend(ncol,nlay) :: clwpmcl
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: reicmcl
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: relqmcl
+            real(kind=8) dimension(ncol,nlay,16),intent(in),depend(ncol,nlay) :: tauaer
+            real(kind=8) dimension(ncol,nlay + 1),intent(out),depend(ncol,nlay) :: uflx
+            real(kind=8) dimension(ncol,nlay + 1),intent(out),depend(ncol,nlay) :: dflx
+            real(kind=8) dimension(ncol,nlay),intent(out),depend(ncol,nlay) :: hr
+            real(kind=8) dimension(ncol,nlay + 1),intent(out),depend(ncol,nlay) :: uflxc
+            real(kind=8) dimension(ncol,nlay + 1),intent(out),depend(ncol,nlay) :: dflxc
+            real(kind=8) dimension(ncol,nlay),intent(out),depend(ncol,nlay) :: hrc
+            real(kind=8) dimension(ncol,nlay + 1),intent(out),depend(ncol,nlay) :: duflx_dt
+            real(kind=8) dimension(ncol,nlay + 1),intent(out),depend(ncol,nlay) :: duflxc_dt
         end subroutine climlab_rrtmg_lw
     end interface 
 end python module _rrtmg_lw

@@ -13,9 +13,10 @@
 
 subroutine climlab_rrtmg_lw_ini(cpdair)
     ! Modules
-    use parkind, only : rb => kind_rb
+    !use parkind, only : rb => kind_rb
     use rrtmg_lw_init, only: rrtmg_lw_ini
     ! Input
+    integer, parameter :: rb = selected_real_kind(12)
     real(kind=rb), intent(in) :: cpdair    ! Specific heat capacity of dry air
                                             ! at constant pressure at 273 K
                                             ! (J kg-1 K-1)
@@ -30,11 +31,13 @@ subroutine climlab_mcica_subcol_lw &
     ciwpmcl, clwpmcl, reicmcl, relqmcl, taucmcl)
 
     ! Modules
-    use parkind, only : im => kind_im, rb => kind_rb
+    !use parkind, only : im => kind_im, rb => kind_rb
+    use parkind, only : im => kind_im
     use mcica_subcol_gen_lw, only: mcica_subcol_lw
     use parrrtm, only: nbndlw, ngptlw
 
 ! Input
+    integer, parameter :: rb = selected_real_kind(12)
     integer(kind=im), intent(in) :: ncol            ! number of columns
     integer(kind=im), intent(in) :: nlay            ! number of model layers
     integer(kind=im), intent(inout) :: icld         ! Cloud overlap method
@@ -57,19 +60,18 @@ subroutine climlab_mcica_subcol_lw &
     real(kind=rb), intent(in) :: relq(ncol,nlay)         ! cloud liquid particle size
     real(kind=rb), intent(in) :: tauc(nbndlw,ncol,nlay)  ! in-cloud optical depth
 ! Output
-!  Declared as intent(inout) so we can pre-allocate storage from Python level
     !   These quantities are computed by McICA
-    real(kind=rb), intent(inout) :: cldfmcl(ngptlw,ncol,nlay)    ! cloud fraction [mcica]
-    real(kind=rb), intent(inout) :: ciwpmcl(ngptlw,ncol,nlay)    ! in-cloud ice water path [mcica]
-    real(kind=rb), intent(inout) :: clwpmcl(ngptlw,ncol,nlay)    ! in-cloud liquid water path [mcica]
-    real(kind=rb), intent(inout) :: reicmcl(ncol,nlay)           ! ice partcle size (microns)  [mcica]
-    real(kind=rb), intent(inout) :: relqmcl(ncol,nlay)           ! liquid particle size (microns) [mcica]
-    real(kind=rb), intent(inout) :: taucmcl(ngptlw,ncol,nlay)    ! in-cloud optical depth [mcica]
+    real(kind=rb), intent(out) :: cldfmcl(ngptlw,ncol,nlay)    ! cloud fraction [mcica]
+    real(kind=rb), intent(out) :: ciwpmcl(ngptlw,ncol,nlay)    ! in-cloud ice water path [mcica]
+    real(kind=rb), intent(out) :: clwpmcl(ngptlw,ncol,nlay)    ! in-cloud liquid water path [mcica]
+    real(kind=rb), intent(out) :: reicmcl(ncol,nlay)           ! ice partcle size (microns)  [mcica]
+    real(kind=rb), intent(out) :: relqmcl(ncol,nlay)           ! liquid particle size (microns) [mcica]
+    real(kind=rb), intent(out) :: taucmcl(ngptlw,ncol,nlay)    ! in-cloud optical depth [mcica]
 !  These are not comments! Necessary directives to f2py to handle array dimensions
 !f2py depend(ncol,nlay) play,
 !f2py depend(ncol,nlay) cldfrac,ciwp,clwp,reic,relq
-!f2py depend(ncol,nlay,nbndlw) tauc
-! !f2py depend(ncol,nlay,ngptlw) cldfmcl,ciwpmcl,clwpmcl,taucmcl
+!f2py depend(ncol,nlay) tauc
+! !f2py depend(ncol,nlay) cldfmcl,ciwpmcl,clwpmcl,taucmcl
 ! !f2py depend(ncol,nlay) reicmcl,relqmcl
 
     ! Call the Monte Carlo Independent Column Approximation
@@ -92,7 +94,8 @@ subroutine climlab_rrtmg_lw &
     duflx_dt,duflxc_dt)
 
 ! Modules
-    use parkind, only : im => kind_im, rb => kind_rb
+    !use parkind, only : im => kind_im, rb => kind_rb
+    use parkind, only : im => kind_im
     use parrrtm, only: nbndlw, ngptlw
     use rrtmg_lw_rad, only: rrtmg_lw
     !use mcica_subcol_gen_lw, only: mcica_subcol_lw
@@ -100,7 +103,7 @@ subroutine climlab_rrtmg_lw &
 
 
 ! Input
-    !integer, parameter :: rb = selected_real_kind(12)
+    integer, parameter :: rb = selected_real_kind(12)
     integer(kind=im), intent(in) :: ncol            ! number of columns
     integer(kind=im), intent(in) :: nlay            ! number of model layers
     ! integer(kind=im), intent(inout) :: icld         ! Cloud overlap method
@@ -159,17 +162,16 @@ subroutine climlab_rrtmg_lw &
     real(kind=rb), intent(in) :: taucmcl(ngptlw,ncol,nlay)    ! in-cloud optical depth [mcica]
 
 ! Output
-!  Declared as intent(inout) so we can pre-allocate storage from Python level
-    real(kind=rb), intent(inout) :: uflx(ncol,nlay+1)      ! Total sky longwave upward flux (W/m2)
-    real(kind=rb), intent(inout) :: dflx(ncol,nlay+1)      ! Total sky longwave downward flux (W/m2)
-    real(kind=rb), intent(inout) :: hr(ncol,nlay)          ! Total sky longwave radiative heating rate (K/d)
-    real(kind=rb), intent(inout) :: uflxc(ncol,nlay+1)     ! Clear sky longwave upward flux (W/m2)
-    real(kind=rb), intent(inout) :: dflxc(ncol,nlay+1)     ! Clear sky longwave downward flux (W/m2)
-    real(kind=rb), intent(inout) :: hrc(ncol,nlay)         ! Clear sky longwave radiative heating rate (K/d)
+    real(kind=rb), intent(out) :: uflx(ncol,nlay+1)      ! Total sky longwave upward flux (W/m2)
+    real(kind=rb), intent(out) :: dflx(ncol,nlay+1)      ! Total sky longwave downward flux (W/m2)
+    real(kind=rb), intent(out) :: hr(ncol,nlay)          ! Total sky longwave radiative heating rate (K/d)
+    real(kind=rb), intent(out) :: uflxc(ncol,nlay+1)     ! Clear sky longwave upward flux (W/m2)
+    real(kind=rb), intent(out) :: dflxc(ncol,nlay+1)     ! Clear sky longwave downward flux (W/m2)
+    real(kind=rb), intent(out) :: hrc(ncol,nlay)         ! Clear sky longwave radiative heating rate (K/d)
 
-    real(kind=rb), intent(inout) :: duflx_dt(ncol,nlay+1)  ! change in upward longwave flux (w/m2/K)
+    real(kind=rb), intent(out) :: duflx_dt(ncol,nlay+1)  ! change in upward longwave flux (w/m2/K)
                                                          ! with respect to surface temperature
-    real(kind=rb), intent(inout) :: duflxc_dt(ncol,nlay+1) ! change in clear sky upward longwave flux (w/m2/K)
+    real(kind=rb), intent(out) :: duflxc_dt(ncol,nlay+1) ! change in clear sky upward longwave flux (w/m2/K)
                                                          ! with respect to surface temperature
 
 !  These are not comments! Necessary directives to f2py to handle array dimensions
@@ -178,7 +180,7 @@ subroutine climlab_rrtmg_lw &
 !f2py depend(ncol,nlay) cfc11vmr,cfc12vmr,cfc22vmr,ccl4vmr
 !f2py depend(ncol) tsfc, emis
 !f2py depend(ncol,nlay) tauaer
-!f2py depend(ncol,nlay,ngptlw) cldfmcl,ciwpmcl,clwpmcl,taucmcl
+!f2py depend(ncol,nlay) cldfmcl,ciwpmcl,clwpmcl,taucmcl
 !f2py depend(ncol,nlay) reicmcl,relqmcl
 !f2py depend(ncol,nlay) uflx,dflx,hr,uflxc,dflxc,hrc,duflx_dt,duflxc_dt
 
@@ -200,7 +202,7 @@ subroutine climlab_rrtmg_lw &
     ! ! In principle the init routine should not need to be called every timestep
     ! !  But calling it from Python is not working... heatfac is not getting set properly
     ! call rrtmg_lw_ini(cpdair)
-    !
+
     !  Call the RRTMG_LW driver to compute radiative fluxes
     call rrtmg_lw(ncol    ,nlay    ,icld    ,idrv    , &
              play    , plev    , tlay    , tlev    , tsfc    , &
