@@ -67,9 +67,10 @@ subroutine climlab_mcica_subcol_lw &
     real(kind=rb), intent(inout) :: taucmcl(ngptlw,ncol,nlay)    ! in-cloud optical depth [mcica]
 !  These are not comments! Necessary directives to f2py to handle array dimensions
 !f2py depend(ncol,nlay) play,
-!f2py depend(ncol,nlay) cldfrac,ciwp,clwp,reic,relq,tauc
-!f2py depend(ncol,nlay,ngptlw) cldfmcl,ciwpmcl,clwpmcl,taucmcl
-!f2py depend(ncol,nlay) reicmcl,relqmcl
+!f2py depend(ncol,nlay) cldfrac,ciwp,clwp,reic,relq
+!f2py depend(ncol,nlay,nbndlw) tauc
+! !f2py depend(ncol,nlay,ngptlw) cldfmcl,ciwpmcl,clwpmcl,taucmcl
+! !f2py depend(ncol,nlay) reicmcl,relqmcl
 
     ! Call the Monte Carlo Independent Column Approximation
     !   (McICA, Pincus et al., JC, 2003)

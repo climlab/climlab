@@ -420,8 +420,8 @@ python module _rrtmg_lw ! in
             use mcica_subcol_gen_lw, only: mcica_subcol_lw
             use parkind, only: im=>kind_im,rb=>kind_rb
             use parrrtm, only: nbndlw,ngptlw
-            integer(kind=im) intent(in) :: ncol
-            integer(kind=im) intent(in) :: nlay
+            integer(kind=im), optional,intent(in),check(shape(cldfmcl,1)==ncol),depend(cldfmcl) :: ncol=shape(cldfmcl,1)
+            integer(kind=im), optional,intent(in),check(shape(cldfmcl,2)==nlay),depend(cldfmcl) :: nlay=shape(cldfmcl,2)
             integer(kind=im) intent(inout) :: icld
             integer(kind=im) intent(in) :: permuteseed
             integer(kind=im) intent(inout) :: irng
@@ -431,13 +431,13 @@ python module _rrtmg_lw ! in
             real(kind=rb) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: clwp
             real(kind=rb) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: reic
             real(kind=rb) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: relq
-            real(kind=rb) dimension(16,ncol,nlay),intent(in),depend(ncol,nlay) :: tauc
-            real(kind=rb) dimension(140,ncol,nlay),intent(inout),depend(ncol,nlay,ngptlw) :: cldfmcl
-            real(kind=rb) dimension(140,ncol,nlay),intent(inout),depend(ncol,nlay,ngptlw) :: ciwpmcl
-            real(kind=rb) dimension(140,ncol,nlay),intent(inout),depend(ncol,nlay,ngptlw) :: clwpmcl
+            real(kind=rb) dimension(16,ncol,nlay),intent(in),depend(ncol,nlay,nbndlw) :: tauc
+            real(kind=rb) dimension(140,ncol,nlay),intent(inout) :: cldfmcl
+            real(kind=rb) dimension(140,ncol,nlay),intent(inout),depend(ncol,nlay) :: ciwpmcl
+            real(kind=rb) dimension(140,ncol,nlay),intent(inout),depend(ncol,nlay) :: clwpmcl
             real(kind=rb) dimension(ncol,nlay),intent(inout),depend(ncol,nlay) :: reicmcl
             real(kind=rb) dimension(ncol,nlay),intent(inout),depend(ncol,nlay) :: relqmcl
-            real(kind=rb) dimension(140,ncol,nlay),intent(inout),depend(ncol,nlay,ngptlw) :: taucmcl
+            real(kind=rb) dimension(140,ncol,nlay),intent(inout),depend(ncol,nlay) :: taucmcl
         end subroutine climlab_mcica_subcol_lw
         subroutine climlab_rrtmg_lw(ncol,nlay,icld,idrv,play,plev,tlay,tlev,tsfc,h2ovmr,o3vmr,co2vmr,ch4vmr,n2ovmr,o2vmr,cfc11vmr,cfc12vmr,cfc22vmr,ccl4vmr,emis,inflglw,iceflglw,liqflglw,cldfmcl,taucmcl,ciwpmcl,clwpmcl,reicmcl,relqmcl,tauaer,uflx,dflx,hr,uflxc,dflxc,hrc,duflx_dt,duflxc_dt) ! in :_rrtmg_lw:Driver.f90
             use rrtmg_lw_rad, only: rrtmg_lw
