@@ -6,12 +6,12 @@ from climlab import constants as const
 def init_lw(fort, cp=const.cp):
     '''Initialization of the RRTMG_LW fortran module.'''
     read_lw_abs_data(fort)
-    fort.rrtmg_lw_init.rrtmg_lw_ini(cp)
+    fort.climlab_rrtmg_lw_ini(cp)
 
 def init_sw(fort, cp=const.cp):
     '''Initialization of the RRTMG_SW fortran module.'''
     read_sw_abs_data(fort)
-    fort.rrtmg_sw_init.rrtmg_sw_ini(cp)
+    fort.climlab_rrtmg_sw_ini(cp)
 
 def name(bandNumber):
     '''Just creates a string `rrlw_kgxx` where `xx` is a zero-padded version

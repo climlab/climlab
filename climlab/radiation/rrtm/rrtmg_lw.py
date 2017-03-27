@@ -11,9 +11,11 @@ import _rrtmg_init
 #     ngptlw = _rrtmg_lw.parrrtm.ngptlw
 # except:
 #     raise ImportError('Cannot import the RRTMG_LW driver, this module will not be functional.')
-from . import _rrtmg_lw
+import _rrtmg_lw
 nbndlw = _rrtmg_lw.parrrtm.nbndlw
 ngptlw = _rrtmg_lw.parrrtm.ngptlw
+#  Python-based initialization of absorption data from netcdf file
+_rrtmg_init.init_lw(_rrtmg_lw)
 
 
 class RRTMG_LW(_Radiation_LW):
@@ -40,8 +42,6 @@ class RRTMG_LW(_Radiation_LW):
         self.add_input('liqflglw', liqflglw)
         self.add_input('tauc', tauc)
         self.add_input('tauaer', tauaer)
-        #  Python-based initialization of absorption data from netcdf file
-        _rrtmg_init.init_lw(_rrtmg_lw)
 
     def _prepare_lw_arguments(self):
         #  scalar integer arguments
@@ -95,7 +95,7 @@ class RRTMG_LW(_Radiation_LW):
         reicmcl = np.zeros((ncol,nlay), order='F')
         relqmcl = np.zeros((ncol,nlay), order='F')
         taucmcl = np.zeros((ngptlw,ncol,nlay), order='F')
-        _rrtmg_lw.mcica_subcol_gen_lw.mcica_subcol_lw(1, ncol, nlay, icld, permuteseed, irng, play,
+        _rrtmg_lw.climlab_mcica_subcol_lw(1, ncol, nlay, icld, permuteseed, irng, play,
                            cldfrac, ciwp, clwp, reic, relq, tauc, cldfmcl,
                            ciwpmcl, clwpmcl, reicmcl, relqmcl, taucmcl)
         #  Initialize return arrays
@@ -109,7 +109,7 @@ class RRTMG_LW(_Radiation_LW):
         duflxc_dt = np.zeros((ncol,nlay+1), order='F')
 
         #!  Call the RRTMG_LW driver to compute radiative fluxes
-        _rrtmg_lw.rrtmg_lw_rad.rrtmg_lw(ncol    ,nlay    ,icld    ,idrv    ,
+        _rrtmg_lw.climlab_rrtmg_lw(ncol    ,nlay    ,icld    ,idrv    ,
                  play    , plev    , tlay    , tlev    , tsfc    ,
                  h2ovmr  , o3vmr   , co2vmr  , ch4vmr  , n2ovmr  , o2vmr ,
                  cfc11vmr, cfc12vmr, cfc22vmr, ccl4vmr , emis    ,
