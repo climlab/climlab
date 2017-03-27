@@ -5,12 +5,16 @@ from climlab.radiation.radiation import _Radiation_LW
 from utils import _prepare_general_arguments
 from utils import _climlab_to_rrtm, _climlab_to_rrtm_sfc, _rrtm_to_climlab
 import _rrtmg_init
-try:
-    import _rrtmg_lw
-    nbndlw = _rrtmg_lw.parrrtm.nbndlw
-    ngptlw = _rrtmg_lw.parrrtm.ngptlw
-except:
-    raise ImportError('Cannot import the RRTMG_LW driver, this module will not be functional.')
+# try:
+#     import _rrtmg_lw
+#     nbndlw = _rrtmg_lw.parrrtm.nbndlw
+#     ngptlw = _rrtmg_lw.parrrtm.ngptlw
+# except:
+#     raise ImportError('Cannot import the RRTMG_LW driver, this module will not be functional.')
+from . import _rrtmg_lw
+nbndlw = _rrtmg_lw.parrrtm.nbndlw
+ngptlw = _rrtmg_lw.parrrtm.ngptlw
+
 
 class RRTMG_LW(_Radiation_LW):
     def __init__(self,
