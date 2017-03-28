@@ -5,7 +5,7 @@ from climlab import constants as const
 
 def init_lw(fort, cp=const.cp):
     '''Initialization of the RRTMG_LW fortran module.'''
-    read_lw_abs_data(fort)
+    #read_lw_abs_data(fort)
     fort.climlab_rrtmg_lw_ini(cp)
 
 def init_sw(fort, cp=const.cp):

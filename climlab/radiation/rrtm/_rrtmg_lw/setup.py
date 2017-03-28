@@ -12,7 +12,7 @@ def configuration(parent_package='', top_path=None):
     # set some fortran compiler-dependent flags (following CliMT code here)
     if compiler == 'gnu95':
         f77flags=['-ffixed-line-length-132', '-fdefault-real-8']
-        f90flags=['-fdefault-real-8', '-fno-range-check', '-ffree-form']
+        f90flags=['-fdefault-real-8', '-fno-range-check', '-ffree-form', '-O0']
         #f90flags=['-fdefault-real-8']
     elif compiler == 'intel' or compiler == 'intelem':
         f77flags='-132 -r8'
@@ -49,6 +49,7 @@ def configuration(parent_package='', top_path=None):
                   'rrtmg_lw_v4.85/gcm_model/modules/rrlw_tbl.f90',
                   'rrtmg_lw_v4.85/gcm_model/modules/rrlw_vsn.f90',
                   'rrtmg_lw_v4.85/gcm_model/modules/rrlw_wvn.f90',
+                  'rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_k_g.f90',
                   'rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_taumol.f90',
                   'rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_setcoef.f90',
                   'rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_rtrnmc.f90',
