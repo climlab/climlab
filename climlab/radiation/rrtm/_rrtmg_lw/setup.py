@@ -19,10 +19,6 @@ def configuration(parent_package='', top_path=None):
         f90flags='-132 -r8'
     print f90flags
 
-    #here = os.path.abspath(os.path.dirname(__file__))
-    #sourcelistfile = os.path.join(here, 'sources_in_order_of_compilation')
-    #sourcelist = [line.rstrip() for line in open(sourcelistfile)]
-    #sourcelist.append('_rrtmg_lw.pyf')
     sourcelist = ['_rrtmg_lw.pyf',
                   'rrtmg_lw_v4.85/gcm_model/modules/parkind.f90',
                   'rrtmg_lw_v4.85/gcm_model/modules/parrrtm.f90',
