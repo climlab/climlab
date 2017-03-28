@@ -323,16 +323,9 @@
                      isolvar, svar_f, svar_s, svar_i, &
                      svar_f_bnd, svar_s_bnd, svar_i_bnd, &
                      ssi, zsflxzen, ztaug, ztaur)
-      !CLIMLAB DEBUG
-      !print *, 'After taumol_sw, ztaug is'
-      !print *, ztaug
-      !print *, 'And ztaur is'
-      !print *, ztaur
 ! Top of shortwave spectral band loop, jb = 16 -> 29; ibm = 1 -> 14
 
       do jb = ib1, ib2
-        ! CLIMLAB DEBUG
-        print *, 'Looping through SW spectral bands. Current band is', jb
          ibm = jb-15
          igt = ngc(ibm)
 
@@ -445,18 +438,10 @@
 !               zomco(jk) = zomco(jk) / ztauo(jk)
 
 ! Clear-sky optical parameters including aerosols
-               ! CLIMLAB DEBUG  the problem is that ztaug is zero ...
-               !print *, 'And now ztaur, ztaug, ptaua, pomga, pasya, zomcc'
-               !print *, ztaur(ikl,iw), ztaug(ikl,iw), ptaua(ikl,ibm), pomga(ikl,ibm), pasya(ikl,ibm), zomcc(jk)
                ztauc(jk) = ztaur(ikl,iw) + ztaug(ikl,iw) + ptaua(ikl,ibm)
                zomcc(jk) = ztaur(ikl,iw) * 1.0_rb + ptaua(ikl,ibm) * pomga(ikl,ibm)
                zgcc(jk) = pasya(ikl,ibm) * pomga(ikl,ibm) * ptaua(ikl,ibm) / zomcc(jk)
-               !CLIMLAB DEBUG ... and we end up dividing by zero here becuase ztauc is zero
-               !print *, 'ztauc is', ztauc(jk)
-               !print *, 'zomcc before is', zomcc(jk)
                zomcc(jk) = zomcc(jk) / ztauc(jk)
-               !CLIMLAB DEBUG
-               !print *, 'zomcc after is', zomcc(jk)
 ! Pre-delta-scaling clear and cloudy direct beam transmittance (must use 'orig', unscaled cloud OD)
 !   \/\/\/ This block of code is only needed for unscaled direct beam calculation
                if (idelm .eq. 0) then
@@ -502,8 +487,6 @@
 
 
 ! Delta scaling - clear
-                ! CLIMLAB DEBUG -- zgcc and zomcc have NaNs!
-                !print *, zgcc(jk), zomcc(jk), ztauc(jk)
                zf = zgcc(jk) * zgcc(jk)
                zwf = zomcc(jk) * zf
                ztauc(jk) = (1.0_rb - zwf) * ztauc(jk)
@@ -540,8 +523,6 @@
 
 ! End of layer loop
             enddo
-            !CLIMLAB DEBUG
-            !print *, 'Before call to reftra_sw, ztauc is', ztauc
 ! Clear sky reflectivities
             call reftra_sw (klev, &
                             lrtchkclr, zgcc, prmu0, ztauc, zomcc, &
@@ -571,7 +552,6 @@
 
 ! Use exponential lookup table for transmittance, or expansion of
 ! exponential for low tau
-              ! CLIMLAB DEBUG  THE PROBLEM IS IN THIS BLOCK vvv
                ze1 = ztauc(jk) / prmu0
                if (ze1 .le. od_lo) then
                   zdbtmc = 1._rb - ze1 + 0.5_rb * ze1 * ze1
@@ -580,9 +560,6 @@
                   itind = tblint * tblind + 0.5_rb
                   zdbtmc = exp_tbl(itind)
                endif
-               ! CLIMLAB DEBUG  THE PROBLEM IS IN THIS BLOCK ^^^
-               !  and it is becuase we divide by ze1 which is NaN!
-               !  BECAUSE ztauc(jk) is Nan!
 
                zdbtc(jk) = zdbtmc
                ztdbtc(jk+1) = zdbtc(jk)*ztdbtc(jk)

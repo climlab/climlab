@@ -1103,10 +1103,6 @@
                          svar_i_bnd(ngb(ngs21+ig)) * (irradnce(ig,js) + &
                          fs * (irradnce(ig,js+1) - irradnce(ig,js)))
             taur(lay,ngs21+ig) = tauray
-            ! CLIMLAB DEBUG
-            print *, 'Hello from taumol22'
-            print *, 'taug(lay,ngs21+ig) = ', taug(lay,ngs21+ig)
-            print *, 'taur(lay,ngs21+ig) = ', taur(lay,ngs21+ig)
          enddo
       enddo
 
@@ -1202,10 +1198,6 @@
                          svar_s_bnd(ngb(ngs22+ig)) * snsptdrk(ig) + &
                          svar_i_bnd(ngb(ngs22+ig)) * irradnce(ig)
             taur(lay,ngs22+ig) = tauray
-            ! CLIMLAB DEBUG
-            print *, 'Hello from taumol23'
-            print *, 'taug(lay,ngs22+ig) = ', taug(lay,ngs22+ig)
-            print *, 'taur(lay,ngs22+ig) = ', taur(lay,ngs22+ig)
          enddo
       enddo
 
