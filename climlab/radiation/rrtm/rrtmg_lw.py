@@ -4,11 +4,12 @@ from climlab import constants as const
 from climlab.radiation.radiation import _Radiation_LW
 from utils import _prepare_general_arguments
 from utils import _climlab_to_rrtm, _climlab_to_rrtm_sfc, _rrtm_to_climlab
-from . import nbndlw, naerec
-try:
-    from _rrtmg_lw import driver as lwdriver
-except:
-    print 'Cannot import compiled _rrtmg_lw driver.'
+#  The compiled fortran extension module
+import _rrtmg_lw
+nbndlw = int(_rrtmg_lw.parrrtm.nbndlw)
+ngptlw = int(_rrtmg_lw.parrrtm.ngptlw)
+#  Initialize absorption data
+_rrtmg_lw.climlab_rrtmg_lw_ini(const.cp)
 
 
 class RRTMG_LW(_Radiation_LW):
@@ -72,9 +73,26 @@ class RRTMG_LW(_Radiation_LW):
     def _compute_heating_rates(self):
         '''Prepare arguments and call the RRTGM_LW driver to calculate
         radiative fluxes and heating rates'''
-        args = self._prepare_lw_arguments()
-        #  Call the RRTM code!
-        uflx, dflx, hr, uflxc, dflxc, hrc, duflx_dt, duflxc_dt = lwdriver(*args)
+        (ncol, nlay, icld, permuteseed, irng, idrv, cp,
+                play, plev, tlay, tlev, tsfc,
+                h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr,
+                cfc11vmr, cfc12vmr, cfc22vmr, ccl4vmr, emis,
+                inflglw, iceflglw, liqflglw,
+                cldfrac, ciwp, clwp, reic, relq, tauc, tauaer,) = self._prepare_lw_arguments()
+        #  Call the Monte Carlo Independent Column Approximation (McICA, Pincus et al., JC, 2003)
+        (cldfmcl, ciwpmcl, clwpmcl, reicmcl, relqmcl, taucmcl) = \
+            _rrtmg_lw.climlab_mcica_subcol_lw(ncol, nlay, icld,
+                                              permuteseed, irng, play,
+                                              cldfrac, ciwp, clwp, reic, relq, tauc)
+        #  Call the RRTMG_LW driver to compute radiative fluxes
+        (uflx, dflx, hr, uflxc, dflxc, hrc, duflx_dt, duflxc_dt) = \
+            _rrtmg_lw.climlab_rrtmg_lw(ncol    ,nlay    ,icld    ,idrv    ,
+                 play    , plev    , tlay    , tlev    , tsfc    ,
+                 h2ovmr  , o3vmr   , co2vmr  , ch4vmr  , n2ovmr  , o2vmr ,
+                 cfc11vmr, cfc12vmr, cfc22vmr, ccl4vmr , emis    ,
+                 inflglw , iceflglw, liqflglw, cldfmcl ,
+                 taucmcl , ciwpmcl , clwpmcl , reicmcl , relqmcl ,
+                 tauaer )
         #  Output is all (ncol,nlay+1) or (ncol,nlay)
         self.LW_flux_up = _rrtm_to_climlab(uflx)
         self.LW_flux_down = _rrtm_to_climlab(dflx)

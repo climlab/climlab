@@ -55,9 +55,9 @@ def _build_extension(name=None, srcdir=None, targetdir=None,
     F2pyCommand.append('f2py -c -m {}'.format(name))
     F2pyCommand.append('--fcompiler={} --noopt'.format(compiler))
     F2pyCommand.append('-I{}'.format(srcdir))
-    F2pyCommand.append('-I{}'.format(os.path.join(srcdir,'include')))
+    #F2pyCommand.append('-I{}'.format(os.path.join(srcdir,'include')))
     F2pyCommand.append('-I{}'.format(os.path.join(srcdir,'src')))
-    F2pyCommand.append('-I{}'.format(os.path.join(srcdir,'src','include')))
+    #F2pyCommand.append('-I{}'.format(os.path.join(srcdir,'src','include')))
     F2pyCommand.append('--f77flags={}'.format(f77flags))
     F2pyCommand.append('--f90flags={}'.format(f90flags))
     F2pyCommand.append('{}.pyf'.format(name))
@@ -67,11 +67,6 @@ def _build_extension(name=None, srcdir=None, targetdir=None,
     print F2pyCommand
     if subprocess.call(F2pyCommand, shell=True) > 0:
         raise StandardError('+++ Compilation failed')
-    # Check to see if we are using Mac OSX
-    #  which might need this hack to make the linking work if using
-    #  gcc compilers installed with conda
-    if sys.platform == 'darwin':
-        _patch_extension_rpath(target)
     # delete signature file
     #os.remove('{}.pyf'.format(name))
     #  No, actually leave the signature file in place
@@ -80,22 +75,6 @@ def _build_extension(name=None, srcdir=None, targetdir=None,
     os.rename(target, os.path.join(targetdir, target))
     #  Switch back to original working directory
     os.chdir(here)
-
-def _patch_extension_rpath(name, verbose=False):
-        ####   This is a little hack to get the build to work on OSX
-        ####   with gcc compilers installed by conda
-        ####   see https://github.com/ContinuumIO/anaconda-issues/issues/739#issuecomment-238076905
-    patch_rpath = []
-    patch_rpath.append('install_name_tool -change @rpath/./libgfortran.3.dylib ${CONDA_PREFIX}/lib/libgfortran.3.dylib')
-    patch_rpath.append('-change @rpath/./libquadmath.0.dylib ${CONDA_PREFIX}/lib/libquadmath.0.dylib ')
-    patch_rpath.append(name)
-    patch_rpath = string.join(patch_rpath)
-    if verbose:
-        print patch_rpath
-    if subprocess.call(patch_rpath, shell=True) > 0:
-        raise StandardError('+++ rpath change failed')
-    if verbose:
-        print 'rpath patch successful'
 
 ###  Begin climlab install script  ###
 
@@ -106,12 +85,12 @@ Extensions = [
     {'name': '_cam3',
      'srcdir': os.path.join('climlab','radiation','cam3'),
      'targetdir': os.path.join('climlab','radiation','cam3')},
-    {'name': '_rrtmg_lw',
-     'srcdir': os.path.join('climlab','radiation','rrtm','_rrtmg_lw'),
-     'targetdir': os.path.join('climlab','radiation','rrtm','_rrtmg_lw')},
-    {'name': '_rrtmg_sw',
-     'srcdir': os.path.join('climlab','radiation','rrtm','_rrtmg_sw'),
-     'targetdir': os.path.join('climlab','radiation','rrtm','_rrtmg_sw')}
+    #{'name': '_rrtmg_lw',
+    # 'srcdir': os.path.join('climlab','radiation','rrtm','_rrtmg_lw'),
+    # 'targetdir': os.path.join('climlab','radiation','rrtm','_rrtmg_lw')},
+    #{'name': '_rrtmg_sw',
+    # 'srcdir': os.path.join('climlab','radiation','rrtm','_rrtmg_sw'),
+    # 'targetdir': os.path.join('climlab','radiation','rrtm','_rrtmg_sw')}
 
     ]
 
@@ -127,8 +106,11 @@ except:
     print 'Something went wrong with finding a Fortran compiler.'
 # set some fortran compiler-dependent flags (following CliMT code here)
 if compiler == 'gnu95':
-    f77flags='-ffixed-line-length-132 -fdefault-real-8'
-    f90flags='-fdefault-real-8 -fno-range-check -ffree-form'
+    # The flag -Wl,-rpath,$(CONDA_PREFIX)/lib
+    # makes sure that the gfortran runtime libraries are linked properly
+    # see https://github.com/ContinuumIO/anaconda-issues/issues/739#issuecomment-238076905
+    f77flags='-ffixed-line-length-132 -fdefault-real-8 -Wl,-rpath,$(CONDA_PREFIX)/lib'
+    f90flags='-fdefault-real-8 -fno-range-check -ffree-form -Wl,-rpath,$(CONDA_PREFIX)/lib'
 elif compiler == 'intel' or compiler == 'intelem':
     f77flags='-132 -r8'
     f90flags='-132 -r8'
