@@ -38,7 +38,7 @@ module wv_saturation
   real(r8) tmax       ! max temperature (K) for table
   real(r8) ttrice     ! transition range from es over H2O to es over ice
   real(r8) pcf(6)     ! polynomial coeffs -> es transition water to ice
-  real(r8) epsqs      ! Ratio of h2o to dry air molecular weights 
+  real(r8) epsqs      ! Ratio of h2o to dry air molecular weights
   real(r8) rgasv      ! Gas constant for water vapor
   real(r8) hlatf      ! Latent heat of vaporization
   real(r8) hlatv      ! Latent heat of fusion
@@ -68,19 +68,19 @@ contains
 
 subroutine gestbl(tmn     ,tmx     ,trice   ,ip      ,epsil   , &
                   latvap  ,latice  ,rh2o    ,cpair   ,tmeltx   )
-!----------------------------------------------------------------------- 
-! 
-! Purpose: 
+!-----------------------------------------------------------------------
+!
+! Purpose:
 ! Builds saturation vapor pressure table for later lookup procedure.
-! 
-! Method: 
+!
+! Method:
 ! Uses Goff & Gratch (1946) relationships to generate the table
 ! according to a set of free parameters defined below.  Auxiliary
 ! routines are also included for making rapid estimates (well with 1%)
 ! of both es and d(es)/dt for the particular table configuration.
-! 
+!
 ! Author: J. Hack
-! 
+!
 !-----------------------------------------------------------------------
    use pmgrid, only: masterproc
 !------------------------------Arguments--------------------------------
@@ -137,6 +137,7 @@ subroutine gestbl(tmn     ,tmx     ,trice   ,ip      ,epsil   , &
 !
    if (icephs) then
       if (ttrice /= 0.0) then
+        ! CLIMLAB is this causing conversion problem?
          itype = -ttrice
       else
          itype = 1
@@ -192,21 +193,21 @@ end subroutine gestbl
 
 subroutine aqsat(t       ,p       ,es      ,qs        ,ii      , &
                  ilen    ,kk      ,kstart  ,kend      )
-!----------------------------------------------------------------------- 
-! 
-! Purpose: 
+!-----------------------------------------------------------------------
+!
+! Purpose:
 ! Utility procedure to look up and return saturation vapor pressure from
 ! precomputed table, calculate and return saturation specific humidity
 ! (g/g),for input arrays of temperature and pressure (dimensioned ii,kk)
 ! This routine is useful for evaluating only a selected region in the
 ! vertical.
-! 
-! Method: 
-! <Describe the algorithm(s) used in the routine.> 
-! <Also include any applicable external references.> 
-! 
+!
+! Method:
+! <Describe the algorithm(s) used in the routine.>
+! <Also include any applicable external references.>
+!
 ! Author: J. Hack
-! 
+!
 !------------------------------Arguments--------------------------------
 !
 ! Input arguments
@@ -257,20 +258,20 @@ end subroutine aqsat
 
 subroutine aqsatd(t       ,p       ,es      ,qs      ,gam     , &
                   ii      ,ilen    ,kk      ,kstart  ,kend    )
-!----------------------------------------------------------------------- 
-! 
-! Purpose: 
+!-----------------------------------------------------------------------
+!
+! Purpose:
 ! Utility procedure to look up and return saturation vapor pressure from
 ! precomputed table, calculate and return saturation specific humidity
-! (g/g).   
-! 
-! Method: 
+! (g/g).
+!
+! Method:
 ! Differs from aqsat by also calculating and returning
 ! gamma (l/cp)*(d(qsat)/dT)
 ! Input arrays temperature and pressure (dimensioned ii,kk).
-! 
+!
 ! Author: J. Hack
-! 
+!
 !------------------------------Arguments--------------------------------
 !
 ! Input arguments
@@ -399,18 +400,18 @@ end subroutine aqsatd
 
 subroutine vqsatd(t       ,p       ,es      ,qs      ,gam      , &
                   len     )
-!----------------------------------------------------------------------- 
-! 
-! Purpose: 
+!-----------------------------------------------------------------------
+!
+! Purpose:
 ! Utility procedure to look up and return saturation vapor pressure from
 ! precomputed table, calculate and return saturation specific humidity
 ! (g/g), and calculate and return gamma (l/cp)*(d(qsat)/dT).  The same
 ! function as qsatd, but operates on vectors of temperature and pressure
-! 
-! Method: 
-! 
+!
+! Method:
+!
 ! Author: J. Hack
-! 
+!
 !------------------------------Arguments--------------------------------
 !
 ! Input arguments
@@ -527,8 +528,8 @@ subroutine vqsatd(t       ,p       ,es      ,qs      ,gam      , &
 end subroutine vqsatd
 
 integer function fqsatd(t    ,p    ,es    ,qs   ,gam   , len     )
-  !----------------------------------------------------------------------- 
-  ! Purpose: 
+  !-----------------------------------------------------------------------
+  ! Purpose:
   ! This is merely a function interface vqsatd.
   !------------------------------Arguments--------------------------------
   ! Input arguments
@@ -544,4 +545,4 @@ integer function fqsatd(t    ,p    ,es    ,qs   ,gam   , len     )
   fqsatd = 1
   return
 end function fqsatd
-end module wv_saturation 
+end module wv_saturation

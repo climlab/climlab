@@ -48,7 +48,7 @@
 
 ! ------- Local -------
 
-      integer(kind=im) :: itr, ibnd, igc, ig, ind, ipr 
+      integer(kind=im) :: itr, ibnd, igc, ig, ind, ipr
       integer(kind=im) :: igcsm, iprsm
 
       real(kind=rb) :: wtsum, wtsm(mg)        !
@@ -75,7 +75,7 @@
       call lwcmbdat               ! g-point interval reduction data
       call lwcldpr                ! cloud optical properties
       call lwatmref               ! reference MLS profile
-      call lwavplank              ! Planck function 
+      call lwavplank              ! Planck function
       call lwavplankderiv         ! Planck function derivative wrt temp
       call lw_kgb01               ! molecular absorption coefficients
       call lw_kgb02
@@ -95,11 +95,11 @@
       call lw_kgb16
 
 ! Compute lookup tables for transmittance, tau transition function,
-! and clear sky tau (for the cloudy sky radiative transfer).  Tau is 
-! computed as a function of the tau transition function, transmittance 
-! is calculated as a function of tau, and the tau transition function 
-! is calculated using the linear in tau formulation at values of tau 
-! above 0.01.  TF is approximated as tau/6 for tau < 0.01.  All tables 
+! and clear sky tau (for the cloudy sky radiative transfer).  Tau is
+! computed as a function of the tau transition function, transmittance
+! is calculated as a function of tau, and the tau transition function
+! is calculated using the linear in tau formulation at values of tau
+! above 0.01.  TF is approximated as tau/6 for tau < 0.01.  All tables
 ! are computed at intervals of 0.001.  The inverse of the constant used
 ! in the Pade approximation to the tau transition function is set to b.
 
@@ -131,7 +131,7 @@
       do ibnd = 1,nbndlw
          iprsm = 0
          if (ngc(ibnd).lt.mg) then
-            do igc = 1,ngc(ibnd) 
+            do igc = 1,ngc(ibnd)
                igcsm = igcsm + 1
                wtsum = 0._rb
                do ipr = 1, ngn(igcsm)
@@ -183,11 +183,11 @@
       use parrrtm, only : maxxsec, maxinpx
       use rrlw_con, only: heatfac, grav, planck, boltz, &
                           clight, avogad, alosmt, gascon, radcn1, radcn2, &
-                          sbcnst, secdy 
+                          sbcnst, secdy
       use rrlw_vsn
 
-      save 
- 
+      save
+
       real(kind=rb), intent(in) :: cpdair      ! Specific heat capacity of dry air
                                                ! at constant pressure at 273 K
                                                ! (J kg-1 K-1)
@@ -231,7 +231,7 @@
                                               ! (ergs s; g cm2 s-1)
       boltz = 1.3806503e-16_rb                ! Boltzmann constant
                                               ! (ergs K-1; g cm2 s-2 K-1)
-      clight = 2.99792458e+10_rb              ! Speed of light in a vacuum  
+      clight = 2.99792458e+10_rb              ! Speed of light in a vacuum
                                               ! (cm s-1)
       avogad = 6.02214199e+23_rb              ! Avogadro constant
                                               ! (mol-1)
@@ -256,11 +256,11 @@
 !          radcn2 = planck*clight/boltz
 
 !     Heatfac is the factor by which delta-flux / delta-pressure is
-!     multiplied, with flux in W/m-2 and pressure in mbar, to get 
+!     multiplied, with flux in W/m-2 and pressure in mbar, to get
 !     the heating rate in units of degrees/day.  It is equal to:
 !     Original value:
 !           (g)x(#sec/day)x(1e-5)/(specific heat of air at const. p)
-!           Here, cpdair (1.004) is in units of J g-1 K-1, and the 
+!           Here, cpdair (1.004) is in units of J g-1 K-1, and the
 !           constant (1.e-5) converts mb to Pa and g-1 to kg-1.
 !        =  (9.8066)(86400)(1e-5)/(1.004)
 !      heatfac = 8.4391_rb
@@ -274,8 +274,8 @@
 !
 !     Calculated value:
 !        (grav) x (#sec/day) / (specific heat of dry air at const. p x 1.e2)
-!           Here, cpdair is in units of J kg-1 K-1, and the constant (1.e2) 
-!           converts mb to Pa when heatfac is multiplied by W m-2 mb-1. 
+!           Here, cpdair is in units of J kg-1 K-1, and the constant (1.e2)
+!           converts mb to Pa when heatfac is multiplied by W m-2 mb-1.
       heatfac = grav * secdy / (cpdair * 1.e2_rb)
 
       end subroutine lwdatinit
@@ -285,10 +285,10 @@
 !***************************************************************************
 
       save
- 
+
 ! ------- Definitions -------
 !     Arrays for the g-point reduction from 256 to 140 for the 16 LW bands:
-!     This mapping from 256 to 140 points has been carefully selected to 
+!     This mapping from 256 to 140 points has been carefully selected to
 !     minimize the effect on the resulting fluxes and cooling rates, and
 !     caution should be used if the mapping is modified.  The full 256
 !     g-point set can be restored with ngptlw=256, ngc=16*16, ngn=256*1., etc.
@@ -296,7 +296,7 @@
 !     ngc     The number of new g-points in each band
 !     ngs     The cumulative sum of new g-points for each band
 !     ngm     The index of each new g-point relative to the original
-!             16 g-points for each band.  
+!             16 g-points for each band.
 !     ngn     The number of original g-points that are combined to make
 !             each new g-point in each band.
 !     ngb     The band index for each new g-point.
@@ -380,7 +380,7 @@
 !
 !  band 1:  10-350 cm-1 (low key - h2o; low minor - n2)
 !                       (high key - h2o; high minor - n2)
-!  note: previous versions of rrtm band 1: 
+!  note: previous versions of rrtm band 1:
 !        10-250 cm-1 (low - h2o; high - h2o)
 !***************************************************************************
 
@@ -391,7 +391,7 @@
                            selfref, forref
 
 ! ------- Local -------
-      integer(kind=im) :: jt, jp, igc, ipr, iprsm 
+      integer(kind=im) :: jt, jp, igc, ipr, iprsm
       real(kind=rb) :: sumk, sumk1, sumk2, sumf1, sumf2
 
 
@@ -480,7 +480,7 @@
 !
 !     band 2:  350-500 cm-1 (low key - h2o; high key - h2o)
 !
-!     note: previous version of rrtm band 2: 
+!     note: previous version of rrtm band 2:
 !           250 - 500 cm-1 (low - h2o; high - h2o)
 !***************************************************************************
 
@@ -489,7 +489,7 @@
                            fracrefa, fracrefb, absa, ka, absb, kb, selfref, forref
 
 ! ------- Local -------
-      integer(kind=im) :: jt, jp, igc, ipr, iprsm 
+      integer(kind=im) :: jt, jp, igc, ipr, iprsm
       real(kind=rb) :: sumk, sumf1, sumf2
 
 
@@ -574,7 +574,7 @@
                            selfref, forref
 
 ! ------- Local -------
-      integer(kind=im) :: jn, jt, jp, igc, ipr, iprsm 
+      integer(kind=im) :: jn, jt, jp, igc, ipr, iprsm
       real(kind=rb) :: sumk, sumf
 
 
@@ -701,7 +701,7 @@
                            fracrefa, fracrefb, absa, ka, absb, kb, selfref, forref
 
 ! ------- Local -------
-      integer(kind=im) :: jn, jt, jp, igc, ipr, iprsm 
+      integer(kind=im) :: jn, jt, jp, igc, ipr, iprsm
       real(kind=rb) :: sumk, sumf
 
 
@@ -803,7 +803,7 @@
                            selfref, forref
 
 ! ------- Local -------
-      integer(kind=im) :: jn, jt, jp, igc, ipr, iprsm 
+      integer(kind=im) :: jn, jt, jp, igc, ipr, iprsm
       real(kind=rb) :: sumk, sumf
 
 
@@ -929,7 +929,7 @@
                            selfref, forref
 
 ! ------- Local -------
-      integer(kind=im) :: jt, jp, igc, ipr, iprsm 
+      integer(kind=im) :: jt, jp, igc, ipr, iprsm
       real(kind=rb) :: sumk, sumf, sumk1, sumk2
 
 
@@ -1018,7 +1018,7 @@
                            selfref, forref
 
 ! ------- Local -------
-      integer(kind=im) :: jn, jt, jp, igc, ipr, iprsm 
+      integer(kind=im) :: jn, jt, jp, igc, ipr, iprsm
       real(kind=rb) :: sumk, sumf
 
 
@@ -1144,7 +1144,7 @@
                            cfc12, cfc22adj
 
 ! ------- Local -------
-      integer(kind=im) :: jt, jp, igc, ipr, iprsm 
+      integer(kind=im) :: jt, jp, igc, ipr, iprsm
       real(kind=rb) :: sumk, sumk1, sumk2, sumk3, sumk4, sumk5, sumf1, sumf2
 
 
@@ -1261,7 +1261,7 @@
                            absb, kb, kb_mn2o, selfref, forref
 
 ! ------- Local -------
-      integer(kind=im) :: jn, jt, jp, igc, ipr, iprsm 
+      integer(kind=im) :: jn, jt, jp, igc, ipr, iprsm
       real(kind=rb) :: sumk, sumf
 
 
@@ -1385,7 +1385,7 @@
                            selfref, forref
 
 ! ------- Local -------
-      integer(kind=im) :: jt, jp, igc, ipr, iprsm 
+      integer(kind=im) :: jt, jp, igc, ipr, iprsm
       real(kind=rb) :: sumk, sumf1, sumf2
 
 
@@ -1474,7 +1474,7 @@
                            absb, kb, kb_mo2, selfref, forref
 
 ! ------- Local -------
-      integer(kind=im) :: jt, jp, igc, ipr, iprsm 
+      integer(kind=im) :: jt, jp, igc, ipr, iprsm
       real(kind=rb) :: sumk, sumk1, sumk2, sumf1, sumf2
 
 
@@ -1573,7 +1573,7 @@
                            fracrefa, absa, ka, selfref, forref
 
 ! ------- Local -------
-      integer(kind=im) :: jn, jt, jp, igc, ipr, iprsm 
+      integer(kind=im) :: jn, jt, jp, igc, ipr, iprsm
       real(kind=rb) :: sumk, sumf
 
 
@@ -1647,7 +1647,7 @@
                            kb_mo3, selfref, forref
 
 ! ------- Local -------
-      integer(kind=im) :: jn, jt, jp, igc, ipr, iprsm 
+      integer(kind=im) :: jn, jt, jp, igc, ipr, iprsm
       real(kind=rb) :: sumk, sumk1, sumk2, sumf
 
 
@@ -1760,7 +1760,7 @@
                            selfref, forref
 
 ! ------- Local -------
-      integer(kind=im) :: jt, jp, igc, ipr, iprsm 
+      integer(kind=im) :: jt, jp, igc, ipr, iprsm
       real(kind=rb) :: sumk, sumf1, sumf2
 
 
@@ -1846,7 +1846,7 @@
                            fracrefa, absa, ka, ka_mn2, selfref, forref
 
 ! ------- Local -------
-      integer(kind=im) :: jn, jt, jp, igc, ipr, iprsm 
+      integer(kind=im) :: jn, jt, jp, igc, ipr, iprsm
       real(kind=rb) :: sumk, sumf
 
 
@@ -1932,7 +1932,7 @@
                            fracrefa, fracrefb, absa, ka, absb, kb, selfref, forref
 
 ! ------- Local -------
-      integer(kind=im) :: jn, jt, jp, igc, ipr, iprsm 
+      integer(kind=im) :: jn, jt, jp, igc, ipr, iprsm
       real(kind=rb) :: sumk, sumf
 
 
@@ -2025,13 +2025,13 @@
 
       save
 
-! ABSCLDn is the liquid water absorption coefficient (m2/g). 
+! ABSCLDn is the liquid water absorption coefficient (m2/g).
 ! For INFLAG = 1.
       abscld1 = 0.0602410_rb
-!  
+!
 ! Everything below is for INFLAG = 2.
 
-! ABSICEn(J,IB) are the parameters needed to compute the liquid water 
+! ABSICEn(J,IB) are the parameters needed to compute the liquid water
 ! absorption coefficient in spectral region IB for ICEFLAG=n.  The units
 ! of ABSICEn(1,IB) are m2/g and ABSICEn(2,IB) has units (microns (m2/g)).
 ! For ICEFLAG = 0.
@@ -2224,7 +2224,7 @@
        6.854061e-03_rb,6.697986e-03_rb,6.550224e-03_rb,6.410138e-03_rb,6.277153e-03_rb, &
        6.150751e-03_rb,6.030462e-03_rb,5.915860e-03_rb/)
 
-! ICEFLAG = 3; Fu parameterization. Particle size 5 - 140 micron in 
+! ICEFLAG = 3; Fu parameterization. Particle size 5 - 140 micron in
 ! increments of 3 microns.
 ! units = m2/g
 ! Hexagonal Ice Particle Parameterization
@@ -2656,4 +2656,3 @@
       end subroutine lwcldpr
 
       end module rrtmg_lw_init
-

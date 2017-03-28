@@ -4,11 +4,13 @@ from climlab import constants as const
 from climlab.radiation.radiation import _Radiation_SW
 from utils import _prepare_general_arguments
 from utils import _climlab_to_rrtm, _climlab_to_rrtm_sfc, _rrtm_to_climlab
-from . import nbndsw, naerec
-try:
-    from _rrtmg_sw import driver as swdriver
-except:
-    print 'Cannot import compiled _rrtmg_sw driver.'
+#  The compiled fortran extension module
+import _rrtmg_sw
+nbndsw = int(_rrtmg_sw.parrrsw.nbndsw)
+naerec = int(_rrtmg_sw.parrrsw.naerec)
+ngptsw = int(_rrtmg_sw.parrrsw.ngptsw)
+#  Initialize absorption data
+_rrtmg_sw.climlab_rrtmg_sw_ini(const.cp)
 
 
 class RRTMG_SW(_Radiation_SW):
@@ -16,7 +18,6 @@ class RRTMG_SW(_Radiation_SW):
             # GENERAL, used in both SW and LW
             icld = 1,    # Cloud overlap method, 0: Clear only, 1: Random, 2,  Maximum/random] 3: Maximum
             irng = 1,  # more monte carlo stuff
-            idrv = 0,  # whether to also calculate the derivative of flux with respect to surface temp
             permuteseed = 150,
             dyofyr = 0,       # day of the year used to get Earth/Sun distance (if not adjes)
             inflgsw  = 2,
@@ -27,12 +28,16 @@ class RRTMG_SW(_Radiation_SW):
             asmc = 0.,  # In-cloud asymmetry parameter
             fsfc = 0.,  # In-cloud forward scattering fraction (delta function pointing forward "forward peaked scattering")
             # AEROSOLS
+            iaer = 0,   #! Aerosol option flag
+                        #!    0: No aerosol
+                        #!    6: ECMWF method: use six ECMWF aerosol types input aerosol optical depth at 0.55 microns for each aerosol type (ecaer)
+                        #!    10:Input aerosol optical properties: input total aerosol optical depth, single scattering albedo and asymmetry parameter (tauaer, ssaaer, asmaer) directly
             tauaer = 0.,   # Aerosol optical depth (iaer=10 only), Dimensions,  (ncol,nlay,nbndsw)] #  (non-delta scaled)
             ssaaer = 0.,   # Aerosol single scattering albedo (iaer=10 only), Dimensions,  (ncol,nlay,nbndsw)] #  (non-delta scaled)
             asmaer = 0.,   # Aerosol asymmetry parameter (iaer=10 only), Dimensions,  (ncol,nlay,nbndsw)] #  (non-delta scaled)
             ecaer  = 0.,   # Aerosol optical depth at 0.55 micron (iaer=6 only), Dimensions,  (ncol,nlay,naerec)] #  (non-delta scaled)
             # new arguments for RRTMG_SW version 4.0
-            isolvar = 0,    # ! Flag for solar variability method
+            isolvar = -1,    # ! Flag for solar variability method
                             # !   -1 = (when scon .eq. 0.0): No solar variability
                             # !        and no solar cycle (Kurucz solar irradiance
                             # !        of 1368.22 Wm-2 only);
@@ -70,21 +75,21 @@ class RRTMG_SW(_Radiation_SW):
                             # !        scaled to scon and solar variability defined
                             # !        (optional) by setting non-zero scale factors
                             # !        for each band in bndsolvar
-            indsolvar = np.zeros(2),      # Facular and sunspot amplitude scale factors (isolvar=1),
-                                          # or Mg and SB indices (isolvar=2)
-            bndsolvar = np.zeros(nbndsw), # Solar variability scale factors for each shortwave band
-            solcycfrac = 0.,              # Fraction of averaged solar cycle (0-1) at current time (isolvar=1)
+            indsolvar = np.ones(2),      # Facular and sunspot amplitude scale factors (isolvar=1),
+                                         # or Mg and SB indices (isolvar=2)
+            bndsolvar = np.ones(nbndsw), # Solar variability scale factors for each shortwave band
+            solcycfrac = 1.,              # Fraction of averaged solar cycle (0-1) at current time (isolvar=1)
             **kwargs):
         super(RRTMG_SW, self).__init__(**kwargs)
         #  define INPUTS
         self.add_input('icld', icld)
         self.add_input('irng', irng)
-        self.add_input('idrv', idrv)
         self.add_input('permuteseed', permuteseed)
         self.add_input('dyofyr', dyofyr)
         self.add_input('inflgsw', inflgsw)
         self.add_input('iceflgsw', iceflgsw)
         self.add_input('liqflgsw', liqflgsw)
+        self.add_input('iaer', iaer)
         self.add_input('tauc', tauc)
         self.add_input('ssac', ssac)
         self.add_input('asmc', asmc)
@@ -113,7 +118,6 @@ class RRTMG_SW(_Radiation_SW):
         #  scalar integer arguments
         icld = self.icld
         irng = self.irng
-        idrv = self.idrv
         permuteseed = self.permuteseed
         inflgsw = self.inflgsw
         iceflgsw = self.iceflgsw
@@ -121,6 +125,7 @@ class RRTMG_SW(_Radiation_SW):
         dyofyr = self.dyofyr
         isolvar = self.isolvar
         solcycfrac = self.solcycfrac
+        iaer = self.iaer
         #  scalar real arguments
         adjes = self.eccentricity_factor
         scon = self.S0
@@ -159,7 +164,7 @@ class RRTMG_SW(_Radiation_SW):
         # Aerosol optical depth at 0.55 micron (iaer=6 only), Dimensions,  (ncol,nlay,naerec)] #  (non-delta scaled)
         ecaer = np.transpose(_climlab_to_rrtm(self.ecaer * np.ones_like(self.Tatm)) * np.ones([naerec,ncol,nlay]), (1,2,0))
 
-        args = [ncol, nlay, icld, permuteseed, irng, idrv, const.cp,
+        args = [ncol, nlay, icld, iaer, permuteseed, irng,
                 play, plev, tlay, tlev, tsfc,
                 h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr,
                 aldif, aldir, asdif, asdir, coszen, adjes, dyofyr, scon, isolvar,
@@ -173,9 +178,31 @@ class RRTMG_SW(_Radiation_SW):
     def _compute_heating_rates(self):
         '''Prepare arguments and call the RRTGM_SW driver to calculate
         radiative fluxes and heating rates'''
-        args = self._prepare_sw_arguments()
-        #  Call the RRTM code!
-        swuflx, swdflx, swhr, swuflxc, swdflxc, swhrc = swdriver(*args)
+        (ncol, nlay, icld, iaer, permuteseed, irng,
+         play, plev, tlay, tlev, tsfc,
+         h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr,
+         aldif, aldir, asdif, asdir, coszen, adjes, dyofyr, scon, isolvar,
+         indsolvar, bndsolvar, solcycfrac,
+         inflgsw, iceflgsw, liqflgsw,
+         cldfrac, ciwp, clwp, reic, relq, tauc, ssac, asmc, fsfc,
+         tauaer, ssaaer, asmaer, ecaer,) = self._prepare_sw_arguments()
+        #  Call the Monte Carlo Independent Column Approximation (McICA, Pincus et al., JC, 2003)
+        (cldfmcl, ciwpmcl, clwpmcl, reicmcl, relqmcl, taucmcl,
+        ssacmcl, asmcmcl, fsfcmcl) = _rrtmg_sw.climlab_mcica_subcol_sw(
+                        ncol, nlay, icld, permuteseed, irng, play,
+                        cldfrac, ciwp, clwp, reic, relq, tauc, ssac, asmc, fsfc)
+        #  Call the RRTMG_SW driver to compute radiative fluxes
+        (swuflx  ,swdflx  ,swhr    ,swuflxc ,swdflxc ,swhrc,) = \
+            _rrtmg_sw.climlab_rrtmg_sw(ncol    ,nlay    ,icld    ,iaer    ,
+                play    ,plev    ,tlay    ,tlev    ,tsfc   ,
+                h2ovmr , o3vmr   ,co2vmr  ,ch4vmr  ,n2ovmr ,o2vmr ,
+                asdir   ,asdif   ,aldir   ,aldif   ,
+                coszen  ,adjes   ,dyofyr  ,scon    ,isolvar,
+                inflgsw ,iceflgsw,liqflgsw,cldfmcl ,
+                taucmcl ,ssacmcl ,asmcmcl ,fsfcmcl ,
+                ciwpmcl ,clwpmcl ,reicmcl ,relqmcl ,
+                tauaer  ,ssaaer  ,asmaer  ,ecaer,
+                bndsolvar,indsolvar,solcycfrac)
         #  Output is all (ncol,nlay+1) or (ncol,nlay)
         self.SW_flux_up = _rrtm_to_climlab(swuflx)
         self.SW_flux_down = _rrtm_to_climlab(swdflx)

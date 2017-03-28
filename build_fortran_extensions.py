@@ -85,12 +85,12 @@ Extensions = [
     {'name': '_cam3',
      'srcdir': os.path.join('climlab','radiation','cam3'),
      'targetdir': os.path.join('climlab','radiation','cam3')},
-    {'name': '_rrtmg_lw',
-     'srcdir': os.path.join('climlab','radiation','rrtm','_rrtmg_lw'),
-     'targetdir': os.path.join('climlab','radiation','rrtm','_rrtmg_lw')},
-    {'name': '_rrtmg_sw',
-     'srcdir': os.path.join('climlab','radiation','rrtm','_rrtmg_sw'),
-     'targetdir': os.path.join('climlab','radiation','rrtm','_rrtmg_sw')}
+    #{'name': '_rrtmg_lw',
+    # 'srcdir': os.path.join('climlab','radiation','rrtm','_rrtmg_lw'),
+    # 'targetdir': os.path.join('climlab','radiation','rrtm','_rrtmg_lw')},
+    #{'name': '_rrtmg_sw',
+    # 'srcdir': os.path.join('climlab','radiation','rrtm','_rrtmg_sw'),
+    # 'targetdir': os.path.join('climlab','radiation','rrtm','_rrtmg_sw')}
 
     ]
 
