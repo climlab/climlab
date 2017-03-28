@@ -14,7 +14,7 @@ def configuration(parent_package='', top_path=None):
     if compiler == 'gnu95':
         f77flags=['-ffixed-line-length-132', '-fdefault-real-8']
         #f90flags='-fdefault-real-8 -fno-range-check -ffree-form'
-        f90flags=['-fdefault-real-8']
+        f90flags=['-fdefault-real-8', '-O0']
     elif compiler == 'intel' or compiler == 'intelem':
         f77flags='-132 -r8'
         f90flags='-132 -r8'
