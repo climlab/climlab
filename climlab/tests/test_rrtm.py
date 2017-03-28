@@ -100,5 +100,5 @@ def test_latitude():
     #  Test for reasonable surface temperature gradient
     #  reversal of gradient at equator
     grad = np.diff(model.Ts, axis=0)
-    assert np.all(grad[0:(num_lat/2-1)] > 0.)
-    assert np.all(grad[(num_lat/2):] < 0.)
+    assert np.all(grad[0:(int(num_lat/2)-1)] > 0.)
+    assert np.all(grad[int(num_lat/2):] < 0.)
