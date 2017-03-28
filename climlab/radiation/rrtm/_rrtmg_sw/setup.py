@@ -19,10 +19,6 @@ def configuration(parent_package='', top_path=None):
         f90flags='-132 -r8'
     print f90flags
 
-    #here = os.path.abspath(os.path.dirname(__file__))
-    #sourcelistfile = os.path.join(here, 'sources_in_order_of_compilation')
-    #sourcelist = [line.rstrip() for line in open(sourcelistfile)]
-    #sourcelist.append('_rrtmg_lw.pyf')
     sourcelist = ['_rrtmg_sw.pyf',
                   'rrtmg_sw_v4.0/gcm_model/modules/parkind.f90',
                   'rrtmg_sw_v4.0/gcm_model/modules/parrrsw.f90',
@@ -44,21 +40,6 @@ def configuration(parent_package='', top_path=None):
                   'rrtmg_sw_v4.0/gcm_model/modules/rrsw_kg28.f90',
                   'rrtmg_sw_v4.0/gcm_model/modules/rrsw_kg29.f90',
                   'rrtmg_sw_v4.0/gcm_model/modules/rrsw_ncpar.f90',
-                  #'rrtmg_sw_k_g_climlab.f90',
-                #   'climlab_rrtmg_sw_kgb16.f90',
-                #   'climlab_rrtmg_sw_kgb17.f90',
-                #   'climlab_rrtmg_sw_kgb18.f90',
-                #   'climlab_rrtmg_sw_kgb19.f90',
-                #   'climlab_rrtmg_sw_kgb20.f90',
-                #   'climlab_rrtmg_sw_kgb21.f90',
-                #   'climlab_rrtmg_sw_kgb22.f90',
-                #   'climlab_rrtmg_sw_kgb23.f90',
-                #   'climlab_rrtmg_sw_kgb24.f90',
-                #   'climlab_rrtmg_sw_kgb25.f90',
-                #   'climlab_rrtmg_sw_kgb26.f90',
-                #   'climlab_rrtmg_sw_kgb27.f90',
-                #   'climlab_rrtmg_sw_kgb28.f90',
-                #   'climlab_rrtmg_sw_kgb29.f90',
                   'rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_k_g.f90',
                   'rrtmg_sw_v4.0/gcm_model/modules/rrsw_ref.f90',
                   'rrtmg_sw_v4.0/gcm_model/modules/rrsw_tbl.f90',

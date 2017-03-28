@@ -9,9 +9,8 @@ import _rrtmg_sw
 nbndsw = int(_rrtmg_sw.parrrsw.nbndsw)
 naerec = int(_rrtmg_sw.parrrsw.naerec)
 ngptsw = int(_rrtmg_sw.parrrsw.ngptsw)
-#  Python-based initialization of absorption data from netcdf file
-import _rrtmg_init
-_rrtmg_init.init_sw(_rrtmg_sw)
+#  Initialize absorption data
+_rrtmg_sw.climlab_rrtmg_sw_ini(const.cp)
 
 
 class RRTMG_SW(_Radiation_SW):
@@ -179,7 +178,6 @@ class RRTMG_SW(_Radiation_SW):
     def _compute_heating_rates(self):
         '''Prepare arguments and call the RRTGM_SW driver to calculate
         radiative fluxes and heating rates'''
-        #args = self._prepare_sw_arguments()
         (ncol, nlay, icld, iaer, permuteseed, irng,
          play, plev, tlay, tlev, tsfc,
          h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr,
@@ -188,37 +186,11 @@ class RRTMG_SW(_Radiation_SW):
          inflgsw, iceflgsw, liqflgsw,
          cldfrac, ciwp, clwp, reic, relq, tauc, ssac, asmc, fsfc,
          tauaer, ssaaer, asmaer, ecaer,) = self._prepare_sw_arguments()
-
-    # ! Call the Monte Carlo Independent Column Approximation
-        # cldfmcl = np.zeros((ngptsw,ncol,nlay), order='F')
-        # ciwpmcl = np.zeros((ngptsw,ncol,nlay), order='F')
-        # clwpmcl = np.zeros((ngptsw,ncol,nlay), order='F')
-        # reicmcl = np.zeros((ncol,nlay), order='F')
-        # relqmcl = np.zeros((ncol,nlay), order='F')
-        # taucmcl = np.zeros((ngptsw,ncol,nlay), order='F')
-        # ssacmcl = np.zeros((ngptsw,ncol,nlay), order='F')
-        # asmcmcl = np.zeros((ngptsw,ncol,nlay), order='F')
-        # fsfcmcl = np.zeros((ngptsw,ncol,nlay), order='F')
-        #_rrtmg_sw.climlab_mcica_subcol_sw(ncol, nlay, icld, permuteseed, irng, play,
-        #                   cldfrac, ciwp, clwp, reic, relq, tauc, ssac, asmc, fsfc,
-        #                   cldfmcl, ciwpmcl, clwpmcl, reicmcl, relqmcl, taucmcl,
-        #                   ssacmcl, asmcmcl, fsfcmcl)
+        #  Call the Monte Carlo Independent Column Approximation (McICA, Pincus et al., JC, 2003)
         (cldfmcl, ciwpmcl, clwpmcl, reicmcl, relqmcl, taucmcl,
         ssacmcl, asmcmcl, fsfcmcl) = _rrtmg_sw.climlab_mcica_subcol_sw(
                         ncol, nlay, icld, permuteseed, irng, play,
                         cldfrac, ciwp, clwp, reic, relq, tauc, ssac, asmc, fsfc)
-
-        # #  Initialize return arrays
-        # swuflx = np.zeros((ncol,nlay+1), order='F')
-        # swdflx = np.zeros((ncol,nlay+1), order='F')
-        # swhr = np.zeros((ncol,nlay), order='F')
-        # swuflxc = np.zeros((ncol,nlay+1), order='F')
-        # swdflxc = np.zeros((ncol,nlay+1), order='F')
-        # swhrc = np.zeros((ncol,nlay), order='F')
-
-        # bndsolvar = bndsolvar.astype('float64', order='F')
-        # indsolvar = indsolvar.astype('float64', order='F')
-        # print bndsolvar, indsolvar, solcycfrac
         #  Call the RRTMG_SW driver to compute radiative fluxes
         (swuflx  ,swdflx  ,swhr    ,swuflxc ,swdflxc ,swhrc,) = \
             _rrtmg_sw.climlab_rrtmg_sw(ncol    ,nlay    ,icld    ,iaer    ,
@@ -231,22 +203,6 @@ class RRTMG_SW(_Radiation_SW):
                 ciwpmcl ,clwpmcl ,reicmcl ,relqmcl ,
                 tauaer  ,ssaaer  ,asmaer  ,ecaer,
                 bndsolvar,indsolvar,solcycfrac)
-
-        # _rrtmg_sw.climlab_rrtmg_sw(
-        #      ncol    ,nlay    ,icld    ,iaer    ,
-        #      play    ,plev    ,tlay    ,tlev    ,tsfc   ,
-        #      h2ovmr , o3vmr   ,co2vmr  ,ch4vmr  ,n2ovmr ,o2vmr ,
-        #      asdir   ,asdif   ,aldir   ,aldif   ,
-        #      coszen  ,adjes   ,dyofyr  ,scon    ,isolvar,
-        #      inflgsw ,iceflgsw,liqflgsw,cldfmcl ,
-        #      taucmcl ,ssacmcl ,asmcmcl ,fsfcmcl ,
-        #      ciwpmcl ,clwpmcl ,reicmcl ,relqmcl ,
-        #      tauaer  ,ssaaer  ,asmaer  ,ecaer   ,
-        #      swuflx  ,swdflx  ,swhr    ,swuflxc ,swdflxc ,swhrc,
-        #      bndsolvar,indsolvar,solcycfrac
-        #      )
-        #  Call the RRTM code!
-        #swuflx, swdflx, swhr, swuflxc, swdflxc, swhrc = swdriver(*args)
         #  Output is all (ncol,nlay+1) or (ncol,nlay)
         self.SW_flux_up = _rrtm_to_climlab(swuflx)
         self.SW_flux_down = _rrtm_to_climlab(swdflx)

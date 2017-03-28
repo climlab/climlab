@@ -91,11 +91,6 @@
       call swaerpr               ! aerosol optical properties
       call swcldpr               ! cloud optical properties
       call swatmref              ! reference MLS profile
-      ! CLIMLAB these actually call modified subroutines from
-      ! rrtmg_sw_k_g_climlab.f90
-      ! to initialize just the solar variability data
-      !  All other fields are initialized by reading the data file rrtmg_sw.nc
-      !  which is implemented at Python level
       call sw_kgb16              ! molecular absorption coefficients
       call sw_kgb17
       call sw_kgb18
