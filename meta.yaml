@@ -1,6 +1,6 @@
 package:
   name: climlab
-  version: '0.5.1.dev0'
+  version: '0.5.1.dev1'
 
 source:
   git_url: https://github.com/brian-rose/climlab.git
