@@ -20,18 +20,18 @@
 !    the names of its contributors may be used to endorse or promote products
 !    derived from this software without specific prior written permission.
 !
-! THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
-! AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
-! IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
-! ARE DISCLAIMED. IN NO EVENT SHALL ATMOSPHERIC & ENVIRONMENTAL RESEARCH, INC., 
-! BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
-! CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
-! SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
-! INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
-! CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
-! ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF 
+! THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+! AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+! IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+! ARE DISCLAIMED. IN NO EVENT SHALL ATMOSPHERIC & ENVIRONMENTAL RESEARCH, INC.,
+! BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+! CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+! SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+! INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+! CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+! ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 ! THE POSSIBILITY OF SUCH DAMAGE.
-!                        (http://www.rtweb.aer.com/)                        
+!                        (http://www.rtweb.aer.com/)
 !----------------------------------------------------------------------------
 
 ! ------- Modules -------
@@ -65,9 +65,9 @@
              pbbfddir, pbbcddir, puvfddir, puvcddir, pnifddir, pnicddir)
 ! ---------------------------------------------------------------------------
 !
-! Purpose: Contains spectral loop to compute the shortwave radiative fluxes, 
+! Purpose: Contains spectral loop to compute the shortwave radiative fluxes,
 !          using the two-stream method of H. Barker and McICA, the Monte-Carlo
-!          Independent Column Approximation, for the representation of 
+!          Independent Column Approximation, for the representation of
 !          sub-grid cloud variability (i.e. cloud overlap).
 !
 ! Interface:  *spcvmc_sw* is called from *rrtmg_sw.F90* or rrtmg_sw.1col.F90*
@@ -86,12 +86,12 @@
 ! Revision: Bug fix to apply delta scaling to clear sky: AER, Dec 2004
 ! Revision: Code modified so that delta scaling is not done in cloudy profiles
 !           if routine cldprop is used; delta scaling can be applied by swithcing
-!           code below if cldprop is not used to get cloud properties. 
+!           code below if cldprop is not used to get cloud properties.
 !           AER, Jan 2005
 ! Revision: Modified to use McICA: MJIacono, AER, Nov 2005
-! Revision: Uniform formatting for RRTMG: MJIacono, AER, Jul 2006 
-! Revision: Use exponential lookup table for transmittance: MJIacono, AER, 
-!           Aug 2007 
+! Revision: Uniform formatting for RRTMG: MJIacono, AER, Jul 2006
+! Revision: Use exponential lookup table for transmittance: MJIacono, AER,
+!           Aug 2007
 !
 ! ------------------------------------------------------------------
 
@@ -122,7 +122,7 @@
       integer(kind=im), intent(in) :: jt1(:)
                                                                !   Dimensions: (nlayers)
 
-      real(kind=rb), intent(in) :: pavel(:)                    ! layer pressure (hPa, mb) 
+      real(kind=rb), intent(in) :: pavel(:)                    ! layer pressure (hPa, mb)
                                                                !   Dimensions: (nlayers)
       real(kind=rb), intent(in) :: tavel(:)                    ! layer temperature (K)
                                                                !   Dimensions: (nlayers)
@@ -131,7 +131,7 @@
       real(kind=rb), intent(in) :: tz(0:)                      ! level temperatures (hPa, mb)
                                                                !   Dimensions: (0:nlayers)
       real(kind=rb), intent(in) :: tbound                      ! surface temperature (K)
-      real(kind=rb), intent(in) :: wkl(:,:)                    ! molecular amounts (mol/cm2) 
+      real(kind=rb), intent(in) :: wkl(:,:)                    ! molecular amounts (mol/cm2)
                                                                !   Dimensions: (mxmol,nlayers)
       real(kind=rb), intent(in) :: coldry(:)                   ! dry air column density (mol/cm2)
                                                                !   Dimensions: (nlayers)
@@ -238,8 +238,8 @@
       integer(kind=im)  :: klev
       integer(kind=im) :: ib1, ib2, ibm, igt, ikl, ikp, ikx
       integer(kind=im) :: iw, jb, jg, jl, jk
-!      integer(kind=im), parameter :: nuv = ?? 
-!      integer(kind=im), parameter :: nvs = ?? 
+!      integer(kind=im), parameter :: nuv = ??
+!      integer(kind=im), parameter :: nvs = ??
       integer(kind=im) :: itind
 
       real(kind=rb) :: tblind, ze1
@@ -259,7 +259,7 @@
       real(kind=rb) :: ztra(nlayers+1), ztrac(nlayers+1), ztrao(nlayers+1)
       real(kind=rb) :: ztrad(nlayers+1), ztradc(nlayers+1), ztrado(nlayers+1)
       real(kind=rb) :: zdbtc(nlayers+1), ztdbtc(nlayers+1)
-      real(kind=rb) :: zincflx(ngptsw), zdbtc_nodel(nlayers+1) 
+      real(kind=rb) :: zincflx(ngptsw), zdbtc_nodel(nlayers+1)
       real(kind=rb) :: ztdbt_nodel(nlayers+1), ztdbtc_nodel(nlayers+1)
 
       real(kind=rb) :: zdbtmc, zdbtmo, zf, zgw, zreflect
@@ -323,10 +323,16 @@
                      isolvar, svar_f, svar_s, svar_i, &
                      svar_f_bnd, svar_s_bnd, svar_i_bnd, &
                      ssi, zsflxzen, ztaug, ztaur)
-
+      !CLIMLAB DEBUG
+      !print *, 'After taumol_sw, ztaug is'
+      !print *, ztaug
+      !print *, 'And ztaur is'
+      !print *, ztaur
 ! Top of shortwave spectral band loop, jb = 16 -> 29; ibm = 1 -> 14
 
       do jb = ib1, ib2
+        ! CLIMLAB DEBUG
+        print *, 'Looping through SW spectral bands. Current band is', jb
          ibm = jb-15
          igt = ngc(ibm)
 
@@ -340,22 +346,22 @@
 !           zbbfu(jk)=0.0_rb
 !        enddo
 
-! Top of g-point interval loop within each band (iw is cumulative counter) 
+! Top of g-point interval loop within each band (iw is cumulative counter)
          do jg = 1,igt
             iw = iw+1
 
 ! Apply adjustment for correct Earth/Sun distance and zenith angle to incoming solar flux
 ! No solar variability and no solar cycle
-            if (isolvar .lt. 0) then 
+            if (isolvar .lt. 0) then
                zincflx(iw) = adjflux(jb) * zsflxzen(iw) * prmu0
 !               zincflux = zincflux + adjflux(jb) * zsflxzen(iw) * prmu0           ! inactive
             endif
 ! Solar variability with averaged or specified solar cycle
-            if (isolvar .ge. 0) then 
+            if (isolvar .ge. 0) then
                zincflx(iw) = adjflux(jb) * ssi(iw) * prmu0
             endif
 
-! Compute layer reflectances and transmittances for direct and diffuse sources, 
+! Compute layer reflectances and transmittances for direct and diffuse sources,
 ! first clear then cloudy
 
 ! zrefc(jk)  direct albedo for clear
@@ -366,7 +372,7 @@
 ! ztrao(jk)  direct transmittance for cloudy
 ! ztradc(jk) diffuse transmittance for clear
 ! ztrado(jk) diffuse transmittance for cloudy
-!  
+!
 ! zref(jk)   direct reflectance
 ! zrefd(jk)  diffuse reflectance
 ! ztra(jk)   direct transmittance
@@ -377,8 +383,8 @@
 ! zdbt(jk)   layer mean direct beam transmittance
 ! ztdbt(jk)  total direct beam transmittance at levels
 
-! Clear-sky    
-!   TOA direct beam    
+! Clear-sky
+!   TOA direct beam
             ztdbtc(1)=1.0_rb
             ztdbtc_nodel(1)=1.0_rb
 !   Surface values
@@ -389,16 +395,16 @@
             zrefdc(klev+1)=palbd(ibm)
             zrupc(klev+1) =palbp(ibm)
             zrupdc(klev+1)=palbd(ibm)
-           
-! Cloudy-sky    
+
+! Cloudy-sky
 !   Surface values
             ztrao(klev+1) =0.0_rb
             ztrado(klev+1)=0.0_rb
             zrefo(klev+1) =palbp(ibm)
             zrefdo(klev+1)=palbd(ibm)
-           
-! Total sky    
-!   TOA direct beam    
+
+! Total sky
+!   TOA direct beam
             ztdbt(1)=1.0_rb
             ztdbt_nodel(1)=1.0_rb
 !   Surface values
@@ -409,11 +415,11 @@
             zrefd(klev+1)=palbd(ibm)
             zrup(klev+1) =palbp(ibm)
             zrupd(klev+1)=palbd(ibm)
-    
+
 ! Top of layer loop
             do jk=1,klev
 
-! Note: two-stream calculations proceed from top to bottom; 
+! Note: two-stream calculations proceed from top to bottom;
 !   RRTMG_SW quantities are given bottom to top and are reversed here
 
                ikl=klev+1-jk
@@ -426,12 +432,12 @@
                lrtchkcld(jk)=.false.
                lrtchkcld(jk)=(pcldfmc(ikl,iw) > repclc)
 
-! Clear-sky optical parameters - this section inactive     
+! Clear-sky optical parameters - this section inactive
 !   Original
 !               ztauc(jk) = ztaur(ikl,iw) + ztaug(ikl,iw)
 !               zomcc(jk) = ztaur(ikl,iw) / ztauc(jk)
 !               zgcc(jk) = 0.0001_rb
-!   Total sky optical parameters        
+!   Total sky optical parameters
 !               ztauo(jk) = ztaur(ikl,iw) + ztaug(ikl,iw) + ptaucmc(ikl,iw)
 !               zomco(jk) = ptaucmc(ikl,iw) * pomgcmc(ikl,iw) + ztaur(ikl,iw)
 !               zgco (jk) = (ptaucmc(ikl,iw) * pomgcmc(ikl,iw) * pasycmc(ikl,iw) + &
@@ -439,15 +445,22 @@
 !               zomco(jk) = zomco(jk) / ztauo(jk)
 
 ! Clear-sky optical parameters including aerosols
+               ! CLIMLAB DEBUG  the problem is that ztaug is zero ...
+               !print *, 'And now ztaur, ztaug, ptaua, pomga, pasya, zomcc'
+               !print *, ztaur(ikl,iw), ztaug(ikl,iw), ptaua(ikl,ibm), pomga(ikl,ibm), pasya(ikl,ibm), zomcc(jk)
                ztauc(jk) = ztaur(ikl,iw) + ztaug(ikl,iw) + ptaua(ikl,ibm)
                zomcc(jk) = ztaur(ikl,iw) * 1.0_rb + ptaua(ikl,ibm) * pomga(ikl,ibm)
                zgcc(jk) = pasya(ikl,ibm) * pomga(ikl,ibm) * ptaua(ikl,ibm) / zomcc(jk)
+               !CLIMLAB DEBUG ... and we end up dividing by zero here becuase ztauc is zero
+               !print *, 'ztauc is', ztauc(jk)
+               !print *, 'zomcc before is', zomcc(jk)
                zomcc(jk) = zomcc(jk) / ztauc(jk)
-
-! Pre-delta-scaling clear and cloudy direct beam transmittance (must use 'orig', unscaled cloud OD)       
+               !CLIMLAB DEBUG
+               !print *, 'zomcc after is', zomcc(jk)
+! Pre-delta-scaling clear and cloudy direct beam transmittance (must use 'orig', unscaled cloud OD)
 !   \/\/\/ This block of code is only needed for unscaled direct beam calculation
                if (idelm .eq. 0) then
-!     
+!
                   zclear = 1.0_rb - pcldfmc(ikl,iw)
                   zcloud = pcldfmc(ikl,iw)
 
@@ -458,7 +471,7 @@
                   ze1 = ztauc(jk) / prmu0
                   if (ze1 .le. od_lo) then
                      zdbtmc = 1._rb - ze1 + 0.5_rb * ze1 * ze1
-                  else 
+                  else
                      tblind = ze1 / (bpade + ze1)
                      itind = tblint * tblind + 0.5_rb
                      zdbtmc = exp_tbl(itind)
@@ -488,7 +501,9 @@
 !   /\/\/\ Above code only needed for unscaled direct beam calculation
 
 
-! Delta scaling - clear   
+! Delta scaling - clear
+                ! CLIMLAB DEBUG -- zgcc and zomcc have NaNs!
+                !print *, zgcc(jk), zomcc(jk), ztauc(jk)
                zf = zgcc(jk) * zgcc(jk)
                zwf = zomcc(jk) * zf
                ztauc(jk) = (1.0_rb - zwf) * ztauc(jk)
@@ -496,16 +511,16 @@
                zgcc (jk) = (zgcc(jk) - zf) / (1.0_rb - zf)
 
 ! Total sky optical parameters (cloud properties already delta-scaled)
-!   Use this code if cloud properties are derived in rrtmg_sw_cldprop       
+!   Use this code if cloud properties are derived in rrtmg_sw_cldprop
                if (icpr .ge. 1) then
                   ztauo(jk) = ztauc(jk) + ptaucmc(ikl,iw)
-                  zomco(jk) = ztauc(jk) * zomcc(jk) + ptaucmc(ikl,iw) * pomgcmc(ikl,iw) 
+                  zomco(jk) = ztauc(jk) * zomcc(jk) + ptaucmc(ikl,iw) * pomgcmc(ikl,iw)
                   zgco (jk) = (ptaucmc(ikl,iw) * pomgcmc(ikl,iw) * pasycmc(ikl,iw) + &
                               ztauc(jk) * zomcc(jk) * zgcc(jk)) / zomco(jk)
                   zomco(jk) = zomco(jk) / ztauo(jk)
 
 ! Total sky optical parameters (if cloud properties not delta scaled)
-!   Use this code if cloud properties are not derived in rrtmg_sw_cldprop       
+!   Use this code if cloud properties are not derived in rrtmg_sw_cldprop
                elseif (icpr .eq. 0) then
                   ztauo(jk) = ztaur(ikl,iw) + ztaug(ikl,iw) + ptaua(ikl,ibm) + ptaucmc(ikl,iw)
                   zomco(jk) = ptaua(ikl,ibm) * pomga(ikl,ibm) + ptaucmc(ikl,iw) * pomgcmc(ikl,iw) + &
@@ -514,24 +529,25 @@
                               ptaua(ikl,ibm)*pomga(ikl,ibm)*pasya(ikl,ibm)) / zomco(jk)
                   zomco(jk) = zomco(jk) / ztauo(jk)
 
-! Delta scaling - clouds 
+! Delta scaling - clouds
 !   Use only if subroutine rrtmg_sw_cldprop is not used to get cloud properties and to apply delta scaling
                   zf = zgco(jk) * zgco(jk)
                   zwf = zomco(jk) * zf
                   ztauo(jk) = (1._rb - zwf) * ztauo(jk)
                   zomco(jk) = (zomco(jk) - zwf) / (1.0_rb - zwf)
                   zgco (jk) = (zgco(jk) - zf) / (1.0_rb - zf)
-               endif 
+               endif
 
 ! End of layer loop
-            enddo    
-
+            enddo
+            !CLIMLAB DEBUG
+            !print *, 'Before call to reftra_sw, ztauc is', ztauc
 ! Clear sky reflectivities
             call reftra_sw (klev, &
                             lrtchkclr, zgcc, prmu0, ztauc, zomcc, &
                             zrefc, zrefdc, ztrac, ztradc)
 
-! Total sky reflectivities      
+! Total sky reflectivities
             call reftra_sw (klev, &
                             lrtchkcld, zgco, prmu0, ztauo, zomco, &
                             zrefo, zrefdo, ztrao, ztrado)
@@ -539,7 +555,7 @@
             do jk=1,klev
 
 ! Combine clear and cloudy contributions for total sky
-               ikl = klev+1-jk 
+               ikl = klev+1-jk
                zclear = 1.0_rb - pcldfmc(ikl,iw)
                zcloud = pcldfmc(ikl,iw)
 
@@ -548,13 +564,14 @@
                ztra(jk) = zclear*ztrac(jk) + zcloud*ztrao(jk)
                ztrad(jk)= zclear*ztradc(jk) + zcloud*ztrado(jk)
 
-! Direct beam transmittance        
+! Direct beam transmittance
 
 ! Clear
 !                zdbtmc = exp(-ztauc(jk) / prmu0)
 
-! Use exponential lookup table for transmittance, or expansion of 
+! Use exponential lookup table for transmittance, or expansion of
 ! exponential for low tau
+              ! CLIMLAB DEBUG  THE PROBLEM IS IN THIS BLOCK vvv
                ze1 = ztauc(jk) / prmu0
                if (ze1 .le. od_lo) then
                   zdbtmc = 1._rb - ze1 + 0.5_rb * ze1 * ze1
@@ -563,6 +580,9 @@
                   itind = tblint * tblind + 0.5_rb
                   zdbtmc = exp_tbl(itind)
                endif
+               ! CLIMLAB DEBUG  THE PROBLEM IS IN THIS BLOCK ^^^
+               !  and it is becuase we divide by ze1 which is NaN!
+               !  BECAUSE ztauc(jk) is Nan!
 
                zdbtc(jk) = zdbtmc
                ztdbtc(jk+1) = zdbtc(jk)*ztdbtc(jk)
@@ -570,7 +590,7 @@
 ! Clear + Cloud
 !                zdbtmo = exp(-ztauo(jk) / prmu0)
 
-! Use exponential lookup table for transmittance, or expansion of 
+! Use exponential lookup table for transmittance, or expansion of
 ! exponential for low tau
                ze1 = ztauo(jk) / prmu0
                if (ze1 .le. od_lo) then
@@ -583,16 +603,16 @@
 
                zdbt(jk) = zclear*zdbtmc + zcloud*zdbtmo
                ztdbt(jk+1) = zdbt(jk)*ztdbt(jk)
-        
-            enddo           
-                 
+
+            enddo
+
 ! Vertical quadrature for clear-sky fluxes
 
             call vrtqdr_sw(klev, iw, &
                            zrefc, zrefdc, ztrac, ztradc, &
                            zdbtc, zrdndc, zrupc, zrupdc, ztdbtc, &
                            zcd, zcu)
-      
+
 ! Vertical quadrature for cloudy fluxes
 
             call vrtqdr_sw(klev, iw, &
@@ -601,26 +621,26 @@
                            zfd, zfu)
 
 ! Upwelling and downwelling fluxes at levels
-!   Two-stream calculations go from top to bottom; 
+!   Two-stream calculations go from top to bottom;
 !   layer indexing is reversed to go bottom to top for output arrays
 
             do jk=1,klev+1
                ikl=klev+2-jk
 
 ! Accumulate spectral fluxes over bands - inactive
-!               zbbfu(ikl) = zbbfu(ikl) + zincflx(iw)*zfu(jk,iw)  
+!               zbbfu(ikl) = zbbfu(ikl) + zincflx(iw)*zfu(jk,iw)
 !               zbbfd(ikl) = zbbfd(ikl) + zincflx(iw)*zfd(jk,iw)
 !               zbbcu(ikl) = zbbcu(ikl) + zincflx(iw)*zcu(jk,iw)
 !               zbbcd(ikl) = zbbcd(ikl) + zincflx(iw)*zcd(jk,iw)
 !               zbbfddir(ikl) = zbbfddir(ikl) + zincflx(iw)*ztdbt_nodel(jk)
 !               zbbcddir(ikl) = zbbcddir(ikl) + zincflx(iw)*ztdbtc_nodel(jk)
 
-! Accumulate spectral fluxes over whole spectrum  
+! Accumulate spectral fluxes over whole spectrum
                pbbfu(ikl) = pbbfu(ikl) + zincflx(iw)*zfu(jk,iw)
                pbbfd(ikl) = pbbfd(ikl) + zincflx(iw)*zfd(jk,iw)
                pbbcu(ikl) = pbbcu(ikl) + zincflx(iw)*zcu(jk,iw)
                pbbcd(ikl) = pbbcd(ikl) + zincflx(iw)*zcd(jk,iw)
-               if (idelm .eq. 0) then 
+               if (idelm .eq. 0) then
                   pbbfddir(ikl) = pbbfddir(ikl) + zincflx(iw)*ztdbt_nodel(jk)
                   pbbcddir(ikl) = pbbcddir(ikl) + zincflx(iw)*ztdbtc_nodel(jk)
                elseif (idelm .eq. 1) then
@@ -632,7 +652,7 @@
                if (ibm >= 10 .and. ibm <= 13) then
                   puvcd(ikl) = puvcd(ikl) + zincflx(iw)*zcd(jk,iw)
                   puvfd(ikl) = puvfd(ikl) + zincflx(iw)*zfd(jk,iw)
-                  if (idelm .eq. 0) then 
+                  if (idelm .eq. 0) then
                      puvfddir(ikl) = puvfddir(ikl) + zincflx(iw)*ztdbt_nodel(jk)
                      puvcddir(ikl) = puvcddir(ikl) + zincflx(iw)*ztdbtc_nodel(jk)
                   elseif (idelm .eq. 1) then
@@ -640,10 +660,10 @@
                      puvcddir(ikl) = puvcddir(ikl) + zincflx(iw)*ztdbtc(jk)
                   endif
 ! Accumulate direct fluxes for near-IR bands
-               else if (ibm == 14 .or. ibm <= 9) then  
+               else if (ibm == 14 .or. ibm <= 9) then
                   pnicd(ikl) = pnicd(ikl) + zincflx(iw)*zcd(jk,iw)
                   pnifd(ikl) = pnifd(ikl) + zincflx(iw)*zfd(jk,iw)
-                  if (idelm .eq. 0) then 
+                  if (idelm .eq. 0) then
                      pnifddir(ikl) = pnifddir(ikl) + zincflx(iw)*ztdbt_nodel(jk)
                      pnicddir(ikl) = pnicddir(ikl) + zincflx(iw)*ztdbtc_nodel(jk)
                   elseif (idelm .eq. 1) then
@@ -655,13 +675,11 @@
             enddo
 
 ! End loop on jg, g-point interval
-         enddo             
+         enddo
 
 ! End loop on jb, spectral band
-      enddo                    
+      enddo
 
       end subroutine spcvmc_sw
 
       end module rrtmg_sw_spcvmc
-
-

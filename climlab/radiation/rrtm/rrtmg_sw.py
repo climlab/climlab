@@ -220,7 +220,6 @@ class RRTMG_SW(_Radiation_SW):
         # indsolvar = indsolvar.astype('float64', order='F')
         # print bndsolvar, indsolvar, solcycfrac
         #  Call the RRTMG_SW driver to compute radiative fluxes
-        print tauaer.shape
         (swuflx  ,swdflx  ,swhr    ,swuflxc ,swdflxc ,swhrc,) = \
             _rrtmg_sw.climlab_rrtmg_sw(ncol    ,nlay    ,icld    ,iaer    ,
                 play    ,plev    ,tlay    ,tlev    ,tsfc   ,
@@ -230,7 +229,8 @@ class RRTMG_SW(_Radiation_SW):
                 inflgsw ,iceflgsw,liqflgsw,cldfmcl ,
                 taucmcl ,ssacmcl ,asmcmcl ,fsfcmcl ,
                 ciwpmcl ,clwpmcl ,reicmcl ,relqmcl ,
-                tauaer  ,ssaaer  ,asmaer  ,ecaer )
+                tauaer  ,ssaaer  ,asmaer  ,ecaer,
+                bndsolvar,indsolvar,solcycfrac)
 
         # _rrtmg_sw.climlab_rrtmg_sw(
         #      ncol    ,nlay    ,icld    ,iaer    ,

@@ -12,10 +12,10 @@
 
 subroutine climlab_rrtmg_sw_ini(cpdair)
     ! Modules
-    !use parkind, only : rb => kind_rb
+    use parkind, only : rb => kind_rb
     use rrtmg_sw_init, only: rrtmg_sw_ini
     ! Input
-    integer, parameter :: rb = selected_real_kind(12)
+    !integer, parameter :: rb = selected_real_kind(12)
     real(kind=rb), intent(in) :: cpdair    ! Specific heat capacity of dry air
                                             ! at constant pressure at 273 K
                                             ! (J kg-1 K-1)
@@ -100,6 +100,7 @@ subroutine climlab_rrtmg_sw &
     taucmcl ,ssacmcl ,asmcmcl ,fsfcmcl , &
     ciwpmcl ,clwpmcl ,reicmcl ,relqmcl , &
     tauaer  ,ssaaer  ,asmaer  ,ecaer   , &
+    bndsolvar,indsolvar,solcycfrac, &
     swuflx, swdflx, swhr, swuflxc, swdflxc, swhrc)
 
 ! Modules
@@ -190,16 +191,16 @@ subroutine climlab_rrtmg_sw &
                                                     !        scaled to scon and solar variability defined
                                                     !        (optional) by setting non-zero scale factors
                                                     !        for each band in bndsolvar
-    ! real(kind=rb), intent(inout), optional :: indsolvar(2) ! Facular and sunspot amplitude
-    !                                           ! scale factors (isolvar=1), or
-    !                                           ! Mg and SB indices (isolvar=2)
-    !                                           !    Dimensions: (2)
-    ! real(kind=rb), intent(inout), optional :: bndsolvar(nbndsw) ! Solar variability scale factors
-    !                                                ! for each shortwave band
-    !                                                !    Dimensions: (nbndsw=14)
-    ! real(kind=rb), intent(inout), optional :: solcycfrac   ! Fraction of averaged solar cycle (0-1)
-    !                                           !    at current time (isolvar=1)
-    !
+    real(kind=rb), intent(inout) :: indsolvar(2) ! Facular and sunspot amplitude
+                                              ! scale factors (isolvar=1), or
+                                              ! Mg and SB indices (isolvar=2)
+                                              !    Dimensions: (2)
+    real(kind=rb), intent(inout) :: bndsolvar(nbndsw) ! Solar variability scale factors
+                                                   ! for each shortwave band
+                                                   !    Dimensions: (nbndsw=14)
+    real(kind=rb), intent(inout) :: solcycfrac   ! Fraction of averaged solar cycle (0-1)
+                                              !    at current time (isolvar=1)
+
     integer(kind=im), intent(in) :: inflgsw         ! Flag for cloud optical properties
     integer(kind=im), intent(in) :: iceflgsw        ! Flag for ice particle specification
     integer(kind=im), intent(in) :: liqflgsw        ! Flag for liquid droplet specification
@@ -239,6 +240,7 @@ subroutine climlab_rrtmg_sw &
 !f2py depend(ncol,nlay) play, plev, tlay, tlev
 !f2py depend(ncol,nlay) h2ovmr,o3vmr,co2vmr,ch4vmr,n2ovmr,o2vmr
 !f2py depend(ncol) tsfc, aldif, aldir, asdif, asdir, coszen
+!f2py depend(ncol,nlay) tauaer,ssaaer,asmaer,ecaer
 !f2py depend(ncol,nlay) reicmcl,relqmcl
 !f2py depend(ncol,nlay) cldfmcl,ciwpmcl,clwpmcl,taucmcl,ssacmcl,asmcmcl,fsfcmcl
 !f2py depend(ncol,nlay) swuflx,swdflx,swhr,swuflxc,swdflxc,swhrc
@@ -253,6 +255,7 @@ subroutine climlab_rrtmg_sw &
               taucmcl ,ssacmcl ,asmcmcl ,fsfcmcl , &
               ciwpmcl ,clwpmcl ,reicmcl ,relqmcl , &
               tauaer  ,ssaaer  ,asmaer  ,ecaer   , &
-              swuflx  ,swdflx  ,swhr    ,swuflxc ,swdflxc ,swhrc)
+              swuflx  ,swdflx  ,swhr    ,swuflxc ,swdflxc ,swhrc, &
+              bndsolvar,indsolvar,solcycfrac)
 
 end subroutine climlab_rrtmg_sw

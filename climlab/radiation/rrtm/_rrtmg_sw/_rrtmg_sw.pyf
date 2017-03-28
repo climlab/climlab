@@ -422,7 +422,8 @@ python module _rrtmg_sw ! in
         end module rrsw_ncpar
         subroutine climlab_rrtmg_sw_ini(cpdair) ! in :_rrtmg_sw:Driver.f90
             use rrtmg_sw_init, only: rrtmg_sw_ini
-            real(kind=8) intent(in) :: cpdair
+            use parkind, only: rb=>kind_rb
+            real(kind=rb) intent(in) :: cpdair
         end subroutine climlab_rrtmg_sw_ini
         subroutine climlab_mcica_subcol_sw(ncol,nlay,icld,permuteseed,irng,play,cldfrac,ciwp,clwp,reic,relq,tauc,ssac,asmc,fsfc,cldfmcl,ciwpmcl,clwpmcl,reicmcl,relqmcl,taucmcl,ssacmcl,asmcmcl,fsfcmcl) ! in :_rrtmg_sw:Driver.f90
             use parrrsw, only: naerec,ngptsw,nbndsw
@@ -453,12 +454,12 @@ python module _rrtmg_sw ! in
             real(kind=8) dimension(112,ncol,nlay),intent(out),depend(ncol,nlay) :: asmcmcl
             real(kind=8) dimension(112,ncol,nlay),intent(out),depend(ncol,nlay) :: fsfcmcl
         end subroutine climlab_mcica_subcol_sw
-        subroutine climlab_rrtmg_sw(ncol,nlay,icld,iaer,play,plev,tlay,tlev,tsfc,h2ovmr,o3vmr,co2vmr,ch4vmr,n2ovmr,o2vmr,asdir,asdif,aldir,aldif,coszen,adjes,dyofyr,scon,isolvar,inflgsw,iceflgsw,liqflgsw,cldfmcl,taucmcl,ssacmcl,asmcmcl,fsfcmcl,ciwpmcl,clwpmcl,reicmcl,relqmcl,tauaer,ssaaer,asmaer,ecaer,swuflx,swdflx,swhr,swuflxc,swdflxc,swhrc) ! in :_rrtmg_sw:Driver.f90
+        subroutine climlab_rrtmg_sw(ncol,nlay,icld,iaer,play,plev,tlay,tlev,tsfc,h2ovmr,o3vmr,co2vmr,ch4vmr,n2ovmr,o2vmr,asdir,asdif,aldir,aldif,coszen,adjes,dyofyr,scon,isolvar,inflgsw,iceflgsw,liqflgsw,cldfmcl,taucmcl,ssacmcl,asmcmcl,fsfcmcl,ciwpmcl,clwpmcl,reicmcl,relqmcl,tauaer,ssaaer,asmaer,ecaer,bndsolvar,indsolvar,solcycfrac,swuflx,swdflx,swhr,swuflxc,swdflxc,swhrc) ! in :_rrtmg_sw:Driver.f90
             use parrrsw, only: naerec,ngptsw,nbndsw
             use parkind, only: im=>kind_im
             use rrtmg_sw_rad, only: rrtmg_sw
-            integer(kind=im), optional,intent(in),check(shape(tauaer,0)==ncol),depend(tauaer) :: ncol=shape(tauaer,0)
-            integer(kind=im), optional,intent(in),check(shape(tauaer,1)==nlay),depend(tauaer) :: nlay=shape(tauaer,1)
+            integer(kind=im) intent(in) :: ncol
+            integer(kind=im) intent(in) :: nlay
             integer(kind=im) intent(inout) :: icld
             integer(kind=im) intent(inout) :: iaer
             real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: play
@@ -493,10 +494,13 @@ python module _rrtmg_sw ! in
             real(kind=8) dimension(112,ncol,nlay),intent(in),depend(ncol,nlay) :: clwpmcl
             real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: reicmcl
             real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: relqmcl
-            real(kind=8) dimension(ncol,nlay,14),intent(in) :: tauaer
+            real(kind=8) dimension(ncol,nlay,14),intent(in),depend(ncol,nlay) :: tauaer
             real(kind=8) dimension(ncol,nlay,14),intent(in),depend(ncol,nlay) :: ssaaer
             real(kind=8) dimension(ncol,nlay,14),intent(in),depend(ncol,nlay) :: asmaer
             real(kind=8) dimension(ncol,nlay,6),intent(in),depend(ncol,nlay) :: ecaer
+            real(kind=8) dimension(14),intent(inout) :: bndsolvar
+            real(kind=8) dimension(2),intent(inout) :: indsolvar
+            real(kind=8) intent(inout) :: solcycfrac
             real(kind=8) dimension(ncol,nlay + 1),intent(out),depend(ncol,nlay) :: swuflx
             real(kind=8) dimension(ncol,nlay + 1),intent(out),depend(ncol,nlay) :: swdflx
             real(kind=8) dimension(ncol,nlay),intent(out),depend(ncol,nlay) :: swhr
