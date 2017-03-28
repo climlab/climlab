@@ -10,7 +10,7 @@ def init_lw(fort, cp=const.cp):
 
 def init_sw(fort, cp=const.cp):
     '''Initialization of the RRTMG_SW fortran module.'''
-    read_sw_abs_data(fort)
+    #read_sw_abs_data(fort)
     fort.climlab_rrtmg_sw_ini(cp)
 
 def name(bandNumber):
