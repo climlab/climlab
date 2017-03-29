@@ -3,20 +3,14 @@ def configuration(parent_package='', top_path=None):
     from numpy.distutils.misc_util import Configuration
     from numpy.distutils import fcompiler
 
-    #  Set default compiler flags
-    cppflags = ''
-    f77flags = ''
-    f90flags = ''
     # figure out which compiler we're going to use
     compiler = fcompiler.get_default_fcompiler()
-    # set some fortran compiler-dependent flags (following CliMT code here)
+    # set some fortran compiler-dependent flags
     if compiler == 'gnu95':
-        f77flags=['-ffixed-line-length-132', '-fdefault-real-8']
-        f90flags=['-fdefault-real-8', '-fno-range-check', '-ffree-form', '-O0']
-        #f90flags=['-fdefault-real-8']
+        f90flags=['-fno-range-check', '-ffree-form', '-O0']
     elif compiler == 'intel' or compiler == 'intelem':
-        f77flags='-132 -r8'
-        f90flags='-132 -r8'
+        #f90flags=['-132', '-r8', '-O0']
+        f90flags=['-132', '-O0']
     print f90flags
 
     sourcelist = ['_rrtmg_sw.pyf',
