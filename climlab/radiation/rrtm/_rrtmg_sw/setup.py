@@ -57,7 +57,8 @@ def configuration(parent_package='', top_path=None):
                          extra_f90_compile_args=f90flags,
                          #f2py_options=['-c',],
                          )
-    config.add_data_files(os.path.join('rrtmg_sw_v4.0', 'gcm_model', 'data', 'rrtmg_sw.nc'))
+    #  Not currently initializing from nc data file, so there's no reason to include it
+    #config.add_data_files(os.path.join('rrtmg_sw_v4.0', 'gcm_model', 'data', 'rrtmg_sw.nc'))
 
     return config
 
