@@ -54,7 +54,8 @@ Links
 Installation
 ----------------
 Currently the only way to install is to build from source.
-To get the latest stable version, do
+
+You can download a tarball of the latest stable source by clicking the pypi badge above! Or get the source from github with
 
 ``git clone https://github.com/brian-rose/climlab.git``
 
@@ -62,15 +63,11 @@ Then from the `climlab` directory, do
 
 ``python setup.py install``
 
-    or, if you are developing new code
-
-``python setup.py develop``
-
 This will trigger the build process for the Fortran components,
 assuming you have a Fortran compiler available on your system.
 
 The Fortran compiler is necessary for the CAM3 and RRTMG radiation modules.
-Other `climlab` components will be fully functional without it.
+
 
 Dependencies
 -----------------
@@ -79,11 +76,11 @@ Required
 - Python 2.7
 - numpy
 - scipy
+- netCDF4 Python package (for data i/o)
+- a Fortran compiler (for building from source; tested with both gcc/gfortran and ifort)
 
 Recommended for full functionality
 ~~~~~~~~~~~~
-- a Fortran compiler (tested with both gcc/gfortran and ifort)
-- netCDF4 Python package (for data i/o)
 - numba Python package (used for acceleration of some components)
 
 Anaconda Python is highly recommended and will provide everything you need.
@@ -133,6 +130,9 @@ and numerous enhancements and simplifications to the API.
 
 Version 0.5 (released March 2017) provides bug fixes and full functionality for the RRTMG module,
 an improved common API for all radiation modules, and better documentation.
+
+Version 0.5.2 (released late March 2017) provides many under-the-hood improvements to the build procedure,
+which should make it much easier to get `climlab` installed on user machines. Binary distribution with `conda` is coming soon!
 
 The documentation_ was first created by Moritz Kreuzer (Potsdam Institut for Climate Impact Research) as part of a thesis project in Spring 2016.
 
