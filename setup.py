@@ -45,4 +45,3 @@ if __name__ == '__main__':
           license='MIT',
           configuration=configuration,
           )
->>>>>>> c00fb86a92a58f20b6c041d31505831aaee803ea
