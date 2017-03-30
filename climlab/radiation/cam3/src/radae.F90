@@ -684,6 +684,7 @@ subroutine radabs(pcols, pver, pverp,            &
 !
             tpatha = abs(tcg(i,k1) - tcg(i,k2))/dw(i)
             t_p = min(max(tpatha, min_tp_h2o), max_tp_h2o)
+            ! CLIMLAB is this line causing conversion problems?
             iest = floor(t_p) - min_tp_h2o
             esx = estblh2o(iest) + (estblh2o(iest+1)-estblh2o(iest)) * &
                  (t_p - min_tp_h2o - iest)
@@ -1270,6 +1271,7 @@ subroutine radabs(pcols, pver, pverp,            &
             pnew(i)  = u(i)/(winpl(i,kn)*dw(i))
             pnew_mks  = pnew(i) * sslp_mks
             t_p = min(max(tbar(i,kn), min_tp_h2o), max_tp_h2o)
+            ! CLIMLAB is this line causing conversion problems?
             iest = floor(t_p) - min_tp_h2o
             esx = estblh2o(iest) + (estblh2o(iest+1)-estblh2o(iest)) * &
                  (t_p - min_tp_h2o - iest)
@@ -2080,6 +2082,7 @@ subroutine radems(pcols, pver, pverp,                           &
 !
          tpathe   = tcg(i,k1)/w(i,k1)
          t_p = min(max(tpathe, min_tp_h2o), max_tp_h2o)
+         ! CLIMLAB is this line causing conversion problems?
          iest = floor(t_p) - min_tp_h2o
          esx = estblh2o(iest) + (estblh2o(iest+1)-estblh2o(iest)) * &
                (t_p - min_tp_h2o - iest)

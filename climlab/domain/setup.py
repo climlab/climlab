@@ -1,14 +1,9 @@
-#!/usr/bin/env python
 from __future__ import division, print_function
-import os
 
 
 def configuration(parent_package='',top_path=None):
     from numpy.distutils.misc_util import Configuration
-    config = Configuration('radiation', parent_package, top_path)
-    config.add_subpackage('rrtm')
-    config.add_subpackage('cam3')
-    config.add_data_files(os.path.join('data','ozone','apeozone_cam3_5_54.nc'))
+    config = Configuration(package_name='domain', parent_name=parent_package, top_path=top_path)
     #config.make_config_py() # installs __config__.py
     return config
 

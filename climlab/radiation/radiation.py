@@ -123,7 +123,7 @@ def default_absorbers(Tatm, ozone_file = 'apeozone_cam3_5_54.nc'):
     absorber_vmr['CFC22'] = 0.
     absorber_vmr['CCL4']  = 0.
 
-    datadir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data', 'ozone'))
+    datadir = os.path.join(os.path.dirname(__file__), 'data', 'ozone')
     ozonefilepath = os.path.join(datadir, ozone_file)
     #  Open the ozone data file
     print 'Getting ozone data from', ozonefilepath
