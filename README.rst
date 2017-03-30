@@ -156,8 +156,8 @@ See the accompanying LICENSE file.
     :target: https://travis-ci.org/brian-rose/climlab
 .. |coverage| image:: https://codecov.io/github/brian-rose/climlab/coverage.svg?branch=master
    :target: https://codecov.io/github/brian-rose/climlab?branch=master
-.. |DOI| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.163527.svg
-   :target: https://doi.org/10.5281/zenodo.163527
+.. |DOI| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.439131.svg
+   :target: https://doi.org/10.5281/zenodo.439131
 .. |docs| image:: http://readthedocs.org/projects/climlab/badge/?version=latest
    :target: http://climlab.readthedocs.io/en/latest/intro.html
    :alt: Documentation Status
