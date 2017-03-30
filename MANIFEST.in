@@ -1,0 +1,12 @@
+include MANIFEST.in
+include LICENSE
+recursive-include licenses *
+include *.txt
+include README.rst
+include .coveragerc
+include *.yml
+include *.yaml
+include *.sh
+recursive-include docs *
+prune docs/build
+global-exclude *.pyc *.pyo *.pyd
