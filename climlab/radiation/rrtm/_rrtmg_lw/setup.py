@@ -45,7 +45,7 @@ def configuration(parent_package='', top_path=None):
                   'rrtmg_lw_v4.85/gcm_model/modules/rrlw_wvn.f90',
                   'rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_k_g.f90',
                   'rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_taumol.f90',
-                  'rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_setcoef.f90',
+                  'sourcemods/rrtmg_lw_setcoef.f90',
                   'rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_rtrnmc.f90',
                   'rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_cldprmc.f90',
                   'rrtmg_lw_v4.85/gcm_model/src/mcica_random_numbers.f90',
