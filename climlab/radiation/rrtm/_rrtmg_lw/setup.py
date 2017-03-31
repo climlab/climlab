@@ -14,6 +14,8 @@ def configuration(parent_package='', top_path=None):
         f90flags.append('-132')
     #  Need zero-level optimization to avoid build problems with rrtmg_lw_k_g.f90
     f90flags.append('-O0')
+    #  Suppress all compiler warnings (avoid huge CI log files)
+    f90flags.append('-w')
 
     sourcelist = ['_rrtmg_lw.pyf',
                   'rrtmg_lw_v4.85/gcm_model/modules/parkind.f90',

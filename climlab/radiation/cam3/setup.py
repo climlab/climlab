@@ -12,6 +12,8 @@ def configuration(parent_package='', top_path=None):
     elif compiler == 'intel' or compiler == 'intelem':
         f90flags.append('-132')
         f90flags.append('-r8')
+    #  Suppress all compiler warnings (avoid huge CI log files)
+    f90flags.append('-w')
 
     sourcelist = ['_cam3.pyf',
                 'src/pmgrid.F90',
