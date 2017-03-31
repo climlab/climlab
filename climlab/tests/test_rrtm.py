@@ -49,6 +49,31 @@ def test_multidim():
     rad.step_forward()
     assert rad.OLR.shape == rad.Ts.shape
 
+def test_cloud():
+    '''Put a high cloud layer in a radiative model.
+    The all-sky ASR should be lower than clear-sky ASR.
+    The all-sky OLR should be lower than clear-sky OLR.'''
+    #  State variables (Air and surface temperature)
+    state = climlab.column_state(num_lev=50, water_depth=1.)
+    lev = state.Tatm.domain.axes['lev'].points
+    #  Define some local cloud characteristics
+    cldfrac = 0.5  # layer cloud fraction
+    r_liq = 14.  # Cloud water drop effective radius (microns)
+    clwp = 60.  # in-cloud liquid water path (g/m2)
+    #  The cloud fraction is a Gaussian bump centered at level i
+    i = 25
+    mycloud = {'cldfrac': cldfrac*np.exp(-(lev-lev[i])**2/(2*25.)**2),
+               'clwp': np.zeros_like(state.Tatm) + clwp,
+               'r_liq': np.zeros_like(state.Tatm) + r_liq,}
+    #  Test both RRTMG and CAM3:
+    #for module in [climlab.radiation.RRTMG, climlab.radiation.CAM3]:
+    #  Apparently clouds in CAM3 are not working. Save this for later
+    for module in [climlab.radiation.RRTMG]:
+        rad = module(state=state, **mycloud)
+        rad.compute_diagnostics()
+        assert(rad.ASR - rad.ASRclr < 0.)
+        assert(rad.OLR - rad.OLRclr < 0.)
+
 def test_radiative_forcing():
     '''Run a single-column radiative-convective model with RRTMG radiation
     out to equilibrium. Clone the model, double CO2 and measure the instantaneous

@@ -1,0 +1,887 @@
+C     path:      $Source: /storm/rc1/cvsroot/rc/rrtmg_lw/doc/rrtmg_lw_instructions.txt,v $
+C     author:    $Author: mike $
+C     revision:  $Revision: 1.4 $
+C     created:   $Date: 2009/11/12 20:52:24 $
+!------------------------------------------------------------------------
+!
+!  --------------------------------------------------------------------------
+! |                                                                          |
+! |  Copyright 2002-2009, Atmospheric & Environmental Research, Inc. (AER).  |
+! |  This software may be used, copied, or redistributed as long as it is    |
+! |  not sold and this copyright notice is reproduced on each copy made.     |
+! |  This model is provided as is without any express or implied warranties. |
+! |                       (http://www.rtweb.aer.com/)                        |
+! |                                                                          |
+!  --------------------------------------------------------------------------
+ 
+
+
+
+
+
+
+
+                           USER INSTRUCTIONS FOR RRTMG_LW
+ 
+
+
+
+
+      Contents:
+            1. Instructions for INPUT_RRTM
+            2. Instructions for IN_CLD_RRTM
+            3. Instructions for IN_AER_RRTM
+
+ 
+ 
+
+ INPUT_RRTM Instructions
+-------------------------
+
+ RECORD 1.1
+ 
+      CXID:  80 characters of user identification  (80A1)
+ 
+            CXID(1) is the flag which determines program initialization and termination.  
+                    The actual input data stream for RRTM commences with the record 
+                    containing a '$' in CXID(1).  Any records that are read prior to a 
+                    record containing a '$' in CXID(1) are ignored.
+
+ RECORD 1.2
+ 
+      IAER,    IATM,  IXSECT, NUMANGS,   IOUT,  IDRV,  IMCA, ICLD
+ 
+        20,      50,      70,   84-85,  88-90,    92,    94,   95   
+ 
+   18x, I2, 29X, I1, 19X, I1, 13X, I2, 2X, I3, 1X,I1,1X, I1,   I1
+ 
+ 
+	  IAER   (0,10)   flag for aerosols
+                  = 0   no layers contain aerosols
+                  = 10  one or more layers contain aerosols (only absorption is treated)
+                       (requires the presence of file IN_AER_RRTM)
+
+	  IATM   (0,1)   flag for RRTATM    1 = yes
+
+	  IXSECT (0,1) flag for cross-sections
+                  = 0  no cross-sections included in calculation
+                  = 1  cross-sections included in calculation
+
+          NUMANGS = 0  radiance will be computed at 1 angle, the cosine of which
+                       equals 1/1.66 (standard diffusivity angle approximation)
+                       (default and only option available)
+
+	  IOUT = -1 if no output is to be printed out.
+	       =  0 if the only output is for 10-3250 cm-1.
+	       =  n (n = 1-16) if the only output is from band n.
+		    For the wavenumbers for each band, see Table I.
+	       = 99 if output is generated for 17 spectral intervals, one
+		    for the full longwave spectrum (10-3250 cm-1), and one 
+		    for each of the 16 bands.
+ 
+	  IDRV   (0,1) flag for applying optional adjustment to the upward flux at
+                       each layer based on the derivative of the Planck function 
+                       with respect to temperature for the change in surface 
+                       temperature (DTBOUND) provided on record 1.4.1 relative to
+                       the surface temperature (TBOUND) provided on record 1.4
+                  = 0  standard forward calculation; do not apply derivative 
+                       adjustment (default)
+                  = 1  adjust upward flux at each layer based on derivative of 
+                       the Planck function to account for the change in surface
+		       temperature defined by DTBOUND
+
+	  IMCA   (0,1) flag for McICA (Monte Carlo Independent Column Approximation)
+                       for statistical representation of sub-grid cloud fraction 
+                       and cloud overlap
+                  = 0  standard forward calculation; do not use McICA
+                  = 1  use McICA (will perform statistical sample of 200 forward
+		       calculations and output average flux and heating rates)
+
+	  ICLD   (0,1,2,3) flag for clouds
+                  = 0  no cloudy layers in atmosphere
+                  = 1  one or more cloudy layers present in atmosphere.  Cloud layers
+		       are treated using a RANDOM overlap assmption.
+                       (requires the presence of file IN_CLD_RRTM for column model)
+                       (available for IMCA = 0 or 1)
+                  = 2  one or more cloudy layers present in atmosphere.  Cloud layers
+		       are treated using a MAXIMUM/RANDOM overlap assmption.
+                       (requires the presence of file IN_CLD_RRTM for column model)
+                       (available for IMCA = 0 or 1)
+                  = 3  one or more cloudy layers present in atmosphere.  Cloud layers
+		       are treated using a MAXIMUM overlap assmption.
+                       (requires the presence of file IN_CLD_RRTM for column model)
+                       (available only for IMCA = 1)
+		  
+
+ 
+
+ RECORD 1.4  
+  
+        TBOUND,  IEMIS, IREFLECT, (SEMISS(IB),IB=1,16)
+ 
+          1-10,     12,       15,        16-95
+ 
+         E10.3  1X, I1,   2X, I1,        16E5.3
+ 
+ 
+         TBOUND   temperature at the surface.  If input value < 0, then surface temperature
+                  is set to the temperature at the bottom of the first layer (see Record 2.1.1)
+ 
+         IEMIS  = 0 each band has surface emissivity equal to 1.0
+                = 1 each band has the same surface emissivity (equal to SEMISS(1)) 
+                = 2 each band has different surface emissivity (for band IB, equal to SEMISS(IB))
+
+         IREFLECT = 0 for Lambertian reflection at surface, i.e. reflected radiance 
+			is equal at all angles (default)
+                  = 1 for specular reflection at surface, i.e. reflected radiance at angle
+			is equal to downward surface radiance at same angle multiplied by
+			the reflectance (option not available in RRTMG_LW)
+                  (Note:  for each band, surface reflectance = 1 - surface emissivity) 
+
+         SEMISS   the surface emissivity for each band (see Table I).  All values must be 
+                  greater than 0 and less than or equal to 1.  If IEMIS = 1, only
+                  SEMISS(1) is considered.  If IEMIS = 2 and no surface emissivity value 
+                  is given for SEMISS(IB), a value of 1.0 is used for band IB.
+ 
+ 
+ 
+
+ RECORD 1.4.1     (only needed if IDRV .EQ. 1)
+  
+       DTBOUND,
+ 
+          1-10,
+ 
+         E10.3 
+ 
+ 
+       DTBOUND    change in surface temperature relative to TBOUND used to adjust
+                  upward flux at each layer based on the derivative of the Planck
+                  function with respect to surface temperature.
+
+ 
+ 
+
+ *****************************************************************************
+ ******  these records applicable only if RRTATM not selected (IATM=0)  ******
+
+                       LAYER INPUT  (MOLECULES ONLY)
+ 
+ RECORD 2.1
+ 
+          IFORM, NLAYRS, NMOL
+ 
+            2     3-5,   6-10
+ 
+          1X,I1    I3,    I5
+ 
+ 
+               IFORM      (0,1) column amount format flag
+			  = 0  read PAVE, WKL(M,L), WBROADL(L) in F10.4, E10.3, E10.3 formats (default)
+			  = 1  read PAVE, WKL(M,L), WBROADL(L) in E15.7 format
+ 
+              NLAYRS      number of layers (maximum of 200)
+ 
+                NMOL      value of highest molecule number used (default = 7; maximum of 35)
+                                 See Table II for molecule numbers.
+ 
+ 
+ RECORD 2.1.1
+  
+          PAVE,  TAVE,    PZ(L-1),  TZ(L-1),   PZ(L),  TZ(L)
+ 
+          1-10, 11-20,     44-51,    52-58,    66-73,  74-80
+ 
+         F10.4, F10.4, 23X, F8.3,    F7.2,  7X, F8.3,   F7.2
+ 
+ 
+                PAVE   average pressure of layer (millibars) (**If IFORM=1, then PAVE in E15.7 format**)
+ 
+                TAVE   average temperature of layer (K)
+ 
+             PZ(L-1)   pressure at bottom of layer L  
+ 
+             TZ(L-1)   temperature at bottom of layer L  -  used by RRTM for Planck Function Calculation
+ 
+                       ** NOTE **  PZ(L-1) and TZ(L-1) are only required for the first layer.  RRTM assumes that 
+                                   these quantites are equal to the top of the previous layer for L > 1.
+ 
+               PZ(L)   pressure at top of layer L
+ 
+               TZ(L)   temperature at top of layer L  -  used by RRTM for Planck Function Calculation
+ 
+ 
+ 
+ RECORD 2.1.2
+ 
+ 
+          (WKL(M,L), M=1, 7), WBROADL(L)
+ 
+                      (8E10.3)
+ 
+ 
+              WKL(M,L)   column densities or mixing ratios for 7 molecular species (molecules/cm**2)
+ 
+            WBROADL(L)   column density for broadening gases (molecules/cm**2)
+
+                         **NOTE** If IFORM=1, then WKL(M,L) and WBROADL(L) are in 8E15.7 format
+ 
+ 
+ RECORD 2.1.3     only if (NMOL  .GT . 7)         # records depends on NMOL
+ 
+ 
+          (WKL(M,L), M=8, NMOL)
+ 
+                (8E10.3)
+ 
+ 
+                NMOL is set from LINFIL (TAPE3)
+ 
+                     (NMOL limited to 35 in RRTM)    **NOTE: If IFORM=1 then WKL(M,L) in 8E15.7 format**
+ 
+ 
+
+
+ 
+ REPEAT RECORDS 2.1.1 through 2.1.3 for the remaining layers (up to NLAYRS)
+ 
+
+ *****************************************************************************
+ ******  these records applicable only if RRTATM not selected (IATM=0)  ******
+ ****************  and cross-sections ARE selected (IXSECT=1)  ***************
+ 
+                    LAYER INPUT  (CROSS-SECTIONS ONLY)
+ 
+ RECORD 2.2
+ 
+          IXMOLS
+ 
+               5
+ 
+              I5
+ 
+ 
+              IXMOLS      number of cross-section molecules to be inputed (maximum of 35)
+
+  
+ RECORD 2.2.1
+ 
+          XSNAME(I), I=1, IXMOLS
+ 
+          (7A10,(/,8A10))
+ 
+ 
+              XSNAME      name of the cross-section molecules to be used
+                          (See Table III for allowed aliases.)
+ 
+
+ RECORD 2.2.2
+ 
+          IFRMX
+ 
+            2  
+ 
+          1X,I1
+ 
+ 
+               IFRMX      (0,1) column amount format flag
+
+			  = 0  read XAMNT(M,L) in E10.3 format (default)
+			  = 1  read XAMNT(M,L) in E15.7 format
+  
+
+ RECORD 2.2.3
+ 
+          This record is a dummy record. Its presence is required but it is not read. 
+ 
+
+ 
+ 
+ RECORD 2.2.4
+ 
+ 
+          (XAMNT(I,L), I=1, 7)
+ 
+                      (7E10.3)
+ 
+ 
+            XAMNT(I,L)   column densities or mixing ratios for 7 cross-section molecules (molecules/cm**2)
+ 
+                         **NOTE** If IFRMX=1, then XAMNT(I,L) is in 7E15.7 format
+ 
+ 
+ 
+ RECORD 2.2.5     only if (IXMOL  .GT . 7)         # records depends on IXMOL
+ 
+ 
+          (XAMNT(I,L), I=8, IXMOL)
+ 
+                (8E10.3)
+ 
+                **NOTE: If IFRMX=1 then XAMNT(I,L) in 8E15.7 format** 
+ 
+
+ 
+ REPEAT RECORDS 2.2.3 through 2.2.5 for the remaining layers (up to NLAYRS)
+ 
+
+ 
+ *****************************************************************************
+ ********     these records applicable if RRTATM selected (IATM=1)    ********
+ 
+ RECORD 3.1
+ 
+ 
+      MODEL,   IBMAX,  NOPRNT,  NMOL, IPUNCH,   MUNITS,    RE,      CO2MX
+ 
+          5,      15,      25,    30,     35,    39-40, 41-50,      71-80
+
+         I5,  5X, I5,  5X, I5,    I5,     I5,   3X, I2, F10.3, 20X, F10.3
+ 
+ 
+           MODEL   selects atmospheric profile
+ 
+                     = 0  user supplied atmospheric profile
+                     = 1  tropical model
+                     = 2  midlatitude summer model
+                     = 3  midlatitude winter model
+                     = 4  subarctic summer model
+                     = 5  subarctic winter model
+                     = 6  U.S. standard 1976
+ 
+           IBMAX     selects layering for RRTM
+ 
+                     = 0  RRTM layers are generated internally (default)
+                     > 0  IBMAX is the number of layer boundaries read in on Record 3.3B which are
+                                 used to define the layers used in RRTM calculation
+		          If IBMAX is set to a negative value, the layer boundaries are
+			  specified in PRESSURE (mbars).  
+
+           NOPRNT    = 0  full printout
+                     = 1  selects short printout
+ 
+           NMOL      number of molecular species (default = 7; maximum value is 35)
+ 
+           IPUNCH    = 0  layer data not written (default)
+                     = 1  layer data written to unit IPU (TAPE7)
+
+           MUNITS    = 0  write molecular column amounts to TAPE7 (if IPUNCH = 1, default)
+                     = 1  write molecular mixing ratios to TAPE7 (if IPUNCH = 1)
+
+           RE        radius of earth (km)
+	                defaults for RE=0: 
+        	        a)  MODEL 0,2,3,6    RE = 6371.23 km
+			b)        1          RE = 6378.39 km
+			c)        4,5        RE = 6356.91 km
+ 
+           CO2MX     mixing ratio for CO2 (ppm).  Default is 330 ppm.
+ 
+	 REF_LAT     latitude of location of calculation (degrees)
+		     defaults for REF_LAT = 0:
+		     a) MODEL 0,2,3,6    REF_LAT = 45.0 degrees
+		     b) MODEL 1          REF_LAT = 15.0
+		     c) MODEL 4,5        REF_LAT = 60.0
+ 
+
+ -----------------------------------------------------------------------------
+ 
+   RECORD 3.2
+ 
+ 
+         HBOUND,   HTOA
+ 
+           1-10,  11-20
+ 
+          F10.3,  F10.3
+  
+ 
+          HBOUND     altitude of the surface (km)
+		     If IBMAX is negative, H1 is provided in pressure units (mbars)
+
+          HTOA       altitude of the top of the atmosphere (km)
+		     If IBMAX is negative, H2 is provided in pressure units (mbars)
+ 
+ 
+                RECORD 3.3  options
+ 
+ 
+ RECORD 3.3A        For IBMAX  = 0 (from RECORD 3.1)
+ 
+ 
+               AVTRAT, TDIFF1, TDIFF2, ALTD1, ALTD2
+ 
+                 1-10,  11-20,  21-30, 31-40, 41-50
+ 
+                F10.3,  F10.3,  F10.3, F10.3, F10.3
+ 
+ 
+          AVTRAT  maximum Voigt width ratio across a layer
+                  (if zero, default = 1.5)
+ 
+          TDIFF1  maximum layer temperature difference at
+                  ALTD1 (if zero, default =  5 K)
+ 
+          TDIFF2  maximum layer temperature difference at
+                  ALTD2 (if zero, default = 8 K)
+ 
+          ALTD1   altitude of TDIFF1 (if zero, default = 0 Km)
+ 
+          ALTD2   altitude of TDIFF2 (if zero, default = 100 Km)
+ 
+ 
+ 
+ RECORD 3.3B        For IBMAX > 0  (from RECORD 3.1)
+ 
+                ZBND(I), I=1, IBMAX   altitudes of RRTM layer boundaries
+ 
+               (8F10.3)
+	
+	            If IBMAX < 0 
+
+		PBND(I), I=1, ABS(IBMAX) pressures of LBLRTM layer boundaries
+
+               (8F10.3)
+  
+ --------------------------------------------------------------------------------
+
+ -----------------------------------------------------------------------------
+                     User Defined Atmospheric Profile
+ 
+ -------------------------------- (MODEL = 0) --------------------------------
+ 
+ 
+ RECORD 3.4
+ 
+ 
+           IMMAX,   HMOD
+ 
+               5,   6-29
+ 
+              I5,    3A8
+ 
+ 
+           IMMAX    number of atmospheric profile boundaries
+ 
+                    If IMMAX is set to a negative value, the level boundaries are
+                    specified in PRESSURE (mbars).
+
+            HMOD    24 character description of profile
+ 
+ RECORD 3.5
+ 
+ 
+       ZM,    PM,    TM,    JCHARP, JCHART,   (JCHAR(K),K =1,28)
+ 
+     1-10, 11-20, 21-30,        36,     37,     41  through  68
+ 
+    E10.3, E10.3, E10.3,   5x,  A1,     A1,    3X,    28A1
+ 
+ 
+          ZM       boundary altitude (km). If IMMAX < 0, altitude levels are 
+		   computed from pressure levels PM. If any altitude levels are
+		   provided, they are ignored if  IMMAX < 0 (exception: The
+		   first input level must have an accompanying ZM for input
+	 	   into the hydrostatic equation)
+ 
+ 
+          PM       pressure (units and input options set by JCHARP)
+ 
+          TM       temperature (units and input options set by JCHART)
+ 
+      JCHARP       flag for units and input options for pressure (see Table II)
+ 
+      JCHART       flag for units and input options for temperature (see Table II)
+ 
+      JCHAR(K)     flag for units and input options for
+                   the K'th molecule (see Table II)
+ 
+ 
+ RECORD 3.6.1 ... 3.6.N
+ 
+          VMOL(K), K=1, NMOL
+ 
+          8E10.3
+ 
+          VMOL(K) density of the K'th molecule in units set by JCHAR(K)
+ 
+ REPEAT records 3.5 and 3.6.1 to 3.6.N for each of the remaining IMMAX boundaries
+ 
+ 
+ *****************************************************************************
+ **********  these records applicable if RRTATM selected (IATM=1)  ***********
+ ****************  and cross-sections ARE selected (IXSECT=1)  ***************
+ 
+ 
+ RECORD 3.7
+ 
+          IXMOLS,  IPRFL, IXSBIN
+ 
+               5,     10,     15
+ 
+              I5,     I5,     I5
+ 
+ 
+              IXMOLS      number of cross-section molecules to be inputed (maximum of 35)
+ 
+              IPRFL  (0,1)
+ 
+                        = 0  user input profile
+                        = 1  standard profile as determined by RRTATM
+ 
+              IXSBIN (0,1) flag to deselect pressure convolution of cross-sections
+ 
+                        = 0 cross-sections convolved with pressure (default)
+                        = 1 cross-sections not convolved with pressure
+ 
+ RECORD 3.7.1
+ 
+          XSNAME(I), I=1, IXMOLS
+ 
+          (7A10,(/,8A10))
+ 
+ 
+              XSNAME      name of the cross-section molecules to be used
+                          (Note: See Table III for allowed aliases.)
+
+
+ -----------------------------------------------------------------------------
+                     User Defined Atmospheric Profile
+ 
+ -------------------------------- (IPRFL = 0) --------------------------------
+ 
+ 
+ RECORD 3.8
+ 
+ 
+            LAYX,  IZORP,  XTITLE
+ 
+               5,     10,   11-60
+ 
+              I5,     I5      A50
+ 
+ 
+           LAYX         number of atmospheric profile boundaries
+ 
+           IZORP (0,1)  flag which determines value of ZORP on Record 3.8.1
+ 
+                        = 0   ZORP is an altitude in KM
+                        = 1   ZORP is a pressure in millibars
+ 
+           XTITLE       50 character description of profile
+ 
+ RECORD 3.8.1
+ 
+ 
+     ZORP,  (JCHAR(K),K =1,28)
+ 
+     1-10,    16  through  50
+ 
+    F10.3, 5X,           35A1
+ 
+ 
+        ZORP       boundary altitude (km) or pressure (millibars) as determined by IZORP on Record 3.8
+ 
+      JCHAR(K)     flag for units and input options for
+                   the K'th cross-section
+ 
+                       JCHAR = 1-1           - default to value for specified model atmosphere
+                             = " ",A         - volume mixing ratio (ppmv)
+ 
+ 
+ RECORD 3.8.2 ... 3.8.N
+ 
+          DENX(K), K=1, IXMOLS
+ 
+          8E10.3
+ 
+          DENX(K) density of the K'th cross-section in units set by JCHAR(K)
+ 
+ REPEAT records 3.8.1 to 3.8.N for each of the remaining LAYX boundaries
+ 
+ ----------------------------------------------------------------------------
+
+
+
+ TABLE I.  RRTM Bands and Included Species 	
+
+
+		
+
+Band    Wavenumber                   1050 - 96 mb      96 - 0.01 mb    Halocarbons  
+       Range (cm-1)			
+
+1       10 -  350		         H2O,N2~          H2O,N2~	   ----
+2      350 -  500		          H2O              H2O		   ----
+3      500 -  630		      H2O,CO2,N2O~     H2O,CO2,N2O~	   ----
+4      630 -  700		        H2O,CO2          CO2,O3 	   ----
+5      700 -  820		        H2O,CO2,O3~      CO2,O3		   CCL4
+6      820 -  980		        H2O,CO2~           --- 	       CFC11^,CFC12
+7      980 - 1080		      H2O,O3,CO2~        O3,CO2	           ----
+8     1080 - 1180                  H2O,CO2~,O3~,N2O~   O3,CO2~,N2O~    CFC12,CFC22^
+9     1180 - 1390		      H2O,CH4,N2O~         CH4,N2O	   ----
+10    1390 - 1480		          H2O              H2O	           ----
+11    1480 - 1800		        H2O,O2~          H2O,O2~	   ----
+12    1800 - 2080		        H2O,CO2            ---		   ----
+13    2080 - 2250	            H2O,N2O,CO2~,CO~       O3~		   ----
+14    2250 - 2380		          CO2              CO2		   ----
+15    2380 - 2600		    N2O,CO2,WV~,N2~        ---		   ----
+16    2600 - 3250		        H2O,CH4            CH4		   ----
+
+
+~  Included by less rigorous method.
+^  The optical depths of these halocarbons are increased to account for other absorption 
+    bands of these species that are not implemented.
+   
+
+ TABLE II. Units and input options for the K'th molecule
+ 
+ 
+ 
+ 
+                                             TABLE II
+ 
+ 
+ 
+ 
+       USER OPTIONS FOR PRESSURE, TEMPERATURE, AND MOLECULAR DENSITY
+ 
+ 
+ 
+                    JCHARP
+ 
+        PRESSURE      1-6         default to value for specified model atmosphere
+        (JCHARP)    " ",A         pressure in (mb)
+                        B            "     "  (atm)
+                        C            "     "  (torr)
+ 
+ 
+                    JCHART
+ 
+     TEMPERATURE      1-6         default to value for specified model atmosphere
+        (JCHART)    " ",A         ambient temperature in deg (K)
+                        B            "     "   "   "   "  "  (C)
+ 
+ 
+                    JCHAR(M)
+ 
+ (M):  AVAILABLE       ( 1)  H2O  ( 2)  CO2  ( 3)    O3 ( 4)   N2O ( 5)    CO ( 6)   CH4 ( 7)    O2
+ MOLECULAR SPECIES     ( 8)   NO  ( 9)  SO2  (10)   NO2 (11)   NH3 (12)  HNO3 (13)    OH (14)    HF
+                       (15)  HCL  (16)  HBR  (17)    HI (18)   CLO (19)   OCS (20)  H2CO (21)  HOCL
+                       (22)   N2  (23)  HCN  (24) CH3CL (25)  H2O2 (26)  C2H2 (27)  C2H6 (28)   PH3
+                       (29) COF2  (30)  SF6  (31)   H2S (32) HCOOH (33) EMPTY (34) EMPTY (35) EMPTY
+ 
+ 
+                           potential choice of units for above species: 
+ 
+        JCHAR = 1-6           - default to value for specified model atmosphere
+              = " ",A         - volume mixing ratio (ppmv)
+              = B             - number density (cm-3)
+              = C             - mass mixing ratio (gm/kg)
+              = D             - mass density (gm m-3)
+              = E             - partial pressure (mb)
+              = F             - dew point temp (K) *H2O only*
+              = G             - dew point temp (C) *H2O only*
+              = H             - relative humidity (percent) *H2O only*
+              = I             - available for user definition
+ 
+        JCHAR must be less than "J"
+
+
+ 
+ TABLE III. Allowed aliases for cross-sectional molecules. 
+ 
+ 
+ 
+ 
+                                                 TABLE III
+
+                                      Cross-Section Molecules and Aliases   
+                                      -----------------------------------
+ 
+                             Alias(1)           Alias(2)           Alias(3)           Alias(4)
+                            ----------         ----------         ----------         ----------
+                            CCL4
+                            CCL3F               CFCL3              CFC11              F11
+                            CCL2F2              CF2CL2             CFC12              F12
+                            CHCLF2              CHF2CL             CFC22              F22
+
+
+ ----------------------------------------------------------------------------
+ 
+ ****************************************************************************
+
+
+ IN_CLD_RRTM Instructions  (this file required if ICLD = 1 in Record 1.2 of INPUT_RRTM)
+--------------------------
+   
+ RECORD C1.1
+	
+      INFLAG, ICEFLAG, LIQFLAG
+
+           5       10       15
+
+      4X, I1,  4X, I1,  4X, I1
+
+      Note:  ICEFLAG and LIQFLAG are required only if INFLAG = 2.
+
+            INFLAG = 0 direct specification of optical depths of clouds;
+                       cloud fraction and cloud optical depth (gray) are
+                       input for each cloudy layer
+                   = 1 calculation of combined ice and liquid cloud optical depths (gray) 
+                       as in CCM2; cloud fraction and cloud water path are input for
+                       each cloudy layer.  
+                   = 2 calculation of separate ice and liquid cloud optical depths, with
+                       parameterizations determined by values of ICEFLAG and LIQFLAG. 
+                       Cloud fraction, cloud water path, cloud ice fraction, and
+                       effective ice radius are input for each cloudy layer for all 
+                       parameterizations.  If LIQFLAG = 1, effective liquid droplet radius
+                       is also needed.  
+
+            ICEFLAG = 0 the optical depths (gray) due to ice clouds are computed as in CCM3.
+                    = 1 the optical depths (non-gray) due to ice clouds are computed as closely as
+                        possible to the method in E.E. Ebert and J.A. Curry, JGR, 97, 3831-3836 (1992).
+                    = 2 the optical depths (non-gray) due to ice clouds are computed by a method
+                        based on the parameterization used in the radiative transfer model Streamer
+                        (reference: J. Key, Streamer User's Guide, Technical Report 96-01, Boston
+                        University, 85 pp. (1996)), which is closely related to the parameterization
+                        of water clouds due to Hu and Stamnes (see below).
+		    = 3 the optical depths (non-gray) due to ice clouds are computed by a method
+	 	 	based on the parameterization given in Fu et al., J. Clim.,11,2223-2237 (1998).
+
+            LIQFLAG = 0 the optical depths (gray) due to water clouds are computed as in CCM3.
+                    = 1 the optical depths (non-gray) due to water clouds are computed by a method
+                        based on the parameterization of water clouds due to Y.X. Hu and K. Stamnes,
+                        J. Clim., 6, 728-742 (1993).
+                       
+	     These methods are further detailed in the comments in the routine 'cldprop.f'.
+
+
+
+ RECORD C1.2  (one record for each cloudy layer)
+
+      TESTCHAR,    LAY, CLDFRAC,   TAUCLD or CWP, FRACICE, EFFRADICE, EFFRADLIQ
+
+             1,    3-5,    6-15,           16-25,   26-35,     36-45,     46-55
+
+            A1, 1X, I3,   E10.5,           E10.5,   E10.5,     E10.5,     E10.5
+
+
+            TESTCHAR   control character -- if equal to '%', cloud input processing
+                       is terminated
+
+            LAY        layer number of cloudy layer.  The layer numbering refers to the
+                       ordering for the upward radiative transfer, i.e. botton to top.
+                       For IATM = 0 (Record 1.2), each layer's number is equal to the  
+                       position of its Record 2.1.1 in the grouping of these records.
+                       For example, the second Record 2.1.1 occurring after Record 2.1
+                       corresponds to the second layer.  For IATM = 1 (Record 1.2) and 
+                       IBMAX > 0 (Record 3.1), layer n corresponds to the region between 
+                       altitudes n and n+1 in the list of layer boundaries in Record 3.3B.  
+                       For IATM = 1 (Record 1.2) and IBMAX = 0 (Record 3.1), the layer 
+                       numbers can be determined by running RRTM for the cloudless case
+                       and examining the TAPE6 output from this run.
+                       
+            CLDFRAC    cloud fraction for the layer
+
+            TAUCLD     (INFLAG = 0 only) total (ice and water) optical depth for the layer
+     or     CWP        (INFLAG > 0) cloud water path for the layer (g/m2)
+
+            FRACICE    (INFLAG = 2) fraction of the layer's cloud water path in the form
+                       of ice particles  
+
+            EFFRADICE  (INFLAG = 2 and ICEFLAG = 1) Effective radius of spherical
+                       ice crystals with equivalent projected area to hexagonal ice particles
+                       following Ebert and Curry (1992).
+                       Valid sizes are 13.0 - 130.0 microns. 
+		
+		       (INFLAG = 2 and ICEFLAG = 2) Effective radius of spherical
+                       ice crystals, re (see STREAMER manual for definition of this parameter)
+                       Valid sizes are 5.0 - 131.0 microns. 
+
+		       (INFLAG = 2 and ICEFLAG = 3) Generalized effective size of hexagonal
+                       ice crystals, dge (see Q. Fu, 1996, for definition of this parameter)
+                       Valid sizes are 5.0 - 140.0 microns. 
+
+          	       NOTE: The size descriptions for effective radius and generalized effective
+                       size are NOT equivalent.  See the particular references for the appropriate 
+		       definition.
+
+            EFFRADLIQ  (INFLAG = 2 and LIQFLAG = 1) Liquid droplet effective radius, re (microns)
+                       Valid sizes are 2.5 - 60.0 microns. 
+
+
+
+ 
+ IN_AER_RRTM Instructions  (this file required if IAER = 1 in Record 1.2 of INPUT_RRTM)
+--------------------------
+   
+ RECORD A1.1
+	
+          NAER
+
+             5
+
+        3X, I2
+ 
+      NAER   number of different aerosol types (maximum of 99).  An aerosol type is characterized by a specified 
+             spectral dependence of aerosol optical depth, single-scattering albedo, and phase function; a change
+             to any of these quantities requires a new aerosol type.  Each aerosol type requires the presence of 
+             Records A2.1 - A2.3.
+
+       
+ RECORD A2.1  
+	
+          NLAY,   IAOD
+
+             5,     10
+
+        3X, I2, 4X, I1
+
+      NLAY   number of layers containing the aerosol with the specified properties:  spectral dependence of aerosol 
+             optical depth (IAOD,AERPAR), single-scattering albedo (ISSA, SSA), and phase function (IPHA,PHASE).
+             Note that each layer can contain only one aerosol type.
+
+      IAOD   (0,1)   flag for specifying the spectral dependence of aerosol optical depth
+             = 0     (inactive)
+             = 1     aerosol optical depths directly input for each layer and band in Record A2.1.1
+
+
+
+   
+ RECORD A2.1.1  
+	
+   (if IAOD = 1)
+         LAY, (AOD(IB),IB=1,16) 
+         
+           5,              6-117      
+
+      2X, I3,             16F7.4
+
+
+            LAY        layer number of aerosol layer.  (The layer numbering refers to the
+                       ordering for the upward radiative transfer, i.e. bottom to top.
+                       For IATM = 0 (Record 1.2), each layer's number is equal to the  
+                       position of its Record 2.1.1 in the grouping of these records.
+                       For example, the second Record 2.1.1 occurring after Record 2.1
+                       corresponds to the second layer.  For IATM = 1 (Record 1.2) and 
+                       IBMAX > 0 (Record 3.1), layer n corresponds to the region between 
+                       altitudes n and n+1 in the list of layer boundaries in Record 3.3B.  
+                       For IATM = 1 (Record 1.2) and IBMAX = 0 (Record 3.1), the layer 
+                       numbers can be determined by running RRTM for the cloudless case
+                       and examining the TAPE6 output from this run.
+
+   (if IAOD = 1)
+            AOD        aerosol optical depth at the mid-point of each of the 16 spectral bands
+ 
+ REPEAT RECORD A2.1.1 for the remaining layers containing this aerosol type. There should be NLAY
+                       records A2.1.1 	
+
+
+
+ REPEAT RECORDS A2.1 through A2.1.1 for the remaining aerosol types.  There should be NAER
+                       sets (A2.1 through A2.1.1) of records.
+
+
+
+
+

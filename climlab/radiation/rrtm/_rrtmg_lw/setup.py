@@ -6,12 +6,16 @@ def configuration(parent_package='', top_path=None):
     # figure out which compiler we're going to use
     compiler = fcompiler.get_default_fcompiler()
     # set some fortran compiler-dependent flags
+    f90flags = []
     if compiler == 'gnu95':
-        f90flags=['-fno-range-check', '-ffree-form', '-O0']
+        f90flags.append('-fno-range-check')
+        f90flags.append('-ffree-form')
     elif compiler == 'intel' or compiler == 'intelem':
-        #f90flags=['-132', '-r8', '-O0']
-        f90flags=['-132', '-O0']
-    print f90flags
+        f90flags.append('-132')
+    #  Need zero-level optimization to avoid build problems with rrtmg_lw_k_g.f90
+    f90flags.append('-O0')
+    #  Suppress all compiler warnings (avoid huge CI log files)
+    f90flags.append('-w')
 
     sourcelist = ['_rrtmg_lw.pyf',
                   'rrtmg_lw_v4.85/gcm_model/modules/parkind.f90',
@@ -41,7 +45,7 @@ def configuration(parent_package='', top_path=None):
                   'rrtmg_lw_v4.85/gcm_model/modules/rrlw_wvn.f90',
                   'rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_k_g.f90',
                   'rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_taumol.f90',
-                  'rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_setcoef.f90',
+                  'sourcemods/rrtmg_lw_setcoef.f90',
                   'rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_rtrnmc.f90',
                   'rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_cldprmc.f90',
                   'rrtmg_lw_v4.85/gcm_model/src/mcica_random_numbers.f90',
@@ -53,7 +57,7 @@ def configuration(parent_package='', top_path=None):
     config.add_extension(name='_rrtmg_lw',
                          sources=sourcelist,
                          extra_f90_compile_args=f90flags,
-                         #f2py_options=['-c',],
+                         f2py_options=['--quiet'],
                          )
     #  Not currently initializing from nc data file, so there's no reason to include it
     #config.add_data_files(os.path.join('rrtmg_lw_v4.85', 'gcm_model', 'data', 'rrtmg_lw.nc'))
