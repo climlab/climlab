@@ -6,12 +6,14 @@ def configuration(parent_package='', top_path=None):
     # figure out which compiler we're going to use
     compiler = fcompiler.get_default_fcompiler()
     # set some fortran compiler-dependent flags
+    f90flags = []
     if compiler == 'gnu95':
-        f90flags=['-fno-range-check', '-ffree-form', '-O0']
+        f90flags.append('-fno-range-check')
+        f90flags.append('-ffree-form')
     elif compiler == 'intel' or compiler == 'intelem':
-        #f90flags=['-132', '-r8', '-O0']
-        f90flags=['-132', '-O0']
-    print f90flags
+        f90flags.append('-132')
+    #  Need zero-level optimization to avoid build problems with rrtmg_sw_k_g.f90
+    f90flags.append('-O0')
 
     sourcelist = ['_rrtmg_sw.pyf',
                   'rrtmg_sw_v4.0/gcm_model/modules/parkind.f90',
