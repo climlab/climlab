@@ -57,7 +57,7 @@ def configuration(parent_package='', top_path=None):
     config.add_extension(name='_rrtmg_lw',
                          sources=sourcelist,
                          extra_f90_compile_args=f90flags,
-                         #f2py_options=['-c',],
+                         f2py_options=['--quiet'],
                          )
     #  Not currently initializing from nc data file, so there's no reason to include it
     #config.add_data_files(os.path.join('rrtmg_lw_v4.85', 'gcm_model', 'data', 'rrtmg_lw.nc'))

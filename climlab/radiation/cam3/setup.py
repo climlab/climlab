@@ -40,7 +40,8 @@ def configuration(parent_package='', top_path=None):
     config = Configuration(package_name='cam3', parent_name=parent_package, top_path=top_path)
     config.add_extension(name='_cam3',
                          sources=sourcelist,
-                         extra_f90_compile_args=f90flags)
+                         extra_f90_compile_args=f90flags,
+                         f2py_options=['--quiet'])
     config.add_include_dirs('src')
     config.add_data_files(os.path.join('data', 'abs_ems_factors_fastvx.c030508.nc'))
     return config
