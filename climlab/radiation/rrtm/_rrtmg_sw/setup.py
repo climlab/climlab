@@ -52,7 +52,7 @@ def configuration(parent_package='', top_path=None):
                   'rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_setcoef.f90',
                   'rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90',
                   'rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_cldprmc.f90',
-                  'rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_rad.f90',
+                  'sourcemods/rrtmg_sw_rad.f90',
                   'Driver.f90']
 
     config = Configuration(package_name='_rrtmg_sw', parent_name=parent_package, top_path=top_path)

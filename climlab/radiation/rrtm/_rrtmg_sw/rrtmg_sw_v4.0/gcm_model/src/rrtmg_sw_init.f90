@@ -20,18 +20,18 @@
 !    the names of its contributors may be used to endorse or promote products
 !    derived from this software without specific prior written permission.
 !
-! THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-! AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-! IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-! ARE DISCLAIMED. IN NO EVENT SHALL ATMOSPHERIC & ENVIRONMENTAL RESEARCH, INC.,
-! BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-! CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-! SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-! INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-! CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-! ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+! THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+! AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+! IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+! ARE DISCLAIMED. IN NO EVENT SHALL ATMOSPHERIC & ENVIRONMENTAL RESEARCH, INC., 
+! BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+! CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+! SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+! INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+! CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+! ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF 
 ! THE POSSIBILITY OF SUCH DAMAGE.
-!                        (http://www.rtweb.aer.com/)
+!                        (http://www.rtweb.aer.com/)                        
 !----------------------------------------------------------------------------
 
 ! ------- Modules -------
@@ -77,7 +77,7 @@
 
 ! ------- Definitions -------
 !     Arrays for 10000-point look-up tables:
-!     TAU_TBL  Clear-sky optical depth
+!     TAU_TBL  Clear-sky optical depth 
 !     EXP_TBL  Exponential lookup table for transmittance
 !     PADE     Pade approximation constant (= 0.278)
 !     BPADE    Inverse of the Pade approximation constant
@@ -107,9 +107,9 @@
       call sw_kgb29
 
 ! Define exponential lookup tables for transmittance. Tau is
-! computed as a function of the tau transition function, and transmittance
-! is calculated as a function of tau.  All tables are computed at intervals
-! of 0.0001.  The inverse of the constant used in the Pade approximation to
+! computed as a function of the tau transition function, and transmittance 
+! is calculated as a function of tau.  All tables are computed at intervals 
+! of 0.0001.  The inverse of the constant used in the Pade approximation to 
 ! the tau transition function is set to bpade.
 
       exp_tbl(0) = 1.0_rb
@@ -180,11 +180,11 @@
 
       use rrsw_con, only: heatfac, grav, planck, boltz, &
                           clight, avogad, alosmt, gascon, radcn1, radcn2, &
-                          sbcnst, secdy
+                          sbcnst, secdy 
       use rrsw_vsn
 
-      save
-
+      save 
+ 
       real(kind=rb), intent(in) :: cpdair     ! Specific heat capacity of dry air
                                               ! at constant pressure at 273 K
                                               ! (J kg-1 K-1)
@@ -210,7 +210,7 @@
                                               ! (ergs s; g cm2 s-1)
       boltz = 1.3806503e-16_rb                ! Boltzmann constant
                                               ! (ergs K-1; g cm2 s-2 K-1)
-      clight = 2.99792458e+10_rb              ! Speed of light in a vacuum
+      clight = 2.99792458e+10_rb              ! Speed of light in a vacuum  
                                               ! (cm s-1)
       avogad = 6.02214199e+23_rb              ! Avogadro constant
                                               ! (mol-1)
@@ -235,11 +235,11 @@
 !          radcn2 = planck*clight/boltz
 
 !     Heatfac is the factor by which delta-flux / delta-pressure is
-!     multiplied, with flux in W/m-2 and pressure in mbar, to get
+!     multiplied, with flux in W/m-2 and pressure in mbar, to get 
 !     the heating rate in units of degrees/day.  It is equal to:
 !     Original value:
 !           (g)x(#sec/day)x(1e-5)/(specific heat of air at const. p)
-!           Here, cpdair (1.004) is in units of J g-1 K-1, and the
+!           Here, cpdair (1.004) is in units of J g-1 K-1, and the 
 !           constant (1.e-5) converts mb to Pa and g-1 to kg-1.
 !        =  (9.8066)(86400)(1e-5)/(1.004)
 !      heatfac = 8.4391_rb
@@ -253,8 +253,8 @@
 !
 !     Calculated value (from constants above and input cpdair)
 !        (grav) x (#sec/day) / (specific heat of dry air at const. p x 1.e2)
-!           Here, cpdair is in units of J kg-1 K-1, and the constant (1.e2)
-!           converts mb to Pa when heatfac is multiplied by W m-2 mb-1.
+!           Here, cpdair is in units of J kg-1 K-1, and the constant (1.e2) 
+!           converts mb to Pa when heatfac is multiplied by W m-2 mb-1. 
       heatfac = grav * secdy / (cpdair * 1.e2_rb)
 
       end subroutine swdatinit
@@ -264,10 +264,10 @@
 !***************************************************************************
 
       save
-
+ 
 ! ------- Definitions -------
 !     Arrays for the g-point reduction from 224 to 112 for the 16 LW bands:
-!     This mapping from 224 to 112 points has been carefully selected to
+!     This mapping from 224 to 112 points has been carefully selected to 
 !     minimize the effect on the resulting fluxes and cooling rates, and
 !     caution should be used if the mapping is modified.  The full 224
 !     g-point set can be restored with ngpt=224, ngc=16*16, ngn=224*1., etc.
@@ -275,7 +275,7 @@
 !     ngc     The number of new g-points in each band
 !     ngs     The cumulative sum of new g-points for each band
 !     ngm     The index of each new g-point relative to the original
-!             16 g-points for each band.
+!             16 g-points for each band.  
 !     ngn     The number of original g-points that are combined to make
 !             each new g-point in each band.
 !     ngb     The band index for each new g-point.
@@ -427,7 +427,7 @@
         1.69446_rb, 1.11855_rb, 1.09212_rb, 1.72145_rb, 1.03858_rb, 1.12044_rb/)
       rsrtaua(14, :) = (/ &
         0.10849_rb, 0.66699_rb, 0.65255_rb, 0.11600_rb, 0.06529_rb, 0.04468_rb/)
-
+ 
       rsrpiza( 1, :) = (/ &
         .5230504_rb, .7868518_rb, .8531531_rb, .4048149_rb, .8748231_rb, .2355667_rb/)
       rsrpiza( 2, :) = (/ &
@@ -487,7 +487,7 @@
         0.700610_rb, 0.818871_rb, 0.702399_rb, 0.689886_rb, .4629866_rb, .1907639_rb/)
 
       end subroutine swaerpr
-
+ 
 !***************************************************************************
       subroutine cmbgb16s
 !***************************************************************************
@@ -500,7 +500,7 @@
 !  The subroutines CMBGB16->CMBGB29 input the absorption coefficient
 !  data for each band, which are defined for 16 g-points and 14 spectral
 !  bands. The data are combined with appropriate weighting following the
-!  g-point mapping arrays specified in RRTMG_SW_INIT.  Solar source
+!  g-point mapping arrays specified in RRTMG_SW_INIT.  Solar source 
 !  Function data in array SFLUXREF are combined without weighting.  All
 !  g-point reduced data are put into new arrays for use in RRTMG_SW.
 !
@@ -1710,7 +1710,7 @@
 ! Explanation of the method for each value of INFLAG.  A value of
 !  0 for INFLAG do not distingish being liquid and ice clouds.
 !  INFLAG = 2 does distinguish between liquid and ice clouds, and
-!    requires further user input to specify the method to be used to
+!    requires further user input to specify the method to be used to 
 !    compute the aborption due to each.
 !  INFLAG = 0:  For each cloudy layer, the cloud fraction, the cloud optical
 !    depth, the cloud single-scattering albedo, and the
@@ -1718,17 +1718,17 @@
 !    that these values are delta-m scaled within this
 !    subroutine.
 
-!  INFLAG = 2:  For each cloudy layer, the cloud fraction, cloud
+!  INFLAG = 2:  For each cloudy layer, the cloud fraction, cloud 
 !    water path (g/m2), and cloud ice fraction are input.
 !  ICEFLAG = 2:  The ice effective radius (microns) is input and the
 !    optical properties due to ice clouds are computed from
-!    the optical properties stored in the RT code, STREAMER v3.0
-!    (Reference: Key. J., Streamer User's Guide, Cooperative
+!    the optical properties stored in the RT code, STREAMER v3.0 
+!    (Reference: Key. J., Streamer User's Guide, Cooperative 
 !    Institute for Meteorological Satellite Studies, 2001, 96 pp.).
 !    Valid range of values for re are between 5.0 and
 !    131.0 micron.
-!    This version uses Ebert and Curry, JGR, (1992) method for
-!    ice particles larger than 131.0 microns.
+!    This version uses Ebert and Curry, JGR, (1992) method for 
+!    ice particles larger than 131.0 microns. 
 !  ICEFLAG = 3:  The ice generalized effective size (dge) is input
 !    and the optical depths, single-scattering albedo,
 !    and phase function moments are calculated as in
@@ -1737,18 +1737,18 @@
 !    bands in RRTM_SW.  Linear interpolation is used to
 !    get the coefficients from the stored tables.
 !    Valid range of values for dge are between 5.0 and
-!    140.0 micron.
-!    This version uses Ebert and Curry, JGR, (1992) method for
-!    ice particles larger than 140.0 microns.
-!  LIQFLAG = 1:  The water droplet effective radius (microns) is input
-!    and the optical depths due to water clouds are computed
+!    140.0 micron. 
+!    This version uses Ebert and Curry, JGR, (1992) method for 
+!    ice particles larger than 140.0 microns. 
+!  LIQFLAG = 1:  The water droplet effective radius (microns) is input 
+!    and the optical depths due to water clouds are computed 
 !    as in Hu and Stamnes, J., Clim., 6, 728-742, (1993) with
-!    modified coefficients derived from Mie scattering calculations.
+!    modified coefficients derived from Mie scattering calculations. 
 !    The values for absorption coefficients appropriate for
-!    the spectral bands in RRTM/RRTMG have been obtained for a
-!    range of effective radii by an averaging procedure
+!    the spectral bands in RRTM/RRTMG have been obtained for a 
+!    range of effective radii by an averaging procedure 
 !    based on the work of J. Pinto (private communication).
-!    Linear interpolation is used to get the absorption
+!    Linear interpolation is used to get the absorption 
 !    coefficients for the input effective radius.
 !
 !     ------------------------------------------------------------------
@@ -3514,3 +3514,5 @@
       end subroutine swcldpr
 
       end module rrtmg_sw_init
+
+

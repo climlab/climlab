@@ -20,18 +20,18 @@
 !    the names of its contributors may be used to endorse or promote products
 !    derived from this software without specific prior written permission.
 !
-! THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-! AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-! IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-! ARE DISCLAIMED. IN NO EVENT SHALL ATMOSPHERIC & ENVIRONMENTAL RESEARCH, INC.,
-! BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-! CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-! SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-! INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-! CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-! ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+! THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+! AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE 
+! IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE 
+! ARE DISCLAIMED. IN NO EVENT SHALL ATMOSPHERIC & ENVIRONMENTAL RESEARCH, INC., 
+! BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR 
+! CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF 
+! SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS 
+! INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN 
+! CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) 
+! ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF 
 ! THE POSSIBILITY OF SUCH DAMAGE.
-!                        (http://www.rtweb.aer.com/)
+!                        (http://www.rtweb.aer.com/)                        
 !----------------------------------------------------------------------------
 
 ! ------- Modules -------
@@ -189,7 +189,7 @@
       integer(kind=im), intent(in) :: nlayers            ! total number of layers
 
       integer(kind=im), intent(in) :: laytrop            ! tropopause layer index
-      integer(kind=im), intent(in) :: jp(:)              !
+      integer(kind=im), intent(in) :: jp(:)              ! 
                                                          !   Dimensions: (nlayers)
       integer(kind=im), intent(in) :: jt(:)              !
                                                          !   Dimensions: (nlayers)
@@ -207,10 +207,10 @@
                                                          !   Dimensions: (nlayers)
       real(kind=rb), intent(in) :: colo2(:)              ! column amount (o2)
                                                          !   Dimensions: (nlayers)
-      real(kind=rb), intent(in) :: colmol(:)             !
+      real(kind=rb), intent(in) :: colmol(:)             ! 
                                                          !   Dimensions: (nlayers)
 
-      integer(kind=im), intent(in) :: indself(:)
+      integer(kind=im), intent(in) :: indself(:)    
                                                          !   Dimensions: (nlayers)
       integer(kind=im), intent(in) :: indfor(:)
                                                          !   Dimensions: (nlayers)
@@ -225,7 +225,7 @@
 
       real(kind=rb), intent(in) :: &                     !
                        fac00(:), fac01(:), &             !   Dimensions: (nlayers)
-                       fac10(:), fac11(:)
+                       fac10(:), fac11(:) 
 
 ! Solar variability
       integer(kind=im), intent(in) :: isolvar            ! Flag for solar variability method
@@ -241,9 +241,9 @@
                                                          !   Dimensions: (ngptsw)
       real(kind=rb), intent(out) :: sfluxzen(:)          ! solar source function
                                                          !   Dimensions: (ngptsw)
-      real(kind=rb), intent(out) :: taug(:,:)            ! gaseous optical depth
+      real(kind=rb), intent(out) :: taug(:,:)            ! gaseous optical depth 
                                                          !   Dimensions: (nlayers,ngptsw)
-      real(kind=rb), intent(out) :: taur(:,:)            ! Rayleigh
+      real(kind=rb), intent(out) :: taur(:,:)            ! Rayleigh 
                                                          !   Dimensions: (nlayers,ngptsw)
 !      real(kind=rb), intent(out) :: ssa(:,:)            ! single scattering albedo (inactive)
                                                          !   Dimensions: (nlayers,ngptsw)
@@ -297,9 +297,9 @@
                        fac110, fac111, fs, speccomb, specmult, specparm, &
                        tauray, strrat1
 
-! Compute the optical depth by interpolating in ln(pressure),
+! Compute the optical depth by interpolating in ln(pressure), 
 ! temperature, and appropriate species.  Below LAYTROP, the water
-! vapor self-continuum is interpolated (in temperature) separately.
+! vapor self-continuum is interpolated (in temperature) separately.  
 
       strrat1 = 252.131_rb
       layreffr = 18
@@ -307,7 +307,7 @@
 ! Lower atmosphere loop
       do lay = 1, laytrop
          speccomb = colh2o(lay) + strrat1*colch4(lay)
-         specparm = colh2o(lay)/speccomb
+         specparm = colh2o(lay)/speccomb 
          if (specparm .ge. oneminus) specparm = oneminus
          specmult = 8._rb*(specparm)
          js = 1 + int(specmult)
@@ -342,7 +342,7 @@
                  (selfref(inds+1,ig) - selfref(inds,ig))) + &
                  forfac(lay) * (forref(indf,ig) + &
                  forfrac(lay) * &
-                 (forref(indf+1,ig) - forref(indf,ig))))
+                 (forref(indf+1,ig) - forref(indf,ig)))) 
 !            ssa(lay,ig) = tauray/taug(lay,ig)
             taur(lay,ig) = tauray
          enddo
@@ -363,11 +363,11 @@
                 (fac00(lay) * absb(ind0  ,ig) + &
                  fac10(lay) * absb(ind0+1,ig) + &
                  fac01(lay) * absb(ind1  ,ig) + &
-                 fac11(lay) * absb(ind1+1,ig))
+                 fac11(lay) * absb(ind1+1,ig)) 
 !            ssa(lay,ig) = tauray/taug(lay,ig)
             if (lay .eq. laysolfr) sfluxzen(ig) = sfluxref(ig)
             if (lay .eq. laysolfr .and. isolvar .lt. 0) &
-               sfluxzen(ig) = sfluxref(ig)
+               sfluxzen(ig) = sfluxref(ig) 
             if (lay .eq. laysolfr .and. isolvar .ge. 0 .and. isolvar .le. 2) &
                ssi(ig) = svar_f * facbrght(ig) + &
                          svar_s * snsptdrk(ig) + &
@@ -376,7 +376,7 @@
                ssi(ig) = svar_f_bnd(ngb(ig)) * facbrght(ig) + &
                          svar_s_bnd(ngb(ig)) * snsptdrk(ig) + &
                          svar_i_bnd(ngb(ig)) * irradnce(ig)
-            taur(lay,ig) = tauray
+            taur(lay,ig) = tauray  
          enddo
       enddo
 
@@ -408,9 +408,9 @@
                        fac110, fac111, fs, speccomb, specmult, specparm, &
                        tauray, strrat
 
-! Compute the optical depth by interpolating in ln(pressure),
+! Compute the optical depth by interpolating in ln(pressure), 
 ! temperature, and appropriate species.  Below LAYTROP, the water
-! vapor self-continuum is interpolated (in temperature) separately.
+! vapor self-continuum is interpolated (in temperature) separately.  
 
       strrat = 0.364641_rb
       layreffr = 30
@@ -418,7 +418,7 @@
 ! Lower atmosphere loop
       do lay = 1, laytrop
          speccomb = colh2o(lay) + strrat*colco2(lay)
-         specparm = colh2o(lay)/speccomb
+         specparm = colh2o(lay)/speccomb 
          if (specparm .ge. oneminus) specparm = oneminus
          specmult = 8._rb*(specparm)
          js = 1 + int(specmult)
@@ -453,7 +453,7 @@
                  (selfref(inds+1,ig) - selfref(inds,ig))) + &
                  forfac(lay) * (forref(indf,ig) + &
                  forfrac(lay) * &
-                 (forref(indf+1,ig) - forref(indf,ig))))
+                 (forref(indf+1,ig) - forref(indf,ig)))) 
 !             ssa(lay,ngs16+ig) = tauray/taug(lay,ngs16+ig)
             taur(lay,ngs16+ig) = tauray
          enddo
@@ -466,7 +466,7 @@
          if (jp(lay-1) .lt. layreffr .and. jp(lay) .ge. layreffr) &
             laysolfr = lay
          speccomb = colh2o(lay) + strrat*colco2(lay)
-         specparm = colh2o(lay)/speccomb
+         specparm = colh2o(lay)/speccomb 
          if (specparm .ge. oneminus) specparm = oneminus
          specmult = 4._rb*(specparm)
          js = 1 + int(specmult)
@@ -497,7 +497,7 @@
                  colh2o(lay) * &
                  forfac(lay) * (forref(indf,ig) + &
                  forfrac(lay) * &
-                 (forref(indf+1,ig) - forref(indf,ig)))
+                 (forref(indf+1,ig) - forref(indf,ig))) 
 !            ssa(lay,ngs16+ig) = tauray/taug(lay,ngs16+ig)
             if (lay .eq. laysolfr) sfluxzen(ngs16+ig) = sfluxref(ig,js) &
                + fs * (sfluxref(ig,js+1) - sfluxref(ig,js))
@@ -550,20 +550,20 @@
                        fac110, fac111, fs, speccomb, specmult, specparm, &
                        tauray, strrat
 
-! Compute the optical depth by interpolating in ln(pressure),
+! Compute the optical depth by interpolating in ln(pressure), 
 ! temperature, and appropriate species.  Below LAYTROP, the water
-! vapor self-continuum is interpolated (in temperature) separately.
+! vapor self-continuum is interpolated (in temperature) separately.  
 
       strrat = 38.9589_rb
       layreffr = 6
       laysolfr = laytrop
-
+      
 ! Lower atmosphere loop
       do lay = 1, laytrop
          if (jp(lay) .lt. layreffr .and. jp(lay+1) .ge. layreffr) &
             laysolfr = min(lay+1,laytrop)
          speccomb = colh2o(lay) + strrat*colch4(lay)
-         specparm = colh2o(lay)/speccomb
+         specparm = colh2o(lay)/speccomb 
          if (specparm .ge. oneminus) specparm = oneminus
          specmult = 8._rb*(specparm)
          js = 1 + int(specmult)
@@ -598,7 +598,7 @@
                  (selfref(inds+1,ig) - selfref(inds,ig))) + &
                  forfac(lay) * (forref(indf,ig) + &
                  forfrac(lay) * &
-                 (forref(indf+1,ig) - forref(indf,ig))))
+                 (forref(indf+1,ig) - forref(indf,ig)))) 
 !            ssa(lay,ngs17+ig) = tauray/taug(lay,ngs17+ig)
             if (lay .eq. laysolfr) sfluxzen(ngs17+ig) = sfluxref(ig,js) &
                + fs * (sfluxref(ig,js+1) - sfluxref(ig,js))
@@ -633,8 +633,8 @@
             taug(lay,ngs17+ig) = colch4(lay) * &
                 (fac00(lay) * absb(ind0,ig) + &
                  fac10(lay) * absb(ind0+1,ig) + &
-                 fac01(lay) * absb(ind1,ig) + &
-                 fac11(lay) * absb(ind1+1,ig))
+                 fac01(lay) * absb(ind1,ig) + &	  
+                 fac11(lay) * absb(ind1+1,ig)) 
 !           ssa(lay,ngs17+ig) = tauray/taug(lay,ngs17+ig)
            taur(lay,ngs17+ig) = tauray
          enddo
@@ -668,20 +668,20 @@
                        fac110, fac111, fs, speccomb, specmult, specparm, &
                        tauray, strrat
 
-! Compute the optical depth by interpolating in ln(pressure),
+! Compute the optical depth by interpolating in ln(pressure), 
 ! temperature, and appropriate species.  Below LAYTROP, the water
-! vapor self-continuum is interpolated (in temperature) separately.
+! vapor self-continuum is interpolated (in temperature) separately.  
 
       strrat = 5.49281_rb
       layreffr = 3
       laysolfr = laytrop
 
-! Lower atmosphere loop
+! Lower atmosphere loop      
       do lay = 1, laytrop
          if (jp(lay) .lt. layreffr .and. jp(lay+1) .ge. layreffr) &
             laysolfr = min(lay+1,laytrop)
          speccomb = colh2o(lay) + strrat*colco2(lay)
-         specparm = colh2o(lay)/speccomb
+         specparm = colh2o(lay)/speccomb 
          if (specparm .ge. oneminus) specparm = oneminus
          specmult = 8._rb*(specparm)
          js = 1 + int(specmult)
@@ -713,10 +713,10 @@
                  colh2o(lay) * &
                  (selffac(lay) * (selfref(inds,ig) + &
                  selffrac(lay) * &
-                 (selfref(inds+1,ig) - selfref(inds,ig))) + &
+                 (selfref(inds+1,ig) - selfref(inds,ig))) + & 
                  forfac(lay) * (forref(indf,ig) + &
                  forfrac(lay) * &
-                 (forref(indf+1,ig) - forref(indf,ig))))
+                 (forref(indf+1,ig) - forref(indf,ig)))) 
 !            ssa(lay,ngs18+ig) = tauray/taug(lay,ngs18+ig)
             if (lay .eq. laysolfr) sfluxzen(ngs18+ig) = sfluxref(ig,js) &
                + fs * (sfluxref(ig,js+1) - sfluxref(ig,js))
@@ -737,7 +737,7 @@
                          fs * (snsptdrk(ig,js+1) - snsptdrk(ig,js))) + &
                          svar_i_bnd(ngb(ngs18+ig)) * (irradnce(ig,js) + &
                          fs * (irradnce(ig,js+1) - irradnce(ig,js)))
-            taur(lay,ngs18+ig) = tauray
+            taur(lay,ngs18+ig) = tauray   
          enddo
       enddo
 
@@ -752,9 +752,9 @@
                 (fac00(lay) * absb(ind0,ig) + &
                  fac10(lay) * absb(ind0+1,ig) + &
                  fac01(lay) * absb(ind1,ig) + &
-                 fac11(lay) * absb(ind1+1,ig))
-!            ssa(lay,ngs18+ig) = tauray/taug(lay,ngs18+ig)
-            taur(lay,ngs18+ig) = tauray
+                 fac11(lay) * absb(ind1+1,ig)) 
+!            ssa(lay,ngs18+ig) = tauray/taug(lay,ngs18+ig) 
+            taur(lay,ngs18+ig) = tauray   
          enddo
       enddo
 
@@ -788,9 +788,9 @@
                        fac110, fac111, fs, speccomb, specmult, specparm, &
                        tauray
 
-! Compute the optical depth by interpolating in ln(pressure),
+! Compute the optical depth by interpolating in ln(pressure), 
 ! temperature, and appropriate species.  Below LAYTROP, the water
-! vapor self-continuum is interpolated (in temperature) separately.
+! vapor self-continuum is interpolated (in temperature) separately.  
 
       layreffr = 3
       laysolfr = laytrop
@@ -811,7 +811,7 @@
                  fac10(lay) * absa(ind0+1,ig) + &
                  fac01(lay) * absa(ind1,ig) + &
                  fac11(lay) * absa(ind1+1,ig)) + &
-                 selffac(lay) * (selfref(inds,ig) + &
+                 selffac(lay) * (selfref(inds,ig) + & 
                  selffrac(lay) * &
                  (selfref(inds+1,ig) - selfref(inds,ig))) + &
                  forfac(lay) * (forref(indf,ig) + &
@@ -819,9 +819,9 @@
                  (forref(indf+1,ig) - forref(indf,ig)))) &
                  + colch4(lay) * absch4(ig)
 !            ssa(lay,ngs19+ig) = tauray/taug(lay,ngs19+ig)
-            if (lay .eq. laysolfr) sfluxzen(ngs19+ig) = sfluxref(ig)
+            if (lay .eq. laysolfr) sfluxzen(ngs19+ig) = sfluxref(ig) 
             if (lay .eq. laysolfr .and. isolvar .lt. 0) &
-               sfluxzen(ngs19+ig) = sfluxref(ig)
+               sfluxzen(ngs19+ig) = sfluxref(ig) 
             if (lay .eq. laysolfr .and. isolvar .ge. 0 .and. isolvar .le. 2) &
                ssi(ngs19+ig) = svar_f * facbrght(ig) + &
                          svar_s * snsptdrk(ig) + &
@@ -830,7 +830,7 @@
                ssi(ngs19+ig) = svar_f_bnd(ngb(ngs19+ig)) * facbrght(ig) + &
                          svar_s_bnd(ngb(ngs19+ig)) * snsptdrk(ig) + &
                          svar_i_bnd(ngb(ngs19+ig)) * irradnce(ig)
-            taur(lay,ngs19+ig) = tauray
+            taur(lay,ngs19+ig) = tauray 
          enddo
       enddo
 
@@ -852,7 +852,7 @@
                  (forref(indf+1,ig) - forref(indf,ig)))) + &
                  colch4(lay) * absch4(ig)
 !            ssa(lay,ngs19+ig) = tauray/taug(lay,ngs19+ig)
-            taur(lay,ngs19+ig) = tauray
+            taur(lay,ngs19+ig) = tauray 
          enddo
       enddo
 
@@ -884,20 +884,20 @@
                        fac110, fac111, fs, speccomb, specmult, specparm, &
                        tauray, strrat
 
-! Compute the optical depth by interpolating in ln(pressure),
+! Compute the optical depth by interpolating in ln(pressure), 
 ! temperature, and appropriate species.  Below LAYTROP, the water
-! vapor self-continuum is interpolated (in temperature) separately.
+! vapor self-continuum is interpolated (in temperature) separately.  
 
       strrat = 0.0045321_rb
       layreffr = 8
       laysolfr = laytrop
-
+      
 ! Lower atmosphere loop
       do lay = 1, laytrop
          if (jp(lay) .lt. layreffr .and. jp(lay+1) .ge. layreffr) &
             laysolfr = min(lay+1,laytrop)
          speccomb = colh2o(lay) + strrat*colco2(lay)
-         specparm = colh2o(lay)/speccomb
+         specparm = colh2o(lay)/speccomb 
          if (specparm .ge. oneminus) specparm = oneminus
          specmult = 8._rb*(specparm)
          js = 1 + int(specmult)
@@ -960,7 +960,7 @@
 ! Upper atmosphere loop
       do lay = laytrop+1, nlayers
          speccomb = colh2o(lay) + strrat*colco2(lay)
-         specparm = colh2o(lay)/speccomb
+         specparm = colh2o(lay)/speccomb 
          if (specparm .ge. oneminus) specparm = oneminus
          specmult = 4._rb*(specparm)
          js = 1 + int(specmult)
@@ -1025,14 +1025,14 @@
                        fac110, fac111, fs, speccomb, specmult, specparm, &
                        tauray, o2adj, o2cont, strrat
 
-! The following factor is the ratio of total O2 band intensity (lines
+! The following factor is the ratio of total O2 band intensity (lines 
 ! and Mate continuum) to O2 band intensity (line only).  It is needed
 ! to adjust the optical depths since the k's include only lines.
       o2adj = 1.6_rb
-
-! Compute the optical depth by interpolating in ln(pressure),
+      
+! Compute the optical depth by interpolating in ln(pressure), 
 ! temperature, and appropriate species.  Below LAYTROP, the water
-! vapor self-continuum is interpolated (in temperature) separately.
+! vapor self-continuum is interpolated (in temperature) separately.  
 
       strrat = 0.022708_rb
       layreffr = 2
@@ -1044,7 +1044,7 @@
             laysolfr = min(lay+1,laytrop)
          o2cont = 4.35e-4_rb*colo2(lay)/(350.0_rb*2.0_rb)
          speccomb = colh2o(lay) + o2adj*strrat*colo2(lay)
-         specparm = colh2o(lay)/speccomb
+         specparm = colh2o(lay)/speccomb 
          if (specparm .ge. oneminus) specparm = oneminus
          specmult = 8._rb*(specparm)
 !         odadj = specparm + o2adj * (1._rb - specparm)
@@ -1156,9 +1156,9 @@
 ! Average Giver et al. correction factor for this band.
       givfac = 1.029_rb
 
-! Compute the optical depth by interpolating in ln(pressure),
+! Compute the optical depth by interpolating in ln(pressure), 
 ! temperature, and appropriate species.  Below LAYTROP, the water
-! vapor self-continuum is interpolated (in temperature) separately.
+! vapor self-continuum is interpolated (in temperature) separately.  
 
       layreffr = 6
       laysolfr = laytrop
@@ -1184,11 +1184,11 @@
                  (selfref(inds+1,ig) - selfref(inds,ig))) + &
                  forfac(lay) * (forref(indf,ig) + &
                  forfrac(lay) * &
-                 (forref(indf+1,ig) - forref(indf,ig))))
+                 (forref(indf+1,ig) - forref(indf,ig)))) 
 !            ssa(lay,ngs22+ig) = tauray/taug(lay,ngs22+ig)
-            if (lay .eq. laysolfr) sfluxzen(ngs22+ig) = sfluxref(ig)
+            if (lay .eq. laysolfr) sfluxzen(ngs22+ig) = sfluxref(ig) 
             if (lay .eq. laysolfr .and. isolvar .lt. 0) &
-               sfluxzen(ngs22+ig) = sfluxref(ig)
+               sfluxzen(ngs22+ig) = sfluxref(ig) 
             if (lay .eq. laysolfr .and. isolvar .ge. 0 .and. isolvar .le. 2) &
                ssi(ngs22+ig) = svar_f * facbrght(ig) + &
                          svar_s * snsptdrk(ig) + &
@@ -1207,7 +1207,7 @@
 !            taug(lay,ngs22+ig) = colmol(lay) * rayl(ig)
 !            ssa(lay,ngs22+ig) = 1.0_rb
             taug(lay,ngs22+ig) = 0._rb
-            taur(lay,ngs22+ig) = colmol(lay) * rayl(ig)
+            taur(lay,ngs22+ig) = colmol(lay) * rayl(ig) 
          enddo
       enddo
 
@@ -1239,9 +1239,9 @@
                        fac110, fac111, fs, speccomb, specmult, specparm, &
                        tauray, strrat
 
-! Compute the optical depth by interpolating in ln(pressure),
+! Compute the optical depth by interpolating in ln(pressure), 
 ! temperature, and appropriate species.  Below LAYTROP, the water
-! vapor self-continuum is interpolated (in temperature) separately.
+! vapor self-continuum is interpolated (in temperature) separately.  
 
       strrat = 0.124692_rb
       layreffr = 1
@@ -1252,7 +1252,7 @@
          if (jp(lay) .lt. layreffr .and. jp(lay+1) .ge. layreffr) &
             laysolfr = min(lay+1,laytrop)
          speccomb = colh2o(lay) + strrat*colo2(lay)
-         specparm = colh2o(lay)/speccomb
+         specparm = colh2o(lay)/speccomb 
          if (specparm .ge. oneminus) specparm = oneminus
          specmult = 8._rb*(specparm)
          js = 1 + int(specmult)
@@ -1283,11 +1283,11 @@
                  fac011 * absa(ind1+9,ig) + &
                  fac111 * absa(ind1+10,ig)) + &
                  colo3(lay) * abso3a(ig) + &
-                 colh2o(lay) * &
+                 colh2o(lay) * & 
                  (selffac(lay) * (selfref(inds,ig) + &
                  selffrac(lay) * &
                  (selfref(inds+1,ig) - selfref(inds,ig))) + &
-                 forfac(lay) * (forref(indf,ig) + &
+                 forfac(lay) * (forref(indf,ig) + & 
                  forfrac(lay) * &
                  (forref(indf+1,ig) - forref(indf,ig))))
 !            ssa(lay,ngs23+ig) = tauray/taug(lay,ngs23+ig)
@@ -1360,9 +1360,9 @@
                        fac110, fac111, fs, speccomb, specmult, specparm, &
                        tauray
 
-! Compute the optical depth by interpolating in ln(pressure),
+! Compute the optical depth by interpolating in ln(pressure), 
 ! temperature, and appropriate species.  Below LAYTROP, the water
-! vapor self-continuum is interpolated (in temperature) separately.
+! vapor self-continuum is interpolated (in temperature) separately.  
 
       layreffr = 2
       laysolfr = laytrop
@@ -1381,11 +1381,11 @@
                  fac10(lay) * absa(ind0+1,ig) + &
                  fac01(lay) * absa(ind1,ig) + &
                  fac11(lay) * absa(ind1+1,ig)) + &
-                 colo3(lay) * abso3a(ig)
+                 colo3(lay) * abso3a(ig) 
 !            ssa(lay,ngs24+ig) = tauray/taug(lay,ngs24+ig)
-            if (lay .eq. laysolfr) sfluxzen(ngs24+ig) = sfluxref(ig)
+            if (lay .eq. laysolfr) sfluxzen(ngs24+ig) = sfluxref(ig) 
             if (lay .eq. laysolfr .and. isolvar .lt. 0) &
-               sfluxzen(ngs24+ig) = sfluxref(ig)
+               sfluxzen(ngs24+ig) = sfluxref(ig) 
             if (lay .eq. laysolfr .and. isolvar .ge. 0 .and. isolvar .le. 2) &
                ssi(ngs24+ig) = svar_f * facbrght(ig) + &
                          svar_s * snsptdrk(ig) + &
@@ -1402,7 +1402,7 @@
       do lay = laytrop+1, nlayers
          do ig = 1, ng25
             tauray = colmol(lay) * rayl(ig)
-            taug(lay,ngs24+ig) = colo3(lay) * abso3b(ig)
+            taug(lay,ngs24+ig) = colo3(lay) * abso3b(ig) 
 !            ssa(lay,ngs24+ig) = tauray/taug(lay,ngs24+ig)
             taur(lay,ngs24+ig) = tauray
          enddo
@@ -1434,20 +1434,20 @@
                        fac110, fac111, fs, speccomb, specmult, specparm, &
                        tauray
 
-! Compute the optical depth by interpolating in ln(pressure),
+! Compute the optical depth by interpolating in ln(pressure), 
 ! temperature, and appropriate species.  Below LAYTROP, the water
-! vapor self-continuum is interpolated (in temperature) separately.
+! vapor self-continuum is interpolated (in temperature) separately.  
 
       laysolfr = laytrop
 
 ! Lower atmosphere loop
       do lay = 1, laytrop
-         do ig = 1, ng26
+         do ig = 1, ng26 
 !            taug(lay,ngs25+ig) = colmol(lay) * rayl(ig)
 !            ssa(lay,ngs25+ig) = 1.0_rb
-            if (lay .eq. laysolfr) sfluxzen(ngs25+ig) = sfluxref(ig)
+            if (lay .eq. laysolfr) sfluxzen(ngs25+ig) = sfluxref(ig) 
             if (lay .eq. laysolfr .and. isolvar .lt. 0) &
-               sfluxzen(ngs25+ig) = sfluxref(ig)
+               sfluxzen(ngs25+ig) = sfluxref(ig) 
             if (lay .eq. laysolfr .and. isolvar .ge. 0 .and. isolvar .le. 2) &
                ssi(ngs25+ig) = svar_f * facbrght(ig) + &
                          svar_s * snsptdrk(ig) + &
@@ -1457,7 +1457,7 @@
                          svar_s_bnd(ngb(ngs25+ig)) * snsptdrk(ig) + &
                          svar_i_bnd(ngb(ngs25+ig)) * irradnce(ig)
             taug(lay,ngs25+ig) = 0._rb
-            taur(lay,ngs25+ig) = colmol(lay) * rayl(ig)
+            taur(lay,ngs25+ig) = colmol(lay) * rayl(ig) 
          enddo
       enddo
 
@@ -1467,7 +1467,7 @@
 !            taug(lay,ngs25+ig) = colmol(lay) * rayl(ig)
 !            ssa(lay,ngs25+ig) = 1.0_rb
             taug(lay,ngs25+ig) = 0._rb
-            taur(lay,ngs25+ig) = colmol(lay) * rayl(ig)
+            taur(lay,ngs25+ig) = colmol(lay) * rayl(ig) 
          enddo
       enddo
 
@@ -1507,9 +1507,9 @@
 
       scalekur = 50.15_rb/48.37_rb
 
-! Compute the optical depth by interpolating in ln(pressure),
+! Compute the optical depth by interpolating in ln(pressure), 
 ! temperature, and appropriate species.  Below LAYTROP, the water
-! vapor self-continuum is interpolated (in temperature) separately.
+! vapor self-continuum is interpolated (in temperature) separately.  
 
       layreffr = 32
 
@@ -1544,12 +1544,12 @@
             taug(lay,ngs26+ig) = colo3(lay) * &
                 (fac00(lay) * absb(ind0,ig) + &
                  fac10(lay) * absb(ind0+1,ig) + &
-                 fac01(lay) * absb(ind1,ig) + &
+                 fac01(lay) * absb(ind1,ig) + & 
                  fac11(lay) * absb(ind1+1,ig))
 !            ssa(lay,ngs26+ig) = tauray/taug(lay,ngs26+ig)
-            if (lay.eq.laysolfr) sfluxzen(ngs26+ig) = scalekur * sfluxref(ig)
+            if (lay.eq.laysolfr) sfluxzen(ngs26+ig) = scalekur * sfluxref(ig) 
             if (lay .eq. laysolfr .and. isolvar .lt. 0) &
-               sfluxzen(ngs26+ig) = scalekur * sfluxref(ig)
+               sfluxzen(ngs26+ig) = scalekur * sfluxref(ig) 
             if (lay .eq. laysolfr .and. isolvar .ge. 0 .and. isolvar .le. 2) &
                ssi(ngs26+ig) = svar_f * facbrght(ig) + &
                          svar_s * snsptdrk(ig) + &
@@ -1589,9 +1589,9 @@
                        fac110, fac111, fs, speccomb, specmult, specparm, &
                        tauray, strrat
 
-! Compute the optical depth by interpolating in ln(pressure),
+! Compute the optical depth by interpolating in ln(pressure), 
 ! temperature, and appropriate species.  Below LAYTROP, the water
-! vapor self-continuum is interpolated (in temperature) separately.
+! vapor self-continuum is interpolated (in temperature) separately.  
 
       strrat = 6.67029e-07_rb
       layreffr = 58
@@ -1599,7 +1599,7 @@
 ! Lower atmosphere loop
       do lay = 1, laytrop
          speccomb = colo3(lay) + strrat*colo2(lay)
-         specparm = colo3(lay)/speccomb
+         specparm = colo3(lay)/speccomb 
          if (specparm .ge. oneminus) specparm = oneminus
          specmult = 8._rb*(specparm)
          js = 1 + int(specmult)
@@ -1625,7 +1625,7 @@
                  fac001 * absa(ind1,ig) + &
                  fac101 * absa(ind1+1,ig) + &
                  fac011 * absa(ind1+9,ig) + &
-                 fac111 * absa(ind1+10,ig))
+                 fac111 * absa(ind1+10,ig)) 
 !            ssa(lay,ngs27+ig) = tauray/taug(lay,ngs27+ig)
             taur(lay,ngs27+ig) = tauray
          enddo
@@ -1638,7 +1638,7 @@
          if (jp(lay-1) .lt. layreffr .and. jp(lay) .ge. layreffr) &
             laysolfr = lay
          speccomb = colo3(lay) + strrat*colo2(lay)
-         specparm = colo3(lay)/speccomb
+         specparm = colo3(lay)/speccomb 
          if (specparm .ge. oneminus) specparm = oneminus
          specmult = 4._rb*(specparm)
          js = 1 + int(specmult)
@@ -1664,7 +1664,7 @@
                  fac001 * absb(ind1,ig) + &
                  fac101 * absb(ind1+1,ig) + &
                  fac011 * absb(ind1+5,ig) + &
-                 fac111 * absb(ind1+6,ig))
+                 fac111 * absb(ind1+6,ig)) 
 !            ssa(lay,ngs27+ig) = tauray/taug(lay,ngs27+ig)
             if (lay .eq. laysolfr) sfluxzen(ngs27+ig) = sfluxref(ig,js) &
                + fs * (sfluxref(ig,js+1) - sfluxref(ig,js))
@@ -1717,9 +1717,9 @@
                        fac110, fac111, fs, speccomb, specmult, specparm, &
                        tauray
 
-! Compute the optical depth by interpolating in ln(pressure),
+! Compute the optical depth by interpolating in ln(pressure), 
 ! temperature, and appropriate species.  Below LAYTROP, the water
-! vapor self-continuum is interpolated (in temperature) separately.
+! vapor self-continuum is interpolated (in temperature) separately.  
 
       layreffr = 49
 
@@ -1740,10 +1740,10 @@
                  selffac(lay) * (selfref(inds,ig) + &
                  selffrac(lay) * &
                  (selfref(inds+1,ig) - selfref(inds,ig))) + &
-                 forfac(lay) * (forref(indf,ig) + &
+                 forfac(lay) * (forref(indf,ig) + & 
                  forfrac(lay) * &
                  (forref(indf+1,ig) - forref(indf,ig)))) &
-                 + colco2(lay) * absco2(ig)
+                 + colco2(lay) * absco2(ig) 
 !            ssa(lay,ngs28+ig) = tauray/taug(lay,ngs28+ig)
             taur(lay,ngs28+ig) = tauray
          enddo
@@ -1764,12 +1764,12 @@
                 (fac00(lay) * absb(ind0,ig) + &
                  fac10(lay) * absb(ind0+1,ig) + &
                  fac01(lay) * absb(ind1,ig) + &
-                 fac11(lay) * absb(ind1+1,ig)) &
-                 + colh2o(lay) * absh2o(ig)
+                 fac11(lay) * absb(ind1+1,ig)) &  
+                 + colh2o(lay) * absh2o(ig) 
 !            ssa(lay,ngs28+ig) = tauray/taug(lay,ngs28+ig)
-            if (lay .eq. laysolfr) sfluxzen(ngs28+ig) = sfluxref(ig)
+            if (lay .eq. laysolfr) sfluxzen(ngs28+ig) = sfluxref(ig) 
             if (lay .eq. laysolfr .and. isolvar .lt. 0) &
-               sfluxzen(ngs28+ig) = sfluxref(ig)
+               sfluxzen(ngs28+ig) = sfluxref(ig) 
             if (lay .eq. laysolfr .and. isolvar .ge. 0 .and. isolvar .le. 2) &
                ssi(ngs28+ig) = svar_f * facbrght(ig) + &
                          svar_s * snsptdrk(ig) + &
@@ -1787,3 +1787,4 @@
       end subroutine taumol_sw
 
       end module rrtmg_sw_taumol
+
