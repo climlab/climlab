@@ -7,6 +7,7 @@ include .coveragerc
 include *.yml
 include *.yaml
 include *.sh
+recursive-include .f2py_f2cmap
 recursive-include docs *
 prune docs/build
 global-exclude *.pyc *.pyo *.pyd
