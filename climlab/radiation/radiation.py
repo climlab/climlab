@@ -92,7 +92,10 @@ def default_specific_humidity(Tatm):
     h2o = ManabeWaterVapor(state={'Tatm': Tatm})
     return h2o.q
 
-def default_absorbers(Tatm, ozone_file = 'apeozone_cam3_5_54.nc'):
+def default_absorbers(Tatm,
+                ozone_file = 'apeozone_cam3_5_54.nc',
+                verbose = True,
+                      ):
     '''Initialize a dictionary of well-mixed radiatively active gases
     All values are volumetric mixing ratios.
 
@@ -126,7 +129,8 @@ def default_absorbers(Tatm, ozone_file = 'apeozone_cam3_5_54.nc'):
     datadir = os.path.join(os.path.dirname(__file__), 'data', 'ozone')
     ozonefilepath = os.path.join(datadir, ozone_file)
     #  Open the ozone data file
-    print 'Getting ozone data from', ozonefilepath
+    if verbose:
+        print 'Getting ozone data from', ozonefilepath
     ozonedata = nc.Dataset(ozonefilepath)
     ozone_lev = ozonedata.variables['lev'][:]
     ozone_lat = ozonedata.variables['lat'][:]
@@ -172,7 +176,7 @@ class _Radiation(EnergyBudget):
             specific_humidity = default_specific_humidity(self.Tatm)
         self.add_input('specific_humidity', specific_humidity)
         if absorber_vmr is None:
-            absorber_vmr = default_absorbers(self.Tatm, ozone_file)
+            absorber_vmr = default_absorbers(self.Tatm, ozone_file, self.verbose)
         self.add_input('absorber_vmr', absorber_vmr)
         self.add_input('cldfrac', cldfrac)
         self.add_input('clwp', clwp)

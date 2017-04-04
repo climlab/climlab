@@ -108,6 +108,8 @@ class Process(object):
     :param int num_levels:
                         number of altitudinal points (optional)
     :param dict input:  collection of input quantities
+    :param bool verbose: Flag to control text output during instantiation
+                         of the Process [default: True]
 
     **Object attributes** \n
 
@@ -140,7 +142,9 @@ class Process(object):
 
     def __init__(self, state=None, domains=None, subprocess=None,
                  lat=None, lev=None, num_lat=None, num_levels=None,
-                 input=None, **kwargs):
+                 input=None, verbose=True, **kwargs):
+        # verbose flag used to control text output at process creation time
+        self.verbose = verbose
         # dictionary of domains. Keys are the domain names
         self.domains = _make_dict(domains, _Domain)
         #  If lat is given, create a simple domains

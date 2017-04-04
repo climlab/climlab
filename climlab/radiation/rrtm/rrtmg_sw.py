@@ -191,23 +191,34 @@ class RRTMG_SW(_Radiation_SW):
          inflgsw, iceflgsw, liqflgsw,
          cldfrac, ciwp, clwp, reic, relq, tauc, ssac, asmc, fsfc,
          tauaer, ssaaer, asmaer, ecaer,) = self._prepare_sw_arguments()
-        #  Call the Monte Carlo Independent Column Approximation (McICA, Pincus et al., JC, 2003)
-        (cldfmcl, ciwpmcl, clwpmcl, reicmcl, relqmcl, taucmcl,
-        ssacmcl, asmcmcl, fsfcmcl) = _rrtmg_sw.climlab_mcica_subcol_sw(
-                        ncol, nlay, icld, permuteseed, irng, play,
-                        cldfrac, ciwp, clwp, reic, relq, tauc, ssac, asmc, fsfc)
+        if icld == 0:  # clear-sky only
+            cldfmcl = np.zeros((ngptsw,ncol,nlay))
+            ciwpmcl = np.zeros((ngptsw,ncol,nlay))
+            clwpmcl = np.zeros((ngptsw,ncol,nlay))
+            reicmcl = np.zeros((ncol,nlay))
+            relqmcl = np.zeros((ncol,nlay))
+            taucmcl = np.zeros((ngptsw,ncol,nlay))
+            ssacmcl = np.zeros((ngptsw,ncol,nlay))
+            asmcmcl = np.zeros((ngptsw,ncol,nlay))
+            fsfcmcl = np.zeros((ngptsw,ncol,nlay))
+        else:
+            #  Call the Monte Carlo Independent Column Approximation (McICA, Pincus et al., JC, 2003)
+            (cldfmcl, ciwpmcl, clwpmcl, reicmcl, relqmcl, taucmcl,
+            ssacmcl, asmcmcl, fsfcmcl) = _rrtmg_sw.climlab_mcica_subcol_sw(
+                            ncol, nlay, icld, permuteseed, irng, play,
+                            cldfrac, ciwp, clwp, reic, relq, tauc, ssac, asmc, fsfc)
         #  Call the RRTMG_SW driver to compute radiative fluxes
-        (swuflx  ,swdflx  ,swhr    ,swuflxc ,swdflxc ,swhrc,) = \
-            _rrtmg_sw.climlab_rrtmg_sw(ncol    ,nlay    ,icld    ,iaer    ,
-                play    ,plev    ,tlay    ,tlev    ,tsfc   ,
-                h2ovmr , o3vmr   ,co2vmr  ,ch4vmr  ,n2ovmr ,o2vmr ,
-                asdir   ,asdif   ,aldir   ,aldif   ,
-                coszen  ,adjes   ,dyofyr  ,scon    ,isolvar,
-                inflgsw ,iceflgsw,liqflgsw,cldfmcl ,
-                taucmcl ,ssacmcl ,asmcmcl ,fsfcmcl ,
-                ciwpmcl ,clwpmcl ,reicmcl ,relqmcl ,
-                tauaer  ,ssaaer  ,asmaer  ,ecaer,
-                bndsolvar,indsolvar,solcycfrac)
+        (swuflx, swdflx, swhr, swuflxc, swdflxc, swhrc) = \
+            _rrtmg_sw.climlab_rrtmg_sw(ncol, nlay, icld, iaer,
+                play, plev, tlay, tlev, tsfc,
+                h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr,
+                asdir, asdif, aldir, aldif,
+                coszen, adjes, dyofyr, scon, isolvar,
+                inflgsw, iceflgsw, liqflgsw, cldfmcl,
+                taucmcl, ssacmcl, asmcmcl, fsfcmcl,
+                ciwpmcl, clwpmcl, reicmcl, relqmcl,
+                tauaer, ssaaer, asmaer, ecaer,
+                bndsolvar, indsolvar, solcycfrac)
         #  Output is all (ncol,nlay+1) or (ncol,nlay)
         self.SW_flux_up = _rrtm_to_climlab(swuflx)
         self.SW_flux_down = _rrtm_to_climlab(swdflx)
@@ -216,7 +227,11 @@ class RRTMG_SW(_Radiation_SW):
         #  Compute quantities derived from fluxes, including ASR
         self._compute_SW_flux_diagnostics()
         #  calculate heating rates from flux divergence
+        SWheating_Wm2 = -np.diff(self.SW_flux_net, axis=-1)
+        SWheating_clr_Wm2 = -np.diff(self.SW_flux_net_clr, axis=-1)
         self.heating_rate['Ts'] = self.SW_flux_net[..., -1, np.newaxis]
-        self.heating_rate['Tatm'] = -np.diff(self.SW_flux_net, axis=-1)
-        self.TdotSW = _rrtm_to_climlab(swhr)  # heating rate in K/day
-        self.TdotSW_clr = _rrtm_to_climlab(swhrc)  # clear-sky heating rate in K/day
+        self.heating_rate['Tatm'] = SWheating_Wm2
+        #  Convert to K / day
+        Catm = self.Tatm.domain.heat_capacity
+        self.TdotSW = SWheating_Wm2 / Catm * const.seconds_per_day
+        self.TdotSW_clr = SWheating_clr_Wm2 / Catm * const.seconds_per_day

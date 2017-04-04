@@ -85,7 +85,8 @@ def test_radiative_forcing():
     #  Fixed relative humidity
     h2o = climlab.radiation.ManabeWaterVapor(state=state)
     #  Couple water vapor to radiation
-    rad = climlab.radiation.RRTMG(state=state, specific_humidity=h2o.q)
+    #   Set icld=0 for clear-sky only (no need to call cloud overlap routine)
+    rad = climlab.radiation.RRTMG(state=state, specific_humidity=h2o.q, icld=0)
     #  Convective adjustment
     conv = climlab.convection.ConvectiveAdjustment(state=state,
                                                    adj_lapse_rate=6.5)
@@ -114,7 +115,11 @@ def test_latitude():
     #  insolation
     sol = climlab.radiation.AnnualMeanInsolation(domains=model.Ts.domain)
     #  radiation module with insolation as input
-    rad = climlab.radiation.RRTMG(state=state, S0=sol.S0, insolation=sol.insolation)
+    #   Set icld=0 for clear-sky only (no need to call cloud overlap routine)
+    rad = climlab.radiation.RRTMG(state=state, icld=0,
+                                  S0=sol.S0,
+                                  insolation=sol.insolation,
+                                  coszen=sol.coszen)
     #  Couple everything together
     model.add_subprocess('Radiation', rad)
     model.add_subprocess('Insolation', sol)
