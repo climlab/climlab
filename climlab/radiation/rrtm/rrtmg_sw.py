@@ -227,7 +227,11 @@ class RRTMG_SW(_Radiation_SW):
         #  Compute quantities derived from fluxes, including ASR
         self._compute_SW_flux_diagnostics()
         #  calculate heating rates from flux divergence
+        SWheating_Wm2 = -np.diff(self.SW_flux_net, axis=-1)
+        SWheating_clr_Wm2 = -np.diff(self.SW_flux_net_clr, axis=-1)
         self.heating_rate['Ts'] = self.SW_flux_net[..., -1, np.newaxis]
-        self.heating_rate['Tatm'] = -np.diff(self.SW_flux_net, axis=-1)
-        self.TdotSW = _rrtm_to_climlab(swhr)  # heating rate in K/day
-        self.TdotSW_clr = _rrtm_to_climlab(swhrc)  # clear-sky heating rate in K/day
+        self.heating_rate['Tatm'] = SWheating_Wm2
+        #  Convert to K / day
+        Catm = self.Tatm.domain.heat_capacity
+        self.TdotSW = SWheating_Wm2 / Catm * const.seconds_per_day
+        self.TdotSW_clr = SWheating_clr_Wm2 / Catm * const.seconds_per_day
