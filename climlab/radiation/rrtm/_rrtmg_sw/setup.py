@@ -1,21 +1,26 @@
 def configuration(parent_package='', top_path=None):
     import os
     from numpy.distutils.misc_util import Configuration
-    from numpy.distutils import fcompiler
+    from numpy.distutils.fcompiler import get_default_fcompiler, CompilerNotFound
 
-    # figure out which compiler we're going to use
-    compiler = fcompiler.get_default_fcompiler()
-    # set some fortran compiler-dependent flags
-    f90flags = []
-    if compiler == 'gnu95':
-        f90flags.append('-fno-range-check')
-        f90flags.append('-ffree-form')
-    elif compiler == 'intel' or compiler == 'intelem':
-        f90flags.append('-132')
-    #  Need zero-level optimization to avoid build problems with rrtmg_sw_k_g.f90
-    f90flags.append('-O0')
-    #  Suppress all compiler warnings (avoid huge CI log files)
-    f90flags.append('-w')
+    build = True
+    try:
+        # figure out which compiler we're going to use
+        compiler = get_default_fcompiler()
+        # set some fortran compiler-dependent flags
+        f90flags = []
+        if compiler == 'gnu95':
+            f90flags.append('-fno-range-check')
+            f90flags.append('-ffree-form')
+        elif compiler == 'intel' or compiler == 'intelem':
+            f90flags.append('-132')
+        #  Need zero-level optimization to avoid build problems with rrtmg_sw_k_g.f90
+        f90flags.append('-O0')
+        #  Suppress all compiler warnings (avoid huge CI log files)
+        f90flags.append('-w')
+    except CompilerNotFound:
+        print 'No Fortran compiler found, not building the RRTMG_SW radiation module!'
+        build = False
 
     sourcelist = ['_rrtmg_sw.pyf',
                   'rrtmg_sw_v4.0/gcm_model/modules/parkind.f90',
@@ -56,11 +61,12 @@ def configuration(parent_package='', top_path=None):
                   'Driver.f90']
 
     config = Configuration(package_name='_rrtmg_sw', parent_name=parent_package, top_path=top_path)
-    config.add_extension(name='_rrtmg_sw',
-                         sources=sourcelist,
-                         extra_f90_compile_args=f90flags,
-                        f2py_options=['--quiet'],
-                        )
+    if build:
+        config.add_extension(name='_rrtmg_sw',
+                             sources=sourcelist,
+                             extra_f90_compile_args=f90flags,
+                            f2py_options=['--quiet'],
+                            )
     #  Not currently initializing from nc data file, so there's no reason to include it
     #config.add_data_files(os.path.join('rrtmg_sw_v4.0', 'gcm_model', 'data', 'rrtmg_sw.nc'))
 
