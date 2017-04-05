@@ -1,6 +1,6 @@
 import os, sys
 
-VERSION = '0.5.4'
+VERSION = '0.5.5.dev0'
 
 def readme():
     with open('README.rst') as f:
