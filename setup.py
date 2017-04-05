@@ -1,7 +1,7 @@
 import os, sys
 import textwrap
 
-VERSION = '0.5.5.dev2'
+VERSION = '0.5.5.dev3'
 
 # BEFORE importing setuptools, remove MANIFEST. Otherwise it may not be
 # properly updated when the contents of directories change (true for distutils,
@@ -157,11 +157,12 @@ def setup_package():
           author_email='brose@albany.edu',
           license='MIT',
     )
-    if "--force" in sys.argv:
-        run_build = True
-    else:
-        # Raise errors for unsupported commands, improve help output, etc.
-        run_build = parse_setuppy_commands()
+    # if "--force" in sys.argv:
+    #     run_build = True
+    # else:
+    #     # Raise errors for unsupported commands, improve help output, etc.
+    #     run_build = parse_setuppy_commands()
+    run_build = True
 
     # This import is here because it needs to be done before importing setup()
     # from numpy.distutils, but after the MANIFEST removing and sdist import
