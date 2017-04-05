@@ -1,7 +1,7 @@
 import os, sys
 import textwrap
 
-VERSION = '0.5.5.dev1'
+VERSION = '0.5.5.dev2'
 
 # BEFORE importing setuptools, remove MANIFEST. Otherwise it may not be
 # properly updated when the contents of directories change (true for distutils,
@@ -73,7 +73,7 @@ def parse_setuppy_commands():
     #         Setuptools commands help
     #         ------------------------
     #         """))
-        return False
+    #    return False
 
     # The following commands aren't supported.  They can only be executed when
     # the user explicitly adds a --force command-line argument.
@@ -162,6 +162,12 @@ def setup_package():
     else:
         # Raise errors for unsupported commands, improve help output, etc.
         run_build = parse_setuppy_commands()
+
+    # This import is here because it needs to be done before importing setup()
+    # from numpy.distutils, but after the MANIFEST removing and sdist import
+    # higher up in this file.
+    from setuptools import setup
+
     if run_build:
         from numpy.distutils.core import setup
         metadata['configuration'] = configuration
