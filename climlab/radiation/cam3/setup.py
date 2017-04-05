@@ -1,4 +1,4 @@
-from os.path import join
+from os.path import join, abspath
 
 
 def configuration(parent_package='', top_path=None):
@@ -56,11 +56,12 @@ def cam3_gen_source(ext, build_dir):
                 'radlw.F90',
                 'radsw.F90',
                 'crm.F90',]
+    thispath = abspath(config.local_path)
     sourcelist = []
-    sourcelist.append(join(config.local_path,'_cam3.pyf'))
+    sourcelist.append(join(thispath,'_cam3.pyf'))
     for item in fort90source:
-        sourcelist.append(join(config.local_path, 'src', item))
-    sourcelist.append(join(config.local_path,'Driver.f90'))
+        sourcelist.append(join(thispath, 'src', item))
+    sourcelist.append(join(thispath,'Driver.f90'))
     try:
         config.have_f90c()
         return sourcelist
