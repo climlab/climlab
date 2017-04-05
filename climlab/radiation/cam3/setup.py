@@ -56,7 +56,8 @@ def cam3_gen_source(ext, build_dir):
                 'radlw.F90',
                 'radsw.F90',
                 'crm.F90',]
-    thispath = abspath(config.local_path)
+    #thispath = abspath(config.local_path)
+    thispath = config.local_path
     sourcelist = []
     sourcelist.append(join(thispath,'_cam3.pyf'))
     for item in fort90source:

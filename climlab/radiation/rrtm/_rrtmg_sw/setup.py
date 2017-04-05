@@ -75,7 +75,8 @@ def rrtmg_sw_gen_source(ext, build_dir):
            'rrtmg_sw_init.f90',
            'rrtmg_sw_cldprmc.f90',
            'rrtmg_sw_rad.f90',]
-    thispath = abspath(config.local_path)
+    #thispath = abspath(config.local_path)
+    thispath = config.local_path
     sourcelist = []
     sourcelist.append(join(thispath,'_rrtmg_sw.pyf'))
     for item in modules:

@@ -74,7 +74,8 @@ def rrtmg_lw_gen_source(ext, build_dir):
            'mcica_subcol_gen_lw.f90',
            'rrtmg_lw_init.f90',
            'rrtmg_lw_rad.f90',]
-    thispath = abspath(config.local_path)
+    #thispath = abspath(config.local_path)
+    thispath = config.local_path
     sourcelist = []
     sourcelist.append(join(thispath,'_rrtmg_lw.pyf'))
     for item in modules:
