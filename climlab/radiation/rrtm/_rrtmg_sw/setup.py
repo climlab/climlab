@@ -1,4 +1,4 @@
-from os.path import join
+from os.path import join, abspath
 
 
 def configuration(parent_package='', top_path=None):
@@ -75,16 +75,18 @@ def rrtmg_sw_gen_source(ext, build_dir):
            'rrtmg_sw_init.f90',
            'rrtmg_sw_cldprmc.f90',
            'rrtmg_sw_rad.f90',]
+    #thispath = abspath(config.local_path)
+    thispath = config.local_path
     sourcelist = []
-    sourcelist.append(join(config.local_path,'_rrtmg_sw.pyf'))
+    sourcelist.append(join(thispath,'_rrtmg_sw.pyf'))
     for item in modules:
-        sourcelist.append(join(config.local_path,'rrtmg_sw_v4.0','gcm_model','modules',item))
+        sourcelist.append(join(thispath,'rrtmg_sw_v4.0','gcm_model','modules',item))
     for item in src:
         if item == 'rrtmg_sw_rad.f90':
-            sourcelist.append(join(config.local_path,'sourcemods',item))
+            sourcelist.append(join(thispath,'sourcemods',item))
         else:
-            sourcelist.append(join(config.local_path,'rrtmg_sw_v4.0','gcm_model','src',item))
-    sourcelist.append(join(config.local_path,'Driver.f90'))
+            sourcelist.append(join(thispath,'rrtmg_sw_v4.0','gcm_model','src',item))
+    sourcelist.append(join(thispath,'Driver.f90'))
     try:
         config.have_f90c()
         return sourcelist

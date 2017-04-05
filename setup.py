@@ -1,6 +1,13 @@
 import os, sys
+import textwrap
 
-VERSION = '0.5.4'
+VERSION = '0.5.5'
+
+# BEFORE importing setuptools, remove MANIFEST. Otherwise it may not be
+# properly updated when the contents of directories change (true for distutils,
+# not sure about setuptools).
+if os.path.exists('MANIFEST'):
+    os.remove('MANIFEST')
 
 def readme():
     with open('README.rst') as f:
@@ -20,14 +27,10 @@ def configuration(parent_package='',top_path=None):
     #config.get_version('numpy/version.py') # sets config.version
     return config
 
-
-if __name__ == '__main__':
-    #  Set up climlab with call to setuptools
-    #from setuptools import setup
-    from numpy.distutils.core import setup
-    #from climlab import __version__
+def setup_package():
     __version__ = VERSION
-    setup(name='climlab',
+    metadata = dict(
+          name='climlab',
           version=__version__,
           description='Package for process-oriented climate modeling',
           long_description=readme(),
@@ -43,5 +46,23 @@ if __name__ == '__main__':
           author='Brian E. J. Rose',
           author_email='brose@albany.edu',
           license='MIT',
-          configuration=configuration,
-          )
+    )
+    # if "--force" in sys.argv:
+    #     run_build = True
+    # else:
+    #     # Raise errors for unsupported commands, improve help output, etc.
+    #     run_build = parse_setuppy_commands()
+    run_build = True
+
+    # This import is here because it needs to be done before importing setup()
+    # from numpy.distutils, but after the MANIFEST removing and sdist import
+    # higher up in this file.
+    from setuptools import setup
+
+    if run_build:
+        from numpy.distutils.core import setup
+        metadata['configuration'] = configuration
+    setup(**metadata)
+
+if __name__ == '__main__':
+    setup_package()

@@ -1,4 +1,4 @@
-from os.path import join
+from os.path import join, abspath
 
 
 def configuration(parent_package='', top_path=None):
@@ -74,16 +74,18 @@ def rrtmg_lw_gen_source(ext, build_dir):
            'mcica_subcol_gen_lw.f90',
            'rrtmg_lw_init.f90',
            'rrtmg_lw_rad.f90',]
+    #thispath = abspath(config.local_path)
+    thispath = config.local_path
     sourcelist = []
-    sourcelist.append(join(config.local_path,'_rrtmg_lw.pyf'))
+    sourcelist.append(join(thispath,'_rrtmg_lw.pyf'))
     for item in modules:
-        sourcelist.append(join(config.local_path,'rrtmg_lw_v4.85','gcm_model','modules',item))
+        sourcelist.append(join(thispath,'rrtmg_lw_v4.85','gcm_model','modules',item))
     for item in src:
         if item == 'rrtmg_lw_setcoef.f90':
-            sourcelist.append(join(config.local_path,'sourcemods',item))
+            sourcelist.append(join(thispath,'sourcemods',item))
         else:
-            sourcelist.append(join(config.local_path,'rrtmg_lw_v4.85','gcm_model','src',item))
-    sourcelist.append(join(config.local_path,'Driver.f90'))
+            sourcelist.append(join(thispath,'rrtmg_lw_v4.85','gcm_model','src',item))
+    sourcelist.append(join(thispath,'Driver.f90'))
     try:
         config.have_f90c()
         return sourcelist
