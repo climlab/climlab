@@ -25,15 +25,19 @@ The simplest and recommended way to install ``climlab`` is using conda_
 (which is the wonderful package manager that comes with `Anaconda Python`_).
 
 On Mac OSX and Linux, you can install ``climlab`` and all its dependencies with
+
 ```
 conda install -c conda-forge climlab
 ```
 
 Or (recommended) add ``conda-forge`` to your conda channels with
+
 ```
 conda config --add channels conda-forge
 ```
+
 and then simply do
+
 ```
 conda install climlab
 ```
@@ -41,16 +45,21 @@ conda install climlab
 Installing from source
 ~~~~~~~~~~~~~~~~~~~~~~
 If you do not use conda, you can install ``climlab`` from source with
+
 ```
 pip install climlab
 ```
+
 (which will download the latest stable release from the `pypi repository`_ and trigger the build process.)
 
 Alternatively, clone the source code repository with
+
 ```
 git clone https://github.com/brian-rose/climlab.git
 ```
+
 and, from the ``climlab`` directory, do
+
 ```
 python setup.py install
 ```
