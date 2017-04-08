@@ -24,38 +24,32 @@ Installing pre-built binaries with conda (Mac OSX and Linux)
 The simplest and recommended way to install ``climlab`` is using conda_
 (which is the wonderful package manager that comes with `Anaconda Python`_).
 
-On Mac OSX and Linux, you can install ``climlab`` and all its dependencies with
+On Mac OSX and Linux, you can install ``climlab`` and all its dependencies with::
 
-.. code::
     conda install -c conda-forge climlab
 
-Or (recommended) add ``conda-forge`` to your conda channels with
+Or (recommended) add ``conda-forge`` to your conda channels with::
 
-.. code::
     conda config --add channels conda-forge
 
-and then simply do
+and then simply do::
 
-.. code::
     conda install climlab
 
 Installing from source
 ~~~~~~~~~~~~~~~~~~~~~~
-If you do not use conda, you can install ``climlab`` from source with
+If you do not use conda, you can install ``climlab`` from source with::
 
-.. code::
     pip install climlab
 
 (which will download the latest stable release from the `pypi repository`_ and trigger the build process.)
 
-Alternatively, clone the source code repository with
+Alternatively, clone the source code repository with::
 
-.. code::
     git clone https://github.com/brian-rose/climlab.git
 
 and, from the ``climlab`` directory, do::
 
-.. code::
     python setup.py install
 
 You will need a Fortran compiler on your system.
