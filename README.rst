@@ -16,6 +16,63 @@ Author
 | brose@albany.edu
 
 
+Installation
+--------------
+
+Installing pre-built binaries with conda (Mac OSX and Linux)
+~~~~~~~~~~~~~~~~~~~~~~
+The simplest and recommended way to install ``climlab`` is using conda_
+(which is the wonderful package manager that comes with `Anaconda Python`_).
+
+On Mac OSX and Linux, you can install ``climlab`` and all its dependencies with
+```
+conda install -c conda-forge climlab
+```
+
+Or (recommended) add ``conda-forge`` to your conda channels with
+```
+conda config --add channels conda-forge
+```
+and then simply do
+```
+conda install climlab
+```
+
+Installing from source
+~~~~~~~~~~~~~~~~~~~~~~
+If you do not use conda, you can install ``climlab`` from source with
+```
+pip install climlab
+```
+(which will download the latest stable release from the `pypi repository`_ and trigger the build process.)
+
+Alternatively, clone the source code repository with
+```
+git clone https://github.com/brian-rose/climlab.git
+```
+and, from the ``climlab`` directory, do
+```
+python setup.py install
+```
+
+You will need a Fortran compiler on your system.
+The build has been tested with both gcc/gfortran and ifort (Linux)
+
+Installing on Windows
+~~~~~~~~~~~~~~~~~~~~~~
+Currently, building from source (see above) is your only option.
+You will need a Fortran compiler, and may possibly need to build ``numpy`` from source as well.
+
+I would love to hear from anyone who tries and/or succeeds to build ``climlab`` on Windows!
+
+Note that many parts of ``climlab`` are written in pure Python and will work on any system, Windows included.
+Fortran builds are necessary for the RRTMG and CAM3 radiation schemes.
+
+.. _conda: https://github.com/conda/conda
+.. _`Anaconda Python`: https://www.continuum.io/downloads
+.. _`pypi repository`: https://pypi.python.org
+
+
 About climlab
 --------------
 ``climlab`` is a flexible engine for process-oriented climate modeling.
@@ -35,7 +92,7 @@ Currently, ``climlab`` has out-of-the-box support and documented examples for
     - CAM3  (from the NCAR GCM)
     - Grey Gas
     - Simplified band-averaged models (4 bands each in longwave and shortwave)
-- 1D diffusive energy balance models
+- Diffusive energy balance models
 - Seasonal and steady-state models
 - Arbitrary combinations of the above, for example:
     - 2D latitude-pressure models with radiation, horizontal diffusion, and fixed relative humidity
@@ -51,39 +108,24 @@ Links
 -  Source code: http://github.com/brian-rose/climlab
 
 
-Installation
-----------------
-Currently the only way to install is to build from source.
-
-You can download a tarball of the latest stable source by clicking the pypi badge above! Or get the source from github with
-
-``git clone https://github.com/brian-rose/climlab.git``
-
-Then from the `climlab` directory, do
-
-``python setup.py install``
-
-This will trigger the build process for the Fortran components,
-assuming you have a Fortran compiler available on your system.
-
-The Fortran compiler is necessary for the CAM3 and RRTMG radiation modules.
-
-
 Dependencies
 -----------------
+
+These are handled automatically if you install with conda_.
+
 Required
 ~~~~~~~~~~~~
-- Python 2.7
-- numpy
-- scipy
-- netCDF4 Python package (for data i/o)
-- a Fortran compiler (for building from source; tested with both gcc/gfortran and ifort)
+- Python 2.7  (compatibility with Python 3 coming soon!)
+- ``numpy``
+- ``scipy``
+- ``netCDF4`` Python package (for data i/o)
 
 Recommended for full functionality
 ~~~~~~~~~~~~
-- numba Python package (used for acceleration of some components)
+- ``numba`` (used for acceleration of some components)
+- ``pytest`` (to run the automated tests, important if you are developing new code)
 
-Anaconda Python is highly recommended and will provide everything you need.
+`Anaconda Python`_ is highly recommended and will provide everything you need.
 
 
 Documentation and Examples
@@ -99,7 +141,6 @@ These are self-describing, and should all run out-of-the-box once the package is
 
 
 .. _here: http://climlab.readthedocs.io
-
 
 
 History
@@ -132,7 +173,9 @@ Version 0.5 (released March 2017) provides bug fixes and full functionality for 
 an improved common API for all radiation modules, and better documentation.
 
 Version 0.5.2 (released late March 2017) provides many under-the-hood improvements to the build procedure,
-which should make it much easier to get `climlab` installed on user machines. Binary distribution with `conda` is coming soon!
+which should make it much easier to get `climlab` installed on user machines. Binary distribution with conda_ is coming soon!
+
+Version 0.5.5 (released early April 2017) finally provides easy binary distrbution with conda_
 
 The documentation_ was first created by Moritz Kreuzer (Potsdam Institut for Climate Impact Research) as part of a thesis project in Spring 2016.
 
