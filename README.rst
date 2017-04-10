@@ -19,12 +19,12 @@ Author
 Installation
 --------------
 
-Installing pre-built binaries with conda (Mac OSX and Linux)
+Installing pre-built binaries with conda (Mac OSX, Linux, and Windows)
 ~~~~~~~~~~~~~~~~~~~~~~
-The simplest and recommended way to install ``climlab`` is using conda_
+By far the simplest and recommended way to install ``climlab`` is using conda_
 (which is the wonderful package manager that comes with `Anaconda Python`_).
 
-On Mac OSX and Linux, you can install ``climlab`` and all its dependencies with::
+You can install ``climlab`` and all its dependencies with::
 
     conda install -c conda-forge climlab
 
@@ -35,6 +35,9 @@ Or (recommended) add ``conda-forge`` to your conda channels with::
 and then simply do::
 
     conda install climlab
+
+Binaries are available for OSX, Linux, and Windows.
+You may need to update your ``numpy`` if you are using are using a version prior to 1.11
 
 Installing from source
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -55,15 +58,16 @@ and, from the ``climlab`` directory, do::
 You will need a Fortran compiler on your system.
 The build has been tested with both gcc/gfortran and ifort (Linux)
 
-Installing on Windows
+Installing from source without a Fortran compiler
 ~~~~~~~~~~~~~~~~~~~~~~
-Currently, building from source (see above) is your only option.
-You will need a Fortran compiler, and may possibly need to build ``numpy`` from source as well.
-
-I would love to hear from anyone who tries and/or succeeds to build ``climlab`` on Windows!
-
-Note that many parts of ``climlab`` are written in pure Python and will work on any system, Windows included.
+Many parts of ``climlab`` are written in pure Python and should work on any system.
 Fortran builds are necessary for the RRTMG and CAM3 radiation schemes.
+If you follow the instructions for installing from source (above) without a valid Fortran compiler,
+you should find that you can still::
+
+    import climlab
+
+and use most of the package. You will see warning messages about the missing radiation components.
 
 .. _conda: https://github.com/conda/conda
 .. _`Anaconda Python`: https://www.continuum.io/downloads
@@ -123,6 +127,7 @@ Recommended for full functionality
 - ``pytest`` (to run the automated tests, important if you are developing new code)
 
 `Anaconda Python`_ is highly recommended and will provide everything you need.
+See "Installing pre-built binaries with conda" above.
 
 
 Documentation and Examples
