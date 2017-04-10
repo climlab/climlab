@@ -13,3 +13,4 @@ rm climlab/radiation/rrtm/_rrtmg_sw/*.so
 rm -r climlab/radiation/rrtm/_rrtmg_sw/*.so.dSYM
 rm climlab/radiation/cam3/*.so
 rm -r climlab/radiation/cam3/*.so.dSYM
+rm -r climlab.egg_info
