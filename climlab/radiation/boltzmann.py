@@ -4,7 +4,7 @@ from climlab.process.energy_budget import EnergyBudget
 
 
 class Boltzmann(EnergyBudget):
-    """A class for black body radiation.
+    r"""A class for black body radiation.
 
     Implements a radiation subprocess which computes longwave radiation
     with the Stefan-Boltzmann law for black/grey body radiation.

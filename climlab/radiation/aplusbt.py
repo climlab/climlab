@@ -5,7 +5,7 @@ import numpy as np
 
 
 class AplusBT(EnergyBudget):
-    """The simplest linear longwave radiation module.
+    r"""The simplest linear longwave radiation module.
 
     Calculates the Outgoing Longwave Radation (OLR) :math:`R\uparrow` as
 

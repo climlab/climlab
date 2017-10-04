@@ -4,7 +4,7 @@ from climlab.process.time_dependent_process import TimeDependentProcess
 
 
 class EnergyBudget(TimeDependentProcess):
-    """A parent class for explicit energy budget processes.
+    r"""A parent class for explicit energy budget processes.
 
     This class solves equations that include a heat capacitiy term like
     :math:`C \\frac{dT}{dt} = \\textrm{flux convergence}`
