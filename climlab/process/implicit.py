@@ -50,7 +50,7 @@ class ImplicitProcess(TimeDependentProcess):
         #adjustment = newstate.copy()
         adjustment = {}
         tendencies = {}
-        for name, var in self.state.iteritems():
+        for name, var in self.state.items():
             adjustment[name] = newstate[name] - var
             tendencies[name] = adjustment[name] / self.param['timestep']
         # express the adjustment (already accounting for the finite time step)

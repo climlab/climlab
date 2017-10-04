@@ -65,6 +65,7 @@
 
 from __future__ import division
 from __future__ import print_function
+from builtins import object
 import time, copy
 import numpy as np
 from climlab.domain.field import Field
@@ -135,7 +136,7 @@ class Process(object):
     def __str__(self):
         str1 = 'climlab Process of type {0}. \n'.format(type(self))
         str1 += 'State variables and domain shapes: \n'
-        for varname in self.state.keys():
+        for varname in list(self.state.keys()):
             str1 += '  {0}: {1} \n'.format(varname, self.domains[varname].shape)
         str1 += 'The subprocess tree: \n'
         str1 += walk.process_tree(self)
@@ -155,7 +156,7 @@ class Process(object):
         # dictionary of state variables (all of type Field)
         self.state = attr_dict.AttrDict()
         states = _make_dict(state, Field)
-        for name, value in states.iteritems():
+        for name, value in states.items():
             self.set_state(name, value)
         #convert int dtype to float
             if np.issubdtype(self.state[name].dtype, 'int'):
@@ -173,7 +174,7 @@ class Process(object):
             #self._input_vars = frozenset()
             self._input_vars = []
         else:
-            self.add_input(input.keys())
+            self.add_input(list(input.keys()))
             for name, var in input:
                 self.__dict__[name] = var
         self.creation_date = time.strftime("%a, %d %b %Y %H:%M:%S %z",
@@ -203,7 +204,7 @@ class Process(object):
         if isinstance(procdict, Process):
             self.add_subprocess('default', procdict)
         else:
-            for name, proc in procdict.iteritems():
+            for name, proc in procdict.items():
                 self.add_subprocess(name, proc)
 
     def add_subprocess(self, name, proc):
@@ -271,7 +272,7 @@ class Process(object):
             self.has_process_type_list = False
             # Add subprocess diagnostics to parent
             #  (if there are no name conflicts)
-            for diagname, value in proc.diagnostics.iteritems():
+            for diagname, value in proc.diagnostics.items():
                 if not (diagname in self.diagnostics or hasattr(self, diagname)):
                     self.add_diagnostic(diagname, value)
         else:
@@ -375,7 +376,7 @@ class Process(object):
                 raise ValueError('Shape mismatch between existing domain and new state variable.')
         # set the state dictionary
         self.state[name] = value
-        for name, value in self.state.iteritems():
+        for name, value in self.state.items():
         #convert int dtype to float
             if np.issubdtype(self.state[name].dtype, 'int'):
                 value = self.state[name].astype(float)
@@ -383,8 +384,8 @@ class Process(object):
         setattr(self, name, value)
 
     def _guess_state_domains(self):
-        for name, value in self.state.iteritems():
-            for domname, dom in self.domains.iteritems():
+        for name, value in self.state.items():
+            for domname, dom in self.domains.items():
                 if value.shape == dom.shape:
                     # same shape, assume it's the right domain
                     self.state_domain[name] = dom
@@ -536,7 +537,7 @@ class Process(object):
 
         """
         try:
-            for domname, dom in self.domains.iteritems():
+            for domname, dom in self.domains.items():
                 try:
                     thislat = dom.axes['lat'].points
                 except:
@@ -556,7 +557,7 @@ class Process(object):
 
         """
         try:
-            for domname, dom in self.domains.iteritems():
+            for domname, dom in self.domains.items():
                 try:
                     thislat = dom.axes['lat'].bounds
                 except:
@@ -576,7 +577,7 @@ class Process(object):
 
         """
         try:
-            for domname, dom in self.domains.iteritems():
+            for domname, dom in self.domains.items():
                 try:
                     thislon = dom.axes['lon'].points
                 except:
@@ -596,7 +597,7 @@ class Process(object):
 
         """
         try:
-            for domname, dom in self.domains.iteritems():
+            for domname, dom in self.domains.items():
                 try:
                     thislon = dom.axes['lon'].bounds
                 except:
@@ -616,7 +617,7 @@ class Process(object):
 
         """
         try:
-            for domname, dom in self.domains.iteritems():
+            for domname, dom in self.domains.items():
                 try:
                     thislev = dom.axes['lev'].points
                 except:
@@ -636,7 +637,7 @@ class Process(object):
 
         """
         try:
-            for domname, dom in self.domains.iteritems():
+            for domname, dom in self.domains.items():
                 try:
                     thislev = dom.axes['lev'].bounds
                 except:
@@ -656,7 +657,7 @@ class Process(object):
 
         """
         try:
-            for domname, dom in self.domains.iteritems():
+            for domname, dom in self.domains.items():
                 try:
                     thisdepth = dom.axes['depth'].points
                 except:
@@ -676,7 +677,7 @@ class Process(object):
 
         """
         try:
-            for domname, dom in self.domains.iteritems():
+            for domname, dom in self.domains.items():
                 try:
                     thisdepth = dom.axes['depth'].bounds
                 except:
@@ -755,7 +756,7 @@ def get_axes(process_or_domain):
         return dom.axes
     elif isinstance(dom, dict):
         axes = {}
-        for thisdom in dom.values():
+        for thisdom in list(dom.values()):
             assert isinstance(thisdom, _Domain)
             axes.update(thisdom.axes)
         return axes

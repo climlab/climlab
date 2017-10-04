@@ -67,5 +67,5 @@ class BudykoTransport(EnergyBudget):
         """Computes energy flux convergences to get heating rates in :math:`W/m^2`.
 
         """
-        for varname, value in self.state.iteritems():
+        for varname, value in self.state.items():
             self.heating_rate[varname] = - self.b * (value - global_mean(value))

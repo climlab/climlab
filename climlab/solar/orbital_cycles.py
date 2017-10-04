@@ -1,12 +1,15 @@
 from __future__ import division
 from __future__ import print_function
+from builtins import str
+from builtins import range
+from builtins import object
 import numpy as np
 from climlab import constants as const
 from climlab.solar.orbital import OrbitalTable
 from climlab.domain.field import global_mean
 
 
-class OrbitalCycles:
+class OrbitalCycles(object):
     def __init__(self,
                  model,
                  kyear_start=-20.,

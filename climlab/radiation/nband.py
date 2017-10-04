@@ -1,4 +1,5 @@
 from __future__ import division
+from builtins import range
 import numpy as np
 from climlab.radiation.greygas import GreyGas
 from climlab import constants as const
@@ -66,7 +67,7 @@ class NbandRadiation(GreyGas):
         # this will cause a problem for a model without CO2
         tau = np.zeros_like(self.absorber_vmr['CO2']*
                             self.absorption_cross_section['CO2'])
-        for gas, vmr in self.absorber_vmr.iteritems():
+        for gas, vmr in self.absorber_vmr.items():
             # convert to mass of absorber per unit total mass
             if gas is 'H2O':  # H2O is stored as specific humidity, not VMR
                 q = vmr

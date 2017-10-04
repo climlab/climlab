@@ -112,7 +112,7 @@ class GreyRadiationModel(TimeDependentProcess):
         self.do_diagnostics()
         # no tendencies for the parent process
         tendencies = {}
-        for name, var in self.state.iteritems():
+        for name, var in self.state.items():
             tendencies[name] = var * 0.
         return tendencies
 

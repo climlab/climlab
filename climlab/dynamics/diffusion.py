@@ -82,7 +82,7 @@ class Diffusion(ImplicitProcess):
         else:
             self.diffusion_axis = diffusion_axis
         # This currently only works with evenly spaced points
-        for dom in self.domains.values():
+        for dom in list(self.domains.values()):
             delta = np.mean(dom.axes[self.diffusion_axis].delta)
             bounds = dom.axes[self.diffusion_axis].bounds
         self.K_dimensionless = (self.param['K'] * np.ones_like(bounds) *
@@ -131,7 +131,7 @@ class Diffusion(ImplicitProcess):
         # Time-stepping the diffusion is just inverting this matrix problem:
         # self.T = np.linalg.solve( self.diffTriDiag, Trad )
         newstate = {}
-        for varname, value in self.state.iteritems():
+        for varname, value in self.state.items():
             if self.use_banded_solver:
                 newvar = _solve_implicit_banded(value, self.diffTriDiag)
             else:
@@ -223,7 +223,7 @@ class MeridionalDiffusion(Diffusion):
                                                 diffusion_axis='lat', **kwargs)
         # Conversion of delta from deg to rad in K_dimensionless
         self.K_dimensionless *= 1./np.deg2rad(1.)**2
-        for dom in self.domains.values():
+        for dom in list(self.domains.values()):
             latax = dom.axes['lat']
         self.diffTriDiag = \
             _make_meridional_diffusion_matrix(self.K_dimensionless, latax)
@@ -399,10 +399,10 @@ def _guess_diffusion_axis(process_or_domain):
     """
     axes = get_axes(process_or_domain)
     diff_ax = {}
-    for axname, ax in axes.iteritems():
+    for axname, ax in axes.items():
         if ax.num_points > 1:
             diff_ax.update({axname: ax})
-    if len(diff_ax.keys()) == 1:
-        return diff_ax.keys()[0]
+    if len(list(diff_ax.keys())) == 1:
+        return list(diff_ax.keys())[0]
     else:
         raise ValueError('More than one possible diffusion axis.')
