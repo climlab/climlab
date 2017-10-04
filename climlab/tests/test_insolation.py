@@ -1,4 +1,5 @@
 from __future__ import division
+from __future__ import print_function
 import numpy as np
 from climlab import constants as const
 from climlab.solar.insolation import daily_insolation
@@ -55,7 +56,7 @@ def test_long_orbital_parameters():
 #  Tests of automatic orbital cycles with EBM
 def test_orbital_cycles():
     ebm = EBM_seasonal()
-    print ebm
+    print(ebm)
     #  add an albedo feedback
     albedo = StepFunctionAlbedo(state=ebm.state, **ebm.param)
     ebm.add_subprocess('albedo', albedo)

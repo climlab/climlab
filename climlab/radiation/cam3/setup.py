@@ -1,3 +1,4 @@
+from __future__ import print_function
 from os.path import join, abspath
 
 
@@ -20,7 +21,7 @@ def configuration(parent_package='', top_path=None):
         #  Suppress all compiler warnings (avoid huge CI log files)
         f90flags.append('-w')
     except CompilerNotFound:
-        print 'No Fortran compiler found, not building the CAM3 radiation module!'
+        print('No Fortran compiler found, not building the CAM3 radiation module!')
         build = False
 
     config = Configuration(package_name='cam3', parent_name=parent_package, top_path=top_path)
@@ -67,7 +68,7 @@ def cam3_gen_source(ext, build_dir):
         config.have_f90c()
         return sourcelist
     except:
-        print 'No Fortran 90 compiler found, not building CAM3 extension!'
+        print('No Fortran 90 compiler found, not building CAM3 extension!')
         return None
 
 if __name__ == '__main__':

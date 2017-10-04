@@ -35,7 +35,8 @@ See <http://rtweb.aer.com/rrtm_frame.html> for more information about the RRTMG 
 
 '''
 from __future__ import division
-from rrtmg import RRTMG
-from rrtmg_lw import RRTMG_LW
-from rrtmg_sw import RRTMG_SW
-from utils import _climlab_to_rrtm, _rrtm_to_climlab
+from __future__ import absolute_import
+from .rrtmg import RRTMG
+from .rrtmg_lw import RRTMG_LW
+from .rrtmg_sw import RRTMG_SW
+from .utils import _climlab_to_rrtm, _rrtm_to_climlab

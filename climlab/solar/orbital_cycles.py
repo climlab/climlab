@@ -1,4 +1,5 @@
 from __future__ import division
+from __future__ import print_function
 import numpy as np
 from climlab import constants as const
 from climlab.solar.orbital import OrbitalTable

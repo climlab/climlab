@@ -1,3 +1,4 @@
+from __future__ import print_function
 from os.path import join, abspath
 
 
@@ -22,7 +23,7 @@ def configuration(parent_package='', top_path=None):
         #  Suppress all compiler warnings (avoid huge CI log files)
         f90flags.append('-w')
     except CompilerNotFound:
-        print 'No Fortran compiler found, not building the RRTMG_SW radiation module!'
+        print('No Fortran compiler found, not building the RRTMG_SW radiation module!')
         build = False
 
     config = Configuration(package_name='_rrtmg_sw', parent_name=parent_package, top_path=top_path)
@@ -91,7 +92,7 @@ def rrtmg_sw_gen_source(ext, build_dir):
         config.have_f90c()
         return sourcelist
     except:
-        print 'No Fortran 90 compiler found, not building RRTMG_LW extension!'
+        print('No Fortran 90 compiler found, not building RRTMG_LW extension!')
         return None
 
 if __name__ == '__main__':

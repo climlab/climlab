@@ -64,6 +64,7 @@
 #==============================================================================
 
 from __future__ import division
+from __future__ import print_function
 import time, copy
 import numpy as np
 from climlab.domain.field import Field
@@ -321,7 +322,7 @@ class Process(object):
             self.subprocess.pop(name)
         except KeyError:
             if verbose:
-                print 'WARNING: {} not found in subprocess dictionary.'.format(name)
+                print('WARNING: {} not found in subprocess dictionary.'.format(name))
         self.has_process_type_list = False
 
     def set_state(self, name, value):
@@ -495,7 +496,7 @@ class Process(object):
             delattr(self, name)
             self._diag_vars.remove(name)
         except:
-            print 'No diagnostic named {} was found.'.format(name)
+            print('No diagnostic named {} was found.'.format(name))
 
     @property
     def diagnostics(self):

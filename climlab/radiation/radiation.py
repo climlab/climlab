@@ -69,6 +69,7 @@ Longwave processes compute these diagnostics (minimum):
 '''
 
 from __future__ import division
+from __future__ import print_function
 import numpy as np
 from climlab.process import EnergyBudget
 from climlab.radiation import ManabeWaterVapor
@@ -78,7 +79,7 @@ from climlab import constants as const
 try:
     import netCDF4 as nc
 except:
-    print 'Cannot import netCDF4 interface. Will not be able to initialize ozone from data file.'
+    print('Cannot import netCDF4 interface. Will not be able to initialize ozone from data file.')
 
 
 def default_specific_humidity(Tatm):
@@ -130,7 +131,7 @@ def default_absorbers(Tatm,
     ozonefilepath = os.path.join(datadir, ozone_file)
     #  Open the ozone data file
     if verbose:
-        print 'Getting ozone data from', ozonefilepath
+        print('Getting ozone data from', ozonefilepath)
     ozonedata = nc.Dataset(ozonefilepath)
     ozone_lev = ozonedata.variables['lev'][:]
     ozone_lat = ozonedata.variables['lat'][:]
@@ -151,8 +152,8 @@ def default_absorbers(Tatm,
             f2d = interp2d(ozone_lat, ozone_lev, ozone_zon)
             absorber_vmr['O3'] = f2d(lat, lev).transpose()
         except:
-            print 'Interpolation of ozone data failed.'
-            print 'Reverting to default O3.'
+            print('Interpolation of ozone data failed.')
+            print('Reverting to default O3.')
             absorber_vmr['O3'] = np.zeros_like(Tatm)
     return absorber_vmr
 

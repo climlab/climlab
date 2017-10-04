@@ -17,6 +17,7 @@ See http://vo.imcce.fr/insola/earth/online/earth/La2004/README.TXT
 
 """
 from __future__ import division
+from __future__ import print_function
 import numpy as np
 from scipy import interpolate
 import os
@@ -106,16 +107,16 @@ class OrbitalTable:
         fullfilename = os.path.join(os.path.dirname(__file__), past_file)
         try:
             record = open(fullfilename,'r')
-            print 'Loading Berger and Loutre (1991) orbital parameter data from file ' + fullfilename
+            print('Loading Berger and Loutre (1991) orbital parameter data from file ' + fullfilename)
         except:
-            print 'Failed to load orbital locally, trying to access it via remote ftp.'
+            print('Failed to load orbital locally, trying to access it via remote ftp.')
             try:
                 import urllib2
                 record = urllib2.urlopen( base_url + past_file )
-                print 'Accessing Berger and Loutre (1991) orbital data from ' + base_url
-                print 'Reading file ' + past_file
+                print('Accessing Berger and Loutre (1991) orbital data from ' + base_url)
+                print('Reading file ' + past_file)
             except:
-                raise StandardError('Failed to load the data via remote ftp.')
+                raise Exception('Failed to load the data via remote ftp.')
 
         #  loop through each line of the file, read it into numpy array
         #  skip first three lines of header
@@ -162,13 +163,13 @@ class LongOrbitalTable(OrbitalTable):
         data_past = np.empty((num_lines_past,num_columns))
         data_future = np.empty((num_lines_future, num_columns))
 
-        print 'Attempting to access La2004 orbital data from ' + base_url
+        print('Attempting to access La2004 orbital data from ' + base_url)
         #  loop through each line of the file, read it into numpy array
         for (data,filename) in zip((data_past,data_future),
                             (past_file,future_file)):
             try:
                 import urllib2
-                print 'Reading file ' + filename
+                print('Reading file ' + filename)
                 record = urllib2.urlopen( base_url + filename )
                 for index,line in enumerate(record):
                     str1 = line.rstrip()  # remove newline character
@@ -176,7 +177,7 @@ class LongOrbitalTable(OrbitalTable):
                     data[index,:] = np.fromstring(str2, sep=' ')
                 record.close()
             except:
-                raise StandardError('Failed to access file ' + filename )
+                raise Exception('Failed to access file ' + filename )
 
         #  need to flip it so the data runs from past to present
         data_past = np.flipud(data_past)
