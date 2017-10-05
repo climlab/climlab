@@ -9,21 +9,21 @@ source:
   path: ../
 
 build:
-  number: 0
-  skip: True  # [not py2k]
+  number: 1
+  #skip: True  # [not py2k]
 
 requirements:
   build:
     - toolchain
     - mingwpy  # [win]
     - gcc  # [osx]
-    - python
+    - python 3.6*
     - setuptools
     - libgfortran  # [linux]
     - numpy x.x
 
   run:
-    - python 2.7*
+    - python 3.6*
     - numpy x.x
     - scipy
     - netcdf4
