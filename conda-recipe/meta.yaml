@@ -1,18 +1,15 @@
 {% set name = "climlab" %}
-{% set version = "0.5.6" %}
-{% set sha256 = "d445c26e230517722b1d3d36f23fbbd6eb1bf22f0fec72e0cc3130ee0a8d0c74" %}
+{% set version = "0.6.0.dev1" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  fn: {{ name }}-{{ version }}.tar.gz
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: {{ sha256 }}
+  path: ../
 
 build:
-  number: 2
+  number: 0
   skip: True  # [not py2k]
 
 requirements:
@@ -32,6 +29,7 @@ requirements:
     - netcdf4
     - pytest
     - libgfortran  # [linux or osx]
+    - future
 
 test:
   requires:
@@ -39,7 +37,7 @@ test:
   imports:
     - climlab
   commands:
-    - pytest -v --pyargs climlab.tests.test_rrtm
+    - pytest -v --pyargs climlab.tests
 
 about:
   home: https://github.com/brian-rose/climlab
