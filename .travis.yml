@@ -12,7 +12,7 @@ python:
   - 3.6
 
 env:
-  - CONDA_PACKAGES="conda-build pip pytest gcc"
+  - CONDA_PACKAGES="pip pytest gcc"
 
 before_install:
   - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
