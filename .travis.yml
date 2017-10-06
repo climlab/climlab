@@ -12,7 +12,7 @@ python:
   - 3.6
 
 env:
-  - CONDA_PACKAGES="pip pytest gcc"  # numpy version hard-coded for now
+  - CONDA_PACKAGES="conda-build pip pytest gcc"
 
 before_install:
   - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
@@ -31,7 +31,7 @@ install:
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION $CONDA_PACKAGES
   - source activate test-environment
   - pip install codecov pytest-cov
-  - conda build conda-recipe --numpy 1.13  # hard-coded for now... better to have a build matrix
+  - conda-build conda-recipe --numpy 1.13  # hard-coded for now... better to have a build matrix
   - conda install climlab --use-local
 
 script:
