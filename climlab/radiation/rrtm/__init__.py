@@ -34,8 +34,7 @@ See <http://rtweb.aer.com/rrtm_frame.html> for more information about the RRTMG 
             print rcm.ASR - rcm.OLR
 
 '''
-from __future__ import division
-from __future__ import absolute_import
+from __future__ import division, absolute_import
 from .rrtmg import RRTMG
 from .rrtmg_lw import RRTMG_LW
 from .rrtmg_sw import RRTMG_SW

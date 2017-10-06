@@ -29,8 +29,7 @@ climlab wrappers for the NCAR CAM3 radiation code
 
 
 '''
-from __future__ import division
-from __future__ import print_function
+from __future__ import division, print_function, absolute_import
 import numpy as np
 from climlab import constants as const
 from climlab.utils.thermo import vmr_to_mmr
@@ -38,7 +37,7 @@ from climlab.radiation.radiation import _Radiation_SW, _Radiation_LW
 import os
 #  Wrapping these imports in try/except to avoid failures during documentation building on readthedocs
 try:
-    import _cam3
+    from . import _cam3
 except:
     print('Cannot import compiled Fortran extension, CAM3 module will not be functional.')
 try:
