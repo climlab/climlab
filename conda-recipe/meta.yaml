@@ -1,5 +1,5 @@
 {% set name = "climlab" %}
-{% set version = "0.6.0.dev4" %}
+{% set version = "0.6.0.dev5" %}
 
 package:
   name: {{ name|lower }}
@@ -17,13 +17,13 @@ requirements:
     - toolchain
     - mingwpy  # [win]
     - gcc  # [osx]
-    - python 3.6*
+    - python
     - setuptools
     - libgfortran  # [linux]
     - numpy x.x
 
   run:
-    - python 3.6*
+    - python
     - numpy x.x
     - scipy
     - netcdf4

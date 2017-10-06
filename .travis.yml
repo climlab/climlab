@@ -9,11 +9,10 @@ matrix:
 
 python:
   - 2.7
-# activate once you think you are python 3 compatible
-#  - 3.5
+  - 3.6
 
 env:
-  - CONDA_PACKAGES="numpy scipy pytest netcdf4 gcc future"
+  - CONDA_PACKAGES="pip pytest gcc"  # numpy version hard-coded for now
 
 before_install:
   - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
@@ -32,7 +31,8 @@ install:
   - conda create -q -n test-environment python=$TRAVIS_PYTHON_VERSION $CONDA_PACKAGES
   - source activate test-environment
   - pip install codecov pytest-cov
-  - pip install -e .
+  - conda build conda-recipe --numpy 1.13  # hard-coded for now... better to have a build matrix
+  - conda install climlab --use-local
 
 script:
   - py.test climlab --cov=climlab --cov-config .coveragerc --cov-report term-missing -v
