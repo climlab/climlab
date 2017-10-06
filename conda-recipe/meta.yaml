@@ -1,5 +1,5 @@
 {% set name = "climlab" %}
-{% set version = "0.6.0.dev5" %}
+{% set version = "0.6.0.dev6" %}
 
 package:
   name: {{ name|lower }}
@@ -30,6 +30,7 @@ requirements:
     - pytest
     - libgfortran  # [linux or osx]
     - future
+    - numba
 
 test:
   requires:
