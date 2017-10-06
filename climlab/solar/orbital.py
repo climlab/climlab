@@ -16,13 +16,10 @@ A subclass :class:`LongOrbitalTable()` works with La2004 orbital data for
 See http://vo.imcce.fr/insola/earth/online/earth/La2004/README.TXT
 
 """
-from __future__ import division
-from __future__ import print_function
+from __future__ import division, print_function
 from future import standard_library
 standard_library.install_aliases()
-from builtins import zip
-from builtins import range
-from builtins import object
+from builtins import zip, range, object
 import numpy as np
 from scipy import interpolate
 import os
@@ -177,7 +174,7 @@ class LongOrbitalTable(OrbitalTable):
                 print('Reading file ' + filename)
                 record = urllib.request.urlopen( base_url + filename )
                 for index,line in enumerate(record):
-                    str1 = line.rstrip()  # remove newline character
+                    str1 = str(line.rstrip(),'utf-8')  # remove newline character
                     str2 = str1.replace('D','E')  # put string into numpy format
                     data[index,:] = np.fromstring(str2, sep=' ')
                 record.close()
