@@ -1,6 +1,6 @@
 name: climlab
 dependencies:
-    - python=2.7
+    - python
     - numpy
     - scipy
     - netCDF4
