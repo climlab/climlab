@@ -1,5 +1,5 @@
 {% set name = "climlab" %}
-{% set version = "0.6.0.dev6" %}
+{% set version = "0.6.0.dev7" %}
 
 package:
   name: {{ name|lower }}
@@ -27,7 +27,6 @@ requirements:
     - numpy x.x
     - scipy
     - netcdf4
-    - pytest
     - libgfortran  # [linux or osx]
     - future
     - numba
@@ -35,10 +34,12 @@ requirements:
 test:
   requires:
     - pytest
+    - codecov
+    - pytest-cov
   imports:
     - climlab
   commands:
-    - pytest -v --pyargs climlab.tests
+    - py.test -v --pyargs climlab.tests --cov=climlab --cov-config .coveragerc --cov-report term-missing -v
 
 about:
   home: https://github.com/brian-rose/climlab
