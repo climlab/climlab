@@ -9,10 +9,10 @@ matrix:
 
 python:
   - 2.7
-  - 3.6
+#  - 3.6
 
 env:
-  - CONDA_PACKAGES="codecov"
+  - CONDA_PACKAGES="codecov pytest"
 
 before_install:
   - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
@@ -31,6 +31,10 @@ before_install:
 
 install:
   - conda-build conda-recipe --numpy 1.13  # hard-coded for now... better to have a build matrix
+  - conda install climlab --use-local
+
+script:
+  - pytest -v -m fast --pyargs climlab.tests --cov=climlab --cov-config .coveragerc --cov-report term-missing -v
 
 after_success:
   - codecov
