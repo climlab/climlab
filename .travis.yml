@@ -23,18 +23,19 @@ before_install:
   - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH="$HOME/miniconda/bin:$PATH"
   - hash -r
-  - conda config --set always_yes yes --set changeps1 no
-  - conda config --add channels conda-forge
-  - conda update -q conda
-  - conda install conda-build
-  - conda info -a
 
 install:
-  - conda-build conda-recipe --numpy 1.13  # hard-coded for now... better to have a build matrix
-  - conda install climlab --use-local
+  - |
+      echo ""
+      echo "Configuring conda."
+      conda config --set always_yes yes --set changeps1 no
+      conda config --add channels conda-forge
+      conda update -q conda
+      conda install conda-build
+      conda info -a
 
 script:
-  - pytest -v -m fast --pyargs climlab.tests --cov=climlab --cov-config .coveragerc --cov-report term-missing -v
+  - conda-build conda-recipe --numpy 1.13  # hard-coded for now... better to have a build matrix
 
 after_success:
   - codecov
