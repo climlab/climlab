@@ -16,7 +16,7 @@ requirements:
   build:
     - toolchain
     - mingwpy  # [win]
-    - gcc  # [osx]
+    - gcc  # [osx or linux]
     - python
     - setuptools
     - libgfortran  # [linux]
