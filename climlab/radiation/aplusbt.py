@@ -5,7 +5,7 @@ import numpy as np
 
 
 class AplusBT(EnergyBudget):
-    """The simplest linear longwave radiation module.
+    r"""The simplest linear longwave radiation module.
 
     Calculates the Outgoing Longwave Radation (OLR) :math:`R\uparrow` as
 
@@ -147,13 +147,13 @@ class AplusBT(EnergyBudget):
         self.param['B'] = value
 
     def _compute_emission(self):
-        for varname, value in self.state.iteritems():
+        for varname, value in self.state.items():
             self.OLR[:] = self.A + self.B * value
 
     def _compute_heating_rates(self):
         '''Compute energy flux convergences to get heating rates in :math:`W/m^2`,'''
         self._compute_emission()
-        for varname, value in self.state.iteritems():
+        for varname, value in self.state.items():
             self.heating_rate[varname] = -self.OLR
 
 
@@ -314,11 +314,11 @@ class AplusBT_CO2(EnergyBudget):
         l = np.log(self.CO2/300.)
         self.A = -326.400 + 9.16100*l - 3.16400*l**2 + 0.546800*l**3
         self.B =    1.953 - 0.04866*l + 0.01309*l**2 - 0.002577*l**3
-        for varname, value in self.state.iteritems():
+        for varname, value in self.state.items():
             self.OLR[:] = self.A + self.B * (value + const.tempCtoK)
 
     def _compute_heating_rates(self):
         """Computes energy flux convergences to get heating rates in :math:`W/m^2`."""
         self._compute_emission()
-        for varname, value in self.state.iteritems():
+        for varname, value in self.state.items():
             self.heating_rate[varname] = -self.OLR

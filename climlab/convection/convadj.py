@@ -1,8 +1,10 @@
 from __future__ import division
+from builtins import range
 import numpy as np
 from climlab import constants as const
 from climlab.process.time_dependent_process import TimeDependentProcess
 from climlab.domain.field import Field
+import sys
 
 
 class ConvectiveAdjustment(TimeDependentProcess):
@@ -265,9 +267,15 @@ def Akamaev_adjustment(theta, q, beta, n_k, theta_k, s_k, t_k):
 #  which gives at least 10x speedup
 #   If numba is not available or compilation fails, the code will be executed
 #   in pure Python. Results should be identical
-try:
-    from numba import jit
-    Akamaev_adjustment = jit(signature_or_function=Akamaev_adjustment)
-    #print 'Compiling Akamaev_adjustment() with numba.'
-except:
-    pass
+
+###  ONLY DO THIS IN PYTHON 2!
+#  Because of a bug in numba for while / break loops that is causing all calls
+#  to ConvectiveAdjustment to hang forever!
+#   https://github.com/numba/numba/issues/2273
+if sys.version_info < (3,0):
+    try:
+        from numba import jit
+        Akamaev_adjustment = jit(signature_or_function=Akamaev_adjustment)
+        #print 'Compiling Akamaev_adjustment() with numba.'
+    except:
+        pass

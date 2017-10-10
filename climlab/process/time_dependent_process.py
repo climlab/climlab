@@ -1,4 +1,7 @@
 from __future__ import division
+from __future__ import print_function
+from builtins import str
+from builtins import range
 import numpy as np
 import copy
 from climlab import constants as const
@@ -63,7 +66,7 @@ class TimeDependentProcess(Process):
         # Create the state dataset
         super(TimeDependentProcess, self).__init__(**kwargs)
         self.tendencies = {}
-        for name, var in self.state.iteritems():
+        for name, var in self.state.items():
             self.tendencies[name] = var * 0.
         self.timeave = {}
         if timestep is None:
@@ -171,11 +174,11 @@ class TimeDependentProcess(Process):
         #  Tendencies due to implicit and adjustment processes need to be
         #  calculated from a state that is already adjusted after explicit stuff
         #  So apply the tendencies temporarily and then remove them again
-        for name, var in self.state.iteritems():
+        for name, var in self.state.items():
             var += tendencies_explicit[name] * self.timestep
         # Now compute all implicit processes -- matrix inversions
         tendencies_implicit = self._compute_type('implicit')
-        for name, var in self.state.iteritems():
+        for name, var in self.state.items():
             var += tendencies_implicit[name] * self.timestep
         # Finally compute all instantaneous adjustments
         #  and express in terms of discrete timestep
@@ -184,7 +187,7 @@ class TimeDependentProcess(Process):
         for name in adjustments:
             tendencies_adjustment[name] = adjustments[name] / self.timestep
         #  Now remove the changes from the model state
-        for name, var in self.state.iteritems():
+        for name, var in self.state.items():
             var -= ( (tendencies_implicit[name] + tendencies_explicit[name]) *
                     self.timestep)
         # Finally sum up all the tendencies from all processes
@@ -210,7 +213,7 @@ class TimeDependentProcess(Process):
             tendencies[varname] = 0. * self.state[varname]
         for proc in self.process_types[proctype]:
             proc.tendencies = proc._compute()
-            for varname, tend in proc.tendencies.iteritems():
+            for varname, tend in proc.tendencies.items():
                 tendencies[varname] += tend
         return tendencies
 
@@ -219,7 +222,7 @@ class TimeDependentProcess(Process):
         #  needs to be implemented for each daughter class
         #  needs to return a dictionary with same keys as self.state
         tendencies = {}
-        for name, value in self.state.iteritems():
+        for name, value in self.state.items():
             tendencies[name] = value * 0.
         return tendencies
 
@@ -272,14 +275,14 @@ class TimeDependentProcess(Process):
         self.compute()
         #  Total tendency is applied as an explicit forward timestep
         # (already accounting properly for order of operations in compute() )
-        for name, var in self.state.iteritems():
+        for name, var in self.state.items():
             var += self.tendencies[name] * self.timestep
 
         # Update all time counters for this and all subprocesses in the tree
         #  Also pass diagnostics up the process tree
         for name, proc, level in walk_processes(self, ignoreFlag=True):
             proc._update_time()
-            for diagname, value in proc.diagnostics.iteritems():
+            for diagname, value in proc.diagnostics.items():
                 self.__setattr__(diagname, value)
 
     def compute_diagnostics(self, num_iter=3):
@@ -293,7 +296,7 @@ class TimeDependentProcess(Process):
             self.compute()
         #  Pass diagnostics up the process tree
         for name, proc, level in walk_processes(self, ignoreFlag=True):
-            for diagname, value in proc.diagnostics.iteritems():
+            for diagname, value in proc.diagnostics.items():
                 self.__setattr__(diagname, value)
 
     def _update_time(self):
@@ -370,14 +373,14 @@ class TimeDependentProcess(Process):
                 # add any new diagnostics to the timeave dictionary
                 self.timeave.update(self.diagnostics)
                 # reset all values to zero
-                for varname, value in self.timeave.iteritems():
+                for varname, value in self.timeave.items():
                 # moves on to the next varname if value is None
                 # this preserves NoneType diagnostics
                     if value is None:
                         continue
                     self.timeave[varname] = 0*value
             # adding up all values for each timestep
-            for varname in self.timeave.keys():
+            for varname in list(self.timeave.keys()):
                 try:
                     self.timeave[varname] += self.state[varname]
                 except:
@@ -385,7 +388,7 @@ class TimeDependentProcess(Process):
                         self.timeave[varname] += self.diagnostics[varname]
                     except: pass
         # calculating mean values through dividing the sum by number of steps
-        for varname, value in self.timeave.iteritems():
+        for varname, value in self.timeave.items():
             if value is None:
                 continue
             self.timeave[varname] /= numsteps
@@ -452,7 +455,7 @@ class TimeDependentProcess(Process):
 
         """
         # implemented by m-kreuzer
-        for varname, value in self.state.iteritems():
+        for varname, value in self.state.items():
             value_old = copy.deepcopy(value)
             self.integrate_years(1,verbose=False)
             while np.max(np.abs(value_old-value)) > crit :

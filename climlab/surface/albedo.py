@@ -1,4 +1,5 @@
 from __future__ import division
+from builtins import next
 import numpy as np
 from climlab.process.diagnostic import DiagnosticProcess
 from climlab.utils.legendre import P2
@@ -41,7 +42,7 @@ class ConstantAlbedo(DiagnosticProcess):
     def __init__(self, albedo=0.33, **kwargs):
         '''Uniform prescribed albedo.'''
         super(ConstantAlbedo, self).__init__(**kwargs)
-        dom = self.domains.itervalues().next()
+        dom = next(iter(self.domains.values()))
         self.add_diagnostic('albedo', Field(albedo, domain=dom))
         #self.albedo = albedo
 
@@ -189,7 +190,7 @@ class P2Albedo(DiagnosticProcess):
         # make sure that the diagnostic has the correct field dimensions.
         #dom = self.domains['default']
         #  this is a more robust way to get the single value from dictionary:
-        dom = self.domains.itervalues().next()
+        dom = next(iter(self.domains.values()))
         self.albedo = Field(albedo, domain=dom)
 
 

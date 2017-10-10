@@ -1,4 +1,5 @@
 from __future__ import division
+from builtins import object
 import numpy as np
 # experimental...  this is not well documented!
 from numpy.core.umath_tests import matrix_multiply

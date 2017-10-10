@@ -14,7 +14,7 @@ Stables releases as well as the current development version can be found on gith
 
 Dependencies
 ------------
-`climlab` is written in `Python 2.7 <https://www.python.org/downloads/>`_ and the requires the following `Python` packages to run:
+`climlab` is written in `Python <https://www.python.org/downloads/>`_ and the requires the following `Python` packages to run:
 
   * `Numpy <http://www.numpy.org/>`_
   * `Scipy <https://www.scipy.org/>`_
@@ -25,7 +25,7 @@ Dependencies
   * `Jupyter <http://jupyter.org/>`_ (to run Jupyter notebooks containing tutorials and introduction for climlab)
   * `Matplotlib <http://matplotlib.org/>`_ (plotting libary)
 
-The packages have to be installed on your machine. Either they can be individially downloaded, compiled and installed according to the the instructions on the corresponding websites. 
+The packages have to be installed on your machine. Either they can be individially downloaded, compiled and installed according to the  instructions on the corresponding websites.
 
 Easier to handle however are Python distributions like `Anaconda <https://www.continuum.io/downloads>`_ or `Enthought Canopy <https://www.enthought.com/products/canopy/>`_ which already include many popular Python packages.
 
@@ -39,9 +39,9 @@ An example is given here how to set up a python environment with `Anaconda <http
 		.. code-block:: console
 
 			$ conda create --name climlab_env numpy scipy netcdf4 jupyter matplotlib
-       
+
 	All new packages which will be installed are displayed including their version number. Press ``y`` to proceed.
-	
+
 	After the environment is build, it can be activated with
 
 		.. code-block:: console
@@ -54,8 +54,8 @@ An example is given here how to set up a python environment with `Anaconda <http
 
 			$ source deactivate
 
-	
-To install climlab in the new environment follow the steps below.        
+
+To install climlab in the new environment follow the steps below.
 
 Installation
 ------------
@@ -85,5 +85,3 @@ Development Version
 		.. code-block:: console
 
 			$ python setup.py develop
-
-

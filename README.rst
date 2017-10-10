@@ -116,7 +116,7 @@ These are handled automatically if you install with conda_.
 
 Required
 ~~~~~~~~~~~~
-- Python 2.7  (compatibility with Python 3 coming soon!)
+- Python 2.7, 3.5, or 3.6 (as of version 0.6.0)
 - ``numpy``
 - ``scipy``
 - ``netCDF4`` Python package (for data i/o)
@@ -178,6 +178,8 @@ Version 0.5.2 (released late March 2017) provides many under-the-hood improvemen
 which should make it much easier to get `climlab` installed on user machines. Binary distribution with conda_ is coming soon!
 
 Version 0.5.5 (released early April 2017) finally provides easy binary distrbution with conda_
+
+Version 0.6.0 (released October 2017) provides full Python 3 compatibility.
 
 The documentation_ was first created by Moritz Kreuzer (Potsdam Institut for Climate Impact Research) as part of a thesis project in Spring 2016.
 

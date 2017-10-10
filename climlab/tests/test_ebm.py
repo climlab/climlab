@@ -3,10 +3,7 @@ import numpy as np
 import climlab
 import pytest
 
-# The fixtures are reusable pieces of code to set up the input to the tests.
-# Without fixtures, we would have to do a lot of cutting and pasting
-# These fixtures are based on the notebook
-# Seasonal cycle and heat capacity.ipynb
+
 @pytest.fixture()
 def EBM_seasonal():
     return climlab.EBM_seasonal(water_depth=10.)
@@ -25,12 +22,14 @@ def _check_minmax(array, amin, amax):
     return (np.allclose(array.min(), amin) and
             np.allclose(array.max(), amax))
 
+@pytest.mark.fast
 def test_model_creation(EBM_seasonal):
     """Just make sure we can create a model."""
     assert len(EBM_seasonal.Ts)==90
 
 #  This is not a great test.. but just sees if we reproduce the same
 #  temperature as in the notebook after 1 year of integration
+@pytest.mark.fast
 def test_integrate_years(EBM_seasonal):
     """Check that we can integrate forward the model and get the expected
     surface temperature."""
@@ -39,6 +38,7 @@ def test_integrate_years(EBM_seasonal):
     assert _check_minmax(EBM_seasonal.Ts, -24.21414189, 31.16169215)
 
 #  And do the same thing at high obliquity
+@pytest.mark.fast
 def test_high_obliquity(EBM_highobliquity):
     """Check that we can integrate forward the model and get the expected
     surface temperature."""
@@ -46,12 +46,14 @@ def test_high_obliquity(EBM_highobliquity):
     EBM_highobliquity.integrate_years(1)
     assert _check_minmax(EBM_highobliquity.Ts, -9.28717079958807, 27.37890262018116)
 
+@pytest.mark.fast
 def test_annual_iceline(EBM_iceline):
     '''Check that the annual mean EBM with interactive ice edge gives expected
     result (ice at 70degrees).'''
     EBM_iceline.integrate_years(5.)
     assert np.all(EBM_iceline.icelat == np.array([-70.,  70.]))
 
+@pytest.mark.fast
 def test_decreased_S0(EBM_iceline):
     '''Check that a decrease in solar constant to 1200 W/m2 will give a
     Snowball Earth result in the annual mean EBM.'''
@@ -59,6 +61,7 @@ def test_decreased_S0(EBM_iceline):
     EBM_iceline.integrate_years(5.)
     assert np.all(EBM_iceline.icelat == np.array([-0.,  0.]))
 
+@pytest.mark.fast
 def test_float():
     '''Check that we can step forward the model after setting the state
     variable with an ndarray of integers through 2 different methods'''
@@ -73,16 +76,16 @@ def test_float():
     k.set_state('Ts', Field([10,15,15,10], domain=k.domains['Ts']))
     k.step_forward()
 
+@pytest.mark.fast
 def test_albedo():
     '''Check that we can integrate forward a model after changing the albedo
     subprocess and get the expected icelat'''
     import numpy as np
-    from climlab.surface import albedo
     m = climlab.EBM()
-    m.add_subprocess('albedo', albedo.ConstantAlbedo(state=m.state, **m.param))
+    m.add_subprocess('albedo', climlab.surface.ConstantAlbedo(state=m.state, **m.param))
     m.integrate_years(1)
     assert m.icelat == None
-    m.add_subprocess('albedo', albedo.StepFunctionAlbedo(state=m.state, **m.param))
+    m.add_subprocess('albedo', climlab.surface.StepFunctionAlbedo(state=m.state, **m.param))
     m.integrate_years(1)
     assert np.all(m.icelat == np.array([-70.,  70.]))
     assert np.all(m.icelat == m.subprocess.albedo.subprocess.iceline.icelat)

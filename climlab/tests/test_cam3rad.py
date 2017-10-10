@@ -19,14 +19,14 @@ def rcm():
     convadj = climlab.convection.ConvectiveAdjustment(state=state,
                                                       adj_lapse_rate=6.5)
     # CAM3 radiation with default parameters and interactive water vapor
-    #rad = climlab.radiation.CAM3(state=state, albedo=alb, specific_humidity=h2o.q)
-    rad = climlab.radiation.CAM3(state=state, albedo=alb)
+    rad = climlab.radiation.CAM3(state=state, albedo=alb, specific_humidity=h2o.q)
     # Couple the models
     rcm.add_subprocess('Radiation', rad)
     rcm.add_subprocess('ConvectiveAdjustment', convadj)
     rcm.add_subprocess('H2O', h2o)
     return rcm
 
+@pytest.mark.fast
 def test_rce(rcm):
     '''Test a single-column radiative-convective model with CAM3 radiation and
     fixed relative humidity.'''
@@ -36,6 +36,7 @@ def test_rce(rcm):
     #rcm.integrate_years(5)
     #assert(np.isclose(rcm.Ts, ))
 
+@pytest.mark.slow
 def test_re_radiative_forcing():
     state = climlab.column_state(num_lev=num_lev)
     rad = climlab.radiation.CAM3(state=state)
@@ -46,6 +47,7 @@ def test_re_radiative_forcing():
     rad2.compute_diagnostics()
     assert (rad2.ASR - rad2.OLR) > 1.  # positive radiative forcing
 
+@pytest.mark.slow
 def test_rce_radiative_forcing(rcm):
     '''Run a single-column radiative-convective model with CAM3 radiation
     out to equilibrium. Clone the model, double CO2 and measure the instantaneous
@@ -57,6 +59,7 @@ def test_rce_radiative_forcing(rcm):
     rcm2.compute_diagnostics()
     assert (rcm2.ASR - rcm2.OLR) > 1.  # positive radiative forcing
 
+@pytest.mark.fast
 def test_cam3_multidim():
     state = climlab.column_state(num_lev=40, num_lat=3, water_depth=5.)
     rad = climlab.radiation.CAM3(state=state)

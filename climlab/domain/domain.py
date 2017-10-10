@@ -1,4 +1,6 @@
 from __future__ import division
+from builtins import str
+from builtins import object
 from climlab.domain.axis import Axis
 from climlab.utils import heat_capacity
 
@@ -68,7 +70,7 @@ class _Domain(object):
         # self.axes should be a dictionary of axes
         # make it possible to give just a single axis:
         self.axes = self._make_axes_dict(axes)
-        self.numdims = len(self.axes.keys())
+        self.numdims = len(list(self.axes.keys()))
         shape = []
         axcount = 0
         axindex = {}
@@ -79,7 +81,7 @@ class _Domain(object):
         add_depth = False
         add_lon = False
         add_lat = False
-        axlist = self.axes.keys()
+        axlist = list(self.axes.keys())
         if 'lev' in axlist:
             axlist.remove('lev')
             add_lev = True

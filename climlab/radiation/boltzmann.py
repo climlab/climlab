@@ -4,7 +4,7 @@ from climlab.process.energy_budget import EnergyBudget
 
 
 class Boltzmann(EnergyBudget):
-    """A class for black body radiation.
+    r"""A class for black body radiation.
 
     Implements a radiation subprocess which computes longwave radiation
     with the Stefan-Boltzmann law for black/grey body radiation.
@@ -185,7 +185,7 @@ class Boltzmann(EnergyBudget):
 #            self.diagnostics['OLR'] = self.OLR
 
     def _compute_emission(self):
-        for varname, value in self.state.iteritems():
+        for varname, value in self.state.items():
             flux = self.eps * self.tau * const.sigma * (value + const.tempCtoK)**4.
             self.OLR[:] = flux
 
@@ -195,5 +195,5 @@ class Boltzmann(EnergyBudget):
 
         """
         self._compute_emission()
-        for varname, value in self.state.iteritems():
+        for varname, value in self.state.items():
             self.heating_rate[varname] = -self.OLR

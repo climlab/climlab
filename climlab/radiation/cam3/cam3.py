@@ -29,7 +29,7 @@ climlab wrappers for the NCAR CAM3 radiation code
 
 
 '''
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 import numpy as np
 from climlab import constants as const
 from climlab.utils.thermo import vmr_to_mmr
@@ -37,13 +37,13 @@ from climlab.radiation.radiation import _Radiation_SW, _Radiation_LW
 import os
 #  Wrapping these imports in try/except to avoid failures during documentation building on readthedocs
 try:
-    import _cam3
+    from . import _cam3
 except:
-    print 'Cannot import compiled Fortran extension, CAM3 module will not be functional.'
+    print('Cannot import compiled Fortran extension, CAM3 module will not be functional.')
 try:
     import netCDF4 as nc
 except:
-    print 'Cannot import netCDF4 interface. Will not be able to properly initialize the CAM3 module.'
+    print('Cannot import netCDF4 interface. Will not be able to properly initialize the CAM3 module.')
 
 
 def init_cam3(mod):
@@ -64,7 +64,7 @@ def init_cam3(mod):
 try:
     init_cam3(_cam3.absems)
 except:
-    print 'Cannot initialize the CAM3 module.'
+    print('Cannot initialize the CAM3 module.')
 
 class CAM3(_Radiation_SW, _Radiation_LW):
     '''

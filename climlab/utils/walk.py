@@ -61,7 +61,7 @@ def walk_processes(top, topname='top', topdown=True, ignoreFlag=False):
         yield topname, proc, level
     if len(proc.subprocess) > 0:  # there are sub-processes
         level += 1
-        for name, subproc in proc.subprocess.iteritems():
+        for name, subproc in proc.subprocess.items():
             for name2, subproc2, level2 in walk_processes(subproc,
                                                           topname=name,
                                                           topdown=subproc.topdown,

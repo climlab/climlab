@@ -6,6 +6,7 @@ from climlab.radiation.rrtm import _climlab_to_rrtm, _rrtm_to_climlab
 
 num_lev = 30
 
+@pytest.mark.fast
 def test_rrtmg_lw_creation():
     state = climlab.column_state(num_lev=num_lev, water_depth=5.)
     rad = climlab.radiation.RRTMG_LW(state=state)
@@ -13,6 +14,7 @@ def test_rrtmg_lw_creation():
     assert np.all(_rrtm_to_climlab(_climlab_to_rrtm(rad.Ts)) == rad.Ts)
     assert np.all(_rrtm_to_climlab(_climlab_to_rrtm(rad.Tatm)) == rad.Tatm)
 
+@pytest.mark.fast
 def test_rrtm_creation():
     # initial state (temperatures)
     state = climlab.column_state(num_lev=num_lev, num_lat=1, water_depth=5.)
@@ -26,6 +28,7 @@ def test_rrtm_creation():
     assert hasattr(rad, 'ASR')
     assert hasattr(rad, 'ASRclr')
 
+@pytest.mark.fast
 def test_swap_component():
     # initial state (temperatures)
     state = climlab.column_state(num_lev=num_lev, num_lat=1, water_depth=5.)
@@ -39,6 +42,7 @@ def test_swap_component():
     rad.step_forward()
     assert hasattr(rad, 'OLR')
 
+@pytest.mark.fast
 def test_multidim():
     state = climlab.column_state(num_lev=40, num_lat=3, water_depth=5.)
     rad = climlab.radiation.RRTMG_LW(state=state)
@@ -49,6 +53,7 @@ def test_multidim():
     rad.step_forward()
     assert rad.OLR.shape == rad.Ts.shape
 
+@pytest.mark.fast
 def test_cloud():
     '''Put a high cloud layer in a radiative model.
     The all-sky ASR should be lower than clear-sky ASR.
@@ -74,6 +79,7 @@ def test_cloud():
         assert(rad.ASR - rad.ASRclr < 0.)
         assert(rad.OLR - rad.OLRclr < 0.)
 
+@pytest.mark.slow
 def test_radiative_forcing():
     '''Run a single-column radiative-convective model with RRTMG radiation
     out to equilibrium. Clone the model, double CO2 and measure the instantaneous
@@ -102,6 +108,7 @@ def test_radiative_forcing():
     rcm2.compute_diagnostics()
     assert (rcm2.ASR - rcm2.OLR) > 1.  # positive radiative forcing
 
+@pytest.mark.slow
 def test_latitude():
     '''
     Run a radiative equilibrum model with RRTMG radiation out to equilibrium

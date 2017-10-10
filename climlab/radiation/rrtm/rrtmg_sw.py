@@ -1,21 +1,21 @@
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 import numpy as np
 from climlab import constants as const
 from climlab.radiation.radiation import _Radiation_SW
-from utils import _prepare_general_arguments
-from utils import _climlab_to_rrtm, _climlab_to_rrtm_sfc, _rrtm_to_climlab
+from .utils import _prepare_general_arguments
+from .utils import _climlab_to_rrtm, _climlab_to_rrtm_sfc, _rrtm_to_climlab
 # These values will get overridden by reading from Fortran extension
 nbndsw = 1; naerec = 1; ngptsw = 1;
 try:
     #  The compiled fortran extension module
-    import _rrtmg_sw
+    from . import _rrtmg_sw
     nbndsw = int(_rrtmg_sw.parrrsw.nbndsw)
     naerec = int(_rrtmg_sw.parrrsw.naerec)
     ngptsw = int(_rrtmg_sw.parrrsw.ngptsw)
     #  Initialize absorption data
     _rrtmg_sw.climlab_rrtmg_sw_ini(const.cp)
 except:
-    print 'Cannot import and initialize compiled Fortran extension, RRTMG_SW module will not be functional.'
+    print('Cannot import and initialize compiled Fortran extension, RRTMG_SW module will not be functional.')
 
 
 class RRTMG_SW(_Radiation_SW):
