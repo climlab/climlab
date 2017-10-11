@@ -3,7 +3,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-    - python=3.5
+    - python=3.6
     - numpy
     - scipy
     - netCDF4
@@ -11,6 +11,7 @@ dependencies:
     - matplotlib
     - ipython
     - jupyter
+    - future
     - sphinx_rtd_theme
     - nbsphinx
     - sphinxcontrib-bibtex
