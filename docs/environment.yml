@@ -1,6 +1,9 @@
 name: climlab
+channels:
+  - conda-forge
+  - defaults
 dependencies:
-    - python
+    - python=3.5
     - numpy
     - scipy
     - netCDF4
@@ -9,7 +12,6 @@ dependencies:
     - ipython
     - jupyter
     - sphinx_rtd_theme
-    - pip:
-        - nbsphinx
-        - sphinxcontrib-bibtex
-        - numpydoc
+    - nbsphinx
+    - sphinxcontrib-bibtex
+    - numpydoc
