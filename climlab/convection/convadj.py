@@ -71,13 +71,7 @@ class ConvectiveAdjustment(TimeDependentProcess):
             else:
                 Tatm = Field(Tadj, domain=self.Tatm.domain)
             self.adjustment['Tatm'] = Tatm - self.Tatm
-        # # express the adjustment (already accounting for the finite time step)
-        # #  as a tendency per unit time, so that it can be applied along with explicit
-        # tendencies = {}
-        # for name, adj in self.adjustment.iteritems():
-        #     tendencies[name] = adj / self.param['timestep']
-        # return tendencies
-        #  go back to just returning the adjustment, independent of timestep
+        #  return the adjustment, independent of timestep
         #  because the parent process might have set a different timestep!
         return self.adjustment
 
