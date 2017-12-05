@@ -145,7 +145,7 @@ autoclass_content = 'both'
 
 # Intersphinx references
 
-intersphinx_mapping = {	'python':('http://docs.python.org/2.7', None),
+intersphinx_mapping = {	'python':('http://docs.python.org/', None),
 			'numpy': ('http://docs.scipy.org/doc/numpy/', None),
 			'scipy': ('http://docs.scipy.org/doc/scipy/reference/', None)
 		      }
@@ -160,7 +160,7 @@ if not on_rtd:  # only import and set the theme if we're building docs locally
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'sphinxdoc'
+#html_theme = 'sphinxdoc'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
