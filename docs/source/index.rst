@@ -10,7 +10,8 @@ Welcome to the climlab documentation!
    :maxdepth: 4
 
    intro
-   download
+   quickstart
+   installation
    architecture
    models
    tutorial

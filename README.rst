@@ -16,6 +16,33 @@ Author
 | brose@albany.edu
 
 
+About climlab
+--------------
+``climlab`` is a flexible engine for process-oriented climate modeling.
+It is based on a very general concept of a model as a collection of individual,
+interacting processes. ``climlab`` defines a base class called ``Process``, which
+can contain an arbitrarily complex tree of sub-processes (each also some
+sub-class of ``Process``). Every climate process (radiative, dynamical,
+physical, turbulent, convective, chemical, etc.) can be simulated as a stand-alone
+process model given appropriate input, or as a sub-process of a more complex model.
+New classes of model can easily be defined and run interactively by putting together an
+appropriate collection of sub-processes.
+
+Currently, ``climlab`` has out-of-the-box support and documented examples for
+
+- Radiative and radiative-convective column models, with various radiation schemes:
+    - RRTMG (a widely used radiative transfer code)
+    - CAM3  (from the NCAR GCM)
+    - Grey Gas
+    - Simplified band-averaged models (4 bands each in longwave and shortwave)
+- Diffusive energy balance models
+- Seasonal and steady-state models
+- Arbitrary combinations of the above, for example:
+    - 2D latitude-pressure models with radiation, horizontal diffusion, and fixed relative humidity
+- Orbital / insolation calculations
+- Boundary layer sensible and latent heat fluxes
+
+
 Installation
 --------------
 
@@ -69,36 +96,10 @@ you should find that you can still::
 
 and use most of the package. You will see warning messages about the missing radiation components.
 
-.. _conda: https://github.com/conda/conda
+.. _conda: https://conda.io/docs/
 .. _`Anaconda Python`: https://www.continuum.io/downloads
 .. _`pypi repository`: https://pypi.python.org
 
-
-About climlab
---------------
-``climlab`` is a flexible engine for process-oriented climate modeling.
-It is based on a very general concept of a model as a collection of individual,
-interacting processes. ``climlab`` defines a base class called ``Process``, which
-can contain an arbitrarily complex tree of sub-processes (each also some
-sub-class of ``Process``). Every climate process (radiative, dynamical,
-physical, turbulent, convective, chemical, etc.) can be simulated as a stand-alone
-process model given appropriate input, or as a sub-process of a more complex model.
-New classes of model can easily be defined and run interactively by putting together an
-appropriate collection of sub-processes.
-
-Currently, ``climlab`` has out-of-the-box support and documented examples for
-
-- Radiative and radiative-convective column models, with various radiation schemes:
-    - RRTMG (a widely used radiative transfer code)
-    - CAM3  (from the NCAR GCM)
-    - Grey Gas
-    - Simplified band-averaged models (4 bands each in longwave and shortwave)
-- Diffusive energy balance models
-- Seasonal and steady-state models
-- Arbitrary combinations of the above, for example:
-    - 2D latitude-pressure models with radiation, horizontal diffusion, and fixed relative humidity
-- Orbital / insolation calculations
-- Boundary layer sensible and latent heat fluxes
 
 
 Links
@@ -179,7 +180,7 @@ which should make it much easier to get `climlab` installed on user machines. Bi
 
 Version 0.5.5 (released early April 2017) finally provides easy binary distrbution with conda_
 
-Version 0.6.0 (released October 2017) provides full Python 3 compatibility.
+Version 0.6.0 (released December 2017) provides full Python 3 compatibility, updated documentation, and minor enhancements and bug fixes.
 
 The documentation_ was first created by Moritz Kreuzer (Potsdam Institut for Climate Impact Research) as part of a thesis project in Spring 2016.
 
