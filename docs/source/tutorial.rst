@@ -45,10 +45,8 @@ Notebooks on grey radiation models
 .. toctree::
    :titlesonly:
 
-   notebooks/Introducing the Column Model.ipynb
-   notebooks/Latitude-dependent grey radiation.ipynb
-   notebooks/Two_layer_atmosphere.ipynb
    notebooks/Soundings from Observations and RCE Models.ipynb
+   notebooks/Latitude-dependent grey radiation.ipynb
 
 Notebooks using spectrally resolved radiation models
 
