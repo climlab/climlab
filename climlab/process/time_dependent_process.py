@@ -191,14 +191,19 @@ class TimeDependentProcess(Process):
             var -= ( (tendencies_implicit[name] + tendencies_explicit[name]) *
                     self.timestep)
         # Finally sum up all the tendencies from all processes
-        self.tendencies = {}
-        for varname in self.state:
-            self.tendencies[varname] = 0. * self.state[varname]
-        for tend_dict in [tendencies_explicit,
-                          tendencies_implicit,
-                          tendencies_adjustment]:
-            for name in tend_dict:
-                self.tendencies[name] += tend_dict[name]
+        #self.tendencies = {}
+        #for varname in self.state:
+        #    self.tendencies[varname] = 0. * self.state[varname]
+        #for tend_dict in [tendencies_explicit,
+        #                  tendencies_implicit,
+        #                  tendencies_adjustment]:
+        #    for name in tend_dict:
+        #        self.tendencies[name] += tend_dict[name]
+        #  Walk the subprocess tree and sum up all tendencies from subprocesses
+        for (name, proc, level) in walk_processes(self,topdown=False):
+            for subname, subproc in proc.subprocess.items():
+                for varname in subproc.tendencies:
+                    proc.tendencies[varname] += subproc.tendencies[varname]
         #  pass diagnostics up the process tree
         #for name, proc in self.subprocess.iteritems():
         #    #self.diagnostics.update(proc.diagnostics)
