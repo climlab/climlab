@@ -181,29 +181,20 @@ class TimeDependentProcess(Process):
         for name, var in self.state.items():
             var += tendencies_implicit[name] * self.timestep
         # Finally compute all instantaneous adjustments
-        #  and express in terms of discrete timestep
         adjustments = self._compute_type('adjustment')
-        tendencies_adjustment = {}
-        for name in adjustments:
-            tendencies_adjustment[name] = adjustments[name] / self.timestep
+        #  The adjustment is actually ignored here because it is stored
+        #  in proc.tendencies and applied later as if it were an explicit forward step
         #  Now remove the changes from the model state
         for name, var in self.state.items():
             var -= ( (tendencies_implicit[name] + tendencies_explicit[name]) *
                     self.timestep)
-        # Finally sum up all the tendencies from all processes
-        self.tendencies = {}
-        for varname in self.state:
-            self.tendencies[varname] = 0. * self.state[varname]
-        for tend_dict in [tendencies_explicit,
-                          tendencies_implicit,
-                          tendencies_adjustment]:
-            for name in tend_dict:
-                self.tendencies[name] += tend_dict[name]
-        #  pass diagnostics up the process tree
-        #for name, proc in self.subprocess.iteritems():
-        #    #self.diagnostics.update(proc.diagnostics)
-        #    for diagname, value in proc.diagnostics.iteritems():
-        #        self.__setattr__(diagname, value)
+        #  Walk the subprocess tree and sum up all tendencies from subprocesses
+        #   By walking with topdown=False we ensure that we don't miss anything
+        for (name, proc, level) in walk_processes(self,topdown=False):
+            for subname, subproc in proc.subprocess.items():
+                for varname in subproc.tendencies:
+                    proc.tendencies[varname] += subproc.tendencies[varname]
+
 
     def _compute_type(self, proctype):
         """Computes tendencies due to all subprocesses of given type
