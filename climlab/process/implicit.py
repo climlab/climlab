@@ -44,10 +44,7 @@ class ImplicitProcess(TimeDependentProcess):
                                 old states.
 
         """
-        # Time-stepping the diffusion is just inverting this matrix problem:
-        # self.T = np.linalg.solve( self.diffTriDiag, Trad )
         newstate = self._implicit_solver()
-        #adjustment = newstate.copy()
         adjustment = {}
         tendencies = {}
         for name, var in self.state.items():

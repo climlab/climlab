@@ -212,15 +212,24 @@ class TimeDependentProcess(Process):
         for varname in self.state:
             tendencies[varname] = 0. * self.state[varname]
         for proc in self.process_types[proctype]:
-            proc.tendencies = proc._compute()
-            for varname, tend in proc.tendencies.items():
-                tendencies[varname] += tend
+            if proctype is "adjustment":
+            #  Adjustement processes return absolute adjustment, not rate of change
+                adjustment = proc._compute()
+                for varname, adj in adjustment.items():
+                    proc.tendencies[varname] = adj / self.timestep
+                    tendencies[varname] += adj
+            else:
+                proc.tendencies = proc._compute()
+                for varname, tend in proc.tendencies.items():
+                    tendencies[varname] += tend
         return tendencies
 
     def _compute(self):
-        # where the tendencies are actually computed...
-        #  needs to be implemented for each daughter class
-        #  needs to return a dictionary with same keys as self.state
+        """Where the tendencies are actually computed...
+
+        Needs to be implemented for each daughter class
+
+        Returns a dictionary with same keys as self.state"""
         tendencies = {}
         for name, value in self.state.items():
             tendencies[name] = value * 0.
