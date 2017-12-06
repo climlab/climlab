@@ -13,6 +13,6 @@ dependencies:
     - jupyter
     - future
     - sphinx_rtd_theme
-    - nbsphinx
+    #- nbsphinx
     - sphinxcontrib-bibtex
     - numpydoc
