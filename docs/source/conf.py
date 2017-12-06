@@ -47,7 +47,7 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.autosummary',
     #'sphinx.ext.automodsumm',
-    'nbsphinx',
+    #'nbsphinx',
     'IPython.sphinxext.ipython_console_highlighting',
     'sphinxcontrib.bibtex',
     'numpydoc',
