@@ -30,6 +30,7 @@ requirements:
     - libgfortran  # [linux or osx]
     - future
     - numba  # [py2k]
+    - xarray
 
 test:
   requires:
