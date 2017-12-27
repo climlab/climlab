@@ -36,6 +36,8 @@ def test_integrate_years(EBM_seasonal):
     EBM_seasonal.step_forward()
     EBM_seasonal.integrate_years(1)
     assert _check_minmax(EBM_seasonal.Ts, -24.21414189, 31.16169215)
+    # Test the xarray interface
+    EBM_seasonal.to_xarray()
 
 #  And do the same thing at high obliquity
 @pytest.mark.fast

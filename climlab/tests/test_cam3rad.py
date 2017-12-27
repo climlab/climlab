@@ -35,6 +35,8 @@ def test_rce(rcm):
     assert np.all(rcm.OLR == rcm.subprocess.Radiation.OLR)
     #rcm.integrate_years(5)
     #assert(np.isclose(rcm.Ts, ))
+    # Test the xarray interface
+    rcm.to_xarray()
 
 @pytest.mark.slow
 def test_re_radiative_forcing():

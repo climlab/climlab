@@ -45,6 +45,8 @@ def _check_minmax(array, amin, amax):
 def test_model_creation(model):
     """Just make sure we can create a model."""
     assert len(model.lat)==90
+    # Test the xarray interface
+    model.to_xarray()
 
 @pytest.mark.fast
 def test_add_insolation(model_with_insolation):

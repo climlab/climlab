@@ -21,6 +21,8 @@ def test_2D_EBM():
     m = climlab.EBM_annual(state=state)
     m.step_forward()
     assert m.state.Ts.shape == (90, 4, 1)
+    # Test the xarray interface
+    m.to_xarray()
 
 @pytest.mark.fast
 def test_2D_insolation():

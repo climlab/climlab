@@ -65,6 +65,8 @@ def test_diffmodel(diffmodel):
     diffmodel.step_forward()
     diffmodel.integrate_days(2)
     #  Would be better to have these tests evaluate a numerical condition
+    #  Test the xarray interface
+    diffmodel.to_xarray()
 
 @pytest.mark.fast
 def test_diffmodel_surfflux(diffmodel_surfflux):

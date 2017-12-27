@@ -27,6 +27,8 @@ def test_rrtm_creation():
     assert hasattr(rad, 'OLRclr')
     assert hasattr(rad, 'ASR')
     assert hasattr(rad, 'ASRclr')
+    # Test the xarray interface
+    rad.to_xarray()
 
 @pytest.mark.fast
 def test_swap_component():
@@ -107,6 +109,8 @@ def test_radiative_forcing():
     rcm2.subprocess['Radiation'].absorber_vmr['CO2'] *= 2.
     rcm2.compute_diagnostics()
     assert (rcm2.ASR - rcm2.OLR) > 1.  # positive radiative forcing
+    #  Test the xarray interface
+    rcm2.to_xarray()
 
 @pytest.mark.slow
 def test_latitude():
