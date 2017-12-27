@@ -71,6 +71,7 @@ import numpy as np
 from climlab.domain.field import Field
 from climlab.domain.domain import _Domain, zonal_mean_surface
 from climlab.utils import walk, attr_dict
+from climlab.domain.xarray import Field_to_xarray
 
 
 def _make_dict(arg, argtype):
@@ -498,6 +499,15 @@ class Process(object):
             self._diag_vars.remove(name)
         except:
             print('No diagnostic named {} was found.'.format(name))
+
+    def to_xarray(self, diagnostics=False):
+        """ Convert state variable dictionary to xarray.Dataset
+        """
+        if diagnostics:
+            print('Sorry, converting diagnostics to xarray.Dataset not yet implemented.')
+            return
+        else:
+            return state_to_xarray(self.state)
 
     @property
     def diagnostics(self):

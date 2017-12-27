@@ -7,6 +7,7 @@
 # http://docs.scipy.org/doc/numpy/user/basics.subclassing.html
 from __future__ import division
 import numpy as np
+from climlab.domain.xarray import Field_to_xarray
 
 
 class Field(np.ndarray):
@@ -308,6 +309,10 @@ class Field(np.ndarray):
         is not supported.
         """
         return self.__getitem__(slice(i, j))
+
+    def to_xarray(self):
+        """Convert Field object to xarray.DataArray"""
+        return Field_to_xarray(self)
 
 
 def global_mean(field):
