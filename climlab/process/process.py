@@ -71,7 +71,7 @@ import numpy as np
 from climlab.domain.field import Field
 from climlab.domain.domain import _Domain, zonal_mean_surface
 from climlab.utils import walk, attr_dict
-from climlab.domain.xarray import Field_to_xarray
+from climlab.domain.xarray import state_to_xarray
 
 
 def _make_dict(arg, argtype):
