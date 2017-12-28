@@ -197,26 +197,26 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         #  we compute everything from the up and downwelling fluxes
         #  Should probably simplify the fortran wrapper
         #  fluxes at layer interfaces
-        self.LW_flux_up = self._cam3_to_climlab(lwuflx)
-        self.LW_flux_down = self._cam3_to_climlab(lwdflx)
-        self.LW_flux_up_clr = self._cam3_to_climlab(lwuflxc)
-        self.LW_flux_down_clr = self._cam3_to_climlab(lwdflxc)
+        self.LW_flux_up = self._cam3_to_climlab(lwuflx) + 0.*self.LW_flux_up
+        self.LW_flux_down = self._cam3_to_climlab(lwdflx) + 0.*self.LW_flux_down
+        self.LW_flux_up_clr = self._cam3_to_climlab(lwuflxc) + 0.*self.LW_flux_up_clr
+        self.LW_flux_down_clr = self._cam3_to_climlab(lwdflxc) + 0.*self.LW_flux_down_clr
         #  fluxes at layer interfaces
-        self.SW_flux_up = self._cam3_to_climlab(swuflx)
-        self.SW_flux_down = self._cam3_to_climlab(swdflx)
-        self.SW_flux_up_clr = self._cam3_to_climlab(swuflxc)
-        self.SW_flux_down_clr = self._cam3_to_climlab(swdflxc)
+        self.SW_flux_up = self._cam3_to_climlab(swuflx) + 0.*self.SW_flux_up
+        self.SW_flux_down = self._cam3_to_climlab(swdflx) + 0.*self.SW_flux_down
+        self.SW_flux_up_clr = self._cam3_to_climlab(swuflxc) + 0.*self.SW_flux_up_clr
+        self.SW_flux_down_clr = self._cam3_to_climlab(swdflxc) + 0.*self.SW_flux_down_clr
         #  Compute quantities derived from fluxes
         self._compute_SW_flux_diagnostics()
         self._compute_LW_flux_diagnostics()
         #  calculate heating rates from flux divergence
         #   this is the total UPWARD flux
         total_flux = self.LW_flux_net - self.SW_flux_net
-        LWheating_Wm2 = np.diff(self.LW_flux_net, axis=-1)
-        LWheating_clr_Wm2 = np.diff(self.LW_flux_net_clr, axis=-1)
-        SWheating_Wm2 = -np.diff(self.SW_flux_net, axis=-1)
-        SWheating_clr_Wm2 = -np.diff(self.SW_flux_net_clr, axis=-1)
-        self.heating_rate['Ts'] = -total_flux[..., -1, np.newaxis]
+        LWheating_Wm2 = np.array(np.diff(self.LW_flux_net, axis=-1)) + 0.*self.Tatm
+        LWheating_clr_Wm2 = np.array(np.diff(self.LW_flux_net_clr, axis=-1)) + 0.*self.Tatm
+        SWheating_Wm2 = np.array(-np.diff(self.SW_flux_net, axis=-1)) + 0.*self.Tatm
+        SWheating_clr_Wm2 = np.array(-np.diff(self.SW_flux_net_clr, axis=-1)) + 0.*self.Tatm
+        self.heating_rate['Ts'] = np.array(-total_flux[..., -1, np.newaxis]) + 0.*self.Ts
         self.heating_rate['Tatm'] = LWheating_Wm2 + SWheating_Wm2
         #  Convert to K / day
         Catm = self.Tatm.domain.heat_capacity

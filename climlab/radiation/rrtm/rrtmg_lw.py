@@ -117,9 +117,9 @@ class RRTMG_LW(_Radiation_LW):
         #  Compute quantities derived from fluxes, including OLR
         self._compute_LW_flux_diagnostics()
         #  calculate heating rates from flux divergence
-        LWheating_Wm2 = np.diff(self.LW_flux_net, axis=-1) + 0.*self.Tatm
-        LWheating_clr_Wm2 = np.diff(self.LW_flux_net_clr, axis=-1) + 0.*self.Tatm
-        self.heating_rate['Ts'] = -self.LW_flux_net[..., -1, np.newaxis] + 0.*self.Ts
+        LWheating_Wm2 = np.array(np.diff(self.LW_flux_net, axis=-1)) + 0.*self.Tatm
+        LWheating_clr_Wm2 = np.array(np.diff(self.LW_flux_net_clr, axis=-1)) + 0.*self.Tatm
+        self.heating_rate['Ts'] = np.array(-self.LW_flux_net[..., -1, np.newaxis]) + 0.*self.Ts
         self.heating_rate['Tatm'] = LWheating_Wm2
         #  Convert to K / day
         Catm = self.Tatm.domain.heat_capacity
