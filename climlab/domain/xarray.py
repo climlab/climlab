@@ -23,18 +23,22 @@ def Field_to_xarray(Field):
 
 def state_to_xarray(state):
     '''Convert a climlab state or diagnostic variable dictionary to xarray.Dataset'''
+    from climlab.domain.field import Field
     ds = xr.Dataset()
-    for name, Field in state.items():
-        ds[name] = Field_to_xarray(Field)
-        dom = Field.domain
-        for axname, ax in dom.axes.items():
-            bounds_name = axname + '_bounds'
-            ds.coords[bounds_name] = xr.DataArray(ax.bounds, dims=[bounds_name],
-                                coords={bounds_name:ax.bounds})
-            try:
-                ds[bounds_name].attrs['units'] = ax.units
-            except:
-                pass
+    for name, field in state.items():
+        if isinstance(field, Field):
+            ds[name] = Field_to_xarray(field)
+            dom = field.domain
+            for axname, ax in dom.axes.items():
+                bounds_name = axname + '_bounds'
+                ds.coords[bounds_name] = xr.DataArray(ax.bounds, dims=[bounds_name],
+                                    coords={bounds_name:ax.bounds})
+                try:
+                    ds[bounds_name].attrs['units'] = ax.units
+                except:
+                    pass
+        else:
+            print('{} excluded from Dataset because it is not a Field variable.'.format(name))
     return ds
 
 def to_xarray(input):
