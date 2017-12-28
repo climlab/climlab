@@ -76,6 +76,7 @@ from climlab.radiation import ManabeWaterVapor
 import os
 from scipy.interpolate import interp1d, interp2d
 from climlab import constants as const
+from climlab.domain.field import Field
 try:
     import netCDF4 as nc
 except:
@@ -157,6 +158,14 @@ def default_absorbers(Tatm,
             absorber_vmr['O3'] = np.zeros_like(Tatm)
     return absorber_vmr
 
+def init_interface(field):
+    '''Return a Field object defined at the vertical interfaces of the input Field object.'''
+    interface_shape = np.array(field.shape); interface_shape[-1] += 1
+    interfaces = np.tile(False,len(interface_shape)); interfaces[-1] = True
+    interface_zero = Field(np.zeros(interface_shape), domain=field.domain, interfaces=interfaces)
+    return interface_zero
+
+
 class _Radiation(EnergyBudget):
     '''Abstact base class for SW and LW radiation processes.
     '''
@@ -228,25 +237,26 @@ class _Radiation_SW(_Radiation):
         self.add_diagnostic('SW_sfc', 0.*self.Ts)
         self.add_diagnostic('SW_sfc_clr', 0.*self.Ts)
         #  Flux diagnostics at layer interfaces
-        #   actually these need an extra vertical level ... bad initialization
-        self.add_diagnostic('SW_flux_up', 0. * self.Tatm)
-        self.add_diagnostic('SW_flux_down', 0. * self.Tatm)
-        self.add_diagnostic('SW_flux_net', 0. * self.Tatm)
-        self.add_diagnostic('SW_flux_up_clr', 0. * self.Tatm)
-        self.add_diagnostic('SW_flux_down_clr', 0. * self.Tatm)
-        self.add_diagnostic('SW_flux_net_clr', 0. * self.Tatm)
+        #   These need an extra vertical level
+        interface_zero = init_interface(self.Tatm)
+        self.add_diagnostic('SW_flux_up', 0. * interface_zero)
+        self.add_diagnostic('SW_flux_down', 0. * interface_zero)
+        self.add_diagnostic('SW_flux_net', 0. * interface_zero)
+        self.add_diagnostic('SW_flux_up_clr', 0. * interface_zero)
+        self.add_diagnostic('SW_flux_down_clr', 0. * interface_zero)
+        self.add_diagnostic('SW_flux_net_clr', 0. * interface_zero)
 
     def _compute_SW_flux_diagnostics(self):
         #  positive down, consistent with ASR
         self.SW_flux_net = self.SW_flux_down - self.SW_flux_up
         self.SW_flux_net_clr = self.SW_flux_down_clr - self.SW_flux_up_clr
         #  TOA diagnostics
-        self.ASR = self.SW_flux_net[..., 0, np.newaxis]
-        self.ASRclr = self.SW_flux_net_clr[..., 0, np.newaxis]
+        self.ASR = self.SW_flux_net[..., 0, np.newaxis] + 0.*self.Ts
+        self.ASRclr = self.SW_flux_net_clr[..., 0, np.newaxis] + 0.*self.Ts
         self.ASRcld = self.ASR - self.ASRclr
         #  Surface diagnostics
-        self.SW_sfc = self.SW_flux_net[..., -1, np.newaxis]
-        self.SW_sfc_clr = self.SW_flux_net_clr[..., -1, np.newaxis]
+        self.SW_sfc = self.SW_flux_net[..., -1, np.newaxis] + 0.*self.Ts
+        self.SW_sfc_clr = self.SW_flux_net_clr[..., -1, np.newaxis] + 0.*self.Ts
 
 
 class _Radiation_LW(_Radiation):
@@ -264,22 +274,23 @@ class _Radiation_LW(_Radiation):
         self.add_diagnostic('LW_sfc', 0.*self.Ts)
         self.add_diagnostic('LW_sfc_clr', 0.*self.Ts)
         #  Flux diagnostics at layer interfaces
-        #   actually these need an extra vertical level ... bad initialization
-        self.add_diagnostic('LW_flux_up', 0. * self.Tatm)
-        self.add_diagnostic('LW_flux_down', 0. * self.Tatm)
-        self.add_diagnostic('LW_flux_net', 0. * self.Tatm)
-        self.add_diagnostic('LW_flux_up_clr', 0. * self.Tatm)
-        self.add_diagnostic('LW_flux_down_clr', 0. * self.Tatm)
-        self.add_diagnostic('LW_flux_net_clr', 0. * self.Tatm)
+        #   These need an extra vertical level
+        interface_zero = init_interface(self.Tatm)
+        self.add_diagnostic('LW_flux_up', 0. * interface_zero)
+        self.add_diagnostic('LW_flux_down', 0. * interface_zero)
+        self.add_diagnostic('LW_flux_net', 0. * interface_zero)
+        self.add_diagnostic('LW_flux_up_clr', 0. * interface_zero)
+        self.add_diagnostic('LW_flux_down_clr', 0. * interface_zero)
+        self.add_diagnostic('LW_flux_net_clr', 0. * interface_zero)
 
     def _compute_LW_flux_diagnostics(self):
         #  LW net flux defined positive UP, consistent with OLR
         self.LW_flux_net = self.LW_flux_up - self.LW_flux_down
         self.LW_flux_net_clr = self.LW_flux_up_clr - self.LW_flux_down_clr
         #  TOA diagnostics
-        self.OLR = self.LW_flux_net[..., 0, np.newaxis]
-        self.OLRclr = self.LW_flux_net_clr[..., 0, np.newaxis]
+        self.OLR = self.LW_flux_net[..., 0, np.newaxis] + 0.*self.Ts
+        self.OLRclr = self.LW_flux_net_clr[..., 0, np.newaxis] + 0.*self.Ts
         self.OLRcld = self.OLR - self.OLRclr
         #  Surface diagnostics
-        self.LW_sfc = self.LW_flux_net[..., -1, np.newaxis]
-        self.LW_sfc_clr = self.LW_flux_net_clr[..., -1, np.newaxis]
+        self.LW_sfc = self.LW_flux_net[..., -1, np.newaxis] + 0.*self.Ts
+        self.LW_sfc_clr = self.LW_flux_net_clr[..., -1, np.newaxis] + 0.*self.Ts

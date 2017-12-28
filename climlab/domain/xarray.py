@@ -40,7 +40,7 @@ def state_to_xarray(state):
 def to_xarray(input):
     '''Convert to xarray. If input is a climlab.Field object, return xarray.DataArray
     If input is a dictionary (e.g. state variables), return xarray.Dataset'''
-    from climlab import Field
+    from climlab.domain.field import Field
     if isinstance(input, Field):
         return Field_to_xarray(input)
     elif isinstance(input, dict):
