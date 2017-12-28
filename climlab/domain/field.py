@@ -83,7 +83,7 @@ class Field(np.ndarray):
             climlab Domain object with domain_type=atm and shape=(30,)
 
     """
-    def __new__(cls, input_array, domain=None):
+    def __new__(cls, input_array, domain=None, interfaces=False):
         # Input array is an already formed ndarray instance
         # We first cast to be our class type
         #obj = np.asarray(input_array).view(cls)
@@ -91,29 +91,39 @@ class Field(np.ndarray):
         #obj = np.atleast_1d(input_array).view(cls)
         # add the new attribute to the created instance
         #  do some checking for correct dimensions
+
+        # input argument interfaces indicates whether input_array exists
+        # on cell interfaces for each dimensions
+        #  It should be either a single Boolean
+        #  or an array of Booleans compatible with number of dimensions
+        if input_array is None:
+            return None
+        else:
+            try:
+                shape = np.array(domain.shape) + np.where(interfaces,1,0)
+            except:
+                raise ValueError('domain and interfaces inconsistent.')
         try:
             #assert obj.shape == domain.shape
             #  This will work if input_array is any of:
             #   - scalar
             #   - same shape as domain
             #   - broadcast-compatible with domain shape
-            obj = (input_array * np.ones(domain.shape)).view(cls)
-            assert obj.shape == domain.shape
+            obj = (input_array * np.ones(shape)).view(cls)
+            assert np.all(obj.shape == shape)
         except:
             try:
                 # Do we get a match if we add a singleton dimension
                 #  (e.g. a singleton depth axis)?
                 obj = np.expand_dims(input_array, axis=-1).view(cls)
-                assert obj.shape == domain.shape
+                assert np.all(obj.shape == shape)
                 #obj = np.transpose(np.atleast_2d(obj))
                 #if obj.shape == domain.shape:
                 #    obj.domain = domain
             except:
-                if input_array is None:
-                    return None
-                else:
-                    raise ValueError('Cannot reconcile shapes of input_array and domain.')
+                raise ValueError('Cannot reconcile shapes of input_array and domain.')
         obj.domain = domain
+        obj.interfaces = interfaces
         #  would be nice to have some automatic domain creation here if none given
 
         # Finally, we must return the newly created object:
