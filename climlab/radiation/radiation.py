@@ -251,12 +251,12 @@ class _Radiation_SW(_Radiation):
         self.SW_flux_net = self.SW_flux_down - self.SW_flux_up
         self.SW_flux_net_clr = self.SW_flux_down_clr - self.SW_flux_up_clr
         #  TOA diagnostics
-        self.ASR = self.SW_flux_net[..., 0, np.newaxis] + 0.*self.Ts
-        self.ASRclr = self.SW_flux_net_clr[..., 0, np.newaxis] + 0.*self.Ts
+        self.ASR = np.array(self.SW_flux_net[..., 0, np.newaxis]) + 0.*self.Ts
+        self.ASRclr = np.array(self.SW_flux_net_clr[..., 0, np.newaxis]) + 0.*self.Ts
         self.ASRcld = self.ASR - self.ASRclr
         #  Surface diagnostics
-        self.SW_sfc = self.SW_flux_net[..., -1, np.newaxis] + 0.*self.Ts
-        self.SW_sfc_clr = self.SW_flux_net_clr[..., -1, np.newaxis] + 0.*self.Ts
+        self.SW_sfc = np.array(self.SW_flux_net[..., -1, np.newaxis]) + 0.*self.Ts
+        self.SW_sfc_clr = np.array(self.SW_flux_net_clr[..., -1, np.newaxis]) + 0.*self.Ts
 
 
 class _Radiation_LW(_Radiation):
@@ -288,9 +288,9 @@ class _Radiation_LW(_Radiation):
         self.LW_flux_net = self.LW_flux_up - self.LW_flux_down
         self.LW_flux_net_clr = self.LW_flux_up_clr - self.LW_flux_down_clr
         #  TOA diagnostics
-        self.OLR = self.LW_flux_net[..., 0, np.newaxis] + 0.*self.Ts
-        self.OLRclr = self.LW_flux_net_clr[..., 0, np.newaxis] + 0.*self.Ts
+        self.OLR = np.array(self.LW_flux_net[..., 0, np.newaxis]) + 0.*self.Ts
+        self.OLRclr = np.array(self.LW_flux_net_clr[..., 0, np.newaxis]) + 0.*self.Ts
         self.OLRcld = self.OLR - self.OLRclr
         #  Surface diagnostics
-        self.LW_sfc = self.LW_flux_net[..., -1, np.newaxis] + 0.*self.Ts
-        self.LW_sfc_clr = self.LW_flux_net_clr[..., -1, np.newaxis] + 0.*self.Ts
+        self.LW_sfc = np.array(self.LW_flux_net[..., -1, np.newaxis]) + 0.*self.Ts
+        self.LW_sfc_clr = np.array(self.LW_flux_net_clr[..., -1, np.newaxis]) + 0.*self.Ts

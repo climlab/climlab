@@ -504,8 +504,10 @@ class Process(object):
         """ Convert state variable dictionary to xarray.Dataset
         """
         if diagnostics:
-            print('Sorry, converting diagnostics to xarray.Dataset not yet implemented.')
-            return
+            dic = self.state.copy()
+            dic.update(self.diagnostics)
+            return state_to_xarray(dic)
+            #print('Sorry, converting diagnostics to xarray.Dataset not yet implemented.')
         else:
             return state_to_xarray(self.state)
 
