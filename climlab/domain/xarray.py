@@ -4,17 +4,24 @@ from builtins import object
 import xarray as xr
 
 
-def Field_to_xarray(Field):
+def Field_to_xarray(field):
     '''Convert a climlab.Field object to xarray.DataArray'''
-    dom = Field.domain
-    coords = {}; dims = []
-    for name in dom.axes:
-        dims.append(name)
-        coords[name] = dom.axes[name].points
+    dom = field.domain
+    dims = []; dimlist = []; coords = {};
+    for axname in dom.axes:
+        dimlist.append(axname)
+        try:
+            assert field.interfaces[dom.axis_index[axname]]
+            bounds_name = axname + '_bounds'
+            dims.append(bounds_name)
+            coords[bounds_name] = dom.axes[axname].bounds
+        except:
+            dims.append(axname)
+            coords[axname] = dom.axes[axname].points
     #  Might need to reorder the data
-    da = xr.DataArray(Field.transpose([dom.axis_index[name] for name in dims]),
+    da = xr.DataArray(field.transpose([dom.axis_index[name] for name in dimlist]),
                       dims=dims, coords=coords)
-    for name in dom.axes:
+    for name in dims:
         try:
             da[name].attrs['units'] = dom.axes[name].units
         except:
