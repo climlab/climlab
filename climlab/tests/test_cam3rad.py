@@ -1,6 +1,7 @@
 from __future__ import division
 import numpy as np
 import climlab
+from climlab.tests.xarray_test import to_xarray
 import pytest
 
 num_lev = 30
@@ -36,7 +37,8 @@ def test_rce(rcm):
     #rcm.integrate_years(5)
     #assert(np.isclose(rcm.Ts, ))
     # Test the xarray interface
-    rcm.to_xarray()
+    to_xarray(rcm)
+
 
 @pytest.mark.slow
 def test_re_radiative_forcing():

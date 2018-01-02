@@ -3,6 +3,7 @@ import numpy as np
 import climlab
 import pytest
 from climlab.radiation.rrtm import _climlab_to_rrtm, _rrtm_to_climlab
+from climlab.tests.xarray_test import to_xarray
 
 num_lev = 30
 
@@ -28,7 +29,7 @@ def test_rrtm_creation():
     assert hasattr(rad, 'ASR')
     assert hasattr(rad, 'ASRclr')
     # Test the xarray interface
-    rad.to_xarray()
+    to_xarray(rad)
 
 @pytest.mark.fast
 def test_swap_component():
@@ -110,7 +111,7 @@ def test_radiative_forcing():
     rcm2.compute_diagnostics()
     assert (rcm2.ASR - rcm2.OLR) > 1.  # positive radiative forcing
     #  Test the xarray interface
-    rcm2.to_xarray()
+    to_xarray(rcm2)
 
 @pytest.mark.slow
 def test_latitude():

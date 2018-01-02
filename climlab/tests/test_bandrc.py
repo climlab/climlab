@@ -2,6 +2,7 @@ from __future__ import division
 import numpy as np
 import climlab
 import pytest
+from climlab.tests.xarray_test import to_xarray
 
 # The fixtures are reusable pieces of code to set up the input to the tests.
 # Without fixtures, we would have to do a lot of cutting and pasting
@@ -66,7 +67,7 @@ def test_diffmodel(diffmodel):
     diffmodel.integrate_days(2)
     #  Would be better to have these tests evaluate a numerical condition
     #  Test the xarray interface
-    diffmodel.to_xarray()
+    to_xarray(diffmodel)
 
 @pytest.mark.fast
 def test_diffmodel_surfflux(diffmodel_surfflux):

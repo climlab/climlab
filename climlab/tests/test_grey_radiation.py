@@ -2,6 +2,7 @@ from __future__ import division
 import numpy as np
 import climlab
 import pytest
+from climlab.tests.xarray_test import to_xarray
 
 
 @pytest.fixture()
@@ -46,7 +47,7 @@ def test_model_creation(model):
     """Just make sure we can create a model."""
     assert len(model.lat)==90
     # Test the xarray interface
-    model.to_xarray()
+    to_xarray(model)
 
 @pytest.mark.fast
 def test_add_insolation(model_with_insolation):

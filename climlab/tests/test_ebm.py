@@ -2,6 +2,7 @@ from __future__ import division
 import numpy as np
 import climlab
 import pytest
+from climlab.tests.xarray_test import to_xarray
 
 
 @pytest.fixture()
@@ -37,7 +38,7 @@ def test_integrate_years(EBM_seasonal):
     EBM_seasonal.integrate_years(1)
     assert _check_minmax(EBM_seasonal.Ts, -24.21414189, 31.16169215)
     # Test the xarray interface
-    EBM_seasonal.to_xarray()
+    to_xarray(EBM_seasonal)
 
 #  And do the same thing at high obliquity
 @pytest.mark.fast
