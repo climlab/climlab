@@ -125,6 +125,7 @@ Required
 Recommended for full functionality
 ~~~~~~~~~~~~
 - ``numba`` (used for acceleration of some components)
+- ``xarray`` (convenience methods to convert model data to ``xarray.DataArray`` format are available)
 - ``pytest`` (to run the automated tests, important if you are developing new code)
 
 `Anaconda Python`_ is highly recommended and will provide everything you need.
@@ -182,9 +183,14 @@ Version 0.5.5 (released early April 2017) finally provides easy binary distrbuti
 
 Version 0.6.0 (released December 2017) provides full Python 3 compatibility, updated documentation, and minor enhancements and bug fixes.
 
+Version 0.6.1 (released January 2018) provides basic integration with xarray_
+(convenience methods for converting climlab objects into ``xarray.DataArray`` and ``xarray.Dataset`` objects)
+
 The documentation_ was first created by Moritz Kreuzer (Potsdam Institut for Climate Impact Research) as part of a thesis project in Spring 2016.
 
 .. _documentation: http://climlab.readthedocs.io
+.. _xarray: http://xarray.pydata.org/en/stable/
+
 
 Contact and Bug Reports
 ----------------------
