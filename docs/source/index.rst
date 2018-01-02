@@ -15,6 +15,7 @@ Welcome to the climlab documentation!
    architecture
    models
    tutorial
+   xarray
    api/climlab
    references
    license

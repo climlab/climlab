@@ -29,7 +29,16 @@ def Field_to_xarray(field):
     return da
 
 def state_to_xarray(state):
-    '''Convert a climlab state or diagnostic variable dictionary to xarray.Dataset'''
+    '''Convert a dictionary of climlab.Field objects to xarray.Dataset
+
+    Input: dictionary of climlab.Field objects
+    (e.g. process.state or process.diagnostics dictionary)
+
+    Output: xarray.Dataset object with all spatial axes,
+    including 'bounds' axes indicating cell boundaries in each spatial dimension.
+
+    Any items in the dictionary that are not instances of climlab.Field
+    are ignored.'''
     from climlab.domain.field import Field
     ds = xr.Dataset()
     for name, field in state.items():
@@ -49,8 +58,16 @@ def state_to_xarray(state):
     return ds
 
 def to_xarray(input):
-    '''Convert to xarray. If input is a climlab.Field object, return xarray.DataArray
-    If input is a dictionary (e.g. state variables), return xarray.Dataset'''
+    '''Convert climlab input to xarray format.
+
+    If input is a climlab.Field object, return xarray.DataArray
+
+    If input is a dictionary (e.g. process.state or process.diagnostics),
+    return xarray.Dataset object with all spatial axes,
+    including 'bounds' axes indicating cell boundaries in each spatial dimension.
+
+    Any items in the dictionary that are not instances of climlab.Field
+    are ignored.'''
     from climlab.domain.field import Field
     if isinstance(input, Field):
         return Field_to_xarray(input)
