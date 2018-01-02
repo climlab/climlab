@@ -68,10 +68,11 @@ class _Insolation(DiagnosticProcess):
         self.add_diagnostic('insolation')
         self.add_diagnostic('coszen')
         try:
-            self.insolation = np.zeros(self.domains['sfc'].shape)
+            domain = self.domains['sfc']
         except:
-            self.insolation = np.zeros(self.domains['default'].shape)
-        self.coszen = np.zeros_like(self.insolation)
+            domain = self.domains['default']
+        self.insolation = Field(np.zeros(domain.shape), domain=domain)
+        self.coszen = Field(np.zeros(domain.shape), domain=domain)
         self.declare_diagnostics(['insolation','coszen'])
         self.S0 = S0
         #  Now that we have a value for self.S0 we can compute the correct coszen

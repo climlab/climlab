@@ -365,7 +365,10 @@ def global_mean(field):
 
 
 def _global_mean(array, lat_radians):
-    return np.average(array, weights=np.cos(lat_radians))
+    #  Use np.array() here to strip the Field data and return a plain array
+    #  (This will be more graceful once we are using xarray.DataArray
+    #  for all internal grid info instead of the Field object)
+    return np.array(np.average(array, weights=np.cos(lat_radians)))
 
 
 def _global_mean_latlon(field):
@@ -374,7 +377,7 @@ def _global_mean_latlon(field):
     dy = np.deg2rad(np.diff(dom.lat.bounds))
     dx = np.deg2rad(np.diff(dom.lon.bounds))*np.cos(np.deg2rad(lat))
     area = dx * dy[:,np.newaxis]  # grid cell area in radians^2
-    return np.average(field, weights=area)
+    return np.array(np.average(field, weights=area))
 
 
 def to_latlon(array, domain, axis = 'lon'):
