@@ -1,7 +1,7 @@
-from __future__ import division
+from __future__ import division, absolute_import
 from builtins import str
 from builtins import object
-import xarray as xr
+from xarray import Dataset, DataArray
 
 
 def Field_to_xarray(field):
@@ -19,7 +19,7 @@ def Field_to_xarray(field):
             dims.append(axname)
             coords[axname] = dom.axes[axname].points
     #  Might need to reorder the data
-    da = xr.DataArray(field.transpose([dom.axis_index[name] for name in dimlist]),
+    da = DataArray(field.transpose([dom.axis_index[name] for name in dimlist]),
                       dims=dims, coords=coords)
     for name in dims:
         try:
@@ -40,14 +40,15 @@ def state_to_xarray(state):
     Any items in the dictionary that are not instances of climlab.Field
     are ignored.'''
     from climlab.domain.field import Field
-    ds = xr.Dataset()
+
+    ds = Dataset()
     for name, field in state.items():
         if isinstance(field, Field):
             ds[name] = Field_to_xarray(field)
             dom = field.domain
             for axname, ax in dom.axes.items():
                 bounds_name = axname + '_bounds'
-                ds.coords[bounds_name] = xr.DataArray(ax.bounds, dims=[bounds_name],
+                ds.coords[bounds_name] = DataArray(ax.bounds, dims=[bounds_name],
                                     coords={bounds_name:ax.bounds})
                 try:
                     ds[bounds_name].attrs['units'] = ax.units
