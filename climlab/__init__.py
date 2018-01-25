@@ -7,7 +7,7 @@ Nevertheless also the underlying code of the ``climlab`` architecture
 has been documented for a comprehensive understanding and traceability.
 '''
 
-__version__ = '0.6.2.dev3'
+__version__ = '0.6.2.dev5'
 
 # this should ensure that we can still import constants.py as climlab.constants
 from climlab.utils import constants
