@@ -22,29 +22,37 @@
 
 
 subroutine emanuel_convection(T, Q, QS, U, V, TRA, P, PH, &
-                ND,  NL,   NTRA,   DELT, CBMFold, IFLAG,  FT,     FQ,   FU, &
-                FV,  FTRA, PRECIP, WD,   TPRIME, QPRIME, CBMFnew    )
+                NCOL,  ND,  NL,   NTRA,   DELT, CBMFold, &
+                IFLAG,  FT,     FQ,   FU,     FV,  FTRA, &
+                PRECIP, WD,   TPRIME, QPRIME, CBMFnew    )
 
 ! INPUT
     integer, intent(in) :: ND, NTRA ! number of layers, number of tracers
     integer, intent(in) :: NL  ! max number of levels to which convection can penetrate
-    real, intent(in) :: T(ND),Q(ND),QS(ND),U(ND),V(ND),TRA(ND,NTRA),P(ND),PH(ND+1)
+    integer, intent(in) :: NCOL  ! number of independent columns
+    real, intent(in) :: T(NCOL,ND),Q(NCOL,ND),QS(NCOL,ND),U(NCOL,ND),V(NCOL,ND)
+    real, intent(in) :: TRA(NCOL,ND,NTRA),P(NCOL,ND),PH(NCOL,ND+1)
     real, intent(in) :: DELT ! The model time step (sec) between calls to CONVECT
-    real, intent(in) :: CBMFold ! The cloud base mass flux ((kg/m**2)/s)
+    real, intent(in) :: CBMFold(NCOL) ! The cloud base mass flux ((kg/m**2)/s)
 ! OUTPUT
-    integer, intent(out) :: IFLAG
-    real, intent(out) :: FT(ND),FQ(ND),FU(ND),FV(ND),FTRA(ND,NTRA)
-    real, intent(out) :: PRECIP, WD, TPRIME, QPRIME
-    real, intent(out) :: CBMFnew
+    integer, intent(out) :: IFLAG(NCOL)
+    real, intent(out) :: FT(NCOL,ND),FQ(NCOL,ND),FU(NCOL,ND),FV(NCOL,ND)
+    real, intent(out) :: FTRA(NCOL,ND,NTRA)
+    real, intent(out) :: PRECIP(NCOL), WD(NCOL), TPRIME(NCOL), QPRIME(NCOL)
+    real, intent(out) :: CBMFnew(NCOL)
 !  These are not comments! Necessary directives to f2py to handle array dimensions
-!f2py depend(ND) T,Q,QS,U,V,P,PH
-!f2py depend(ND,NTRA) TRA
-!f2py depend(ND) FT,FQ,FU,FV
-!f2py depend(ND,NTRA) FTRA
+!f2py depend(NCOL,ND) T,Q,QS,U,V,P,PH
+!f2py depend(NCOL,ND,NTRA) TRA
+!f2py depend(NCOL,ND) FT,FQ,FU,FV
+!f2py depend(NCOL,ND,NTRA) FTRA
+!f2py depend(NCOL) IFLAG, CBMFold, CBMFnew, PRECIP, WD, TPRIME, QPRIME
 
-    CBMFnew = 0. + CBMFold  ! will be updated during call to CONVECT
-
-    call CONVECT(T,Q,QS,U,V,TRA,P,PH,ND,NL,NTRA,DELT, &
-             IFLAG,FT,FQ,FU,FV,FTRA,PRECIP,WD,TPRIME,QPRIME,CBMFnew)
+    do j = 1, NCOL
+      CBMFnew(j) = 0. + CBMFold(j)  ! will be updated during call to CONVECT
+      call CONVECT(T(j,:),Q(j,:),QS(j,:),U(j,:),V(j,:),TRA(j,:,:),P(j,:),PH(j,:), &
+             ND,NL,NTRA,DELT, &
+             IFLAG(j),FT(j,:),FQ(j,:),FU(j,:),FV(j,:),FTRA(j,:,:), PRECIP(j), &
+             WD(j), TPRIME(j),QPRIME(j),CBMFnew(j))
+    end do
 
 end subroutine emanuel_convection

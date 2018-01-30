@@ -7,6 +7,9 @@ import numpy as np
 from climlab.process import TimeDependentProcess
 from climlab.utils.thermo import qsat
 from ._emanuel_convection import emanuel_convection as convect
+# The array conversion routines we are borrowing from the RRTMG wrapper
+from climlab.radiation.rrtm.utils import _climlab_to_rrtm as _climlab_to_convect
+from climlab.radiation.rrtm.utils import _rrtm_to_climlab as _convect_to_climlab
 
 
 class EmanuelConvection(TimeDependentProcess):
@@ -19,46 +22,49 @@ class EmanuelConvection(TimeDependentProcess):
 
     def _compute(self):
         #  Invert arrays so the first element is the bottom of column
-        T = self._climlab_to_convect(self.Tatm)
+        T = _climlab_to_convect(self.Tatm)
         dom = self.Tatm.domain
-        P = self._climlab_to_convect(dom.lev.points)
-        PH = self._climlab_to_convect(dom.lev.bounds)
-        Q = self._climlab_to_convect(self.q)
+        P = _climlab_to_convect(dom.lev.points)
+        PH = _climlab_to_convect(dom.lev.bounds)
+        Q = _climlab_to_convect(self.q)
         QS = qsat(T,P)
-        ND = T.size
+        ND = np.size(T, axis=1)
+        NCOL = np.size(T, axis=0)
         NL = ND-1
         try:
-            U = self._climlab_to_convect(self.U)
+            U = _climlab_to_convect(self.U)
         except:
-            U = np.zeros(ND)
+            U = np.zeros_like(T)
         try:
-            V = self._climlab_to_convect(self.V)
+            V = _climlab_to_convect(self.V)
         except:
-            V = np.zeros(ND)
+            V = np.zeros_like(T)
         NTRA = 1
-        TRA = np.zeros((ND,NTRA), order='F')  # tracers ignored
-        NTRA = np.size(TRA,axis=1)
+        TRA = np.zeros((NCOL,ND,NTRA), order='F')  # tracers ignored
         DELT = float(self.timestep)
-        CBMF = float(self.CBMF)
+        CBMF = self.CBMF
         (IFLAG, FT, FQ, FU, FV, FTRA, PRECIP, WD, TPRIME, QPRIME, CBMFnew) = \
-            convect(T, Q, QS, U, V, TRA, P, PH, ND, NL, NTRA, DELT, CBMF)
+            convect(T, Q, QS, U, V, TRA, P, PH, NCOL, ND, NL, NTRA, DELT, CBMF)
 
-        tendencies = {'Tatm': self._convect_to_climlab(FT),
-                      'q': self._convect_to_climlab(FQ)}
+        tendencies = {'Tatm': _convect_to_climlab(FT),
+                      'q': _convect_to_climlab(FQ)}
         if 'Ts' in self.state:
-            tendencies['Ts'] = np.zeros_like(self.Ts)
+            tendencies['Ts'] = 0. * self.Ts
         if 'U' in self.state:
-            tendencies['U'] = self._convect_to_climlab(FU)
+            tendencies['U'] = _convect_to_climlab(FU) * np.ones_like(self.U)
         if 'V' in self.state:
-            tendencies['V'] = self._convect_to_climlab(FV)
+            tendencies['V'] = _convect_to_climlab(FV) * np.ones_like(self.V)
         self.CBMF = CBMFnew
         self.PRECIP = PRECIP
         self.IFLAG = IFLAG
         return tendencies
 
-    def _climlab_to_convect(self, field):
-        #  Invert arrays so the first element is the bottom of column
-        return np.flipud(field)
-
-    def _convect_to_climlab(self, field):
-        return np.flipud(field) * np.ones_like(self.Tatm)
+    # def _climlab_to_convect(self, field):
+    #     #  Invert arrays so the first element is the bottom of column
+    #     #return np.flipud(field)
+    #     newfield = _climlab_to_rrtm(field)
+    #     return _climlab_to_rrtm(field)
+    #
+    # def _convect_to_climlab(self, field):
+    #     #return np.flipud(field) * np.ones_like(self.Tatm)
+    #     return _rrtm_to_climlab(field)

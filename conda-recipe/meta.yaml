@@ -1,5 +1,5 @@
 {% set name = "climlab" %}
-{% set version = "0.6.2.dev5" %}
+{% set version = "0.6.2.dev6" %}
 
 package:
   name: {{ name|lower }}
@@ -9,7 +9,7 @@ source:
   path: ../
 
 build:
-  number: 7
+  number: 0
   #skip: True  # [not py2k]
 
 requirements:
