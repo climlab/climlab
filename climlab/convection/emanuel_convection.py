@@ -17,8 +17,8 @@ class EmanuelConvection(TimeDependentProcess):
         super(EmanuelConvection, self).__init__(**kwargs)
         self.time_type = 'explicit'
         #  Define inputs and diagnostics
-        self.add_diagnostic('CBMF', 0.)  # cloud base mass flux
-        self.add_diagnostic('PRECIP', 0.) # Precip rate (mm/day)
+        self.add_diagnostic('CBMF', np.zeros(self.Tatm[...,0].shape))  # cloud base mass flux
+        self.add_diagnostic('PRECIP', np.zeros(self.Tatm[...,0].shape)) # Precip rate (mm/day)
 
     def _compute(self):
         #  Invert arrays so the first element is the bottom of column

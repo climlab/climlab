@@ -31,7 +31,7 @@ subroutine emanuel_convection(T, Q, QS, U, V, TRA, P, PH, &
     integer, intent(in) :: NL  ! max number of levels to which convection can penetrate
     integer, intent(in) :: NCOL  ! number of independent columns
     real, intent(in) :: T(NCOL,ND),Q(NCOL,ND),QS(NCOL,ND),U(NCOL,ND),V(NCOL,ND)
-    real, intent(in) :: TRA(NCOL,ND,NTRA),P(NCOL,ND),PH(NCOL,ND+1)
+    real, intent(in) :: TRA(NCOL,ND,NTRA),P(ND),PH(ND+1)
     real, intent(in) :: DELT ! The model time step (sec) between calls to CONVECT
     real, intent(in) :: CBMFold(NCOL) ! The cloud base mass flux ((kg/m**2)/s)
 ! OUTPUT
@@ -41,7 +41,8 @@ subroutine emanuel_convection(T, Q, QS, U, V, TRA, P, PH, &
     real, intent(out) :: PRECIP(NCOL), WD(NCOL), TPRIME(NCOL), QPRIME(NCOL)
     real, intent(out) :: CBMFnew(NCOL)
 !  These are not comments! Necessary directives to f2py to handle array dimensions
-!f2py depend(NCOL,ND) T,Q,QS,U,V,P,PH
+!f2py depend(ND) P,PH
+!f2py depend(NCOL,ND) T,Q,QS,U,V
 !f2py depend(NCOL,ND,NTRA) TRA
 !f2py depend(NCOL,ND) FT,FQ,FU,FV
 !f2py depend(NCOL,ND,NTRA) FTRA
@@ -49,7 +50,7 @@ subroutine emanuel_convection(T, Q, QS, U, V, TRA, P, PH, &
 
     do j = 1, NCOL
       CBMFnew(j) = 0. + CBMFold(j)  ! will be updated during call to CONVECT
-      call CONVECT(T(j,:),Q(j,:),QS(j,:),U(j,:),V(j,:),TRA(j,:,:),P(j,:),PH(j,:), &
+      call CONVECT(T(j,:),Q(j,:),QS(j,:),U(j,:),V(j,:),TRA(j,:,:),P,PH, &
              ND,NL,NTRA,DELT, &
              IFLAG(j),FT(j,:),FQ(j,:),FU(j,:),FV(j,:),FTRA(j,:,:), PRECIP(j), &
              WD(j), TPRIME(j),QPRIME(j),CBMFnew(j))
