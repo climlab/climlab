@@ -10,7 +10,7 @@ from .utils import _climlab_to_rrtm, _climlab_to_rrtm_sfc, _rrtm_to_climlab
 nbndlw = 1; ngptlw = 1;
 try:
     #  The compiled fortran extension module
-    from . import _rrtmg_lw
+    from pyrrtmg import _rrtmg_lw
     nbndlw = int(_rrtmg_lw.parrrtm.nbndlw)
     ngptlw = int(_rrtmg_lw.parrrtm.ngptlw)
     #  Initialize absorption data
