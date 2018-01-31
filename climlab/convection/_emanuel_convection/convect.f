@@ -153,7 +153,7 @@ C
       REAL UP(NA),VP(NA),TRAP(NA,NTRA)
       REAL M(NA),MP(NA),MENT(NA,NA),QENT(NA,NA),ELIJ(NA,NA)
       REAL SIJ(NA,NA),TVP(NA),TV(NA),WATER(NA)
-      REAL QP(NA),EP(NA),TH(NA),WT(NA),EVAP(NA),CLW(NA)
+      REAL QP(NA),EP(NA),WT(NA),EVAP(NA),CLW(NA)
       REAL SIGP(NA),TP(NA),TOLD(NA),CPN(NA)
       REAL LV(NA),LVCP(NA),H(NA),HP(NA),GZ(NA),HM(NA)
 C BRIAN... lots more input parameters to declare
@@ -259,11 +259,12 @@ C
           FTRA(I,J)=0.0
     4    CONTINUE
     5   CONTINUE
-        DO 7 I=1,NL+1
-         RDCP=(RD*(1.-Q(I))+Q(I)*RV)/
-     1    (CPD*(1.-Q(I))+Q(I)*CPV)
-         TH(I)=T(I)*(1000.0/P(I))**RDCP
-    7   CONTINUE
+C Brian  -- TH (potential temperature) only used in dry adjustment code
+C        DO 7 I=1,NL+1
+C         RDCP=(RD*(1.-Q(I))+Q(I)*RV)/
+C     1    (CPD*(1.-Q(I))+Q(I)*CPV)
+C         TH(I)=T(I)*(1000.0/P(I))**RDCP
+C    7   CONTINUE
         PRECIP=0.0
         WD=0.0
         TPRIME=0.0
