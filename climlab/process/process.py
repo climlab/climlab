@@ -587,8 +587,13 @@ class Process(object):
         :type:      dict
 
         """
-        return { key:getattr(self,key) for key in dir(self)
-                if key in self._diag_vars }
+        diag_dict = {}
+        for key in self._diag_vars:
+            try:
+                diag_dict[key] = getattr(self,key)
+            except:
+                pass
+        return diag_dict
     @property
     def input(self):
         """Dictionary access to all input variables
@@ -599,10 +604,13 @@ class Process(object):
         :type:      dict
 
         """
-        return { key:getattr(self,key) for key in dir(self)
-                 if key in self._input_vars }
-        #return { key:value for key, value in self.__dict__.items()
-        #         if key in self._input_vars }
+        input_dict = {}
+        for key in self._input_vars:
+            try:
+                input_dict[key] = getattr(self,key)
+            except:
+                pass
+        return input_dict
 
     # Some handy shortcuts... only really make sense when there is only
     # a single axis of that type in the process.
