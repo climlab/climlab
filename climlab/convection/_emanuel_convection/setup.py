@@ -30,7 +30,8 @@ def configuration(parent_package='', top_path=None):
     #  Build source list
     thispath = config.local_path
     sourcelist = []
-    sourcelist.append(join(thispath,'CONVECT4','convect43c.f'))
+    #sourcelist.append(join(thispath,'CONVECT4','convect43c.f'))
+    sourcelist.append(join(thispath,'convect.f'))
     sourcelist.append(join(thispath,'Driver.f90'))
     if build:
         config.add_extension(name='_emanuel_convection',

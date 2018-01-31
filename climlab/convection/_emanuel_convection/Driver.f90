@@ -23,6 +23,9 @@
 
 subroutine emanuel_convection(T, Q, QS, U, V, TRA, P, PH, &
                 NCOL,  ND,  NL,   NTRA,   DELT, CBMFold, &
+                CPD, CPV, CL, RV, RD, LV0, G, ROWL, MINORIG, &
+                ELCRIT, TLCRIT, ENTP, SIGD, SIGS, OMTRAIN, OMTSNOW, &
+                COEFFR, COEFFS, CU, BETA, DTMAX, ALPHA, DAMP, &
                 IFLAG,  FT,     FQ,   FU,     FV,  FTRA, &
                 PRECIP, WD,   TPRIME, QPRIME, CBMFnew    )
 
@@ -34,6 +37,10 @@ subroutine emanuel_convection(T, Q, QS, U, V, TRA, P, PH, &
     real, intent(in) :: TRA(NCOL,ND,NTRA),P(ND),PH(ND+1)
     real, intent(in) :: DELT ! The model time step (sec) between calls to CONVECT
     real, intent(in) :: CBMFold(NCOL) ! The cloud base mass flux ((kg/m**2)/s)
+    real, intent(in) :: CPD, CPV, CL, RV, RD, LV0, G, ROWL  ! thermodynamic constants
+    integer, intent(in) :: MINORIG  ! index of lowest level from which convection may originate
+    real, intent(in) :: ELCRIT, TLCRIT, ENTP, SIGD, SIGS, OMTRAIN, OMTSNOW ! model parameters
+    real, intent(in) :: COEFFR, COEFFS, CU, BETA, DTMAX, ALPHA, DAMP ! more model parameters
 ! OUTPUT
     integer, intent(out) :: IFLAG(NCOL)
     real, intent(out) :: FT(NCOL,ND),FQ(NCOL,ND),FU(NCOL,ND),FV(NCOL,ND)
@@ -51,7 +58,10 @@ subroutine emanuel_convection(T, Q, QS, U, V, TRA, P, PH, &
     do j = 1, NCOL
       CBMFnew(j) = 0. + CBMFold(j)  ! will be updated during call to CONVECT
       call CONVECT(T(j,:),Q(j,:),QS(j,:),U(j,:),V(j,:),TRA(j,:,:),P,PH, &
-             ND,NL,NTRA,DELT, &
+             ND,NL,NTRA,DELT,MINORIG, &
+             CPD, CPV, CL, RV, RD, LV0, G, ROWL, &
+             ELCRIT, TLCRIT, ENTP, SIGD, SIGS, OMTRAIN, OMTSNOW, &
+             COEFFR, COEFFS, CU, BETA, DTMAX, ALPHA, DAMP, &
              IFLAG(j),FT(j,:),FQ(j,:),FU(j,:),FV(j,:),FTRA(j,:,:), PRECIP(j), &
              WD(j), TPRIME(j),QPRIME(j),CBMFnew(j))
     end do

@@ -1,6 +1,7 @@
 from __future__ import division
 import numpy as np
 import climlab
+from climlab.convection import emanuel_convection
 import pytest
 
 
@@ -37,6 +38,17 @@ FU = np.flipud([6.96138741E-05,   2.54272982E-05,  -4.23727352E-06,
 FV = np.zeros_like(FU)
 
 
+#  Set thermodynamic constants to their defaults from Emanuel's code
+#   so that we get same tendencies
+emanuel_convection.CPD=1005.7
+emanuel_convection.CPV=1870.0
+emanuel_convection.RV=461.5
+emanuel_convection.RD=287.04
+emanuel_convection.LV0=2.501E6
+emanuel_convection.G=9.8
+emanuel_convection.ROWL=1000.0
+
+
 @pytest.mark.fast
 def test_convect_tendencies():
     # Temperatures in a single column
@@ -45,7 +57,7 @@ def test_convect_tendencies():
     state['q'] = state.Tatm * 0. + Q
     state['U'] = state.Tatm * 0. + U
     state['V'] = state.Tatm * 0. + V
-    conv = climlab.convection.EmanuelConvection(state=state, timestep=DELT)
+    conv = emanuel_convection.EmanuelConvection(state=state, timestep=DELT)
     conv.step_forward()
     #  Did we get all the correct output?
     assert conv.IFLAG == 1
@@ -71,7 +83,7 @@ def test_multidim_tendencies():
         state['q'][i,:] += Q
         state['U'][i,:] += U
         state['V'][i,:] += V
-    conv = climlab.convection.EmanuelConvection(state=state, timestep=DELT)
+    conv = emanuel_convection.EmanuelConvection(state=state, timestep=DELT)
     conv.step_forward()
     #  Did we get all the correct output?
     assert np.all(conv.IFLAG == 1)
