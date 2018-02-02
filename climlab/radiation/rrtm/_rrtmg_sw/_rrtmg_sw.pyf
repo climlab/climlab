@@ -1,0 +1,515 @@
+!    -*- f90 -*-
+! Note: the context of this file is case sensitive.
+
+python module _rrtmg_sw ! in 
+    interface  ! in :_rrtmg_sw
+        module parrrsw ! in :_rrtmg_sw:rrtmg_sw_v4.0/gcm_model/modules/parrrsw.f90
+            use parkind, only: im=>kind_im,rb=>kind_rb
+            integer(kind=im), parameter,optional :: jmumu=32
+            integer(kind=im), parameter,optional :: mxlay=203
+            integer(kind=im), parameter,optional :: jpb1=16
+            integer(kind=im), parameter,optional :: jmxstr=16
+            integer(kind=im), parameter,optional :: jpb2=29
+            integer(kind=im), parameter,optional :: naerec=6
+            integer(kind=im), parameter,optional :: jmcmu=32
+            integer(kind=im), parameter,optional :: jmphi=3
+            integer(kind=im), parameter,optional :: ng29=12
+            integer(kind=im), parameter,optional :: ng28=6
+            integer(kind=im), parameter,optional :: ng23=10
+            integer(kind=im), parameter,optional :: ng22=2
+            integer(kind=im), parameter,optional :: ng21=10
+            integer(kind=im), parameter,optional :: ng20=10
+            integer(kind=im), parameter,optional :: ng27=8
+            integer(kind=im), parameter,optional :: ng26=6
+            integer(kind=im), parameter,optional :: ng25=6
+            integer(kind=im), parameter,optional :: ng24=8
+            integer(kind=im), parameter,optional :: nbndsw=14
+            integer(kind=im), parameter,optional :: ngs29=112
+            integer(kind=im), parameter,optional :: ngs28=100
+            integer(kind=im), parameter,optional :: ngs27=94
+            integer(kind=im), parameter,optional :: jmxang=4
+            integer(kind=im), parameter,optional :: ngs25=80
+            integer(kind=im), parameter,optional :: ngs24=74
+            integer(kind=im), parameter,optional :: ngs23=66
+            integer(kind=im), parameter,optional :: ngs22=56
+            integer(kind=im), parameter,optional :: ngs21=54
+            integer(kind=im), parameter,optional :: ngs20=44
+            integer(kind=im), parameter,optional :: mxmol=38
+            integer(kind=im), parameter,optional :: ng16=6
+            integer(kind=im), parameter,optional :: ng17=12
+            integer(kind=im), parameter,optional :: ngs26=86
+            integer(kind=im), parameter,optional :: ng18=8
+            integer(kind=im), parameter,optional :: ng19=8
+            integer(kind=im), parameter,optional :: mg=16
+            real(kind=rb), parameter,optional :: rrsw_scon=1368.22
+            integer(kind=im), parameter,optional :: nmol=7
+            integer(kind=im), parameter,optional :: nstr=2
+            integer(kind=im), parameter,optional :: jpband=29
+            integer(kind=im), parameter,optional :: ngptsw=112
+            integer(kind=im), parameter,optional :: ngs16=6
+            integer(kind=im), parameter,optional :: ngs17=18
+            integer(kind=im), parameter,optional :: ngs18=26
+            integer(kind=im), parameter,optional :: ngs19=34
+        end module parrrsw
+        module rrsw_kg16 ! in :_rrtmg_sw:rrtmg_sw_v4.0/gcm_model/modules/rrsw_kg16.f90
+            use parrrsw, only: ng16
+            use parkind, only: im=>kind_im,rb=>kind_rb
+            real(kind=rb) dimension(16) :: snsptdrko
+            real(kind=rb) dimension(5,47,16) :: kbo
+            real(kind=rb) dimension(10,6) :: selfref
+            real(kind=rb) dimension(16) :: sfluxrefo
+            real(kind=rb) dimension(9,5,13,16) :: kao
+            real(kind=rb) dimension(235,6) :: absb
+            real(kind=rb) dimension(6) :: irradnce
+            real(kind=rb) dimension(5,47,6) :: kb
+            real(kind=rb) dimension(9,5,13,6) :: ka
+            real(kind=rb) dimension(10,16) :: selfrefo
+            real(kind=rb) dimension(16) :: facbrghto
+            integer(kind=im), parameter,optional :: no16=16
+            real(kind=rb) dimension(6) :: sfluxref
+            real(kind=rb) dimension(16) :: irradnceo
+            real(kind=rb) dimension(585,6) :: absa
+            real(kind=rb) dimension(3,6) :: forref
+            real(kind=rb) dimension(6) :: facbrght
+            real(kind=rb) dimension(3,16) :: forrefo
+            real(kind=rb) :: rayl
+            real(kind=rb) dimension(6) :: snsptdrk
+        end module rrsw_kg16
+        module rrsw_kg17 ! in :_rrtmg_sw:rrtmg_sw_v4.0/gcm_model/modules/rrsw_kg17.f90
+            use parrrsw, only: ng17
+            use parkind, only: im=>kind_im,rb=>kind_rb
+            real(kind=rb) dimension(16,5) :: snsptdrko
+            real(kind=rb) dimension(5,5,47,16) :: kbo
+            real(kind=rb) dimension(10,12) :: selfref
+            real(kind=rb) dimension(12,5) :: facbrght
+            real(kind=rb) dimension(9,5,13,16) :: kao
+            real(kind=rb) dimension(1175,12) :: absb
+            real(kind=rb) dimension(12,5) :: irradnce
+            real(kind=rb) dimension(5,5,47,12) :: kb
+            real(kind=rb) dimension(9,5,13,12) :: ka
+            real(kind=rb) dimension(10,16) :: selfrefo
+            real(kind=rb) dimension(16,5) :: facbrghto
+            integer(kind=im), parameter,optional :: no17=16
+            real(kind=rb) dimension(12,5) :: sfluxref
+            real(kind=rb) dimension(16,5) :: irradnceo
+            real(kind=rb) dimension(585,12) :: absa
+            real(kind=rb) dimension(4,12) :: forref
+            real(kind=rb) dimension(16,5) :: sfluxrefo
+            real(kind=rb) dimension(4,16) :: forrefo
+            real(kind=rb) :: rayl
+            real(kind=rb) dimension(12,5) :: snsptdrk
+        end module rrsw_kg17
+        module rrsw_kg18 ! in :_rrtmg_sw:rrtmg_sw_v4.0/gcm_model/modules/rrsw_kg18.f90
+            use parrrsw, only: ng18
+            use parkind, only: im=>kind_im,rb=>kind_rb
+            real(kind=rb) dimension(16,9) :: snsptdrko
+            real(kind=rb) dimension(5,47,16) :: kbo
+            real(kind=rb) dimension(10,8) :: selfref
+            real(kind=rb) dimension(16,9) :: sfluxrefo
+            real(kind=rb) dimension(9,5,13,16) :: kao
+            real(kind=rb) dimension(235,8) :: absb
+            real(kind=rb) dimension(8,9) :: irradnce
+            real(kind=rb) dimension(5,47,8) :: kb
+            real(kind=rb) dimension(9,5,13,8) :: ka
+            real(kind=rb) dimension(10,16) :: selfrefo
+            real(kind=rb) dimension(16,9) :: facbrghto
+            integer(kind=im), parameter,optional :: no18=16
+            real(kind=rb) dimension(8,9) :: sfluxref
+            real(kind=rb) dimension(16,9) :: irradnceo
+            real(kind=rb) dimension(585,8) :: absa
+            real(kind=rb) dimension(3,8) :: forref
+            real(kind=rb) dimension(8,9) :: facbrght
+            real(kind=rb) dimension(3,16) :: forrefo
+            real(kind=rb) :: rayl
+            real(kind=rb) dimension(8,9) :: snsptdrk
+        end module rrsw_kg18
+        module rrsw_kg19 ! in :_rrtmg_sw:rrtmg_sw_v4.0/gcm_model/modules/rrsw_kg19.f90
+            use parrrsw, only: ng19
+            use parkind, only: im=>kind_im,rb=>kind_rb
+            real(kind=rb) dimension(16,9) :: snsptdrko
+            real(kind=rb) dimension(5,47,16) :: kbo
+            real(kind=rb) dimension(10,8) :: selfref
+            real(kind=rb) dimension(16,9) :: sfluxrefo
+            real(kind=rb) dimension(9,5,13,16) :: kao
+            real(kind=rb) dimension(235,8) :: absb
+            real(kind=rb) dimension(8,9) :: irradnce
+            real(kind=rb) dimension(5,47,8) :: kb
+            real(kind=rb) dimension(9,5,13,8) :: ka
+            real(kind=rb) dimension(10,16) :: selfrefo
+            real(kind=rb) dimension(16,9) :: facbrghto
+            integer(kind=im), parameter,optional :: no19=16
+            real(kind=rb) dimension(8,9) :: sfluxref
+            real(kind=rb) dimension(16,9) :: irradnceo
+            real(kind=rb) dimension(585,8) :: absa
+            real(kind=rb) dimension(3,8) :: forref
+            real(kind=rb) dimension(8,9) :: facbrght
+            real(kind=rb) dimension(3,16) :: forrefo
+            real(kind=rb) :: rayl
+            real(kind=rb) dimension(8,9) :: snsptdrk
+        end module rrsw_kg19
+        module rrsw_kg20 ! in :_rrtmg_sw:rrtmg_sw_v4.0/gcm_model/modules/rrsw_kg20.f90
+            use parrrsw, only: ng20
+            use parkind, only: im=>kind_im,rb=>kind_rb
+            real(kind=rb) dimension(16) :: snsptdrko
+            real(kind=rb) dimension(5,47,16) :: kbo
+            real(kind=rb) dimension(10,10) :: selfref
+            real(kind=rb) dimension(5,47,10) :: kb
+            real(kind=rb) dimension(16) :: sfluxrefo
+            real(kind=rb) dimension(5,13,16) :: kao
+            real(kind=rb) dimension(4,10) :: forref
+            real(kind=rb) dimension(10) :: irradnce
+            real(kind=rb) dimension(16) :: absch4o
+            real(kind=rb) dimension(10) :: absch4
+            real(kind=rb) dimension(5,13,10) :: ka
+            integer(kind=im), parameter,optional :: no20=16
+            real(kind=rb) dimension(10,16) :: selfrefo
+            real(kind=rb) dimension(16) :: facbrghto
+            real(kind=rb) dimension(10) :: sfluxref
+            real(kind=rb) dimension(16) :: irradnceo
+            real(kind=rb) dimension(65,10) :: absa
+            real(kind=rb) dimension(235,10) :: absb
+            real(kind=rb) dimension(10) :: facbrght
+            real(kind=rb) dimension(4,16) :: forrefo
+            real(kind=rb) :: rayl
+            real(kind=rb) dimension(10) :: snsptdrk
+        end module rrsw_kg20
+        module rrsw_kg21 ! in :_rrtmg_sw:rrtmg_sw_v4.0/gcm_model/modules/rrsw_kg21.f90
+            use parrrsw, only: ng21
+            use parkind, only: im=>kind_im,rb=>kind_rb
+            real(kind=rb) dimension(1175,10) :: absb
+            real(kind=rb) dimension(16,9) :: snsptdrko
+            real(kind=rb) dimension(5,5,47,16) :: kbo
+            real(kind=rb) dimension(10,10) :: selfref
+            real(kind=rb) dimension(16,9) :: sfluxrefo
+            real(kind=rb) dimension(9,5,13,16) :: kao
+            real(kind=rb) dimension(9,5,13,10) :: ka
+            real(kind=rb) dimension(10,9) :: irradnce
+            real(kind=rb) dimension(5,5,47,10) :: kb
+            integer(kind=im), parameter,optional :: no21=16
+            real(kind=rb) dimension(10,16) :: selfrefo
+            real(kind=rb) dimension(16,9) :: facbrghto
+            real(kind=rb) dimension(10,9) :: sfluxref
+            real(kind=rb) dimension(16,9) :: irradnceo
+            real(kind=rb) dimension(585,10) :: absa
+            real(kind=rb) dimension(4,10) :: forref
+            real(kind=rb) dimension(10,9) :: facbrght
+            real(kind=rb) dimension(4,16) :: forrefo
+            real(kind=rb) :: rayl
+            real(kind=rb) dimension(10,9) :: snsptdrk
+        end module rrsw_kg21
+        module rrsw_kg22 ! in :_rrtmg_sw:rrtmg_sw_v4.0/gcm_model/modules/rrsw_kg22.f90
+            use parrrsw, only: ng22
+            use parkind, only: im=>kind_im,rb=>kind_rb
+            real(kind=rb) dimension(16,9) :: snsptdrko
+            real(kind=rb) dimension(5,47,16) :: kbo
+            real(kind=rb) dimension(10,2) :: selfref
+            real(kind=rb) dimension(5,47,2) :: kb
+            real(kind=rb) dimension(16,9) :: sfluxrefo
+            real(kind=rb) dimension(9,5,13,16) :: kao
+            real(kind=rb) dimension(235,2) :: absb
+            real(kind=rb) dimension(2,9) :: irradnce
+            integer(kind=im), parameter,optional :: no22=16
+            real(kind=rb) dimension(9,5,13,2) :: ka
+            real(kind=rb) dimension(10,16) :: selfrefo
+            real(kind=rb) dimension(16,9) :: facbrghto
+            real(kind=rb) dimension(2,9) :: sfluxref
+            real(kind=rb) dimension(16,9) :: irradnceo
+            real(kind=rb) dimension(585,2) :: absa
+            real(kind=rb) dimension(3,2) :: forref
+            real(kind=rb) dimension(2,9) :: facbrght
+            real(kind=rb) dimension(3,16) :: forrefo
+            real(kind=rb) :: rayl
+            real(kind=rb) dimension(2,9) :: snsptdrk
+        end module rrsw_kg22
+        module rrsw_kg23 ! in :_rrtmg_sw:rrtmg_sw_v4.0/gcm_model/modules/rrsw_kg23.f90
+            use parrrsw, only: ng23
+            use parkind, only: im=>kind_im,rb=>kind_rb
+            real(kind=rb) dimension(16) :: raylo
+            real(kind=rb) dimension(16) :: snsptdrko
+            real(kind=rb) dimension(10,10) :: selfref
+            real(kind=rb) dimension(16) :: sfluxrefo
+            real(kind=rb) dimension(5,13,16) :: kao
+            real(kind=rb) dimension(10) :: irradnce
+            integer(kind=im), parameter,optional :: no23=16
+            real(kind=rb) dimension(5,13,10) :: ka
+            real(kind=rb) dimension(10,16) :: selfrefo
+            real(kind=rb) dimension(16) :: facbrghto
+            real(kind=rb) dimension(10) :: sfluxref
+            real(kind=rb) dimension(16) :: irradnceo
+            real(kind=rb) dimension(65,10) :: absa
+            real(kind=rb) dimension(3,10) :: forref
+            real(kind=rb) dimension(10) :: facbrght
+            real(kind=rb) dimension(3,16) :: forrefo
+            real(kind=rb) dimension(10) :: rayl
+            real(kind=rb) dimension(10) :: snsptdrk
+        end module rrsw_kg23
+        module rrsw_kg24 ! in :_rrtmg_sw:rrtmg_sw_v4.0/gcm_model/modules/rrsw_kg24.f90
+            use parrrsw, only: ng24
+            use parkind, only: im=>kind_im,rb=>kind_rb
+            real(kind=rb) dimension(16,9) :: snsptdrko
+            real(kind=rb) dimension(8,9) :: facbrght
+            real(kind=rb) dimension(5,47,16) :: kbo
+            real(kind=rb) dimension(10,8) :: selfref
+            real(kind=rb) dimension(16,9) :: sfluxrefo
+            real(kind=rb) dimension(3,8) :: forref
+            real(kind=rb) dimension(8,9) :: rayla
+            real(kind=rb) dimension(8) :: abso3a
+            real(kind=rb) dimension(8) :: abso3b
+            real(kind=rb) dimension(8) :: raylb
+            real(kind=rb) dimension(9,5,13,16) :: kao
+            real(kind=rb) dimension(8,9) :: irradnce
+            real(kind=rb) dimension(16,9) :: raylao
+            real(kind=rb) dimension(16) :: abso3ao
+            real(kind=rb) dimension(5,47,8) :: kb
+            real(kind=rb) dimension(9,5,13,8) :: ka
+            real(kind=rb) dimension(10,16) :: selfrefo
+            real(kind=rb) dimension(16,9) :: facbrghto
+            integer(kind=im), parameter,optional :: no24=16
+            real(kind=rb) dimension(8,9) :: sfluxref
+            real(kind=rb) dimension(16) :: abso3bo
+            real(kind=rb) dimension(16,9) :: irradnceo
+            real(kind=rb) dimension(585,8) :: absa
+            real(kind=rb) dimension(235,8) :: absb
+            real(kind=rb) dimension(16) :: raylbo
+            real(kind=rb) dimension(3,16) :: forrefo
+            real(kind=rb) dimension(8,9) :: snsptdrk
+        end module rrsw_kg24
+        module rrsw_kg25 ! in :_rrtmg_sw:rrtmg_sw_v4.0/gcm_model/modules/rrsw_kg25.f90
+            use parrrsw, only: ng25
+            use parkind, only: im=>kind_im,rb=>kind_rb
+            real(kind=rb) dimension(16) :: raylo
+            real(kind=rb) dimension(16) :: snsptdrko
+            real(kind=rb) dimension(6) :: facbrght
+            real(kind=rb) dimension(5,13,16) :: kao
+            real(kind=rb) dimension(6) :: abso3a
+            real(kind=rb) dimension(6) :: abso3b
+            real(kind=rb) dimension(6) :: irradnce
+            real(kind=rb) dimension(16) :: abso3ao
+            real(kind=rb) dimension(5,13,6) :: ka
+            real(kind=rb) dimension(16) :: facbrghto
+            integer(kind=im), parameter,optional :: no25=16
+            real(kind=rb) dimension(6) :: sfluxref
+            real(kind=rb) dimension(16) :: abso3bo
+            real(kind=rb) dimension(16) :: irradnceo
+            real(kind=rb) dimension(65,6) :: absa
+            real(kind=rb) dimension(16) :: sfluxrefo
+            real(kind=rb) dimension(6) :: rayl
+            real(kind=rb) dimension(6) :: snsptdrk
+        end module rrsw_kg25
+        module rrsw_kg26 ! in :_rrtmg_sw:rrtmg_sw_v4.0/gcm_model/modules/rrsw_kg26.f90
+            use parrrsw, only: ng26
+            use parkind, only: im=>kind_im,rb=>kind_rb
+            real(kind=rb) dimension(16) :: raylo
+            real(kind=rb) dimension(16) :: snsptdrko
+            integer(kind=im), parameter,optional :: no26=16
+            real(kind=rb) dimension(16) :: sfluxrefo
+            real(kind=rb) dimension(6) :: sfluxref
+            real(kind=rb) dimension(16) :: irradnceo
+            real(kind=rb) dimension(6) :: irradnce
+            real(kind=rb) dimension(6) :: facbrght
+            real(kind=rb) dimension(6) :: rayl
+            real(kind=rb) dimension(16) :: facbrghto
+            real(kind=rb) dimension(6) :: snsptdrk
+        end module rrsw_kg26
+        module rrsw_kg27 ! in :_rrtmg_sw:rrtmg_sw_v4.0/gcm_model/modules/rrsw_kg27.f90
+            use parrrsw, only: ng27
+            use parkind, only: im=>kind_im,rb=>kind_rb
+            real(kind=rb) dimension(16) :: raylo
+            real(kind=rb) dimension(16) :: snsptdrko
+            real(kind=rb) dimension(5,47,16) :: kbo
+            real(kind=rb) dimension(16) :: sfluxrefo
+            real(kind=rb) dimension(5,13,16) :: kao
+            real(kind=rb) dimension(8) :: irradnce
+            real(kind=rb) dimension(5,47,8) :: kb
+            real(kind=rb) dimension(5,13,8) :: ka
+            integer(kind=im), parameter,optional :: no27=16
+            real(kind=rb) dimension(16) :: facbrghto
+            real(kind=rb) dimension(8) :: sfluxref
+            real(kind=rb) dimension(16) :: irradnceo
+            real(kind=rb) dimension(65,8) :: absa
+            real(kind=rb) dimension(235,8) :: absb
+            real(kind=rb) dimension(8) :: facbrght
+            real(kind=rb) dimension(8) :: rayl
+            real(kind=rb) dimension(8) :: snsptdrk
+        end module rrsw_kg27
+        module rrsw_kg28 ! in :_rrtmg_sw:rrtmg_sw_v4.0/gcm_model/modules/rrsw_kg28.f90
+            use parrrsw, only: ng28
+            use parkind, only: im=>kind_im,rb=>kind_rb
+            real(kind=rb) dimension(16,5) :: snsptdrko
+            real(kind=rb) dimension(5,5,47,16) :: kbo
+            real(kind=rb) dimension(16,5) :: sfluxrefo
+            real(kind=rb) dimension(9,5,13,16) :: kao
+            real(kind=rb) dimension(6,5) :: irradnce
+            real(kind=rb) dimension(5,5,47,6) :: kb
+            real(kind=rb) dimension(9,5,13,6) :: ka
+            real(kind=rb) dimension(16,5) :: facbrghto
+            integer(kind=im), parameter,optional :: no28=16
+            real(kind=rb) dimension(6,5) :: sfluxref
+            real(kind=rb) dimension(16,5) :: irradnceo
+            real(kind=rb) dimension(585,6) :: absa
+            real(kind=rb) dimension(1175,6) :: absb
+            real(kind=rb) dimension(6,5) :: facbrght
+            real(kind=rb) :: rayl
+            real(kind=rb) dimension(6,5) :: snsptdrk
+        end module rrsw_kg28
+        module rrsw_kg29 ! in :_rrtmg_sw:rrtmg_sw_v4.0/gcm_model/modules/rrsw_kg29.f90
+            use parrrsw, only: ng29
+            use parkind, only: im=>kind_im,rb=>kind_rb
+            real(kind=rb) dimension(16) :: snsptdrko
+            real(kind=rb) dimension(5,47,16) :: kbo
+            real(kind=rb) dimension(10,12) :: selfref
+            real(kind=rb) dimension(16) :: sfluxrefo
+            real(kind=rb) dimension(16) :: absh2oo
+            real(kind=rb) dimension(5,13,16) :: kao
+            real(kind=rb) dimension(4,12) :: forref
+            real(kind=rb) dimension(12) :: irradnce
+            real(kind=rb) dimension(12) :: absco2
+            real(kind=rb) dimension(16) :: absco2o
+            real(kind=rb) dimension(5,47,12) :: kb
+            real(kind=rb) dimension(5,13,12) :: ka
+            real(kind=rb) dimension(10,16) :: selfrefo
+            real(kind=rb) dimension(16) :: facbrghto
+            real(kind=rb) dimension(12) :: absh2o
+            integer(kind=im), parameter,optional :: no29=16
+            real(kind=rb) dimension(12) :: sfluxref
+            real(kind=rb) dimension(16) :: irradnceo
+            real(kind=rb) dimension(65,12) :: absa
+            real(kind=rb) dimension(235,12) :: absb
+            real(kind=rb) dimension(12) :: facbrght
+            real(kind=rb) dimension(4,16) :: forrefo
+            real(kind=rb) :: rayl
+            real(kind=rb) dimension(12) :: snsptdrk
+        end module rrsw_kg29
+        module rrsw_ncpar ! in :_rrtmg_sw:rrtmg_sw_v4.0/gcm_model/modules/rrsw_ncpar.f90
+            use parkind, only: im=>kind_im,rb=>kind_rb
+            integer(kind=im), parameter,optional :: maxabsorbernamelength=5
+            integer(kind=im), optional,dimension(14) :: bandnums=(/16, 17, 18, 19, 20, 21, 22,23, 24, 25, 26, 27, 28, 29/)
+            integer(kind=im), parameter,optional :: tdiff=5
+            real(kind=rb), optional,dimension(2) :: tempforeignupper=(/224, 260/)
+            integer(kind=im), parameter,optional :: gpoint=16
+            integer(kind=im), parameter,optional :: pupper=47
+            integer(kind=im), parameter,optional :: keylower=9
+            integer(kind=im), parameter,optional :: keyupper=5
+            integer(kind=im), parameter,optional :: ps=59
+            integer(kind=im), parameter,optional :: absorber=12
+            integer(kind=im), parameter,optional :: maxkeyspeciesnames=2
+            real(kind=rb), optional,dimension(5) :: keyspeciesupper=(/0.0, 0.25, 0.50, 0.75, 1.0/)
+            character(len=3), parameter,optional,dimension(14,2),depend(maxkeyspeciesnames,band) :: keyspeciesnamesupper=reshape(source=(/'ch4', 'h2o', 'ch4', 'co2', 'h2o', 'h2o', 'o2 ','', 'o2 ', '', '', 'o3 ', 'o3 ', 'co2','', 'co2', '', '', '', 'co2', '','', '', '', '', '', 'o2 ', ''/),shape=(/band, maxkeyspeciesnames/))
+            real(kind=rb), parameter,optional :: cpdair=1003.5
+            integer(kind=im) dimension(50) :: status
+            character(len=5), parameter,optional,dimension(12) :: absorbernames=(/'n2   ','ccl4 ','cfc11','cfc12','cfc22','h2o','co2','o3','n2o','co','ch4','o2'/)
+            real(kind=rb), optional,dimension(10) :: tempself=(/245.6,252.8,260.0,267.2,274.4,281.6,288.8,296.0,303.2,310.4/)
+            real(kind=rb), optional,dimension(9) :: keyspecieslower=(/1.0, 0.125, 0.25, 0.375,0.50, 0.625, 0.75, 0.875, 1.0/)
+            integer(kind=im), parameter,optional :: pforeign=4
+            integer(kind=im), parameter,optional :: band=14
+            integer(kind=im), parameter,optional :: tforeignlower=3
+            integer(kind=im), parameter,optional :: tforeignupper=2
+            real(kind=rb), optional,dimension(5) :: tempdiffs=(/-30,-15, 0, 15, 30/)
+            character(len=3), parameter,optional,dimension(14,2),depend(maxkeyspeciesnames,band) :: keyspeciesnameslower=reshape(source=(/'h2o', 'h2o', 'h2o', 'h2o', 'h2o', 'h2o', 'h2o','h2o', 'h2o', 'h2o', '', 'o3 ', 'o3 ', 'h2o','ch4', 'co2', 'ch4', 'co2', '', 'co2', 'o2 ','', 'o2 ', '', '', '', 'o2 ', ''/),shape=(/band, maxkeyspeciesnames/))
+            integer(kind=im), parameter,optional :: tself=10
+            integer(kind=im), parameter,optional :: gpointset=2
+            integer(kind=im), parameter,optional :: maxkeyspeciesnamelength=3
+            real(kind=rb), optional,dimension(19) :: temp=(/188.0, 195.2, 202.4, 209.6, 216.8, 224.0,231.2, 238.4, 245.6, 252.8, 260.0, 267.2,274.4, 281.6, 288.8, 296.0, 303.2, 310.4, 317.6/)
+            integer(kind=im) :: i
+            real(kind=rb), optional,dimension(4) :: pressforeign=(/970, 475, 219, 3/)
+            integer(kind=im), parameter,optional :: plower=13
+            integer(kind=im), parameter,optional :: t=19
+            real(kind=rb), optional,dimension(3) :: tempforeignlower=(/296, 260, 224/)
+            subroutine getabsorberindex(absorbername,absorberindex) ! in :_rrtmg_sw:rrtmg_sw_v4.0/gcm_model/modules/rrsw_ncpar.f90:rrsw_ncpar
+                character*(*) intent(in) :: absorbername
+                integer(kind=im) intent(out) :: absorberindex
+            end subroutine getabsorberindex
+        end module rrsw_ncpar
+        subroutine climlab_rrtmg_sw_ini(cpdair) ! in :_rrtmg_sw:Driver.f90
+            use rrtmg_sw_init, only: rrtmg_sw_ini
+            use parkind, only: rb=>kind_rb
+            real(kind=rb) intent(in) :: cpdair
+        end subroutine climlab_rrtmg_sw_ini
+        subroutine climlab_mcica_subcol_sw(ncol,nlay,icld,permuteseed,irng,play,cldfrac,ciwp,clwp,reic,relq,tauc,ssac,asmc,fsfc,cldfmcl,ciwpmcl,clwpmcl,reicmcl,relqmcl,taucmcl,ssacmcl,asmcmcl,fsfcmcl) ! in :_rrtmg_sw:Driver.f90
+            use parrrsw, only: naerec,ngptsw,nbndsw
+            use mcica_subcol_gen_sw, only: mcica_subcol_sw
+            use parkind, only: im=>kind_im
+            integer(kind=im) intent(in) :: ncol
+            integer(kind=im) intent(in) :: nlay
+            integer(kind=im) intent(inout) :: icld
+            integer(kind=im) intent(in) :: permuteseed
+            integer(kind=im) intent(inout) :: irng
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: play
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: cldfrac
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: ciwp
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: clwp
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: reic
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: relq
+            real(kind=8) dimension(14,ncol,nlay),intent(in),depend(ncol,nlay) :: tauc
+            real(kind=8) dimension(14,ncol,nlay),intent(in),depend(ncol,nlay) :: ssac
+            real(kind=8) dimension(14,ncol,nlay),intent(in),depend(ncol,nlay) :: asmc
+            real(kind=8) dimension(14,ncol,nlay),intent(in),depend(ncol,nlay) :: fsfc
+            real(kind=8) dimension(112,ncol,nlay),intent(out),depend(ncol,nlay) :: cldfmcl
+            real(kind=8) dimension(112,ncol,nlay),intent(out),depend(ncol,nlay) :: ciwpmcl
+            real(kind=8) dimension(112,ncol,nlay),intent(out),depend(ncol,nlay) :: clwpmcl
+            real(kind=8) dimension(ncol,nlay),intent(out),depend(ncol,nlay) :: reicmcl
+            real(kind=8) dimension(ncol,nlay),intent(out),depend(ncol,nlay) :: relqmcl
+            real(kind=8) dimension(112,ncol,nlay),intent(out),depend(ncol,nlay) :: taucmcl
+            real(kind=8) dimension(112,ncol,nlay),intent(out),depend(ncol,nlay) :: ssacmcl
+            real(kind=8) dimension(112,ncol,nlay),intent(out),depend(ncol,nlay) :: asmcmcl
+            real(kind=8) dimension(112,ncol,nlay),intent(out),depend(ncol,nlay) :: fsfcmcl
+        end subroutine climlab_mcica_subcol_sw
+        subroutine climlab_rrtmg_sw(ncol,nlay,icld,iaer,play,plev,tlay,tlev,tsfc,h2ovmr,o3vmr,co2vmr,ch4vmr,n2ovmr,o2vmr,asdir,asdif,aldir,aldif,coszen,adjes,dyofyr,scon,isolvar,inflgsw,iceflgsw,liqflgsw,cldfmcl,taucmcl,ssacmcl,asmcmcl,fsfcmcl,ciwpmcl,clwpmcl,reicmcl,relqmcl,tauaer,ssaaer,asmaer,ecaer,bndsolvar,indsolvar,solcycfrac,swuflx,swdflx,swhr,swuflxc,swdflxc,swhrc) ! in :_rrtmg_sw:Driver.f90
+            use parrrsw, only: naerec,ngptsw,nbndsw
+            use parkind, only: im=>kind_im
+            use rrtmg_sw_rad, only: rrtmg_sw
+            integer(kind=im) intent(in) :: ncol
+            integer(kind=im) intent(in) :: nlay
+            integer(kind=im) intent(inout) :: icld
+            integer(kind=im) intent(inout) :: iaer
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: play
+            real(kind=8) dimension(ncol,nlay + 1),intent(in),depend(ncol,nlay) :: plev
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: tlay
+            real(kind=8) dimension(ncol,nlay + 1),intent(in),depend(ncol,nlay) :: tlev
+            real(kind=8) dimension(ncol),intent(in),depend(ncol) :: tsfc
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: h2ovmr
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: o3vmr
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: co2vmr
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: ch4vmr
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: n2ovmr
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: o2vmr
+            real(kind=8) dimension(ncol),intent(in),depend(ncol) :: asdir
+            real(kind=8) dimension(ncol),intent(in),depend(ncol) :: asdif
+            real(kind=8) dimension(ncol),intent(in),depend(ncol) :: aldir
+            real(kind=8) dimension(ncol),intent(in),depend(ncol) :: aldif
+            real(kind=8) dimension(ncol),intent(in),depend(ncol) :: coszen
+            real(kind=8) intent(in) :: adjes
+            integer(kind=im) intent(in) :: dyofyr
+            real(kind=8) intent(in) :: scon
+            integer(kind=im) intent(in) :: isolvar
+            integer(kind=im) intent(in) :: inflgsw
+            integer(kind=im) intent(in) :: iceflgsw
+            integer(kind=im) intent(in) :: liqflgsw
+            real(kind=8) dimension(112,ncol,nlay),intent(in),depend(ncol,nlay) :: cldfmcl
+            real(kind=8) dimension(112,ncol,nlay),intent(in),depend(ncol,nlay) :: taucmcl
+            real(kind=8) dimension(112,ncol,nlay),intent(in),depend(ncol,nlay) :: ssacmcl
+            real(kind=8) dimension(112,ncol,nlay),intent(in),depend(ncol,nlay) :: asmcmcl
+            real(kind=8) dimension(112,ncol,nlay),intent(in),depend(ncol,nlay) :: fsfcmcl
+            real(kind=8) dimension(112,ncol,nlay),intent(in),depend(ncol,nlay) :: ciwpmcl
+            real(kind=8) dimension(112,ncol,nlay),intent(in),depend(ncol,nlay) :: clwpmcl
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: reicmcl
+            real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: relqmcl
+            real(kind=8) dimension(ncol,nlay,14),intent(in),depend(ncol,nlay) :: tauaer
+            real(kind=8) dimension(ncol,nlay,14),intent(in),depend(ncol,nlay) :: ssaaer
+            real(kind=8) dimension(ncol,nlay,14),intent(in),depend(ncol,nlay) :: asmaer
+            real(kind=8) dimension(ncol,nlay,6),intent(in),depend(ncol,nlay) :: ecaer
+            real(kind=8) dimension(14),intent(inout) :: bndsolvar
+            real(kind=8) dimension(2),intent(inout) :: indsolvar
+            real(kind=8) intent(inout) :: solcycfrac
+            real(kind=8) dimension(ncol,nlay + 1),intent(out),depend(ncol,nlay) :: swuflx
+            real(kind=8) dimension(ncol,nlay + 1),intent(out),depend(ncol,nlay) :: swdflx
+            real(kind=8) dimension(ncol,nlay),intent(out),depend(ncol,nlay) :: swhr
+            real(kind=8) dimension(ncol,nlay + 1),intent(out),depend(ncol,nlay) :: swuflxc
+            real(kind=8) dimension(ncol,nlay + 1),intent(out),depend(ncol,nlay) :: swdflxc
+            real(kind=8) dimension(ncol,nlay),intent(out),depend(ncol,nlay) :: swhrc
+        end subroutine climlab_rrtmg_sw
+    end interface 
+end python module _rrtmg_sw
+
+! This file was auto-generated with f2py (version:2).
+! See http://cens.ioc.ee/projects/f2py2e/
