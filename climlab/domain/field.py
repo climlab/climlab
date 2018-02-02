@@ -156,21 +156,29 @@ class Field(np.ndarray):
 
         #self.domain = getattr(obj, 'domain', None)
         # To enable intelligent slicing of Field variables:
-        domain = getattr(obj, 'domain', None)
-        interfaces = getattr(obj, 'interfaces', None)
-        if hasattr(domain, 'shape'):
-            if domain.shape == obj.shape:
-                self.domain = domain
-                self.interfaces = interfaces
-            else:
-            #  Look at how the slicing works for the MaskedArray type
-            #  We should be able to emulate that to slice heat capacity and axes
-            #  For now, nothing different happens
-                self.domain = domain
-                self.interfaces = interfaces
-        else:
-            self.domain = domain
-            self.interfaces = interfaces
+        # domain = getattr(obj, 'domain', None)
+        # interfaces = getattr(obj, 'interfaces', None)
+        # if hasattr(domain, 'shape'):
+        #     if domain.shape == obj.shape:
+        #         self.domain = domain
+        #         self.interfaces = interfaces
+        #     else:
+        #     #  Look at how the slicing works for the MaskedArray type
+        #     #  We should be able to emulate that to slice heat capacity and axes
+        #     #  For now, nothing different happens
+        #         self.domain = domain
+        #         self.interfaces = interfaces
+        # else:
+        #     self.domain = domain
+        #     self.interfaces = interfaces
+        try:
+            self.domain = obj.domain
+        except:
+            self.domain = None
+        try:
+            self.interfaces = obj.interfaces
+        except:
+            pass
         # We do not need to return anything
 
 ##  Loosely based on the approach in numpy.ma.core.MaskedArray
