@@ -153,24 +153,6 @@ class Field(np.ndarray):
         # method sees all creation of default objects - with the
         # Field.__new__ constructor, but also with
         # arr.view(Field).
-
-        #self.domain = getattr(obj, 'domain', None)
-        # To enable intelligent slicing of Field variables:
-        # domain = getattr(obj, 'domain', None)
-        # interfaces = getattr(obj, 'interfaces', None)
-        # if hasattr(domain, 'shape'):
-        #     if domain.shape == obj.shape:
-        #         self.domain = domain
-        #         self.interfaces = interfaces
-        #     else:
-        #     #  Look at how the slicing works for the MaskedArray type
-        #     #  We should be able to emulate that to slice heat capacity and axes
-        #     #  For now, nothing different happens
-        #         self.domain = domain
-        #         self.interfaces = interfaces
-        # else:
-        #     self.domain = domain
-        #     self.interfaces = interfaces
         try:
             self.domain = obj.domain
         except:
@@ -190,17 +172,18 @@ class Field(np.ndarray):
         """
         #  create a view of just the data as np.ndarray and slice it
         dout = self.view(np.ndarray)[indx]
-        # Did we extract a single item?
-        if not getattr(dout, 'ndim', False):
-            return dout
-        else:
-            # Force dout to type Field
+        try:
+            #Force dout to type Field
             dout = dout.view(type(self))
             # Now slice the domain
             dout.domain = self.domain[indx]
             # Inherit attributes from self
             if hasattr(self, 'interfaces'):
                 dout.interfaces = self.interfaces
+        except:
+            # The above will fail if we extract a single item
+            # in which case we should just return the item
+            pass
         return dout
 
     def to_xarray(self):
