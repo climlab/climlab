@@ -203,43 +203,25 @@ class TimeDependentProcess(Process):
         for varname in self.state:
             tendencies[varname] = 0. * self.state[varname]
         for proc in self.process_types[proctype]:
-            if proctype is "adjustment":
-            #  Adjustement processes return absolute adjustment, not rate of change
-                adjustment = proc._compute()
-                for varname, adj in adjustment.items():
-                    proc.tendencies[varname] = adj / self.timestep
-                    tendencies[varname] += adj
-            else:
-                # accomodate asynchrynous coupling (crudely)...
-                #   assumes that subprocess timestep is an integer multiple of parent timestep
-                #   and that no subprocesses of subprocess have a longer timestep
-                #   But we are not actually checking for that
-                if proc.timestep != self.timestep:
-                    #  create empty proctend dictionary
-                    proctend = {}
-                    for varname in proc.state:
-                        proctend[varname] = 0. * proc.state[varname]
-                    #  Iterate the required number of substeps
-                    num_substeps = int(self.timestep/proc.timestep)
-                    for step in range(num_substeps):
-                        # compute the curent tendencies
-                        step_tendencies = proc._compute()
-                        for varname in step_tendencies:
-                            # apply the tendencies to state
-                            proc.state[varname] += step_tendencies[varname] * proc.timestep
-                            # add to running total of tendencies
-                            proctend[varname] += step_tendencies[varname]
-                    #  remove total integrated tendencies from state
-                    for varname in proc.state:
-                        proc.state[varname] -= proctend[varname] * proc.timestep * num_substeps
+            #  Asynchronous coupling
+            #  if subprocess has longer timestep than parent
+            #  We compute subprocess tendencies once
+            #   and apply the same tendency at each substep
+            step_ratio = int(proc.timestep / self.timestep)
+            #  Does the number of parent steps divide evenly by the ratio?
+            #  If so, it's time to do a subprocess step.
+            if self.time['steps'] % step_ratio == 0:
+                if proctype is "adjustment":
+                #  Adjustement processes return absolute adjustment, not rate of change
+                    adjustment = proc._compute()
+                    for varname, adj in adjustment.items():
+                        proc.tendencies[varname] = adj / self.timestep
+                        tendencies[varname] += adj
                 else:
-                    #  Just compute tendencies once
-                    proctend = proc._compute()
-                # Store process tendencies
-                proc.tendencies = proctend
-                # Sum up all the tendencies from all the subprocesses!
-                for varname, tend in proc.tendencies.items():
-                    tendencies[varname] += tend
+                    proc.tendencies = proc._compute()
+            # proc.tendencies is unchanged from last subprocess timestep if we didn't recompute it above
+            for varname, tend in proc.tendencies.items():
+                tendencies[varname] += tend
         return tendencies
 
     def _compute(self):

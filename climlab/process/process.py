@@ -590,7 +590,8 @@ class Process(object):
         diag_dict = {}
         for key in self._diag_vars:
             try:
-                diag_dict[key] = getattr(self,key)
+                #diag_dict[key] = getattr(self,key)
+                diag_dict[key] = self.__dict__[key]
             except:
                 pass
         return diag_dict
