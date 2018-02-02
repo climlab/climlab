@@ -98,7 +98,8 @@ class TimeDependentProcess(Process):
                      'steps': 0,
                      'days_elapsed': 0,
                      'years_elapsed': 0,
-                     'days_of_year': days_of_year}
+                     'days_of_year': days_of_year,
+                     'active_now': True}
         self.param['timestep'] = value
 
     def set_timestep(self, timestep=const.seconds_per_day, num_steps_per_year=None):
@@ -191,9 +192,10 @@ class TimeDependentProcess(Process):
         #  Walk the subprocess tree and sum up all tendencies from subprocesses
         #   By walking with topdown=False we ensure that we don't miss anything
         for (name, proc, level) in walk_processes(self,topdown=False):
-            for subname, subproc in proc.subprocess.items():
-                for varname in subproc.tendencies:
-                    proc.tendencies[varname] += subproc.tendencies[varname]
+            if proc.time['active_now']:
+                for subname, subproc in proc.subprocess.items():
+                    for varname in subproc.tendencies:
+                        proc.tendencies[varname] += subproc.tendencies[varname]
 
 
     def _compute_type(self, proctype):
@@ -211,6 +213,7 @@ class TimeDependentProcess(Process):
             #  Does the number of parent steps divide evenly by the ratio?
             #  If so, it's time to do a subprocess step.
             if self.time['steps'] % step_ratio == 0:
+                proc.time['active_now'] = True
                 if proctype is "adjustment":
                 #  Adjustement processes return absolute adjustment, not rate of change
                     adjustment = proc._compute()
@@ -219,6 +222,8 @@ class TimeDependentProcess(Process):
                         tendencies[varname] += adj
                 else:
                     proc.tendencies = proc._compute()
+            else:
+                proc.time['active_now'] = False
             # proc.tendencies is unchanged from last subprocess timestep if we didn't recompute it above
             for varname, tend in proc.tendencies.items():
                 tendencies[varname] += tend
@@ -290,9 +295,10 @@ class TimeDependentProcess(Process):
         # Update all time counters for this and all subprocesses in the tree
         #  Also pass diagnostics up the process tree
         for name, proc, level in walk_processes(self, ignoreFlag=True):
-            proc._update_time()
-            for diagname, value in proc.diagnostics.items():
-                self.__setattr__(diagname, value)
+            if proc.time['active_now']:
+                proc._update_time()
+                for diagname, value in proc.diagnostics.items():
+                    self.__setattr__(diagname, value)
 
     def compute_diagnostics(self, num_iter=3):
         """Compute all tendencies and diagnostics, but don't update model state.
