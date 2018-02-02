@@ -210,7 +210,34 @@ class TimeDependentProcess(Process):
                     proc.tendencies[varname] = adj / self.timestep
                     tendencies[varname] += adj
             else:
-                proc.tendencies = proc._compute()
+                # accomodate asynchrynous coupling (crudely)...
+                #   assumes that subprocess timestep is an integer multiple of parent timestep
+                #   and that no subprocesses of subprocess have a longer timestep
+                #   But we are not actually checking for that
+                if proc.timestep != self.timestep:
+                    #  create empty proctend dictionary
+                    proctend = {}
+                    for varname in proc.state:
+                        proctend[varname] = 0. * proc.state[varname]
+                    #  Iterate the required number of substeps
+                    num_substeps = int(self.timestep/proc.timestep)
+                    for step in range(num_substeps):
+                        # compute the curent tendencies
+                        step_tendencies = proc._compute()
+                        for varname in step_tendencies:
+                            # apply the tendencies to state
+                            proc.state[varname] += step_tendencies[varname] * proc.timestep
+                            # add to running total of tendencies
+                            proctend[varname] += step_tendencies[varname]
+                    #  remove total integrated tendencies from state
+                    for varname in proc.state:
+                        proc.state[varname] -= proctend[varname] * proc.timestep * num_substeps
+                else:
+                    #  Just compute tendencies once
+                    proctend = proc._compute()
+                # Store process tendencies
+                proc.tendencies = proctend
+                # Sum up all the tendencies from all the subprocesses!
                 for varname, tend in proc.tendencies.items():
                     tendencies[varname] += tend
         return tendencies
