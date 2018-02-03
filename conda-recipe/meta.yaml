@@ -9,7 +9,7 @@ source:
   path: ../
 
 build:
-  number: 2
+  number: 3
   #skip: True  # [not py2k]
 
 requirements:
@@ -31,7 +31,6 @@ requirements:
     - future
     - numba  # [py2k]
     - xarray
-    - pyrrtmg
 
 test:
   requires:
