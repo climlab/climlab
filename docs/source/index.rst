@@ -7,28 +7,28 @@ Welcome to the climlab documentation!
 =====================================
 
 .. toctree::
-   :maxdepth: 4
+    :maxdepth: 4
 
-   intro
-   quickstart
-   installation
-   architecture
-   models
-   tutorial
-   xarray
-   api/climlab
-   references
-   license
-   support
-   contact
+    intro
+    quickstart
+    installation
+    architecture
+    models
+    tutorial
+    xarray
+    api/climlab
+    references
+    license
+    support
+    contact
 
 
 
 .. only:: html
 
-   Indices and tables
-   ==================
+    Indices and tables
+    ==================
 
-   * :ref:`genindex`
-   * :ref:`modindex`
-   * :ref:`search`
+    * :ref:`genindex`
+    * :ref:`modindex`
+    * :ref:`search`

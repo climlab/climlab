@@ -1,7 +1,9 @@
 '''
 Modules for atmospheric convection.
 
-Currently limited to simple hard convective adjustment to prescribed lapse rate.
+For simple adjustment of temperature to a prescribed lapse rate, use :class:`~climlab.convection.ConvectiveAdjustment`
+
+For a full convection scheme including interactive water vapor, use :class:`~climlab.convection.EmanuelConvection`
 '''
 from __future__ import absolute_import
 from .convadj import ConvectiveAdjustment

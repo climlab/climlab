@@ -30,6 +30,121 @@ CL=2500.0
 #CPV = CPD  #  try neglecting effect of water vapor on heat capacity
 
 class EmanuelConvection(TimeDependentProcess):
+    '''
+    The climlab wrapper for Kerry Emanuel's moist convection scheme <https://emanuel.mit.edu/FORTRAN-subroutine-convect>
+
+    From the documentation distributed with the Fortran 77 code CONVECT:
+
+        The subroutine is designed to be used in time-marching models of mesoscale to global-scale dimensions.
+        It is meant to represent the effects of all moist convection, including shallow, non-precipitating cumulus.
+        It also contains a dry adiabatic adjustment scheme.
+
+        Since the method of calculating the convective fluxes involves a relaxation toward quasi-equilibrium,
+        subroutine CONVECT must be run for at least several time steps to give meaningful results.
+        At the first time step, the tendencies and convective precipitation will be zero.
+        If the initial sounding is unstable, these will rapidly increase over successive time steps,
+        depending on the values of the constants ALPHA and DAMP.
+        Thus the user interested in convective fluxes and precipitation
+        associated with a single initial sounding (i.e., without large-scale forcing)
+        should still march CONVECT forward enough time steps that the fluxes have
+        returned back to zero;
+        the net tendencies and precipitation integrated over this time interval are then the desired results.
+        But it should be cautioned that these quantities will not necessarily be
+        independent of other model parameters such as the time step.
+        CONVECT is very much built on the philosophy that convection,
+        to the extent it can be represented in terms of large-scale variables,
+        is never very far away from statistical equilibrium with the large-scale flow.
+        To achieve a smooth evolution of the convective forcing,
+        CONVECT should be called at least every 20 minutes during the time integration.
+        CONVECT will work at longer time intervals, but the convective tendencies may become noisy.
+
+    Basic characteristics:
+
+    State:
+
+        - Ts (surface radiative temperature -- optional, and ignored)
+        - Tatm (air temperature in K)
+        - q (specific humidity in kg/kg)
+        - U (zonal velocity in m/s -- optional)
+        - V (meridional velocity in m/s -- optional)
+
+    Input arguments and default values (taken from convect43.f fortran source):
+
+        - MINORIG = 0,  index of lowest level from which convection may originate (zero means lowest)
+        - ELCRIT = 0.0011,  autoconversion threshold water content (g/g)
+        - TLCRIT = -55.0, critical temperature below which the auto-conversion threshold is assumed to be zero (the autoconversion threshold varies linearly between 0 C and TLCRIT)
+        - ENTP = 1.5, coefficient of mixing in the entrainment formulation
+        - SIGD = 0.05, FRACTIONAL AREA COVERED BY UNSATURATED DNDRAFT
+        - SIGS = 0.12, FRACTION OF PRECIPITATION FALLING OUTSIDE OF CLOUD
+        - OMTRAIN = 50.0, ASSUMED FALL SPEED (P/s) OF RAIN
+        - OMTSNOW = 5.5, ASSUMED FALL SPEED (P/s) OF SNOW
+        - COEFFR = 1.0, COEFFICIENT GOVERNING THE RATE OF EVAPORATION OF RAIN
+        - COEFFS = 0.8, COEFFICIENT GOVERNING THE RATE OF EVAPORATION OF SNOW
+        - CU = 0.7, COEFFICIENT GOVERNING CONVECTIVE MOMENTUM TRANSPORT
+        - BETA = 10.0, COEFFICIENT used in downdraft velocity scale calculation
+        - DTMAX = 0.9, MAXIMUM NEGATIVE TEMPERATURE PERTURBATION A LIFTED PARCEL IS ALLOWED TO HAVE BELOW ITS LFC
+        - ALPHA = 0.2, first parameter that controls the rate of approach to quasi-equilibrium
+        - DAMP = 0.1, second parameter that controls the rate of approach to quasi-equilibrium (DAMP must be less than 1)
+
+    Tendencies computed:
+
+        - air temperature (K/s)
+        - specific humidity (kg/kg/s)
+        - optional:
+            - U and V wind components (m/s/s), if U and V are included in state dictionary
+
+    Diagnostics computed:
+
+        - CBMF (cloud base mass flux in kg/m2/s) -- this is actually stored internally and used as input for subsequent timesteps
+        - PRECIP (convective precipitation rate in mm/day)
+
+        :Example:
+
+            Here is an example of setting up a single-column
+            Radiative-Convective model with interactive water vapor.
+
+            This example also demonstrates *asynchronous coupling*:
+            the radiation uses a longer timestep than the other model components::
+
+                import climlab
+                from climlab import constants as const
+                # Temperatures in a single column
+                full_state = climlab.column_state(num_lev=30, water_depth=2.5)
+                temperature_state = {'Tatm':full_state.Tatm,'Ts':full_state.Ts}
+                #  Initialize a nearly dry column (small background stratospheric humidity)
+                q = np.ones_like(full_state.Tatm) * 5.E-6
+                #  Add specific_humidity to the state dictionary
+                full_state['q'] = q
+                #  ASYNCHRONOUS COUPLING -- the radiation uses a much longer timestep
+                #  The top-level model
+                model = climlab.TimeDependentProcess(state=full_state,
+                                              timestep=const.seconds_per_hour)
+                #  Radiation coupled to water vapor
+                rad = climlab.radiation.RRTMG(state=temperature_state,
+                                              specific_humidity=full_state.q,
+                                              albedo=0.3,
+                                              timestep=const.seconds_per_day
+                                              )
+                #  Convection scheme -- water vapor is a state variable
+                conv = climlab.convection.EmanuelConvection(state=full_state,
+                                              timestep=const.seconds_per_hour)
+                #  Surface heat flux processes
+                shf = climlab.surface.SensibleHeatFlux(state=temperature_state, Cd=0.5E-3,
+                                              timestep=const.seconds_per_hour)
+                lhf = climlab.surface.LatentHeatFlux(state=full_state, Cd=0.5E-3,
+                                              timestep=const.seconds_per_hour)
+                #  Couple all the submodels together
+                model.add_subprocess('Radiation', rad)
+                model.add_subprocess('Convection', conv)
+                model.add_subprocess('SHF', shf)
+                model.add_subprocess('LHF', lhf)
+                print(model)
+
+                #  Run the model
+                model.integrate_years(1)
+                #  Check for energy balance
+                print(model.ASR - model.OLR)
+    '''
     def __init__(self,
             MINORIG = 0,  # index of lowest level from which convection may originate (zero means lowest)
             #  Default parameter values taken from convect43c.f  fortran source

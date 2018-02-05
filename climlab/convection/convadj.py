@@ -9,10 +9,14 @@ from .akmaev_adjustment import convective_adjustment_direct
 
 class ConvectiveAdjustment(TimeDependentProcess):
     '''Convective adjustment process
+    
     Instantly returns column to neutral lapse rate
 
     Adjustment includes the surface IF 'Ts' is included in the state
-    dictionary. Otherwise only the atmopsheric temperature is adjusted.'''
+    dictionary. Otherwise only the atmopsheric temperature is adjusted.
+
+    Implements the conservative adjustment algorithm from Akmaev (1991) Monthly Weather Review.
+    '''
     def __init__(self, adj_lapse_rate=None, **kwargs):
         super(ConvectiveAdjustment, self).__init__(**kwargs)
         # lapse rate for convective adjustment, in K / km
