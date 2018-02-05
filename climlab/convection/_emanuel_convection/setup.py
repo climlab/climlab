@@ -22,24 +22,30 @@ def configuration(parent_package='', top_path=None):
         f90flags.append('-O0')
         #  Suppress all compiler warnings (avoid huge CI log files)
         f90flags.append('-w')
-    except:
+    except CompilerNotFound:
         print('No Fortran compiler found, not building the RRTMG_LW radiation module!')
         build = False
 
     config = Configuration(package_name='_emanuel_convection', parent_name=parent_package, top_path=top_path)
-    #  Build source list
-    thispath = config.local_path
-    sourcelist = []
-    #sourcelist.append(join(thispath,'CONVECT4','convect43c.f'))
-    sourcelist.append(join(thispath,'convect.f'))
-    sourcelist.append(join(thispath,'Driver.f90'))
     if build:
         config.add_extension(name='_emanuel_convection',
-                             sources=sourcelist,
+                             sources=[gen_source],
                              extra_f90_compile_args=f90flags,
                              f2py_options=['--quiet'],
                              )
     return config
+
+def gen_source(ext, build_dir):
+    thispath = config.local_path
+    sourcelist = []
+    sourcelist.append(join(thispath,'convect.f'))
+    sourcelist.append(join(thispath,'Driver.f90'))
+    try:
+        config.have_f90c()
+        return sourcelist
+    except:
+        print('No Fortran 90 compiler found, not building EmanuelConvection extension!')
+        return None
 
 if __name__ == '__main__':
     from numpy.distutils.core import setup
