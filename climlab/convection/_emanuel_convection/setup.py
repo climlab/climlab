@@ -22,7 +22,7 @@ def configuration(parent_package='', top_path=None):
         f90flags.append('-O0')
         #  Suppress all compiler warnings (avoid huge CI log files)
         f90flags.append('-w')
-    except CompilerNotFound:
+    except:
         print('No Fortran compiler found, not building the RRTMG_LW radiation module!')
         build = False
 
