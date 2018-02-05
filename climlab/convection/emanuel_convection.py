@@ -74,15 +74,15 @@ class EmanuelConvection(TimeDependentProcess):
         - ELCRIT = 0.0011,  autoconversion threshold water content (g/g)
         - TLCRIT = -55.0, critical temperature below which the auto-conversion threshold is assumed to be zero (the autoconversion threshold varies linearly between 0 C and TLCRIT)
         - ENTP = 1.5, coefficient of mixing in the entrainment formulation
-        - SIGD = 0.05, FRACTIONAL AREA COVERED BY UNSATURATED DNDRAFT
-        - SIGS = 0.12, FRACTION OF PRECIPITATION FALLING OUTSIDE OF CLOUD
-        - OMTRAIN = 50.0, ASSUMED FALL SPEED (P/s) OF RAIN
-        - OMTSNOW = 5.5, ASSUMED FALL SPEED (P/s) OF SNOW
-        - COEFFR = 1.0, COEFFICIENT GOVERNING THE RATE OF EVAPORATION OF RAIN
-        - COEFFS = 0.8, COEFFICIENT GOVERNING THE RATE OF EVAPORATION OF SNOW
-        - CU = 0.7, COEFFICIENT GOVERNING CONVECTIVE MOMENTUM TRANSPORT
-        - BETA = 10.0, COEFFICIENT used in downdraft velocity scale calculation
-        - DTMAX = 0.9, MAXIMUM NEGATIVE TEMPERATURE PERTURBATION A LIFTED PARCEL IS ALLOWED TO HAVE BELOW ITS LFC
+        - SIGD = 0.05, fractional area covered by unsaturated downdraft
+        - SIGS = 0.12, fraction of precipitation falling outside of cloud
+        - OMTRAIN = 50.0, assumed fall speed (Pa/s) of rain
+        - OMTSNOW = 5.5, assumed fall speed (Pa/s) of snow
+        - COEFFR = 1.0, coefficient governing the rate of evaporation of rain
+        - COEFFS = 0.8, coefficient governing the rate of evaporation of snow
+        - CU = 0.7, coefficient governing convective momentum transport
+        - BETA = 10.0, coefficient used in downdraft velocity scale calculation
+        - DTMAX = 0.9, maximum negative temperature perturbation a lifted parcel is allowed to have below its LFC
         - ALPHA = 0.2, first parameter that controls the rate of approach to quasi-equilibrium
         - DAMP = 0.1, second parameter that controls the rate of approach to quasi-equilibrium (DAMP must be less than 1)
 
