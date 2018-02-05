@@ -16,6 +16,7 @@ def configuration(parent_package='', top_path=None):
         if compiler == 'gnu95':
             f90flags.append('-fno-range-check')
             f90flags.append('-ffree-form')
+            f90flags.append('-fPIC')
         elif compiler == 'intel' or compiler == 'intelem':
             f90flags.append('-132')
         #  Need zero-level optimization to avoid build problems with rrtmg_sw_k_g.f90

@@ -9,7 +9,7 @@ source:
   path: ../
 
 build:
-  number: 3
+  number: 4
   #skip: True  # [not py2k]
 
 requirements:
