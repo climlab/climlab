@@ -357,9 +357,9 @@ class StepFunctionAlbedo(DiagnosticProcess):
         self.param['a2'] = a2
         self.param['ai'] = ai
         sfc = self.domains['Ts']
-        self.add_subprocess('iceline', Iceline(Tf=Tf, state=self.state))
-        self.add_subprocess('warm_albedo', P2Albedo(a0=a0, a2=a2, domains=sfc))
-        self.add_subprocess('cold_albedo', ConstantAlbedo(albedo=ai, domains=sfc))
+        self.add_subprocess('iceline', Iceline(Tf=Tf, state=self.state, timestep=self.timestep))
+        self.add_subprocess('warm_albedo', P2Albedo(a0=a0, a2=a2, domains=sfc, timestep=self.timestep))
+        self.add_subprocess('cold_albedo', ConstantAlbedo(albedo=ai, domains=sfc, timestep=self.timestep))
         self.topdown = False  # call subprocess compute methods first
         self.add_diagnostic('albedo')
 

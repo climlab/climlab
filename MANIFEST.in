@@ -19,6 +19,7 @@ recursive-include climlab *.F90
 recursive-include climlab *.h
 recursive-include climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85 *
 recursive-include climlab/radiation/rrtm/_rrtmg_sw/rrtmg_sw_v4.0 *
+recursive-include climlab/convection/_emanuel_convection *
 recursive-include docs *
 prune docs/build
 global-exclude *.pyc *.pyo *.pyd .DS_Store

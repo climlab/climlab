@@ -58,3 +58,17 @@ class LatentHeatFlux(SurfaceFlux):
         #  flux from bulk formula
         self._flux = const.Lhvap * rho * self.Cd * self.U * Deltaq
         self.LHF = self._flux
+
+    def _compute(self):
+        '''Overides the _compute method of EnergyBudget'''
+        tendencies = self._temperature_tendencies()
+        if 'q' in self.state:
+            # in a model with active water vapor, this flux should affect
+            #  water vapor tendency, NOT air temperature tendency!
+            tendencies['Tatm'] *= 0.
+            Pa_per_hPa = 100.
+            air_mass_per_area = self.Tatm.domain.lev.delta[...,-1] * Pa_per_hPa / const.g
+            specific_humidity_tendency = 0.*self.q
+            specific_humidity_tendency[...,-1] = self.LHF/const.Lhvap / air_mass_per_area
+            tendencies['q'] = specific_humidity_tendency
+        return tendencies
