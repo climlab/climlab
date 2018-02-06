@@ -1,7 +1,7 @@
 import os, sys
 import textwrap
 
-VERSION = '0.6.2.dev17'
+VERSION = '0.6.2'
 
 # BEFORE importing setuptools, remove MANIFEST. Otherwise it may not be
 # properly updated when the contents of directories change (true for distutils,
@@ -36,7 +36,7 @@ def setup_package():
           long_description=readme(),
           classifiers=[
             'License :: OSI Approved :: MIT License',
-            'Programming Language :: Python :: 2.7',
+            'Programming Language :: Python',
             'Intended Audience :: Education',
             'Intended Audience :: Science/Research',
             'Topic :: Scientific/Engineering :: Atmospheric Science',
