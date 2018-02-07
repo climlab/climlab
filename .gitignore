@@ -19,3 +19,7 @@
 
 # documentation built by sphinx
 /docs/build/
+
+*.pyd
+*-f2pywrappers2.f90
+_*module.c
