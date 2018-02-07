@@ -12,6 +12,8 @@ module quicksort
 ! mvr modified integer array to intent inout - may now be any integer 
 !     array that gets sorted along with associated real array
 
+use shr_kind_mod,      only: r8 => shr_kind_r8
+
 implicit none
 save
 private
@@ -22,7 +24,7 @@ RECURSIVE SUBROUTINE quick_sort(list, order)
 
 implicit none
 
-REAL, DIMENSION (:), INTENT(INOUT)  :: list
+REAL(r8), DIMENSION (:), INTENT(INOUT)  :: list
 INTEGER, DIMENSION (:), INTENT(INOUT)  :: order
 
 ! Local variable
