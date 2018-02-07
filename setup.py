@@ -13,6 +13,29 @@ def readme():
     with open('README.rst') as f:
         return f.read()
 
+# Patch the GNU Fortran compiler not to optimize certain sources
+def patch_gnu_fortran():
+    from numpy.distutils.fcompiler import gnu
+    
+    def monkeypatched_spawn(old_spawn):
+        def spawn(self, cmd, *args, **kw):
+            for arg in cmd:
+                if os.path.basename(arg) in (
+                    'rrtmg_sw_k_g.f90',
+                    'rrtmg_lw_k_g.f90',
+                ):
+                    try:
+                        cmd.remove('-O3')
+                    except ValueError:
+                        pass
+                    break
+
+            return old_spawn(self, cmd, *args, **kw)
+        return spawn
+
+    gnu.GnuFCompiler.spawn = monkeypatched_spawn(gnu.GnuFCompiler.spawn)
+    gnu.Gnu95FCompiler.spawn = monkeypatched_spawn(gnu.Gnu95FCompiler.spawn)
+
 def configuration(parent_package='',top_path=None):
     from numpy.distutils.misc_util import Configuration
 
@@ -58,6 +81,8 @@ def setup_package():
     # from numpy.distutils, but after the MANIFEST removing and sdist import
     # higher up in this file.
     from setuptools import setup
+
+    patch_gnu_fortran()
 
     if run_build:
         from numpy.distutils.core import setup
