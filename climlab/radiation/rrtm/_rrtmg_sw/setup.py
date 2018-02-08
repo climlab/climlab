@@ -66,21 +66,10 @@ def configuration(parent_package='', top_path=None):
 
     config = Configuration(package_name='_rrtmg_sw', parent_name=parent_package, top_path=top_path)
 
-    module_src = []
-    for item in modules:
-        fullname = join('rrtmg_sw_v4.0','gcm_model','modules',item)
-        module_src.append(fullname)
-    for item in src:
-        if item in mod_src:
-            fullname = join('sourcemods',item)
-        else:
-            fullname = join('rrtmg_sw_v4.0','gcm_model','src',item)
-        module_src.append(fullname)
-
     if build:
         config.add_extension(
             name='_rrtmg_sw',
-            sources=module_src + [rrtmg_sw_gen_source],
+            sources=[rrtmg_sw_gen_source],
             extra_f90_compile_args=f90flags,
             f2py_options=['--quiet'],
         )
@@ -90,11 +79,21 @@ def rrtmg_sw_gen_source(ext, build_dir):
     '''Add RRTMG_SW fortran source if Fortran 90 compiler available,
     if no compiler is found do not try to build the extension.'''
     thispath = config.local_path
+    module_src = []
+    for item in modules:
+        fullname = join(thispath,'rrtmg_sw_v4.0','gcm_model','modules',item)
+        module_src.append(fullname)
+    for item in src:
+        if item in mod_src:
+            fullname = join(thispath,'sourcemods',item)
+        else:
+            fullname = join(thispath,'rrtmg_sw_v4.0','gcm_model','src',item)
+        module_src.append(fullname)
     sourcelist = [join(thispath,'_rrtmg_sw.pyf'),
                   join(thispath,'Driver.f90')]
     try:
         config.have_f90c()
-        return sourcelist
+        return module_src + sourcelist
     except:
         print('No Fortran 90 compiler found, not building RRTMG_SW extension!')
         return None
