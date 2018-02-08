@@ -1,7 +1,7 @@
 import os, sys
 import textwrap
 
-VERSION = '0.6.2'
+VERSION = '0.6.3.dev0'
 
 # BEFORE importing setuptools, remove MANIFEST. Otherwise it may not be
 # properly updated when the contents of directories change (true for distutils,
@@ -16,7 +16,7 @@ def readme():
 # Patch the GNU Fortran compiler not to optimize certain sources
 def patch_gnu_fortran():
     from numpy.distutils.fcompiler import gnu
-    
+
     def monkeypatched_spawn(old_spawn):
         def spawn(self, cmd, *args, **kw):
             for arg in cmd:
