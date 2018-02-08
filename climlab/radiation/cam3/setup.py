@@ -40,9 +40,9 @@ def cam3_gen_source(ext, build_dir):
     #  Fortran 90 sources in order of compilation
     fort90source = ['pmgrid.F90',
                 'prescribed_aerosols.F90',
+                'shr_kind_mod.F90',
                 'quicksort.F90',
                 'abortutils.F90',
-                'shr_kind_mod.F90',
                 'absems.F90',
                 'wv_saturation.F90',
                 'aer_optics.F90',

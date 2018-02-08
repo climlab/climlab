@@ -65,45 +65,26 @@ def configuration(parent_package='', top_path=None):
         build = False
 
     config = Configuration(package_name='_rrtmg_sw', parent_name=parent_package, top_path=top_path)
-    if build:
-        link_args_list = build_extra_objects(f90flags)
-        config.add_extension(name='_rrtmg_sw',
-                             sources=[rrtmg_sw_gen_source],
-                             extra_f90_compile_args=f90flags + ['-O3'],
-                            f2py_options=['--quiet'],
-                            extra_link_args=link_args_list,
-                            )
-    return config
 
-def build_extra_objects(f90flags):
-    import subprocess
-    thispath = config.local_path
-    object_file_list = []
-    #  Compile all source to object .o files
-    gfortran_call = ['gfortran', '-c', ] + f90flags
-    try:
-        for item in modules:
-            optflag = '-O3'
-            output_file = item[:-3]+'o'
-            object_file_list.append(output_file)
-            fullname = join(thispath,'rrtmg_sw_v4.0','gcm_model','modules',item)
-            subprocess.call(gfortran_call + [fullname] + [optflag] + ['-o'] + [output_file])
-        for item in src:
-            if item in mod_src:
-                fullname = join(thispath,'sourcemods',item)
-            else:
-                fullname = join(thispath,'rrtmg_sw_v4.0','gcm_model','src',item)
-            if item in unoptimized_src:
-                optflag = '-O0'
-            else:
-                optflag = '-O3'
-            output_file = item[:-3]+'o'
-            object_file_list.append(output_file)
-            subprocess.call(gfortran_call + [fullname] + [optflag] + ['-o'] + [output_file])
-        return object_file_list
-    except:
-        print('There was a problem with compiling rrtmg_sw objects.')
-        return None
+    module_src = []
+    for item in modules:
+        fullname = join('rrtmg_sw_v4.0','gcm_model','modules',item)
+        module_src.append(fullname)
+    for item in src:
+        if item in mod_src:
+            fullname = join('sourcemods',item)
+        else:
+            fullname = join('rrtmg_sw_v4.0','gcm_model','src',item)
+        module_src.append(fullname)
+
+    if build:
+        config.add_extension(
+            name='_rrtmg_sw',
+            sources=module_src + [rrtmg_sw_gen_source],
+            extra_f90_compile_args=f90flags,
+            f2py_options=['--quiet'],
+        )
+    return config
 
 def rrtmg_sw_gen_source(ext, build_dir):
     '''Add RRTMG_SW fortran source if Fortran 90 compiler available,
