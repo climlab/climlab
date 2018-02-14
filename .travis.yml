@@ -36,7 +36,7 @@ install:
       conda info -a
 
 script:
-  - conda-build conda-recipe --numpy 1.13  # hard-coded for now... better to have a build matrix
+  - conda-build conda-recipe 
 
 after_success:
   - codecov
