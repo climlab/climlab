@@ -18,6 +18,8 @@ def configuration(parent_package='', top_path=None):
         elif compiler == 'intel' or compiler == 'intelem':
             f90flags.append('-132')
             f90flags.append('-r8')
+        #  Set aggressive optimization level
+        f90flags.append('-O3')
         #  Suppress all compiler warnings (avoid huge CI log files)
         f90flags.append('-w')
     except CompilerNotFound:
