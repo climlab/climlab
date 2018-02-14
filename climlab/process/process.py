@@ -159,10 +159,6 @@ class Process(object):
         states = _make_dict(state, Field)
         for name, value in states.items():
             self.set_state(name, value)
-        #convert int dtype to float
-            if np.issubdtype(self.state[name].dtype, 'int'):
-                value = self.state[name].astype(float)
-                self.set_state(name, value)
         # dictionary of model parameters
         self.param = kwargs
         # dictionary of diagnostic quantities
@@ -379,7 +375,7 @@ class Process(object):
         self.state[name] = value
         for name, value in self.state.items():
         #convert int dtype to float
-            if np.issubdtype(self.state[name].dtype, 'int'):
+            if np.issubdtype(self.state[name].dtype, np.dtype('int').type):
                 value = self.state[name].astype(float)
                 self.state[name]=value
         setattr(self, name, value)
