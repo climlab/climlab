@@ -166,8 +166,11 @@ class EmanuelConvection(TimeDependentProcess):
         super(EmanuelConvection, self).__init__(**kwargs)
         self.time_type = 'explicit'
         #  Define inputs and diagnostics
-        self.add_diagnostic('CBMF', np.zeros(self.Tatm[...,0].shape))  # cloud base mass flux
-        self.add_diagnostic('PRECIP', np.zeros(self.Tatm[...,0].shape)) # Precip rate (mm/day)
+        #surface_shape = self.Tatm[...,0].shape
+        #  For some strange reason self.Tatm is breaking tests under Python 3.5 in some configurations
+        surface_shape = self.state['Tatm'][...,0].shape
+        self.add_diagnostic('CBMF', np.zeros(surface_shape))  # cloud base mass flux
+        self.add_diagnostic('PRECIP', np.zeros(surface_shape)) # Precip rate (mm/day)
         self.add_input('MINORIG', MINORIG)
         self.add_input('ELCRIT', ELCRIT)
         self.add_input('TLCRIT', TLCRIT)
