@@ -140,14 +140,15 @@ class Process(object):
         for varname in list(self.state.keys()):
             str1 += '  {0}: {1} \n'.format(varname, self.domains[varname].shape)
         str1 += 'The subprocess tree: \n'
-        str1 += walk.process_tree(self)
+        str1 += walk.process_tree(self, name=self.name)
         return str1
 
-    def __init__(self, state=None, domains=None, subprocess=None,
+    def __init__(self, name='Untitled', state=None, domains=None, subprocess=None,
                  lat=None, lev=None, num_lat=None, num_levels=None,
                  input=None, verbose=True, **kwargs):
         # verbose flag used to control text output at process creation time
         self.verbose = verbose
+        self.name = name
         # dictionary of domains. Keys are the domain names
         self.domains = _make_dict(domains, _Domain)
         #  If lat is given, create a simple domains

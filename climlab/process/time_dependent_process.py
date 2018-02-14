@@ -6,7 +6,7 @@ import numpy as np
 import copy
 from climlab import constants as const
 from climlab.process.process import Process
-from climlab.utils.walk import walk_processes
+from climlab.utils import walk, attr_dict
 
 
 class TimeDependentProcess(Process):
@@ -76,6 +76,18 @@ class TimeDependentProcess(Process):
         self.time_type = time_type
         self.topdown = topdown
         self.has_process_type_list = False
+
+    def __add__(self, other):
+        #  Union of the two state dictionaries
+        newstate = attr_dict.AttrDict()
+        for key in self.state:
+            newstate[key] = self.state[key]
+        for key in other.state:
+            newstate[key] = other.state[key]
+        newparent = TimeDependentProcess(state=newstate)
+        newparent.add_subprocess(self.name, self)
+        newparent.add_subprocess(other.name, other)
+        return newparent
 
     @property
     def timestep(self):
@@ -191,7 +203,7 @@ class TimeDependentProcess(Process):
                     self.timestep)
         #  Walk the subprocess tree and sum up all tendencies from subprocesses
         #   By walking with topdown=False we ensure that we don't miss anything
-        for (name, proc, level) in walk_processes(self,topdown=False):
+        for (name, proc, level) in walk.walk_processes(self,topdown=False):
             if proc.time['active_now']:
                 for subname, subproc in proc.subprocess.items():
                     for varname in subproc.tendencies:
@@ -256,7 +268,7 @@ class TimeDependentProcess(Process):
 
         """
         self.process_types = {'diagnostic': [], 'explicit': [], 'implicit': [], 'adjustment': []}
-        for name, proc, level in walk_processes(self, topdown=self.topdown):
+        for name, proc, level in walk.walk_processes(self, topdown=self.topdown):
             self.process_types[proc.time_type].append(proc)
         self.has_process_type_list = True
 
@@ -294,7 +306,7 @@ class TimeDependentProcess(Process):
 
         # Update all time counters for this and all subprocesses in the tree
         #  Also pass diagnostics up the process tree
-        for name, proc, level in walk_processes(self, ignoreFlag=True):
+        for name, proc, level in walk.walk_processes(self, ignoreFlag=True):
             if proc.time['active_now']:
                 proc._update_time()
                 for diagname, value in proc.diagnostics.items():
@@ -310,7 +322,7 @@ class TimeDependentProcess(Process):
         for n in range(num_iter):
             self.compute()
         #  Pass diagnostics up the process tree
-        for name, proc, level in walk_processes(self, ignoreFlag=True):
+        for name, proc, level in walk.walk_processes(self, ignoreFlag=True):
             for diagname, value in proc.diagnostics.items():
                 self.__setattr__(diagname, value)
 
