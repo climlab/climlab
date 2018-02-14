@@ -217,7 +217,8 @@ class EmanuelConvection(TimeDependentProcess):
         tendencies = {'Tatm': _convect_to_climlab(FT),
                       'q': _convect_to_climlab(FQ)}
         if 'Ts' in self.state:
-            tendencies['Ts'] = 0. * self.Ts
+            # for some strange reason self.Ts is breaking tests under Python 3.5 in some configurations
+            tendencies['Ts'] = 0. * self.state['Ts']
         if 'U' in self.state:
             tendencies['U'] = _convect_to_climlab(FU) * np.ones_like(self.U)
         if 'V' in self.state:
