@@ -53,10 +53,14 @@ emanuel_convection.ROWL=1000.0
 def test_convect_tendencies():
     # Temperatures in a single column
     state = climlab.column_state(num_lev=num_lev)
-    state['Tatm'][:] = T
+    state.Tatm[:] = T
     state['q'] = state.Tatm * 0. + Q
     state['U'] = state.Tatm * 0. + U
     state['V'] = state.Tatm * 0. + V
+    assert hasattr(state, 'Tatm')
+    assert hasattr(state, 'q')
+    assert hasattr(state, 'U')
+    assert hasattr(state, 'V')
     conv = emanuel_convection.EmanuelConvection(state=state, timestep=DELT)
     conv.step_forward()
     #  Did we get all the correct output?
@@ -79,10 +83,14 @@ def test_multidim_tendencies():
     state['U'] = state.Tatm * 0. #+ U
     state['V'] = state.Tatm * 0. #+ V
     for i in range(num_lat):
-        state['Tatm'][i,:] = T
+        state.Tatm[i,:] = T
         state['q'][i,:] += Q
         state['U'][i,:] += U
         state['V'][i,:] += V
+    assert hasattr(state, 'Tatm')
+    assert hasattr(state, 'q')
+    assert hasattr(state, 'U')
+    assert hasattr(state, 'V')
     conv = emanuel_convection.EmanuelConvection(state=state, timestep=DELT)
     conv.step_forward()
     #  Did we get all the correct output?
