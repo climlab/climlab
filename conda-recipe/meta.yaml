@@ -1,5 +1,5 @@
 {% set name = "climlab" %}
-{% set version = "0.6.3.dev6" %}
+{% set version = "0.6.3.dev7" %}
 
 package:
   name: {{ name|lower }}

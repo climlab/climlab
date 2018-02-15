@@ -189,21 +189,21 @@ class EmanuelConvection(TimeDependentProcess):
 
     def _compute(self):
         #  Invert arrays so the first element is the bottom of column
-        T = _climlab_to_convect(self.Tatm)
-        dom = self.Tatm.domain
+        T = _climlab_to_convect(self.state['Tatm'])
+        dom = self.state['Tatm'].domain
         P = _climlab_to_convect(dom.lev.points)
         PH = _climlab_to_convect(dom.lev.bounds)
-        Q = _climlab_to_convect(self.q)
+        Q = _climlab_to_convect(self.state['q'])
         QS = qsat(T,P)
         ND = np.size(T, axis=1)
         NCOL = np.size(T, axis=0)
         NL = ND-1
         try:
-            U = _climlab_to_convect(self.U)
+            U = _climlab_to_convect(self.state['U'])
         except:
             U = np.zeros_like(T)
         try:
-            V = _climlab_to_convect(self.V)
+            V = _climlab_to_convect(self.state['V'])
         except:
             V = np.zeros_like(T)
         NTRA = 1
@@ -223,20 +223,10 @@ class EmanuelConvection(TimeDependentProcess):
             # for some strange reason self.Ts is breaking tests under Python 3.5 in some configurations
             tendencies['Ts'] = 0. * self.state['Ts']
         if 'U' in self.state:
-            tendencies['U'] = _convect_to_climlab(FU) * np.ones_like(self.U)
+            tendencies['U'] = _convect_to_climlab(FU) * np.ones_like(self.state['U'])
         if 'V' in self.state:
-            tendencies['V'] = _convect_to_climlab(FV) * np.ones_like(self.V)
+            tendencies['V'] = _convect_to_climlab(FV) * np.ones_like(self.state['V'])
         self.CBMF = CBMFnew
         self.PRECIP = PRECIP
         self.IFLAG = IFLAG
         return tendencies
-
-    # def _climlab_to_convect(self, field):
-    #     #  Invert arrays so the first element is the bottom of column
-    #     #return np.flipud(field)
-    #     newfield = _climlab_to_rrtm(field)
-    #     return _climlab_to_rrtm(field)
-    #
-    # def _convect_to_climlab(self, field):
-    #     #return np.flipud(field) * np.ones_like(self.Tatm)
-    #     return _rrtm_to_climlab(field)
