@@ -200,7 +200,11 @@ class Process(object):
 
         """
         if isinstance(procdict, Process):
-            self.add_subprocess('default', procdict)
+            try:
+                name = procdict.name
+            except:
+                name = 'default'
+            self.add_subprocess(name, procdict)
         else:
             for name, proc in procdict.items():
                 self.add_subprocess(name, proc)
