@@ -217,8 +217,8 @@ class EmanuelConvection(TimeDependentProcess):
                     self.OMTRAIN, self.OMTSNOW, self.COEFFR, self.COEFFS,
                     self.CU, self.BETA, self.DTMAX, self.ALPHA, self.DAMP
                     )
-        tendencies = {'Tatm': _convect_to_climlab(FT),
-                      'q': _convect_to_climlab(FQ)}
+        tendencies = {'Tatm': _convect_to_climlab(FT)*np.ones_like(self.state['Tatm']),
+                      'q': _convect_to_climlab(FQ)*np.ones_like(self.state['q'])}
         if 'Ts' in self.state:
             # for some strange reason self.Ts is breaking tests under Python 3.5 in some configurations
             tendencies['Ts'] = 0. * self.state['Ts']
