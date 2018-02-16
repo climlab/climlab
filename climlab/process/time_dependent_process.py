@@ -9,15 +9,30 @@ from .process import Process
 from climlab.utils import walk, attr_dict
 
 
-def couple(proclist):
+def couple(proclist, name='Parent'):
     #  Union of the two state dictionaries
-    newstate = attr_dict.AttrDict()
+    new_state = attr_dict.AttrDict()
+    new_input = attr_dict.AttrDict()
+    all_input = {}
+    all_diagnotics_list = []
+    timestep = const.seconds_per_year * 1E6  # very long!
     for proc in proclist:
+        timestep = np.minimum(timestep, proc.timestep)
         for key in proc.state:
-            newstate[key] = proc.state[key]
-    coupled = TimeDependentProcess(state=newstate)
+            new_state[key] = proc.state[key]
+        all_diagnotics_list += list(proc.diagnostics.keys())
+        for key in proc.input:
+            all_input[key] = proc.input[key]
+    for key in all_input:
+        if (key not in new_state) and (key not in all_diagnotics_list):
+            # This quantity is still a necessary input for the parent process
+            new_input[key] = all_input[key]
+    # The newly created parent process has the minimum timestep
+    coupled = TimeDependentProcess(state=new_state, timestep=timestep, name=name)
     for proc in proclist:
         coupled.add_subprocess(proc.name, proc)
+    for key in new_input:
+        coupled.add_input(key, new_input[key])
     return coupled
 
 

@@ -445,8 +445,8 @@ class Process(object):
         Quantity is accessible in two ways:
 
             * as a process attribute, i.e. ``proc.name``
-            * as a member of the diagnostics dictionary,
-              i.e. ``proc.diagnostics['name']``
+            * as a member of the input dictionary,
+              i.e. ``proc.input['name']``
 
         Use attribute method to set values, e.g.
         ```proc.name = value ```
