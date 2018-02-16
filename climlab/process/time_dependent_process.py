@@ -5,8 +5,20 @@ from builtins import range
 import numpy as np
 import copy
 from climlab import constants as const
-from climlab.process.process import Process
+from .process import Process
 from climlab.utils import walk, attr_dict
+
+
+def couple(proclist):
+    #  Union of the two state dictionaries
+    newstate = attr_dict.AttrDict()
+    for proc in proclist:
+        for key in proc.state:
+            newstate[key] = proc.state[key]
+    coupled = TimeDependentProcess(state=newstate)
+    for proc in proclist:
+        coupled.add_subprocess(proc.name, proc)
+    return coupled
 
 
 class TimeDependentProcess(Process):
@@ -78,15 +90,7 @@ class TimeDependentProcess(Process):
         self.has_process_type_list = False
 
     def __add__(self, other):
-        #  Union of the two state dictionaries
-        newstate = attr_dict.AttrDict()
-        for key in self.state:
-            newstate[key] = self.state[key]
-        for key in other.state:
-            newstate[key] = other.state[key]
-        newparent = TimeDependentProcess(state=newstate)
-        newparent.add_subprocess(self.name, self)
-        newparent.add_subprocess(other.name, other)
+        newparent = couple([self,other])
         return newparent
 
     @property

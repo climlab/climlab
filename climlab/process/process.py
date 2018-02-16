@@ -63,8 +63,7 @@
 #         - anything in the `input` dictionary of `subprocname` will remain fixed
 #==============================================================================
 
-from __future__ import division
-from __future__ import print_function
+from __future__ import division, print_function
 from builtins import object
 import time, copy
 import numpy as np
