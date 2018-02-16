@@ -21,7 +21,9 @@ and then simply do::
     conda install climlab
 
 Binaries are available for OSX, Linux, and Windows.
-You may need to update your ``numpy`` if you are using are using a version prior to 1.11
+You may need to update your ``numpy`` if you are using are using a version prior to 1.11.
+
+For Windows, builds are available for 64-bit versions of Python 3.5 and Python 3.6, and will require numpy 1.14 or later.
 
 Installing from source
 ----------------------

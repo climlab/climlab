@@ -35,6 +35,8 @@ Currently, ``climlab`` has out-of-the-box support and documented examples for
     - CAM3  (from the NCAR GCM)
     - Grey Gas
     - Simplified band-averaged models (4 bands each in longwave and shortwave)
+- Emanuel moist convection scheme
+- Hard convective adjustment
 - Diffusive energy balance models
 - Seasonal and steady-state models
 - Arbitrary combinations of the above, for example:
@@ -88,13 +90,13 @@ The build has been tested with both gcc/gfortran and ifort (Linux)
 Installing from source without a Fortran compiler
 ~~~~~~~~~~~~~~~~~~~~~~
 Many parts of ``climlab`` are written in pure Python and should work on any system.
-Fortran builds are necessary for the RRTMG and CAM3 radiation schemes.
+Fortran builds are necessary for the RRTMG and CAM3 radiation schemes and for the Emanuel convection scheme.
 If you follow the instructions for installing from source (above) without a valid Fortran compiler,
 you should find that you can still::
 
     import climlab
 
-and use most of the package. You will see warning messages about the missing radiation components.
+and use most of the package. You will see warning messages about the missing components.
 
 .. _conda: https://conda.io/docs/
 .. _`Anaconda Python`: https://www.continuum.io/downloads
@@ -185,6 +187,10 @@ Version 0.6.0 (released December 2017) provides full Python 3 compatibility, upd
 
 Version 0.6.1 (released January 2018) provides basic integration with xarray_
 (convenience methods for converting climlab objects into ``xarray.DataArray`` and ``xarray.Dataset`` objects)
+
+Version 0.6.2 (released February 2018) introduces the Emanuel moist convection scheme, support for asynchonous coupling, and internal optimzations.
+
+Version 0.6.3 (released February 2018) brings under-the-hood improvements to the Fortran builds which enable successful builds on a wider variety of platforms (incluing Windows/Python3).
 
 The documentation_ was first created by Moritz Kreuzer (Potsdam Institut for Climate Impact Research) as part of a thesis project in Spring 2016.
 
