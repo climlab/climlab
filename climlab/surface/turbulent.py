@@ -3,6 +3,7 @@ import numpy as np
 from climlab.utils.thermo import qsat
 from climlab import constants as const
 from climlab.process.energy_budget import EnergyBudget
+from climlab.domain.field import Field
 
 
 class SurfaceFlux(EnergyBudget):
@@ -25,6 +26,7 @@ class SurfaceFlux(EnergyBudget):
     def _air_density(self, Ta):
         return self.ps * const.mb_to_Pa / const.Rd / Ta
 
+
 class SensibleHeatFlux(SurfaceFlux):
     def __init__(self, Cd=3E-3, **kwargs):
         super(SensibleHeatFlux, self).__init__(Cd=Cd, **kwargs)
@@ -33,7 +35,7 @@ class SensibleHeatFlux(SurfaceFlux):
     def _compute_flux(self):
         # this ensure same dimensions as Ts
         #  (and use only the lowest model level)
-        Ta = self.Tatm[..., -1, np.newaxis]
+        Ta = Field(self.Tatm[..., -1, np.newaxis], domain=self.Ts.domain)
         Ts = self.Ts
         DeltaT = Ts - Ta
         rho = self._air_density(Ta)
@@ -50,10 +52,10 @@ class LatentHeatFlux(SurfaceFlux):
     def _compute_flux(self):
         #  specific humidity at lowest model level
         #  assumes pressure is the last axis
-        q = self.q[..., -1, np.newaxis]
-        Ta = self.Tatm[..., -1, np.newaxis]
+        q = Field(self.q[..., -1, np.newaxis], domain=self.Ts.domain)
+        Ta = Field(self.Tatm[..., -1, np.newaxis], domain=self.Ts.domain)
         qs = qsat(self.Ts, self.ps)
-        Deltaq = qs - q
+        Deltaq = Field(qs - q, domain=self.Ts.domain)
         rho = self._air_density(Ta)
         #  flux from bulk formula
         self._flux = const.Lhvap * rho * self.Cd * self.U * Deltaq

@@ -2,6 +2,7 @@ from __future__ import division
 import numpy as np
 import climlab
 from climlab.convection import emanuel_convection
+from climlab.tests.xarray_test import to_xarray
 import pytest
 
 
@@ -103,3 +104,40 @@ def test_multidim_tendencies():
     assert np.tile(FQ,(num_lat,1)) == pytest.approx(tend['q'], rel=tol)
     assert np.tile(FU,(num_lat,1)) == pytest.approx(tend['U'], rel=tol)
     assert np.tile(FV,(num_lat,1)) == pytest.approx(tend['V'], rel=tol)
+
+@pytest.mark.fast
+def test_rcm_emanuel():
+    num_lev = 30
+    water_depth = 5.
+    # Temperatures in a single column
+    state = climlab.column_state(num_lev=num_lev, water_depth=water_depth)
+    #  Initialize a nearly dry column (small background stratospheric humidity)
+    state['q'] = np.ones_like(state.Tatm) * 5.E-6
+    #  ASYNCHRONOUS COUPLING -- the radiation uses a much longer timestep
+    short_timestep = climlab.constants.seconds_per_hour
+    #  The top-level model
+    model = climlab.TimeDependentProcess(name='Radiative-Convective Model',
+                        state=state,
+                        timestep=short_timestep)
+    #  Radiation coupled to water vapor
+    rad = climlab.radiation.RRTMG(name='Radiation',
+                        state=state,
+                        specific_humidity=state.q,
+                        albedo=0.3,
+                        timestep=24*short_timestep)
+    #  Convection scheme -- water vapor is a state variable
+    conv = climlab.convection.EmanuelConvection(name='Convection',
+                                  state=state,
+                                  timestep=short_timestep)
+    #  Surface heat flux processes
+    shf = climlab.surface.SensibleHeatFlux(name='SHF',
+                                  state=state, Cd=0.5E-3,
+                                  timestep=climlab.constants.seconds_per_hour)
+    lhf = climlab.surface.LatentHeatFlux(name='LHF',
+                                  state=state, Cd=0.5E-3,
+                                  timestep=short_timestep)
+    #  Couple all the submodels together
+    for proc in [rad, conv, shf, lhf]:
+        model.add_subprocess(proc.name, proc)
+    model.step_forward()
+    to_xarray(model)
