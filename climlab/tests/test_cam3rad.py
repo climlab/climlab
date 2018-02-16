@@ -11,8 +11,6 @@ alb = 0.25
 def rcm():
     # initial state (temperatures)
     state = climlab.column_state(num_lev=num_lev, num_lat=1, water_depth=5.)
-    #  Create a parent process
-    #rcm = climlab.TimeDependentProcess(state=state)
     ## Create individual physical process models:
     #  fixed relative humidity
     h2o = climlab.radiation.ManabeWaterVapor(state=state, name='H2O')
@@ -22,9 +20,6 @@ def rcm():
     # CAM3 radiation with default parameters and interactive water vapor
     rad = climlab.radiation.CAM3(state=state, albedo=alb, specific_humidity=h2o.q, name='Radiation')
     # Couple the models
-    #rcm.add_subprocess('Radiation', rad)
-    #rcm.add_subprocess('ConvectiveAdjustment', convadj)
-    #rcm.add_subprocess('H2O', h2o)
     rcm = h2o + convadj + rad
     return rcm
 

@@ -89,20 +89,20 @@ def test_radiative_forcing():
     change in TOA flux. It should be positive net downward flux.'''
     #  State variables (Air and surface temperature)
     state = climlab.column_state(num_lev=30, water_depth=1.)
-    #  Parent model process
-    rcm = climlab.TimeDependentProcess(state=state)
     #  Fixed relative humidity
-    h2o = climlab.radiation.ManabeWaterVapor(state=state)
+    h2o = climlab.radiation.ManabeWaterVapor(name='WaterVapor', state=state)
     #  Couple water vapor to radiation
     #   Set icld=0 for clear-sky only (no need to call cloud overlap routine)
-    rad = climlab.radiation.RRTMG(state=state, specific_humidity=h2o.q, icld=0)
+    rad = climlab.radiation.RRTMG(name='Radiation',
+                                  state=state,
+                                  specific_humidity=h2o.q,
+                                  icld=0)
     #  Convective adjustment
-    conv = climlab.convection.ConvectiveAdjustment(state=state,
+    conv = climlab.convection.ConvectiveAdjustment(name='Convection',
+                                                   state=state,
                                                    adj_lapse_rate=6.5)
     #  Couple everything together
-    rcm.add_subprocess('Radiation', rad)
-    rcm.add_subprocess('WaterVapor', h2o)
-    rcm.add_subprocess('Convection', conv)
+    rcm = rad + h2o + conv
 
     rcm.integrate_years(5.)
     assert np.abs(rcm.ASR - rcm.OLR) < 0.1  # close to energy balance
@@ -122,19 +122,18 @@ def test_latitude():
     num_lat = 8
     #  State variables (Air and surface temperature)
     state = climlab.column_state(num_lev=30, num_lat=num_lat, water_depth=1.)
-    #  Parent model process
-    model = climlab.TimeDependentProcess(state=state)
     #  insolation
-    sol = climlab.radiation.AnnualMeanInsolation(domains=model.Ts.domain)
+    #sol = climlab.radiation.AnnualMeanInsolation(domains=model.Ts.domain)
+    sol = climlab.radiation.AnnualMeanInsolation(name='Insolation',
+                                                 domains=state.Ts.domain)
     #  radiation module with insolation as input
     #   Set icld=0 for clear-sky only (no need to call cloud overlap routine)
-    rad = climlab.radiation.RRTMG(state=state, icld=0,
+    rad = climlab.radiation.RRTMG(name='Radiation', state=state, icld=0,
                                   S0=sol.S0,
                                   insolation=sol.insolation,
                                   coszen=sol.coszen)
     #  Couple everything together
-    model.add_subprocess('Radiation', rad)
-    model.add_subprocess('Insolation', sol)
+    model = rad + sol
     #  Run out to equilibrium
     model.integrate_years(2.)
     #  Test for energy balance
