@@ -102,7 +102,7 @@ def test_radiative_forcing():
                                                    state=state,
                                                    adj_lapse_rate=6.5)
     #  Couple everything together
-    rcm = rad + h2o + conv
+    rcm = climlab.couple([rad,h2o,conv], name='Radiative-Convective Model')
 
     rcm.integrate_years(5.)
     assert np.abs(rcm.ASR - rcm.OLR) < 0.1  # close to energy balance
