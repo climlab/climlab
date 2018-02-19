@@ -230,6 +230,8 @@ class Iceline(DiagnosticProcess):
         self.param['Tf'] = Tf
         self.add_diagnostic('icelat')
         self.add_diagnostic('ice_area')
+        #  Set diagnostics based on initial conditions
+        self.find_icelines()
 
     def find_icelines(self):
         """Finds iceline according to the surface temperature.
@@ -361,7 +363,7 @@ class StepFunctionAlbedo(DiagnosticProcess):
         self.add_subprocess('warm_albedo', P2Albedo(a0=a0, a2=a2, domains=sfc, timestep=self.timestep))
         self.add_subprocess('cold_albedo', ConstantAlbedo(albedo=ai, domains=sfc, timestep=self.timestep))
         self.topdown = False  # call subprocess compute methods first
-        self.add_diagnostic('albedo')
+        self.add_diagnostic('albedo', self._get_current_albedo())
 
     def _get_current_albedo(self):
         '''Simple step-function albedo based on ice line at temperature Tf.'''

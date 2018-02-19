@@ -5,6 +5,7 @@ along with processes for insolation and fixed relative humidity.
 from __future__ import absolute_import
 
 from .aplusbt import AplusBT, AplusBT_CO2
+from .absorbed_shorwave import SimpleAbsorbedShortwave
 from .boltzmann import Boltzmann
 from .insolation import FixedInsolation, P2Insolation, AnnualMeanInsolation, DailyInsolation
 from .nband import NbandRadiation, ThreeBandSW

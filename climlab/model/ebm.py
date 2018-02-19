@@ -378,14 +378,18 @@ class EBM_seasonal(EBM):
                 :include-source:
 
         """
+        if ai is None:
+            no_albedo_feedback = True
+            ai = 0. # ignored but need to set a number
+        else:
+            no_albedo_feedback = False
         super(EBM_seasonal, self).__init__(a0=a0, a2=a2, ai=ai, **kwargs)
-        sfc = self.domains['Ts']
-        self.add_subprocess('insolation',
-                            DailyInsolation(domains=sfc, **self.param))
         self.param['a0'] = a0
         self.param['a2'] = a2
-        if ai is None:
-            # No albedo feedback
+        sfc = self.domains['Ts']
+        self.add_subprocess('insolation',
+                        DailyInsolation(domains=sfc, **self.param))
+        if no_albedo_feedback:
             # Remove unused parameters here for clarity
             _ = self.param.pop('ai')
             _ = self.param.pop('Tf')
