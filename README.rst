@@ -192,6 +192,8 @@ Version 0.6.2 (released February 2018) introduces the Emanuel moist convection s
 
 Version 0.6.3 (released February 2018) brings under-the-hood improvements to the Fortran builds which enable successful builds on a wider variety of platforms (incluing Windows/Python3).
 
+Version 0.6.4 (released February 2018) brings some bug fixes and a new ``climlab.couple()`` method to simplify creating complete models from components.
+
 The documentation_ was first created by Moritz Kreuzer (Potsdam Institut for Climate Impact Research) as part of a thesis project in Spring 2016.
 
 .. _documentation: http://climlab.readthedocs.io
