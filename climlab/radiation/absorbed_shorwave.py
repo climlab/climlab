@@ -6,10 +6,12 @@ from climlab import constants as const
 class SimpleAbsorbedShortwave(EnergyBudget):
     '''A class for the shortwave radiation process in a one-layer EBM.
 
-    Computes the diagnostics `ASR` (absorbed shortwave radiation)
+    Computes the diagnostic `ASR` (absorbed shortwave radiation)
     from the formula `self.ASR = (1-self.albedo) * self.insolation`
+    and applies this as a tendency on the surface temperature.
 
-    `albedo` and `insolation` are given as inputs.
+    `albedo` and `insolation` are given as inputs. These should either be scalars
+    or have same dimensions as state variable `Ts`
 
     User can supply constants, or link to diagnostics of specific insolation
     and albedo processes.

@@ -11,6 +11,12 @@ from climlab.dynamics import MeridionalDiffusion
 from climlab.domain.initial import surface_state
 from scipy import integrate
 
+#  A lot of this should be re-written / simplified
+#  using more up-to-date climlab APIs for coupling processes together
+#  Making sure that each subprocess properly declares inputs and diagnostics
+
+#  For example, the basic EBM should be created with something like
+#  ebm = climlab.couple([asr,olr,diff])
 
 class EBM(EnergyBudget):
     """A parent class for all Energy-Balance-Model classes.
