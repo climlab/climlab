@@ -85,6 +85,7 @@ class EmanuelConvection(TimeDependentProcess):
         - DTMAX = 0.9, maximum negative temperature perturbation a lifted parcel is allowed to have below its LFC
         - ALPHA = 0.2, first parameter that controls the rate of approach to quasi-equilibrium
         - DAMP = 0.1, second parameter that controls the rate of approach to quasi-equilibrium (DAMP must be less than 1)
+        - IPBL = 0, switch to bypass the dry convective adjustment (bypass if IPBL==0)
 
     Tendencies computed:
 
@@ -162,6 +163,7 @@ class EmanuelConvection(TimeDependentProcess):
             DTMAX=0.9,
             ALPHA=0.2,
             DAMP=0.1,
+            IPBL=0,
             **kwargs):
         super(EmanuelConvection, self).__init__(**kwargs)
         self.time_type = 'explicit'
@@ -186,6 +188,7 @@ class EmanuelConvection(TimeDependentProcess):
         self.add_input('DTMAX', DTMAX)
         self.add_input('ALPHA', ALPHA)
         self.add_input('DAMP', DAMP)
+        self.add_input('IPBL', IPBL)
 
     def _compute(self):
         #  Invert arrays so the first element is the bottom of column
@@ -210,13 +213,17 @@ class EmanuelConvection(TimeDependentProcess):
         TRA = np.zeros((NCOL,ND,NTRA), order='F')  # tracers ignored
         DELT = float(self.timestep)
         CBMF = self.CBMF
-        (IFLAG, FT, FQ, FU, FV, FTRA, PRECIP, WD, TPRIME, QPRIME, CBMFnew) = \
-            convect(T, Q, QS, U, V, TRA, P, PH, NCOL, ND, NL, NTRA, DELT, CBMF,
+        (IFLAG, FT, FQ, FU, FV, FTRA, PRECIP, WD, TPRIME, QPRIME, CBMFnew,
+        Tout, Qout, QSout, Uout, Vout, TRAout) = \
+            convect(T, Q, QS, U, V, TRA, P, PH, NCOL, ND, NL, NTRA, DELT, self.IPBL, CBMF,
                     CPD, CPV, CL, RV, RD, LV0, G, ROWL, self.MINORIG,
                     self.ELCRIT, self.TLCRIT, self.ENTP, self.SIGD, self.SIGS,
                     self.OMTRAIN, self.OMTSNOW, self.COEFFR, self.COEFFS,
                     self.CU, self.BETA, self.DTMAX, self.ALPHA, self.DAMP
                     )
+        # If dry adjustment is being used then the tendencies need to be adjusted
+        FT += (Tout - T) / DELT
+        FQ += (Qout - Q) / DELT
         tendencies = {'Tatm': _convect_to_climlab(FT)*np.ones_like(self.state['Tatm']),
                       'q': _convect_to_climlab(FQ)*np.ones_like(self.state['q'])}
         if 'Ts' in self.state:

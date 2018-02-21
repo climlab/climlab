@@ -265,7 +265,8 @@ C         RDCP=(RD*(1.-Q(I))+Q(I)*RV)/
 C     1    (CPD*(1.-Q(I))+Q(I)*CPV)
 C         TH(I)=T(I)*(1000.0/P(I))**RDCP
 C    7   CONTINUE
-        PRECIP=0.0
+C BRIAN  --  PRECIP is passed in already initialized -- it may be non-zero from dry adjustment
+C        PRECIP=0.0
         WD=0.0
         TPRIME=0.0
         QPRIME=0.0

@@ -38,6 +38,7 @@ def configuration(parent_package='', top_path=None):
 def gen_source(ext, build_dir):
     thispath = config.local_path
     sourcelist = []
+    sourcelist.append(join(thispath,'dry_adjustment.f'))
     sourcelist.append(join(thispath,'convect.f'))
     sourcelist.append(join(thispath,'Driver.f90'))
     try:
