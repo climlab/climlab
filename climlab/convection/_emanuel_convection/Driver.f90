@@ -37,7 +37,7 @@ subroutine emanuel_convection(T, Q, QS, U, V, TRA, P, PH, &
     real, intent(in) :: T(NCOL,ND),Q(NCOL,ND),QS(NCOL,ND),U(NCOL,ND),V(NCOL,ND)
     real, intent(in) :: TRA(NCOL,ND,NTRA),P(ND),PH(ND+1)
     real, intent(in) :: DELT ! The model time step (sec) between calls to CONVECT
-    real, intent(in) :: IPBL ! switch to bypass the dry adiabatic adjustment (bypass if IPBL=0)
+    integer, intent(in) :: IPBL ! switch to bypass the dry adiabatic adjustment (bypass if IPBL=0)
     real, intent(in) :: CBMFold(NCOL) ! The cloud base mass flux ((kg/m**2)/s)
     real, intent(in) :: CPD, CPV, CL, RV, RD, LV0, G, ROWL  ! thermodynamic constants
     integer, intent(in) :: MINORIG  ! index of lowest level from which convection may originate
@@ -77,8 +77,7 @@ subroutine emanuel_convection(T, Q, QS, U, V, TRA, P, PH, &
       end if
       CBMFnew(j) = 0. + CBMFold(j)  ! will be updated during call to CONVECT
       call CONVECT(Tout(j,:),Qout(j,:),QSout(j,:),Uout(j,:),Vout(j,:), &
-             TRAout(j,:,:),P,PH, &
-             ND,NL,NTRA,DELT,MINORIG, &
+             TRAout(j,:,:),P,PH, ND,NL,NTRA,DELT,MINORIG, &
              CPD, CPV, CL, RV, RD, LV0, G, ROWL, &
              ELCRIT, TLCRIT, ENTP, SIGD, SIGS, OMTRAIN, OMTSNOW, &
              COEFFR, COEFFS, CU, BETA, DTMAX, ALPHA, DAMP, &

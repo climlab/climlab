@@ -222,8 +222,9 @@ class EmanuelConvection(TimeDependentProcess):
                     self.CU, self.BETA, self.DTMAX, self.ALPHA, self.DAMP
                     )
         # If dry adjustment is being used then the tendencies need to be adjusted
-        FT += (Tout - T) / DELT
-        FQ += (Qout - Q) / DELT
+        if self.IPBL != 0:
+            FT += (Tout - T) / DELT
+            FQ += (Qout - Q) / DELT
         tendencies = {'Tatm': _convect_to_climlab(FT)*np.ones_like(self.state['Tatm']),
                       'q': _convect_to_climlab(FQ)*np.ones_like(self.state['q'])}
         if 'Ts' in self.state:
