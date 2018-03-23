@@ -28,6 +28,7 @@ CLIMLAB has out-of-the-box support and documented examples for
 - Diffusion solvers for energy balance models
 - Insolation for arbitrary orbital parameters [e.g. as used by @Rose:2017a]
 - Boundary layer turbulence
+
 CLIMLAB allows the user to assemble arbitrary combinations of the above on 1D, 2D, or 3D spatial domains. It is also an open framework allowing arbitrary pieces of useful climate model code to be wrapped into new `Process` classes.
 
 The user-facing parts of CLIMLAB are written in Python and well-suited to interactive command line use. CLIMLAB is agnostic about the underlying numerics; several process modules use compiled Fortran code. Automated build services are used to provide binaries for most common platforms, vastly simplifying the deployment of scientific software to non-specialist students and researchers.
