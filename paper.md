@@ -29,7 +29,7 @@ A `Process` object can also contain an arbitrarily complex tree of subprocesses 
 CLIMLAB has out-of-the-box support and documented examples for:
 
 - Several atmospheric radiation codes including the widely used [RRTMG model](http://rtweb.aer.com/rrtm_frame.html) [@Mlawer:1997a;@Clough:2005a]
-- Convection models including the [Emanuel moist convection scheme](https://emanuel.mit.edu/problem-convective-moistening) [@EmanueL:1991a; @EmanueL:1999a]
+- Convection models including the [Emanuel moist convection scheme](https://emanuel.mit.edu/problem-convective-moistening) [@Emanuel:1991a; @Emanuel:1999a]
 - Diffusion solvers for energy balance models
 - Insolation for arbitrary orbital parameters [e.g. as used by @Rose:2017a]
 - Boundary layer turbulence
