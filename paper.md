@@ -7,6 +7,9 @@ authors:
 - name: Brian E. J. Rose
   orcid: 0000-0002-9961-3821
   affiliation: 1 # (Multiple affiliations must be quoted)
+affiliations:
+- name: Department of Atmospheric and Environmental Sciences, University at Albany (State University of New York)
+  index: 1
 date: 22 March 2018
 bibliography: paper.bib
 ---
