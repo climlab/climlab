@@ -13,7 +13,7 @@ Usage in publications, teaching, etc.
 
 If you use CLIMLAB in any way for published research or theses, online teaching materials, or anything else, we would appreciate hearing about it. Our goal is to maintain a list of links and references to use cases. This is essential information for our funders (NSF) but will also be a great resource for new users looking to find out more about what you can do with CLIMLAB.
 
-The best way to report usage is through this `open issue on the CLIMLAB github page`_. If you're not a github users you can report usage directly to Brian Rose (see [Contact page](contact)).
+The best way to report usage is through this `open issue on the CLIMLAB github page`_. If you're not a github users you can report usage directly to Brian Rose (see `Contact page`_).
 
 
 Reporting bugs, issues, new feature requests, and documentation problems
@@ -96,6 +96,7 @@ from the `climlab/docs` directory.
 - Once you are satisfied, commit changes as described above and submit a new Pull Request describing your changes.
 
 
+.. _`Contact page`: contact.html
 .. _ReStructuredText: http://docutils.sourceforge.net/docs/user/rst/quickstart.html
 .. _`these instructions`: https://help.github.com/articles/fork-a-repo/
 .. _`open issue on the CLIMLAB github page`: https://github.com/brian-rose/climlab/issues/68
