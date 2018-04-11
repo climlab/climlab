@@ -17,6 +17,7 @@ Welcome to the climlab documentation!
     tutorial
     xarray
     api/climlab
+    contributing
     references
     license
     support
