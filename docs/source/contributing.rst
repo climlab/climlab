@@ -92,6 +92,7 @@ The documentation_ is generated with Sphinx from docstrings in the source code i
     make html
 
 from the `climlab/docs` directory.
+
 - The new and improved docs should now be available locally in the `climlab/docs/build/html` directory. Check them out in your web browser.
 - Once you are satisfied, commit changes as described above and submit a new Pull Request describing your changes.
 
