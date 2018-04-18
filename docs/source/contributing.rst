@@ -57,11 +57,7 @@ Contributions will happen through Pull Requests on github. You will need a free 
 (choose a more descriptive name for your new feature).
 
 3. Work on your new feature, using ``git add`` to add your changes.
-4. Test your modified code! You can run the entire test suite by running::
-
-    pytest -v path_to_climlab_installation
-
-Make sure to add new tests for your cool new feature.
+4. Build and Test your modified code! See `Building and Testing CLIMLAB`_ below for instructions. Make sure to add new tests for your cool new feature.
 
 5. When your feature is complete and tested, commit your changes::
 
@@ -81,22 +77,64 @@ and push your branch to github::
     git branch -d cool_new_feature
 
 
+Building and Testing CLIMLAB
+----------------------
+
+CLIMLAB has an extensive set of tests designed to work with `pytest`_. The test code is found in the ``climlab/tests`` directory inside the source repo.
+
+To run the full set of tests on the currently installed version of CLIMLAB, you can always do this::
+
+    pytest -v --pyargs climlab
+
+All tests should report ``PASSED``.
+
+CLIMLAB is a mix of pure Python and compiled Fortran. To fully test new code modifications, you will need to rebuild and install a new version. We use (and recommend) `conda build`_ to handle the dependencies including Fortran compiler.
+
+To build CLIMLAB, do this from the root directory of the CLIMLAB source repo::
+
+    conda-build conda-recipe
+
+This will automatically install all build dependencies in a temporary new conda environment, build all the Fortran extensions, bundle everything together, install the new pacakge in a temporary test environment, and run a minimal set of tests on the package (only the tests marked as ``fast``). The whole procedure will take several minutes to run through.
+
+Assuming the tests pass successfully, you will see a message like::
+
+    TEST END: /Users/br546577/anaconda3/conda-bld/osx-64/climlab-0.6.5.dev0-py36_5.tar.bz2
+
+(though obviously with different paths and version numbers)
+
+To fully test your new build (including the tests not marked as ``fast``), you can now install it in a new test environment (with all dependencies) and run the full set of tests::
+
+    conda create --name newtest climlab --use-local
+    source activate newtest
+    pytest -v --pyargs climlab
+
+Once you're happy with this you can safely delete the test environment with::
+
+    source deactivate
+    conda remove --name newtest --all
+
+If you encounter problems with the conda build recipe, please raise an issue at <https://github.com/brian-rose/climlab/issues>. You could also take a look at the `CLIMLAB recipe used on conda-forge`_, which might be a little more up-to-date.
+
+
 Contributing improved documentation
 ---------------------
 
 The documentation_ is generated with Sphinx from docstrings in the source code itself, along with a small collection of ReStructuredText_ (.rst) files. You can help improve the documentation!
 
-- Edit doctrings and/or .rst files in `climlab/docs/`
+- Edit doctrings and/or .rst files in ``climlab/docs/``
 - Build the improved docs locally with::
 
     make html
 
-from the `climlab/docs` directory.
+from the ``climlab/docs`` directory.
 
-- The new and improved docs should now be available locally in the `climlab/docs/build/html` directory. Check them out in your web browser.
+- The new and improved docs should now be available locally in the ``climlab/docs/build/html`` directory. Check them out in your web browser.
 - Once you are satisfied, commit changes as described above and submit a new Pull Request describing your changes.
 
 
+.. _`CLIMLAB recipe used on conda-forge`: https://github.com/conda-forge/climlab-feedstock
+.. _`pytest`: https://docs.pytest.org/en/latest/
+.. _`conda build`: https://conda.io/docs/user-guide/tasks/build-packages/index.html
 .. _`Contact page`: contact.html
 .. _ReStructuredText: http://docutils.sourceforge.net/docs/user/rst/quickstart.html
 .. _`these instructions`: https://help.github.com/articles/fork-a-repo/
