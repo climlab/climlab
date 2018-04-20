@@ -2,7 +2,7 @@
 climlab
 ================
 
-|docs| |DOI| |pypi| |Build Status| |coverage|
+|docs| |JOSS| |DOI| |pypi| |Build Status| |coverage|
 
 ----------
  Python package for process-oriented climate modeling
@@ -194,6 +194,8 @@ Version 0.6.3 (released February 2018) brings under-the-hood improvements to the
 
 Version 0.6.4 (released February 2018) brings some bug fixes and a new ``climlab.couple()`` method to simplify creating complete models from components.
 
+Version 0.6.5 (released April 2018) adds some improved documentation, associated with the JOSS paper.
+
 The documentation_ was first created by Moritz Kreuzer (Potsdam Institut for Climate Impact Research) as part of a thesis project in Spring 2016.
 
 .. _documentation: http://climlab.readthedocs.io
@@ -223,6 +225,8 @@ See the accompanying LICENSE file.
 .. |docs| image:: http://readthedocs.org/projects/climlab/badge/?version=latest
    :target: http://climlab.readthedocs.io/en/latest/intro.html
    :alt: Documentation Status
+
+.. |JOSS| [status](http://joss.theoj.org/papers/6831d26a8ae32c11b8991bb848d0d4e2/status.svg)](http://joss.theoj.org/papers/6831d26a8ae32c11b8991bb848d0d4e2)
 =======
 
 
