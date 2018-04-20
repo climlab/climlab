@@ -2,7 +2,7 @@
 climlab
 ================
 
-|docs| |JOSS| |DOI| |pypi| |Build Status| |coverage|
+|docs| |DOI| |pypi| |Build Status| |coverage|
 
 ----------
  Python package for process-oriented climate modeling
