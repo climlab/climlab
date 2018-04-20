@@ -2,7 +2,7 @@
 climlab
 ================
 
-|docs| |DOI| |pypi| |Build Status| |coverage|
+|docs| |JOSS| |DOI| |pypi| |Build Status| |coverage|
 
 ----------
  Python package for process-oriented climate modeling
@@ -215,6 +215,8 @@ License
 This code is freely available under the MIT license.
 See the accompanying LICENSE file.
 
+.. |JOSS| image:: http://joss.theoj.org/papers/10.21105/joss.00659/status.svg
+   :target: https://doi.org/10.21105/joss.00659
 .. |pypi| image:: https://badge.fury.io/py/climlab.svg
    :target: https://badge.fury.io/py/climlab
 .. |Build Status| image:: https://travis-ci.org/brian-rose/climlab.svg?branch=master
