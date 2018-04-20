@@ -15,6 +15,10 @@ If you use CLIMLAB in any way for published research or theses, online teaching 
 
 The best way to report usage is through this `open issue on the CLIMLAB github page`_. If you're not a github users you can report usage directly to Brian Rose (see `Contact page`_).
 
+For publications, please cite the `CLIMLAB description paper in JOSS`_. The full citation is:
+
+  Rose, (2018). CLIMLAB: a Python toolkit for interactive, process-oriented climate modeling. Journal of Open Source Software, 3(24), 659, https://doi.org/10.21105/joss.00659
+
 
 Reporting bugs, issues, new feature requests, and documentation problems
 -----------------------
@@ -132,6 +136,7 @@ from the ``climlab/docs`` directory.
 - Once you are satisfied, commit changes as described above and submit a new Pull Request describing your changes.
 
 
+.. _`CLIMLAB description paper in JOSS`: http://joss.theoj.org/papers/10.21105/joss.00659
 .. _`CLIMLAB recipe used on conda-forge`: https://github.com/conda-forge/climlab-feedstock
 .. _`pytest`: https://docs.pytest.org/en/latest/
 .. _`conda build`: https://conda.io/docs/user-guide/tasks/build-packages/index.html
