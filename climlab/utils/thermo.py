@@ -23,7 +23,6 @@ def theta(T,p):
     '''Convenience method, identical to thermo.potential_temperature(T,p).'''
     return potential_temperature(T,p)
 
-
 def temperature_from_potential(theta,p):
     """Convert potential temperature to in-situ temperature.
 
@@ -35,11 +34,9 @@ def temperature_from_potential(theta,p):
     T = theta/((const.ps/p)**const.kappa)
     return T
 
-
 def T(theta,p):
     '''Convenience method, identical to thermo.temperature_from_potential(theta,p).'''
     return temperature_from_potential(theta,p)
-
 
 def clausius_clapeyron(T):
     """Compute saturation vapor pressure as function of temperature T.
@@ -56,7 +53,6 @@ def clausius_clapeyron(T):
     es = 6.112 * np.exp(17.67*Tcel/(Tcel+243.5))
     return es
 
-
 def qsat(T,p):
     """Compute saturation specific humidity as function of temperature and pressure.
 
@@ -69,7 +65,6 @@ def qsat(T,p):
     es = clausius_clapeyron(T)
     q = eps * es / (p - (1 - eps) * es )
     return q
-
 
 def pseudoadiabat(T,p):
     """Compute the local slope of the pseudoadiabat at given temperature and pressure
@@ -96,19 +91,47 @@ def pseudoadiabat(T,p):
         (1 + const.kappa * (const.cpv / const.Rv + (ratio-1) * ratio) * esoverp))
     return dTdp
 
+def lifting_condensation_level(T, RH):
+    '''Compute the Lifiting Condensation Level (LCL) for a given temperature and relative humidity
+
+    Inputs:  T is temperature in Kelvin
+            RH is relative humidity (dimensionless)
+
+    Output: LCL in meters
+
+    This is height (relative to parcel height) at which the parcel would become saturated during adiabatic ascent.
+
+    Based on approximate formula from Bolton (1980 MWR) as given by Romps (2017 JAS)
+
+    For an exact formula see Romps (2017 JAS), doi:10.1175/JAS-D-17-0102.1
+    '''
+    Tadj = T-55.  # in Kelvin
+    return const.cp/const.g*(Tadj - (1/Tadj - np.log(RH)/2840.)**(-1))
 
 def estimated_inversion_strength(T0,T700):
-    '''Compute the "estimated inversion strength", T0 is surface temp, T700 is temp at 700 hPa, both in K.
-    Following Wood and Bretherton, J. Climate 2006.
+    '''Compute the Estimated Inversion Strength or EIS,
+    following Wood and Bretherton (2006, J. Climate)
 
+    Inputs: T0 is surface temp in Kelvin
+           T700 is air temperature at 700 hPa in Kelvin
+
+    Output: EIS in Kelvin
+
+    EIS is a normalized measure of lower tropospheric stability acccounting for
+    temperature-dependence of the moist adiabat.
     '''
-    RH = 0.8
+    # Interpolate to 850 hPa
     T850 = (T0+T700)/2.;
-    LCL = (20. + (T0-const.tempCtoK)/5.)*(1.-RH)  # approximate formula... could do this more accurately.
-    LTS = potential_temperature(T700, 700) - T0  # Lower Tropospheric Stability (theta700 - theta0)
+    # Assume 80% relative humidity to compute LCL, appropriate for marine boundary layer
+    LCL = lifting_condensation_level(T0, 0.8)
+    # Lower Tropospheric Stability (theta700 - theta0)
+    LTS = potential_temperature(T700, 700) - T0
+    #  Gammam  = -dtheta/dz is the rate of potential temperature decrease along the moist adiabat
+    #  in K / m
     Gammam = (const.g/const.cp*(1.0 - (1.0 + const.Lhvap*qsat(T850,850) /
               const.Rd / T850) / (1.0 + const.Lhvap**2 * qsat(T850,850)/
               const.cp/const.Rv/T850**2)))
+    #  Assume exponential decrease of pressure with scale height given by surface temperature
     z700 = (const.Rd*T0/const.g)*np.log(1000./700.)
     return LTS - Gammam*(z700 - LCL)
 
