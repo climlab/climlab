@@ -77,12 +77,16 @@ def pseudoadiabat(T,p):
     Inputs:   p is pressure in hPa or mb
               T is local temperature in Kelvin
     Output:   dT/dp, the rate of temperature change for pseudoadiabatic ascent
+                in units of K / hPa
 
-    the pseudoadiabat describes changes in temperature and pressure for an air
+    The pseudoadiabat describes changes in temperature and pressure for an air
     parcel at saturation assuming instantaneous rain-out of the super-saturated water
 
-    Formula from Raymond Pierrehumbert, "Principles of Planetary Climate"
+    Formula consistent with eq. (2.33) from Raymond Pierrehumbert, "Principles of Planetary Climate"
+    which nominally accounts for non-dilute effects, but computes the derivative
+    dT/dpa, where pa is the partial pressure of the non-condensible gas.
 
+    Integrating the result dT/dp treating p as total pressure effectively makes the dilute assumption.
     """
     esoverp = clausius_clapeyron(T) / p
     Tcel = T - const.tempCtoK
