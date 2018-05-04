@@ -61,10 +61,42 @@ def qsat(T,p):
     Output: saturation specific humidity (dimensionless).
 
     """
-    eps = const.Rd / const.Rv
     es = clausius_clapeyron(T)
-    q = eps * es / (p - (1 - eps) * es )
+    q = const.eps * es / (p - (1 - const.eps) * es )
     return q
+
+def virtual_temperature_from_mixing_ratio(T,w):
+    '''Virtual temperature Tv
+    T is air temperature (K)
+    w is water vapor mixing ratio (dimensionless)'''
+    return T * ((1+w/const.eps)/(1+w))
+
+def vapor_pressure_from_specific_humidity(p,q):
+    '''Vapor pressure (same units as input p)
+    p is total air pressure
+    q is specific humidity (dimensionless) -- mass of vapor per unit mass moist air'''
+    return p * (q/(const.eps+q*(1-const.eps)))
+
+def mixing_ratio_from_vapor_pressure(p,e):
+    '''Water vapor mixing ratio
+    p is air pressure
+    e is vapor pressure
+    p and e must be in same units (e.g. hPa)
+    '''
+    return const.eps * e / (p-e)
+
+def rho_moist(T,p,q):
+    '''Density of moist air.
+    T is air temperature (K)
+    p is air pressure (hPa)
+    q is specific humidity (hPa)
+
+    returns density in kg/m3
+    '''
+    e = vapor_pressure_from_specific_humidity(p,q)
+    w = mixing_ratio_from_vapor_pressure(p,e)
+    Tv = virtual_temperature_from_mixing_ratio(T,w)
+    return p*100./const.Rd/Tv
 
 def pseudoadiabat(T,p):
     """Compute the local slope of the pseudoadiabat at given temperature and pressure

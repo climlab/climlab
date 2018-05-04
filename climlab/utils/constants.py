@@ -22,6 +22,7 @@ Rd = 287.         # gas constant for dry air (J / kg / K)
 kappa = Rd / cp
 Rv = 461.5       # gas constant for water vapor (J / kg / K)
 cpv = 1875.   # specific heat at constant pressure for water vapor (J / kg / K)
+eps = Rd / Rv
 Omega = 2 * np.math.pi / 24. / 3600.  # Earth's rotation rate, (s**(-1))
 g = 9.8          # gravitational acceleration (m / s**2)
 kBoltzmann = 1.3806488E-23  # the Boltzmann constant (J / K)
