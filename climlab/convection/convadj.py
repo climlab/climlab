@@ -62,7 +62,8 @@ class ConvectiveAdjustment(TimeDependentProcess):
             pflip = self.pnew[..., ::-1]
             Tflip = Tcol[..., ::-1]
             cflip = self.cnew[..., ::-1]
-            Tadj_flip = convective_adjustment_direct(pflip, Tflip, cflip, lapserate=self.adj_lapse_rate)
+            lapseflip = self.adj_lapse_rate[..., ::-1]
+            Tadj_flip = convective_adjustment_direct(pflip, Tflip, cflip, lapserate=lapseflip)
             Tadj = Tadj_flip[..., ::-1]
             if 'Ts' in self.state:
                 Ts = Field(Tadj[...,-1], domain=self.Ts.domain)
