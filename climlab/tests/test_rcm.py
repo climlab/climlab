@@ -6,7 +6,7 @@ import pytest
 @pytest.fixture()
 def rcm():
     # initial state (temperatures)
-    state = climlab.column_state(num_lev=num_lev, num_lat=1, water_depth=5.)
+    state = climlab.column_state(num_lev=40, num_lat=1, water_depth=5.)
     ## Create individual physical process models:
     #  fixed relative humidity
     h2o = climlab.radiation.ManabeWaterVapor(state=state, name='H2O')
