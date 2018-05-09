@@ -44,17 +44,6 @@ class ConvectiveAdjustment(TimeDependentProcess):
         self.param['adj_lapse_rate'] = adj_lapse_rate
         self.time_type = 'adjustment'
         self.adjustment = {}
-        # patm = self.lev
-        # c_atm = self.Tatm.domain.heat_capacity
-        # if 'Ts' in self.state:
-        #     c_sfc = self.Ts.domain.heat_capacity
-        #     #  surface pressure should correspond to model domain!
-        #     ps = self.lev_bounds[-1]
-        #     self.pnew = np.append(patm, ps)
-        #     self.cnew = np.append(c_atm, c_sfc)
-        # else:
-        #     self.pnew = patm
-        #     self.cnew = c_atm
     @property
     def pcol(self):
         patm = self.lev
@@ -83,21 +72,25 @@ class ConvectiveAdjustment(TimeDependentProcess):
             return Tatm
     @property
     def adj_lapse_rate(self):
-        return self._adj_lapse_rate
+        lapserate = self._adj_lapse_rate
+        if type(lapserate) is str:
+            if lapserate in ['DALR', 'dry adiabat']:
+                return const.g / const.cp * 1.E3
+            elif lapserate in ['MALR', 'moist adiabat', 'pseudoadiabat']:
+                # critical lapse rate at each level is set by pseudoadiabat
+                dTdp = pseudoadiabat(self.Tcol,self.pcol) / 100.  # K / Pa
+                #  Could include water vapor effect on density here ...
+                #  Replace Tcol with virtual temperature
+                rho = self.pcol*100./const.Rd/self.Tcol  # in kg/m**3
+                return dTdp * const.g * rho * 1000.  # K / km
+            else:
+                raise ValueError('adj_lapse_rate must be either numeric or any of \'DALR\', \'dry adiabat\', \'MALR\', \'moist adiabat\', \'pseudoadiabat\'.')
+        else:
+            return lapserate
     @adj_lapse_rate.setter
     def adj_lapse_rate(self, lapserate):
-        if lapserate is ('DALR' or 'dry adiabat'):
-            self._adj_lapse_rate = const.g / const.cp * 1.E3
-        elif lapserate is ('MALR' or 'moist adiabat' or 'pseudoadiabat'):
-            # critical lapse rate at each level is set by pseudoadiabat
-            dTdp = pseudoadiabat(self.Tcol,self.pcol) / 100.  # K / Pa
-            #  Could include water vapor effect on density here ...
-            #  Replace Tcol with virtual temperature
-            rho = self.pcol*100./const.Rd/self.Tcol  # in kg/m**3
-            self._adj_lapse_rate = dTdp * const.g * rho * 1000.  # K / km
-        else:
-            self._adj_lapse_rate = lapserate
-        self.param['adj_lapse_rate'] = self._adj_lapse_rate
+        self._adj_lapse_rate = lapserate
+        self.param['adj_lapse_rate'] = lapserate
 
     def _compute(self):
         if self.adj_lapse_rate is None:
