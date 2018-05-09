@@ -26,5 +26,5 @@ def test_convective_adjustment(rcm):
     rcm.subprocess['ConvectiveAdjustment'].adj_lapse_rate = np.linspace(5., 8., num_lev)
     rcm.step_forward()
     #  test pseudoadiabatic critical lapse rate
-    #rcm.subprocess['ConvectiveAdjustment'].adj_lapse_rate = 'pseudoadiabat'
-    #rcm.step_forward()
+    rcm.subprocess['ConvectiveAdjustment'].adj_lapse_rate = 'pseudoadiabat'
+    rcm.step_forward()

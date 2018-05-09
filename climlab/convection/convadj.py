@@ -9,14 +9,33 @@ from .akmaev_adjustment import convective_adjustment_direct
 
 
 class ConvectiveAdjustment(TimeDependentProcess):
-    '''Convective adjustment process
+    '''Hard Convective Adjustment to a prescribed lapse rate.
 
-    Instantly returns column to neutral lapse rate
+    This process computes the instantaneous adjustment to conservatively
+    remove any instabilities in each column.
 
-    Adjustment includes the surface IF 'Ts' is included in the state
-    dictionary. Otherwise only the atmopsheric temperature is adjusted.
+    Instability is defined as a temperature decrease with height that exceeds
+    the prescribed critical lapse rate. This critical rate is set by input argument
+    ``adj_lapse_rate``, which can be either a numerical or string value.
 
-    Implements the conservative adjustment algorithm from Akmaev (1991) Monthly Weather Review.
+    Numerical values for ``adj_lapse_rate`` are given in units of K / km. Both
+    array and scalar values are valid. For scalar values, the assumption is that
+    the critical lapse rate is the same at every level.
+
+    If an array is given, it is assumed to represent the in-situ critical lapse
+    rate (in K/km) at every grid point.
+
+    Alternatively, string arguments can be given as follows:
+
+        - ``'DALR'`` or ``'dry adiabat'``: critical lapse rate is set to g/cp = 9.8 K / km
+        - ``'MALR'`` or ``'moist adiabat'`` or ``'pseudoadiabat'``: critical lapse rate follows the in-situ moist pseudoadiabat at every level
+
+    Adjustment includes the surface if ``'Ts'`` is included in the ``state``
+    dictionary. This implicitly accounts for turbulent surface fluxes.
+    Otherwise only the atmospheric temperature is adjusted.
+
+    This process implements the conservative adjustment algorithm described in
+    Akmaev (1991) Monthly Weather Review.
     '''
     def __init__(self, adj_lapse_rate=None, **kwargs):
         super(ConvectiveAdjustment, self).__init__(**kwargs)
