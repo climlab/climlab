@@ -23,10 +23,9 @@ def convective_adjustment_direct(p, T, c, lapserate=6.5):
     # largely follows notation and algorithm in Akmaev (1991) MWR
     alpha = const.Rd / const.g * lapserate / 1.E3 # same dimensions as lapserate
     L = p.size
-    #  Here const.ps = 1000 hPa is just used as a reference pressure
-    #  to compute potential temperature, so is valid even for different
-    #  surface pressures
-    Pi = (p[:]/const.ps)**alpha  # will need to modify to allow variable lapse rates
+    ###  now handles variable lapse rate
+    pextended = np.insert(p,0,const.ps)  # prepend const.ps = 1000 hPa as ref pressure to compute potential temperature
+    Pi = np.cumprod((p / pextended[:-1])**alpha)  # Akmaev's equation 14 recurrence formula
     beta = 1./Pi
     theta = T * beta
     q = Pi * c

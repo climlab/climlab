@@ -9,7 +9,7 @@ from .akmaev_adjustment import convective_adjustment_direct
 
 class ConvectiveAdjustment(TimeDependentProcess):
     '''Convective adjustment process
-    
+
     Instantly returns column to neutral lapse rate
 
     Adjustment includes the surface IF 'Ts' is included in the state
@@ -28,7 +28,6 @@ class ConvectiveAdjustment(TimeDependentProcess):
         c_atm = self.Tatm.domain.heat_capacity
         if 'Ts' in self.state:
             c_sfc = self.Ts.domain.heat_capacity
-            #self.pnew = np.append(patm, const.ps)
             #  surface pressure should correspond to model domain!
             ps = self.lev_bounds[-1]
             self.pnew = np.append(patm, ps)
@@ -48,9 +47,7 @@ class ConvectiveAdjustment(TimeDependentProcess):
         self.param['adj_lapse_rate'] = self._adj_lapse_rate
 
     def _compute(self):
-        #lapse_rate = self.param['adj_lapse_rate']
         if self.adj_lapse_rate is None:
-            #self.adjustment = self.state * 0.
             self.adjustment['Ts'] = self.Ts * 0.
             self.adjustment['Tatm'] = self.Tatm * 0.
         else:
@@ -58,7 +55,6 @@ class ConvectiveAdjustment(TimeDependentProcess):
             unstable_Tatm = self.Tatm
             if 'Ts' in self.state:
                 unstable_Ts = np.atleast_1d(self.Ts)
-                #Tcol = np.concatenate((unstable_Ts, unstable_Tatm),axis=-1)
                 Tcol = np.concatenate((unstable_Tatm, unstable_Ts),axis=-1)
             else:
                 Tcol = unstable_Tatm
