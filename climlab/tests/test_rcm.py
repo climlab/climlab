@@ -19,6 +19,7 @@ def rcm():
     rcm = climlab.couple([h2o,convadj,rad], name='RCM')
     return rcm
 
+@pytest.mark.fast
 def test_convective_adjustment(rcm):
     rcm.step_forward()
     #  test non-scalar critical lapse rate
