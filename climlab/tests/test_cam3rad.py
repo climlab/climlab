@@ -20,7 +20,7 @@ def rcm():
     # CAM3 radiation with default parameters and interactive water vapor
     rad = climlab.radiation.CAM3(state=state, albedo=alb, specific_humidity=h2o.q, name='Radiation')
     # Couple the models
-    rcm = h2o + convadj + rad
+    rcm = climlab.couple([h2o,convadj,rad], name='RCM')
     return rcm
 
 @pytest.mark.fast

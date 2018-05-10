@@ -4,9 +4,9 @@ thermodynamic calculations for the atmosphere.
 """
 
 from __future__ import division
-import numpy as np
-from climlab import constants as const
-
+from numpy import exp, log
+from .constants import (ps, kappa, tempCtoK, eps, Rd, Rv, cpv, cp, g, Lhvap,
+                        sigma, hPlanck, c_light, kBoltzmann, molecular_weight)
 
 def potential_temperature(T,p):
     """Compute potential temperature for an air parcel.
@@ -16,7 +16,7 @@ def potential_temperature(T,p):
     Output: potential temperature in Kelvin.
 
     """
-    theta = T*(const.ps/p)**const.kappa
+    theta = T*(ps/p)**kappa
     return theta
 
 def theta(T,p):
@@ -31,7 +31,7 @@ def temperature_from_potential(theta,p):
     Output: absolute temperature in Kelvin.
 
     """
-    T = theta/((const.ps/p)**const.kappa)
+    T = theta/((ps/p)**kappa)
     return T
 
 def T(theta,p):
@@ -49,8 +49,8 @@ def clausius_clapeyron(T):
     Based on the paper by Bolton (1980, Monthly Weather Review).
 
     """
-    Tcel = T - const.tempCtoK
-    es = 6.112 * np.exp(17.67*Tcel/(Tcel+243.5))
+    Tcel = T - tempCtoK
+    es = 6.112 * exp(17.67*Tcel/(Tcel+243.5))
     return es
 
 def qsat(T,p):
@@ -62,20 +62,20 @@ def qsat(T,p):
 
     """
     es = clausius_clapeyron(T)
-    q = const.eps * es / (p - (1 - const.eps) * es )
+    q = eps * es / (p - (1 - eps) * es )
     return q
 
 def virtual_temperature_from_mixing_ratio(T,w):
     '''Virtual temperature Tv
     T is air temperature (K)
     w is water vapor mixing ratio (dimensionless)'''
-    return T * ((1+w/const.eps)/(1+w))
+    return T * ((1+w/eps)/(1+w))
 
 def vapor_pressure_from_specific_humidity(p,q):
     '''Vapor pressure (same units as input p)
     p is total air pressure
     q is specific humidity (dimensionless) -- mass of vapor per unit mass moist air'''
-    return p * (q/(const.eps+q*(1-const.eps)))
+    return p * (q/(eps+q*(1-eps)))
 
 def mixing_ratio_from_vapor_pressure(p,e):
     '''Water vapor mixing ratio
@@ -83,7 +83,7 @@ def mixing_ratio_from_vapor_pressure(p,e):
     e is vapor pressure
     p and e must be in same units (e.g. hPa)
     '''
-    return const.eps * e / (p-e)
+    return eps * e / (p-e)
 
 def rho_moist(T,p,q):
     '''Density of moist air.
@@ -96,7 +96,7 @@ def rho_moist(T,p,q):
     e = vapor_pressure_from_specific_humidity(p,q)
     w = mixing_ratio_from_vapor_pressure(p,e)
     Tv = virtual_temperature_from_mixing_ratio(T,w)
-    return p*100./const.Rd/Tv
+    return p*100./ Rd/Tv
 
 def pseudoadiabat(T,p):
     """Compute the local slope of the pseudoadiabat at given temperature and pressure
@@ -116,11 +116,11 @@ def pseudoadiabat(T,p):
     Integrating the result dT/dp treating p as total pressure effectively makes the dilute assumption.
     """
     esoverp = clausius_clapeyron(T) / p
-    Tcel = T - const.tempCtoK
+    Tcel = T - tempCtoK
     L = (2.501 - 0.00237 * Tcel) * 1.E6   # Accurate form of latent heat of vaporization in J/kg
-    ratio = L / T / const.Rv
-    dTdp = (T / p * const.kappa * (1 + esoverp * ratio) /
-        (1 + const.kappa * (const.cpv / const.Rv + (ratio-1) * ratio) * esoverp))
+    ratio = L / T /  Rv
+    dTdp = (T / p * kappa * (1 + esoverp * ratio) /
+        (1 + kappa * (cpv / Rv + (ratio-1) * ratio) * esoverp))
     return dTdp
 
 def lifting_condensation_level(T, RH):
@@ -138,7 +138,7 @@ def lifting_condensation_level(T, RH):
     For an exact formula see Romps (2017 JAS), doi:10.1175/JAS-D-17-0102.1
     '''
     Tadj = T-55.  # in Kelvin
-    return const.cp/const.g*(Tadj - (1/Tadj - np.log(RH)/2840.)**(-1))
+    return cp/g*(Tadj - (1/Tadj - log(RH)/2840.)**(-1))
 
 def estimated_inversion_strength(T0,T700):
     '''Compute the Estimated Inversion Strength or EIS,
@@ -160,11 +160,10 @@ def estimated_inversion_strength(T0,T700):
     LTS = potential_temperature(T700, 700) - T0
     #  Gammam  = -dtheta/dz is the rate of potential temperature decrease along the moist adiabat
     #  in K / m
-    Gammam = (const.g/const.cp*(1.0 - (1.0 + const.Lhvap*qsat(T850,850) /
-              const.Rd / T850) / (1.0 + const.Lhvap**2 * qsat(T850,850)/
-              const.cp/const.Rv/T850**2)))
+    Gammam = (g/cp*(1.0 - (1.0 + Lhvap*qsat(T850,850) / Rd / T850) /
+             (1.0 + Lhvap**2 * qsat(T850,850)/ cp/Rv/T850**2)))
     #  Assume exponential decrease of pressure with scale height given by surface temperature
-    z700 = (const.Rd*T0/const.g)*np.log(1000./700.)
+    z700 = (Rd*T0/g)*log(1000./700.)
     return LTS - Gammam*(z700 - LCL)
 
 def EIS(T0,T700):
@@ -173,7 +172,7 @@ def EIS(T0,T700):
 
 def blackbody_emission(T):
     '''Blackbody radiation following the Stefan-Boltzmann law.'''
-    return const.sigma * T**4
+    return sigma * T**4
 
 def Planck_frequency(nu, T):
     '''The Planck function B(nu,T):
@@ -182,12 +181,8 @@ def Planck_frequency(nu, T):
     T is temperature in Kelvin
 
     Formula from Raymond Pierrehumbert, "Principles of Planetary Climate"
-
     '''
-    h = const.hPlanck
-    c = const.c_light
-    k = const.kBoltzmann
-    return 2*h*nu**3/c**2/(np.exp(h*nu/k/T)-1)
+    return 2*hPlanck*nu**3/c_light**2/(exp(hPlanck*nu/kBoltzmann/T)-1)
 
 def Planck_wavenumber(n, T):
     '''The Planck function (flux density for blackbody radition)
@@ -196,12 +191,10 @@ def Planck_wavenumber(n, T):
     T is temperature in Kelvin
 
     Formula from Raymond Pierrehumbert, "Principles of Planetary Climate"
-
     '''
-    c = const.c_light
     # convert to mks units
     n = n*100.
-    return c * Planck_frequency(n*c, T)
+    return c_light * Planck_frequency(n*c_light, T)
 
 def Planck_wavelength(l, T):
     '''The Planck function (flux density for blackbody radiation)
@@ -210,24 +203,20 @@ def Planck_wavelength(l, T):
     T is temperature in Kelvin
 
     Formula from Raymond Pierrehumbert, "Principles of Planetary Climate"
-
     '''
-    h = const.hPlanck
-    c = const.c_light
-    k = const.kBoltzmann
-    u = h*c/l/k/T
-    return 2*k**5*T**5/h**4/c**3*u**5/(np.exp(u)-1)
+    u = hPlanck*c_light/l/kBoltzmann/T
+    return 2*k**5*T**5/hPlanck**4/c_light**3*u**5/(exp(u)-1)
 
 def vmr_to_mmr(vmr, gas):
     '''
     Convert volume mixing ratio to mass mixing ratio for named gas.
     ( molecular weights are specific in climlab.utils.constants.py )
     '''
-    return vmr * const.molecular_weight[gas] / const.molecular_weight['dry air']
+    return vmr * molecular_weight[gas] / molecular_weight['dry air']
 
 def mmr_to_vmr(mmr, gas):
     '''
     Convert mass mixing ratio to volume mixing ratio for named gas.
     ( molecular weights are specific in climlab.utils.constants.py )
     '''
-    return mmr * const.molecular_weight['dry air'] / const.molecular_weight[gas]
+    return mmr * molecular_weight['dry air'] / molecular_weight[gas]
