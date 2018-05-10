@@ -13,8 +13,8 @@ def rcm():
     #  Hard convective adjustment
     convadj = climlab.convection.ConvectiveAdjustment(state=state, name='ConvectiveAdjustment',
                                                       adj_lapse_rate=6.5)
-    # CAM3 radiation with default parameters and interactive water vapor
-    rad = climlab.radiation.RRTMG(state=state, albedo=alb, specific_humidity=h2o.q, name='Radiation')
+    # RRTMG radiation with default parameters and interactive water vapor
+    rad = climlab.radiation.RRTMG(state=state, albedo=0.2, specific_humidity=h2o.q, name='Radiation')
     # Couple the models
     rcm = climlab.couple([h2o,convadj,rad], name='RCM')
     return rcm
