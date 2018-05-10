@@ -24,8 +24,17 @@ def test_convective_adjustment(rcm):
     rcm.step_forward()
     #  test non-scalar critical lapse rate
     num_lev = rcm.lev.size
-    rcm.subprocess['ConvectiveAdjustment'].adj_lapse_rate = np.linspace(5., 8., num_lev)
+    rcm.subprocess['ConvectiveAdjustment'].adj_lapse_rate = np.linspace(5., 8., num_lev+1)
+    rcm.step_forward()
+    #  Test two flags for dry adiabatic adjustment
+    rcm.subprocess['ConvectiveAdjustment'].adj_lapse_rate = 'DALR'
+    rcm.step_forward()
+    rcm.subprocess['ConvectiveAdjustment'].adj_lapse_rate = 'dry adiabat'
     rcm.step_forward()
     #  test pseudoadiabatic critical lapse rate
     rcm.subprocess['ConvectiveAdjustment'].adj_lapse_rate = 'pseudoadiabat'
+    rcm.step_forward()
+    rcm.subprocess['ConvectiveAdjustment'].adj_lapse_rate = 'MALR'
+    rcm.step_forward()
+    rcm.subprocess['ConvectiveAdjustment'].adj_lapse_rate = 'moist adiabat'
     rcm.step_forward()

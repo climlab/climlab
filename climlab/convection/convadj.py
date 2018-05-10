@@ -34,6 +34,10 @@ class ConvectiveAdjustment(TimeDependentProcess):
     dictionary. This implicitly accounts for turbulent surface fluxes.
     Otherwise only the atmospheric temperature is adjusted.
 
+    If ``adj_lapse_rate`` is an array, its size must match the number of vertical
+    levels of the adjustment. This is number of pressure levels if the surface is
+    not adjusted, or number of pressure levels + 1 if the surface is adjusted.
+
     This process implements the conservative adjustment algorithm described in
     Akmaev (1991) Monthly Weather Review.
     '''
