@@ -25,6 +25,7 @@ class SimpleAbsorbedShortwave(EnergyBudget):
         self.add_input('albedo', albedo)
         self.add_input('insolation', insolation)
         self.add_diagnostic('ASR', 0.*self.Ts)
+        self.topdown = False  # call subprocess compute methods first
 
     def _compute_heating_rates(self):
         self.ASR = (1-self.albedo) * self.insolation

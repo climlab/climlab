@@ -2,10 +2,10 @@ from __future__ import division
 import numpy as np
 from climlab import constants as const
 from climlab.domain.field import Field, global_mean
-from climlab.process import EnergyBudget
+from climlab.process import EnergyBudget, TimeDependentProcess
 from climlab.utils import legendre
 from climlab.domain import domain
-from climlab.radiation import AplusBT, P2Insolation, AnnualMeanInsolation, DailyInsolation
+from climlab.radiation import AplusBT, P2Insolation, AnnualMeanInsolation, DailyInsolation, SimpleAbsorbedShortwave
 from climlab.surface import albedo
 from climlab.dynamics import MeridionalDiffusion
 from climlab.domain.initial import surface_state
@@ -18,7 +18,7 @@ from scipy import integrate
 #  For example, the basic EBM should be created with something like
 #  ebm = climlab.couple([asr,olr,diff])
 
-class EBM(EnergyBudget):
+class EBM(TimeDependentProcess):
     """A parent class for all Energy-Balance-Model classes.
 
     This class sets up a typical EnergyBalance Model with following subprocesses:
@@ -175,11 +175,21 @@ class EBM(EnergyBudget):
         self.param['ai'] = ai
         # create sub-models
         self.add_subprocess('LW', AplusBT(state=self.state, **self.param))
-        self.add_subprocess('insolation',
-                            P2Insolation(domains=sfc, **self.param))
-        self.add_subprocess('albedo',
-                            albedo.StepFunctionAlbedo(state=self.state,
-                                                      **self.param))
+        #self.add_subprocess('insolation',
+        #                    P2Insolation(domains=sfc, **self.param))
+        #self.add_subprocess('albedo',
+        #                    albedo.StepFunctionAlbedo(state=self.state,
+        #                                              **self.param))
+        ins = P2Insolation(domains=sfc, **self.param)
+        alb = albedo.StepFunctionAlbedo(state=self.state, **self.param)
+        sw = SimpleAbsorbedShortwave(state=self.state,
+                                     insolation=ins.insolation,
+                                     albedo=alb.albedo,
+                                     **self.param)
+        sw.add_subprocess('insolation', ins)
+        sw.add_subprocess('albedo', alb)
+        self.add_subprocess('SW', sw)
+
         # diffusivity in units of 1/s
         K = self.param['D'] / self.domains['Ts'].heat_capacity
         self.add_subprocess('diffusion', MeridionalDiffusion(state=self.state,
@@ -187,35 +197,23 @@ class EBM(EnergyBudget):
                                                         use_banded_solver=True,
                                                              **self.param))
         self.topdown = False  # call subprocess compute methods first
-        self.add_diagnostic('ASR', 0.*self.Ts)
+        #self.add_diagnostic('ASR', 0.*self.Ts)
         self.add_diagnostic('net_radiation', 0.*self.Ts)
-        self.add_diagnostic('albedo', 0.*self.Ts)
-        self.add_diagnostic('icelat', None)
-        self.add_diagnostic('ice_area', None)
+        #self.add_diagnostic('albedo', 0.*self.Ts)
+        #self.add_diagnostic('icelat', None)
+        #self.add_diagnostic('ice_area', None)
 
+    @property
+    def S0(self):
+        return self.subprocess['SW'].subprocess['insolation'].S0
+    @S0.setter
+    def S0(self, value):
+        self.param['S0'] = value
+        self.subprocess['SW'].subprocess['insolation'].S0 = value
 
-    def _compute_heating_rates(self):
-        """Computes energy flux convergences to get heating rates in :math:`W/m^2`
-
-        """
-        insolation = self.subprocess['insolation'].insolation
-        self.albedo = self.subprocess['albedo'].albedo
-        self.ASR = (1-self.albedo) * insolation
-        self.OLR = self.subprocess['LW'].OLR
-        self.net_radiation = self.ASR - self.OLR
-        #  The part of the heating due just to shortwave
-        #  (longwave part is computed in subprocess)
-        self.heating_rate['Ts'] = self.ASR
-        # useful diagnostics
-        #try:
-        #    self.icelat = self.subprocess['albedo'].subprocess['iceline'].icelat
-        #except KeyError, icelat:
-        #    self.icelat = None
-        #try:
-        #    self.ice_area = self.subprocess['albedo'].subprocess['iceline'].ice_area
-        #except KeyError, ice_area:
-        #    self.ice_area = None
-
+    def _compute(self):
+        self.net_radiation = self.subprocess['SW'].ASR - self.subprocess['LW'].OLR
+        return super(EBM, self)._compute()
 
     def global_mean_temperature(self):
         """Convenience method to compute global mean surface temperature.
@@ -393,19 +391,22 @@ class EBM_seasonal(EBM):
         self.param['a0'] = a0
         self.param['a2'] = a2
         sfc = self.domains['Ts']
-        self.add_subprocess('insolation',
-                        DailyInsolation(domains=sfc, **self.param))
+        ins = DailyInsolation(domains=sfc, **self.param)
         if no_albedo_feedback:
             # Remove unused parameters here for clarity
             _ = self.param.pop('ai')
             _ = self.param.pop('Tf')
-            self.remove_diagnostic('icelat')
-            self.add_subprocess('albedo',
-                            albedo.P2Albedo(domains=sfc, **self.param))
+            alb = albedo.P2Albedo(domains=sfc, **self.param)
         else:
             self.param['ai'] = ai
-            self.add_subprocess('albedo',
-                    albedo.StepFunctionAlbedo(state=self.state, **self.param))
+            alb = albedo.StepFunctionAlbedo(state=self.state, **self.param)
+        sw = SimpleAbsorbedShortwave(state=self.state,
+                                     insolation=ins.insolation,
+                                     albedo=alb.albedo,
+                                     **self.param)
+        sw.add_subprocess('insolation', ins)
+        sw.add_subprocess('albedo', alb)
+        self.add_subprocess('SW', sw)
 
 
 class EBM_annual(EBM_seasonal):
@@ -458,8 +459,9 @@ class EBM_annual(EBM_seasonal):
         """
         super(EBM_annual, self).__init__(**kwargs)
         sfc = self.domains['Ts']
-        self.add_subprocess('insolation',
-                            AnnualMeanInsolation(domains=sfc, **self.param))
+        ins = AnnualMeanInsolation(domains=sfc, **self.param)
+        self.subprocess['SW'].add_subprocess('insolation', ins)
+        self.subprocess['SW'].insolation = ins.insolation
 
 # an EBM that computes degree-days has an additional state variable.
 #  Need to implement that

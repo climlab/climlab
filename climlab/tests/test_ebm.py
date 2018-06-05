@@ -60,7 +60,8 @@ def test_annual_iceline(EBM_iceline):
 def test_decreased_S0(EBM_iceline):
     '''Check that a decrease in solar constant to 1200 W/m2 will give a
     Snowball Earth result in the annual mean EBM.'''
-    EBM_iceline.subprocess['insolation'].S0 = 1200.
+    #EBM_iceline.subprocess['insolation'].S0 = 1200.
+    EBM_iceline.S0 = 1200.
     EBM_iceline.integrate_years(5.)
     assert np.all(EBM_iceline.icelat == np.array([-0.,  0.]))
 
@@ -85,10 +86,10 @@ def test_albedo():
     subprocess and get the expected icelat'''
     import numpy as np
     m = climlab.EBM()
-    m.add_subprocess('albedo', climlab.surface.ConstantAlbedo(state=m.state, **m.param))
+    m.subprocess['SW'].add_subprocess('albedo', climlab.surface.ConstantAlbedo(state=m.state, **m.param))
     m.integrate_years(1)
     assert m.icelat == None
-    m.add_subprocess('albedo', climlab.surface.StepFunctionAlbedo(state=m.state, **m.param))
+    m.subprocess['SW'].add_subprocess('albedo', climlab.surface.StepFunctionAlbedo(state=m.state, **m.param))
     m.integrate_years(1)
     assert np.all(m.icelat == np.array([-70.,  70.]))
     assert np.all(m.icelat == m.subprocess.albedo.subprocess.iceline.icelat)
