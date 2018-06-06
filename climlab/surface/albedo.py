@@ -226,7 +226,7 @@ class Iceline(DiagnosticProcess):
 
     """
     def __init__(self, Tf=-10., **kwargs):
-        super(DiagnosticProcess, self).__init__(**kwargs)
+        super(Iceline, self).__init__(**kwargs)
         self.param['Tf'] = Tf
         self.add_diagnostic('icelat')
         self.add_diagnostic('ice_area')
@@ -353,7 +353,7 @@ class StepFunctionAlbedo(DiagnosticProcess):
 
     """
     def __init__(self, Tf=-10., a0=0.3, a2=0.078, ai=0.62, **kwargs):
-        super(DiagnosticProcess, self).__init__(**kwargs)
+        super(StepFunctionAlbedo, self).__init__(**kwargs)
         self.param['Tf'] = Tf
         self.param['a0'] = a0
         self.param['a2'] = a2
