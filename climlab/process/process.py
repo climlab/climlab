@@ -274,8 +274,9 @@ class Process(object):
             # Add subprocess diagnostics to parent
             #  (if there are no name conflicts)
             for diagname, value in proc.diagnostics.items():
-                if not (diagname in self.diagnostics or hasattr(self, diagname)):
-                    self.add_diagnostic(diagname, value)
+                #if not (diagname in self.diagnostics or hasattr(self, diagname)):
+                #    self.add_diagnostic(diagname, value)
+                self.add_diagnostic(diagname, value)
         else:
             raise ValueError('subprocess must be Process object')
 

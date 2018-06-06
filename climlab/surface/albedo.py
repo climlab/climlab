@@ -360,12 +360,14 @@ class StepFunctionAlbedo(DiagnosticProcess):
         self.param['ai'] = ai
         sfc = self.domains['Ts']
         self.add_subprocess('iceline', Iceline(Tf=Tf, state=self.state, timestep=self.timestep))
-        self.add_subprocess('warm_albedo', P2Albedo(a0=a0, a2=a2, domains=sfc, timestep=self.timestep))
-        self.add_subprocess('cold_albedo', ConstantAlbedo(albedo=ai, domains=sfc, timestep=self.timestep))
+        warm = P2Albedo(a0=a0, a2=a2, domains=sfc, timestep=self.timestep)
+        cold = ConstantAlbedo(albedo=ai, domains=sfc, timestep=self.timestep)
         # remove `albedo` from the diagnostics list for the two subprocesses
         #  because they cause conflicts when passed up the subprocess tree
-        for name in ['warm_albedo', 'cold_albedo']:
-            self.subprocess[name]._diag_vars.remove('albedo')
+        for proc in [warm, cold]:
+            proc._diag_vars.remove('albedo')
+        self.add_subprocess('warm_albedo', warm)
+        self.add_subprocess('cold_albedo', cold)
         self.topdown = False  # call subprocess compute methods first
         self.add_diagnostic('albedo', self._get_current_albedo())
 

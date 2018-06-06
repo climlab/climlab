@@ -86,13 +86,14 @@ def test_albedo():
     subprocess and get the expected icelat'''
     import numpy as np
     m = climlab.EBM()
-    m.subprocess['SW'].add_subprocess('albedo', climlab.surface.ConstantAlbedo(state=m.state, **m.param))
+    m.add_subprocess('albedo', climlab.surface.ConstantAlbedo(state=m.state, **m.param))
+    m.subprocess['SW'].albedo = m.subprocess['albedo'].albedo
     m.integrate_years(1)
-    assert m.icelat == None
-    m.subprocess['SW'].add_subprocess('albedo', climlab.surface.StepFunctionAlbedo(state=m.state, **m.param))
+    m.add_subprocess('albedo', climlab.surface.StepFunctionAlbedo(state=m.state, **m.param))
+    m.subprocess['SW'].albedo = m.subprocess['albedo'].albedo
     m.integrate_years(1)
     assert np.all(m.icelat == np.array([-70.,  70.]))
-    assert np.all(m.icelat == m.subprocess.albedo.subprocess.iceline.icelat)
+    assert np.all(m.icelat == m.subprocess['albedo'].subprocess['iceline'].icelat)
     #  What is the expected behavior if we swap out a subprocess for another
     #  and they have different diagnostics???
     #m.add_subprocess('albedo', albedo.ConstantAlbedo(state=m.state, **m.param))

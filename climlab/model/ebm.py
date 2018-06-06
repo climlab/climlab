@@ -186,8 +186,8 @@ class EBM(TimeDependentProcess):
                                      insolation=ins.insolation,
                                      albedo=alb.albedo,
                                      **self.param)
-        sw.add_subprocess('insolation', ins)
-        sw.add_subprocess('albedo', alb)
+        self.add_subprocess('insolation', ins)
+        self.add_subprocess('albedo', alb)
         self.add_subprocess('SW', sw)
 
         # diffusivity in units of 1/s
