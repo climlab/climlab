@@ -182,8 +182,8 @@ class EBM(TimeDependentProcess):
                                      albedo=alb.albedo,
                                      **self.param)
         self.add_subprocess('LW', lw)
-        sw.add_subprocess('insolation', ins)
-        sw.add_subprocess('albedo', alb)
+        self.add_subprocess('insolation', ins)
+        self.add_subprocess('albedo', alb)
         self.add_subprocess('SW', sw)
 
         # diffusivity in units of 1/s
@@ -197,11 +197,11 @@ class EBM(TimeDependentProcess):
 
     @property
     def S0(self):
-        return self.subprocess['SW'].subprocess['insolation'].S0
+        return self.subprocess['insolation'].S0
     @S0.setter
     def S0(self, value):
         self.param['S0'] = value
-        self.subprocess['SW'].subprocess['insolation'].S0 = value
+        self.subprocess['insolation'].S0 = value
 
     def _compute(self):
         self.net_radiation = self.subprocess['SW'].ASR - self.subprocess['LW'].OLR
@@ -396,8 +396,8 @@ class EBM_seasonal(EBM):
                                      insolation=ins.insolation,
                                      albedo=alb.albedo,
                                      **self.param)
-        sw.add_subprocess('insolation', ins)
-        sw.add_subprocess('albedo', alb)
+        self.add_subprocess('insolation', ins)
+        self.add_subprocess('albedo', alb)
         self.add_subprocess('SW', sw)
 
 
@@ -452,7 +452,7 @@ class EBM_annual(EBM_seasonal):
         super(EBM_annual, self).__init__(**kwargs)
         sfc = self.domains['Ts']
         ins = AnnualMeanInsolation(domains=sfc, **self.param)
-        self.subprocess['SW'].add_subprocess('insolation', ins)
+        self.add_subprocess('insolation', ins)
         self.subprocess['SW'].insolation = ins.insolation
 
 # an EBM that computes degree-days has an additional state variable.
