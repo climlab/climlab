@@ -3,6 +3,7 @@ import numpy as np
 from scipy.linalg import solve_banded
 from climlab.process.implicit import ImplicitProcess
 from climlab.process.process import get_axes
+from climlab import constants as const
 
 
 class Diffusion(ImplicitProcess):
@@ -83,11 +84,15 @@ class Diffusion(ImplicitProcess):
             self.diffusion_axis = diffusion_axis
         # This currently only works with evenly spaced points
         for dom in list(self.domains.values()):
+            points = dom.axes[self.diffusion_axis].points
             delta = np.mean(dom.axes[self.diffusion_axis].delta)
             bounds = dom.axes[self.diffusion_axis].bounds
+        self.delta = delta  # grid interval in length units
         self.K_dimensionless = (self.param['K'] * np.ones_like(bounds) *
-                                self.param['timestep'] / delta**2)
+                                self.timestep / self.delta**2)
         self.diffTriDiag = _make_diffusion_matrix(self.K_dimensionless)
+        self.add_diagnostic('diffusive_flux', np.zeros_like(bounds))
+        self.add_diagnostic('diffusive_flux_convergence', np.zeros_like(points))
 
     def _implicit_solver(self):
         """Invertes and solves the matrix problem for diffusion matrix
@@ -129,7 +134,6 @@ class Diffusion(ImplicitProcess):
 
         """
         # Time-stepping the diffusion is just inverting this matrix problem:
-        # self.T = np.linalg.solve( self.diffTriDiag, Trad )
         newstate = {}
         for varname, value in self.state.items():
             if self.use_banded_solver:
@@ -137,6 +141,11 @@ class Diffusion(ImplicitProcess):
             else:
                 newvar = np.linalg.solve(self.diffTriDiag, value)
             newstate[varname] = newvar
+            # Diagnostic calculations of flux and convergence
+            #  These assume 1D state variables...
+            K = self.K_dimensionless * self.delta**2/self.timestep  # length**2 / time
+            self.diffusive_flux[1:-1] = -K[1:-1] * np.diff(np.squeeze(newvar))/self.delta  # length / time
+            self.diffusive_flux_convergence[:] = -np.diff(self.diffusive_flux)/self.delta # 1/time
         return newstate
 
 
@@ -222,6 +231,8 @@ class MeridionalDiffusion(Diffusion):
         super(MeridionalDiffusion, self).__init__(K=K,
                                                 diffusion_axis='lat', **kwargs)
         # Conversion of delta from deg to rad in K_dimensionless
+        #  and self.delta is multiplied by Earth radius for diagnostics -- has physical length units
+        self.delta *= (np.deg2rad(1.) * const.a)
         self.K_dimensionless *= 1./np.deg2rad(1.)**2
         for dom in list(self.domains.values()):
             latax = dom.axes['lat']
