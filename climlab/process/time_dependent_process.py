@@ -343,11 +343,7 @@ class TimeDependentProcess(Process):
 
         """
         for n in range(num_iter):
-            self.compute()
-        #  Pass diagnostics up the process tree
-        for name, proc, level in walk.walk_processes(self, ignoreFlag=True):
-            for diagname, value in proc.diagnostics.items():
-                self.__setattr__(diagname, value)
+            ignored = self.compute()
 
     def _update_time(self):
         """Increments the timestep counter by one.
