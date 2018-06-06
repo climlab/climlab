@@ -174,20 +174,16 @@ class EBM(TimeDependentProcess):
         self.param['a2'] = a2
         self.param['ai'] = ai
         # create sub-models
-        self.add_subprocess('LW', AplusBT(state=self.state, **self.param))
-        #self.add_subprocess('insolation',
-        #                    P2Insolation(domains=sfc, **self.param))
-        #self.add_subprocess('albedo',
-        #                    albedo.StepFunctionAlbedo(state=self.state,
-        #                                              **self.param))
+        lw = AplusBT(state=self.state, **self.param)
         ins = P2Insolation(domains=sfc, **self.param)
         alb = albedo.StepFunctionAlbedo(state=self.state, **self.param)
         sw = SimpleAbsorbedShortwave(state=self.state,
                                      insolation=ins.insolation,
                                      albedo=alb.albedo,
                                      **self.param)
-        self.add_subprocess('insolation', ins)
-        self.add_subprocess('albedo', alb)
+        self.add_subprocess('LW', lw)
+        sw.add_subprocess('insolation', ins)
+        sw.add_subprocess('albedo', alb)
         self.add_subprocess('SW', sw)
 
         # diffusivity in units of 1/s
@@ -197,11 +193,7 @@ class EBM(TimeDependentProcess):
                                                         use_banded_solver=True,
                                                              **self.param))
         self.topdown = False  # call subprocess compute methods first
-        #self.add_diagnostic('ASR', 0.*self.Ts)
         self.add_diagnostic('net_radiation', 0.*self.Ts)
-        #self.add_diagnostic('albedo', 0.*self.Ts)
-        #self.add_diagnostic('icelat', None)
-        #self.add_diagnostic('ice_area', None)
 
     @property
     def S0(self):
