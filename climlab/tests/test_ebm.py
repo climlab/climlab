@@ -3,7 +3,7 @@ import numpy as np
 import climlab
 import pytest
 from climlab.tests.xarray_test import to_xarray
-
+from climlab.utils.legendre import P2
 
 @pytest.fixture()
 def EBM_seasonal():
@@ -99,3 +99,25 @@ def test_albedo():
     #m.add_subprocess('albedo', albedo.ConstantAlbedo(state=m.state, **m.param))
     #m.integrate_years(1)
     #assert m.icelat == None
+
+@pytest.mark.fast
+def test_analytical():
+    '''Check to see if the the numerical solution converges to the analytical
+    steady-state solution of the simple EBM with constant albedo'''
+    param = {'a0': 0.3,
+             'a2': 0.,
+             'ai': 0.3,
+             's2': -0.48,
+             'S0': 1360.,
+             'A': 210.,
+             'B': 2.,
+             'D': 0.55,
+             'Tf': -1000., # effectively makes albedo constant
+            }
+    m = climlab.EBM(**param)
+    m.integrate_years(5)
+    Tnumerical = np.squeeze(m.Ts)
+    delta = param['D']/param['B']
+    x = np.sin(np.deg2rad(m.lat))
+    Tanalytical = ((1-param['a0'])*param['S0']/4*(1+param['s2']*P2(x)/(1+6*delta))-param['A'])/param['B']
+    assert Tnumerical == pytest.approx(Tanalytical, abs=2E-2)

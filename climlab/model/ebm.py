@@ -143,6 +143,7 @@ class EBM(TimeDependentProcess):
     def __init__(self,
                  num_lat=90,
                  S0=const.S0,
+                 s2=-0.48,
                  A=210.,
                  B=2.,
                  D=0.555,  # in W / m^2 / degC, same as B
@@ -165,6 +166,7 @@ class EBM(TimeDependentProcess):
         super(EBM, self).__init__(timestep=timestep, **kwargs)
         sfc = self.Ts.domain
         self.param['S0'] = S0
+        self.param['s2'] = s2
         self.param['A'] = A
         self.param['B'] = B
         self.param['D'] = D
