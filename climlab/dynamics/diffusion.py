@@ -87,14 +87,17 @@ class Diffusion(ImplicitProcess):
             points = dom.axes[self.diffusion_axis].points
             delta = np.mean(dom.axes[self.diffusion_axis].delta)
             bounds = dom.axes[self.diffusion_axis].bounds
+        self.diffusion_axis_index = dom.axis_index[self.diffusion_axis]
         self.delta = delta  # grid interval in length units
         self.K_dimensionless = (self.param['K'] * np.ones_like(bounds) *
                                 self.timestep / self.delta**2)
         self._weight1 = np.ones_like(bounds)
         self._weight2 = np.ones_like(points)
         self.diffTriDiag = _make_diffusion_matrix(self.K_dimensionless, self._weight1, self._weight2)
-        self.add_diagnostic('diffusive_flux', np.zeros_like(bounds))
-        self.add_diagnostic('diffusive_flux_convergence', np.zeros_like(points))
+        # These diagnostics currently only implemented for 1D state variable
+        self.add_diagnostic('diffusive_flux', 0.*self.K_dimensionless*self._weight1)
+        self.add_diagnostic('diffusive_flux_convergence', 0.*np.diff(self.diffusive_flux,
+                axis=self.diffusion_axis_index))
 
     def _implicit_solver(self):
         """Invertes and solves the matrix problem for diffusion matrix
@@ -147,11 +150,16 @@ class Diffusion(ImplicitProcess):
 
     def _update_diagnostics(self, newstate):
         for varname, value in newstate.items():
-            # Diagnostic calculations of flux and convergence
-            #  These assume 1D state variables...
-            K = self.K_dimensionless * self.delta**2/self.timestep  # length**2 / time
-            self.diffusive_flux[1:-1] = -K[1:-1] * np.diff(np.squeeze(value))/self.delta  # length / time
-            self.diffusive_flux_convergence[:] = -np.diff(self.diffusive_flux*self._weight1)/self.delta/self._weight2 # 1/time
+            if np.squeeze(value).ndim == 1:
+                # Diagnostic calculations of flux and convergence
+                #  These assume 1D state variables...
+                ax = self.state[varname].domain.axis_index[self.diffusion_axis] # axis index
+                K = self.K_dimensionless * self.delta**2/self.timestep  # length**2 / time
+
+                self.diffusive_flux[1:-1] = -K[1:-1] * np.diff(np.squeeze(value), axis=ax)/self.delta  # length / time
+                self.diffusive_flux_convergence[:] = -np.diff(self.diffusive_flux*self._weight1, axis=ax)/self.delta/self._weight2 # 1/time
+            else:
+                pass  # To do: implement flux diagnostics for arbitrary dimension state variables 
 
 def _solve_implicit_banded(current, banded_matrix):
     """Uses a banded solver for matrix inversion of a tridiagonal matrix.
