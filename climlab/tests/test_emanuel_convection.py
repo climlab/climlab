@@ -50,6 +50,7 @@ emanuel_convection.G=9.8
 emanuel_convection.ROWL=1000.0
 
 
+@pytest.mark.compiled
 @pytest.mark.fast
 def test_convect_tendencies():
     # Temperatures in a single column
@@ -75,6 +76,7 @@ def test_convect_tendencies():
     assert FU == pytest.approx(tend['U'], rel=tol)
     assert FV == pytest.approx(tend['V'], rel=tol)
 
+@pytest.mark.compiled
 @pytest.mark.fast
 def test_multidim_tendencies():
     # Same test just repeated in two parallel columns
@@ -105,6 +107,7 @@ def test_multidim_tendencies():
     assert np.tile(FU,(num_lat,1)) == pytest.approx(tend['U'], rel=tol)
     assert np.tile(FV,(num_lat,1)) == pytest.approx(tend['V'], rel=tol)
 
+@pytest.mark.compiled
 @pytest.mark.fast
 def test_rcm_emanuel():
     num_lev = 30

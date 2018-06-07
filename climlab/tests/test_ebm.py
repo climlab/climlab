@@ -3,7 +3,7 @@ import numpy as np
 import climlab
 import pytest
 from climlab.tests.xarray_test import to_xarray
-
+from climlab.utils.legendre import P2
 
 @pytest.fixture()
 def EBM_seasonal():
@@ -60,7 +60,8 @@ def test_annual_iceline(EBM_iceline):
 def test_decreased_S0(EBM_iceline):
     '''Check that a decrease in solar constant to 1200 W/m2 will give a
     Snowball Earth result in the annual mean EBM.'''
-    EBM_iceline.subprocess['insolation'].S0 = 1200.
+    #EBM_iceline.subprocess['insolation'].S0 = 1200.
+    EBM_iceline.S0 = 1200.
     EBM_iceline.integrate_years(5.)
     assert np.all(EBM_iceline.icelat == np.array([-0.,  0.]))
 
@@ -86,14 +87,48 @@ def test_albedo():
     import numpy as np
     m = climlab.EBM()
     m.add_subprocess('albedo', climlab.surface.ConstantAlbedo(state=m.state, **m.param))
+    m.subprocess['SW'].albedo = m.subprocess['albedo'].albedo
     m.integrate_years(1)
-    assert m.icelat == None
     m.add_subprocess('albedo', climlab.surface.StepFunctionAlbedo(state=m.state, **m.param))
+    m.subprocess['SW'].albedo = m.subprocess['albedo'].albedo
     m.integrate_years(1)
     assert np.all(m.icelat == np.array([-70.,  70.]))
-    assert np.all(m.icelat == m.subprocess.albedo.subprocess.iceline.icelat)
+    assert np.all(m.icelat == m.subprocess['albedo'].subprocess['iceline'].icelat)
     #  What is the expected behavior if we swap out a subprocess for another
     #  and they have different diagnostics???
     #m.add_subprocess('albedo', albedo.ConstantAlbedo(state=m.state, **m.param))
     #m.integrate_years(1)
     #assert m.icelat == None
+
+@pytest.mark.fast
+def test_analytical():
+    '''Check to see if the the numerical solution converges to the analytical
+    steady-state solution of the simple EBM with constant albedo'''
+    param = {'a0': 0.3,
+             'a2': 0.,
+             'ai': 0.3,
+             's2': -0.48,
+             'S0': 1360.,
+             'A': 210.,
+             'B': 2.,
+             'D': 0.55,
+             'Tf': -1000., # effectively makes albedo constant
+            }
+    m = climlab.EBM(**param)
+    m.integrate_years(5)
+    Tnumerical = np.squeeze(m.Ts)
+    delta = param['D']/param['B']
+    x = np.sin(np.deg2rad(m.lat))
+    Tanalytical = ((1-param['a0'])*param['S0']/4*(1+param['s2']*P2(x)/(1+6*delta))-param['A'])/param['B']
+    assert Tnumerical == pytest.approx(Tanalytical, abs=2E-2)
+
+@pytest.mark.fast
+def test_moist_EBM_creation():
+    '''See if we can swap a moist diffusion module for the dry diffusion
+    and just step forward once.'''
+    m = climlab.EBM()
+    m.remove_subprocess('diffusion')
+    diff = climlab.dynamics.MeridionalMoistDiffusion(state=m.state, timestep=m.timestep)
+    m.add_subprocess('diffusion', diff)
+    m.step_forward()
+    assert hasattr(m, 'heat_transport')

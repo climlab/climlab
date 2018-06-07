@@ -62,8 +62,9 @@ def test_long_orbital_parameters():
 def test_orbital_cycles():
     ebm = EBM_seasonal()
     #  add an albedo feedback
-    albedo = StepFunctionAlbedo(state=ebm.state, **ebm.param)
-    ebm.add_subprocess('albedo', albedo)
+    alb = StepFunctionAlbedo(state=ebm.state, **ebm.param)
+    ebm.add_subprocess('albedo', alb)
+    ebm.subprocess['SW'].albedo = alb.albedo
     #  run for 1,000 orbital years, but only 100 model years
     experiment = OrbitalCycles(ebm, kyear_start=-20, kyear_stop=-19,
                                orbital_year_factor=10.)

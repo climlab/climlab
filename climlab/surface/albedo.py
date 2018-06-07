@@ -226,7 +226,7 @@ class Iceline(DiagnosticProcess):
 
     """
     def __init__(self, Tf=-10., **kwargs):
-        super(DiagnosticProcess, self).__init__(**kwargs)
+        super(Iceline, self).__init__(**kwargs)
         self.param['Tf'] = Tf
         self.add_diagnostic('icelat')
         self.add_diagnostic('ice_area')
@@ -353,15 +353,21 @@ class StepFunctionAlbedo(DiagnosticProcess):
 
     """
     def __init__(self, Tf=-10., a0=0.3, a2=0.078, ai=0.62, **kwargs):
-        super(DiagnosticProcess, self).__init__(**kwargs)
+        super(StepFunctionAlbedo, self).__init__(**kwargs)
         self.param['Tf'] = Tf
         self.param['a0'] = a0
         self.param['a2'] = a2
         self.param['ai'] = ai
         sfc = self.domains['Ts']
         self.add_subprocess('iceline', Iceline(Tf=Tf, state=self.state, timestep=self.timestep))
-        self.add_subprocess('warm_albedo', P2Albedo(a0=a0, a2=a2, domains=sfc, timestep=self.timestep))
-        self.add_subprocess('cold_albedo', ConstantAlbedo(albedo=ai, domains=sfc, timestep=self.timestep))
+        warm = P2Albedo(a0=a0, a2=a2, domains=sfc, timestep=self.timestep)
+        cold = ConstantAlbedo(albedo=ai, domains=sfc, timestep=self.timestep)
+        # remove `albedo` from the diagnostics list for the two subprocesses
+        #  because they cause conflicts when passed up the subprocess tree
+        for proc in [warm, cold]:
+            proc._diag_vars.remove('albedo')
+        self.add_subprocess('warm_albedo', warm)
+        self.add_subprocess('cold_albedo', cold)
         self.topdown = False  # call subprocess compute methods first
         self.add_diagnostic('albedo', self._get_current_albedo())
 
@@ -375,5 +381,5 @@ class StepFunctionAlbedo(DiagnosticProcess):
         return albedo
 
     def _compute(self):
-        self.albedo = self._get_current_albedo()
+        self.albedo[:] = self._get_current_albedo()
         return {}

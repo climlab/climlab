@@ -27,10 +27,8 @@ def rcmodel():
 @pytest.fixture()
 def diffmodel(rcmodel):
     diffmodel = climlab.process_like(rcmodel)
-    # thermal diffusivity in W/m**2/degC
-    D = 0.05
-    # meridional diffusivity in 1/s
-    K = D / diffmodel.Tatm.domain.heat_capacity[0]
+    # meridional diffusivity in m**2/s
+    K = 0.05 / diffmodel.Tatm.domain.heat_capacity[0] *  climlab.constants.a**2
     d = climlab.dynamics.MeridionalDiffusion(K=K,
                 state={'Tatm': diffmodel.state['Tatm']},
                 **diffmodel.param)

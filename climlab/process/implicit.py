@@ -49,8 +49,15 @@ class ImplicitProcess(TimeDependentProcess):
         tendencies = {}
         for name, var in self.state.items():
             adjustment[name] = newstate[name] - var
-            tendencies[name] = adjustment[name] / self.param['timestep']
+            tendencies[name] = adjustment[name] / self.timestep
         # express the adjustment (already accounting for the finite time step)
         #  as a tendency per unit time, so that it can be applied along with explicit
         self.adjustment = adjustment
+        self._update_diagnostics(newstate)
         return tendencies
+
+    def _update_diagnostics(self, newstate):
+        '''This method is called each timestep after the new state is computed
+        with the implicit solver. Daughter classes can implement this method to
+        compute any diagnostic quantities using the new state.'''
+        pass

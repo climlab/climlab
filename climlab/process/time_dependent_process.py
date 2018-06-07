@@ -197,41 +197,48 @@ class TimeDependentProcess(Process):
                                 after computation of tendencies.
 
         """
+        #  First reset tendencies to zero -- recomputing them is the point of this method
+        for varname in self.tendencies:
+            self.tendencies[varname] *= 0.
         if not self.has_process_type_list:
             self._build_process_type_list()
-        # First compute all strictly diagnostic processes
+        tendencies = {}
         ignored = self._compute_type('diagnostic')
-        # Compute tendencies and diagnostics for all explicit processes
-        tendencies_explicit = self._compute_type('explicit')
+        tendencies['explicit'] = self._compute_type('explicit')
         #  Tendencies due to implicit and adjustment processes need to be
         #  calculated from a state that is already adjusted after explicit stuff
         #  So apply the tendencies temporarily and then remove them again
         for name, var in self.state.items():
-            var += tendencies_explicit[name] * self.timestep
+            var += tendencies['explicit'][name] * self.timestep
         # Now compute all implicit processes -- matrix inversions
-        tendencies_implicit = self._compute_type('implicit')
+        tendencies['implicit'] = self._compute_type('implicit')
+        #  Same deal ... temporarily apply tendencies from implicit step
         for name, var in self.state.items():
-            var += tendencies_implicit[name] * self.timestep
-        # Finally compute all instantaneous adjustments
-        adjustments = self._compute_type('adjustment')
-        #  The adjustment is actually ignored here because it is stored
-        #  in proc.tendencies and applied later as if it were an explicit forward step
+            var += tendencies['implicit'][name] * self.timestep
+        # Finally compute all instantaneous adjustments -- expressed as explicit forward step
+        tendencies['adjustment'] = self._compute_type('adjustment')
         #  Now remove the changes from the model state
         for name, var in self.state.items():
-            var -= ( (tendencies_implicit[name] + tendencies_explicit[name]) *
+            var -= ( (tendencies['implicit'][name] + tendencies['explicit'][name]) *
                     self.timestep)
-        #  Walk the subprocess tree and sum up all tendencies from subprocesses
-        #   By walking with topdown=False we ensure that we don't miss anything
-        for (name, proc, level) in walk.walk_processes(self,topdown=False):
-            if proc.time['active_now']:
-                for subname, subproc in proc.subprocess.items():
-                    for varname in subproc.tendencies:
-                        proc.tendencies[varname] += subproc.tendencies[varname]
-
+        #  Sum up all subprocess tendencies
+        for proctype in ['explicit', 'implicit', 'adjustment']:
+            for varname, tend in tendencies[proctype].items():
+                self.tendencies[varname] += tend
+        # Finally compute my own tendencies, if any
+        self_tend = self._compute()
+        #  Adjustment processes _compute method returns absolute adjustment
+        #  Needs to be converted to rate of change
+        if self.time_type is 'adjustment':
+            for varname, adj in self_tend.items():
+                self_tend[varname] /= self.timestep
+        for varname, tend in self_tend.items():
+            self.tendencies[varname] += tend
+        return self.tendencies
 
     def _compute_type(self, proctype):
         """Computes tendencies due to all subprocesses of given type
-        ``'proctype'``."""
+        ``'proctype'``. Also pass all diagnostics up to parent process."""
         tendencies = {}
         for varname in self.state:
             tendencies[varname] = 0. * self.state[varname]
@@ -245,19 +252,15 @@ class TimeDependentProcess(Process):
             #  If so, it's time to do a subprocess step.
             if self.time['steps'] % step_ratio == 0:
                 proc.time['active_now'] = True
-                if proctype is "adjustment":
-                #  Adjustement processes return absolute adjustment, not rate of change
-                    adjustment = proc._compute()
-                    for varname, adj in adjustment.items():
-                        proc.tendencies[varname] = adj / self.timestep
-                        tendencies[varname] += adj
-                else:
-                    proc.tendencies = proc._compute()
+                tenddict = proc.compute()
             else:
+                # proc.tendencies is unchanged from last subprocess timestep if we didn't recompute it above
                 proc.time['active_now'] = False
-            # proc.tendencies is unchanged from last subprocess timestep if we didn't recompute it above
-            for varname, tend in proc.tendencies.items():
-                tendencies[varname] += tend
+                tenddict = proc.tendencies
+            for name, tend in tenddict.items():
+                tendencies[name] += tend
+            for diagname, value in proc.diagnostics.items():
+                self.__setattr__(diagname, value)
         return tendencies
 
     def _compute(self):
@@ -285,9 +288,13 @@ class TimeDependentProcess(Process):
         The ``process_types`` dictionary is created while walking
         through the processes with :func:`~climlab.utils.walk.walk_processes`
 
+        CHANGING THIS TO REFER ONLY TO THE CURRENT LEVEL IN SUBPROCESS TREE
+
         """
         self.process_types = {'diagnostic': [], 'explicit': [], 'implicit': [], 'adjustment': []}
-        for name, proc, level in walk.walk_processes(self, topdown=self.topdown):
+        #for name, proc, level in walk.walk_processes(self, topdown=self.topdown):
+        #    self.process_types[proc.time_type].append(proc)
+        for name, proc in self.subprocess.items():
             self.process_types[proc.time_type].append(proc)
         self.has_process_type_list = True
 
@@ -317,19 +324,16 @@ class TimeDependentProcess(Process):
                 1
 
         """
-        self.compute()
+        tenddict = self.compute()
         #  Total tendency is applied as an explicit forward timestep
         # (already accounting properly for order of operations in compute() )
-        for name, var in self.state.items():
-            var += self.tendencies[name] * self.timestep
-
+        for varname, tend in tenddict.items():
+            self.state[varname] += tend * self.timestep
         # Update all time counters for this and all subprocesses in the tree
         #  Also pass diagnostics up the process tree
         for name, proc, level in walk.walk_processes(self, ignoreFlag=True):
             if proc.time['active_now']:
                 proc._update_time()
-                for diagname, value in proc.diagnostics.items():
-                    self.__setattr__(diagname, value)
 
     def compute_diagnostics(self, num_iter=3):
         """Compute all tendencies and diagnostics, but don't update model state.
@@ -339,11 +343,7 @@ class TimeDependentProcess(Process):
 
         """
         for n in range(num_iter):
-            self.compute()
-        #  Pass diagnostics up the process tree
-        for name, proc, level in walk.walk_processes(self, ignoreFlag=True):
-            for diagname, value in proc.diagnostics.items():
-                self.__setattr__(diagname, value)
+            ignored = self.compute()
 
     def _update_time(self):
         """Increments the timestep counter by one.
