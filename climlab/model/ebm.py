@@ -53,16 +53,16 @@ class MeridionalHeatDiffusion(MeridionalDiffusion):
         K = self.D / heat_capacity
         super(MeridionalHeatDiffusion, self).__init__(K=K,
                         use_banded_solver=use_banded_solver, **kwargs)
-        self.add_diagnostic('heat_transport2', np.zeros_like(self.lat_bounds))
-        self.add_diagnostic('heat_transport_convergence2', np.zeros_like(self.lat))
+        self.add_diagnostic('heat_transport', np.zeros_like(self.lat_bounds))
+        self.add_diagnostic('heat_transport_convergence', np.zeros_like(self.lat))
 
     def _update_diagnostics(self, newstate):
         super(MeridionalHeatDiffusion, self)._update_diagnostics(newstate)
         for varname, value in self.state.items():
             heat_capacity = value.domain.heat_capacity
-        self.heat_transport2[:] = (self.diffusive_flux * heat_capacity *
+        self.heat_transport[:] = (self.diffusive_flux * heat_capacity *
                         2 * np.pi * const.a * self._weight1 * 1E-15) # in PW
-        self.heat_transport_convergence2[:] = (self.diffusive_flux_convergence *
+        self.heat_transport_convergence[:] = (self.diffusive_flux_convergence *
                         heat_capacity)  # in W/m**2
 
 
@@ -235,18 +235,11 @@ class EBM(TimeDependentProcess):
                                      insolation=ins.insolation,
                                      albedo=alb.albedo,
                                      **self.param)
+        diff = MeridionalHeatDiffusion(state=self.state, **self.param)
         self.add_subprocess('LW', lw)
         self.add_subprocess('insolation', ins)
         self.add_subprocess('albedo', alb)
         self.add_subprocess('SW', sw)
-
-        # diffusivity in units of 1/s
-        #K = self.param['D'] / self.domains['Ts'].heat_capacity
-        #self.add_subprocess('diffusion', MeridionalDiffusion(state=self.state,
-        #                                                     K=K,
-        #                                                use_banded_solver=True,
-        #                                                     **self.param))
-        diff = MeridionalHeatDiffusion(state=self.state, **self.param)
         self.add_subprocess('diffusion', diff)
         self.topdown = False  # call subprocess compute methods first
         self.add_diagnostic('net_radiation', 0.*self.Ts)
@@ -310,19 +303,19 @@ class EBM(TimeDependentProcess):
         return (1E-15 * 2 * np.math.pi * const.a**2 *
                 integrate.cumtrapz(np.cos(phi)*energy_in, x=phi, initial=0.))
 
-    def heat_transport(self):
-        """Returns instantaneous heat transport in unit :math:`\\textrm{PW}`
-        on the staggered grid (bounds) through calling
-        :func:`diffusive_heat_transport`.
-
-        :Example:
-
-            .. plot:: code_input_manual/example_EBM_heat_transport.py
-                :include-source:
-
-        """
-        return self.diffusive_heat_transport()
-
+    # def heat_transport(self):
+    #     """Returns instantaneous heat transport in unit :math:`\\textrm{PW}`
+    #     on the staggered grid (bounds) through calling
+    #     :func:`diffusive_heat_transport`.
+    #
+    #     :Example:
+    #
+    #         .. plot:: code_input_manual/example_EBM_heat_transport.py
+    #             :include-source:
+    #
+    #     """
+    #     return self.diffusive_heat_transport()
+    #
     def diffusive_heat_transport(self):
         """Compute instantaneous diffusive heat transport in unit :math:`\\textrm{PW}`
         on the staggered grid (bounds) through calculating:
@@ -334,6 +327,8 @@ class EBM(TimeDependentProcess):
 
         :rtype: array of size ``np.size(self.lat_bounds)``
 
+        THIS IS DEPRECATED AND WILL BE REMOVED IN THE FUTURE. Use the diagnostic
+        ``heat_transport`` instead, which implements the same calculation. 
         """
         phi = np.deg2rad(self.lat)
         phi_stag = np.deg2rad(self.lat_bounds)
@@ -344,29 +339,29 @@ class EBM(TimeDependentProcess):
         dTdphi = np.insert(dTdphi, 0, 0.)
         return (1E-15*-2*np.math.pi*np.cos(phi_stag)*const.a**2*D*dTdphi)
 
-    def heat_transport_convergence(self):
-        """Returns instantaneous convergence of heat transport.
-
-        .. math::
-
-            h(\\varphi) = - \\frac{1}{2 \pi R^2 cos(\\varphi)} \\frac{dH}{d\\varphi}
-                        \\approx - \\frac{1}{2 \pi R^2 cos(\\varphi)} \\frac{\Delta H}{\Delta \\varphi}
-
-        h is the *dynamical heating rate* in unit :math:`\\textrm{W}/ \\textrm{m}^2`
-        which is the convergence of energy transport into each latitude band,
-        namely the difference between what's coming in and what's going out.
-
-        :Example:
-
-            .. plot:: code_input_manual/example_EBM_heat_transport_convergence.py
-                :include-source:
-
-        """
-        phi = np.deg2rad(self.lat)
-        phi_stag = np.deg2rad(self.lat_bounds)
-        H = 1.E15*self.heat_transport()
-        return (-1./(2*np.math.pi*const.a**2*np.cos(phi)) *
-                np.diff(H)/np.diff(phi_stag))
+    # def heat_transport_convergence(self):
+    #     """Returns instantaneous convergence of heat transport.
+    #
+    #     .. math::
+    #
+    #         h(\\varphi) = - \\frac{1}{2 \pi R^2 cos(\\varphi)} \\frac{dH}{d\\varphi}
+    #                     \\approx - \\frac{1}{2 \pi R^2 cos(\\varphi)} \\frac{\Delta H}{\Delta \\varphi}
+    #
+    #     h is the *dynamical heating rate* in unit :math:`\\textrm{W}/ \\textrm{m}^2`
+    #     which is the convergence of energy transport into each latitude band,
+    #     namely the difference between what's coming in and what's going out.
+    #
+    #     :Example:
+    #
+    #         .. plot:: code_input_manual/example_EBM_heat_transport_convergence.py
+    #             :include-source:
+    #
+    #     """
+    #     phi = np.deg2rad(self.lat)
+    #     phi_stag = np.deg2rad(self.lat_bounds)
+    #     H = 1.E15*self.heat_transport()
+    #     return (-1./(2*np.math.pi*const.a**2*np.cos(phi)) *
+    #             np.diff(H)/np.diff(phi_stag))
 
 
 class EBM_seasonal(EBM):
