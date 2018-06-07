@@ -18,6 +18,38 @@ from scipy import integrate
 #  For example, the basic EBM should be created with something like
 #  ebm = climlab.couple([asr,olr,diff])
 
+
+class MeridionalHeatDiffusion(MeridionalDiffusion):
+    def __init__(self,
+                 D=0.555,  # in W / m^2 / degC
+                 use_banded_solver=True,
+                 **kwargs):
+        self.D = D
+        state = kwargs['state']
+        for varname, value in state.items():
+            heat_capacity = value.domain.heat_capacity
+        # diffusivity in units of 1/s
+        K = self.D / heat_capacity
+        super(MeridionalHeatDiffusion, self).__init__(K=K,
+                        use_banded_solver=use_banded_solver, **kwargs)
+        self._diag_vars.append('heat_transport2')
+        self._diag_vars.append('heat_transport_convergence2')
+
+    @property
+    def heat_transport2(self):
+        '''Heat transport in PW'''
+        return self.diffusive_flux * 1E15
+
+    @property
+    def heat_transport_convergence2(self):
+        '''Heat transport convergence in W/m**2'''
+        for varname, value in self.state.items():
+            heat_capacity = value.domain.heat_capacity
+        return self.diffusive_flux_convergence * heat_capacity
+
+
+
+
 class EBM(TimeDependentProcess):
     """A parent class for all Energy-Balance-Model classes.
 
@@ -189,11 +221,13 @@ class EBM(TimeDependentProcess):
         self.add_subprocess('SW', sw)
 
         # diffusivity in units of 1/s
-        K = self.param['D'] / self.domains['Ts'].heat_capacity
-        self.add_subprocess('diffusion', MeridionalDiffusion(state=self.state,
-                                                             K=K,
-                                                        use_banded_solver=True,
-                                                             **self.param))
+        #K = self.param['D'] / self.domains['Ts'].heat_capacity
+        #self.add_subprocess('diffusion', MeridionalDiffusion(state=self.state,
+        #                                                     K=K,
+        #                                                use_banded_solver=True,
+        #                                                     **self.param))
+        diff = MeridionalHeatDiffusion(state=self.state, **self.param)
+        self.add_subprocess('diffusion', diff)
         self.topdown = False  # call subprocess compute methods first
         self.add_diagnostic('net_radiation', 0.*self.Ts)
 
