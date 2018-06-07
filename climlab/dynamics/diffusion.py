@@ -4,6 +4,7 @@ from scipy.linalg import solve_banded
 from climlab.process.implicit import ImplicitProcess
 from climlab.process.process import get_axes
 from climlab import constants as const
+from climlab.utils.thermo import qsat
 
 
 class Diffusion(ImplicitProcess):
@@ -284,10 +285,13 @@ class MeridionalHeatDiffusion(MeridionalDiffusion):
     @D.setter
     def D(self, Dvalue):
         self._D = Dvalue
+        self._update_diffusivity()
+
+    def _update_diffusivity(self):
         for varname, value in self.state.items():
             heat_capacity = value.domain.heat_capacity
         # diffusivity in units of m**2/s
-        self.K = Dvalue / heat_capacity * const.a**2
+        self.K = self.D / heat_capacity * const.a**2
 
     def _update_diagnostics(self, newstate):
         super(MeridionalHeatDiffusion, self)._update_diagnostics(newstate)
@@ -299,23 +303,24 @@ class MeridionalHeatDiffusion(MeridionalDiffusion):
                         heat_capacity)  # in W/m**2
 
 
-# class MeridionalMoistDiffusion(MeridionalHeatDiffusion):
-#     def __init__(self, r=0.8, **kwargs):
-#         super(MoistDiffusion, self).__init__(**kwargs)
-#         #  new parameter r for relative humidity
-#         self.r = r
-#     def update_diffusivity(self):
-#         Tinterp = np.interp(self.lat_bounds, self.lat, np.squeeze(self.Ts))
-#         Tkelvin = Tinterp + const.tempCtoK
-#         self.f = f(self.r, Tkelvin)
-#         K_dimensionless = self.K_dimensionless * (1.+self.f)
-#         latax = self.Ts.domain.axes['lat']
-#         self.diffTriDiag = \
-#             climlab.dynamics.diffusion._make_meridional_diffusion_matrix(K_dimensionless, latax)
-#     def _implicit_solver(self):
-#         self.update_diffusivity()
-#         #  and then do all the same stuff the parent class would do...
-#         return super(MoistDiffusion, self)._implicit_solver()
+class MeridionalMoistDiffusion(MeridionalHeatDiffusion):
+    def __init__(self, D=0.24, relative_humidity=0.8, **kwargs):
+        super(MoistDiffusion, self).__init__(D=D, **kwargs)
+        self.add_input('relative_humidity', relative_humidity)
+        self._update_diffusivity()
+
+    def _update_diffusivity(self):
+        Tinterp = np.interp(self.lat_bounds, self.lat, np.squeeze(self.Ts))
+        Tkelvin = Tinterp + const.tempCtoK
+        f = moist_amplification_factor(Tkelvin, self.relative_humidity)
+        heat_capacity = self.Ts.domain.heat_capacity
+        self.K = self.D / heat_capacity * const.a**2 * (1+f)
+
+    def _implicit_solver(self):
+        self.update_diffusivity()
+        #  and then do all the same stuff the parent class would do...
+        return super(MoistDiffusion, self)._implicit_solver()
+
 
 def _make_diffusion_matrix(K, weight1=None, weight2=None):
     """Builds the general diffusion matrix with dimension nxn.
@@ -518,3 +523,12 @@ def _guess_diffusion_axis(process_or_domain):
         return list(diff_ax.keys())[0]
     else:
         raise ValueError('More than one possible diffusion axis.')
+
+
+def moist_amplification_factor(Tkelvin, relative_humidity=0.8):
+    '''Compute the moisture amplification factor for the moist diffusivity
+    given relative humidity and reference temperature profile.'''
+    deltaT = 0.01
+    #  slope of saturation specific humidity at 1000 hPa
+    dqsdTs = (qsat(Tkelvin+deltaT/2, 1000.) - qsat(Tkelvin-deltaT/2, 1000.)) / deltaT
+    return const.Lhvap / const.cp * relative_humidity * dqsdTs
