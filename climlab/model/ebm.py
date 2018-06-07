@@ -7,7 +7,7 @@ from climlab.utils import legendre
 from climlab.domain import domain
 from climlab.radiation import AplusBT, P2Insolation, AnnualMeanInsolation, DailyInsolation, SimpleAbsorbedShortwave
 from climlab.surface import albedo
-from climlab.dynamics import MeridionalDiffusion
+from climlab.dynamics import MeridionalHeatDiffusion
 from climlab.domain.initial import surface_state
 from scipy import integrate
 
@@ -17,53 +17,6 @@ from scipy import integrate
 
 #  For example, the basic EBM should be created with something like
 #  ebm = climlab.couple([asr,olr,diff])
-
-
-class MeridionalHeatDiffusion(MeridionalDiffusion):
-    '''A 1D diffusion solver for Energy Balance Models.
-
-    Solves the meridional heat diffusion equation
-
-    $$ C \frac{\partial T}{\partial t} = -\frac{1}{\cos\phi} \frac{\partial}{\partial \phi} \left[ -D \cos\phi \frac{\partial T}{\partial \phi} \right]$$
-
-    on an evenly-spaced latitude grid, with a state variable $T$, a heat capacity $C$ and diffusivity $D$.
-
-    Assuming $T$ is a temperature in $K$ or $^\circ$C, then the units are:
-
-    - $D$ in W m$^{-2}$ K$^{-1}$
-    - $C$ in J m$^{-2}$ K$^{-1}$
-
-    If the state variable has other units, then $D$ and $C$ should be expressed
-    per state variabe unit.
-
-    $D$ is provided as input, and can be either scalar
-    or vector defined at latitude boundaries (length).
-
-    $C$ is normally handled automatically for temperature state variables in CLIMLAB.
-    '''
-    def __init__(self,
-                 D=0.555,  # in W / m^2 / degC
-                 use_banded_solver=True,
-                 **kwargs):
-        self.D = D
-        state = kwargs['state']
-        for varname, value in state.items():
-            heat_capacity = value.domain.heat_capacity
-        # diffusivity in units of 1/s
-        K = self.D / heat_capacity
-        super(MeridionalHeatDiffusion, self).__init__(K=K,
-                        use_banded_solver=use_banded_solver, **kwargs)
-        self.add_diagnostic('heat_transport', np.zeros_like(self.lat_bounds))
-        self.add_diagnostic('heat_transport_convergence', np.zeros_like(self.lat))
-
-    def _update_diagnostics(self, newstate):
-        super(MeridionalHeatDiffusion, self)._update_diagnostics(newstate)
-        for varname, value in self.state.items():
-            heat_capacity = value.domain.heat_capacity
-        self.heat_transport[:] = (self.diffusive_flux * heat_capacity *
-                        2 * np.pi * const.a * self._weight1 * 1E-15) # in PW
-        self.heat_transport_convergence[:] = (self.diffusive_flux_convergence *
-                        heat_capacity)  # in W/m**2
 
 
 class EBM(TimeDependentProcess):
@@ -328,7 +281,7 @@ class EBM(TimeDependentProcess):
         :rtype: array of size ``np.size(self.lat_bounds)``
 
         THIS IS DEPRECATED AND WILL BE REMOVED IN THE FUTURE. Use the diagnostic
-        ``heat_transport`` instead, which implements the same calculation. 
+        ``heat_transport`` instead, which implements the same calculation.
         """
         phi = np.deg2rad(self.lat)
         phi_stag = np.deg2rad(self.lat_bounds)

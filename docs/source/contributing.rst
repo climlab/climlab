@@ -96,7 +96,7 @@ CLIMLAB is a mix of pure Python and compiled Fortran. If you are developing new 
 
     pytest -v -m "not compiled"
 
-which excludes the tests marked as requiring the compiled components. Again, look for all tests to report ``PASSED``.
+which excludes the tests marked as requiring the compiled components. Again, look for all tests to report ``PASSED``. For more details see the `pytest`_ documentation.
 
 If you are interacting with compiled components (e.g. RRTMG radiation), testing is a little more complicated. You will need to rebuild and install a new version. We use (and recommend) `conda build`_ to handle the dependencies including Fortran compiler.
 
