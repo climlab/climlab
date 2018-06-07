@@ -20,6 +20,27 @@ from scipy import integrate
 
 
 class MeridionalHeatDiffusion(MeridionalDiffusion):
+    '''A 1D diffusion solver for Energy Balance Models.
+
+    Solves the meridional heat diffusion equation
+
+    $$ C \frac{\partial T}{\partial t} = -\frac{1}{\cos\phi} \frac{\partial}{\partial \phi} \left[ -D \cos\phi \frac{\partial T}{\partial \phi} \right]$$
+
+    on an evenly-spaced latitude grid, with a state variable $T$, a heat capacity $C$ and diffusivity $D$.
+
+    Assuming $T$ is a temperature in $K$ or $^\circ$C, then the units are:
+
+    - $D$ in W m$^{-2}$ K$^{-1}$
+    - $C$ in J m$^{-2}$ K$^{-1}$
+
+    If the state variable has other units, then $D$ and $C$ should be expressed
+    per state variabe unit.
+
+    $D$ is provided as input, and can be either scalar
+    or vector defined at latitude boundaries (length).
+
+    $C$ is normally handled automatically for temperature state variables in CLIMLAB. 
+    '''
     def __init__(self,
                  D=0.555,  # in W / m^2 / degC
                  use_banded_solver=True,
