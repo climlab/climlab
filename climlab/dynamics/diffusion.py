@@ -50,14 +50,14 @@ class Diffusion(ImplicitProcess):
                                     specified during initialization
                                     or output of method
                                     :func:`_guess_diffusion_axis`
-    :ivar array K_dimensionless:    diffusion parameter K multiplied by the
+    :ivar array _K_dimensionless:    diffusion parameter K multiplied by the
                                     timestep and divided by mean of diffusion
                                     axis delta in the power of two. Array has
                                     the size of diffusion axis bounds.
                                     :math:`K_{\\textrm{dimensionless}}[i]= K \\frac{\\Delta t}{ \\left(\\overline{\\Delta \\textrm{bounds}} \\right)^2}`
     :ivar array diffTriDiag:        tridiagonal diffusion matrix made by
                                     :func:`_make_diffusion_matrix()` with input
-                                    ``self.K_dimensionless``
+                                    ``self._K_dimensionless``
 
 
     :Example:
@@ -76,7 +76,7 @@ class Diffusion(ImplicitProcess):
                  use_banded_solver=False,
                  **kwargs):
         super(Diffusion, self).__init__(**kwargs)
-        self.param['K'] = K  # Diffusivity in units of [length]**2 / time
+        self.K = K  # Diffusivity in units of [length]**2 / time
         self.use_banded_solver = use_banded_solver
         if diffusion_axis is None:
             self.diffusion_axis = _guess_diffusion_axis(self)
@@ -89,15 +89,19 @@ class Diffusion(ImplicitProcess):
             bounds = dom.axes[self.diffusion_axis].bounds
         self.diffusion_axis_index = dom.axis_index[self.diffusion_axis]
         self.delta = delta  # grid interval in length units
-        self.K_dimensionless = (self.param['K'] * np.ones_like(bounds) *
+        self._K_dimensionless = (self.K * np.ones_like(bounds) *
                                 self.timestep / self.delta**2)
         self._weight1 = np.ones_like(bounds)
         self._weight2 = np.ones_like(points)
-        self.diffTriDiag = _make_diffusion_matrix(self.K_dimensionless, self._weight1, self._weight2)
+        self.diffTriDiag = _make_diffusion_matrix(self._K_dimensionless, self._weight1, self._weight2)
         # These diagnostics currently only implemented for 1D state variable
-        self.add_diagnostic('diffusive_flux', 0.*self.K_dimensionless*self._weight1)
+        self.add_diagnostic('diffusive_flux', 0.*self._K_dimensionless*self._weight1)
         self.add_diagnostic('diffusive_flux_convergence', 0.*np.diff(self.diffusive_flux,
                 axis=self.diffusion_axis_index))
+
+#    @property
+#    def K(self):
+
 
     def _implicit_solver(self):
         """Invertes and solves the matrix problem for diffusion matrix
@@ -138,6 +142,8 @@ class Diffusion(ImplicitProcess):
                                         the method solving the matrix problem
 
         """
+        #if self.update_diffusivity:
+
         # Time-stepping the diffusion is just inverting this matrix problem:
         newstate = {}
         for varname, value in self.state.items():
@@ -154,7 +160,7 @@ class Diffusion(ImplicitProcess):
                 # Diagnostic calculations of flux and convergence
                 #  These assume 1D state variables...
                 ax = self.state[varname].domain.axis_index[self.diffusion_axis] # axis index
-                K = self.K_dimensionless * self.delta**2/self.timestep  # length**2 / time
+                K = self._K_dimensionless * self.delta**2/self.timestep  # length**2 / time
 
                 self.diffusive_flux[1:-1] = -K[1:-1] * np.diff(np.squeeze(value), axis=ax)/self.delta  # length / time
                 self.diffusive_flux_convergence[:] = -np.diff(self.diffusive_flux*self._weight1, axis=ax)/self.delta/self._weight2 # 1/time
@@ -217,7 +223,7 @@ class MeridionalDiffusion(Diffusion):
     which is initialized with ``diffusion_axis='lat'``, following object
     attributes are modified during initialization:
 
-    :ivar array K_dimensionless:    As K_dimensionless has been computed like
+    :ivar array _K_dimensionless:    As _K_dimensionless has been computed like
                                     :math:`K_{\\textrm{dimensionless}}= K \\frac{\\Delta t}{(\\Delta \\textrm{bounds})^2}`
                                     with :math:`K` in units :math:`1/s`,
                                     the :math:`\\Delta (\\textrm{bounds})` have to
@@ -242,14 +248,14 @@ class MeridionalDiffusion(Diffusion):
                  **kwargs):
         super(MeridionalDiffusion, self).__init__(K=K,
                                                 diffusion_axis='lat', **kwargs)
-        # Conversion of delta from deg to rad in K_dimensionless
+        # Conversion of delta from deg to rad in _K_dimensionless
         #  and self.delta is multiplied by Earth radius for diagnostics -- has physical length units
         self.delta *= (np.deg2rad(1.) * const.a)
-        self.K_dimensionless *= 1./np.deg2rad(1.)**2
+        self._K_dimensionless *= 1./np.deg2rad(1.)**2
         for dom in list(self.domains.values()):
             latax = dom.axes['lat']
         self.diffTriDiag, self._weight1, self._weight2 = \
-            _make_meridional_diffusion_matrix(self.K_dimensionless, latax)
+            _make_meridional_diffusion_matrix(self._K_dimensionless, latax)
 
 
 class MeridionalHeatDiffusion(MeridionalDiffusion):
