@@ -1,7 +1,7 @@
-diffusion
+Diffusion
 ---------
 
-.. inheritance-diagram:: climlab.dynamics.diffusion
+.. inheritance-diagram:: climlab.dynamics.Diffusion
    :parts: 1
    :private-bases:
 
