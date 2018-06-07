@@ -7,6 +7,7 @@ from climlab.tests.xarray_test import to_xarray
 
 num_lev = 30
 
+@pytest.mark.compiled
 @pytest.mark.fast
 def test_rrtmg_lw_creation():
     state = climlab.column_state(num_lev=num_lev, water_depth=5.)
@@ -15,6 +16,7 @@ def test_rrtmg_lw_creation():
     assert np.all(_rrtm_to_climlab(_climlab_to_rrtm(rad.Ts)) == rad.Ts)
     assert np.all(_rrtm_to_climlab(_climlab_to_rrtm(rad.Tatm)) == rad.Tatm)
 
+@pytest.mark.compiled
 @pytest.mark.fast
 def test_rrtm_creation():
     # initial state (temperatures)
@@ -31,6 +33,7 @@ def test_rrtm_creation():
     # Test the xarray interface
     to_xarray(rad)
 
+@pytest.mark.compiled
 @pytest.mark.fast
 def test_swap_component():
     # initial state (temperatures)
@@ -45,6 +48,7 @@ def test_swap_component():
     rad.step_forward()
     assert hasattr(rad, 'OLR')
 
+@pytest.mark.compiled
 @pytest.mark.fast
 def test_multidim():
     state = climlab.column_state(num_lev=40, num_lat=3, water_depth=5.)
@@ -56,6 +60,7 @@ def test_multidim():
     rad.step_forward()
     assert rad.OLR.shape == rad.Ts.shape
 
+@pytest.mark.compiled
 @pytest.mark.fast
 def test_cloud():
     '''Put a high cloud layer in a radiative model.
@@ -82,6 +87,7 @@ def test_cloud():
         assert(rad.ASR - rad.ASRclr < 0.)
         assert(rad.OLR - rad.OLRclr < 0.)
 
+@pytest.mark.compiled
 @pytest.mark.slow
 def test_radiative_forcing():
     '''Run a single-column radiative-convective model with RRTMG radiation
@@ -113,6 +119,7 @@ def test_radiative_forcing():
     #  Test the xarray interface
     to_xarray(rcm2)
 
+@pytest.mark.compiled
 @pytest.mark.slow
 def test_latitude():
     '''

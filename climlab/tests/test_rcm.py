@@ -3,6 +3,7 @@ import numpy as np
 import climlab
 import pytest
 
+@pytest.mark.compiled
 @pytest.fixture()
 def rcm():
     # initial state (temperatures)
@@ -19,6 +20,7 @@ def rcm():
     rcm = climlab.couple([h2o,convadj,rad], name='RCM')
     return rcm
 
+@pytest.mark.compiled
 @pytest.mark.fast
 def test_convective_adjustment(rcm):
     rcm.step_forward()

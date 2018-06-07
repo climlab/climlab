@@ -23,6 +23,8 @@ def rcm():
     rcm = climlab.couple([h2o,convadj,rad], name='RCM')
     return rcm
 
+
+@pytest.mark.compiled
 @pytest.mark.fast
 def test_rce(rcm):
     '''Test a single-column radiative-convective model with CAM3 radiation and
@@ -35,7 +37,7 @@ def test_rce(rcm):
     # Test the xarray interface
     to_xarray(rcm)
 
-
+@pytest.mark.compiled
 @pytest.mark.slow
 def test_re_radiative_forcing():
     state = climlab.column_state(num_lev=num_lev)
@@ -47,6 +49,7 @@ def test_re_radiative_forcing():
     rad2.compute_diagnostics()
     assert (rad2.ASR - rad2.OLR) > 1.  # positive radiative forcing
 
+@pytest.mark.compiled
 @pytest.mark.slow
 def test_rce_radiative_forcing(rcm):
     '''Run a single-column radiative-convective model with CAM3 radiation
@@ -59,6 +62,7 @@ def test_rce_radiative_forcing(rcm):
     rcm2.compute_diagnostics()
     assert (rcm2.ASR - rcm2.OLR) > 1.  # positive radiative forcing
 
+@pytest.mark.compiled
 @pytest.mark.fast
 def test_cam3_multidim():
     state = climlab.column_state(num_lev=40, num_lat=3, water_depth=5.)
