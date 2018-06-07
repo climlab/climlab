@@ -39,8 +39,10 @@ class MeridionalHeatDiffusion(MeridionalDiffusion):
         super(MeridionalHeatDiffusion, self)._update_diagnostics(newstate)
         for varname, value in self.state.items():
             heat_capacity = value.domain.heat_capacity
-        self.heat_transport2[:] = self.diffusive_flux * 1E15  # in PW... fix this
-        self.heat_transport_convergence2[:] = self.diffusive_flux_convergence * heat_capacity  # in W/m**2
+        self.heat_transport2[:] = (self.diffusive_flux * heat_capacity *
+                        2 * np.pi * const.a * self._weight1 * 1E-15) # in PW
+        self.heat_transport_convergence2[:] = (self.diffusive_flux_convergence *
+                        heat_capacity)  # in W/m**2
 
 
 class EBM(TimeDependentProcess):
