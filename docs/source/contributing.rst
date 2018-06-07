@@ -92,7 +92,13 @@ To run the full set of tests on the currently installed version of CLIMLAB, you 
 
 All tests should report ``PASSED``.
 
-CLIMLAB is a mix of pure Python and compiled Fortran. To fully test new code modifications, you will need to rebuild and install a new version. We use (and recommend) `conda build`_ to handle the dependencies including Fortran compiler.
+CLIMLAB is a mix of pure Python and compiled Fortran. If you are developing new code that does not rely on the compiled components, it is useful to run tests directly from the source code directory. From the ``climlab`` root directory, do the following::
+
+    pytest -v -m "not compiled"
+
+which excludes the tests marked as requiring the compiled components. Again, look for all tests to report ``PASSED``.
+
+If you are interacting with compiled components (e.g. RRTMG radiation), testing is a little more complicated. You will need to rebuild and install a new version. We use (and recommend) `conda build`_ to handle the dependencies including Fortran compiler.
 
 To build CLIMLAB, do this from the root directory of the CLIMLAB source repo::
 
