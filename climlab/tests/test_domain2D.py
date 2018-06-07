@@ -17,8 +17,9 @@ def test_state():
 @pytest.mark.fast
 def test_2D_EBM():
     '''Can we step forward a 2D lat/lon EBM?'''
-    state = climlab.surface_state(num_lon=4)
-    m = climlab.EBM_annual(state=state)
+    #state = climlab.surface_state(num_lon=4)
+    #m = climlab.EBM_annual(state=state)
+    m = climlab.EBM_annual(num_lon=4)
     m.step_forward()
     assert m.state.Ts.shape == (90, 4, 1)
     # Test the xarray interface
@@ -26,8 +27,9 @@ def test_2D_EBM():
 
 @pytest.mark.fast
 def test_2D_insolation():
-    state = climlab.surface_state(num_lon=4)
-    m = climlab.EBM_annual(state=state)
+    #state = climlab.surface_state(num_lon=4)
+    #m = climlab.EBM_annual(state=state)
+    m = climlab.EBM_annual(num_lon=4)
     #  the answers are the mean of 1D insolation arrays
     #  the mean shouldn't change from 1D to 2D...
     #  there are exactly the same amount of each number in 2D array

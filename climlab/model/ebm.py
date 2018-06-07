@@ -39,7 +39,7 @@ class MeridionalHeatDiffusion(MeridionalDiffusion):
     $D$ is provided as input, and can be either scalar
     or vector defined at latitude boundaries (length).
 
-    $C$ is normally handled automatically for temperature state variables in CLIMLAB. 
+    $C$ is normally handled automatically for temperature state variables in CLIMLAB.
     '''
     def __init__(self,
                  D=0.555,  # in W / m^2 / degC
@@ -90,6 +90,9 @@ class EBM(TimeDependentProcess):
                                 :class:`~climlab.domain.domain.zonal_mean_surface`
                                                                             \n
                                 - default value: ``90``
+    :param int num_lon:         number of equally spaced points in longitude
+                                                                            \n
+                                - default value: ``None``
     :param float S0:            solar constant                              \n
                                 - unit: :math:`\\frac{\\textrm{W}}{\\textrm{m}^2}`   \n
                                 - default value: ``1365.2``
@@ -190,6 +193,7 @@ class EBM(TimeDependentProcess):
     """
     def __init__(self,
                  num_lat=90,
+                 num_lon=None,
                  S0=const.S0,
                  s2=-0.48,
                  A=210.,
@@ -207,8 +211,8 @@ class EBM(TimeDependentProcess):
         # Check to see if an initial state is already provided
         #  If not, make one
         if 'state' not in kwargs:
-            state = surface_state(num_lat=num_lat, water_depth=water_depth,
-                                  T0=T0, T2=T2)
+            state = surface_state(num_lat=num_lat, num_lon=num_lon,
+                                  water_depth=water_depth, T0=T0, T2=T2)
             sfc = state.Ts.domain
             kwargs.update({'state': state, 'domains':{'sfc':sfc}})
         super(EBM, self).__init__(timestep=timestep, **kwargs)
