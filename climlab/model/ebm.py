@@ -32,22 +32,15 @@ class MeridionalHeatDiffusion(MeridionalDiffusion):
         K = self.D / heat_capacity
         super(MeridionalHeatDiffusion, self).__init__(K=K,
                         use_banded_solver=use_banded_solver, **kwargs)
-        self._diag_vars.append('heat_transport2')
-        self._diag_vars.append('heat_transport_convergence2')
+        self.add_diagnostic('heat_transport2', np.zeros_like(self.lat_bounds))
+        self.add_diagnostic('heat_transport_convergence2', np.zeros_like(self.lat))
 
-    @property
-    def heat_transport2(self):
-        '''Heat transport in PW'''
-        return self.diffusive_flux * 1E15
-
-    @property
-    def heat_transport_convergence2(self):
-        '''Heat transport convergence in W/m**2'''
+    def _update_diagnostics(self, newstate):
+        super(MeridionalHeatDiffusion, self)._update_diagnostics(newstate)
         for varname, value in self.state.items():
             heat_capacity = value.domain.heat_capacity
-        return self.diffusive_flux_convergence * heat_capacity
-
-
+        self.heat_transport2[:] = self.diffusive_flux * 1E15  # in PW... fix this
+        self.heat_transport_convergence2[:] = self.diffusive_flux_convergence * heat_capacity  # in W/m**2
 
 
 class EBM(TimeDependentProcess):

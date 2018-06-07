@@ -141,12 +141,15 @@ class Diffusion(ImplicitProcess):
             else:
                 newvar = np.linalg.solve(self.diffTriDiag, value)
             newstate[varname] = newvar
+        return newstate
+
+    def _update_diagnostics(self, newstate):
+        for varname, value in newstate.items():
             # Diagnostic calculations of flux and convergence
             #  These assume 1D state variables...
             K = self.K_dimensionless * self.delta**2/self.timestep  # length**2 / time
-            self.diffusive_flux[1:-1] = -K[1:-1] * np.diff(np.squeeze(newvar))/self.delta  # length / time
+            self.diffusive_flux[1:-1] = -K[1:-1] * np.diff(np.squeeze(value))/self.delta  # length / time
             self.diffusive_flux_convergence[:] = -np.diff(self.diffusive_flux)/self.delta # 1/time
-        return newstate
 
 
 def _solve_implicit_banded(current, banded_matrix):
