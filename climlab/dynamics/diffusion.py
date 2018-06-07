@@ -305,8 +305,8 @@ class MeridionalHeatDiffusion(MeridionalDiffusion):
 
 class MeridionalMoistDiffusion(MeridionalHeatDiffusion):
     def __init__(self, D=0.24, relative_humidity=0.8, **kwargs):
-        super(MoistDiffusion, self).__init__(D=D, **kwargs)
-        self.add_input('relative_humidity', relative_humidity)
+        self.relative_humidity = relative_humidity
+        super(MeridionalMoistDiffusion, self).__init__(D=D, **kwargs)
         self._update_diffusivity()
 
     def _update_diffusivity(self):
@@ -317,9 +317,9 @@ class MeridionalMoistDiffusion(MeridionalHeatDiffusion):
         self.K = self.D / heat_capacity * const.a**2 * (1+f)
 
     def _implicit_solver(self):
-        self.update_diffusivity()
+        self._update_diffusivity()
         #  and then do all the same stuff the parent class would do...
-        return super(MoistDiffusion, self)._implicit_solver()
+        return super(MeridionalMoistDiffusion, self)._implicit_solver()
 
 
 def _make_diffusion_matrix(K, weight1=None, weight2=None):

@@ -121,3 +121,14 @@ def test_analytical():
     x = np.sin(np.deg2rad(m.lat))
     Tanalytical = ((1-param['a0'])*param['S0']/4*(1+param['s2']*P2(x)/(1+6*delta))-param['A'])/param['B']
     assert Tnumerical == pytest.approx(Tanalytical, abs=2E-2)
+
+@pytest.mark.fast
+def test_moist_EBM_creation():
+    '''See if we can swap a moist diffusion module for the dry diffusion
+    and just step forward once.'''
+    m = climlab.EBM()
+    m.remove_subprocess('diffusion')
+    diff = climlab.dynamics.MeridionalMoistDiffusion(state=m.state, timestep=m.timestep)
+    m.add_subprocess('diffusion', diff)
+    m.step_forward()
+    assert hasattr(m, 'heat_transport')
