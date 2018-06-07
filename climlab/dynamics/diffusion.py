@@ -90,7 +90,9 @@ class Diffusion(ImplicitProcess):
         self.delta = delta  # grid interval in length units
         self.K_dimensionless = (self.param['K'] * np.ones_like(bounds) *
                                 self.timestep / self.delta**2)
-        self.diffTriDiag = _make_diffusion_matrix(self.K_dimensionless)
+        self._weight1 = np.ones_like(bounds)
+        self._weight2 = np.ones_like(points)
+        self.diffTriDiag = _make_diffusion_matrix(self.K_dimensionless, self._weight1, self._weight2)
         self.add_diagnostic('diffusive_flux', np.zeros_like(bounds))
         self.add_diagnostic('diffusive_flux_convergence', np.zeros_like(points))
 
@@ -149,8 +151,7 @@ class Diffusion(ImplicitProcess):
             #  These assume 1D state variables...
             K = self.K_dimensionless * self.delta**2/self.timestep  # length**2 / time
             self.diffusive_flux[1:-1] = -K[1:-1] * np.diff(np.squeeze(value))/self.delta  # length / time
-            self.diffusive_flux_convergence[:] = -np.diff(self.diffusive_flux)/self.delta # 1/time
-
+            self.diffusive_flux_convergence[:] = -np.diff(self.diffusive_flux*self._weight1)/self.delta/self._weight2 # 1/time
 
 def _solve_implicit_banded(current, banded_matrix):
     """Uses a banded solver for matrix inversion of a tridiagonal matrix.
@@ -239,7 +240,7 @@ class MeridionalDiffusion(Diffusion):
         self.K_dimensionless *= 1./np.deg2rad(1.)**2
         for dom in list(self.domains.values()):
             latax = dom.axes['lat']
-        self.diffTriDiag = \
+        self.diffTriDiag, self._weight1, self._weight2 = \
             _make_meridional_diffusion_matrix(self.K_dimensionless, latax)
 
 
@@ -392,7 +393,7 @@ def _make_meridional_diffusion_matrix(K, lataxis):
     weight1 = np.cos(phi_stag)
     weight2 = np.cos(phi)
     diag = _make_diffusion_matrix(K, weight1, weight2)
-    return diag
+    return diag, weight1, weight2
 
 
 def _guess_diffusion_axis(process_or_domain):
