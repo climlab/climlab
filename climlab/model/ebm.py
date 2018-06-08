@@ -1,3 +1,81 @@
+r"""Convenience classes for pre-made Energy Balance Models in CLIMLAB.
+
+These models all solve some form of the equation
+
+.. math::
+
+    C \frac{\partial}{\partial t} T_s(\phi,t) = (1-\alpha)S(\phi,t) - \left[A + B T_s \right] + \frac{1}{\cos\phi} \frac{\partial}{\partial \phi} \left[ \cos\phi ~ D ~ \frac{\partial T_s}{\partial \phi} \right]
+
+where
+
+- :math:`\phi` is latitude
+- :math:`T_s` is a zonally averaged surface temperature
+- :math:`C` is a depth-integrated heat capacity
+- :math:`\alpha` is an albedo (which may depend on latitude and/or temperature)
+- :math:`S(\phi, t)` is the insolation
+- :math:`\left[A + B T_s \right]` is a parameterization of the Outgoing Longwave Radiation to space
+- the last term on the right hand side is a diffusive heat transport convergence with thermal diffusivity :math:`D` in the same units as :math:`B`
+
+Three classes are provided, which differ in the type of insolation :math:`S`:
+
+- ``climlab.EBM`` uses a steady idealized annual insolation (second Legendre polynomial form)
+- ``climlab.EBM_annual`` uses realistic steady annual-mean insolation
+- ``climlab.EBM_seasonal`` uses realistic seasonally varying insolation
+
+The ``__init__`` method of class ``EBM`` shows how these models are assembled
+from subprocesses representing each term in the above equation.
+
+
+Building the Moist EBM
+----------------------
+
+There is currently no ready-made convenience class for the **moist EBM**,
+but it can be readily built by swapping out the dry heat diffusion process ``climlab.dynamics.MeridionalHeatDiffusion``
+with the moist equivalent ``climlab.dynamics.MeridionalMoistDiffusion``.
+
+This sort of mixing and matching of model components is at the heart of CLIMLAB
+design and functionality.
+
+    :Example:
+
+        .. code-block:: python
+
+            import climlab
+            #  create and display a 1D Energy Balance Model
+            dry = climlab.EBM()
+            print(dry)
+            #  clone this model and swap out the diffusion subprocess
+            moist = climlab.process_like(dry)
+            diff = climlab.dynamics.MeridionalMoistDiffusion(state=moist.state, timestep=moist.timestep)
+            moist.add_subprocess('diffusion', diff)
+            print(moist)
+
+We can run both models out to equilibrium and compare the results as follows:
+
+    :Example:
+
+        .. code-block:: python
+
+            #  Run both models out to quasi-equilibrium
+            #   print out the global mean planetary energy budget -- should be very small
+            for m in [dry, moist]:
+                m.integrate_years(10)
+                print(climlab.global_mean(m.net_radiation))
+            #  plot and compare the temperatures
+            import matplotlib.pyplot as plt
+            plt.figure()
+            plt.plot(dry.lat, dry.Ts, label='Dry')
+            plt.plot(moist.lat, moist.Ts, label='Moist')
+            plt.legend()
+            plt.show()
+            #  plot and compare the heat transport
+            plt.figure()
+            plt.plot(dry.lat_bounds, dry.heat_transport, label='Dry')
+            plt.plot(moist.lat_bounds, moist.heat_transport, label='Moist')
+            plt.legend()
+            plt.show()
+
+"""
 from __future__ import division
 import numpy as np
 from climlab import constants as const
@@ -25,13 +103,15 @@ class EBM(TimeDependentProcess):
     This class sets up a typical EnergyBalance Model with following subprocesses:
 
     * Outgoing Longwave Radiation (OLR) parametrization through
-      :class:`~climlab.radiation.AplusBT.AplusBT`
+      :class:`~climlab.radiation.AplusBT`
+    * Absorbed Shortwave Radiation (ASR) through
+      :class:`~climlab.radiation.SimpleAbsorbedShortwave`
     * solar insolation paramtrization through
-      :class:`~climlab.radiation.insolation.P2Insolation`
+      :class:`~climlab.radiation.P2Insolation`
     * albedo parametrization in dependence of temperature through
-      :class:`~climlab.surface.albedo.StepFunctionAlbedo`
+      :class:`~climlab.surface.StepFunctionAlbedo`
     * energy diffusion through
-      :class:`~climlab.dynamics.diffusion.MeridionalDiffusion`
+      :class:`~climlab.dynamics.MeridionalHeatDiffusion`
 
     **Initialization parameters** \n
 
@@ -103,7 +183,7 @@ class EBM(TimeDependentProcess):
 
     **Object attributes** \n
 
-    Additional to the parent class :class:`~climlab.process.energy_budget.EnergyBudget`
+    Additional to the parent class :class:`~climlab.process.EnergyBudget`
     following object attributes are generated and updated during initialization:
 
     :ivar dict param:       The parameter dictionary is updated with a couple
@@ -322,10 +402,10 @@ class EBM_seasonal(EBM):
         """A class that implements Energy Balance Models with realistic
         daily insolation.
 
-        This class is inherited from the general :class:`~climlab.model.ebm.EBM`
+        This class is inherited from the general :class:`~climlab.EBM`
         class and uses the insolation subprocess
-        :class:`~climlab.radiation.insolation.DailyInsolation` instead of
-        :class:`~climlab.radiation.insolation.P2Insolation` to compute a
+        :class:`~climlab.radiation.DailyInsolation` instead of
+        :class:`~climlab.radiation.P2Insolation` to compute a
         realisitc distribution of solar radiation on a daily basis.
 
         If argument for ice albedo ``'ai'`` is not given, the model will not
@@ -412,12 +492,12 @@ class EBM_annual(EBM_seasonal):
         The annual solar distribution is calculated through averaging the
         :class:`~climlab.radiation.insolation.DailyInsolation` over time
         which has been used in used in the parent class
-        :class:`~climlab.model.ebm.EBM_seasonal`. That is done by the subprocess
-        :class:`~climlab.radiation.insolation.AnnualMeanInsolation` which is
-        more realistic than the :class:`~climlab.radiation.insolation.P2Insolation`
-        module used in the classical :class:`~climlab.model.ebm.EBM` class.
+        :class:`~climlab.EBM_seasonal`. That is done by the subprocess
+        :class:`~climlab.radiation.AnnualMeanInsolation` which is
+        more realistic than the :class:`~climlab.radiation.P2Insolation`
+        module used in the classical :class:`~climlab.EBM` class.
 
-        According to the parent class :class:`~climlab.model.ebm.EBM_seasonal`
+        According to the parent class :class:`~climlab.EBM_seasonal`
         the model will not have an ice-albedo feedback, if albedo ice parameter
         ``'ai'`` is not given. For details see there.
 
@@ -427,12 +507,12 @@ class EBM_annual(EBM_seasonal):
         Following object attributes are updated during initialization: \n
 
         :ivar dict subprocess:  suprocess ``'insolation'`` is overwritten by
-                                :class:`~climlab.radiation.insolation.AnnualMeanInsolation`
+                                :class:`~climlab.radiation.AnnualMeanInsolation`
 
         :Example:
 
-            The :class:`~climlab.model.ebm.EBM_annual` class uses a different
-            insolation subprocess than the :class:`~climlab.model.ebm.EBM` class::
+            The :class:`~climlab.EBM_annual` class uses a different
+            insolation subprocess than the :class:`~climlab.EBM` class::
 
                 >>> import climlab
                 >>> model_annual = climlab.EBM_annual()
@@ -446,11 +526,11 @@ class EBM_annual(EBM_seasonal):
                 State variables and domain shapes:
                   Ts: (90, 1)
                 The subprocess tree:
-                top: <class 'climlab.model.ebm.EBM_annual'>
-                   diffusion: <class 'climlab.dynamics.diffusion.MeridionalDiffusion'>
-                   LW: <class 'climlab.radiation.AplusBT.AplusBT'>
-                   albedo: <class 'climlab.surface.albedo.P2Albedo'>
-                   insolation: <class 'climlab.radiation.insolation.AnnualMeanInsolation'>
+                top: <class 'climlab.EBM_annual'>
+                   diffusion: <class 'climlab.dynamics.MeridionalHeatDiffusion'>
+                   LW: <class 'climlab.radiation.AplusBT'>
+                   albedo: <class 'climlab.surface.P2Albedo'>
+                   insolation: <class 'climlab.radiation.AnnualMeanInsolation'>
 
         """
         super(EBM_annual, self).__init__(**kwargs)

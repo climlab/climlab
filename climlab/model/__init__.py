@@ -9,7 +9,7 @@ This package contains ready-made models that can be run "off-the-shelf".
             #  create a 1D Energy Balance Model
             mymodel = climlab.EBM()
             #  see what you just created
-            print mymodel
+            print(mymodel)
             #  run the model
             mymodel.integrate_years(2.)
             #  display the current state
