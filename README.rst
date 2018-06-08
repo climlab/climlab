@@ -35,14 +35,16 @@ Currently, ``climlab`` has out-of-the-box support and documented examples for
     - CAM3  (from the NCAR GCM)
     - Grey Gas
     - Simplified band-averaged models (4 bands each in longwave and shortwave)
-- Emanuel moist convection scheme
-- Hard convective adjustment
-- Diffusive energy balance models
-- Seasonal and steady-state models
+- Convection schemes:
+    - Emanuel moist convection scheme
+    - Hard convective adjustment (to constant lapse rate or to moist adiabat)
+- Diffusion solvers for moist and dry Energy Balance Models
+- Flexible insolation including:
+  - Seasonal and annual-mean models
+  - Arbitrary orbital parameters
+- Boundary layer scheme including sensible and latent heat fluxes
 - Arbitrary combinations of the above, for example:
-    - 2D latitude-pressure models with radiation, horizontal diffusion, and fixed relative humidity
-- Orbital / insolation calculations
-- Boundary layer sensible and latent heat fluxes
+    - 2D latitude-pressure models with radiation, horizontally-varying diffusion, and fixed relative humidity
 
 
 Installation
@@ -110,6 +112,7 @@ Links
 -  HTML documentation: http://climlab.readthedocs.io/en/latest/intro.html
 -  Issue tracker: http://github.com/brian-rose/climlab/issues
 -  Source code: http://github.com/brian-rose/climlab
+-  JOSS meta-paper: https://doi.org/10.21105/joss.00659
 
 
 Dependencies
@@ -149,55 +152,98 @@ These are self-describing, and should all run out-of-the-box once the package is
 .. _here: http://climlab.readthedocs.io
 
 
-History
+Release history
 ----------------------
-The first versions of the code and notebooks were originally developed in winter / spring 2014
-in support of an undergraduate course at the University at Albany.
-See the original course webpage at
-http://www.atmos.albany.edu/facstaff/brose/classes/ENV480_Spring2014/
 
-The package and its API was completely redesigned around a truly object-oriented
-modeling framework in January 2015.
+Version 0.7.0 (released July 2018)
+    New functionality, improved documentation_, and a few breaking changes to the API.
 
-It was used extensively for a graduate-level climate modeling course in Spring 2015:
-http://www.atmos.albany.edu/facstaff/brose/classes/ATM623_Spring2015/
-Many more examples are found in the online lecture notes for that course:
-http://nbviewer.jupyter.org/github/brian-rose/ClimateModeling_courseware/blob/master/index.ipynb
+    Major new functionality includes **convective adjustment to the moist adiabat**
+    and **moist EBMs with diffusion on moist static energy gradients**.
 
-Version 0.3 was released in February 2016. It includes many internal changes and
-some backwards-incompatible changes (hopefully simplifications) to the public API.
-It also includes the CAM3 radiation module.
+    Details:
 
-Version 0.4 was released in October 2016. It includes comprehensive documentation,
-an automated test suite, support for latitude-longitude grids, and numerous small enhancements and bug fixes.
+    - ``climlab.convection.ConvectiveAdjustement`` now allows non-constant critical lapse rates,
+    stored in input parameter ``adj_lapse_rate``.
+        - New switches to implement automatic adjustment to **dry** and **moist** adiabats (pseudoadiabat)
+    - ``climlab.EBM()`` and its daughter classes are significantly reorganized to better respect CLIMLAB principles:
+        - Essentially all the computations are done by subprocesses
+        - SW radiation is now handled by ``climlab.radiation.SimpleAbsorbedShortwave`` class
+        - Diffusion and its diagnostics now handled by ``climlab.dynamics.MeridionalHeatDiffusion`` class.
+        - Diffusivity can be altered at any time by the user, e.g. during timestepping
+        - Diffusivity input value ``K`` in class ``climlab.dynamics.MeridionalDiffusion`` is now specified in physical units of m2/s instead of (1/s).
+        This is consistent with its parent class ``climlab.dynamics.Diffusion``.
+    - A new class ``climlab.dynamics.MeridionalMoistDiffusion`` for the moist EBM (diffusion down moist static energy gradient)
+    - Tests that require compiled code are now marked with ``pytest.mark.compiled`` for easy exclusion during local development
 
-Version 0.4.2 (released January 2017) introduces the RRTMG radiation scheme,
-a much-improved build process for the Fortran extension,
-and numerous enhancements and simplifications to the API.
+    Under-the-hood changes include
 
-Version 0.5 (released March 2017) provides bug fixes and full functionality for the RRTMG module,
-an improved common API for all radiation modules, and better documentation.
+    - Internal changes to the timestepping; the ``compute()`` method of every subprocess is now called explicitly.
+    - ``compute()`` now always returns tendency dictionaries
 
-Version 0.5.2 (released late March 2017) provides many under-the-hood improvements to the build procedure,
-which should make it much easier to get `climlab` installed on user machines. Binary distribution with conda_ is coming soon!
+Version 0.6.5 (released April 2018)
+    Some improved documentation, associated with publication of a meta-description paper in JOSS.
 
-Version 0.5.5 (released early April 2017) finally provides easy binary distrbution with conda_
+Version 0.6.4 (released February 2018)
+    Some bug fixes and a new ``climlab.couple()`` method to simplify creating complete models from components.
 
-Version 0.6.0 (released December 2017) provides full Python 3 compatibility, updated documentation, and minor enhancements and bug fixes.
+Version 0.6.3 (released February 2018)
+    Under-the-hood improvements to the Fortran builds which enable successful builds on a wider variety of platforms (incluing Windows/Python3).
 
-Version 0.6.1 (released January 2018) provides basic integration with xarray_
-(convenience methods for converting climlab objects into ``xarray.DataArray`` and ``xarray.Dataset`` objects)
+Version 0.6.2 (released February 2018)
+    Introduces the Emanuel moist convection scheme, support for asynchonous coupling, and internal optimzations.
 
-Version 0.6.2 (released February 2018) introduces the Emanuel moist convection scheme, support for asynchonous coupling, and internal optimzations.
+Version 0.6.1 (released January 2018)
+    Provides basic integration with xarray_
+    (convenience methods for converting climlab objects into ``xarray.DataArray`` and ``xarray.Dataset`` objects)
 
-Version 0.6.3 (released February 2018) brings under-the-hood improvements to the Fortran builds which enable successful builds on a wider variety of platforms (incluing Windows/Python3).
+Version 0.6.0 (released December 2017)
+    Provides full Python 3 compatibility, updated documentation, and minor enhancements and bug fixes.
 
-Version 0.6.4 (released February 2018) brings some bug fixes and a new ``climlab.couple()`` method to simplify creating complete models from components.
+Version 0.5.5 (released early April 2017)
+    Finally provides easy binary distrbution with conda_
 
-Version 0.6.5 (released April 2018) adds some improved documentation, associated with publication of a meta-description paper in JOSS.
+Version 0.5.2 (released late March 2017)
+    Many under-the-hood improvements to the build procedure,
+    which should make it much easier to get `climlab` installed on user machines.
+    Binary distribution with conda_ is coming soon!
+
+Version 0.5 (released March 2017)
+    Bug fixes and full functionality for the RRTMG radiation module,
+    an improved common API for all radiation modules, and better documentation.
+
+Version 0.4.2 (released January 2017)
+    Introduces the RRTMG radiation scheme,
+    a much-improved build process for the Fortran extension,
+    and numerous enhancements and simplifications to the API.
+
+Version 0.4 (released October 2016)
+    Includes comprehensive documentation, an automated test suite,
+    support for latitude-longitude grids, and numerous small enhancements and bug fixes.
+
+Version 0.3 (released February 2016)
+    Includes many internal changes and some backwards-incompatible changes
+    (hopefully simplifications) to the public API.
+    It also includes the CAM3 radiation module.
+
+Version 0.2 (released January 2015)
+    The package and its API was completely redesigned around a truly object-oriented
+    modeling framework in January 2015.
+
+    It was used extensively for a graduate-level climate modeling course in Spring 2015:
+    http://www.atmos.albany.edu/facstaff/brose/classes/ATM623_Spring2015/
+    Many more examples are found in the online lecture notes for that course:
+    http://nbviewer.jupyter.org/github/brian-rose/ClimateModeling_courseware/blob/master/index.ipynb
+
+Version 0.1
+    The first versions of the code and notebooks were originally developed in winter / spring 2014
+    in support of an undergraduate course at the University at Albany.
+    See the original course webpage at
+    http://www.atmos.albany.edu/facstaff/brose/classes/ENV480_Spring2014/
 
 
-The documentation_ was first created by Moritz Kreuzer (Potsdam Institut for Climate Impact Research) as part of a thesis project in Spring 2016.
+The documentation_ was first created by Moritz Kreuzer
+(Potsdam Institut for Climate Impact Research) as part of a thesis project in Spring 2016.
 
 .. _documentation: http://climlab.readthedocs.io
 .. _xarray: http://xarray.pydata.org/en/stable/
