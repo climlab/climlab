@@ -1,12 +1,40 @@
-'''Solver for 1D meridional diffusion down the surface temperature gradient.
+r"""Solver for the 1D meridional heat diffusion equation on the sphere:
 
-The grid must be evenly spaced in latitude.
+.. math::
 
-Thermal diffusivity D is specified in W/m2/K
-at mid-points between latitude points.
+    C\frac{\partial}{\partial t} T(\phi,t) = \frac{1}{\cos\phi} \frac{\partial}{\partial \phi} \left[ \cos\phi ~ D ~ \frac{\partial T}{\partial \phi} \right]
 
-The method handles constant or spatially variable diffusivity.
-'''
+for a temperature state variable :math:`T(\phi,t)`,
+a vertically-integrated heat capacity :math:`C`,
+and arbitrary thermal diffusivity :math:`D(\phi,t)`
+in units of W/m2/K.
+
+The diffusivity :math:`D` can be a single scalar,
+or optionally a vector *specified at grid cell boundaries*
+(so its length must be exactly 1 greater than the length of :math:`\phi`).
+
+:math:`D` can be modified by the user at any time
+(e.g., after each timestep, if it depends on other state variables).
+
+The heat capacity :math:`C` is normally handled automatically by CLIMLAB
+as part of the grid specification.
+
+A fully implicit timestep is used for computational efficiency. Thus the computed
+tendency :math:`\frac{\partial T}{\partial t}` will depend on the timestep.
+
+The diagnostics ``diffusive_flux`` and ``diffusive_flux_convergence`` are computed
+as described in the parent class ``MeridionalDiffusion``.
+Two additional diagnostics are computed here,
+which are meaningful if :math:`T` represents a *zonally averaged temperature*:
+
+- ``heat_transport`` given by :math:`\mathcal{H}(\phi) = -2 \pi ~ a^2 ~ \cos\phi ~ D ~ \frac{\partial T}{\partial \phi}` in units of PW (petawatts).
+- ``heat_transport_convergence`` given by :math:`-\frac{1}{2 \pi ~a^2 \cos\phi} \frac{\partial \mathcal{H}}{\partial \phi}` in units of W/m2
+
+The grid must be *evenly spaced in latitude*.
+
+The state variable :math:`T` may be multi-dimensional, but the diffusion
+will operate along the latitude dimension only.
+"""
 from __future__ import division
 import numpy as np
 from .meridional_diffusion import MeridionalDiffusion

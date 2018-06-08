@@ -1,13 +1,13 @@
 .. highlight:: rst
 
-Integration with `xarray`
+Integration with ``xarray``
 =========================
 
 xarray_ is a powerful Python package for geospatial data analysis.
 It provides ``DataArray`` and ``Dataset`` structures for self-describing gridded data.
 
-For the convenience of xarray users, climlab provides tools for automatic translation
-of the native ``Field`` object to xarray format.
+For the convenience of ``xarray`` users, climlab provides tools for automatic translation
+of the native ``Field`` object to ``xarray`` format.
 
 
 :Example 1:
@@ -94,7 +94,7 @@ of the native ``Field`` object to xarray format.
 
     Use the ``climlab.to_xarray()`` method to convert the ``timeave`` dictionary
     to ``xarray.Dataset``::
-      
+
         >>> # integrate forward one year and automatically store time averages
         >>> model.integrate_years(1)
         Integrating for 365 steps, 365.2422 days, or 1 years.

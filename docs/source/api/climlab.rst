@@ -1,4 +1,4 @@
-climlab package reference
+CLIMLAB API reference
 =================
 
 .. automodule:: climlab

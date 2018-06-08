@@ -1,7 +1,7 @@
-budyko_transport
+BudykoTransport
 ----------------
 
-.. inheritance-diagram:: climlab.dynamics.budyko_transport
+.. inheritance-diagram:: climlab.dynamics.BudykoTransport
    :parts: 1
    :private-bases:
 

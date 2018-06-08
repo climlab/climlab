@@ -1,12 +1,40 @@
-'''General solver of 1D diffusion equation.
+r"""General solver of the 1D diffusion equation:
 
-An implicit timestep is used for efficiency.
+.. math::
+
+    \frac{\partial}{\partial t} \Psi(x,t) &= -\frac{1}{w(x)} \frac{\partial}{\partial x} \left[ w(x) ~ F(x,t) \right] \\
+    F &= -K ~ \frac{\partial \Psi}{\partial x}
+
+for a state variable :math:`\Psi(x,t)` and arbitrary diffusivity :math:`K(x,t)`
+in units of :math:`x^2 ~ t^{-1}`.
+
+:math:`w(x)` is an optional weighting function
+for the divergence operator on curvilinear grids.
+
+The diffusivity :math:`K` can be a single scalar,
+or optionally a vector *specified at grid cell boundaries*
+(so its length must be exactly 1 greater than the length of :math:`x`).
+
+:math:`K` can be modified by the user at any time
+(e.g., after each timestep, if it depends on other state variables).
+
+A fully implicit timestep is used for computational efficiency. Thus the computed
+tendency :math:`\frac{\partial \Psi}{\partial t}` will depend on the timestep.
+
+In addition to the tendency over the implicit timestep,
+the solver also calculates two diagnostics from the updated state:
+
+- ``diffusive_flux`` given by :math:`F(x)` in units of :math:`[\Psi]~[x]`/s
+- ``diffusive_flux_convergence`` given by the right hand side of the first equation above, in units of :math:`[\Psi]`/s
 
 This base class can be used without modification for diffusion in
-Cartesian coordinates on a regularly spaced grid.
+Cartesian coordinates (:math:`w=1`) on a regularly spaced grid.
 
-Other classes implement spherical geometry. 
-'''
+The state variable :math:`\Psi` may be multi-dimensional, but the diffusion
+will operate along a single dimension only.
+
+Other classes implement the weighting for spherical geometry.
+"""
 from __future__ import division
 import numpy as np
 from scipy.linalg import solve_banded
@@ -16,12 +44,6 @@ from climlab.process.process import get_axes
 
 class Diffusion(ImplicitProcess):
     """A parent class for one dimensional implicit diffusion modules.
-
-    Solves the one dimensional heat equation
-
-    .. math::
-
-        \\frac{dT}{dt} = \\frac{d}{dy} \\left[ K \\cdot \\frac{dT}{dy} \\right]
 
     **Initialization parameters** \n
 
