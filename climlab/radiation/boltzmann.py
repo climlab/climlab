@@ -21,7 +21,7 @@ class Boltzmann(EnergyBudget):
 
     As the :class:`~climlab.process.energy_budget.EnergyBudget` of the
     Energy Balance Model is accounted in unit :math:`\textrm{energy} / \textrm{area}`
-    (:math:`\\textrm{W}/ \\textrm{m}^2`)
+    (:math:`\textrm{W}/ \textrm{m}^2`)
     the energy budget equation looks like this:
 
     .. math::

@@ -5,13 +5,13 @@ import numpy as np
 
 
 class AplusBT(EnergyBudget):
-    """The simplest linear longwave radiation module.
+    r"""The simplest linear longwave radiation module.
 
     Calculates the Outgoing Longwave Radation (OLR) :math:`R\uparrow` as
 
     .. math::
 
-        R\uparrow = A + B \\cdot T
+        R\uparrow = A + B \cdot T
 
     where :math:`T` is the state variable.
 
@@ -24,10 +24,10 @@ class AplusBT(EnergyBudget):
     arguments:
 
     :param float A:             parameter for linear OLR parametrization   \n
-                                - unit: :math:`\\frac{\\textrm{W}}{\\textrm{m}^2}` \n
+                                - unit: :math:`\frac{\textrm{W}}{\textrm{m}^2}` \n
                                 - default value: ``200.0``
     :param float B:             parameter for linear OLR parametrization   \n
-                                - unit: :math:`\\frac{\\textrm{W}} {\\textrm{m}^2 \\ ^{\circ} \\textrm{C}}`  \n
+                                - unit: :math:`\frac{\textrm{W}} {\textrm{m}^2 ^{\circ}\textrm{C}}`  \n
                                 - default value: ``2.0``
 
     **Object attributes** \n
