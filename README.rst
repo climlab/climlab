@@ -141,9 +141,8 @@ Documentation and Examples
 ------------------
 Full user manual is available here_.
 
-The directory ``climlab/courseware/`` also contains a collection of Jupyter
-notebooks (*.ipynb) used for teaching some basics of climate science,
-and documenting use of the ``climlab`` package.
+The directory ``climlab/courseware/`` also contains a collection of Jupyter notebooks (``*.ipynb``) used for teaching some basics of climate science, and documenting use of the ``climlab`` package.
+
 These are self-describing, and should all run out-of-the-box once the package is installed, e.g:
 
 ``jupyter notebook Insolation.ipynb``
@@ -158,21 +157,18 @@ Release history
 Version 0.7.0 (released July 2018)
     New functionality, improved documentation_, and a few breaking changes to the API.
 
-    Major new functionality includes **convective adjustment to the moist adiabat**
-    and **moist EBMs with diffusion on moist static energy gradients**.
+    Major new functionality includes `convective adjustment to the moist adiabat <http://climlab.readthedocs.io/en/latest/api/climlab.convection.convadj.html>`_ and `moist EBMs with diffusion on moist static energy gradients <http://climlab.readthedocs.io/en/latest/api/climlab.model.ebm.html>`_.
 
     Details:
 
-    - ``climlab.convection.ConvectiveAdjustement`` now allows non-constant critical lapse rates,
-    stored in input parameter ``adj_lapse_rate``.
+    - ``climlab.convection.ConvectiveAdjustement`` now allows non-constant critical lapse rates, stored in input parameter ``adj_lapse_rate``.
         - New switches to implement automatic adjustment to **dry** and **moist** adiabats (pseudoadiabat)
     - ``climlab.EBM()`` and its daughter classes are significantly reorganized to better respect CLIMLAB principles:
         - Essentially all the computations are done by subprocesses
         - SW radiation is now handled by ``climlab.radiation.SimpleAbsorbedShortwave`` class
         - Diffusion and its diagnostics now handled by ``climlab.dynamics.MeridionalHeatDiffusion`` class.
         - Diffusivity can be altered at any time by the user, e.g. during timestepping
-        - Diffusivity input value ``K`` in class ``climlab.dynamics.MeridionalDiffusion`` is now specified in physical units of m2/s instead of (1/s).
-        This is consistent with its parent class ``climlab.dynamics.Diffusion``.
+        - Diffusivity input value ``K`` in class ``climlab.dynamics.MeridionalDiffusion`` is now specified in physical units of m2/s instead of (1/s). This is consistent with its parent class ``climlab.dynamics.Diffusion``.
     - A new class ``climlab.dynamics.MeridionalMoistDiffusion`` for the moist EBM (diffusion down moist static energy gradient)
     - Tests that require compiled code are now marked with ``pytest.mark.compiled`` for easy exclusion during local development
 
@@ -232,12 +228,14 @@ Version 0.2 (released January 2015)
 
     It was used extensively for a graduate-level climate modeling course in Spring 2015:
     http://www.atmos.albany.edu/facstaff/brose/classes/ATM623_Spring2015/
+
     Many more examples are found in the online lecture notes for that course:
     http://nbviewer.jupyter.org/github/brian-rose/ClimateModeling_courseware/blob/master/index.ipynb
 
 Version 0.1
     The first versions of the code and notebooks were originally developed in winter / spring 2014
     in support of an undergraduate course at the University at Albany.
+
     See the original course webpage at
     http://www.atmos.albany.edu/facstaff/brose/classes/ENV480_Spring2014/
 
