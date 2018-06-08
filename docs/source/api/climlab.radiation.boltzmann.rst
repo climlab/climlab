@@ -1,7 +1,7 @@
-boltzmann
+Boltzmann
 ---------
 
-.. inheritance-diagram:: climlab.radiation.boltzmann
+.. inheritance-diagram:: climlab.radiation.Boltzmann
    :parts: 1
    :private-bases:
 

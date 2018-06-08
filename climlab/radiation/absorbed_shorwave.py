@@ -7,12 +7,13 @@ class SimpleAbsorbedShortwave(EnergyBudget):
     '''A class for the shortwave radiation process in a one-layer EBM.
     The basic assumption is that all the shortwave absorption occurs at the surface.
 
-    Computes the diagnostic `ASR` (absorbed shortwave radiation)
-    from the formula `self.ASR = (1-self.albedo) * self.insolation`
-    and applies this as a tendency on the surface temperature.
+    Computes the diagnostic ``ASR`` (absorbed shortwave radiation)
+    from the formula ``self.ASR = (1-self.albedo) * self.insolation``
+    and applies this as a tendency on the surface temperature ``self.Ts``
 
-    `albedo` and `insolation` are given as inputs. These should either be scalars
-    or have same dimensions as state variable `Ts`
+    ``albedo`` and ``insolation`` are given as inputs.
+    These should either be scalars
+    or have same dimensions as state variable ``Ts``
 
     User can supply constants, or link to diagnostics of specific insolation
     and albedo processes.

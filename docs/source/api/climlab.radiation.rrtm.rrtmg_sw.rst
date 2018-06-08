@@ -1,7 +1,7 @@
-rrtmg_sw
+RRTMG_SW
 ---------
 
-.. inheritance-diagram:: climlab.radiation.rrtm.rrtmg_sw
+.. inheritance-diagram:: climlab.radiation.RRTMG_SW
    :parts: 1
    :private-bases:
 

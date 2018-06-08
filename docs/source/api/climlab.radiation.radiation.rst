@@ -1,9 +1,9 @@
-radiation
+Radiation
 ---------
 
 .. _radiation:
 
-.. inheritance-diagram:: climlab.radiation.radiation
+.. inheritance-diagram:: climlab.radiation.Radiation
    :parts: 1
    :private-bases:
 

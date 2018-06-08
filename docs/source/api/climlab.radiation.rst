@@ -14,13 +14,14 @@ climlab.radiation
 .. toctree::
    :maxdepth: 3
 
-   climlab.radiation.aplusbt
-   climlab.radiation.boltzmann
-   climlab.radiation.cam3.cam3
-   climlab.radiation.greygas
+   climlab.radiation.AplusBT
+   climlab.radiation.Boltzmann
+   climlab.radiation.CAM3
+   climlab.radiation.GreyGas
    climlab.radiation.insolation
    climlab.radiation.nband
-   climlab.radiation.radiation
-   climlab.radiation.rrtm
+   climlab.radiation.Radiation
+   climlab.radiation.RRTMG
+   climlab.radiation.SimpleAbsorbedShortwave
    climlab.radiation.transmissivity
    climlab.radiation.water_vapor

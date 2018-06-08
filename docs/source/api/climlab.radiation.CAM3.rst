@@ -1,7 +1,7 @@
-cam3
+CAM3
 ---------
 
-.. inheritance-diagram:: climlab.radiation.cam3.cam3
+.. inheritance-diagram:: climlab.radiation.CAM3
    :parts: 1
    :private-bases:
 

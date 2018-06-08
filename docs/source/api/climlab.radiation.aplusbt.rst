@@ -1,7 +1,7 @@
-aplusbt
+AplusBT
 -------
 
-.. inheritance-diagram:: climlab.radiation.aplusbt
+.. inheritance-diagram:: climlab.radiation.AplusBT
    :parts: 1
    :private-bases:
 

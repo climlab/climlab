@@ -1,12 +1,12 @@
-rrtm
+RRTMG
 ---------
 
 .. toctree::
    :maxdepth: 3
 
-  climlab.radiation.rrtm.rrtmg
-  climlab.radiation.rrtm.rrtmg_lw
-  climlab.radiation.rrtm.rrtmg_sw
+  climlab.radiation.rrtm.RRTMG
+  climlab.radiation.rrtm.RRTMG_LW
+  climlab.radiation.rrtm.RRTMG_SW
 
 .. automodule:: climlab.radiation.rrtm
     :members:

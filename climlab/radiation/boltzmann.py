@@ -15,25 +15,25 @@ class Boltzmann(EnergyBudget):
 
     .. math::
 
-        P = A \\varepsilon \\sigma T^4
+        P = A \varepsilon \sigma T^4
 
-    where :math:`\\varepsilon` is the emissivity of the body.
+    where :math:`\varepsilon` is the emissivity of the body.
 
     As the :class:`~climlab.process.energy_budget.EnergyBudget` of the
-    Energy Balance Model is accounted in unit :math:`\\textrm{energy} / \\textrm{area}`
+    Energy Balance Model is accounted in unit :math:`\textrm{energy} / \textrm{area}`
     (:math:`\\textrm{W}/ \\textrm{m}^2`)
     the energy budget equation looks like this:
 
     .. math::
 
-        C \\frac{dT}{dt} = R\downarrow - R\uparrow - H  \n
+        C \frac{dT}{dt} = R\downarrow - R\uparrow - H  \n
 
     The :class:`Boltzmann` radiation subprocess represents the outgoing radiation
     :math:`R\uparrow` which then can be written as
 
     .. math::
 
-        R\uparrow = \\varepsilon \\sigma T^4
+        R\uparrow = \varepsilon \sigma T^4
 
     with state variable :math:`T`.
 
