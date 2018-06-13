@@ -1,6 +1,9 @@
 '''
 climlab wrappers for the NCAR CAM3 radiation code
 
+Input arguments and diagnostics follow specifications in
+:class:`~climlab.radiation._Radiation`
+
     :Example:
 
         Here is a quick example of setting up a single-column

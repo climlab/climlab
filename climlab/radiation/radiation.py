@@ -1,4 +1,4 @@
-'''_Radiation, _Radiation_SW and _Radiation_LW
+'''``_Radiation``, ``_Radiation_SW`` and ``_Radiation_LW``
 are the base classes for radiative transfer modules
 
 Currently this includes :class:`~climlab.radiation.cam3.CAM3`,
@@ -10,62 +10,62 @@ Basic characteristics:
 
 State:
 
-    - Ts (surface radiative temperature)
-    - Tatm (air temperature)
+    - ``Ts`` (surface radiative temperature)
+    - ``Tatm`` (air temperature)
 
 Input arguments (both LW and SW):
 
-    - specific_humidity (kg/kg)
-    - absorber_vmr (dict of volumetric mixing ratios)
-    - cldfrac      (layer cloud fraction
-    - clwp         (in-cloud liquid water path (g/m2))
-    - ciwp = 0.,     # in-cloud ice water path (g/m2)
-    - r_liq = 0.,    # Cloud water drop effective radius (microns)
-    - r_ice = 0.,    # Cloud ice particle effective size (microns)
-    - ozone_file = 'apeozone_cam3_5_54.nc'  (file with ozone distribution)
+    - ``specific_humidity`` (kg/kg)
+    - ``absorber_vmr`` (dict of volumetric mixing ratios)
+    - ``cldfrac``      (layer cloud fraction
+    - ``clwp``         (in-cloud liquid water path (g/m2))
+    - ``ciwp = 0.``,     # in-cloud ice water path (g/m2)
+    - ``r_liq = 0.``,    # Cloud water drop effective radius (microns)
+    - ``r_ice = 0.``,    # Cloud ice particle effective size (microns)
+    - ``ozone_file = 'apeozone_cam3_5_54.nc'``  (file with ozone distribution)
 
 Additional input arguments for SW:
 
-     - albedo = None  (optional, single parameter to set all 4 albedo values)
-     - aldif = 0.3,   (near-infrared albedo, diffuse)
-     - aldir = 0.3,   (near-infrared albedo, direct)
-     - asdif = 0.3,   (shortwave albedo, diffuse)
-     - asdir = 0.3,   (shortwave albedo, direct)
-     - S0    = const.S0,  (solar constant, W/m2)
-     - insolation = const.S0/4.,  (time-mean insolaltion, W/m2)
-     - coszen = None,    # cosine of the solar zenith angle
-     - eccentricity_factor = 1.,  # instantaneous irradiance = S0 * eccentricity_factor
+     - ``albedo = None``  (optional, single parameter to set all 4 albedo values)
+     - ``aldif = 0.3``,   (near-infrared albedo, diffuse)
+     - ``aldir = 0.3``,   (near-infrared albedo, direct)
+     - ``asdif = 0.3``,   (shortwave albedo, diffuse)
+     - ``asdir = 0.3``,   (shortwave albedo, direct)
+     - ``S0 = const.S0``,  (solar constant, W/m2)
+     - ``insolation = const.S0/4.``,  (time-mean insolaltion, W/m2)
+     - ``coszen = None``,    # cosine of the solar zenith angle
+     - ``eccentricity_factor = 1.``,  # instantaneous irradiance = S0 * eccentricity_factor
 
 Additional input arguments for LW:
-    - emissivity = 1.,  # surface emissivity
+    - ``emissivity = 1.``,  # surface emissivity
 
 Shortave processes compute these diagnostics (minimum):
 
-    - ASR (W/m2, net Absorbed Shortwave Radiation at TOA, **positive down**)
-    - ASRclr (clear-sky component)
-    - ASRcld (cloud component, all-sky minus clear-sky)
-    - SW_flux_up   (W/m2, defined at pressure level interfaces)
-    - SW_flux_down (W/m2, defined at pressure level interfaces)
-    - SW_flux_net  (W/m2 **downward** net flux at pressure level interfaces)
-    - SW_flux_up_clr  (clear-sky flux)
-    - SW_flux_down_clr (clear-sky flux)
-    - SW_flux_net_clr  (clear-sky flux)
-    - TdotSW   (K/day, radiative heating rate)
-    - TdotSW_clr (clear-sky heating rate)
+    - ``ASR`` (W/m2, net Absorbed Shortwave Radiation at TOA, **positive down**)
+    - ``ASRclr`` (clear-sky component)
+    - ``ASRcld`` (cloud component, all-sky minus clear-sky)
+    - ``SW_flux_up``   (W/m2, defined at pressure level interfaces)
+    - ``SW_flux_down`` (W/m2, defined at pressure level interfaces)
+    - ``SW_flux_net``  (W/m2 **downward** net flux at pressure level interfaces)
+    - ``SW_flux_up_clr``  (clear-sky flux)
+    - ``SW_flux_down_clr`` (clear-sky flux)
+    - ``SW_flux_net_clr``  (clear-sky flux)
+    - ``TdotSW``   (K/day, radiative heating rate)
+    - ``TdotSW_clr`` (clear-sky heating rate)
 
 Longwave processes compute these diagnostics (minimum):
 
-    - OLR (W/m2, net Outgoing Longwave radiation at TOA, **positive up**)
-    - OLRclr (clear-sky component)
-    - OLRcld (cloud component, all-sky minus clear-sky)
-    - LW_flux_up   (W/m2, defined at pressure level interfaces)
-    - LW_flux_down (W/m2, defined at pressure level interfaces)
-    - LW_flux_net  (W/m2 **upward** net flux at pressure level interfaces)
-    - LW_flux_up_clr  (clear-sky flux)
-    - LW_flux_down_clr (clear-sky flux)
-    - LW_flux_net_clr  (clear-sky flux)
-    - TdotLW   (K/day, radiative heating rate)
-    - TdotLW_clr (clear-sky heating rate)
+    - ``OLR`` (W/m2, net Outgoing Longwave radiation at TOA, **positive up**)
+    - ``OLRclr`` (clear-sky component)
+    - ``OLRcld`` (cloud component, all-sky minus clear-sky)
+    - ``LW_flux_up``   (W/m2, defined at pressure level interfaces)
+    - ``LW_flux_down`` (W/m2, defined at pressure level interfaces)
+    - ``LW_flux_net``  (W/m2 **upward** net flux at pressure level interfaces)
+    - ``LW_flux_up_clr``  (clear-sky flux)
+    - ``LW_flux_down_clr`` (clear-sky flux)
+    - ``LW_flux_net_clr``  (clear-sky flux)
+    - ``TdotLW``   (K/day, radiative heating rate)
+    - ``TdotLW_clr`` (clear-sky heating rate)
 '''
 
 from __future__ import division

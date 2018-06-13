@@ -5,6 +5,9 @@ This is implemented with classes :class:`~climlab.radiation.rrtm.RRTMG_LW`, and
 as well as a container class :class:`~climlab.radiation.rrtm.RRTMG`
 that has LW and SW radiation as subprocesses.
 
+Input arguments and diagnostics follow specifications in
+:class:`~climlab.radiation._Radiation`
+
 See <http://rtweb.aer.com/rrtm_frame.html> for more information about the RRTMG code.
 
     :Example:
