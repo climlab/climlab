@@ -22,8 +22,7 @@ Input arguments (both LW and SW):
     - ``ciwp = 0.``,     # in-cloud ice water path (g/m2)
     - ``r_liq = 0.``,    # Cloud water drop effective radius (microns)
     - ``r_ice = 0.``,    # Cloud ice particle effective size (microns)
-    - ``ozone_file = 'apeozone_cam3_5_54.nc'``  (file with ozone distribution --
-    ignored if ``absorber_vmr`` is given)
+    - ``ozone_file = 'apeozone_cam3_5_54.nc'``  (file with ozone distribution - ignored if ``absorber_vmr`` is given)
 
 If ``absorber_vmr = None`` then ozone will be interpolated to the model grid
 from a climatology file, or set to zero if ``ozone_file = None``.
