@@ -16,13 +16,17 @@ State:
 Input arguments (both LW and SW):
 
     - ``specific_humidity`` (kg/kg)
-    - ``absorber_vmr`` (dict of volumetric mixing ratios)
+    - ``absorber_vmr = None`` (dictionary of volumetric mixing ratios. Default values supplied if ``None``)
     - ``cldfrac``      (layer cloud fraction
     - ``clwp``         (in-cloud liquid water path (g/m2))
     - ``ciwp = 0.``,     # in-cloud ice water path (g/m2)
     - ``r_liq = 0.``,    # Cloud water drop effective radius (microns)
     - ``r_ice = 0.``,    # Cloud ice particle effective size (microns)
-    - ``ozone_file = 'apeozone_cam3_5_54.nc'``  (file with ozone distribution)
+    - ``ozone_file = 'apeozone_cam3_5_54.nc'``  (file with ozone distribution --
+    ignored if ``absorber_vmr`` is given)
+
+If ``absorber_vmr = None`` then ozone will be interpolated to the model grid
+from a climatology file, or set to zero if ``ozone_file = None``.
 
 Additional input arguments for SW:
 
@@ -128,34 +132,38 @@ def default_absorbers(Tatm,
     absorber_vmr['CFC22'] = 0.
     absorber_vmr['CCL4']  = 0.
 
-    datadir = os.path.join(os.path.dirname(__file__), 'data', 'ozone')
-    ozonefilepath = os.path.join(datadir, ozone_file)
-    #  Open the ozone data file
-    if verbose:
-        print('Getting ozone data from', ozonefilepath)
-    ozonedata = nc.Dataset(ozonefilepath)
-    ozone_lev = ozonedata.variables['lev'][:]
-    ozone_lat = ozonedata.variables['lat'][:]
-    #  zonal and time average
-    ozone_zon = np.mean(ozonedata.variables['OZONE'], axis=(0,3))
-    ozone_global = np.average(ozone_zon, weights=np.cos(np.deg2rad(ozone_lat)), axis=1)
-    lev = Tatm.domain.axes['lev'].points
-    if Tatm.shape == lev.shape:
-        # 1D interpolation on pressure levels using global average data
-        f = interp1d(ozone_lev, ozone_global)
-        #  interpolate data to model levels
-        absorber_vmr['O3'] = f(lev)
-    else:
-        #  Attempt 2D interpolation in pressure and latitude
-        f2d = interp2d(ozone_lat, ozone_lev, ozone_zon)
-        try:
-            lat = Tatm.domain.axes['lat'].points
+    # Ozone: start with all zeros, interpolate to data if we can
+    absorber_vmr['O3'] = np.zeros_like(Tatm)
+    if ozone_file is not None:
+        datadir = os.path.join(os.path.dirname(__file__), 'data', 'ozone')
+        ozonefilepath = os.path.join(datadir, ozone_file)
+        #  Open the ozone data file
+        if verbose:
+            print('Getting ozone data from', ozonefilepath)
+        ozonedata = nc.Dataset(ozonefilepath)
+        ozone_lev = ozonedata.variables['lev'][:]
+        ozone_lat = ozonedata.variables['lat'][:]
+        #  zonal and time average
+        ozone_zon = np.mean(ozonedata.variables['OZONE'], axis=(0,3))
+        ozone_global = np.average(ozone_zon,
+                    weights=np.cos(np.deg2rad(ozone_lat)), axis=1)
+        lev = Tatm.domain.axes['lev'].points
+        if Tatm.shape == lev.shape:
+            # 1D interpolation on pressure levels using global average data
+            f = interp1d(ozone_lev, ozone_global)
+            #  interpolate data to model levels
+            absorber_vmr['O3'] = f(lev)
+        else:
+            #  Attempt 2D interpolation in pressure and latitude
             f2d = interp2d(ozone_lat, ozone_lev, ozone_zon)
-            absorber_vmr['O3'] = f2d(lat, lev).transpose()
-        except:
-            print('Interpolation of ozone data failed.')
-            print('Reverting to default O3.')
-            absorber_vmr['O3'] = np.zeros_like(Tatm)
+            try:
+                lat = Tatm.domain.axes['lat'].points
+                f2d = interp2d(ozone_lat, ozone_lev, ozone_zon)
+                absorber_vmr['O3'] = f2d(lat, lev).transpose()
+            except:
+                print('Interpolation of ozone data failed.')
+                print('Reverting to default O3.')
+                absorber_vmr['O3'] = np.zeros_like(Tatm)
     return absorber_vmr
 
 def init_interface(field):
