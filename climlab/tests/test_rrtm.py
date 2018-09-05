@@ -165,3 +165,4 @@ def test_no_ozone():
     lev.delta = np.abs(np.diff(lev.bounds))
     #  Create a RRTM radiation model
     rad = climlab.radiation.RRTMG(state=state, ozone_file=None)
+    assert np.all(rad.absorber_vmr['O3']==0.)
