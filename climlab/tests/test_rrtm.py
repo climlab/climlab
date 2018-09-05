@@ -150,3 +150,19 @@ def test_latitude():
     grad = np.diff(model.Ts, axis=0)
     assert np.all(grad[0:(int(num_lat/2)-1)] > 0.)
     assert np.all(grad[int(num_lat/2):] < 0.)
+
+@pytest.mark.compiled
+@pytest.mark.fast
+def test_no_ozone():
+    '''When user gives None as the ozone_file, the model is initialized
+    with zero ozone. This should work on arbitrary grids.'''
+    ps = 1060.
+    num_lev=4000
+    state = climlab.column_state(num_lev=num_lev, num_lat=1, water_depth=5.)
+    lev = state.Tatm.domain.lev
+    lev.bounds = np.linspace(0., ps, num_lev+1)
+    lev.points = lev.bounds[:-1] + np.diff(lev.bounds)/2.
+    lev.delta = np.abs(np.diff(lev.bounds))
+    #  Create a RRTM radiation model
+    rad = climlab.radiation.RRTMG(state=state, ozone_file=None)
+    assert np.all(rad.absorber_vmr['O3']==0.)
