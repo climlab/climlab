@@ -79,3 +79,18 @@ def test_diffmodel(diffmodel):
     diffmodel.integrate_years(1)
     tatm = diffmodel.timeave['Tatm']
     assert _check_minmax(tatm, 208.689339823, 285.16085319)
+
+@pytest.mark.fast
+def test_external_tendency():
+    """Check that we can add an externally defined tendency to a
+    radiative-convective model."""
+    model = climlab.GreyRadiationModel(num_lev=30)
+    model2 = climlab.process_like(model)
+    model.step_forward()
+    ext = climlab.process.ExternalForcing(state=model2.state)
+    temp_tend = 1E-5  # K/s
+    ext.forcing_tendencies['Tatm'][:] = temp_tend
+    model2.add_subprocess('External', ext)
+    model2.step_forward()
+    assert model.tendencies['Tatm'] + temp_tend == pytest.approx(model2.tendencies['Tatm'])
+    #assert np.all(np.isclose(model.tendencies['Tatm'] == (model2.tendencies['Tatm']-temp_tend))
