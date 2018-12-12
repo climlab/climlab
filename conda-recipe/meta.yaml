@@ -15,7 +15,6 @@ requirements:
   build:
     - toolchain
     - mingwpy  # [win and py2k]
-    - vs2015  # [win and py3k]
     - flang  # [win and py3k]
     - gcc  # [osx or linux]
     - python
