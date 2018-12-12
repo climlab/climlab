@@ -26,14 +26,13 @@ before_install:
   - hash -r
 
 install:
-  - |
-      echo ""
-      echo "Configuring conda."
-      conda config --set always_yes yes --set changeps1 no
-      conda config --append channels conda-forge
-      conda update -q conda
-      conda install conda-build
-      conda info -a
+  - echo ""
+  - echo "Configuring conda."
+  - conda config --set always_yes yes --set changeps1 no
+  - conda config --append channels conda-forge
+  - conda update -q conda
+  - conda install conda-build
+  - conda info -a
 
 script:
   - conda-build conda-recipe
