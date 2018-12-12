@@ -9,17 +9,19 @@ source:
   path: ../
 
 build:
-  number: 2
+  number: 3
 
 requirements:
   build:
-    - {{ compiler('fortran') }}
-    - {{ compiler('c') }}
-  host:
+    - toolchain
+    - mingwpy  # [win and py2k]
     - flang  # [win and py3k]
+    - gcc  # [osx or linux]
     - python
     - setuptools
-    - numpy
+    - libgfortran  # [linux]
+    - numpy 1.11.*  # [not (win and py3k)]
+    - numpy 1.14.*  # [win and py3k]
 
   run:
     - python
