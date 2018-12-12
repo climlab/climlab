@@ -30,8 +30,8 @@ install:
   - echo "Configuring conda."
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
+  - conda config --add channels conda-forge
   - conda install conda-build
-  - conda config --append channels conda-forge
   - conda info -a
 
 script:
