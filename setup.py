@@ -24,10 +24,8 @@ def patch_gnu_fortran():
                     'rrtmg_sw_k_g.f90',
                     'rrtmg_lw_k_g.f90',
                 ):
-                    print('\n \n !!!  TRYING TO ADD OPT FLAG  !!! \n \n')
                     try:
                         cmd.append('-O0')
-                        print('\n \n !!!  ADDED -O0  !!! \n \n')
                     except ValueError:
                         pass
                     break
