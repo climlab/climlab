@@ -1,0 +1,49 @@
+#  This is cribbing from .appveyor.yml in conda-forge/climlab-feedstock
+
+environment:
+
+#  BINSTAR_TOKEN:
+#    # The BINSTAR_TOKEN secure variable. This is defined canonically in conda-forge.yml.
+#    secure: tumuXLL8PU75WMnRDemRy02ruEq2RpNxeK3dz0MjFssnosPm2v4EFjfNB4PTotA1
+
+  matrix:
+    - CONDA_INSTALL_LOCN: C:\Miniconda36-x64
+
+# We always use a 64-bit machine, but can build x86 distributions
+# with the TARGET_ARCH variable.
+platform:
+    - x64
+
+install:
+    # If there is a newer build queued for the same PR, cancel this one.
+    - cmd: |
+        powershell -Command "(New-Object Net.WebClient).DownloadFile('https://raw.githubusercontent.com/conda-forge/conda-forge-ci-setup-feedstock/branch2.0/recipe/conda_forge_ci_setup/ff_ci_pr_build.py', 'ff_ci_pr_build.py')"
+        ff_ci_pr_build -v --ci "appveyor" "%APPVEYOR_ACCOUNT_NAME%/%APPVEYOR_PROJECT_SLUG%" "%APPVEYOR_BUILD_NUMBER%" "%APPVEYOR_PULL_REQUEST_NUMBER%"
+        del ff_ci_pr_build.py
+
+    # Cywing's git breaks conda-build. (See https://github.com/conda-forge/conda-smithy-feedstock/pull/2.)
+    - cmd: rmdir C:\cygwin /s /q
+
+    # Add path, activate `conda` and update conda.
+    - cmd: call %CONDA_INSTALL_LOCN%\Scripts\activate.bat
+    - cmd: conda.exe update --yes --quiet conda
+
+    - cmd: set PYTHONUNBUFFERED=1
+
+    # Add our channels.
+    - cmd: conda.exe config --set show_channel_urls true
+    - cmd: conda.exe config --remove channels defaults
+    - cmd: conda.exe config --add channels defaults
+    - cmd: conda.exe config --add channels conda-forge
+
+    # Configure the VM.
+    - cmd: conda.exe install -n root --quiet --yes conda-forge-ci-setup=2
+    - cmd: run_conda_forge_build_setup
+
+# Skip .NET project specific build phase.
+build: off
+
+test_script:
+    - conda.exe build conda-recipe #--quiet
+#deploy_script:
+#    - cmd: upload_package .\ .\recipe .ci_support\%CONFIG%.yaml
