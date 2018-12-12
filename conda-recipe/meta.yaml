@@ -17,7 +17,6 @@ requirements:
     - {{ compiler('c') }}
   host:
     - flang  # [win and py3k]
-    - toolchain
     - python
     - setuptools
     - numpy

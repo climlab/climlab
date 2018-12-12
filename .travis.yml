@@ -30,10 +30,9 @@ install:
       echo ""
       echo "Configuring conda."
       conda config --set always_yes yes --set changeps1 no
-      conda config --add channels conda-forge
       conda update -q conda
       conda install conda-build
       conda info -a
 
 script:
-  - conda-build conda-recipe 
+  - conda-build conda-recipe
