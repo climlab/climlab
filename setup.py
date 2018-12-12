@@ -1,7 +1,7 @@
 import os, sys
 import textwrap
 
-VERSION = '0.7.1.dev2'
+VERSION = '0.7.1.dev4'
 
 # BEFORE importing setuptools, remove MANIFEST. Otherwise it may not be
 # properly updated when the contents of directories change (true for distutils,
@@ -25,7 +25,7 @@ def patch_gnu_fortran():
                     'rrtmg_lw_k_g.f90',
                 ):
                     try:
-                        cmd.remove('-O3')
+                        cmd.append('-O0')
                     except ValueError:
                         pass
                     break
