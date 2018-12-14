@@ -61,11 +61,13 @@ def _get_Laskar_data():
     print('Attempting to access La2004 orbital data from ' + base_url)
     longorbit = {}
     xlongorbit = {}
-    longorbit['past'] = pd.read_table(base_url + past_file, delim_whitespace=True, header=None, index_col=0,
+    longorbit['past'] = pd.read_table(base_url + past_file,
+                            delim_whitespace=True, header=None, index_col=0,
                              names=['kyear','ecc','obliquity','long_peri'])
-    longorbit['future'] = pd.read_table(base_url + future_file, delim_whitespace=True, header=None,
-                                     index_col=0, skiprows=1, # first row is kyear=0, redundant
-                                        names=['kyear','ecc','obliquity','long_peri'])
+    longorbit['future'] = pd.read_table(base_url + future_file,
+                            delim_whitespace=True, header=None, index_col=0,
+                            skiprows=1, # first row is kyear=0, redundant
+                            names=['kyear','ecc','obliquity','long_peri'])
     for time in ['past', 'future']:
         # Cannot convert to float until we replace the D notation with E for floating point numbers
         longorbit[time].replace(to_replace='D', value='E', regex=True, inplace=True)
@@ -79,69 +81,5 @@ def _get_Laskar_data():
     longorbit['precession'] = longorbit.ecc*np.sin(np.deg2rad(longorbit.long_peri))
     return longorbit
 
-
-class OrbitalTable(object):
-    """Invoking OrbitalTable() will load 5 million years of orbital data
-    from :cite:`Berger_1991` and compute linear interpolants.
-
-    The data can be accessed through the method :func:`lookup_parameters()`.
-
-
-    **Object attributes** \n
-
-    Following object attributes are generated during initialization:
-
-    :ivar array kyear:          time table with negative values are before present
-                                (*unit:* kyears)
-    :ivar array ecc:            eccentricity over time (*unit:* dimensionless)
-    :ivar array long_peri:      longitude of perihelion (precession angle) (*unit:* degrees)
-    :ivar array obliquity:      obliquity angle (*unit:* degrees)
-    :ivar float kyear_min:      minimum value of time table (*unit:* kyears)
-    :ivar float kyear_max:      maximum value of time table (*unit:* kyears)
-
-    """
-    def __init__(self):
-        self.orbit = self._get_data()
-
-    def _get_data(self,):
-        return _get_Berger_data()
-
-    def lookup_parameters(self, kyear = 0):
-        """Look up orbital parameters for given kyear measured from present.
-
-        .. note::
-
-            Input ``kyear`` is thousands of years after present.
-            For years before present, use ``kyear < 0``.
-
-        **Function-call argument** \n
-
-        :param array kyear:     Time for which oribtal parameters should be given.
-                                Will handle scalar or vector input (for multiple years).
-                                [default: 0]
-
-        :returns:               a three-member dictionary of orbital parameters:
-
-                                    * ``'ecc'``: eccentricity (dimensionless)
-                                    * ``'long_peri'``: longitude of perihelion
-                                      relative to vernal equinox (degrees)
-                                    * ``'obliquity'``: obliquity angle or axial tilt (degrees).
-
-                                Each member is an array of same size as kyear.
-        :rtype:                 dict
-
-        """
-        return self.orbit.interp(kyear=kyear)
-
-
-class LongOrbitalTable(OrbitalTable):
-    """Loads orbital parameter tables for -51 to +21 Myears.
-
-    Based on calculations by :cite:`Laskar_2004`
-        http://vo.imcce.fr/insola/earth/online/earth/La2004/README.TXT
-
-    Usage is identical to parent class :class:`OrbitalTable()`.
-
-    """
-    def _get_data(self,):
-        return _get_Laskar_data()
+OrbitalTable = _get_Berger_data()
+LongOrbitalTable = _get_Laskar_data()

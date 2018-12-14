@@ -28,8 +28,7 @@ def test_daily_insolation():
 @pytest.mark.fast
 def test_orbital_parameters():
     kyears = np.arange( -1000., 1.)
-    table = OrbitalTable()
-    orb = table.lookup_parameters(kyears)
+    orb = OrbitalTable.interp(kyear=kyears)
 
     # check that orb has the right dictionary keys
     # key: (min, max)
@@ -44,8 +43,7 @@ def test_orbital_parameters():
 @pytest.mark.slow
 def test_long_orbital_parameters():
     kyears = np.arange( -1000., +500.)
-    table = LongOrbitalTable()
-    orb = table.lookup_parameters(kyears)
+    orb = LongOrbitalTable.interp(kyear=kyears)
 
     # check that orb has the right dictionary keys
     # key: (min, max)
