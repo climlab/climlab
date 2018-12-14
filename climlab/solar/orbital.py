@@ -47,9 +47,11 @@ def _get_Berger_data():
     #  As xarray structure with the dimension named 'kyear'
     orbit = xr.Dataset(orbit91_pd).rename({'dim_0': 'kyear'})
     #  Now change names
-    orbit = orbit.rename({'ECC': 'ecc', 'OMEGA': 'long_peri', 'OBL': 'obliquity'})
+    orbit = orbit.rename({'ECC': 'ecc', 'OMEGA': 'long_peri',
+                          'OBL': 'obliquity', 'PREC': 'precession'})
     # add 180 degrees to long_peri (see lambda definition, Berger 1978 Appendix)
     orbit['long_peri'] += 180.
+    orbit['precession'] *= -1.
     return orbit
 
 def _get_Laskar_data():
@@ -74,6 +76,7 @@ def _get_Laskar_data():
     longorbit = xr.concat([xlongorbit['past'], xlongorbit['future']], dim='kyear')
     # add 180 degrees to long_peri (see lambda definition, Berger 1978 Appendix)
     longorbit['long_peri'] += 180.
+    longorbit['precession'] = longorbit.ecc*np.sin(np.deg2rad(longorbit.long_peri))
     return longorbit
 
 
