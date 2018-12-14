@@ -59,11 +59,8 @@ def _get_orbit91():
     #  Now change names
     orbit = orbit.rename({'ECC': 'ecc', 'OMEGA': 'long_peri', 'OBL': 'obliquity'})
     # add 180 degrees to long_peri (see lambda definition, Berger 1978 Appendix)
-            #long_peri0rad = np.deg2rad(self.long_peri + 180.)
     orbit['long_peri'] += 180.
     return orbit
-
-orbit = _get_orbit91()
 
 
 class OrbitalTable(object):
@@ -87,7 +84,7 @@ class OrbitalTable(object):
 
     """
     def __init__(self):
-        pass
+        self.orbit = self._get_data()
         # self.kyear = None
         # self.ecc = None
         # self.long_peri = None
@@ -99,8 +96,10 @@ class OrbitalTable(object):
         # # if you ask for something outside this range -- not yet implemented.
         # self.kyear_max = np.max(self.kyear)
         # self.kyear_min = np.min(self.kyear)
+    def _get_data(self,):
+        return _get_orbit91()
 
-    def lookup_parameters( self, kyear = 0 ):
+    def lookup_parameters(self, kyear = 0):
         """Look up orbital parameters for given kyear measured from present.
 
         .. note::
@@ -134,7 +133,7 @@ class OrbitalTable(object):
         # # Build a dictionary of all the parameters
         # orb = {'ecc':this_ecc, 'long_peri':long_peri_converted, 'obliquity':this_obliquity}
         # return orb
-        return orbit.interp(kyear=kyear)
+        return self.orbit.interp(kyear=kyear)
 
     # def _get_data(self):
     #     past_file = 'orbit91'
@@ -201,33 +200,51 @@ class LongOrbitalTable(OrbitalTable):
         base_url = 'http://vo.imcce.fr/insola/earth/online/earth/La2004/'
         past_file = 'INSOLN.LA2004.BTL.ASC'
         future_file = 'INSOLP.LA2004.BTL.ASC'
-
-        num_lines_past = 51001
-        num_lines_future = 21001
-        num_columns = 4
-        data_past = np.empty((num_lines_past,num_columns))
-        data_future = np.empty((num_lines_future, num_columns))
-
         print('Attempting to access La2004 orbital data from ' + base_url)
-        #  loop through each line of the file, read it into numpy array
-        for (data,filename) in zip((data_past,data_future),
-                            (past_file,future_file)):
-            print('Reading file ' + filename)
-            record = urlopen( base_url + filename )
-            for index,line in enumerate(record):
-                str1 = line.rstrip()  # remove newline character
-                try:
-                    str2 = str1.replace('D','E')  # put string into numpy format
-                except:
-                    #  in Python 3 we need to convert from bytes object first
-                    str2 = (str(str1,'utf-8')).replace('D','E')
-                data[index,:] = np.fromstring(str2, sep=' ')
-            record.close()
-        #  need to flip it so the data runs from past to present
-        data_past = np.flipud(data_past)
-        # and expunge the first line of the future data because it repeats year 0
-        data = np.concatenate((data_past,data_future[1:,:]), axis=0)
-        self.kyear = data[:,0]
-        self.ecc = data[:,1]
-        self.obliquity = np.rad2deg(data[:,2])
-        self.long_peri = np.rad2deg(data[:,3])
+        longorbit = {}
+        xlongorbit = {}
+        longorbit['past'] = pd.read_table(base_url + past_file, delim_whitespace=True, header=None, index_col=0,
+                                 names=['kyear','ecc','obliquity','long_peri'])
+        longorbit['future'] = pd.read_table(base_url + future_file, delim_whitespace=True, header=None,
+                                         index_col=0, skiprows=1, # first row is kyear=0, redundant
+                                            names=['kyear','ecc','obliquity','long_peri'])
+        for time in ['past', 'future']:
+            # Cannot convert to float until we replace the D notation with E for floating point numbers
+            longorbit[time].replace(to_replace='D', value='E', regex=True, inplace=True)
+            xlongorbit[time] = xr.Dataset()
+            xlongorbit[time]['ecc'] = xr.DataArray(pd.to_numeric(longorbit[time]['ecc']))
+            for field in ['obliquity', 'long_peri']:
+                xlongorbit[time][field] = xr.DataArray(np.rad2deg(pd.to_numeric(longorbit[time][field])))
+        longorbit = xr.concat([xlongorbit['past'], xlongorbit['future']], dim='kyear')
+        # add 180 degrees to long_peri (see lambda definition, Berger 1978 Appendix)
+        longorbit['long_peri'] += 180.
+        return longorbit
+
+        # num_lines_past = 51001
+        # num_lines_future = 21001
+        # num_columns = 4
+        # data_past = np.empty((num_lines_past,num_columns))
+        # data_future = np.empty((num_lines_future, num_columns))
+        #
+        # #  loop through each line of the file, read it into numpy array
+        # for (data,filename) in zip((data_past,data_future),
+        #                     (past_file,future_file)):
+        #     print('Reading file ' + filename)
+        #     record = urlopen( base_url + filename )
+        #     for index,line in enumerate(record):
+        #         str1 = line.rstrip()  # remove newline character
+        #         try:
+        #             str2 = str1.replace('D','E')  # put string into numpy format
+        #         except:
+        #             #  in Python 3 we need to convert from bytes object first
+        #             str2 = (str(str1,'utf-8')).replace('D','E')
+        #         data[index,:] = np.fromstring(str2, sep=' ')
+        #     record.close()
+        # #  need to flip it so the data runs from past to present
+        # data_past = np.flipud(data_past)
+        # # and expunge the first line of the future data because it repeats year 0
+        # data = np.concatenate((data_past,data_future[1:,:]), axis=0)
+        # self.kyear = data[:,0]
+        # self.ecc = data[:,1]
+        # self.obliquity = np.rad2deg(data[:,2])
+        # self.long_peri = np.rad2deg(data[:,3])
