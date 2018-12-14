@@ -12,8 +12,8 @@ import pytest
 
 @pytest.mark.fast
 def test_daily_insolation():
-    lat = np.linspace( -90., 90., 500. )
-    days = np.linspace(0, const.days_per_year, 365. )
+    lat = np.linspace(-90., 90., 500)
+    days = np.linspace(0, const.days_per_year, 365)
     Q = daily_insolation(lat, days)
 
     # check the range of Q
