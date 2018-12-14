@@ -17,23 +17,13 @@ See http://vo.imcce.fr/insola/earth/online/earth/La2004/README.TXT
 
 """
 from __future__ import division, print_function
-from future import standard_library
-standard_library.install_aliases()
-from builtins import zip, range, object
 import numpy as np
-from scipy import interpolate
 import os
-try:
-    # This should work in Python 3.x
-    from urllib.request import urlopen
-except:
-    # Fallback for Python 2.7
-    from urllib2 import urlopen
 import pandas as pd
 import xarray as xr
 
 
-def _get_orbit91():
+def _get_Berger_data():
     '''Read in the Berger and Loutre orbital table as a pandas dataframe, convert to xarray
     '''
     orbit91_file = 'orbit91'
@@ -62,6 +52,30 @@ def _get_orbit91():
     orbit['long_peri'] += 180.
     return orbit
 
+def _get_Laskar_data():
+    base_url = 'http://vo.imcce.fr/insola/earth/online/earth/La2004/'
+    past_file = 'INSOLN.LA2004.BTL.ASC'
+    future_file = 'INSOLP.LA2004.BTL.ASC'
+    print('Attempting to access La2004 orbital data from ' + base_url)
+    longorbit = {}
+    xlongorbit = {}
+    longorbit['past'] = pd.read_table(base_url + past_file, delim_whitespace=True, header=None, index_col=0,
+                             names=['kyear','ecc','obliquity','long_peri'])
+    longorbit['future'] = pd.read_table(base_url + future_file, delim_whitespace=True, header=None,
+                                     index_col=0, skiprows=1, # first row is kyear=0, redundant
+                                        names=['kyear','ecc','obliquity','long_peri'])
+    for time in ['past', 'future']:
+        # Cannot convert to float until we replace the D notation with E for floating point numbers
+        longorbit[time].replace(to_replace='D', value='E', regex=True, inplace=True)
+        xlongorbit[time] = xr.Dataset()
+        xlongorbit[time]['ecc'] = xr.DataArray(pd.to_numeric(longorbit[time]['ecc']))
+        for field in ['obliquity', 'long_peri']:
+            xlongorbit[time][field] = xr.DataArray(np.rad2deg(pd.to_numeric(longorbit[time][field])))
+    longorbit = xr.concat([xlongorbit['past'], xlongorbit['future']], dim='kyear')
+    # add 180 degrees to long_peri (see lambda definition, Berger 1978 Appendix)
+    longorbit['long_peri'] += 180.
+    return longorbit
+
 
 class OrbitalTable(object):
     """Invoking OrbitalTable() will load 5 million years of orbital data
@@ -85,19 +99,9 @@ class OrbitalTable(object):
     """
     def __init__(self):
         self.orbit = self._get_data()
-        # self.kyear = None
-        # self.ecc = None
-        # self.long_peri = None
-        # self.obliquity = None
-        # #  call a method that reads data from a file and populates the arrays
-        # self._get_data()
-        # self._compute_interpolants()
-        # # find and store min and max years. lookup_parameters should throw an exception
-        # # if you ask for something outside this range -- not yet implemented.
-        # self.kyear_max = np.max(self.kyear)
-        # self.kyear_min = np.min(self.kyear)
+
     def _get_data(self,):
-        return _get_orbit91()
+        return _get_Berger_data()
 
     def lookup_parameters(self, kyear = 0):
         """Look up orbital parameters for given kyear measured from present.
@@ -124,67 +128,7 @@ class OrbitalTable(object):
         :rtype:                 dict
 
         """
-        # #  linear interpolation:
-        # this_ecc = self.f_ecc(kyear)
-        # this_obliquity = self.f_obliquity(kyear)
-        # this_long_peri = self.f_long_peri(kyear)
-        # #  convert long_peri to an angle (in degrees) between 0 and 360
-        # long_peri_converted = this_long_peri % 360.
-        # # Build a dictionary of all the parameters
-        # orb = {'ecc':this_ecc, 'long_peri':long_peri_converted, 'obliquity':this_obliquity}
-        # return orb
         return self.orbit.interp(kyear=kyear)
-
-    # def _get_data(self):
-    #     past_file = 'orbit91'
-    #     base_url = 'ftp://ftp.ncdc.noaa.gov/pub/data/paleo/insolation/'
-    #     #  This gives the full path to the data file, assuming it's in the same directory
-    #     local_path = os.path.dirname(__file__)
-    #     fullfilename = os.path.join(local_path, past_file)
-    #
-    #     num_lines_past = 5001
-    #     self.kyear = np.empty(num_lines_past)
-    #     self.ecc = np.empty_like(self.kyear)
-    #     self.long_peri = np.empty_like(self.kyear)
-    #     self.obliquity = np.empty_like(self.kyear)
-    #
-    #     #  This gives the full path to the data file, assuming it's in the same directory
-    #     fullfilename = os.path.join(os.path.dirname(__file__), past_file)
-    #     try:
-    #         record = open(fullfilename,'r')
-    #         print('Loading Berger and Loutre (1991) orbital parameter data from file ' + fullfilename)
-    #     except:
-    #         print('Failed to load orbital locally, trying to access it via remote ftp.')
-    #         try:
-    #             record = urlopen( base_url + past_file )
-    #             print('Accessing Berger and Loutre (1991) orbital data from ' + base_url)
-    #             print('Reading file ' + past_file)
-    #         except:
-    #             raise Exception('Failed to load the data via remote ftp.')
-    #
-    #     #  loop through each line of the file, read it into numpy array
-    #     #  skip first three lines of header
-    #     toskip = 3
-    #     for i in range(toskip):
-    #         record.readline()
-    #     for index,line in enumerate(record):
-    #         str1 = line.rstrip()  # remove newline character
-    #         thisdata = np.fromstring(str1, sep=' ')
-    #         # ignore after the 4th column
-    #         self.kyear[index] = thisdata[0]
-    #         self.ecc[index] = thisdata[1]
-    #         self.long_peri[index] = thisdata[2]
-    #         self.obliquity[index] = thisdata[3]
-    #     record.close()
-    #
-    # def _compute_interpolants(self):
-    #     # add 180 degrees to long_peri (see lambda definition, Berger 1978 Appendix)
-    #     long_peri0rad = np.deg2rad(self.long_peri + 180.)
-    #     long_peri0 = np.rad2deg( np.unwrap( long_peri0rad ) ) # remove discontinuities (360 degree jumps)
-    #     #  calculate linear interpolants
-    #     self.f_ecc = interpolate.interp1d(self.kyear, self.ecc)
-    #     self.f_long_peri = interpolate.interp1d(self.kyear, long_peri0)
-    #     self.f_obliquity = interpolate.interp1d(self.kyear, self.obliquity)
 
 
 class LongOrbitalTable(OrbitalTable):
@@ -196,55 +140,5 @@ class LongOrbitalTable(OrbitalTable):
     Usage is identical to parent class :class:`OrbitalTable()`.
 
     """
-    def _get_data(self):
-        base_url = 'http://vo.imcce.fr/insola/earth/online/earth/La2004/'
-        past_file = 'INSOLN.LA2004.BTL.ASC'
-        future_file = 'INSOLP.LA2004.BTL.ASC'
-        print('Attempting to access La2004 orbital data from ' + base_url)
-        longorbit = {}
-        xlongorbit = {}
-        longorbit['past'] = pd.read_table(base_url + past_file, delim_whitespace=True, header=None, index_col=0,
-                                 names=['kyear','ecc','obliquity','long_peri'])
-        longorbit['future'] = pd.read_table(base_url + future_file, delim_whitespace=True, header=None,
-                                         index_col=0, skiprows=1, # first row is kyear=0, redundant
-                                            names=['kyear','ecc','obliquity','long_peri'])
-        for time in ['past', 'future']:
-            # Cannot convert to float until we replace the D notation with E for floating point numbers
-            longorbit[time].replace(to_replace='D', value='E', regex=True, inplace=True)
-            xlongorbit[time] = xr.Dataset()
-            xlongorbit[time]['ecc'] = xr.DataArray(pd.to_numeric(longorbit[time]['ecc']))
-            for field in ['obliquity', 'long_peri']:
-                xlongorbit[time][field] = xr.DataArray(np.rad2deg(pd.to_numeric(longorbit[time][field])))
-        longorbit = xr.concat([xlongorbit['past'], xlongorbit['future']], dim='kyear')
-        # add 180 degrees to long_peri (see lambda definition, Berger 1978 Appendix)
-        longorbit['long_peri'] += 180.
-        return longorbit
-
-        # num_lines_past = 51001
-        # num_lines_future = 21001
-        # num_columns = 4
-        # data_past = np.empty((num_lines_past,num_columns))
-        # data_future = np.empty((num_lines_future, num_columns))
-        #
-        # #  loop through each line of the file, read it into numpy array
-        # for (data,filename) in zip((data_past,data_future),
-        #                     (past_file,future_file)):
-        #     print('Reading file ' + filename)
-        #     record = urlopen( base_url + filename )
-        #     for index,line in enumerate(record):
-        #         str1 = line.rstrip()  # remove newline character
-        #         try:
-        #             str2 = str1.replace('D','E')  # put string into numpy format
-        #         except:
-        #             #  in Python 3 we need to convert from bytes object first
-        #             str2 = (str(str1,'utf-8')).replace('D','E')
-        #         data[index,:] = np.fromstring(str2, sep=' ')
-        #     record.close()
-        # #  need to flip it so the data runs from past to present
-        # data_past = np.flipud(data_past)
-        # # and expunge the first line of the future data because it repeats year 0
-        # data = np.concatenate((data_past,data_future[1:,:]), axis=0)
-        # self.kyear = data[:,0]
-        # self.ecc = data[:,1]
-        # self.obliquity = np.rad2deg(data[:,2])
-        # self.long_peri = np.rad2deg(data[:,3])
+    def _get_data(self,):
+        return _get_Laskar_data()
