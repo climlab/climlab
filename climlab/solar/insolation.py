@@ -135,10 +135,10 @@ def daily_insolation(lat, day, orb=const.orb_present, S0=None, day_type=1):
 
     # Compute Ho, the hour angle at sunrise / sunset
     #  Check for no sunrise or no sunset: Berger 1978 eqn (8),(9)
-    Ho = xr.where( abs(delta)-np.pi/2+abs(phi) < 0., # there is sunset/sunrise
+    Ho = np.where( abs(delta)-np.pi/2+abs(phi) < 0., # there is sunset/sunrise
               arccos(-tan(phi)*tan(delta)),
               # otherwise figure out if it's all night or all day
-              xr.where(phi*delta>0., np.pi, 0.) )
+              np.where(phi*delta>0., np.pi, 0.) )
     # this is not really the daily average cosine of the zenith angle...
     #  it's the integral from sunrise to sunset of that quantity...
     coszen = Ho*sin(phi)*sin(delta) + cos(phi)*cos(delta)*sin(Ho)
