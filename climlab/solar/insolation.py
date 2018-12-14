@@ -23,7 +23,7 @@ following :cite:`Berger_1978`. Further references: :cite:`Berger_1991`.
 from __future__ import division
 import numpy as np
 from climlab import constants as const
-from xarray.ufuncs import sqrt, deg2rad, rad2deg, sin, cos, tan, arcsin, arccos
+from numpy import sqrt, deg2rad, rad2deg, sin, cos, tan, arcsin, arccos
 
 
 def daily_insolation(lat, day, orb=const.orb_present, S0=None, day_type=1):
