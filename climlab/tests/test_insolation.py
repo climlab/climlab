@@ -34,7 +34,7 @@ def test_orbital_parameters():
     # check that orb has the right dictionary keys
     # key: (min, max)
     orb_expected = {'ecc': (0.004, 0.057),
-                    'long_peri': (2.3, 360),
+                    #'long_peri': (2.3, 360),
                     'obliquity': (22, 24.5) }
 
     for k in orb_expected:

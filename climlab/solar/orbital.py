@@ -29,6 +29,42 @@ try:
 except:
     # Fallback for Python 2.7
     from urllib2 import urlopen
+import pandas as pd
+import xarray as xr
+
+
+def _get_orbit91():
+    '''Read in the Berger and Loutre orbital table as a pandas dataframe, convert to xarray
+    '''
+    orbit91_file = 'orbit91'
+    orbit91_url = "https://www1.ncdc.noaa.gov/pub/data/paleo/climate_forcing/orbital_variations/insolation/"
+    try:
+        #  This gives the full path to the data file, assuming it's in the same directory
+        local_path = os.path.dirname(__file__)
+        path = os.path.join(local_path, orbit91_file)
+        # The first column of the data file is used as the row index, and represents kyr from present
+        orbit91_pd = pd.read_table(path, delim_whitespace=True, skiprows=1)
+        print('Loaded Berger and Loutre (1991) orbital parameter data from file ' + path)
+    except:
+        print('Failed to load orbital data locally, trying to access it from NCDC archive.')
+        try:
+            path = os.path.join(orbit91_url, orbit91_file)
+            orbit91_pd = pd.read_table(path, delim_whitespace=True, skiprows=1)
+            print('Accessing Berger and Loutre (1991) orbital data from ' + base_url)
+            print('Reading file ' + past_file)
+        except:
+            raise Exception('Failed to load the orbital data.')
+    #  As xarray structure with the dimension named 'kyear'
+    orbit = xr.Dataset(orbit91_pd).rename({'dim_0': 'kyear'})
+    #  Now change names
+    orbit = orbit.rename({'ECC': 'ecc', 'OMEGA': 'long_peri', 'OBL': 'obliquity'})
+    # add 180 degrees to long_peri (see lambda definition, Berger 1978 Appendix)
+            #long_peri0rad = np.deg2rad(self.long_peri + 180.)
+    orbit['long_peri'] += 180.
+    return orbit
+
+orbit = _get_orbit91()
+
 
 class OrbitalTable(object):
     """Invoking OrbitalTable() will load 5 million years of orbital data
@@ -51,17 +87,18 @@ class OrbitalTable(object):
 
     """
     def __init__(self):
-        self.kyear = None
-        self.ecc = None
-        self.long_peri = None
-        self.obliquity = None
-        #  call a method that reads data from a file and populates the arrays
-        self._get_data()
-        self._compute_interpolants()
-        # find and store min and max years. lookup_parameters should throw an exception
-        # if you ask for something outside this range -- not yet implemented.
-        self.kyear_max = np.max(self.kyear)
-        self.kyear_min = np.min(self.kyear)
+        pass
+        # self.kyear = None
+        # self.ecc = None
+        # self.long_peri = None
+        # self.obliquity = None
+        # #  call a method that reads data from a file and populates the arrays
+        # self._get_data()
+        # self._compute_interpolants()
+        # # find and store min and max years. lookup_parameters should throw an exception
+        # # if you ask for something outside this range -- not yet implemented.
+        # self.kyear_max = np.max(self.kyear)
+        # self.kyear_min = np.min(self.kyear)
 
     def lookup_parameters( self, kyear = 0 ):
         """Look up orbital parameters for given kyear measured from present.
@@ -88,66 +125,67 @@ class OrbitalTable(object):
         :rtype:                 dict
 
         """
-        #  linear interpolation:
-        this_ecc = self.f_ecc(kyear)
-        this_obliquity = self.f_obliquity(kyear)
-        this_long_peri = self.f_long_peri(kyear)
-        #  convert long_peri to an angle (in degrees) between 0 and 360
-        long_peri_converted = this_long_peri % 360.
-        # Build a dictionary of all the parameters
-        orb = {'ecc':this_ecc, 'long_peri':long_peri_converted, 'obliquity':this_obliquity}
-        return orb
+        # #  linear interpolation:
+        # this_ecc = self.f_ecc(kyear)
+        # this_obliquity = self.f_obliquity(kyear)
+        # this_long_peri = self.f_long_peri(kyear)
+        # #  convert long_peri to an angle (in degrees) between 0 and 360
+        # long_peri_converted = this_long_peri % 360.
+        # # Build a dictionary of all the parameters
+        # orb = {'ecc':this_ecc, 'long_peri':long_peri_converted, 'obliquity':this_obliquity}
+        # return orb
+        return orbit.interp(kyear=kyear)
 
-    def _get_data(self):
-        past_file = 'orbit91'
-        base_url = 'ftp://ftp.ncdc.noaa.gov/pub/data/paleo/insolation/'
-        #  This gives the full path to the data file, assuming it's in the same directory
-        local_path = os.path.dirname(__file__)
-        fullfilename = os.path.join(local_path, past_file)
-
-        num_lines_past = 5001
-        self.kyear = np.empty(num_lines_past)
-        self.ecc = np.empty_like(self.kyear)
-        self.long_peri = np.empty_like(self.kyear)
-        self.obliquity = np.empty_like(self.kyear)
-
-        #  This gives the full path to the data file, assuming it's in the same directory
-        fullfilename = os.path.join(os.path.dirname(__file__), past_file)
-        try:
-            record = open(fullfilename,'r')
-            print('Loading Berger and Loutre (1991) orbital parameter data from file ' + fullfilename)
-        except:
-            print('Failed to load orbital locally, trying to access it via remote ftp.')
-            try:
-                record = urlopen( base_url + past_file )
-                print('Accessing Berger and Loutre (1991) orbital data from ' + base_url)
-                print('Reading file ' + past_file)
-            except:
-                raise Exception('Failed to load the data via remote ftp.')
-
-        #  loop through each line of the file, read it into numpy array
-        #  skip first three lines of header
-        toskip = 3
-        for i in range(toskip):
-            record.readline()
-        for index,line in enumerate(record):
-            str1 = line.rstrip()  # remove newline character
-            thisdata = np.fromstring(str1, sep=' ')
-            # ignore after the 4th column
-            self.kyear[index] = thisdata[0]
-            self.ecc[index] = thisdata[1]
-            self.long_peri[index] = thisdata[2]
-            self.obliquity[index] = thisdata[3]
-        record.close()
-
-    def _compute_interpolants(self):
-        # add 180 degrees to long_peri (see lambda definition, Berger 1978 Appendix)
-        long_peri0rad = np.deg2rad(self.long_peri + 180.)
-        long_peri0 = np.rad2deg( np.unwrap( long_peri0rad ) ) # remove discontinuities (360 degree jumps)
-        #  calculate linear interpolants
-        self.f_ecc = interpolate.interp1d(self.kyear, self.ecc)
-        self.f_long_peri = interpolate.interp1d(self.kyear, long_peri0)
-        self.f_obliquity = interpolate.interp1d(self.kyear, self.obliquity)
+    # def _get_data(self):
+    #     past_file = 'orbit91'
+    #     base_url = 'ftp://ftp.ncdc.noaa.gov/pub/data/paleo/insolation/'
+    #     #  This gives the full path to the data file, assuming it's in the same directory
+    #     local_path = os.path.dirname(__file__)
+    #     fullfilename = os.path.join(local_path, past_file)
+    #
+    #     num_lines_past = 5001
+    #     self.kyear = np.empty(num_lines_past)
+    #     self.ecc = np.empty_like(self.kyear)
+    #     self.long_peri = np.empty_like(self.kyear)
+    #     self.obliquity = np.empty_like(self.kyear)
+    #
+    #     #  This gives the full path to the data file, assuming it's in the same directory
+    #     fullfilename = os.path.join(os.path.dirname(__file__), past_file)
+    #     try:
+    #         record = open(fullfilename,'r')
+    #         print('Loading Berger and Loutre (1991) orbital parameter data from file ' + fullfilename)
+    #     except:
+    #         print('Failed to load orbital locally, trying to access it via remote ftp.')
+    #         try:
+    #             record = urlopen( base_url + past_file )
+    #             print('Accessing Berger and Loutre (1991) orbital data from ' + base_url)
+    #             print('Reading file ' + past_file)
+    #         except:
+    #             raise Exception('Failed to load the data via remote ftp.')
+    #
+    #     #  loop through each line of the file, read it into numpy array
+    #     #  skip first three lines of header
+    #     toskip = 3
+    #     for i in range(toskip):
+    #         record.readline()
+    #     for index,line in enumerate(record):
+    #         str1 = line.rstrip()  # remove newline character
+    #         thisdata = np.fromstring(str1, sep=' ')
+    #         # ignore after the 4th column
+    #         self.kyear[index] = thisdata[0]
+    #         self.ecc[index] = thisdata[1]
+    #         self.long_peri[index] = thisdata[2]
+    #         self.obliquity[index] = thisdata[3]
+    #     record.close()
+    #
+    # def _compute_interpolants(self):
+    #     # add 180 degrees to long_peri (see lambda definition, Berger 1978 Appendix)
+    #     long_peri0rad = np.deg2rad(self.long_peri + 180.)
+    #     long_peri0 = np.rad2deg( np.unwrap( long_peri0rad ) ) # remove discontinuities (360 degree jumps)
+    #     #  calculate linear interpolants
+    #     self.f_ecc = interpolate.interp1d(self.kyear, self.ecc)
+    #     self.f_long_peri = interpolate.interp1d(self.kyear, long_peri0)
+    #     self.f_obliquity = interpolate.interp1d(self.kyear, self.obliquity)
 
 
 class LongOrbitalTable(OrbitalTable):
