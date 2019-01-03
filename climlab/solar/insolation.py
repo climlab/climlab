@@ -24,9 +24,10 @@ from __future__ import division
 import numpy as np
 from climlab import constants as const
 from numpy import sqrt, deg2rad, rad2deg, sin, cos, tan, arcsin, arccos
+import xarray as xr
 
 
-def daily_insolation(lat, day, orb=const.orb_present, S0=None, day_type=1):
+def daily_insolation(lat, day, orb=const.orb_present, S0=const.S0, day_type=1):
     """Compute daily average insolation given latitude, time of year and orbital parameters.
 
     Orbital parameters can be computed for any time in the last 5 Myears with
@@ -109,13 +110,12 @@ def daily_insolation(lat, day, orb=const.orb_present, S0=None, day_type=1):
         :ref:`Tutorial` chapter.
 
      """
-    # If input argument S0 is not given, use the standard Earth value
-    if S0 is None:
-        S0 = const.S0
-
-    # Inputs can be scalar or vector. If scalar, convert to 0d numpy arrays
-    #lat = np.array( lat )
-    #day = np.array( day )
+    # Inputs can be scalar, numpy vector, or xarray.DataArray.
+    #  If numpy, convert to xarray so that it will broadcast correctly
+    if type(lat) is np.ndarray:
+        lat = xr.DataArray(lat, coords=[lat], dims=['lat'])
+    if type(day) is np.ndarray:
+        day = xr.DataArray(day, coords=[day], dims=['day'])
     ecc = orb['ecc']
     long_peri = orb['long_peri']
     obliquity = orb['obliquity']
@@ -135,10 +135,10 @@ def daily_insolation(lat, day, orb=const.orb_present, S0=None, day_type=1):
 
     # Compute Ho, the hour angle at sunrise / sunset
     #  Check for no sunrise or no sunset: Berger 1978 eqn (8),(9)
-    Ho = np.where( abs(delta)-np.pi/2+abs(phi) < 0., # there is sunset/sunrise
+    Ho = xr.where( abs(delta)-np.pi/2+abs(phi) < 0., # there is sunset/sunrise
               arccos(-tan(phi)*tan(delta)),
               # otherwise figure out if it's all night or all day
-              np.where(phi*delta>0., np.pi, 0.) )
+              xr.where(phi*delta>0., np.pi, 0.) )
     # this is not really the daily average cosine of the zenith angle...
     #  it's the integral from sunrise to sunset of that quantity...
     coszen = Ho*sin(phi)*sin(delta) + cos(phi)*cos(delta)*sin(Ho)
