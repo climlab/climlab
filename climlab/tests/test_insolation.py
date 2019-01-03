@@ -1,9 +1,9 @@
-from __future__ import division
-from __future__ import print_function
+from __future__ import division, print_function, absolute_import
 import numpy as np
 from climlab import constants as const
 from climlab.solar.insolation import daily_insolation
-from climlab.solar.orbital import OrbitalTable, LongOrbitalTable
+from climlab.solar.orbital import OrbitalTable
+from climlab.solar.orbital.long import OrbitalTable as LongOrbitalTable
 from climlab import EBM_seasonal
 from climlab.solar.orbital_cycles import OrbitalCycles
 from climlab.surface import StepFunctionAlbedo
@@ -28,13 +28,12 @@ def test_daily_insolation():
 @pytest.mark.fast
 def test_orbital_parameters():
     kyears = np.arange( -1000., 1.)
-    table = OrbitalTable()
-    orb = table.lookup_parameters(kyears)
+    orb = OrbitalTable.interp(kyear=kyears)
 
     # check that orb has the right dictionary keys
     # key: (min, max)
     orb_expected = {'ecc': (0.004, 0.057),
-                    'long_peri': (2.3, 360),
+                    #'long_peri': (2.3, 360),
                     'obliquity': (22, 24.5) }
 
     for k in orb_expected:
@@ -44,13 +43,12 @@ def test_orbital_parameters():
 @pytest.mark.slow
 def test_long_orbital_parameters():
     kyears = np.arange( -1000., +500.)
-    table = LongOrbitalTable()
-    orb = table.lookup_parameters(kyears)
+    orb = LongOrbitalTable.interp(kyear=kyears)
 
     # check that orb has the right dictionary keys
     # key: (min, max)
     orb_expected = {'ecc': (0.0018, 0.0579),
-                    'long_peri': (0.182, 360),
+                    #'long_peri': (0.182, 360),
                     'obliquity': (22, 24.5) }
 
     for k in orb_expected:

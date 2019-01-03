@@ -10,8 +10,7 @@ has been documented for a comprehensive understanding and traceability.
 __version__ = '0.7.1.dev5'
 
 # this should ensure that we can still import constants.py as climlab.constants
-from .utils import constants
-from .utils import thermo, legendre
+from .utils import constants, thermo, legendre
 # some more useful shorcuts
 from .model.column import GreyRadiationModel, RadiativeConvectiveModel, BandRCModel
 from .model.ebm import EBM, EBM_annual, EBM_seasonal
