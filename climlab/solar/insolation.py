@@ -144,7 +144,8 @@ def daily_insolation(lat, day, orb=const.orb_present, S0=const.S0, day_type=1):
     coszen = Ho*sin(phi)*sin(delta) + cos(phi)*cos(delta)*sin(Ho)
     # Compute insolation: Berger 1978 eq (10)
     Fsw = S0/np.pi*( (1+ecc*cos(lambda_long -deg2rad(long_peri)))**2 / (1-ecc**2)**2 * coszen)
-    return Fsw
+    # Dimensional ordering consistent with previous numpy code
+    return Fsw.transpose()
 
 
 def solar_longitude( day, orb=const.orb_present, days_per_year = None ):
