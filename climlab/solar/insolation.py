@@ -120,7 +120,7 @@ def daily_insolation(lat, day, orb=const.orb_present, S0=None, day_type=1):
     long_peri = orb['long_peri']
     obliquity = orb['obliquity']
     # Convert precession angle and latitude to radians
-    phi = np.deg2rad( lat )
+    phi = deg2rad( lat )
 
     # lambda_long (solar longitude) is the angular distance along Earth's orbit measured from spring equinox (21 March)
     if day_type==1: # calendar days
