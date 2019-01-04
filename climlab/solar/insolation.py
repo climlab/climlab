@@ -23,7 +23,7 @@ following :cite:`Berger_1978`. Further references: :cite:`Berger_1991`.
 from __future__ import division
 import numpy as np
 from climlab import constants as const
-from numpy import sqrt, deg2rad, rad2deg, sin, cos, tan, arcsin, arccos
+from numpy import sqrt, deg2rad, rad2deg, sin, cos, tan, arcsin, arccos, pi
 import xarray as xr
 
 
@@ -112,9 +112,13 @@ def daily_insolation(lat, day, orb=const.orb_present, S0=const.S0, day_type=1):
      """
     # Inputs can be scalar, numpy vector, or xarray.DataArray.
     #  If numpy, convert to xarray so that it will broadcast correctly
+    lat_is_xarray = True
+    day_is_xarray = True
     if type(lat) is np.ndarray:
+        lat_is_xarray = False
         lat = xr.DataArray(lat, coords=[lat], dims=['lat'])
     if type(day) is np.ndarray:
+        day_is_xarray = False
         day = xr.DataArray(day, coords=[day], dims=['day'])
     ecc = orb['ecc']
     long_peri = orb['long_peri']
@@ -124,7 +128,7 @@ def daily_insolation(lat, day, orb=const.orb_present, S0=const.S0, day_type=1):
 
     # lambda_long (solar longitude) is the angular distance along Earth's orbit measured from spring equinox (21 March)
     if day_type==1: # calendar days
-        lambda_long = solar_longitude( day, orb )
+        lambda_long = solar_longitude(day,orb)
     elif day_type==2: #solar longitude (1-360) is specified in input, no need to convert days to longitude
         lambda_long = deg2rad(day)
     else:
@@ -135,17 +139,20 @@ def daily_insolation(lat, day, orb=const.orb_present, S0=const.S0, day_type=1):
 
     # Compute Ho, the hour angle at sunrise / sunset
     #  Check for no sunrise or no sunset: Berger 1978 eqn (8),(9)
-    Ho = xr.where( abs(delta)-np.pi/2+abs(phi) < 0., # there is sunset/sunrise
+    Ho = xr.where( abs(delta)-pi/2+abs(phi) < 0., # there is sunset/sunrise
               arccos(-tan(phi)*tan(delta)),
               # otherwise figure out if it's all night or all day
-              xr.where(phi*delta>0., np.pi, 0.) )
+              xr.where(phi*delta>0., pi, 0.) )
     # this is not really the daily average cosine of the zenith angle...
     #  it's the integral from sunrise to sunset of that quantity...
     coszen = Ho*sin(phi)*sin(delta) + cos(phi)*cos(delta)*sin(Ho)
     # Compute insolation: Berger 1978 eq (10)
-    Fsw = S0/np.pi*( (1+ecc*cos(lambda_long -deg2rad(long_peri)))**2 / (1-ecc**2)**2 * coszen)
-    # Dimensional ordering consistent with previous numpy code
-    return Fsw.transpose()
+    Fsw = S0/pi*( (1+ecc*cos(lambda_long -deg2rad(long_peri)))**2 / (1-ecc**2)**2 * coszen)
+    if not (lat_is_xarray or day_is_xarray):
+        # Dimensional ordering consistent with previous numpy code
+        return Fsw.transpose().values
+    else:
+        return Fsw
 
 
 def solar_longitude( day, orb=const.orb_present, days_per_year = None ):
@@ -192,12 +199,12 @@ def solar_longitude( day, orb=const.orb_present, days_per_year = None ):
         days_per_year = const.days_per_year
     ecc = orb['ecc']
     long_peri_rad = deg2rad( orb['long_peri'])
-    delta_lambda = (day - 80.)*2. * np.pi/days_per_year
-    beta = sqrt( 1 - ecc**2 )
-    lambda_long_m = ((ecc/2. + ecc**3/8. )*(1.+beta)*sin(-long_peri_rad)
-                     - ecc**2/4*(beta+1/2)*sin(-2*long_peri_rad)
-                     + ecc**3/8 * (beta+1/3)*sin(-3*long_peri_rad) ) + delta_lambda
+    delta_lambda = (day - 80.) * 2*pi/days_per_year
+    beta = sqrt(1 - ecc**2)
+    lambda_long_m = -2*((ecc/2 + (ecc**3)/8 ) * (1+beta) * sin(-long_peri_rad) -
+        (ecc**2)/4 * (1/2 + beta) * sin(-2*long_peri_rad) + (ecc**3)/8 *
+        (1/3 + beta) * sin(-3*long_peri_rad)) + delta_lambda
     lambda_long = ( lambda_long_m + (2*ecc - (ecc**3)/4)*sin(lambda_long_m - long_peri_rad) +
-        (5./4.) * (ecc**2) * sin(2 *(lambda_long_m - long_peri_rad)) + (13./12.)*(ecc**3)
+        (5/4)*(ecc**2) * sin(2*(lambda_long_m - long_peri_rad)) + (13/12)*(ecc**3)
         * sin(3*(lambda_long_m - long_peri_rad)) )
     return lambda_long
