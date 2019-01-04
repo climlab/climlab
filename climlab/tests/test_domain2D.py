@@ -33,8 +33,10 @@ def test_2D_insolation():
     #  the answers are the mean of 1D insolation arrays
     #  the mean shouldn't change from 1D to 2D...
     #  there are exactly the same amount of each number in 2D array
-    assert np.mean(m.subprocess['insolation'].insolation) == 299.30467670961832
+    assert np.mean(m.subprocess['insolation'].insolation) == pytest.approx(299.30467670961832)
+    #assert np.mean(m.subprocess['insolation'].insolation) == 299.30467670961832
     sfc = m.domains['Ts']
     m.add_subprocess('insolation',
         climlab.radiation.P2Insolation(domains=sfc, **m.param))
-    assert np.mean(m.subprocess['insolation'].insolation) == 300.34399999999999
+    assert np.mean(m.subprocess['insolation'].insolation) == pytest.approx(300.34399999999999)
+    #assert np.mean(m.subprocess['insolation'].insolation) == 300.34399999999999
