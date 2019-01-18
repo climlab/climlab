@@ -133,6 +133,11 @@ class TimeDependentProcess(Process):
                      'active_now': True}
         self.param['timestep'] = value
 
+    def set_state(self, name, value):
+        super(TimeDependentProcess, self).set_state(name,value)
+        # Make sure that the new state variable is added to the tendencies dict
+        self.tendencies[name] = value * 0.
+
     def set_timestep(self, timestep=const.seconds_per_day, num_steps_per_year=None):
         """Calculates the timestep in unit seconds
         and calls the setter function of :func:`timestep`
