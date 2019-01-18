@@ -180,7 +180,7 @@ def Planck_frequency(nu, T):
     nu is frequency in 1/s
     T is temperature in Kelvin
 
-    Formula from Raymond Pierrehumbert, "Principles of Planetary Climate"
+    Formula (3.1) from Raymond Pierrehumbert, "Principles of Planetary Climate"
     '''
     return 2*hPlanck*nu**3/c_light**2/(exp(hPlanck*nu/kBoltzmann/T)-1)
 
@@ -190,7 +190,7 @@ def Planck_wavenumber(n, T):
     n is wavenumber in 1/cm
     T is temperature in Kelvin
 
-    Formula from Raymond Pierrehumbert, "Principles of Planetary Climate"
+    Formula from Raymond Pierrehumbert, "Principles of Planetary Climate", page 140.
     '''
     # convert to mks units
     n = n*100.
@@ -202,10 +202,10 @@ def Planck_wavelength(l, T):
     l is wavelength in meters
     T is temperature in Kelvin
 
-    Formula from Raymond Pierrehumbert, "Principles of Planetary Climate"
+    Formula (3.3) from Raymond Pierrehumbert, "Principles of Planetary Climate"
     '''
     u = hPlanck*c_light/l/kBoltzmann/T
-    return 2*k**5*T**5/hPlanck**4/c_light**3*u**5/(exp(u)-1)
+    return 2*kBoltzmann**5*T**5/hPlanck**4/c_light**3*u**5/(exp(u)-1)
 
 def vmr_to_mmr(vmr, gas):
     '''

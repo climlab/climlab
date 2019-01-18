@@ -1,5 +1,5 @@
 {% set name = "climlab" %}
-{% set version = "0.7.1.dev4" %}
+{% set version = "0.7.1.dev6" %}
 
 package:
   name: {{ name|lower }}
@@ -9,29 +9,25 @@ source:
   path: ../
 
 build:
+  skip: True  # [win32 or (win and py27)]
   number: 0
 
 requirements:
   build:
-    - toolchain
-    - mingwpy  # [win and py2k]
+    - {{ compiler('fortran') }}
+    - {{ compiler('c') }}
+  host:
     - flang  # [win and py3k]
-    - gcc  # [osx or linux]
     - python
     - setuptools
-    - libgfortran  # [linux]
-    - numpy 1.11.*  # [not (win and py3k)]
-    - numpy 1.14.*  # [win and py3k]
-
+    - numpy
   run:
     - python
-    - numpy >=1.11  # [not (win and py3k)]
-    - numpy >=1.14  # [win and py3k]
+    - {{ pin_compatible('numpy') }}
     - libflang  # [win and py3k]
     - scipy
     - netcdf4
     - xarray
-    - libgfortran  # [linux or osx]
     - future
     - numba  # [py2k]
 
