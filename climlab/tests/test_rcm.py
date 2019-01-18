@@ -45,14 +45,13 @@ def test_convective_adjustment(rcm):
 @pytest.mark.fast
 def test_coupled_rcm(rcm):
     deltat = rcm.timestep
-    #  Create the domains
     ocean_bounds = np.arange(0., 2010., 100.)
     depthax = climlab.Axis(axis_type='depth', bounds=ocean_bounds)
     ocean = climlab.domain.domain.Ocean(axes=depthax)
     ocean_diff = 5.E-4
     Tinitial_ocean = rcm.Ts * np.ones(ocean.shape)
     Tocean = climlab.Field(Tinitial_ocean.copy(), domain=ocean)
-    Tatm = climlab.Field(rcm.Tatm.copy(), domain=atm)
+    Tatm = climlab.Field(rcm.Tatm.copy(), domain=rcm.Tatm)
     #  Surface temperature Ts is the upper-most grid box of the ocean
     Ts = Tocean[0:1]
     atm_state = {'Tatm': Tatm, 'Ts': Ts}
