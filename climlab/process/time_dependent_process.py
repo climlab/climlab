@@ -91,8 +91,8 @@ class TimeDependentProcess(Process):
     """
     def __init__(self, time_type='explicit', timestep=None, topdown=True, **kwargs):
         # Create the state dataset
-        super(TimeDependentProcess, self).__init__(**kwargs)
         self.tendencies = {}
+        super(TimeDependentProcess, self).__init__(**kwargs)
         for name, var in self.state.items():
             self.tendencies[name] = var * 0.
         self.timeave = {}
