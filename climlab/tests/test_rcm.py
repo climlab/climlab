@@ -40,3 +40,39 @@ def test_convective_adjustment(rcm):
     rcm.step_forward()
     rcm.subprocess['ConvectiveAdjustment'].adj_lapse_rate = 'moist adiabat'
     rcm.step_forward()
+
+@pytest.mark.compiled
+@pytest.mark.fast
+def test_coupled_rcm(rcm):
+    deltat = rcm.timestep
+    #  Create the domains
+    ocean_bounds = np.arange(0., 2010., 100.)
+    depthax = climlab.Axis(axis_type='depth', bounds=ocean_bounds)
+    ocean = climlab.domain.domain.Ocean(axes=depthax)
+    ocean_diff = 5.E-4
+    Tinitial_ocean = rcm.Ts * np.ones(ocean.shape)
+    Tocean = climlab.Field(Tinitial_ocean.copy(), domain=ocean)
+    Tatm = climlab.Field(rcm.Tatm.copy(), domain=atm)
+    #  Surface temperature Ts is the upper-most grid box of the ocean
+    Ts = Tocean[0:1]
+    atm_state = {'Tatm': Tatm, 'Ts': Ts}
+    rad = climlab.radiation.RRTMG(name='Radiation',
+                                  state=atm_state,
+                                  specific_humidity=rcm.specific_humidity,
+                                  timestep = deltat,
+                                  albedo = 0.25,
+                                 )
+    conv = climlab.convection.ConvectiveAdjustment(name='Convection',
+                                                   state=atm_state,
+                                                   adj_lapse_rate=6.5,
+                                                   timestep=deltat,)
+
+    model = rad + conv
+    model.set_state('Tocean', Tocean)
+    diff = climlab.dynamics.Diffusion(state={'Tocean': model.Tocean},
+                                K=ocean_diff,
+                                diffusion_axis='depth',
+                                timestep=deltat * 10,)
+    model.add_subprocess('Ocean Heat Uptake', diff)
+    for i in range(10):
+        model.step_forward()
