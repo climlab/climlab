@@ -68,7 +68,7 @@ def test_coupled_rcm(rcm):
 
     model = rad + conv
     model.set_state('Tocean', Tocean)
-    diff = climlab.dynamics.Diffusion(state={'Tocean': model.Tocean},
+    diff = climlab.dynamics.Diffusion(state={'Tocean': Tocean},
                                 K=ocean_diff,
                                 diffusion_axis='depth',
                                 timestep=deltat * 10,)
