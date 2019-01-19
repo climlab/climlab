@@ -384,7 +384,7 @@ class Process(object):
             if np.issubdtype(self.state[name].dtype, np.dtype('int').type):
                 value = self.state[name].astype(float)
                 self.state[name]=value
-        setattr(self, name, value)
+        self.__setattr__(name, value)
 
     def _guess_state_domains(self):
         for name, value in self.state.items():
