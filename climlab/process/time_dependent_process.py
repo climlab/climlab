@@ -6,13 +6,14 @@ import numpy as np
 import copy
 from climlab import constants as const
 from .process import Process
-from climlab.utils import walk, attr_dict
+from climlab.utils import walk
+from attrdict import AttrDict
 
 
 def couple(proclist, name='Parent'):
     #  Union of the two state dictionaries
-    new_state = attr_dict.AttrDict()
-    new_input = attr_dict.AttrDict()
+    new_state = AttrDict()
+    new_input = AttrDict()
     all_input = {}
     all_diagnotics_list = []
     timestep = const.seconds_per_year * 1E6  # very long!
@@ -91,8 +92,8 @@ class TimeDependentProcess(Process):
     """
     def __init__(self, time_type='explicit', timestep=None, topdown=True, **kwargs):
         # Create the state dataset
-        super(TimeDependentProcess, self).__init__(**kwargs)
         self.tendencies = {}
+        super(TimeDependentProcess, self).__init__(**kwargs)
         for name, var in self.state.items():
             self.tendencies[name] = var * 0.
         self.timeave = {}
@@ -132,6 +133,11 @@ class TimeDependentProcess(Process):
                      'days_of_year': days_of_year,
                      'active_now': True}
         self.param['timestep'] = value
+
+    def set_state(self, name, value):
+        super(TimeDependentProcess, self).set_state(name,value)
+        # Make sure that the new state variable is added to the tendencies dict
+        self.tendencies[name] = value * 0.
 
     def set_timestep(self, timestep=const.seconds_per_day, num_steps_per_year=None):
         """Calculates the timestep in unit seconds

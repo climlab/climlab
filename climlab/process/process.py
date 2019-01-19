@@ -69,7 +69,8 @@ import time, copy
 import numpy as np
 from climlab.domain.field import Field
 from climlab.domain.domain import _Domain, zonal_mean_surface
-from climlab.utils import walk, attr_dict
+from climlab.utils import walk
+from attrdict import AttrDict
 from climlab.domain.xarray import state_to_xarray
 
 
@@ -155,14 +156,14 @@ class Process(object):
             sfc = zonal_mean_surface()
             self.domains.update({'default': sfc})
         # dictionary of state variables (all of type Field)
-        self.state = attr_dict.AttrDict()
+        self.state = AttrDict()
         states = _make_dict(state, Field)
         for name, value in states.items():
             self.set_state(name, value)
         # dictionary of model parameters
         self.param = kwargs
         # dictionary of diagnostic quantities
-        #self.diagnostics = attr_dict.AttrDict()
+        #self.diagnostics = AttrDict()
         #self._diag_vars = frozenset()
         self._diag_vars = []
         # dictionary of input quantities
@@ -177,13 +178,13 @@ class Process(object):
         self.creation_date = time.strftime("%a, %d %b %Y %H:%M:%S %z",
                                            time.localtime())
         # subprocess is a dictionary of any sub-processes
-        self.subprocess = attr_dict.AttrDict()
+        self.subprocess = AttrDict()
         if subprocess is not None:
             self.add_subprocesses(subprocess)
         #if subprocess is None:
         #    #self.subprocess = {}
         #    # a dictionary whose items can be accessed as attributes
-        #    self.subprocess = attr_dict.AttrDict()
+        #    self.subprocess = AttrDict()
         #else:
         #    self.add_subprocesses(subprocess)
 
@@ -383,7 +384,7 @@ class Process(object):
             if np.issubdtype(self.state[name].dtype, np.dtype('int').type):
                 value = self.state[name].astype(float)
                 self.state[name]=value
-        setattr(self, name, value)
+        self.__setattr__(name, value)
 
     def _guess_state_domains(self):
         for name, value in self.state.items():
