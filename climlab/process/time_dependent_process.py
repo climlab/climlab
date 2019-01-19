@@ -6,13 +6,14 @@ import numpy as np
 import copy
 from climlab import constants as const
 from .process import Process
-from climlab.utils import walk, attr_dict
+from climlab.utils import walk
+from attrdict import AttrDict
 
 
 def couple(proclist, name='Parent'):
     #  Union of the two state dictionaries
-    new_state = attr_dict.AttrDict()
-    new_input = attr_dict.AttrDict()
+    new_state = AttrDict()
+    new_input = AttrDict()
     all_input = {}
     all_diagnotics_list = []
     timestep = const.seconds_per_year * 1E6  # very long!

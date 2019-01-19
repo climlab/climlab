@@ -1,5 +1,5 @@
 {% set name = "climlab" %}
-{% set version = "0.7.1.dev7" %}
+{% set version = "0.7.1.dev8" %}
 
 package:
   name: {{ name|lower }}
@@ -29,6 +29,7 @@ requirements:
     - netcdf4
     - xarray
     - future
+    - attrdict
     - numba  # [py2k]
 
 test:
