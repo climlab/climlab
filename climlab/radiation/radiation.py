@@ -81,9 +81,9 @@ from scipy.interpolate import interp1d, interp2d
 from climlab import constants as const
 from climlab.domain.field import Field
 try:
-    import netCDF4 as nc
+    import xarray as xr
 except:
-    print('Cannot import netCDF4 interface. Will not be able to initialize ozone from data file.')
+    print('Cannot import xarray. Will not be able to initialize ozone from data file.')
 
 
 def default_specific_humidity(Tatm):
@@ -139,13 +139,16 @@ def default_absorbers(Tatm,
         #  Open the ozone data file
         if verbose:
             print('Getting ozone data from', ozonefilepath)
-        ozonedata = nc.Dataset(ozonefilepath)
-        ozone_lev = ozonedata.variables['lev'][:]
-        ozone_lat = ozonedata.variables['lat'][:]
-        #  zonal and time average
-        ozone_zon = np.mean(ozonedata.variables['OZONE'], axis=(0,3))
-        ozone_global = np.average(ozone_zon,
-                    weights=np.cos(np.deg2rad(ozone_lat)), axis=1)
+        ozonedata = xr.open_dataset(ozonefilepath)
+        ozone_lev = ozonedata.lev
+        ozone_lat = ozonedata.lat
+        ##  zonal and time average
+        #ozone_zon = np.mean(ozonedata.variables['OZONE'], axis=(0,3))
+        ozone_zon = ozonedata.OZONE.mean(dim=('time','lon'))
+        weight = np.cos(np.deg2rad(ozonedata.lat))
+        ozone_global = (ozone_zon * weight).mean(dim='lat') / weight.mean(dim='lat')
+        ozone_zon = ozone_zon.values
+        ozone_global = ozone_global.values
         lev = Tatm.domain.axes['lev'].points
         if Tatm.shape == lev.shape:
             # 1D interpolation on pressure levels using global average data

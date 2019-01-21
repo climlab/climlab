@@ -44,24 +44,21 @@ try:
 except:
     print('Cannot import compiled Fortran extension, CAM3 module will not be functional.')
 try:
-    import netCDF4 as nc
+    import xarray as xr
 except:
-    print('Cannot import netCDF4 interface. Will not be able to properly initialize the CAM3 module.')
+    print('Cannot import xarray. Will not be able to properly initialize the CAM3 module.')
 
 
 def init_cam3(mod):
     # Initialise absorptivity / emissivity data
     here = os.path.dirname(__file__)
-    #datadir = os.path.abspath(os.path.join(here, os.pardir, 'data', 'cam3'))
     datadir = os.path.join(here, 'data')
     AbsEmsDataFile = os.path.join(datadir, 'abs_ems_factors_fastvx.c030508.nc')
     #  Open the absorption data file
-    data = nc.Dataset(AbsEmsDataFile)
-    #  The fortran module that holds the data
-    #mod = _cam3.absems
+    data = xr.open_dataset(AbsEmsDataFile)
     #  Populate storage arrays with values from netcdf file
     for field in ['ah2onw', 'eh2onw', 'ah2ow', 'ln_ah2ow', 'cn_ah2ow', 'ln_eh2ow', 'cn_eh2ow']:
-        setattr(mod, field, data.variables[field][:].T)
+        setattr(mod, field, data[field].transpose())
     data.close()
 
 try:

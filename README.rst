@@ -125,12 +125,12 @@ Required
 - Python 2.7, 3.5, or 3.6 (as of version 0.6.0)
 - ``numpy``
 - ``scipy``
-- ``netCDF4`` Python package (for data i/o)
+- ``xarray`` 
+- ``attrdict``
 
 Recommended for full functionality
 ~~~~~~~~~~~~
 - ``numba`` (used for acceleration of some components)
-- ``xarray`` (convenience methods to convert model data to ``xarray.DataArray`` format are available)
 - ``pytest`` (to run the automated tests, important if you are developing new code)
 
 `Anaconda Python`_ is highly recommended and will provide everything you need.
