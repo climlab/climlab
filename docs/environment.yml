@@ -6,8 +6,8 @@ dependencies:
     - python=3.6
     - numpy
     - scipy
-    - netCDF4
     - xarray
+    - attrdict
     - sphinx
     - matplotlib
     - ipython
