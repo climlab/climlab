@@ -77,7 +77,6 @@ import numpy as np
 from climlab.process import EnergyBudget
 from climlab.radiation import ManabeWaterVapor
 import os
-from scipy.interpolate import interp1d, interp2d
 from climlab import constants as const
 from climlab.domain.field import Field
 try:
@@ -132,7 +131,8 @@ def default_absorbers(Tatm,
     absorber_vmr['CCL4']  = 0.
 
     # Ozone: start with all zeros, interpolate to data if we can
-    absorber_vmr['O3'] = np.zeros_like(Tatm)
+    xTatm = Tatm.to_xarray()
+    O3 = 0. * xTatm
     if ozone_file is not None:
         datadir = os.path.join(os.path.dirname(__file__), 'data', 'ozone')
         ozonefilepath = os.path.join(datadir, ozone_file)
@@ -140,32 +140,19 @@ def default_absorbers(Tatm,
         if verbose:
             print('Getting ozone data from', ozonefilepath)
         ozonedata = xr.open_dataset(ozonefilepath)
-        ozone_lev = ozonedata.lev
-        ozone_lat = ozonedata.lat
         ##  zonal and time average
-        #ozone_zon = np.mean(ozonedata.variables['OZONE'], axis=(0,3))
-        ozone_zon = ozonedata.OZONE.mean(dim=('time','lon'))
+        ozone_zon = ozonedata.OZONE.mean(dim=('time','lon')).transpose('lat','lev')
         weight = np.cos(np.deg2rad(ozonedata.lat))
         ozone_global = (ozone_zon * weight).mean(dim='lat') / weight.mean(dim='lat')
-        ozone_zon = ozone_zon.values
-        ozone_global = ozone_global.values
-        lev = Tatm.domain.axes['lev'].points
-        if Tatm.shape == lev.shape:
-            # 1D interpolation on pressure levels using global average data
-            f = interp1d(ozone_lev, ozone_global)
-            #  interpolate data to model levels
-            absorber_vmr['O3'] = f(lev)
-        else:
-            #  Attempt 2D interpolation in pressure and latitude
-            f2d = interp2d(ozone_lat, ozone_lev, ozone_zon)
-            try:
-                lat = Tatm.domain.axes['lat'].points
-                f2d = interp2d(ozone_lat, ozone_lev, ozone_zon)
-                absorber_vmr['O3'] = f2d(lat, lev).transpose()
-            except:
-                print('Interpolation of ozone data failed.')
-                print('Reverting to default O3.')
-                absorber_vmr['O3'] = np.zeros_like(Tatm)
+        try:
+            if ('lat' in xTatm.dims):
+                O3 = ozone_zon.interp_like(xTatm)
+            else:
+                O3 = ozone_global.interp_like(xTatm)
+        except:
+            print('Interpolation of ozone data failed.')
+            print('Setting O3 to zero instead.')
+    absorber_vmr['O3'] = O3.values
     return absorber_vmr
 
 def init_interface(field):
