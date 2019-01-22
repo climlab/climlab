@@ -9,6 +9,11 @@ It provides ``DataArray`` and ``Dataset`` structures for self-describing gridded
 For the convenience of ``xarray`` users, climlab provides tools for automatic translation
 of the native ``Field`` object to ``xarray`` format.
 
+Additionally, as of climlab v0.7.1, the insolation and orbital functions have been updated
+with an ``xarray``-compatible interface. ``climlab.solar.orbital.OrbitalTable``
+returns an ``xarray.Dataset`` object with orbital data.
+``climlab.solar.insolation.daily_insolation`` accepts input
+in labeled ``xarray.DataArray`` format and return the same.
 
 :Example 1:
 
