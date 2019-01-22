@@ -1,7 +1,23 @@
-"""This module contains general-purpose routines for computing incoming
-solar radiation at the top of the atmosphere.
+"""This module contains general-purpose routines for computing
+daily-average incoming solar radiation at the top of the atmosphere.
 
-Currently, only daily average insolation is computed.
+    :Example:
+        Compute the timeseries of insolation at 65N at summer
+        solstice over the past 5 Myears::
+
+            import numpy as np
+            from climlab.solar.orbital import OrbitalTable
+            from climlab.solar.insolation import daily_insolation
+
+            # array with specified kyears (can be plain numpy or xarray.DataArray)
+            years = np.linspace(-5000, 0, 5001)
+
+            # subset of orbital parameters for specified time
+            orb = OrbitalTable.interp(kyear=years)
+
+            # insolation values for past 5 Myears at 65N at summer solstice (day 172)
+            S65 = daily_insolation(lat=65, day=172, orb=orb)
+            # returns an xarray.DataArray object with insolation values in W/m2
 
 .. note::
 
@@ -30,9 +46,15 @@ import xarray as xr
 def daily_insolation(lat, day, orb=const.orb_present, S0=const.S0, day_type=1):
     """Compute daily average insolation given latitude, time of year and orbital parameters.
 
-    Orbital parameters can be computed for any time in the last 5 Myears with
-    :func:`~climlab.solar.orbital.OrbitalTable.lookup_parameters` (see example below).
+    Orbital parameters can be interpolated to any time in the last 5 Myears with
+    ``climlab.solar.orbital.OrbitalTable`` (see example above).
 
+    Longer orbital tables are available with ``climlab.solar.orbital.LongOrbitalTable``
+
+    Inputs can be scalar, ``numpy.ndarray``, or ``xarray.DataArray``.
+
+    The return value will be ``numpy.ndarray`` if **all** the inputs are ``numpy``.
+    Otherwise ``xarray.DataArray``.
 
     **Function-call argument** \n
 
@@ -40,7 +62,7 @@ def daily_insolation(lat, day, orb=const.orb_present, S0=const.S0, day_type=1):
     :param array day:       Indicator of time of year. See argument ``day_type``
                             for details about format.
     :param dict orb:        a dictionary with three members (as provided by
-                            :class:`~climlab.solar.orbital.OrbitalTable`)
+                            ``climlab.solar.orbital.OrbitalTable``)
 
                             * ``'ecc'`` - eccentricity
 
@@ -86,25 +108,6 @@ def daily_insolation(lat, day, orb=const.orb_present, S0=const.S0, day_type=1):
     Orbital arguments should all have the same sizes.
     This is automatic if computed from
     :func:`~climlab.solar.orbital.OrbitalTable.lookup_parameters`
-
-    :Example:
-        to compute the timeseries of insolation at 65N at summer
-        solstice over the past 5 Myears::
-
-            from climlab.solar.orbital import OrbitalTable
-            from climlab.solar.insolation import daily_insolation
-
-            # import orbital table
-            table = OrbitalTable()
-
-            # array with specified kyears
-            years = np.linspace(-5000, 0, 5001)
-
-            # orbital parameters for specified time
-            orb = table.lookup_parameters( years )
-
-            # insolation values for past 5 Myears at 65N at summer solstice
-            S65 = daily_insolation( 65, 172, orb )
 
         For more information about computation of solar insolation see the
         :ref:`Tutorial` chapter.
