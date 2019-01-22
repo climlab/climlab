@@ -1,8 +1,9 @@
 # Based on http://conda.pydata.org/docs/travis.html
 language: python
-sudo: false # use container based build
+#sudo: false # use container based build
 notifications:
   email: false
+dist: xenial
 
 matrix:
   fast_finish: true
