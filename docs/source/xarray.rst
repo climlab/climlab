@@ -6,14 +6,14 @@ Integration with ``xarray``
 xarray_ is a powerful Python package for geospatial data analysis.
 It provides ``DataArray`` and ``Dataset`` structures for self-describing gridded data.
 
-For the convenience of ``xarray`` users, climlab provides tools for automatic translation
-of the native ``Field`` object to ``xarray`` format.
+For the convenience of xarray users, climlab provides tools for automatic translation
+of the native ``Field`` object to xarray format.
 
 Additionally, as of climlab v0.7.1, the insolation and orbital functions have been updated
-with an ``xarray``-compatible interface. ``climlab.solar.orbital.OrbitalTable``
-returns an ``xarray.Dataset`` object with orbital data.
-``climlab.solar.insolation.daily_insolation`` accepts input
-in labeled ``xarray.DataArray`` format and return the same.
+with an xarray-compatible interface:
+
+- ``climlab.solar.orbital.OrbitalTable`` returns an ``xarray.Dataset`` object with orbital data.
+- ``climlab.solar.insolation.daily_insolation`` accepts input in labeled ``xarray.DataArray`` format and return the same.
 
 :Example 1:
 

@@ -6,7 +6,7 @@ class ExternalForcing(TimeDependentProcess):
     Useful for combining some prescribed external forcing with an interactive model.
 
     :Example:
-        The user can invoke the process on a dicionary of state variables ``mystate`` like this:
+        The user can invoke the process on a dicionary of state variables ``mystate`` like this::
 
             myforcing = climlab.process.ExternalForcing(state=mystate)
 
