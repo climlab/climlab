@@ -155,7 +155,7 @@ Release history
 ----------------------
 
 Version 0.7.1 (released January 2019)
-    Deeper ``xarray`` integration, include one breaking change to ``climlab.solar.orbital.OrbitalTable``, and minor enhancements.
+    Deeper xarray integration, include one breaking change to ``climlab.solar.orbital.OrbitalTable``, and minor enhancements.
 
     Details:
       - Removed ``climlab.utils.attr_dict.AttrDict`` and replaced with AttrDict package (a new dependency)
