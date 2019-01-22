@@ -79,10 +79,11 @@ These are handled automatically if you install with conda_.
 
 Required
 ------------
-- Python 2.7, 3.5, or 3.6 (as of version 0.6.0)
+- Python 2.7, 3.5, 3.6, 3.7 (as of version 0.7.1)
 - ``numpy``
 - ``scipy``
-- ``netCDF4`` Python package (for data i/o)
+- ``xarray`` (for data i/o)
+- ``attrdict``
 
 Recommended for full functionality
 ---------------

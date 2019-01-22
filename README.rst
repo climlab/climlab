@@ -122,7 +122,7 @@ These are handled automatically if you install with conda_.
 
 Required
 ~~~~~~~~~~~~
-- Python 2.7, 3.5, or 3.6 (as of version 0.6.0)
+- Python 2.7, 3.5, 3.6, 3.7 (as of version 0.7.1)
 - ``numpy``
 - ``scipy``
 - ``xarray``
@@ -155,7 +155,7 @@ Release history
 ----------------------
 
 Version 0.7.1 (released January 2019)
-    Deeper xarray integration, include one breaking change to ``climlab.solar.orbital.OrbitalTable``, and minor enhancements.
+    Deeper xarray integration, include one breaking change to ``climlab.solar.orbital.OrbitalTable``, Python 3.7 compatibility, and minor enhancements.
 
     Details:
       - Removed ``climlab.utils.attr_dict.AttrDict`` and replaced with AttrDict package (a new dependency)
@@ -164,6 +164,7 @@ Version 0.7.1 (released January 2019)
       - The ``lookup_parameter()`` method was removed in favor of using built-in xarray interpolation.
       - New class ``climlab.process.ExternalForcing()`` for arbitrary externally defined tendencies for state variables.
       - New input option ``ozone_file=None`` for radiation components, sets ozone to zero.
+      - Tested on Python 3.7. Builds will be available through conda-forge.
 
 Version 0.7.0 (released July 2018)
     New functionality, improved documentation_, and a few breaking changes to the API.
