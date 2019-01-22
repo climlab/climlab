@@ -125,7 +125,7 @@ Required
 - Python 2.7, 3.5, or 3.6 (as of version 0.6.0)
 - ``numpy``
 - ``scipy``
-- ``xarray`` 
+- ``xarray``
 - ``attrdict``
 
 Recommended for full functionality
@@ -153,6 +153,17 @@ These are self-describing, and should all run out-of-the-box once the package is
 
 Release history
 ----------------------
+
+Version 0.7.1 (released January 2019)
+    Deeper ``xarray`` integration, include one breaking change to ``climlab.solar.orbital.OrbitalTable``, and minor enhancements.
+
+    Details:
+      - Removed ``climlab.utils.attr_dict.AttrDict`` and replaced with AttrDict package (a new dependency)
+      - Added ``xarray`` input and output capabilities for ``climlab.solar.insolation.daily_insolation()``
+      - ``climlab.solar.orbital.OrbitalTable`` and ``climlab.solar.orbital.long.OrbitalTable`` now return ``xarray.Dataset`` objects containing the orbital data.
+      - The ``lookup_parameter()`` method was removed in favor of using built-in xarray interpolation.
+      - New class ``climlab.process.ExternalForcing()`` for arbitrary externally defined tendencies for state variables.
+      - New input option ``ozone_file=None`` for radiation components, sets ozone to zero.
 
 Version 0.7.0 (released July 2018)
     New functionality, improved documentation_, and a few breaking changes to the API.

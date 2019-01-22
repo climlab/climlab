@@ -8,7 +8,7 @@ class ExternalForcing(TimeDependentProcess):
     The user can invoke the process on a dicionary of state variables ``mystate`` like this:
 
     ```
-    myforcing = ExternalForcing(state=mystate)
+    myforcing = climlab.process.ExternalForcing(state=mystate)
     ```
 
     and then set the desired tendencies in the dictionary ``myforcing.forcing_tendencies``,
