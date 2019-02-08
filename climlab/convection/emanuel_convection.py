@@ -4,13 +4,14 @@ A climlab process for the Emanuel convection scheme
 from __future__ import absolute_import
 
 import numpy as np
+import warnings
 from climlab.process import TimeDependentProcess
 from climlab.utils.thermo import qsat
 from climlab import constants as const
 try:
     from ._emanuel_convection import emanuel_convection as convect
 except:
-    print('Cannot import EmanuelConvection fortran extension, this module will not be functional.')
+    warnings.warn('Cannot import EmanuelConvection fortran extension, this module will not be functional.')
 # The array conversion routines we are borrowing from the RRTMG wrapper
 from climlab.radiation.rrtm.utils import _climlab_to_rrtm as _climlab_to_convect
 from climlab.radiation.rrtm.utils import _rrtm_to_climlab as _convect_to_climlab

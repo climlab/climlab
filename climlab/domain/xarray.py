@@ -2,6 +2,7 @@ from __future__ import division, absolute_import
 from builtins import str
 from builtins import object
 from xarray import Dataset, DataArray
+import warnings
 
 
 def Field_to_xarray(field):
@@ -55,7 +56,7 @@ def state_to_xarray(state):
                 except:
                     pass
         else:
-            print('{} excluded from Dataset because it is not a Field variable.'.format(name))
+            warnings.warn('{} excluded from Dataset because it is not a Field variable.'.format(name))
     return ds
 
 def to_xarray(input):

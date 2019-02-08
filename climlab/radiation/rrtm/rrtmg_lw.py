@@ -1,7 +1,6 @@
-from __future__ import division
-from __future__ import print_function
-from __future__ import absolute_import
+from __future__ import division, print_function, absolute_import
 import numpy as np
+import warnings
 from climlab import constants as const
 from climlab.radiation.radiation import _Radiation_LW
 from .utils import _prepare_general_arguments
@@ -16,7 +15,7 @@ try:
     #  Initialize absorption data
     _rrtmg_lw.climlab_rrtmg_lw_ini(const.cp)
 except:
-    print('Cannot import and initialize compiled Fortran extension, RRTMG_LW module will not be functional.')
+    warnings.warn('Cannot import and initialize compiled Fortran extension, RRTMG_LW module will not be functional.')
 
 
 class RRTMG_LW(_Radiation_LW):

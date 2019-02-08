@@ -79,11 +79,12 @@ from climlab.radiation import ManabeWaterVapor
 import os
 from climlab import constants as const
 from climlab.domain.field import Field
+import warnings
 try:
     import xarray as xr
 except:
-    print('Cannot import xarray. Will not be able to initialize ozone from data file.')
-
+    warnings.warn('Cannot import `xarray`. Will not be able to initialize ozone from data file.',
+                FutureWarning, stacklevel=2)
 
 def default_specific_humidity(Tatm):
     '''Initialize a specific humidity distribution

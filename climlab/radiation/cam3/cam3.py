@@ -37,16 +37,8 @@ import numpy as np
 from climlab import constants as const
 from climlab.utils.thermo import vmr_to_mmr
 from climlab.radiation.radiation import _Radiation_SW, _Radiation_LW
-import os
-#  Wrapping these imports in try/except to avoid failures during documentation building on readthedocs
-try:
-    from . import _cam3
-except:
-    print('Cannot import compiled Fortran extension, CAM3 module will not be functional.')
-try:
-    import xarray as xr
-except:
-    print('Cannot import xarray. Will not be able to properly initialize the CAM3 module.')
+import os, warnings
+import xarray as xr
 
 
 def init_cam3(mod):
@@ -61,10 +53,13 @@ def init_cam3(mod):
         setattr(mod, field, data[field].transpose())
     data.close()
 
+#  Wrapping these imports in try/except to avoid failures during documentation building on readthedocs
 try:
+    from . import _cam3
     init_cam3(_cam3.absems)
 except:
-    print('Cannot initialize the CAM3 module.')
+    warnings.warn('Cannot import and initialize compiled Fortran extension, CAM3 module will not be functional.')
+
 
 class CAM3(_Radiation_SW, _Radiation_LW):
     '''
