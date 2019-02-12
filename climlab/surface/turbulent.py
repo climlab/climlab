@@ -7,9 +7,10 @@ from climlab.domain.field import Field
 
 
 class SurfaceFlux(EnergyBudget):
-    def __init__(self, Cd=3E-3, **kwargs):
+    def __init__(self, Cd=3E-3, resistance=1., **kwargs):
         super(SurfaceFlux, self).__init__(**kwargs)
         self.Cd = Cd
+        self.resistance = resistance
         self.heating_rate['Tatm'] = np.zeros_like(self.Tatm)
         #  fixed wind speed (for now)
         self.add_input('U', 5. * np.ones_like(self.Ts))
@@ -30,7 +31,7 @@ class SurfaceFlux(EnergyBudget):
 class SensibleHeatFlux(SurfaceFlux):
     def __init__(self, Cd=3E-3, **kwargs):
         super(SensibleHeatFlux, self).__init__(Cd=Cd, **kwargs)
-        self.add_diagnostic('SHF')
+        self.add_diagnostic('SHF', 0.*self.Ts)
 
     def _compute_flux(self):
         # this ensure same dimensions as Ts
@@ -40,14 +41,14 @@ class SensibleHeatFlux(SurfaceFlux):
         DeltaT = Ts - Ta
         rho = self._air_density(Ta)
         #  flux from bulk formula
-        self._flux = const.cp * rho * self.Cd * self.U * DeltaT
+        self._flux = self.resistance * const.cp * rho * self.Cd * self.U * DeltaT
         self.SHF = self._flux
 
 
 class LatentHeatFlux(SurfaceFlux):
     def __init__(self, Cd=3E-3, **kwargs):
         super(LatentHeatFlux, self).__init__(Cd=Cd, **kwargs)
-        self.add_diagnostic('LHF')
+        self.add_diagnostic('LHF', 0.*self.Ts)
 
     def _compute_flux(self):
         #  specific humidity at lowest model level
@@ -58,7 +59,7 @@ class LatentHeatFlux(SurfaceFlux):
         Deltaq = Field(qs - q, domain=self.Ts.domain)
         rho = self._air_density(Ta)
         #  flux from bulk formula
-        self._flux = const.Lhvap * rho * self.Cd * self.U * Deltaq
+        self._flux = self.resistance * const.Lhvap * rho * self.Cd * self.U * Deltaq
         self.LHF = self._flux
 
     def _compute(self):

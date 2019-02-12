@@ -236,6 +236,7 @@ class EmanuelConvection(TimeDependentProcess):
         if 'V' in self.state:
             tendencies['V'] = _convect_to_climlab(FV) * np.ones_like(self.state['V'])
         self.CBMF = CBMFnew
-        self.PRECIP = PRECIP
+        # This is clunky but ensures that self.PRECIP always points to the same data
+        self.PRECIP += (_convect_to_climlab(PRECIP)-self.PRECIP)
         self.IFLAG = IFLAG
         return tendencies
