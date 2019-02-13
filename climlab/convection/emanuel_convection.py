@@ -98,7 +98,7 @@ class EmanuelConvection(TimeDependentProcess):
     Diagnostics computed:
 
         - CBMF (cloud base mass flux in kg/m2/s) -- this is actually stored internally and used as input for subsequent timesteps
-        - PRECIP (convective precipitation rate in mm/day)
+        - precipitation (convective precipitation rate in m/s)
 
         :Example:
 
@@ -173,7 +173,7 @@ class EmanuelConvection(TimeDependentProcess):
         #  For some strange reason self.Tatm is breaking tests under Python 3.5 in some configurations
         surface_shape = self.state['Tatm'][...,0].shape
         self.add_diagnostic('CBMF', np.zeros(surface_shape))  # cloud base mass flux
-        self.add_diagnostic('PRECIP', np.zeros(surface_shape)) # Precip rate (mm/day)
+        self.add_diagnostic('precipitation', np.atleast_1d(np.zeros(surface_shape))) # Precip rate (mm/day)
         self.add_input('MINORIG', MINORIG)
         self.add_input('ELCRIT', ELCRIT)
         self.add_input('TLCRIT', TLCRIT)
@@ -236,7 +236,7 @@ class EmanuelConvection(TimeDependentProcess):
         if 'V' in self.state:
             tendencies['V'] = _convect_to_climlab(FV) * np.ones_like(self.state['V'])
         self.CBMF = CBMFnew
-        # This is clunky but ensures that self.PRECIP always points to the same data
-        self.PRECIP += (_convect_to_climlab(PRECIP)-self.PRECIP)
+        #  Need to convert from mm/day to m/s
+        self.precipitation[:] = _convect_to_climlab(PRECIP)*1E-3/const.seconds_per_day
         self.IFLAG = IFLAG
         return tendencies

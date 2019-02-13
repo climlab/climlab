@@ -45,10 +45,12 @@ class SensibleHeatFlux(SurfaceFlux):
         self.SHF = self._flux
 
 
+
 class LatentHeatFlux(SurfaceFlux):
     def __init__(self, Cd=3E-3, **kwargs):
         super(LatentHeatFlux, self).__init__(Cd=Cd, **kwargs)
         self.add_diagnostic('LHF', 0.*self.Ts)
+        self.add_diagnostic('evaporation', 0.*self.Ts)
 
     def _compute_flux(self):
         #  specific humidity at lowest model level
@@ -61,6 +63,8 @@ class LatentHeatFlux(SurfaceFlux):
         #  flux from bulk formula
         self._flux = self.resistance * const.Lhvap * rho * self.Cd * self.U * Deltaq
         self.LHF = self._flux
+        # evporation rate, convert from W/m2 to m/s
+        self.evaporation = self.LHF/const.Lhvap/const.rho_w
 
     def _compute(self):
         '''Overides the _compute method of EnergyBudget'''
@@ -72,6 +76,6 @@ class LatentHeatFlux(SurfaceFlux):
             Pa_per_hPa = 100.
             air_mass_per_area = self.Tatm.domain.lev.delta[...,-1] * Pa_per_hPa / const.g
             specific_humidity_tendency = 0.*self.q
-            specific_humidity_tendency[...,-1] = self.LHF/const.Lhvap / air_mass_per_area
+            specific_humidity_tendency[...,-1,np.newaxis] = self.LHF/const.Lhvap / air_mass_per_area
             tendencies['q'] = specific_humidity_tendency
         return tendencies
