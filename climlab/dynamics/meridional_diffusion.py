@@ -97,8 +97,8 @@ class MeridionalDiffusion(Diffusion):
         self.delta *= (np.deg2rad(1.) * const.a)
         for dom in list(self.domains.values()):
             lataxis = dom.axes['lat']
-        phi_stag = np.deg2rad(lataxis.bounds)
-        phi = np.deg2rad(lataxis.points)
+        phi_stag = np.deg2rad(lataxis.bounds.values)
+        phi = np.deg2rad(lataxis.points.values)
         self._weight1 = np.cos(phi_stag)
         self._weight2 = np.cos(phi)
         #  Now properly compute the weighted diffusion matrix

@@ -4,27 +4,33 @@ from builtins import object
 from xarray import Dataset, DataArray
 import warnings
 
+axis_types = ['lev', 'lat', 'lon', 'depth', 'abstract']
+
 
 def Field_to_xarray(field):
     '''Convert a climlab.Field object to xarray.DataArray'''
     dom = field.domain
     dims = []; dimlist = []; coords = {};
     for axname in dom.axes:
+        if axname not in axis_types:
+            dimname = 'abstract'
+        else:
+            dimname = axname
         dimlist.append(axname)
         try:
             assert field.interfaces[dom.axis_index[axname]]
-            bounds_name = axname + '_bounds'
+            bounds_name = dimname + '_bounds'
             dims.append(bounds_name)
             coords[bounds_name] = dom.axes[axname].bounds
         except:
-            dims.append(axname)
-            coords[axname] = dom.axes[axname].points
+            dims.append(dimname)
+            coords[dimname] = dom.axes[axname].points
     #  Might need to reorder the data
     da = DataArray(field.transpose([dom.axis_index[name] for name in dimlist]),
                       dims=dims, coords=coords)
     for name in dims:
         try:
-            da[name].attrs['units'] = dom.axes[name].units
+            da[name].attrs['units'] = dom.axes[name].attrs['units']
         except:
             pass
     return da
@@ -48,7 +54,11 @@ def state_to_xarray(state):
             ds[name] = Field_to_xarray(field)
             dom = field.domain
             for axname, ax in dom.axes.items():
-                bounds_name = axname + '_bounds'
+                if axname not in axis_types:
+                    dimname = 'abstract'
+                else:
+                    dimname = axname
+                bounds_name = dimname + '_bounds'
                 ds.coords[bounds_name] = DataArray(ax.bounds, dims=[bounds_name],
                                     coords={bounds_name:ax.bounds})
                 try:

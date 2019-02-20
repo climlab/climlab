@@ -11,7 +11,7 @@ def model():
 
 @pytest.fixture()
 def model_with_insolation(model):
-    insolation = climlab.radiation.DailyInsolation(domains=model.Ts.domain)
+    insolation = climlab.radiation.DailyInsolation(domains=model.domains['Ts'])
     model.add_subprocess('insolation', insolation)
     model.subprocess.SW.flux_from_space = insolation.insolation
     return model
@@ -19,7 +19,7 @@ def model_with_insolation(model):
 @pytest.fixture()
 def rcmodel():
     model2 = climlab.RadiativeConvectiveModel(num_lev=30, num_lat=90)
-    insolation = climlab.radiation.DailyInsolation(domains=model2.Ts.domain)
+    insolation = climlab.radiation.DailyInsolation(domains=model2.domains['Ts'])
     model2.add_subprocess('insolation', insolation)
     model2.subprocess.SW.flux_from_space = insolation.insolation
     return model2
@@ -28,7 +28,7 @@ def rcmodel():
 def diffmodel(rcmodel):
     diffmodel = climlab.process_like(rcmodel)
     # meridional diffusivity in m**2/s
-    K = 0.05 / diffmodel.Tatm.domain.heat_capacity[0] *  climlab.constants.a**2
+    K = 0.05 / diffmodel.domains['Tatm'].heat_capacity[0] *  climlab.constants.a**2
     d = climlab.dynamics.MeridionalDiffusion(K=K,
                 state={'Tatm': diffmodel.state['Tatm']},
                 **diffmodel.param)

@@ -46,7 +46,7 @@ class NbandRadiation(GreyGas):
         # each item should have dimension...  (num_channels, 1)
         self.absorption_cross_section = {}
         self.cosZen = 1.  # cosine of the average zenith angle
-        dp = self.Tatm.domain.lev.delta
+        dp = self.domains['Tatm'].lev.delta.values
         self.mass_per_layer = dp * const.mb_to_Pa / const.g
         self.albedo_sfc = np.ones_like(self.band_fraction) * self.albedo_sfc
 
@@ -57,7 +57,7 @@ class NbandRadiation(GreyGas):
     def band_fraction(self, value):
         self.num_channels = value.size
         # abstract axis for channels
-        ax = axis.Axis(num_points=self.num_channels)
+        ax = axis.Axis(axis_type='abstract', num_points=self.num_channels)
         self.channel_ax = {'channel': ax}
         dom = domain._Domain(axes=self.channel_ax)
         #   fraction of the total solar flux in each band:
@@ -87,7 +87,7 @@ class NbandRadiation(GreyGas):
         optical_path = self._compute_optical_path()
         #  account for finite layer depth
         absorptivity = 1. - np.exp(-optical_path)
-        axes = copy(self.Tatm.domain.axes)
+        axes = copy(self.domains['Tatm'].axes)
         # add these to the dictionary of axes
         axes.update(self.channel_ax)
         dom = domain.Atmosphere(axes=axes)
@@ -102,7 +102,7 @@ class NbandRadiation(GreyGas):
         #  need to split the total emission across the bands
         total_emission = super(NbandRadiation, self)._compute_emission()
         band_fraction = self.band_fraction
-        for n in range(self.Tatm.domain.numdims):
+        for n in range(self.domains['Tatm'].numdims):
             band_fraction = band_fraction[:, np.newaxis]
         return total_emission * band_fraction
 
@@ -152,7 +152,7 @@ class ThreeBandSW(NbandRadiation):
         #    (self.num_channels, 1))
         #H2O = np.array([0.002, 0.002, 0.002])
         H2O = np.array([0., 0., 0.001])
-        for n in range(self.Tatm.domain.numdims):
+        for n in range(self.domains['Tatm'].numdims):
             H2O = H2O[:, np.newaxis]
             O3 = O3[:, np.newaxis]
         self.absorption_cross_section['O3'] = O3
@@ -202,7 +202,7 @@ class FourBandSW(NbandRadiation):
         #self.absorption_cross_section['O3'] = np.reshape(O3,
         #    (self.num_channels, 1))
         H2O = np.array([0., 0., 0., 0.0012])
-        for n in range(self.Tatm.domain.numdims):
+        for n in range(self.domains['Tatm'].numdims):
             H2O = H2O[:, np.newaxis]
             O3 = O3[:, np.newaxis]
         self.absorption_cross_section['O3'] = O3
@@ -259,7 +259,7 @@ class FourBandLW(NbandRadiation):
         H2O = np.array([0., 0., ABLWV1, ABLWV2]) / 1E5 * const.g * 1E3
         #self.absorption_cross_section['H2O'] = np.reshape(H2O,
         #    (self.num_channels, 1))
-        for n in range(self.Tatm.domain.numdims):
+        for n in range(self.domains['Tatm'].numdims):
             CO2 = CO2[:, np.newaxis]
             O3 = O3[:, np.newaxis]
             H2O = H2O[:, np.newaxis]

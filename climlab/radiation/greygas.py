@@ -70,12 +70,11 @@ class GreyGas(EnergyBudget):
         return self.trans.absorptivity
     @absorptivity.setter
     def absorptivity(self, value):
-        #  value should be a Field,
-         #  or numpy array of same size as self.Tatm
+        #  value should be compatible with self.Tatm
         try:
             axis = value.domain.axis_index['lev']
         except:
-            axis = self.Tatm.domain.axis_index['lev']
+            axis = self.domains['Tatm'].axis_index['lev']
             # if a single scalar is given, broadcast that to all levels
             if len(np.shape(np.array(value))) is 0:
                 value = np.ones_like(self.Tatm) * value
@@ -104,12 +103,11 @@ class GreyGas(EnergyBudget):
         return self.trans.reflectivity
     @reflectivity.setter
     def reflectivity(self, value):
-        #  value should be a Field,
-         #  or numpy array of same size as self.Tatm
+        #  value should be compatible with self.Tatm
         try:
             axis = value.domain.axis_index['lev']
         except:
-            axis = self.Tatm.domain.axis_index['lev']
+            axis = self.domains['Tatm'].axis_index['lev']
             # if a single scalar is given, broadcast that to all levels
             if len(np.shape(np.array(value))) is 0:
                 value = np.ones_like(self.Tatm) * value

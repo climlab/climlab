@@ -121,6 +121,6 @@ class RRTMG_LW(_Radiation_LW):
         self.heating_rate['Ts'] = np.array(-self.LW_flux_net[..., -1, np.newaxis]) + 0.*self.Ts
         self.heating_rate['Tatm'] = LWheating_Wm2
         #  Convert to K / day
-        Catm = self.Tatm.domain.heat_capacity
+        Catm = self.domains['Tatm'].heat_capacity
         self.TdotLW = LWheating_Wm2 / Catm * const.seconds_per_day
         self.TdotLW_clr = LWheating_clr_Wm2 / Catm * const.seconds_per_day

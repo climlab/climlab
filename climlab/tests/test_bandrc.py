@@ -18,13 +18,13 @@ def diffmodel():
     fixed relative humidity, meridional heat transport (diffusion) and convective adjustment.
     '''
     diffmodel = climlab.BandRCModel(num_lev=30, num_lat=90)
-    insolation = climlab.radiation.AnnualMeanInsolation(domains=diffmodel.Ts.domain)
+    insolation = climlab.radiation.AnnualMeanInsolation(domains=diffmodel.domains['Ts'])
     diffmodel.add_subprocess('insolation', insolation)
     diffmodel.subprocess.SW.flux_from_space = insolation.insolation
     # thermal diffusivity in W/m**2/degC
     D = 0.05
     # meridional diffusivity in 1/s
-    K = D / diffmodel.Tatm.domain.heat_capacity[0]
+    K = D / diffmodel.domains['Tatm'].heat_capacity[0]
     d = climlab.dynamics.MeridionalDiffusion(K=K,
                 state={'Tatm': diffmodel.state['Tatm']},
                 **diffmodel.param)

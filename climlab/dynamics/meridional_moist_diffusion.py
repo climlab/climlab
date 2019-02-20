@@ -133,7 +133,7 @@ class MeridionalMoistDiffusion(MeridionalHeatDiffusion):
         Tinterp = np.interp(self.lat_bounds, self.lat, np.squeeze(self.Ts))
         Tkelvin = Tinterp + const.tempCtoK
         f = moist_amplification_factor(Tkelvin, self.relative_humidity)
-        heat_capacity = self.Ts.domain.heat_capacity
+        heat_capacity = self.domains['Ts'].heat_capacity
         self.K = self.D / heat_capacity * const.a**2 * (1+f)
 
     def _implicit_solver(self):

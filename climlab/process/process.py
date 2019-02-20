@@ -1,68 +1,3 @@
-
-#==============================================================================
-# Principles of the new `climlab` API design:
-#
-#     * `climlab.Process` object has several iterable dictionaries of named,
-#       gridded variables:
-#
-#         * `process.state`
-#
-#             * state variables, usually time-dependent
-#
-#         - `process.input`
-#             - boundary conditions and other gridded quantities independent of the
-#             `process`
-#             - often set by a parent `process`
-#         - `process.param`  (which are basically just scalar `input`)
-#         - `process.tendencies`
-#             - iterable `dict` of time-tendencies (d/dt) for each state variable
-#         - `process.diagnostics`
-#             - any quantity derived from current state
-# - The `process` is fully described by contents of `state`, `input` and `param`
-# dictionaries. `tendencies` and `diagnostics` are always computable from current
-# state.
-# - `climlab` will remain (as much as possible) agnostic about the data formats
-#     - Variables within the dictionaries will behave as `numpy.ndarray` objects
-#     - Grid information and other domain details accessible as attributes
-#     of each variable
-#         - e.g. Tatm.lat
-#         - Shortcuts like `process.lat` will work where these are unambiguous
-# - Many variables will be accessible as process attributes `process.name`
-#     - this restricts to unique field names in the above dictionaries
-# - There may be other dictionaries that do have name conflicts
-#     - e.g. dictionary of tendencies, with same keys as `process.state`
-#     - These will *not* be accessible as `process.name`
-#     - but *will* be accessible as `process.dict_name.name`
-#     (as well as regular dict interface)
-# - There will be a dictionary of named subprocesses `process.subprocess`
-# - Each item in subprocess dict will itself be a `climlab.Process` object
-# - For convenience with interactive work, each subprocess should be accessible
-# as `process.subprocess.name` as well as `process.subprocess['name']`
-# - `process.compute()` is a method that computes tendencies (d/dt)
-#     - returns a dictionary of tendencies for all state variables
-#     - keys for this dictionary are same as keys of state dictionary
-#     - tendency dictionary is the total tendency including all subprocesses
-#     - method only computes d/dt, does not apply changes
-#     - thus method is relatively independent of numerical scheme
-#         - may need to make exception for implicit scheme?
-#     - method *will* update variables in `process.diagnostic`
-#         - will also *gather all diagnostics* from `subprocesses`
-# - `process.step_forward()` updates the state variables
-#     - calls `process.compute()` to get current tendencies
-#     - implements a particular time-stepping scheme
-#     - user interface is agnostic about numerical scheme
-# - `process.integrate_years()` etc will automate time-stepping
-#     - also computation of time-average diagnostics.
-# - Every `subprocess` should work independently of its parent `process` given
-# appropriate `input`.
-#     - investigating an individual `process` (possibly with its own
-#     `subprocesses`) isolated from its parent needs to be as simple as doing:
-#         - `newproc = climlab.process_like(procname.subprocess['subprocname'])`
-#
-#         - `newproc.compute()`
-#         - anything in the `input` dictionary of `subprocname` will remain fixed
-#==============================================================================
-
 from __future__ import division, print_function
 from builtins import object
 import time, copy
@@ -632,7 +567,7 @@ class Process(object):
         try:
             for domname, dom in self.domains.items():
                 try:
-                    thislat = dom.axes['lat'].points
+                    thislat = dom.axes['lat'].points.values
                 except:
                     pass
             return thislat
@@ -652,7 +587,7 @@ class Process(object):
         try:
             for domname, dom in self.domains.items():
                 try:
-                    thislat = dom.axes['lat'].bounds
+                    thislat = dom.axes['lat'].bounds.values
                 except:
                     pass
             return thislat
@@ -672,7 +607,7 @@ class Process(object):
         try:
             for domname, dom in self.domains.items():
                 try:
-                    thislon = dom.axes['lon'].points
+                    thislon = dom.axes['lon'].points.values
                 except:
                     pass
             return thislon
@@ -692,7 +627,7 @@ class Process(object):
         try:
             for domname, dom in self.domains.items():
                 try:
-                    thislon = dom.axes['lon'].bounds
+                    thislon = dom.axes['lon'].bounds.values
                 except:
                     pass
             return thislon
@@ -712,7 +647,7 @@ class Process(object):
         try:
             for domname, dom in self.domains.items():
                 try:
-                    thislev = dom.axes['lev'].points
+                    thislev = dom.axes['lev'].points.values
                 except:
                     pass
             return thislev
@@ -732,7 +667,7 @@ class Process(object):
         try:
             for domname, dom in self.domains.items():
                 try:
-                    thislev = dom.axes['lev'].bounds
+                    thislev = dom.axes['lev'].bounds.values
                 except:
                     pass
             return thislev
@@ -752,7 +687,7 @@ class Process(object):
         try:
             for domname, dom in self.domains.items():
                 try:
-                    thisdepth = dom.axes['depth'].points
+                    thisdepth = dom.axes['depth'].points.values
                 except:
                     pass
             return thisdepth
@@ -772,7 +707,7 @@ class Process(object):
         try:
             for domname, dom in self.domains.items():
                 try:
-                    thisdepth = dom.axes['depth'].bounds
+                    thisdepth = dom.axes['depth'].bounds.values
                 except:
                     pass
             return thisdepth

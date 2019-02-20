@@ -3,6 +3,7 @@ from builtins import str
 from builtins import object
 from climlab.domain.axis import Axis
 from climlab.utils import heat_capacity
+import xarray as xr
 
 
 class _Domain(object):
@@ -147,9 +148,9 @@ class _Domain(object):
         """
         if type(axes) is dict:
             axdict = axes
-        elif type(axes) is Axis:
+        elif type(axes) is xr.Dataset:
             ax = axes
-            axdict = {ax.axis_type: ax}
+            axdict = {ax.attrs['axis_type']: ax}
         elif axes is None:
             axdict = {'empty': None}
         else:
@@ -233,7 +234,7 @@ class Atmosphere(_Domain):
                                     the ``'lev'`` Axis.
 
         """
-        self.heat_capacity = heat_capacity.atmosphere(self.axes['lev'].delta)
+        self.heat_capacity = heat_capacity.atmosphere(self.axes['lev'].delta.values)
 
 
 class Ocean(_Domain):
@@ -284,7 +285,7 @@ class Ocean(_Domain):
                                     the ``'depth'`` Axis.
 
         """
-        self.heat_capacity = heat_capacity.ocean(self.axes['depth'].delta)
+        self.heat_capacity = heat_capacity.ocean(self.axes['depth'].delta.values)
 
 
 def make_slabocean_axis(num_points=1):
@@ -531,7 +532,7 @@ def surface_2D(num_lat=90, num_lon=180, water_depth=10., lon=None,
     """
     if lat is None:
         latax = Axis(axis_type='lat', num_points=num_lat)
-    elif isinstance(lat, Axis):
+    elif isinstance(lat, xr.DataArray):
         latax = lat
     else:
         try:
@@ -540,7 +541,7 @@ def surface_2D(num_lat=90, num_lon=180, water_depth=10., lon=None,
             raise ValueError('lat must be Axis object or latitude array')
     if lon is None:
         lonax = Axis(axis_type='lon', num_points=num_lon)
-    elif isinstance(lon, Axis):
+    elif isinstance(lon, xr.DataArray):
         lonax = lon
     else:
         try:

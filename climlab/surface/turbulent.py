@@ -36,7 +36,7 @@ class SensibleHeatFlux(SurfaceFlux):
     def _compute_flux(self):
         # this ensure same dimensions as Ts
         #  (and use only the lowest model level)
-        Ta = Field(self.Tatm[..., -1, np.newaxis], domain=self.Ts.domain)
+        Ta = Field(self.Tatm[..., -1, np.newaxis], domain=self.domains['Ts'])
         Ts = self.Ts
         DeltaT = Ts - Ta
         rho = self._air_density(Ta)
@@ -55,10 +55,10 @@ class LatentHeatFlux(SurfaceFlux):
     def _compute_flux(self):
         #  specific humidity at lowest model level
         #  assumes pressure is the last axis
-        q = Field(self.q[..., -1, np.newaxis], domain=self.Ts.domain)
-        Ta = Field(self.Tatm[..., -1, np.newaxis], domain=self.Ts.domain)
+        q = Field(self.q[..., -1, np.newaxis], domain=self.domains['Ts'])
+        Ta = Field(self.Tatm[..., -1, np.newaxis], domain=self.domains['Ts'])
         qs = qsat(self.Ts, self.ps)
-        Deltaq = Field(qs - q, domain=self.Ts.domain)
+        Deltaq = Field(qs - q, domain=self.domains['Ts'])
         rho = self._air_density(Ta)
         #  flux from bulk formula
         self._flux = self.resistance * const.Lhvap * rho * self.Cd * self.U * Deltaq
@@ -74,7 +74,7 @@ class LatentHeatFlux(SurfaceFlux):
             #  water vapor tendency, NOT air temperature tendency!
             tendencies['Tatm'] *= 0.
             Pa_per_hPa = 100.
-            air_mass_per_area = self.Tatm.domain.lev.delta[...,-1] * Pa_per_hPa / const.g
+            air_mass_per_area = self.domains['Tatm'].lev.delta[...,-1] * Pa_per_hPa / const.g
             specific_humidity_tendency = 0.*self.q
             specific_humidity_tendency[...,-1,np.newaxis] = self.LHF/const.Lhvap / air_mass_per_area
             tendencies['q'] = specific_humidity_tendency

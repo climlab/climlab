@@ -59,9 +59,9 @@ class ConvectiveAdjustment(TimeDependentProcess):
             return patm
     @property
     def ccol(self):
-        c_atm = self.Tatm.domain.heat_capacity
+        c_atm = self.domains['Tatm'].heat_capacity
         if 'Ts' in self.state:
-            c_sfc = self.Ts.domain.heat_capacity
+            c_sfc = self.domains['Ts'].heat_capacity
             return np.append(c_atm, c_sfc)
         else:
             return c_atm
@@ -109,11 +109,11 @@ class ConvectiveAdjustment(TimeDependentProcess):
             Tadj_flip = convective_adjustment_direct(pflip, Tflip, cflip, lapserate=lapseflip)
             Tadj = Tadj_flip[..., ::-1]
             if 'Ts' in self.state:
-                Ts = Field(Tadj[...,-1], domain=self.Ts.domain)
-                Tatm = Field(Tadj[...,:-1], domain=self.Tatm.domain)
+                Ts = Field(Tadj[...,-1], domain=self.domains['Ts'])
+                Tatm = Field(Tadj[...,:-1], domain=self.domains['Tatm'])
                 self.adjustment['Ts'] = Ts - self.Ts
             else:
-                Tatm = Field(Tadj, domain=self.Tatm.domain)
+                Tatm = Field(Tadj, domain=self.domains['Tatm'])
             self.adjustment['Tatm'] = Tatm - self.Tatm
         #  return the adjustment, independent of timestep
         #  because the parent process might have set a different timestep!

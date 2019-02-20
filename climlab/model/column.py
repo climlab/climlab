@@ -21,10 +21,10 @@ Here is an example to implement seasonal insolation at 45 degrees North
             lat = climlab.domain.Axis(axis_type='lat', points=45.)
 
             #  add this new axis to the surface domain
-            col.Ts.domain.axes['lat'] = lat
+            col.domains['Ts'].axes['lat'] = lat
 
             #  create a new insolation process using this domain
-            Q = climlab.radiation.insolation.DailyInsolation(domains=col.Ts.domain, **col.param)
+            Q = climlab.radiation.insolation.DailyInsolation(domains=col.domains['Ts'], **col.param)
 
             #  replace the fixed insolation subprocess in the column model
             col.add_subprocess('insolation', Q)
@@ -70,10 +70,10 @@ class GreyRadiationModel(TimeDependentProcess):
         self.param['Q'] = Q
         self.param['abs_coeff'] = abs_coeff
 
-        sfc = self.Ts.domain
-        atm = self.Tatm.domain
+        sfc = self.domains['Ts']
+        atm = self.domains['Tatm']
         # create sub-models for longwave and shortwave radiation
-        dp = self.Tatm.domain.lev.delta
+        dp = atm.lev.delta
         absorbLW = compute_layer_absorptivity(self.param['abs_coeff'], dp)
         absorbLW = Field(np.tile(absorbLW, sfc.shape), domain=atm)
         absorbSW = np.zeros_like(absorbLW)

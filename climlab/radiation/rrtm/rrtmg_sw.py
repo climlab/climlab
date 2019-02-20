@@ -233,6 +233,6 @@ class RRTMG_SW(_Radiation_SW):
         self.heating_rate['Ts'] = np.array(self.SW_flux_net[..., -1, np.newaxis]) + 0.*self.Ts
         self.heating_rate['Tatm'] = SWheating_Wm2
         #  Convert to K / day
-        Catm = self.Tatm.domain.heat_capacity
+        Catm = self.domains['Tatm'].heat_capacity
         self.TdotSW = SWheating_Wm2 / Catm * const.seconds_per_day
         self.TdotSW_clr = SWheating_clr_Wm2 / Catm * const.seconds_per_day

@@ -113,9 +113,9 @@ class Diffusion(ImplicitProcess):
             self.diffusion_axis = diffusion_axis
         # This currently only works with evenly spaced points
         for dom in list(self.domains.values()):
-            points = dom.axes[self.diffusion_axis].points
-            delta = np.mean(dom.axes[self.diffusion_axis].delta)
-            bounds = dom.axes[self.diffusion_axis].bounds
+            points = dom.axes[self.diffusion_axis].points.values
+            delta = np.mean(dom.axes[self.diffusion_axis].delta.values)
+            bounds = dom.axes[self.diffusion_axis].bounds.values
         self.diffusion_axis_index = dom.axis_index[self.diffusion_axis]
         self.delta = delta  # grid interval in length units
         self._weight1 = np.ones_like(bounds)  # weights for curvilinear grids
@@ -134,7 +134,7 @@ class Diffusion(ImplicitProcess):
         self._K = Kvalue
         # This currently only works with evenly spaced points
         for dom in list(self.domains.values()):
-            bounds = dom.axes[self.diffusion_axis].bounds
+            bounds = dom.axes[self.diffusion_axis].bounds.values
         self._K_dimensionless = (Kvalue * np.ones_like(bounds) *
                                 self.timestep / self.delta**2)
         self._diffTriDiag = _make_diffusion_matrix(self._K_dimensionless,

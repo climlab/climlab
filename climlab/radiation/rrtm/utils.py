@@ -7,7 +7,7 @@ from climlab.utils.thermo import mmr_to_vmr
 def _prepare_general_arguments(RRTMGobject):
     '''Prepare arguments needed for both RRTMG_SW and RRTMG_LW with correct dimensions.'''
     tlay = _climlab_to_rrtm(RRTMGobject.Tatm)
-    tlev = _climlab_to_rrtm(interface_temperature(**RRTMGobject.state))
+    tlev = _climlab_to_rrtm(interface_temperature(RRTMGobject))
     play = _climlab_to_rrtm(RRTMGobject.lev * np.ones_like(tlay))
     plev = _climlab_to_rrtm(RRTMGobject.lev_bounds * np.ones_like(tlev))
     ncol, nlay = tlay.shape
@@ -38,11 +38,14 @@ def _prepare_general_arguments(RRTMGobject):
 
 
 
-def interface_temperature(Ts, Tatm, **kwargs):
+def interface_temperature(RRTMGobject):
     '''Compute temperature at model layer interfaces.'''
     #  Actually it's not clear to me how the RRTM code uses these values
-    lev = Tatm.domain.axes['lev'].points
-    lev_bounds = Tatm.domain.axes['lev'].bounds
+    atm = RRTMGobject.domains['Tatm']
+    Tatm = RRTMGobject.Tatm
+    Ts = RRTMGobject.Ts
+    lev = atm.axes['lev'].points
+    lev_bounds = atm.axes['lev'].bounds
     #  Interpolate to layer interfaces
     f = interp1d(lev, Tatm, axis=-1)  # interpolation function
     Tinterp = f(lev_bounds[1:-1])

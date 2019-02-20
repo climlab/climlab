@@ -60,8 +60,8 @@ class EnergyBudget(TimeDependentProcess):
         self._compute_heating_rates()
         tendencies = {}
         for varname, value in self.state.items():
-            #C = self.state_domain[varname].heat_capacity
-            C = value.domain.heat_capacity
+            C = self.domains[varname].heat_capacity
+            #C = value.domain.heat_capacity
             try:  # there may be state variables without heating rates
                 tendencies[varname] = (self.heating_rate[varname] / C)
             except:
