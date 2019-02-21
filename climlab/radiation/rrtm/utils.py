@@ -44,8 +44,8 @@ def interface_temperature(RRTMGobject):
     atm = RRTMGobject.domains['Tatm']
     Tatm = RRTMGobject.Tatm
     Ts = RRTMGobject.Ts
-    lev = atm.axes['lev'].points
-    lev_bounds = atm.axes['lev'].bounds
+    lev = atm.axes['lev'].lev.values
+    lev_bounds = atm.axes['lev'].lev_bounds.values
     #  Interpolate to layer interfaces
     f = interp1d(lev, Tatm, axis=-1)  # interpolation function
     Tinterp = f(lev_bounds[1:-1])

@@ -350,8 +350,8 @@ def _make_meridional_diffusion_matrix(K, lataxis):
         u_i = \\cos(b_i) K_i
 
     """
-    phi_stag = np.deg2rad(lataxis.bounds)
-    phi = np.deg2rad(lataxis.points)
+    phi_stag = np.deg2rad(lataxis.lat_bounds.values)
+    phi = np.deg2rad(lataxis.lat.values)
     weight1 = np.cos(phi_stag)
     weight2 = np.cos(phi)
     diag = _make_diffusion_matrix(K, weight1, weight2)
