@@ -255,7 +255,7 @@ class Iceline(DiagnosticProcess):
         """
         Tf = self.param['Tf']
         Ts = self.state['Ts']
-        lat_bounds = self.domains['Ts'].axes['lat'].bounds
+        lat_bounds = self.domains['Ts'].axes['lat'].lat_bounds.values
         self.noice = np.where(Ts >= Tf, True, False)
         self.ice = np.where(Ts < Tf, True, False)
         #  Ice cover in fractional area

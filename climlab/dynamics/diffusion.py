@@ -40,6 +40,7 @@ import numpy as np
 from scipy.linalg import solve_banded
 from climlab.process.implicit import ImplicitProcess
 from climlab.process.process import get_axes
+from climlab.domain.axis import delta as compute_delta
 
 
 class Diffusion(ImplicitProcess):
@@ -113,9 +114,9 @@ class Diffusion(ImplicitProcess):
             self.diffusion_axis = diffusion_axis
         # This currently only works with evenly spaced points
         for dom in list(self.domains.values()):
-            points = dom.axes[self.diffusion_axis].points.values
-            delta = np.mean(dom.axes[self.diffusion_axis].delta.values)
-            bounds = dom.axes[self.diffusion_axis].bounds.values
+            points = dom.axes[self.diffusion_axis][self.diffusion_axis].values
+            delta = np.mean(compute_delta(dom.axes, self.diffusion_axis))
+            bounds = dom.axes[self.diffusion_axis][self.diffusion_axis+'_bounds'].values
         self.diffusion_axis_index = dom.axis_index[self.diffusion_axis]
         self.delta = delta  # grid interval in length units
         self._weight1 = np.ones_like(bounds)  # weights for curvilinear grids
@@ -134,7 +135,7 @@ class Diffusion(ImplicitProcess):
         self._K = Kvalue
         # This currently only works with evenly spaced points
         for dom in list(self.domains.values()):
-            bounds = dom.axes[self.diffusion_axis].bounds.values
+            bounds = dom.axes[self.diffusion_axis][self.diffusion_axis+'_bounds'].values
         self._K_dimensionless = (Kvalue * np.ones_like(bounds) *
                                 self.timestep / self.delta**2)
         self._diffTriDiag = _make_diffusion_matrix(self._K_dimensionless,

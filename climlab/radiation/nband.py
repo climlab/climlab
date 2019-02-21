@@ -5,6 +5,7 @@ from climlab.radiation.greygas import GreyGas
 from climlab import constants as const
 from climlab.domain import domain, axis, field
 from copy import copy
+from climlab.domain.axis import delta as compute_delta
 
 
 class NbandRadiation(GreyGas):
@@ -46,7 +47,7 @@ class NbandRadiation(GreyGas):
         # each item should have dimension...  (num_channels, 1)
         self.absorption_cross_section = {}
         self.cosZen = 1.  # cosine of the average zenith angle
-        dp = self.domains['Tatm'].lev.delta.values
+        dp = compute_delta(self.domains['Tatm'].axes, 'lev')
         self.mass_per_layer = dp * const.mb_to_Pa / const.g
         self.albedo_sfc = np.ones_like(self.band_fraction) * self.albedo_sfc
 
@@ -57,7 +58,7 @@ class NbandRadiation(GreyGas):
     def band_fraction(self, value):
         self.num_channels = value.size
         # abstract axis for channels
-        ax = axis.Axis(axis_type='abstract', num_points=self.num_channels)
+        ax = axis.Axis(axis='abstract', num_points=self.num_channels)
         self.channel_ax = {'channel': ax}
         dom = domain._Domain(axes=self.channel_ax)
         #   fraction of the total solar flux in each band:

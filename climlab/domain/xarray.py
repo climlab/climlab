@@ -21,10 +21,10 @@ def Field_to_xarray(field):
             assert field.interfaces[dom.axis_index[axname]]
             bounds_name = dimname + '_bounds'
             dims.append(bounds_name)
-            coords[bounds_name] = dom.axes[axname].bounds
+            coords[bounds_name] = dom.axes[axname][bounds_name]
         except:
             dims.append(dimname)
-            coords[dimname] = dom.axes[axname].points
+            coords[dimname] = dom.axes[axname][dimname]
     #  Might need to reorder the data
     da = DataArray(field.transpose([dom.axis_index[name] for name in dimlist]),
                       dims=dims, coords=coords)
@@ -59,8 +59,8 @@ def state_to_xarray(state):
                 else:
                     dimname = axname
                 bounds_name = dimname + '_bounds'
-                ds.coords[bounds_name] = DataArray(ax.bounds, dims=[bounds_name],
-                                    coords={bounds_name:ax.bounds})
+                ds.coords[bounds_name] = DataArray(ax[bounds_name], dims=[bounds_name],
+                                    coords={bounds_name:ax[bounds_name]})
                 try:
                     ds[bounds_name].attrs['units'] = ax.units
                 except:

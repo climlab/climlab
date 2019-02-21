@@ -1,7 +1,7 @@
 from __future__ import division
 from builtins import str
 from builtins import object
-from climlab.domain.axis import Axis
+from climlab.domain.axis import Axis, delta
 from climlab.utils import heat_capacity
 import xarray as xr
 
@@ -150,7 +150,7 @@ class _Domain(object):
             axdict = axes
         elif type(axes) is xr.Dataset:
             ax = axes
-            axdict = {ax.attrs['axis_type']: ax}
+            axdict = {ax.attrs['axis']: ax}
         elif axes is None:
             axdict = {'empty': None}
         else:
@@ -198,7 +198,7 @@ class Atmosphere(_Domain):
         Setting up an Atmosphere Domain::
 
             >>> import climlab
-            >>> atm_ax = climlab.domain.Axis(axis_type='pressure', num_points=10)
+            >>> atm_ax = climlab.domain.Axis(axis='pressure', num_points=10)
             >>> atm_domain = climlab.domain.Atmosphere(axes=atm_ax)
 
             >>> print atm_domain
@@ -234,7 +234,7 @@ class Atmosphere(_Domain):
                                     the ``'lev'`` Axis.
 
         """
-        self.heat_capacity = heat_capacity.atmosphere(self.axes['lev'].delta.values)
+        self.heat_capacity = heat_capacity.atmosphere(delta(self.axes, 'lev'))
 
 
 class Ocean(_Domain):
@@ -252,7 +252,7 @@ class Ocean(_Domain):
         Setting up an Ocean Domain::
 
             >>> import climlab
-            >>> ocean_ax = climlab.domain.Axis(axis_type='depth', num_points=5)
+            >>> ocean_ax = climlab.domain.Axis(axis='depth', num_points=5)
             >>> ocean_domain = climlab.domain.Ocean(axes=ocean_ax)
 
             >>> print ocean_domain
@@ -285,7 +285,7 @@ class Ocean(_Domain):
                                     the ``'depth'`` Axis.
 
         """
-        self.heat_capacity = heat_capacity.ocean(self.axes['depth'].delta.values)
+        self.heat_capacity = heat_capacity.ocean(delta(self.axes, 'depth'))
 
 
 def make_slabocean_axis(num_points=1):
@@ -294,7 +294,7 @@ def make_slabocean_axis(num_points=1):
     **Function-call argument** \n
 
     :param int num_points:    number of points for the slabocean Axis [default: 1]
-    :returns:               an Axis with ``axis_type='depth'`` and ``num_points=num_points``
+    :returns:               an Axis with ``axis='depth'`` and ``num_points=num_points``
     :rtype:                 :class:`~climlab.domain.axis.Axis`
 
     :Example:
@@ -307,7 +307,7 @@ def make_slabocean_axis(num_points=1):
             >>> print slab_ocean_axis
             Axis of type depth with 1 points.
 
-            >>> slab_ocean_axis.axis_type
+            >>> slab_ocean_axis.axis
             'depth'
 
             >>> slab_ocean_axis.bounds
@@ -317,7 +317,7 @@ def make_slabocean_axis(num_points=1):
             'meters'
 
     """
-    depthax = Axis(axis_type='depth', num_points=num_points)
+    depthax = Axis(axis='depth', num_points=num_points)
     return depthax
 
 def make_slabatm_axis(num_points=1):
@@ -326,7 +326,7 @@ def make_slabatm_axis(num_points=1):
     **Function-call argument** \n
 
     :param int num_points:   number of points for the slabatmosphere Axis [default: 1]
-    :returns:               an Axis with ``axis_type='lev'`` and ``num_points=num_points``
+    :returns:               an Axis with ``axis='lev'`` and ``num_points=num_points``
     :rtype:                 :class:`~climlab.domain.axis.Axis`
 
     :Example:
@@ -339,7 +339,7 @@ def make_slabatm_axis(num_points=1):
             >>> print slab_atm_axis
             Axis of type lev with 1 points.
 
-            >>> slab_atm_axis.axis_type
+            >>> slab_atm_axis.axis
             'lev'
 
             >>> slab_atm_axis.bounds
@@ -349,7 +349,7 @@ def make_slabatm_axis(num_points=1):
             'mb'
 
     """
-    depthax = Axis(axis_type='lev', num_points=num_points)
+    depthax = Axis(axis='lev', num_points=num_points)
     return depthax
 
 
@@ -445,15 +445,15 @@ def single_column(num_lev=30, water_depth=1., lev=None, **kwargs):
 
     """
     if lev is None:
-        levax = Axis(axis_type='lev', num_points=num_lev)
+        levax = Axis(axis='lev', num_points=num_lev)
     elif isinstance(lev, Axis):
         levax = lev
     else:
         try:
-            levax = Axis(axis_type='lev', points=lev)
+            levax = Axis(axis='lev', points=lev)
         except:
             raise ValueError('lev must be Axis object or pressure array')
-    depthax = Axis(axis_type='depth', bounds=[water_depth, 0.])
+    depthax = Axis(axis='depth', bounds=[water_depth, 0.])
     slab = SlabOcean(axes=depthax, **kwargs)
     atm = Atmosphere(axes=levax, **kwargs)
     return slab, atm
@@ -486,15 +486,15 @@ def zonal_mean_surface(num_lat=90, water_depth=10., lat=None, **kwargs):
 
     """
     if lat is None:
-        latax = Axis(axis_type='lat', num_points=num_lat)
+        latax = Axis(axis='lat', num_points=num_lat)
     elif isinstance(lat, Axis):
         latax = lat
     else:
         try:
-            latax = Axis(axis_type='lat', points=lat)
+            latax = Axis(axis='lat', points=lat)
         except:
             raise ValueError('lat must be Axis object or latitude array')
-    depthax = Axis(axis_type='depth', bounds=[water_depth, 0.])
+    depthax = Axis(axis='depth', bounds=[water_depth, 0.])
     axes = {'depth': depthax, 'lat': latax}
     slab = SlabOcean(axes=axes, **kwargs)
     return slab
@@ -531,24 +531,24 @@ def surface_2D(num_lat=90, num_lon=180, water_depth=10., lon=None,
 
     """
     if lat is None:
-        latax = Axis(axis_type='lat', num_points=num_lat)
+        latax = Axis(axis='lat', num_points=num_lat)
     elif isinstance(lat, xr.DataArray):
         latax = lat
     else:
         try:
-            latax = Axis(axis_type='lat', points=lat)
+            latax = Axis(axis='lat', points=lat)
         except:
             raise ValueError('lat must be Axis object or latitude array')
     if lon is None:
-        lonax = Axis(axis_type='lon', num_points=num_lon)
+        lonax = Axis(axis='lon', num_points=num_lon)
     elif isinstance(lon, xr.DataArray):
         lonax = lon
     else:
         try:
-            lonax = Axis(axis_type='lon', points=lon)
+            lonax = Axis(axis='lon', points=lon)
         except:
             raise ValueError('lon must be Axis object or longitude array')
-    depthax = Axis(axis_type='depth', bounds=[water_depth, 0.])
+    depthax = Axis(axis='depth', bounds=[water_depth, 0.])
     axes = {'lat': latax, 'lon': lonax, 'depth': depthax}
     slab = SlabOcean(axes=axes, **kwargs)
     return slab
@@ -595,25 +595,25 @@ def zonal_mean_column(num_lat=90, num_lev=30, water_depth=10., lat=None,
 
     """
     if lat is None:
-        latax = Axis(axis_type='lat', num_points=num_lat)
+        latax = Axis(axis='lat', num_points=num_lat)
     elif isinstance(lat, Axis):
         latax = lat
     else:
         try:
-            latax = Axis(axis_type='lat', points=lat)
+            latax = Axis(axis='lat', points=lat)
         except:
             raise ValueError('lat must be Axis object or latitude array')
     if lev is None:
-        levax = Axis(axis_type='lev', num_points=num_lev)
+        levax = Axis(axis='lev', num_points=num_lev)
     elif isinstance(lev, Axis):
         levax = lev
     else:
         try:
-            levax = Axis(axis_type='lev', points=lev)
+            levax = Axis(axis='lev', points=lev)
         except:
             raise ValueError('lev must be Axis object or pressure array')
 
-    depthax = Axis(axis_type='depth', bounds=[water_depth, 0.])
+    depthax = Axis(axis='depth', bounds=[water_depth, 0.])
     #axes = {'depth': depthax, 'lat': latax, 'lev': levax}
     slab = SlabOcean(axes={'lat':latax, 'depth':depthax}, **kwargs)
     atm = Atmosphere(axes={'lat':latax, 'lev':levax}, **kwargs)
@@ -638,7 +638,7 @@ def box_model_domain(num_points=2, **kwargs):
             climlab Domain object with domain_type=box and shape=(2,)
 
     """
-    ax = Axis(axis_type='abstract', num_points=num_points)
+    ax = Axis(axis='abstract', num_points=num_points)
     boxes = _Domain(axes=ax, **kwargs)
     boxes.domain_type = 'box'
     return boxes

@@ -148,9 +148,9 @@ def surface_state(num_lat=90,
                                 num_lon=num_lon,
                                 water_depth=water_depth)
     if 'lon' in sfc.axes:
-        lon, lat = np.meshgrid(sfc.axes['lon'].points, sfc.axes['lat'].points)
+        lon, lat = np.meshgrid(sfc.axes['lon'].lon.values, sfc.axes['lat'].lat.values)
     else:
-        lat = sfc.axes['lat'].points
+        lat = sfc.axes['lat'].lat.values
     sinphi = np.sin(np.deg2rad(lat))
     initial = T0 + T2 * legendre.P2(sinphi)
     Ts = Field(initial, domain=sfc)

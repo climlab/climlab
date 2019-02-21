@@ -9,21 +9,21 @@ import xarray as xr
 axis_types = ['lev', 'lat', 'lon', 'depth', 'abstract']
 
 
-def Axis(axis_type='abstract', num_points=10, points=None, bounds=None):
-    if axis_type in axis_types:
+def Axis(axis='abstract', num_points=10, points=None, bounds=None):
+    if axis in axis_types:
         pass
-    elif axis_type in ['p', 'press', 'pressure', 'P', 'Pressure', 'Press']:
-        axis_type = 'lev'
-    elif axis_type in ['Latitude', 'latitude']:
-        axis_type = 'lat'
-    elif axis_type in ['Longitude', 'longitude']:
-        axis_type = 'lon'
-    elif axis_type in ['depth', 'Depth', 'waterDepth', 'water_depth', 'slab']:
-        axis_type = 'depth'
+    elif axis in ['p', 'press', 'pressure', 'P', 'Pressure', 'Press']:
+        axis = 'lev'
+    elif axis in ['Latitude', 'latitude']:
+        axis = 'lat'
+    elif axis in ['Longitude', 'longitude']:
+        axis = 'lon'
+    elif axis in ['depth', 'Depth', 'waterDepth', 'water_depth', 'slab']:
+        axis = 'depth'
     else:
-        raise ValueError('axis_type %s not recognized' % axis_type)
+        raise ValueError('axis %s not recognized' % axis)
     self = xr.Dataset()
-    self.attrs['axis_type'] = axis_type
+    self.attrs['axis'] = axis
 
     defaultEndPoints = {'lev': (0., const.ps),
                         'lat': (-90., 90.),
@@ -50,8 +50,8 @@ def Axis(axis_type='abstract', num_points=10, points=None, bounds=None):
 
     if bounds is None:
         # assume default end points
-        end0 = defaultEndPoints[axis_type][0]
-        end1 = defaultEndPoints[axis_type][1]
+        end0 = defaultEndPoints[axis][0]
+        end1 = defaultEndPoints[axis][1]
         if points is not None:
             # only points are given
             num_points = points.size
@@ -76,9 +76,18 @@ def Axis(axis_type='abstract', num_points=10, points=None, bounds=None):
             if points.size != num_points:
                 raise ValueError('points and bounds have incompatible sizes')
     self.attrs['num_points'] = num_points
-    self.attrs['units'] = defaultUnits[axis_type]
-    self['points'] = xr.DataArray(points, dims=axis_type, coords={axis_type: points})
-    self['bounds'] = xr.DataArray(bounds, dims=(axis_type+'_bounds'), coords={(axis_type+'_bounds'): bounds})
-    self['delta'] = xr.DataArray(np.abs(np.diff(self.bounds)), dims=axis_type, coords={axis_type: points})
+    self.attrs['units'] = defaultUnits[axis]
+    self[axis] = xr.DataArray(points, dims=axis, coords={axis: points})
+    self[axis].attrs['axis'] = axis
+    self[axis+'_bounds'] = xr.DataArray(bounds, dims=(axis+'_bounds'), coords={(axis+'_bounds'): bounds})
+    self[axis+'_bounds'].attrs['axis'] = axis
+    self[axis+'_bounds'].attrs['c_grid_axis_shift'] = -0.5
+    #self['delta'] = xr.DataArray(np.abs(np.diff(self.bounds)), dims=axis_type, coords={axis_type: points})
+    self[axis+'_delta'] = xr.DataArray(np.abs(np.diff(bounds)), dims=axis, coords={axis: points})
+    #self[axis+'_delta'].attrs['axis'] = axis
 
     return self
+
+def delta(axes, axname):
+    '''Return the grid point width along the named axis as plain numpy array'''
+    return np.abs(np.diff(axes[axname][axname+'_bounds'].values))

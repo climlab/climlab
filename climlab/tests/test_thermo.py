@@ -28,7 +28,7 @@ def test_thermo_domain():
     '''Can we call qsat, etc on a multi-dim climlab state temperature object?'''
     state = climlab.column_state(num_lev = 30, num_lat=3)
     T = state.Tatm
-    p = T.domain.axes['lev'].points.values
+    p = T.domain.axes['lev'].lev.values
     thermo.clausius_clapeyron(T)
     thermo.qsat(T, p)
     thermo.pseudoadiabat(T, p)
