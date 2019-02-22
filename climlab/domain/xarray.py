@@ -11,7 +11,7 @@ def Field_to_xarray(field):
     '''Convert a climlab.Field object to xarray.DataArray'''
     dom = field.domain
     dims = []; dimlist = []; coords = {};
-    for axname in dom.axes:
+    for axname in dom.grid.axes:
         if axname not in axis_types:
             dimname = 'abstract'
         else:
@@ -21,10 +21,10 @@ def Field_to_xarray(field):
             assert field.interfaces[dom.axis_index[axname]]
             bounds_name = dimname + '_bounds'
             dims.append(bounds_name)
-            coords[bounds_name] = dom.axes[axname][bounds_name]
+            coords[bounds_name] = dom.axes[bounds_name]
         except:
             dims.append(dimname)
-            coords[dimname] = dom.axes[axname][dimname]
+            coords[dimname] = dom.axes[dimname]
     #  Might need to reorder the data
     da = DataArray(field.transpose([dom.axis_index[name] for name in dimlist]),
                       dims=dims, coords=coords)

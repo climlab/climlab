@@ -72,7 +72,7 @@ def column_state(num_lev=30,
                                             lev=lev,
                                             num_lat=num_lat,
                                             lat=lat)
-    num_lev = atm.lev.num_points
+    num_lev = atm.axes['lev'].size
     Ts = Field(288.*np.ones(sfc.shape), domain=sfc)
     Tinitial = np.tile(np.linspace(200., 288.-10., num_lev), sfc.shape)
     Tatm = Field(Tinitial, domain=atm)

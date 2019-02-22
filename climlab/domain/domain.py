@@ -1,9 +1,10 @@
 from __future__ import division
 from builtins import str
 from builtins import object
-from climlab.domain.axis import Axis, delta
+from climlab.domain.axis import Axis
 from climlab.utils import heat_capacity
 import xarray as xr
+import xgcm
 
 
 class _Domain(object):
@@ -68,10 +69,26 @@ class _Domain(object):
                 str(self.shape))
     def __init__(self, axes=None, **kwargs):
         self.domain_type = 'undefined'
+
+        # What are we trying to do?
+        # - make sure that axes dict (now xr.Dataset) is ordered
+        # - populate self.shape
+        # - populate self.heat_capacity
+
+        # But the ordering is complicated by the _bounds axes
+        #  Why not use self.heat_capacity as the place where we enforce order?
+        #  Then self.shape would be just self.heat_capacity.shape
+        # and self.numdims would be len(self.heat_capacity.shape)
+        #  ... have not implemented this yet
+
         # self.axes should be a dictionary of axes
         # make it possible to give just a single axis:
-        self.axes = self._make_axes_dict(axes)
-        self.numdims = len(list(self.axes.keys()))
+        #self.axes = self._make_axes_dict(axes)
+        #axes_dict = self._make_axes_dict(axes)
+        #self.axes = xr.merge([ax for ax in axes_dict.values()])
+        self.axes = self._make_axes_dataset(axes)
+        self.grid = xgcm.Grid(self.axes)
+        self.numdims = len(self.grid.axes)
         shape = []
         axcount = 0
         axindex = {}
@@ -82,7 +99,7 @@ class _Domain(object):
         add_depth = False
         add_lon = False
         add_lat = False
-        axlist = list(self.axes.keys())
+        axlist = list(self.grid.axes.keys())
         if 'lev' in axlist:
             axlist.remove('lev')
             add_lev = True
@@ -107,7 +124,8 @@ class _Domain(object):
         #for axType, ax in self.axes.iteritems():
         for axType in axlist2:
             ax = self.axes[axType]
-            shape.append(ax.num_points)
+            num_points = ax.size
+            shape.append(num_points)
             #  can access axes as object attributes
             setattr(self, axType, ax)
             #
@@ -115,7 +133,6 @@ class _Domain(object):
             axcount += 1
         self.axis_index = axindex
         self.shape = tuple(shape)
-
         self.set_heat_capacity()
 
     def set_heat_capacity(self):
@@ -127,35 +144,47 @@ class _Domain(object):
         self.heat_capacity = None
         #  implemented by daughter classes
 
-    def _make_axes_dict(self, axes):
-        """Makes an axes dictionary.
-
-        .. note::
-
-            In case the input is ``None``, the dictionary :code:`{'empty': None}`
-            is returned.
-
-        **Function-call argument** \n
-
-        :param axes:    axes input
-        :type axes:     dict or single instance of
-                        :class:`~climlab.domain.axis.Axis` object or ``None``
-        :raises: :exc:`ValueError`  if input is not an instance of Axis class
-                                    or a dictionary of Axis objetcs
-        :returns: dictionary of input axes
-        :rtype: dict
-
-        """
-        if type(axes) is dict:
-            axdict = axes
-        elif type(axes) is xr.Dataset:
-            ax = axes
-            axdict = {ax.attrs['axis']: ax}
+    def _make_axes_dataset(self, axes):
+        '''Ensure we have xarray.Dataset'''
+        if type(axes) is xr.Dataset:
+                ds = axes
+        elif type(axes) is dict:
+            ds = xr.merge([ax for ax in axes.values()])
         elif axes is None:
-            axdict = {'empty': None}
+            ds = xr.Dataset()
         else:
             raise ValueError('axes needs to be Axis object or dictionary of Axis object')
-        return axdict
+        return ds
+
+    # def _make_axes_dict(self, axes):
+    #     """Makes an axes dictionary.
+    #
+    #     .. note::
+    #
+    #         In case the input is ``None``, the dictionary :code:`{'empty': None}`
+    #         is returned.
+    #
+    #     **Function-call argument** \n
+    #
+    #     :param axes:    axes input
+    #     :type axes:     dict or single instance of
+    #                     :class:`~climlab.domain.axis.Axis` object or ``None``
+    #     :raises: :exc:`ValueError`  if input is not an instance of Axis class
+    #                                 or a dictionary of Axis objetcs
+    #     :returns: dictionary of input axes
+    #     :rtype: dict
+    #
+    #     """
+    #     if type(axes) is dict:
+    #         axdict = axes
+    #     elif type(axes) is xr.Dataset:
+    #         ax = axes
+    #         axdict = {ax.attrs['axis']: ax}
+    #     elif axes is None:
+    #         axdict = {'empty': None}
+    #     else:
+    #         raise ValueError('axes needs to be Axis object or dictionary of Axis object')
+    #     return axdict
 
     def __getitem__(self, indx):
         # Make domains sliceable
@@ -234,7 +263,7 @@ class Atmosphere(_Domain):
                                     the ``'lev'`` Axis.
 
         """
-        self.heat_capacity = heat_capacity.atmosphere(delta(self.axes, 'lev'))
+        self.heat_capacity = heat_capacity.atmosphere(compute_delta(self, 'lev'))
 
 
 class Ocean(_Domain):
@@ -285,7 +314,7 @@ class Ocean(_Domain):
                                     the ``'depth'`` Axis.
 
         """
-        self.heat_capacity = heat_capacity.ocean(delta(self.axes, 'depth'))
+        self.heat_capacity = heat_capacity.ocean(compute_delta(self, 'depth'))
 
 
 def make_slabocean_axis(num_points=1):
@@ -642,3 +671,6 @@ def box_model_domain(num_points=2, **kwargs):
     boxes = _Domain(axes=ax, **kwargs)
     boxes.domain_type = 'box'
     return boxes
+
+def compute_delta(domain, axname):
+    return domain.grid.diff(domain.axes[axname+'_bounds'], axname).values

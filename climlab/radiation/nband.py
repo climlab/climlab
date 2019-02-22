@@ -5,7 +5,8 @@ from climlab.radiation.greygas import GreyGas
 from climlab import constants as const
 from climlab.domain import domain, axis, field
 from copy import copy
-from climlab.domain.axis import delta as compute_delta
+from climlab.domain.domain import compute_delta
+import xarray as xr
 
 
 class NbandRadiation(GreyGas):
@@ -47,7 +48,7 @@ class NbandRadiation(GreyGas):
         # each item should have dimension...  (num_channels, 1)
         self.absorption_cross_section = {}
         self.cosZen = 1.  # cosine of the average zenith angle
-        dp = compute_delta(self.domains['Tatm'].axes, 'lev')
+        dp = compute_delta(self.domains['Tatm'], 'lev')
         self.mass_per_layer = dp * const.mb_to_Pa / const.g
         self.albedo_sfc = np.ones_like(self.band_fraction) * self.albedo_sfc
 
@@ -59,7 +60,7 @@ class NbandRadiation(GreyGas):
         self.num_channels = value.size
         # abstract axis for channels
         ax = axis.Axis(axis='abstract', num_points=self.num_channels)
-        self.channel_ax = {'channel': ax}
+        self.channel_ax = ax
         dom = domain._Domain(axes=self.channel_ax)
         #   fraction of the total solar flux in each band:
         self._band_fraction = field.Field(value, domain=dom)
@@ -90,7 +91,7 @@ class NbandRadiation(GreyGas):
         absorptivity = 1. - np.exp(-optical_path)
         axes = copy(self.domains['Tatm'].axes)
         # add these to the dictionary of axes
-        axes.update(self.channel_ax)
+        axes = xr.merge([self.channel_ax, axes])
         dom = domain.Atmosphere(axes=axes)
         self.absorptivity = field.Field(absorptivity, domain=dom)
 

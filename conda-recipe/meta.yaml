@@ -30,6 +30,7 @@ requirements:
     - future
     - attrdict
     - numba  # [py2k]
+    - xgcm
 
 test:
   requires:

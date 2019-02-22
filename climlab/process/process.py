@@ -567,7 +567,7 @@ class Process(object):
         try:
             for domname, dom in self.domains.items():
                 try:
-                    thislat = dom.axes['lat'].lat.values
+                    thislat = dom.axes.lat.values
                 except:
                     pass
             return thislat
@@ -587,7 +587,7 @@ class Process(object):
         try:
             for domname, dom in self.domains.items():
                 try:
-                    thislat = dom.axes['lat'].lat_bounds.values
+                    thislat = dom.axes.lat_bounds.values
                 except:
                     pass
             return thislat
@@ -607,7 +607,7 @@ class Process(object):
         try:
             for domname, dom in self.domains.items():
                 try:
-                    thislon = dom.axes['lon'].lon.values
+                    thislon = dom.axes.lon.values
                 except:
                     pass
             return thislon
@@ -627,7 +627,7 @@ class Process(object):
         try:
             for domname, dom in self.domains.items():
                 try:
-                    thislon = dom.axes['lon'].lon_bounds.values
+                    thislon = dom.axes.lon_bounds.values
                 except:
                     pass
             return thislon
@@ -647,7 +647,7 @@ class Process(object):
         try:
             for domname, dom in self.domains.items():
                 try:
-                    thislev = dom.axes['lev'].lev.values
+                    thislev = dom.axes.lev.values
                 except:
                     pass
             return thislev
@@ -667,7 +667,7 @@ class Process(object):
         try:
             for domname, dom in self.domains.items():
                 try:
-                    thislev = dom.axes['lev'].lev_bounds.values
+                    thislev = dom.axes.lev_bounds.values
                 except:
                     pass
             return thislev
@@ -687,7 +687,7 @@ class Process(object):
         try:
             for domname, dom in self.domains.items():
                 try:
-                    thisdepth = dom.axes['depth'].depth.values
+                    thisdepth = dom.axes.depth.values
                 except:
                     pass
             return thisdepth
@@ -707,7 +707,7 @@ class Process(object):
         try:
             for domname, dom in self.domains.items():
                 try:
-                    thisdepth = dom.axes['depth'].depth_bounds.values
+                    thisdepth = dom.axes.depth_bounds.values
                 except:
                     pass
             return thisdepth

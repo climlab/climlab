@@ -234,8 +234,8 @@ def _global_mean(array, lat_radians):
 def _global_mean_latlon(field):
     dom = field.domain
     lon, lat = np.meshgrid(dom.lon.lon.values, dom.lat.lat.values)
-    dy = np.deg2rad(np.diff(dom.lat['lat_bounds'].values))
-    dx = np.deg2rad(np.diff(dom.lon['lon_bounds'].values))*np.cos(np.deg2rad(lat))
+    dy = np.deg2rad(np.diff(dom.axes.lat_bounds.values))
+    dx = np.deg2rad(np.diff(dom.axes.lon_bounds.values))*np.cos(np.deg2rad(lat))
     area = dx * dy[:,np.newaxis]  # grid cell area in radians^2
     return np.array(np.average(field, weights=area))
 

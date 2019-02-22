@@ -75,7 +75,7 @@ def Axis(axis='abstract', num_points=10, points=None, bounds=None):
             # points and bounds both given, check that they are compatible
             if points.size != num_points:
                 raise ValueError('points and bounds have incompatible sizes')
-    self.attrs['num_points'] = num_points
+    #self.attrs['num_points'] = num_points
     self.attrs['units'] = defaultUnits[axis]
     self[axis] = xr.DataArray(points, dims=axis, coords={axis: points})
     self[axis].attrs['axis'] = axis
@@ -83,11 +83,7 @@ def Axis(axis='abstract', num_points=10, points=None, bounds=None):
     self[axis+'_bounds'].attrs['axis'] = axis
     self[axis+'_bounds'].attrs['c_grid_axis_shift'] = -0.5
     #self['delta'] = xr.DataArray(np.abs(np.diff(self.bounds)), dims=axis_type, coords={axis_type: points})
-    self[axis+'_delta'] = xr.DataArray(np.abs(np.diff(bounds)), dims=axis, coords={axis: points})
+    #self[axis+'_delta'] = xr.DataArray(np.abs(np.diff(bounds)), dims=axis, coords={axis: points})
     #self[axis+'_delta'].attrs['axis'] = axis
 
     return self
-
-def delta(axes, axname):
-    '''Return the grid point width along the named axis as plain numpy array'''
-    return np.abs(np.diff(axes[axname][axname+'_bounds'].values))

@@ -40,7 +40,7 @@ import numpy as np
 from scipy.linalg import solve_banded
 from climlab.process.implicit import ImplicitProcess
 from climlab.process.process import get_axes
-from climlab.domain.axis import delta as compute_delta
+from climlab.domain.domain import compute_delta
 
 
 class Diffusion(ImplicitProcess):
@@ -114,9 +114,9 @@ class Diffusion(ImplicitProcess):
             self.diffusion_axis = diffusion_axis
         # This currently only works with evenly spaced points
         for dom in list(self.domains.values()):
-            points = dom.axes[self.diffusion_axis][self.diffusion_axis].values
-            delta = np.mean(compute_delta(dom.axes, self.diffusion_axis))
-            bounds = dom.axes[self.diffusion_axis][self.diffusion_axis+'_bounds'].values
+            points = dom.axes[self.diffusion_axis].values
+            delta = np.mean(compute_delta(dom, self.diffusion_axis))
+            bounds = dom.axes[self.diffusion_axis+'_bounds'].values
         self.diffusion_axis_index = dom.axis_index[self.diffusion_axis]
         self.delta = delta  # grid interval in length units
         self._weight1 = np.ones_like(bounds)  # weights for curvilinear grids
@@ -135,7 +135,7 @@ class Diffusion(ImplicitProcess):
         self._K = Kvalue
         # This currently only works with evenly spaced points
         for dom in list(self.domains.values()):
-            bounds = dom.axes[self.diffusion_axis][self.diffusion_axis+'_bounds'].values
+            bounds = dom.axes[self.diffusion_axis+'_bounds'].values
         self._K_dimensionless = (Kvalue * np.ones_like(bounds) *
                                 self.timestep / self.delta**2)
         self._diffTriDiag = _make_diffusion_matrix(self._K_dimensionless,
@@ -350,8 +350,8 @@ def _make_meridional_diffusion_matrix(K, lataxis):
         u_i = \\cos(b_i) K_i
 
     """
-    phi_stag = np.deg2rad(lataxis.lat_bounds.values)
-    phi = np.deg2rad(lataxis.lat.values)
+    phi_stag = np.deg2rad(axes.lat_bounds.values)
+    phi = np.deg2rad(axes.lat.values)
     weight1 = np.cos(phi_stag)
     weight2 = np.cos(phi)
     diag = _make_diffusion_matrix(K, weight1, weight2)
@@ -401,7 +401,7 @@ def _guess_diffusion_axis(process_or_domain):
     axes = get_axes(process_or_domain)
     diff_ax = {}
     for axname, ax in axes.items():
-        if ax.num_points > 1:
+        if ax[axname].size > 1:
             diff_ax.update({axname: ax})
     if len(list(diff_ax.keys())) == 1:
         return list(diff_ax.keys())[0]

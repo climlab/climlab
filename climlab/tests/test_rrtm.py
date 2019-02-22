@@ -159,9 +159,9 @@ def test_no_ozone():
     ps = 1060.
     num_lev=4000
     state = climlab.column_state(num_lev=num_lev, num_lat=1, water_depth=5.)
-    lev = state.Tatm.domain.lev
-    lev['lev_bounds'] = np.linspace(0., ps, num_lev+1)
-    lev['lev'] = lev.lev_bounds[:-1].values + np.diff(lev.lev_bounds.values)/2.
+    axes = state.Tatm.domain.axes
+    axes['lev_bounds'] = np.linspace(0., ps, num_lev+1)
+    axes['lev'] = axes.lev_bounds[:-1].values + np.diff(axes.lev_bounds.values)/2.
     #lev.delta = np.abs(np.diff(lev.bounds))
     #  Create a RRTM radiation model
     rad = climlab.radiation.RRTMG(state=state, ozone_file=None)

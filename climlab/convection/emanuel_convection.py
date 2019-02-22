@@ -195,8 +195,8 @@ class EmanuelConvection(TimeDependentProcess):
         #  Invert arrays so the first element is the bottom of column
         T = _climlab_to_convect(self.state['Tatm'])
         dom = self.state['Tatm'].domain
-        P = _climlab_to_convect(dom.lev.lev.values)
-        PH = _climlab_to_convect(dom.lev.lev_bounds.values)
+        P = _climlab_to_convect(dom.axes.lev.values)
+        PH = _climlab_to_convect(dom.axes.lev_bounds.values)
         Q = _climlab_to_convect(self.state['q'])
         QS = qsat(T,P)
         ND = np.size(T, axis=1)

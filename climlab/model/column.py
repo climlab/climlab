@@ -45,7 +45,7 @@ from climlab.radiation.greygas import GreyGas, GreyGasSW
 from climlab.convection.convadj import ConvectiveAdjustment
 from climlab.radiation.nband import ThreeBandSW, FourBandLW, FourBandSW
 from climlab.radiation.water_vapor import ManabeWaterVapor
-from climlab.domain.axis import delta as compute_delta
+from climlab.domain.domain import compute_delta
 
 class GreyRadiationModel(TimeDependentProcess):
     def __init__(self,
@@ -74,7 +74,7 @@ class GreyRadiationModel(TimeDependentProcess):
         sfc = self.domains['Ts']
         atm = self.domains['Tatm']
         # create sub-models for longwave and shortwave radiation
-        dp = compute_delta(atm.axes, 'lev')
+        dp = compute_delta(atm, 'lev')
         absorbLW = compute_layer_absorptivity(self.param['abs_coeff'], dp)
         absorbLW = Field(np.tile(absorbLW, sfc.shape), domain=atm)
         absorbSW = np.zeros_like(absorbLW)

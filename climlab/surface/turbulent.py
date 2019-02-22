@@ -4,7 +4,7 @@ from climlab.utils.thermo import qsat
 from climlab import constants as const
 from climlab.process.energy_budget import EnergyBudget
 from climlab.domain.field import Field
-from climlab.domain.axis import delta as compute_delta
+from climlab.domain.domain import compute_delta
 
 
 class SurfaceFlux(EnergyBudget):
@@ -75,7 +75,7 @@ class LatentHeatFlux(SurfaceFlux):
             #  water vapor tendency, NOT air temperature tendency!
             tendencies['Tatm'] *= 0.
             Pa_per_hPa = 100.
-            dp = compute_delta(self.domains['Tatm'].axes, 'lev')[...,-1]
+            dp = compute_delta(self.domains['Tatm'], 'lev')[...,-1]
             air_mass_per_area = dp * Pa_per_hPa / const.g
             specific_humidity_tendency = 0.*self.q
             specific_humidity_tendency[...,-1,np.newaxis] = self.LHF/const.Lhvap / air_mass_per_area
