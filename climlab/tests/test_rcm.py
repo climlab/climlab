@@ -46,7 +46,7 @@ def test_convective_adjustment(rcm):
 def test_coupled_rcm(rcm):
     deltat = rcm.timestep
     ocean_bounds = np.arange(0., 2010., 100.)
-    depthax = climlab.Axis(axis_type='depth', bounds=ocean_bounds)
+    depthax = climlab.Axis(axis='depth', bounds=ocean_bounds)
     ocean = climlab.domain.domain.Ocean(axes=depthax)
     ocean_diff = 5.E-4
     Tinitial_ocean = rcm.Ts * np.ones(ocean.shape)

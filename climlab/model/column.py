@@ -18,7 +18,7 @@ Here is an example to implement seasonal insolation at 45 degrees North
             col = climlab.GreyRadiationModel()
 
             #  create a new latitude axis with a single point
-            lat = climlab.domain.Axis(axis_type='lat', points=45.)
+            lat = climlab.domain.Axis(axis='lat', points=45.)
 
             #  add this new axis to the surface domain
             col.domains['Ts'].axes['lat'] = lat
