@@ -68,7 +68,7 @@ def test_cloud():
     The all-sky OLR should be lower than clear-sky OLR.'''
     #  State variables (Air and surface temperature)
     state = climlab.column_state(num_lev=50, water_depth=1.)
-    lev = state.Tatm.domain.axes['lev'].lev.values
+    lev = state.Tatm.domain['axes'].lev.values
     #  Define some local cloud characteristics
     cldfrac = 0.5  # layer cloud fraction
     r_liq = 14.  # Cloud water drop effective radius (microns)
@@ -159,7 +159,7 @@ def test_no_ozone():
     ps = 1060.
     num_lev=4000
     state = climlab.column_state(num_lev=num_lev, num_lat=1, water_depth=5.)
-    axes = state.Tatm.domain.axes
+    axes = state.Tatm.domain['axes']
     axes['lev_bounds'] = np.linspace(0., ps, num_lev+1)
     axes['lev'] = axes.lev_bounds[:-1].values + np.diff(axes.lev_bounds.values)/2.
     #lev.delta = np.abs(np.diff(lev.bounds))
