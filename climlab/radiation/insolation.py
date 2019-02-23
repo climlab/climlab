@@ -89,8 +89,8 @@ class _Insolation(DiagnosticProcess):
             domain = self.domains['sfc']
         except:
             domain = self.domains['default']
-        self.insolation = Field(np.zeros(domain.shape), domain=domain)
-        self.coszen = Field(np.zeros(domain.shape), domain=domain)
+        self.insolation = Field(np.zeros(domain['shape']), domain=domain)
+        self.coszen = Field(np.zeros(domain['shape']), domain=domain)
         self.declare_diagnostics(['insolation','coszen'])
         self.S0 = S0
         #  Now that we have a value for self.S0 we can compute the correct coszen

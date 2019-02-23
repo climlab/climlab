@@ -14,10 +14,10 @@ Testing multi-dimensional column radiation
         import numpy as np
         import climlab
         sfc, atm = climlab.domain.zonal_mean_column()
-        absorb = np.ones(atm.shape)
+        absorb = np.ones(atm['shape'])
         trans = climlab.radiation.transmissivity.Transmissivity(absorptivity=absorb,axis=1)
-        fromspace = np.zeros(sfc.shape)
-        emission = 200*np.ones(atm.shape)
+        fromspace = np.zeros(sfc['shape'])
+        emission = 200*np.ones(atm['shape'])
         A = trans.flux_down(fluxDownTop=fromspace, emission=emission)
         A.shape
 

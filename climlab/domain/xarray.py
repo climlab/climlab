@@ -18,19 +18,19 @@ def Field_to_xarray(field):
             dimname = axname
         dimlist.append(axname)
         try:
-            assert field.interfaces[dom.axis_index[axname]]
+            assert field.interfaces[dom['axis_index'][axname]]
             bounds_name = dimname + '_bounds'
             dims.append(bounds_name)
-            coords[bounds_name] = dom.axes[bounds_name]
+            coords[bounds_name] = dom['axes'][bounds_name]
         except:
             dims.append(dimname)
-            coords[dimname] = dom.axes[dimname]
+            coords[dimname] = dom['axes'][dimname]
     #  Might need to reorder the data
-    da = DataArray(field.transpose([dom.axis_index[name] for name in dimlist]),
+    da = DataArray(field.transpose([dom['axis_index'][name] for name in dimlist]),
                       dims=dims, coords=coords)
     for name in dims:
         try:
-            da[name].attrs['units'] = dom.axes[name].attrs['units']
+            da[name].attrs['units'] = dom['axes'][name].attrs['units']
         except:
             pass
     return da
@@ -53,7 +53,7 @@ def state_to_xarray(state):
         if isinstance(field, Field):
             ds[name] = Field_to_xarray(field)
             dom = field.domain
-            for axname, ax in dom.axes.items():
+            for axname, ax in dom['axes'].items():
                 if axname not in axis_types:
                     dimname = 'abstract'
                 else:

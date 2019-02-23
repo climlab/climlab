@@ -76,7 +76,7 @@ class GreyRadiationModel(TimeDependentProcess):
         # create sub-models for longwave and shortwave radiation
         dp = compute_delta(atm, 'lev')
         absorbLW = compute_layer_absorptivity(self.param['abs_coeff'], dp)
-        absorbLW = Field(np.tile(absorbLW, sfc.shape), domain=atm)
+        absorbLW = Field(np.tile(absorbLW, sfc['shape']), domain=atm)
         absorbSW = np.zeros_like(absorbLW)
         longwave = GreyGas(state=self.state, absorptivity=absorbLW,
                              albedo_sfc=0)

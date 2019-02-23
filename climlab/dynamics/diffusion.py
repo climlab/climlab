@@ -114,10 +114,10 @@ class Diffusion(ImplicitProcess):
             self.diffusion_axis = diffusion_axis
         # This currently only works with evenly spaced points
         for dom in list(self.domains.values()):
-            points = dom.axes[self.diffusion_axis].values
+            points = dom['axes'][self.diffusion_axis].values
             delta = np.mean(compute_delta(dom, self.diffusion_axis))
-            bounds = dom.axes[self.diffusion_axis+'_bounds'].values
-        self.diffusion_axis_index = dom.axis_index[self.diffusion_axis]
+            bounds = dom['axes'][self.diffusion_axis+'_bounds'].values
+        self.diffusion_axis_index = dom['axis_index'][self.diffusion_axis]
         self.delta = delta  # grid interval in length units
         self._weight1 = np.ones_like(bounds)  # weights for curvilinear grids
         self._weight2 = np.ones_like(points)
@@ -135,7 +135,7 @@ class Diffusion(ImplicitProcess):
         self._K = Kvalue
         # This currently only works with evenly spaced points
         for dom in list(self.domains.values()):
-            bounds = dom.axes[self.diffusion_axis+'_bounds'].values
+            bounds = dom['axes'][self.diffusion_axis+'_bounds'].values
         self._K_dimensionless = (Kvalue * np.ones_like(bounds) *
                                 self.timestep / self.delta**2)
         self._diffTriDiag = _make_diffusion_matrix(self._K_dimensionless,
@@ -197,7 +197,7 @@ class Diffusion(ImplicitProcess):
             if np.squeeze(value).ndim == 1:
                 # Diagnostic calculations of flux and convergence
                 #  These assume 1D state variables...
-                ax = self.state[varname].domain.axis_index[self.diffusion_axis] # axis index
+                ax = self.state[varname].domain['axis_index'][self.diffusion_axis] # axis index
                 K = self._K_dimensionless * self.delta**2/self.timestep  # length**2 / time
 
                 self.diffusive_flux[1:-1] = -K[1:-1] * np.diff(np.squeeze(value), axis=ax)/self.delta  # length / time

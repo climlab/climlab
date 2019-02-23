@@ -288,7 +288,7 @@ An :class:`~climlab.domain.axis.Axis` is an object where information of a :class
 
 These include the `type` of the axis, the `number of points`, location of `points` and `bounds` on the spatial dimension, magnitude of bounds differences `delta` as well as their `unit`.
 
-The `axes` of a :class:`~climlab.domain.domain._Domain` are stored in the dictionary axes, so they can be accessed through ``dom.axes`` if ``dom`` is an instance of :class:`~climlab.domain.domain._Domain`.
+The `axes` of a :class:`~climlab.domain.domain._Domain` are stored in the dictionary axes, so they can be accessed through ``dom['axes']`` if ``dom`` is an instance of :class:`~climlab.domain.domain._Domain`.
 
 *************
 Accessibility

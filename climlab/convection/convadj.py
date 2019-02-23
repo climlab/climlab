@@ -59,9 +59,9 @@ class ConvectiveAdjustment(TimeDependentProcess):
             return patm
     @property
     def ccol(self):
-        c_atm = self.domains['Tatm'].heat_capacity
+        c_atm = self.domains['Tatm']['heat_capacity']
         if 'Ts' in self.state:
-            c_sfc = self.domains['Ts'].heat_capacity
+            c_sfc = self.domains['Ts']['heat_capacity']
             return np.append(c_atm, c_sfc)
         else:
             return c_atm

@@ -72,9 +72,9 @@ def column_state(num_lev=30,
                                             lev=lev,
                                             num_lat=num_lat,
                                             lat=lat)
-    num_lev = atm.axes['lev'].size
-    Ts = Field(288.*np.ones(sfc.shape), domain=sfc)
-    Tinitial = np.tile(np.linspace(200., 288.-10., num_lev), sfc.shape)
+    num_lev = atm['axes'].lev.size
+    Ts = Field(288.*np.ones(sfc['shape']), domain=sfc)
+    Tinitial = np.tile(np.linspace(200., 288.-10., num_lev), sfc['shape'])
     Tatm = Field(Tinitial, domain=atm)
     state = AttrDict()
     state['Ts'] = Ts
@@ -147,10 +147,10 @@ def surface_state(num_lat=90,
         sfc = domain.surface_2D(num_lat=num_lat,
                                 num_lon=num_lon,
                                 water_depth=water_depth)
-    if 'lon' in sfc.axes:
-        lon, lat = np.meshgrid(sfc.axes['lon'].lon.values, sfc.axes['lat'].lat.values)
+    if 'lon' in sfc['axes']:
+        lon, lat = np.meshgrid(sfc['axes'].lon.values, sfc['axes'].lat.values)
     else:
-        lat = sfc.axes['lat'].lat.values
+        lat = sfc['axes'].lat.values
     sinphi = np.sin(np.deg2rad(lat))
     initial = T0 + T2 * legendre.P2(sinphi)
     Ts = Field(initial, domain=sfc)

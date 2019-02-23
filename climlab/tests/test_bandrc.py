@@ -24,7 +24,7 @@ def diffmodel():
     # thermal diffusivity in W/m**2/degC
     D = 0.05
     # meridional diffusivity in 1/s
-    K = D / diffmodel.domains['Tatm'].heat_capacity[0]
+    K = D / diffmodel.domains['Tatm']['heat_capacity'][0]
     d = climlab.dynamics.MeridionalDiffusion(K=K,
                 state={'Tatm': diffmodel.state['Tatm']},
                 **diffmodel.param)

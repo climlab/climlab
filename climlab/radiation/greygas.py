@@ -72,13 +72,13 @@ class GreyGas(EnergyBudget):
     def absorptivity(self, value):
         #  value should be compatible with self.Tatm
         try:
-            axis = value.domain.axis_index['lev']
+            axis = value.domain['axis_index']['lev']
         except:
-            axis = self.domains['Tatm'].axis_index['lev']
+            axis = self.domains['Tatm']['axis_index']['lev']
             # if a single scalar is given, broadcast that to all levels
             if len(np.shape(np.array(value))) is 0:
                 value = np.ones_like(self.Tatm) * value
-            elif value.shape != self.Tatm.shape:
+            elif value.shape != self.Tatm['shape']:
                 raise ValueError('absorptivity must be a Field, a scalar, or match atm grid dimensions')
         try:
             self.trans = Transmissivity(absorptivity=value,
@@ -105,13 +105,13 @@ class GreyGas(EnergyBudget):
     def reflectivity(self, value):
         #  value should be compatible with self.Tatm
         try:
-            axis = value.domain.axis_index['lev']
+            axis = value.domain['axis_index']['lev']
         except:
-            axis = self.domains['Tatm'].axis_index['lev']
+            axis = self.domains['Tatm']['axis_index']['lev']
             # if a single scalar is given, broadcast that to all levels
             if len(np.shape(np.array(value))) is 0:
                 value = np.ones_like(self.Tatm) * value
-            elif value.shape != self.Tatm.shape:
+            elif value.shape != self.Tatm['shape']:
                 raise ValueError('reflectivity must be a Field, a scalar, or match atm grid dimensions')
         self.trans = Transmissivity(absorptivity=self.absorptivity,
                                     reflectivity=value,

@@ -85,14 +85,14 @@ class MeridionalHeatDiffusion(MeridionalDiffusion):
 
     def _update_diffusivity(self):
         for varname, value in self.state.items():
-            heat_capacity = self.domains[varname].heat_capacity
+            heat_capacity = self.domains[varname]['heat_capacity']
         # diffusivity in units of m**2/s
         self.K = self.D / heat_capacity * const.a**2
 
     def _update_diagnostics(self, newstate):
         super(MeridionalHeatDiffusion, self)._update_diagnostics(newstate)
         for varname, value in self.state.items():
-            heat_capacity = self.domains[varname].heat_capacity
+            heat_capacity = self.domains[varname]['heat_capacity']
         self.heat_transport[:] = (self.diffusive_flux * heat_capacity *
                         2 * np.pi * const.a * self._weight1 * 1E-15) # in PW
         self.heat_transport_convergence[:] = (self.diffusive_flux_convergence *
