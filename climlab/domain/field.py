@@ -100,7 +100,7 @@ class Field(np.ndarray):
             return None
         else:
             try:
-                shape = np.array(domain.shape) + np.where(interfaces,1,0)
+                shape = np.array(domain['shape']) + np.where(interfaces,1,0)
             except:
                 raise ValueError('domain and interfaces inconsistent.')
         try:
@@ -211,12 +211,12 @@ def global_mean(field):
 
     """
     try:
-        lat = field.domain.lat.lat.values
+        lat = field.domain['axes'].lat.values
     except:
         raise ValueError('No latitude axis in input field.')
     try:
         #  Field is 2D latitude / longitude
-        lon = field.domain.lon.lon.values
+        lon = field.domain['axes'].lon.values
         return _global_mean_latlon(field.squeeze())
     except:
         #  Field is 1D latitude only (zonal average)
@@ -233,9 +233,9 @@ def _global_mean(array, lat_radians):
 
 def _global_mean_latlon(field):
     dom = field.domain
-    lon, lat = np.meshgrid(dom.lon.lon.values, dom.lat.lat.values)
-    dy = np.deg2rad(np.diff(dom.axes.lat_bounds.values))
-    dx = np.deg2rad(np.diff(dom.axes.lon_bounds.values))*np.cos(np.deg2rad(lat))
+    lon, lat = np.meshgrid(dom['axes'].lon.values, dom['axes'].lat.values)
+    dy = np.deg2rad(np.diff(dom['axes'].lat_bounds.values))
+    dx = np.deg2rad(np.diff(dom['axes'].lon_bounds.values))*np.cos(np.deg2rad(lat))
     area = dx * dy[:,np.newaxis]  # grid cell area in radians^2
     return np.array(np.average(field, weights=area))
 
@@ -273,8 +273,8 @@ def to_latlon(array, domain, axis = 'lon'):
 
     """
     #  if array is latitude dependent (has the same shape as lat)
-    axis, array, depth = np.meshgrid(domain.axes[axis][axis], array,
-                                    domain.axes['depth']['depth'])
+    axis, array, depth = np.meshgrid(domain['axes'][axis].values, array,
+                                    domain['axes'].depth.values)
     if axis == 'lat':
     #  if array is longitude dependent (has the same shape as lon)
         np.swapaxes(array,1,0)

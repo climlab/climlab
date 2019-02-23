@@ -89,7 +89,7 @@ class NbandRadiation(GreyGas):
         optical_path = self._compute_optical_path()
         #  account for finite layer depth
         absorptivity = 1. - np.exp(-optical_path)
-        axes = copy(self.domains['Tatm'].axes)
+        axes = copy(self.domains['Tatm']['axes'])
         # add these to the dictionary of axes
         axes = xr.merge([self.channel_ax, axes])
         dom = domain.Atmosphere(axes=axes)

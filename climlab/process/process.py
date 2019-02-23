@@ -13,12 +13,10 @@ def _make_dict(arg, argtype):
     if arg is None:
         return {}
     elif isinstance(arg, dict):
-        return arg
-    elif isinstance(arg, argtype):
-        return {'default': arg}
-    else:
-        raise ValueError('Problem with input type')
-
+        if 'axes' in arg:  # a single domain
+            return {'default': arg}
+        else:
+            return arg  # a dict of domains (hopefully)
 
 class Process(object):
     """A generic parent class for all climlab process objects.
@@ -73,7 +71,7 @@ class Process(object):
         str1 = 'climlab Process of type {0}. \n'.format(type(self))
         str1 += 'State variables and domain shapes: \n'
         for varname in list(self.state.keys()):
-            str1 += '  {0}: {1} \n'.format(varname, self.domains[varname].shape)
+            str1 += '  {0}: {1} \n'.format(varname, self.domains[varname]['shape'])
         str1 += 'The subprocess tree: \n'
         str1 += walk.process_tree(self, name=self.name)
         return str1
@@ -85,7 +83,7 @@ class Process(object):
         self.verbose = verbose
         self.name = name
         # dictionary of domains. Keys are the domain names
-        self.domains = _make_dict(domains, _Domain)
+        self.domains = _make_dict(domains, dict)
         #  If lat is given, create a simple domains
         if lat is not None:
             sfc = zonal_mean_surface()
@@ -567,7 +565,7 @@ class Process(object):
         try:
             for domname, dom in self.domains.items():
                 try:
-                    thislat = dom.axes.lat.values
+                    thislat = dom['axes'].lat.values
                 except:
                     pass
             return thislat
@@ -587,7 +585,7 @@ class Process(object):
         try:
             for domname, dom in self.domains.items():
                 try:
-                    thislat = dom.axes.lat_bounds.values
+                    thislat = dom['axes'].lat_bounds.values
                 except:
                     pass
             return thislat
@@ -607,7 +605,7 @@ class Process(object):
         try:
             for domname, dom in self.domains.items():
                 try:
-                    thislon = dom.axes.lon.values
+                    thislon = dom['axes'].lon.values
                 except:
                     pass
             return thislon
@@ -627,7 +625,7 @@ class Process(object):
         try:
             for domname, dom in self.domains.items():
                 try:
-                    thislon = dom.axes.lon_bounds.values
+                    thislon = dom['axes'].lon_bounds.values
                 except:
                     pass
             return thislon
@@ -647,7 +645,7 @@ class Process(object):
         try:
             for domname, dom in self.domains.items():
                 try:
-                    thislev = dom.axes.lev.values
+                    thislev = dom['axes'].lev.values
                 except:
                     pass
             return thislev
@@ -667,7 +665,7 @@ class Process(object):
         try:
             for domname, dom in self.domains.items():
                 try:
-                    thislev = dom.axes.lev_bounds.values
+                    thislev = dom['axes'].lev_bounds.values
                 except:
                     pass
             return thislev
@@ -687,7 +685,7 @@ class Process(object):
         try:
             for domname, dom in self.domains.items():
                 try:
-                    thisdepth = dom.axes.depth.values
+                    thisdepth = dom['axes'].depth.values
                 except:
                     pass
             return thisdepth
@@ -707,7 +705,7 @@ class Process(object):
         try:
             for domname, dom in self.domains.items():
                 try:
-                    thisdepth = dom.axes.depth_bounds.values
+                    thisdepth = dom['axes'].depth_bounds.values
                 except:
                     pass
             return thisdepth
@@ -780,13 +778,12 @@ def get_axes(process_or_domain):
         dom = process_or_domain.domains
     else:
         dom = process_or_domain
-    if isinstance(dom, _Domain):
-        return dom.axes
-    elif isinstance(dom, dict):
+    try:
+        return dom['axes']
+    except:
         axes = {}
-        for thisdom in list(dom.values()):
-            assert isinstance(thisdom, _Domain)
-            axes.update(thisdom.axes)
+        for thisdom in dom:
+            axes.update(thisdom['axes'])
         return axes
     else:
-        raise TypeError('dom must be a domain or dictionary of domains.')
+        raise TypeError('dom must be a process, domain or dictionary of domains.')

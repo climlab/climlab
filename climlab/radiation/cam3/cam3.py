@@ -214,7 +214,7 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         self.heating_rate['Ts'] = np.array(-total_flux[..., -1, np.newaxis]) + 0.*self.Ts
         self.heating_rate['Tatm'] = LWheating_Wm2 + SWheating_Wm2
         #  Convert to K / day
-        Catm = self.domains['Tatm'].heat_capacity
+        Catm = self.domains['Tatm']['heat_capacity']
         self.TdotLW = LWheating_Wm2 / Catm * const.seconds_per_day
         self.TdotLW_clr = LWheating_clr_Wm2 / Catm * const.seconds_per_day
         self.TdotSW = SWheating_Wm2 / Catm * const.seconds_per_day

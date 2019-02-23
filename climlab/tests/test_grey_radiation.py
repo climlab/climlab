@@ -28,7 +28,7 @@ def rcmodel():
 def diffmodel(rcmodel):
     diffmodel = climlab.process_like(rcmodel)
     # meridional diffusivity in m**2/s
-    K = 0.05 / diffmodel.domains['Tatm'].heat_capacity[0] *  climlab.constants.a**2
+    K = 0.05 / diffmodel.domains['Tatm']['heat_capacity'][0] *  climlab.constants.a**2
     d = climlab.dynamics.MeridionalDiffusion(K=K,
                 state={'Tatm': diffmodel.state['Tatm']},
                 **diffmodel.param)
