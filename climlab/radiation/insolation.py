@@ -1,3 +1,21 @@
+r"""
+Classes to provide insolation as input for other CLIMLAB processes.
+
+Options include
+
+- ``climlab.radiation.P2Insolation`` (idealized 2nd Legendre polynomial form)
+- ``climlab.radiation.FixedInsolation`` (generic steady-state insolation)
+- ``climlab.radiation.AnnualMeanInsolation`` (steady-state annual-mean insolation computed from orbital parameters and latitude)
+- ``climlab.radiation.DailyInsolation`` (time-varying daily-mean insolation computed from orbital parameters, latitude and time of year)
+
+All are subclasses of ``climlab.process.DiagnosticProcess``
+and do add any tendencies to any state variables.
+
+At least two diagnostics are provided:
+
+- ``insolation``, the incoming solar radiation in :math:`\textrm{W}}{\textrm{m}^2}``
+- ``coszen``, cosine of the solar zenith angle
+"""
 from __future__ import division
 import numpy as np
 from climlab.process.diagnostic import DiagnosticProcess
@@ -68,10 +86,11 @@ class _Insolation(DiagnosticProcess):
         self.add_diagnostic('insolation')
         self.add_diagnostic('coszen')
         try:
-            self.insolation = np.zeros(self.domains['sfc'].shape)
+            domain = self.domains['sfc']
         except:
-            self.insolation = np.zeros(self.domains['default'].shape)
-        self.coszen = np.zeros_like(self.insolation)
+            domain = self.domains['default']
+        self.insolation = Field(np.zeros(domain.shape), domain=domain)
+        self.coszen = Field(np.zeros(domain.shape), domain=domain)
         self.declare_diagnostics(['insolation','coszen'])
         self.S0 = S0
         #  Now that we have a value for self.S0 we can compute the correct coszen

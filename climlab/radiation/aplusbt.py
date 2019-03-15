@@ -5,13 +5,13 @@ import numpy as np
 
 
 class AplusBT(EnergyBudget):
-    """The simplest linear longwave radiation module.
+    r"""The simplest linear longwave radiation module.
 
     Calculates the Outgoing Longwave Radation (OLR) :math:`R\uparrow` as
 
     .. math::
 
-        R\uparrow = A + B \\cdot T
+        R\uparrow = A + B \cdot T
 
     where :math:`T` is the state variable.
 
@@ -24,12 +24,10 @@ class AplusBT(EnergyBudget):
     arguments:
 
     :param float A:             parameter for linear OLR parametrization   \n
-                                - unit: :math:`\\frac{\\textrm{W}}
-                                  {\\textrm{m}^2}`                          \n
+                                - unit: :math:`\frac{\textrm{W}}{\textrm{m}^2}` \n
                                 - default value: ``200.0``
     :param float B:             parameter for linear OLR parametrization   \n
-                                - unit: :math:`\\frac{\\textrm{W}}
-                                  {\\textrm{m}^2 \\ ^{\circ} \\textrm{C}}`  \n
+                                - unit: :math:`\frac{\textrm{W}} {\textrm{m}^2 ^{\circ}\textrm{C}}`  \n
                                 - default value: ``2.0``
 
     **Object attributes** \n
@@ -147,13 +145,13 @@ class AplusBT(EnergyBudget):
         self.param['B'] = value
 
     def _compute_emission(self):
-        for varname, value in self.state.iteritems():
+        for varname, value in self.state.items():
             self.OLR[:] = self.A + self.B * value
 
     def _compute_heating_rates(self):
         '''Compute energy flux convergences to get heating rates in :math:`W/m^2`,'''
         self._compute_emission()
-        for varname, value in self.state.iteritems():
+        for varname, value in self.state.items():
             self.heating_rate[varname] = -self.OLR
 
 
@@ -314,11 +312,11 @@ class AplusBT_CO2(EnergyBudget):
         l = np.log(self.CO2/300.)
         self.A = -326.400 + 9.16100*l - 3.16400*l**2 + 0.546800*l**3
         self.B =    1.953 - 0.04866*l + 0.01309*l**2 - 0.002577*l**3
-        for varname, value in self.state.iteritems():
+        for varname, value in self.state.items():
             self.OLR[:] = self.A + self.B * (value + const.tempCtoK)
 
     def _compute_heating_rates(self):
         """Computes energy flux convergences to get heating rates in :math:`W/m^2`."""
         self._compute_emission()
-        for varname, value in self.state.iteritems():
+        for varname, value in self.state.items():
             self.heating_rate[varname] = -self.OLR

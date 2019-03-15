@@ -9,8 +9,11 @@ module quicksort
 ! Modified by Alan Miller to include an associated integer array which gives
 ! the positions of the elements in the original order.
 ! pjr added module declaration
-! mvr modified integer array to intent inout - may now be any integer 
+! mvr modified integer array to intent inout - may now be any integer
 !     array that gets sorted along with associated real array
+
+!  CLIMLAB use this module to be consistent with the rest
+use shr_kind_mod,      only: r8 => shr_kind_r8
 
 implicit none
 save
@@ -22,7 +25,8 @@ RECURSIVE SUBROUTINE quick_sort(list, order)
 
 implicit none
 
-REAL, DIMENSION (:), INTENT(INOUT)  :: list
+!  CLIMLAB use consistent type here
+REAL(r8), DIMENSION (:), INTENT(INOUT)  :: list
 INTEGER, DIMENSION (:), INTENT(INOUT)  :: order
 
 ! Local variable

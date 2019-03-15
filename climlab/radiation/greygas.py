@@ -1,4 +1,5 @@
 from __future__ import division
+from builtins import range
 import numpy as np
 from climlab.utils.thermo import blackbody_emission
 from climlab.radiation.transmissivity import Transmissivity

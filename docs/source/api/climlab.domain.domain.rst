@@ -1,4 +1,4 @@
-domain 
+domain
 ------
 
 .. inheritance-diagram:: climlab.domain.domain

@@ -1,15 +1,19 @@
 name: climlab
+channels:
+  - conda-forge
+  - defaults
 dependencies:
-    - python=2.7
+    - python=3.6
     - numpy
     - scipy
-    - netCDF4
+    - xarray
+    - attrdict
     - sphinx
     - matplotlib
     - ipython
     - jupyter
+    - future
     - sphinx_rtd_theme
-    - pip:
-        - nbsphinx
-        - sphinxcontrib-bibtex
-        - numpydoc
+    #- nbsphinx
+    - sphinxcontrib-bibtex
+    - numpydoc

@@ -1,1 +1,0 @@
-../data/rrtmg_lw.nc

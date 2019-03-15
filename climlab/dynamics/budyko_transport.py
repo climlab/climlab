@@ -4,7 +4,7 @@ from climlab.domain.field import global_mean
 
 
 class BudykoTransport(EnergyBudget):
-    """calculates the 1 dimensional heat transport as the difference
+    r"""calculates the 1 dimensional heat transport as the difference
     between the local temperature and the global mean temperature.
 
     :param float b:     budyko transport parameter                      \n
@@ -49,7 +49,7 @@ class BudykoTransport(EnergyBudget):
 
     @property
     def b(self):
-        """the budyko transport parameter in unit
+        r"""the budyko transport parameter in unit
         :math:`\\frac{\\textrm{W}}{\\textrm{m}^2 \\textrm{K}}`
 
         :getter: returns the budyko transport parameter
@@ -67,5 +67,5 @@ class BudykoTransport(EnergyBudget):
         """Computes energy flux convergences to get heating rates in :math:`W/m^2`.
 
         """
-        for varname, value in self.state.iteritems():
+        for varname, value in self.state.items():
             self.heating_rate[varname] = - self.b * (value - global_mean(value))

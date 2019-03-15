@@ -16,8 +16,7 @@ def configuration(parent_package='',top_path=None):
     config.add_subpackage('surface')
     config.add_subpackage('tests')
     config.add_subpackage('utils')
-    config.add_data_files(os.path.join('data','ozone','apeozone_cam3_5_54.nc'))
-    config.make_config_py() # installs __config__.py
+    #config.make_config_py() # installs __config__.py
     return config
 
 if __name__ == '__main__':

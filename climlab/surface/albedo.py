@@ -1,4 +1,5 @@
 from __future__ import division
+from builtins import next
 import numpy as np
 from climlab.process.diagnostic import DiagnosticProcess
 from climlab.utils.legendre import P2
@@ -41,7 +42,7 @@ class ConstantAlbedo(DiagnosticProcess):
     def __init__(self, albedo=0.33, **kwargs):
         '''Uniform prescribed albedo.'''
         super(ConstantAlbedo, self).__init__(**kwargs)
-        dom = self.domains.itervalues().next()
+        dom = next(iter(self.domains.values()))
         self.add_diagnostic('albedo', Field(albedo, domain=dom))
         #self.albedo = albedo
 
@@ -189,7 +190,7 @@ class P2Albedo(DiagnosticProcess):
         # make sure that the diagnostic has the correct field dimensions.
         #dom = self.domains['default']
         #  this is a more robust way to get the single value from dictionary:
-        dom = self.domains.itervalues().next()
+        dom = next(iter(self.domains.values()))
         self.albedo = Field(albedo, domain=dom)
 
 
@@ -225,10 +226,12 @@ class Iceline(DiagnosticProcess):
 
     """
     def __init__(self, Tf=-10., **kwargs):
-        super(DiagnosticProcess, self).__init__(**kwargs)
+        super(Iceline, self).__init__(**kwargs)
         self.param['Tf'] = Tf
         self.add_diagnostic('icelat')
         self.add_diagnostic('ice_area')
+        #  Set diagnostics based on initial conditions
+        self.find_icelines()
 
     def find_icelines(self):
         """Finds iceline according to the surface temperature.
@@ -350,17 +353,23 @@ class StepFunctionAlbedo(DiagnosticProcess):
 
     """
     def __init__(self, Tf=-10., a0=0.3, a2=0.078, ai=0.62, **kwargs):
-        super(DiagnosticProcess, self).__init__(**kwargs)
+        super(StepFunctionAlbedo, self).__init__(**kwargs)
         self.param['Tf'] = Tf
         self.param['a0'] = a0
         self.param['a2'] = a2
         self.param['ai'] = ai
         sfc = self.domains['Ts']
-        self.add_subprocess('iceline', Iceline(Tf=Tf, state=self.state))
-        self.add_subprocess('warm_albedo', P2Albedo(a0=a0, a2=a2, domains=sfc))
-        self.add_subprocess('cold_albedo', ConstantAlbedo(albedo=ai, domains=sfc))
+        self.add_subprocess('iceline', Iceline(Tf=Tf, state=self.state, timestep=self.timestep))
+        warm = P2Albedo(a0=a0, a2=a2, domains=sfc, timestep=self.timestep)
+        cold = ConstantAlbedo(albedo=ai, domains=sfc, timestep=self.timestep)
+        # remove `albedo` from the diagnostics list for the two subprocesses
+        #  because they cause conflicts when passed up the subprocess tree
+        for proc in [warm, cold]:
+            proc._diag_vars.remove('albedo')
+        self.add_subprocess('warm_albedo', warm)
+        self.add_subprocess('cold_albedo', cold)
         self.topdown = False  # call subprocess compute methods first
-        self.add_diagnostic('albedo')
+        self.add_diagnostic('albedo', self._get_current_albedo())
 
     def _get_current_albedo(self):
         '''Simple step-function albedo based on ice line at temperature Tf.'''
@@ -372,5 +381,5 @@ class StepFunctionAlbedo(DiagnosticProcess):
         return albedo
 
     def _compute(self):
-        self.albedo = self._get_current_albedo()
+        self.albedo[:] = self._get_current_albedo()
         return {}

@@ -1,10 +1,10 @@
 from __future__ import division
+from __future__ import absolute_import
 import numpy as np
 from climlab import constants as const
 from climlab.radiation.radiation import _Radiation_SW, _Radiation_LW
-from rrtmg_lw import RRTMG_LW
-from rrtmg_sw import RRTMG_SW
-from . import nbndsw
+from .rrtmg_lw import RRTMG_LW
+from .rrtmg_sw import RRTMG_SW, nbndsw
 
 
 class RRTMG(_Radiation_SW, _Radiation_LW):
@@ -137,6 +137,9 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
                      ciwp = self.ciwp,
                      r_liq = self.r_liq,
                      r_ice = self.r_ice,
+                     icld = icld,
+                     irng = irng,
+                     idrv = idrv,
                      permuteseed = permuteseed_lw,
                      emissivity = self.emissivity,
                      inflglw = inflglw,
@@ -151,6 +154,8 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
                      ciwp = self.ciwp,
                      r_liq = self.r_liq,
                      r_ice = self.r_ice,
+                     icld = icld,
+                     irng = irng,
                      permute = permuteseed_sw,
                      aldif = self.aldif,
                      aldir = self.aldir,

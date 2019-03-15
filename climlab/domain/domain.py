@@ -1,4 +1,6 @@
 from __future__ import division
+from builtins import str
+from builtins import object
 from climlab.domain.axis import Axis
 from climlab.utils import heat_capacity
 
@@ -68,7 +70,7 @@ class _Domain(object):
         # self.axes should be a dictionary of axes
         # make it possible to give just a single axis:
         self.axes = self._make_axes_dict(axes)
-        self.numdims = len(self.axes.keys())
+        self.numdims = len(list(self.axes.keys()))
         shape = []
         axcount = 0
         axindex = {}
@@ -79,7 +81,7 @@ class _Domain(object):
         add_depth = False
         add_lon = False
         add_lat = False
-        axlist = self.axes.keys()
+        axlist = list(self.axes.keys())
         if 'lev' in axlist:
             axlist.remove('lev')
             add_lev = True
@@ -154,6 +156,30 @@ class _Domain(object):
             raise ValueError('axes needs to be Axis object or dictionary of Axis object')
         return axdict
 
+    def __getitem__(self, indx):
+        # Make domains sliceable
+        # First create a bare domain object (without calling the __init__ method)
+        dout = type(self).__new__(type(self))
+        # inherit *most* of the attributes of self
+        #  For now we are just slicing the heat capacity
+        #  But would be great to have some logic for slicing axes
+        #   I am not 100% percent clear on how all this works
+        #   But for now we're just going to "try" to slice to avoid
+        #   some failures
+        for key, value in self.__dict__.items():
+            if key is 'heat_capacity':
+                try:
+                    dout.heat_capacity = self.heat_capacity[indx]
+                except:
+                    dout.heat_capacity = self.heat_capacity
+            elif key is 'shape':
+                try:
+                    dout.shape = self.heat_capacity[indx].shape
+                except:
+                    dout.shape = self.shape
+            else:
+                setattr(dout, key, value)
+        return dout
 
 
 class Atmosphere(_Domain):

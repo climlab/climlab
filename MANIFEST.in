@@ -1,0 +1,25 @@
+include MANIFEST.in
+include LICENSE
+recursive-include licenses *
+include *.txt
+include README.rst
+include .coveragerc
+include *.yml
+include *.yaml
+include *.sh
+include .f2py_f2cmap
+include climlab/radiation/cam3/.f2py_f2cmap
+include climlab/radiation/rrtm/_rrtmg_lw/.f2py_f2cmap
+include climlab/radiation/rrtm/_rrtmg_sw/.f2py_f2cmap
+recursive-include climlab *.nc
+recursive-include climlab *.pyf
+recursive-include climlab *.sh
+recursive-include climlab *.f90
+recursive-include climlab *.F90
+recursive-include climlab *.h
+recursive-include climlab/radiation/rrtm/_rrtmg_lw/rrtmg_lw_v4.85 *
+recursive-include climlab/radiation/rrtm/_rrtmg_sw/rrtmg_sw_v4.0 *
+recursive-include climlab/convection/_emanuel_convection *
+recursive-include docs *
+prune docs/build
+global-exclude *.pyc *.pyo *.pyd .DS_Store

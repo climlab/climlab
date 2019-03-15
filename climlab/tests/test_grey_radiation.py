@@ -2,19 +2,16 @@ from __future__ import division
 import numpy as np
 import climlab
 import pytest
+from climlab.tests.xarray_test import to_xarray
 
-# The fixtures are reusable pieces of code to set up the input to the tests.
-# Without fixtures, we would have to do a lot of cutting and pasting
-# I inferred which fixtures to use from the notebook
-# Latitude-dependent grey radiation.ipynb
+
 @pytest.fixture()
 def model():
     return climlab.GreyRadiationModel(num_lev=30, num_lat=90)
 
 @pytest.fixture()
 def model_with_insolation(model):
-    insolation = climlab.radiation.insolation.DailyInsolation(
-                                                        domains=model.Ts.domain)
+    insolation = climlab.radiation.DailyInsolation(domains=model.Ts.domain)
     model.add_subprocess('insolation', insolation)
     model.subprocess.SW.flux_from_space = insolation.insolation
     return model
@@ -22,7 +19,7 @@ def model_with_insolation(model):
 @pytest.fixture()
 def rcmodel():
     model2 = climlab.RadiativeConvectiveModel(num_lev=30, num_lat=90)
-    insolation = climlab.radiation.insolation.DailyInsolation(domains=model2.Ts.domain)
+    insolation = climlab.radiation.DailyInsolation(domains=model2.Ts.domain)
     model2.add_subprocess('insolation', insolation)
     model2.subprocess.SW.flux_from_space = insolation.insolation
     return model2
@@ -30,48 +27,34 @@ def rcmodel():
 @pytest.fixture()
 def diffmodel(rcmodel):
     diffmodel = climlab.process_like(rcmodel)
-    # thermal diffusivity in W/m**2/degC
-    D = 0.05
-    # meridional diffusivity in 1/s
-    K = D / diffmodel.Tatm.domain.heat_capacity[0]
-    d = climlab.dynamics.diffusion.MeridionalDiffusion(K=K,
-                state={'Tatm': diffmodel.state['Tatm']}, **diffmodel.param)
+    # meridional diffusivity in m**2/s
+    K = 0.05 / diffmodel.Tatm.domain.heat_capacity[0] *  climlab.constants.a**2
+    d = climlab.dynamics.MeridionalDiffusion(K=K,
+                state={'Tatm': diffmodel.state['Tatm']},
+                **diffmodel.param)
     diffmodel.add_subprocess('diffusion', d)
     return diffmodel
-
-@pytest.fixture()
-def diffmodel_surfflux(diffmodel):
-    diffmodel_surfflux = climlab.process_like(diffmodel)
-    # process models for surface heat fluxes
-    shf = SensibleHeatFlux(state=diffmodel_surfflux.state, Cd=0.5E-3)
-    lhf = LatentHeatFlux(state=diffmodel_surfflux, Cd=0.5E-3)
-    # set the water vapor input field for LHF
-    lhf.q = diffmodel_surfflux.q
-    diffmodel_surfflux.add_subprocess('SHF', shf)
-    diffmodel_surfflux.add_subprocess('LHF', lhf)
-    #  Convective adjustment for atmosphere only
-    diffmodel_surfflux.remove_subprocess('convective adjustment')
-    conv = ConvectiveAdjustment(state={'Tatm':diffmodel_surfflux.state['Tatm']},
-                                **diffmodel_surfflux.param)
-    diffmodel_surfflux.add_subprocess('convective adjustment', conv)
-    return diffmodel_surfflux
-
 
 # helper for a common test pattern
 def _check_minmax(array, amin, amax):
     return (np.allclose(array.min(), amin) and
             np.allclose(array.max(), amax))
 
+@pytest.mark.fast
 def test_model_creation(model):
     """Just make sure we can create a model."""
     assert len(model.lat)==90
+    # Test the xarray interface
+    to_xarray(model)
 
+@pytest.mark.fast
 def test_add_insolation(model_with_insolation):
     """"Create a model with insolation and check that SW_down_TOA has
     reasonable values."""
     model_with_insolation.step_forward()
     assert _check_minmax(model_with_insolation.SW_down_TOA, 0, 555.17111)
 
+@pytest.mark.slow
 def test_integrate_years(model_with_insolation):
     """Check that we can integrate forward the model and get the expected
     surface temperature."""
@@ -80,6 +63,7 @@ def test_integrate_years(model_with_insolation):
     ts = model_with_insolation.timeave['Ts']
     assert _check_minmax(ts, 225.402329962, 301.659494398)
 
+@pytest.mark.slow
 def test_rcmodel(rcmodel):
     """Check that we can integrate forwrd the radiative convective model and
     get expected atmospheric temperature."""
@@ -88,9 +72,25 @@ def test_rcmodel(rcmodel):
     tatm = rcmodel.timeave['Tatm']
     assert _check_minmax(tatm, 176.786517491, 292.222277112)
 
+@pytest.mark.slow
 def test_diffmodel(diffmodel):
     """Check that we can integrate the model with diffusion."""
     diffmodel.step_forward()
     diffmodel.integrate_years(1)
     tatm = diffmodel.timeave['Tatm']
     assert _check_minmax(tatm, 208.689339823, 285.16085319)
+
+@pytest.mark.fast
+def test_external_tendency():
+    """Check that we can add an externally defined tendency to a
+    radiative-convective model."""
+    model = climlab.GreyRadiationModel(num_lev=30)
+    model2 = climlab.process_like(model)
+    model.step_forward()
+    ext = climlab.process.ExternalForcing(state=model2.state)
+    temp_tend = 1E-5  # K/s
+    ext.forcing_tendencies['Tatm'][:] = temp_tend
+    model2.add_subprocess('External', ext)
+    model2.step_forward()
+    assert model.tendencies['Tatm'] + temp_tend == pytest.approx(model2.tendencies['Tatm'])
+    #assert np.all(np.isclose(model.tendencies['Tatm'] == (model2.tendencies['Tatm']-temp_tend))

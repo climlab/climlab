@@ -4,7 +4,7 @@ from climlab.process.energy_budget import EnergyBudget
 
 
 class Boltzmann(EnergyBudget):
-    """A class for black body radiation.
+    r"""A class for black body radiation.
 
     Implements a radiation subprocess which computes longwave radiation
     with the Stefan-Boltzmann law for black/grey body radiation.
@@ -15,25 +15,25 @@ class Boltzmann(EnergyBudget):
 
     .. math::
 
-        P = A \\varepsilon \\sigma T^4
+        P = A \varepsilon \sigma T^4
 
-    where :math:`\\varepsilon` is the emissivity of the body.
+    where :math:`\varepsilon` is the emissivity of the body.
 
     As the :class:`~climlab.process.energy_budget.EnergyBudget` of the
-    Energy Balance Model is accounted in unit :math:`\\textrm{energy} / \\textrm{area}`
-    (:math:`\\textrm{W}/ \\textrm{m}^2`)
+    Energy Balance Model is accounted in unit :math:`\textrm{energy} / \textrm{area}`
+    (:math:`\textrm{W}/ \textrm{m}^2`)
     the energy budget equation looks like this:
 
     .. math::
 
-        C \\frac{dT}{dt} = R\downarrow - R\uparrow - H  \n
+        C \frac{dT}{dt} = R\downarrow - R\uparrow - H  \n
 
     The :class:`Boltzmann` radiation subprocess represents the outgoing radiation
     :math:`R\uparrow` which then can be written as
 
     .. math::
 
-        R\uparrow = \\varepsilon \\sigma T^4
+        R\uparrow = \varepsilon \sigma T^4
 
     with state variable :math:`T`.
 
@@ -185,7 +185,7 @@ class Boltzmann(EnergyBudget):
 #            self.diagnostics['OLR'] = self.OLR
 
     def _compute_emission(self):
-        for varname, value in self.state.iteritems():
+        for varname, value in self.state.items():
             flux = self.eps * self.tau * const.sigma * (value + const.tempCtoK)**4.
             self.OLR[:] = flux
 
@@ -195,5 +195,5 @@ class Boltzmann(EnergyBudget):
 
         """
         self._compute_emission()
-        for varname, value in self.state.iteritems():
+        for varname, value in self.state.items():
             self.heating_rate[varname] = -self.OLR

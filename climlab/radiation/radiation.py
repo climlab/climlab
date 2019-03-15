@@ -1,4 +1,4 @@
-'''_Radiation, _Radiation_SW and _Radiation_LW
+'''``_Radiation``, ``_Radiation_SW`` and ``_Radiation_LW``
 are the base classes for radiative transfer modules
 
 Currently this includes :class:`~climlab.radiation.cam3.CAM3`,
@@ -10,76 +10,81 @@ Basic characteristics:
 
 State:
 
-    - Ts (surface radiative temperature)
-    - Tatm (air temperature)
+    - ``Ts`` (surface radiative temperature)
+    - ``Tatm`` (air temperature)
 
 Input arguments (both LW and SW):
 
-    - specific_humidity (kg/kg)
-    - absorber_vmr (dict of volumetric mixing ratios)
-    - cldfrac      (layer cloud fraction
-    - clwp         (in-cloud liquid water path (g/m2))
-    - ciwp = 0.,     # in-cloud ice water path (g/m2)
-    - r_liq = 0.,    # Cloud water drop effective radius (microns)
-    - r_ice = 0.,    # Cloud ice particle effective size (microns)
-    - ozone_file = 'apeozone_cam3_5_54.nc'  (file with ozone distribution)
+    - ``specific_humidity`` (kg/kg)
+    - ``absorber_vmr = None`` (dictionary of volumetric mixing ratios. Default values supplied if ``None``)
+    - ``cldfrac``      (layer cloud fraction
+    - ``clwp``         (in-cloud liquid water path (g/m2))
+    - ``ciwp = 0.``,     # in-cloud ice water path (g/m2)
+    - ``r_liq = 0.``,    # Cloud water drop effective radius (microns)
+    - ``r_ice = 0.``,    # Cloud ice particle effective size (microns)
+    - ``ozone_file = 'apeozone_cam3_5_54.nc'``  (file with ozone distribution - ignored if ``absorber_vmr`` is given)
+
+If ``absorber_vmr = None`` then ozone will be interpolated to the model grid
+from a climatology file, or set to zero if ``ozone_file = None``.
 
 Additional input arguments for SW:
 
-     - albedo = None  (optional, single parameter to set all 4 albedo values)
-     - aldif = 0.3,   (near-infrared albedo, diffuse)
-     - aldir = 0.3,   (near-infrared albedo, direct)
-     - asdif = 0.3,   (shortwave albedo, diffuse)
-     - asdir = 0.3,   (shortwave albedo, direct)
-     - S0    = const.S0,  (solar constant, W/m2)
-     - insolation = const.S0/4.,  (time-mean insolaltion, W/m2)
-     - coszen = None,    # cosine of the solar zenith angle
-     - eccentricity_factor = 1.,  # instantaneous irradiance = S0 * eccentricity_factor
+     - ``albedo = None``  (optional, single parameter to set all 4 albedo values)
+     - ``aldif = 0.3``,   (near-infrared albedo, diffuse)
+     - ``aldir = 0.3``,   (near-infrared albedo, direct)
+     - ``asdif = 0.3``,   (shortwave albedo, diffuse)
+     - ``asdir = 0.3``,   (shortwave albedo, direct)
+     - ``S0 = const.S0``,  (solar constant, W/m2)
+     - ``insolation = const.S0/4.``,  (time-mean insolaltion, W/m2)
+     - ``coszen = None``,    # cosine of the solar zenith angle
+     - ``eccentricity_factor = 1.``,  # instantaneous irradiance = S0 * eccentricity_factor
 
 Additional input arguments for LW:
-    - emissivity = 1.,  # surface emissivity
+    - ``emissivity = 1.``,  # surface emissivity
 
 Shortave processes compute these diagnostics (minimum):
 
-    - ASR (W/m2, net Absorbed Shortwave Radiation at TOA, **positive down**)
-    - ASRclr (clear-sky component)
-    - ASRcld (cloud component, all-sky minus clear-sky)
-    - SW_flux_up   (W/m2, defined at pressure level interfaces)
-    - SW_flux_down (W/m2, defined at pressure level interfaces)
-    - SW_flux_net  (W/m2 **downward** net flux at pressure level interfaces)
-    - SW_flux_up_clr  (clear-sky flux)
-    - SW_flux_down_clr (clear-sky flux)
-    - SW_flux_net_clr  (clear-sky flux)
-    - TdotSW   (K/day, radiative heating rate)
-    - TdotSW_clr (clear-sky heating rate)
+    - ``ASR`` (W/m2, net Absorbed Shortwave Radiation at TOA, **positive down**)
+    - ``ASRclr`` (clear-sky component)
+    - ``ASRcld`` (cloud component, all-sky minus clear-sky)
+    - ``SW_flux_up``   (W/m2, defined at pressure level interfaces)
+    - ``SW_flux_down`` (W/m2, defined at pressure level interfaces)
+    - ``SW_flux_net``  (W/m2 **downward** net flux at pressure level interfaces)
+    - ``SW_flux_up_clr``  (clear-sky flux)
+    - ``SW_flux_down_clr`` (clear-sky flux)
+    - ``SW_flux_net_clr``  (clear-sky flux)
+    - ``TdotSW``   (K/day, radiative heating rate)
+    - ``TdotSW_clr`` (clear-sky heating rate)
 
 Longwave processes compute these diagnostics (minimum):
 
-    - OLR (W/m2, net Outgoing Longwave radiation at TOA, **positive up**)
-    - OLRclr (clear-sky component)
-    - OLRcld (cloud component, all-sky minus clear-sky)
-    - LW_flux_up   (W/m2, defined at pressure level interfaces)
-    - LW_flux_down (W/m2, defined at pressure level interfaces)
-    - LW_flux_net  (W/m2 **upward** net flux at pressure level interfaces)
-    - LW_flux_up_clr  (clear-sky flux)
-    - LW_flux_down_clr (clear-sky flux)
-    - LW_flux_net_clr  (clear-sky flux)
-    - TdotLW   (K/day, radiative heating rate)
-    - TdotLW_clr (clear-sky heating rate)
+    - ``OLR`` (W/m2, net Outgoing Longwave radiation at TOA, **positive up**)
+    - ``OLRclr`` (clear-sky component)
+    - ``OLRcld`` (cloud component, all-sky minus clear-sky)
+    - ``LW_flux_up``   (W/m2, defined at pressure level interfaces)
+    - ``LW_flux_down`` (W/m2, defined at pressure level interfaces)
+    - ``LW_flux_net``  (W/m2 **upward** net flux at pressure level interfaces)
+    - ``LW_flux_up_clr``  (clear-sky flux)
+    - ``LW_flux_down_clr`` (clear-sky flux)
+    - ``LW_flux_net_clr``  (clear-sky flux)
+    - ``TdotLW``   (K/day, radiative heating rate)
+    - ``TdotLW_clr`` (clear-sky heating rate)
 '''
 
 from __future__ import division
+from __future__ import print_function
 import numpy as np
 from climlab.process import EnergyBudget
 from climlab.radiation import ManabeWaterVapor
 import os
-from scipy.interpolate import interp1d, interp2d
 from climlab import constants as const
+from climlab.domain.field import Field
+import warnings
 try:
-    import netCDF4 as nc
+    import xarray as xr
 except:
-    print 'Cannot import netCDF4 interface. Will not be able to initialize ozone from data file.'
-
+    warnings.warn('Cannot import `xarray`. Will not be able to initialize ozone from data file.',
+                FutureWarning, stacklevel=2)
 
 def default_specific_humidity(Tatm):
     '''Initialize a specific humidity distribution
@@ -92,7 +97,10 @@ def default_specific_humidity(Tatm):
     h2o = ManabeWaterVapor(state={'Tatm': Tatm})
     return h2o.q
 
-def default_absorbers(Tatm, ozone_file = 'apeozone_cam3_5_54.nc'):
+def default_absorbers(Tatm,
+                ozone_file = 'apeozone_cam3_5_54.nc',
+                verbose = True,
+                      ):
     '''Initialize a dictionary of well-mixed radiatively active gases
     All values are volumetric mixing ratios.
 
@@ -123,34 +131,38 @@ def default_absorbers(Tatm, ozone_file = 'apeozone_cam3_5_54.nc'):
     absorber_vmr['CFC22'] = 0.
     absorber_vmr['CCL4']  = 0.
 
-    datadir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'data', 'ozone'))
-    ozonefilepath = os.path.join(datadir, ozone_file)
-    #  Open the ozone data file
-    print 'Getting ozone data from', ozonefilepath
-    ozonedata = nc.Dataset(ozonefilepath)
-    ozone_lev = ozonedata.variables['lev'][:]
-    ozone_lat = ozonedata.variables['lat'][:]
-    #  zonal and time average
-    ozone_zon = np.mean(ozonedata.variables['OZONE'], axis=(0,3))
-    ozone_global = np.average(ozone_zon, weights=np.cos(np.deg2rad(ozone_lat)), axis=1)
-    lev = Tatm.domain.axes['lev'].points
-    if Tatm.shape == lev.shape:
-        # 1D interpolation on pressure levels using global average data
-        f = interp1d(ozone_lev, ozone_global)
-        #  interpolate data to model levels
-        absorber_vmr['O3'] = f(lev)
-    else:
-        #  Attempt 2D interpolation in pressure and latitude
-        f2d = interp2d(ozone_lat, ozone_lev, ozone_zon)
+    # Ozone: start with all zeros, interpolate to data if we can
+    xTatm = Tatm.to_xarray()
+    O3 = 0. * xTatm
+    if ozone_file is not None:
+        datadir = os.path.join(os.path.dirname(__file__), 'data', 'ozone')
+        ozonefilepath = os.path.join(datadir, ozone_file)
+        #  Open the ozone data file
+        if verbose:
+            print('Getting ozone data from', ozonefilepath)
+        ozonedata = xr.open_dataset(ozonefilepath)
+        ##  zonal and time average
+        ozone_zon = ozonedata.OZONE.mean(dim=('time','lon')).transpose('lat','lev')
+        weight = np.cos(np.deg2rad(ozonedata.lat))
+        ozone_global = (ozone_zon * weight).mean(dim='lat') / weight.mean(dim='lat')
         try:
-            lat = Tatm.domain.axes['lat'].points
-            f2d = interp2d(ozone_lat, ozone_lev, ozone_zon)
-            absorber_vmr['O3'] = f2d(lat, lev).transpose()
+            if ('lat' in xTatm.dims):
+                O3 = ozone_zon.interp_like(xTatm)
+            else:
+                O3 = ozone_global.interp_like(xTatm)
         except:
-            print 'Interpolation of ozone data failed.'
-            print 'Reverting to default O3.'
-            absorber_vmr['O3'] = np.zeros_like(Tatm)
+            print('Interpolation of ozone data failed.')
+            print('Setting O3 to zero instead.')
+    absorber_vmr['O3'] = O3.values
     return absorber_vmr
+
+def init_interface(field):
+    '''Return a Field object defined at the vertical interfaces of the input Field object.'''
+    interface_shape = np.array(field.shape); interface_shape[-1] += 1
+    interfaces = np.tile(False,len(interface_shape)); interfaces[-1] = True
+    interface_zero = Field(np.zeros(interface_shape), domain=field.domain, interfaces=interfaces)
+    return interface_zero
+
 
 class _Radiation(EnergyBudget):
     '''Abstact base class for SW and LW radiation processes.
@@ -172,7 +184,7 @@ class _Radiation(EnergyBudget):
             specific_humidity = default_specific_humidity(self.Tatm)
         self.add_input('specific_humidity', specific_humidity)
         if absorber_vmr is None:
-            absorber_vmr = default_absorbers(self.Tatm, ozone_file)
+            absorber_vmr = default_absorbers(self.Tatm, ozone_file, self.verbose)
         self.add_input('absorber_vmr', absorber_vmr)
         self.add_input('cldfrac', cldfrac)
         self.add_input('clwp', clwp)
@@ -223,25 +235,26 @@ class _Radiation_SW(_Radiation):
         self.add_diagnostic('SW_sfc', 0.*self.Ts)
         self.add_diagnostic('SW_sfc_clr', 0.*self.Ts)
         #  Flux diagnostics at layer interfaces
-        #   actually these need an extra vertical level ... bad initialization
-        self.add_diagnostic('SW_flux_up', 0. * self.Tatm)
-        self.add_diagnostic('SW_flux_down', 0. * self.Tatm)
-        self.add_diagnostic('SW_flux_net', 0. * self.Tatm)
-        self.add_diagnostic('SW_flux_up_clr', 0. * self.Tatm)
-        self.add_diagnostic('SW_flux_down_clr', 0. * self.Tatm)
-        self.add_diagnostic('SW_flux_net_clr', 0. * self.Tatm)
+        #   These need an extra vertical level
+        interface_zero = init_interface(self.Tatm)
+        self.add_diagnostic('SW_flux_up', 0. * interface_zero)
+        self.add_diagnostic('SW_flux_down', 0. * interface_zero)
+        self.add_diagnostic('SW_flux_net', 0. * interface_zero)
+        self.add_diagnostic('SW_flux_up_clr', 0. * interface_zero)
+        self.add_diagnostic('SW_flux_down_clr', 0. * interface_zero)
+        self.add_diagnostic('SW_flux_net_clr', 0. * interface_zero)
 
     def _compute_SW_flux_diagnostics(self):
         #  positive down, consistent with ASR
         self.SW_flux_net = self.SW_flux_down - self.SW_flux_up
         self.SW_flux_net_clr = self.SW_flux_down_clr - self.SW_flux_up_clr
         #  TOA diagnostics
-        self.ASR = self.SW_flux_net[..., 0, np.newaxis]
-        self.ASRclr = self.SW_flux_net_clr[..., 0, np.newaxis]
+        self.ASR = np.array(self.SW_flux_net[..., 0, np.newaxis]) + 0.*self.Ts
+        self.ASRclr = np.array(self.SW_flux_net_clr[..., 0, np.newaxis]) + 0.*self.Ts
         self.ASRcld = self.ASR - self.ASRclr
         #  Surface diagnostics
-        self.SW_sfc = self.SW_flux_net[..., -1, np.newaxis]
-        self.SW_sfc_clr = self.SW_flux_net_clr[..., -1, np.newaxis]
+        self.SW_sfc = np.array(self.SW_flux_net[..., -1, np.newaxis]) + 0.*self.Ts
+        self.SW_sfc_clr = np.array(self.SW_flux_net_clr[..., -1, np.newaxis]) + 0.*self.Ts
 
 
 class _Radiation_LW(_Radiation):
@@ -259,22 +272,23 @@ class _Radiation_LW(_Radiation):
         self.add_diagnostic('LW_sfc', 0.*self.Ts)
         self.add_diagnostic('LW_sfc_clr', 0.*self.Ts)
         #  Flux diagnostics at layer interfaces
-        #   actually these need an extra vertical level ... bad initialization
-        self.add_diagnostic('LW_flux_up', 0. * self.Tatm)
-        self.add_diagnostic('LW_flux_down', 0. * self.Tatm)
-        self.add_diagnostic('LW_flux_net', 0. * self.Tatm)
-        self.add_diagnostic('LW_flux_up_clr', 0. * self.Tatm)
-        self.add_diagnostic('LW_flux_down_clr', 0. * self.Tatm)
-        self.add_diagnostic('LW_flux_net_clr', 0. * self.Tatm)
+        #   These need an extra vertical level
+        interface_zero = init_interface(self.Tatm)
+        self.add_diagnostic('LW_flux_up', 0. * interface_zero)
+        self.add_diagnostic('LW_flux_down', 0. * interface_zero)
+        self.add_diagnostic('LW_flux_net', 0. * interface_zero)
+        self.add_diagnostic('LW_flux_up_clr', 0. * interface_zero)
+        self.add_diagnostic('LW_flux_down_clr', 0. * interface_zero)
+        self.add_diagnostic('LW_flux_net_clr', 0. * interface_zero)
 
     def _compute_LW_flux_diagnostics(self):
         #  LW net flux defined positive UP, consistent with OLR
         self.LW_flux_net = self.LW_flux_up - self.LW_flux_down
         self.LW_flux_net_clr = self.LW_flux_up_clr - self.LW_flux_down_clr
         #  TOA diagnostics
-        self.OLR = self.LW_flux_net[..., 0, np.newaxis]
-        self.OLRclr = self.LW_flux_net_clr[..., 0, np.newaxis]
+        self.OLR = np.array(self.LW_flux_net[..., 0, np.newaxis]) + 0.*self.Ts
+        self.OLRclr = np.array(self.LW_flux_net_clr[..., 0, np.newaxis]) + 0.*self.Ts
         self.OLRcld = self.OLR - self.OLRclr
         #  Surface diagnostics
-        self.LW_sfc = self.LW_flux_net[..., -1, np.newaxis]
-        self.LW_sfc_clr = self.LW_flux_net_clr[..., -1, np.newaxis]
+        self.LW_sfc = np.array(self.LW_flux_net[..., -1, np.newaxis]) + 0.*self.Ts
+        self.LW_sfc_clr = np.array(self.LW_flux_net_clr[..., -1, np.newaxis]) + 0.*self.Ts

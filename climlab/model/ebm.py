@@ -1,30 +1,117 @@
+r"""Convenience classes for pre-made Energy Balance Models in CLIMLAB.
+
+These models all solve some form of the equation
+
+.. math::
+
+    C \frac{\partial}{\partial t} T_s(\phi,t) = (1-\alpha)S(\phi,t) - \left[A + B T_s \right] + \frac{1}{\cos\phi} \frac{\partial}{\partial \phi} \left[ \cos\phi ~ D ~ \frac{\partial T_s}{\partial \phi} \right]
+
+where
+
+- :math:`\phi` is latitude
+- :math:`T_s` is a zonally averaged surface temperature
+- :math:`C` is a depth-integrated heat capacity
+- :math:`\alpha` is an albedo (which may depend on latitude and/or temperature)
+- :math:`S(\phi, t)` is the insolation
+- :math:`\left[A + B T_s \right]` is a parameterization of the Outgoing Longwave Radiation to space
+- the last term on the right hand side is a diffusive heat transport convergence with thermal diffusivity :math:`D` in the same units as :math:`B`
+
+Three classes are provided, which differ in the type of insolation :math:`S`:
+
+- ``climlab.EBM`` uses a steady idealized annual insolation (second Legendre polynomial form)
+- ``climlab.EBM_annual`` uses realistic steady annual-mean insolation
+- ``climlab.EBM_seasonal`` uses realistic seasonally varying insolation
+
+The ``__init__`` method of class ``EBM`` shows how these models are assembled
+from subprocesses representing each term in the above equation.
+
+
+Building the Moist EBM
+----------------------
+
+There is currently no ready-made convenience class for the **moist EBM**,
+but it can be readily built by swapping out the dry heat diffusion process ``climlab.dynamics.MeridionalHeatDiffusion``
+with the moist equivalent ``climlab.dynamics.MeridionalMoistDiffusion``.
+
+This sort of mixing and matching of model components is at the heart of CLIMLAB
+design and functionality.
+
+    :Example:
+
+        .. code-block:: python
+
+            import climlab
+            #  create and display a 1D Energy Balance Model
+            dry = climlab.EBM()
+            print(dry)
+            #  clone this model and swap out the diffusion subprocess
+            moist = climlab.process_like(dry)
+            diff = climlab.dynamics.MeridionalMoistDiffusion(state=moist.state, timestep=moist.timestep)
+            moist.add_subprocess('diffusion', diff)
+            print(moist)
+
+We can run both models out to equilibrium and compare the results as follows:
+
+    :Example:
+
+        .. code-block:: python
+
+            #  Run both models out to quasi-equilibrium
+            #   print out the global mean planetary energy budget -- should be very small
+            for m in [dry, moist]:
+                m.integrate_years(10)
+                print(climlab.global_mean(m.net_radiation))
+            #  plot and compare the temperatures
+            import matplotlib.pyplot as plt
+            plt.figure()
+            plt.plot(dry.lat, dry.Ts, label='Dry')
+            plt.plot(moist.lat, moist.Ts, label='Moist')
+            plt.legend()
+            plt.show()
+            #  plot and compare the heat transport
+            plt.figure()
+            plt.plot(dry.lat_bounds, dry.heat_transport, label='Dry')
+            plt.plot(moist.lat_bounds, moist.heat_transport, label='Moist')
+            plt.legend()
+            plt.show()
+
+"""
 from __future__ import division
 import numpy as np
 from climlab import constants as const
 from climlab.domain.field import Field, global_mean
-from climlab.process import EnergyBudget
+from climlab.process import EnergyBudget, TimeDependentProcess
 from climlab.utils import legendre
 from climlab.domain import domain
-from climlab.radiation import AplusBT, P2Insolation, AnnualMeanInsolation, DailyInsolation
+from climlab.radiation import AplusBT, P2Insolation, AnnualMeanInsolation, DailyInsolation, SimpleAbsorbedShortwave
 from climlab.surface import albedo
-from climlab.dynamics import MeridionalDiffusion
+from climlab.dynamics import MeridionalHeatDiffusion
 from climlab.domain.initial import surface_state
 from scipy import integrate
 
+#  A lot of this should be re-written / simplified
+#  using more up-to-date climlab APIs for coupling processes together
+#  Making sure that each subprocess properly declares inputs and diagnostics
 
-class EBM(EnergyBudget):
+#  For example, the basic EBM should be created with something like
+#  ebm = climlab.couple([asr,olr,diff])
+
+
+class EBM(TimeDependentProcess):
     """A parent class for all Energy-Balance-Model classes.
 
     This class sets up a typical EnergyBalance Model with following subprocesses:
 
     * Outgoing Longwave Radiation (OLR) parametrization through
-      :class:`~climlab.radiation.AplusBT.AplusBT`
+      :class:`~climlab.radiation.AplusBT`
+    * Absorbed Shortwave Radiation (ASR) through
+      :class:`~climlab.radiation.SimpleAbsorbedShortwave`
     * solar insolation paramtrization through
-      :class:`~climlab.radiation.insolation.P2Insolation`
+      :class:`~climlab.radiation.P2Insolation`
     * albedo parametrization in dependence of temperature through
-      :class:`~climlab.surface.albedo.StepFunctionAlbedo`
+      :class:`~climlab.surface.StepFunctionAlbedo`
     * energy diffusion through
-      :class:`~climlab.dynamics.diffusion.MeridionalDiffusion`
+      :class:`~climlab.dynamics.MeridionalHeatDiffusion`
 
     **Initialization parameters** \n
 
@@ -36,6 +123,9 @@ class EBM(EnergyBudget):
                                 :class:`~climlab.domain.domain.zonal_mean_surface`
                                                                             \n
                                 - default value: ``90``
+    :param int num_lon:         number of equally spaced points in longitude
+                                                                            \n
+                                - default value: ``None``
     :param float S0:            solar constant                              \n
                                 - unit: :math:`\\frac{\\textrm{W}}{\\textrm{m}^2}`   \n
                                 - default value: ``1365.2``
@@ -93,7 +183,7 @@ class EBM(EnergyBudget):
 
     **Object attributes** \n
 
-    Additional to the parent class :class:`~climlab.process.energy_budget.EnergyBudget`
+    Additional to the parent class :class:`~climlab.process.EnergyBudget`
     following object attributes are generated and updated during initialization:
 
     :ivar dict param:       The parameter dictionary is updated with a couple
@@ -136,7 +226,9 @@ class EBM(EnergyBudget):
     """
     def __init__(self,
                  num_lat=90,
+                 num_lon=None,
                  S0=const.S0,
+                 s2=-0.48,
                  A=210.,
                  B=2.,
                  D=0.555,  # in W / m^2 / degC, same as B
@@ -152,13 +244,14 @@ class EBM(EnergyBudget):
         # Check to see if an initial state is already provided
         #  If not, make one
         if 'state' not in kwargs:
-            state = surface_state(num_lat=num_lat, water_depth=water_depth,
-                                  T0=T0, T2=T2)
+            state = surface_state(num_lat=num_lat, num_lon=num_lon,
+                                  water_depth=water_depth, T0=T0, T2=T2)
             sfc = state.Ts.domain
             kwargs.update({'state': state, 'domains':{'sfc':sfc}})
         super(EBM, self).__init__(timestep=timestep, **kwargs)
         sfc = self.Ts.domain
         self.param['S0'] = S0
+        self.param['s2'] = s2
         self.param['A'] = A
         self.param['B'] = B
         self.param['D'] = D
@@ -168,48 +261,33 @@ class EBM(EnergyBudget):
         self.param['a2'] = a2
         self.param['ai'] = ai
         # create sub-models
-        self.add_subprocess('LW', AplusBT(state=self.state, **self.param))
-        self.add_subprocess('insolation',
-                            P2Insolation(domains=sfc, **self.param))
-        self.add_subprocess('albedo',
-                            albedo.StepFunctionAlbedo(state=self.state,
-                                                      **self.param))
-        # diffusivity in units of 1/s
-        K = self.param['D'] / self.domains['Ts'].heat_capacity
-        self.add_subprocess('diffusion', MeridionalDiffusion(state=self.state,
-                                                             K=K,
-                                                        use_banded_solver=True,
-                                                             **self.param))
+        lw = AplusBT(state=self.state, **self.param)
+        ins = P2Insolation(domains=sfc, **self.param)
+        alb = albedo.StepFunctionAlbedo(state=self.state, **self.param)
+        sw = SimpleAbsorbedShortwave(state=self.state,
+                                     insolation=ins.insolation,
+                                     albedo=alb.albedo,
+                                     **self.param)
+        diff = MeridionalHeatDiffusion(state=self.state, **self.param)
+        self.add_subprocess('LW', lw)
+        self.add_subprocess('insolation', ins)
+        self.add_subprocess('albedo', alb)
+        self.add_subprocess('SW', sw)
+        self.add_subprocess('diffusion', diff)
         self.topdown = False  # call subprocess compute methods first
-        self.add_diagnostic('ASR', 0.*self.Ts)
         self.add_diagnostic('net_radiation', 0.*self.Ts)
-        self.add_diagnostic('albedo', 0.*self.Ts)
-        self.add_diagnostic('icelat', None)
-        self.add_diagnostic('ice_area', None)
 
+    @property
+    def S0(self):
+        return self.subprocess['insolation'].S0
+    @S0.setter
+    def S0(self, value):
+        self.param['S0'] = value
+        self.subprocess['insolation'].S0 = value
 
-    def _compute_heating_rates(self):
-        """Computes energy flux convergences to get heating rates in :math:`W/m^2`
-
-        """
-        insolation = self.subprocess['insolation'].insolation
-        self.albedo = self.subprocess['albedo'].albedo
-        self.ASR = (1-self.albedo) * insolation
-        self.OLR = self.subprocess['LW'].OLR
-        self.net_radiation = self.ASR - self.OLR
-        #  The part of the heating due just to shortwave
-        #  (longwave part is computed in subprocess)
-        self.heating_rate['Ts'] = self.ASR
-        # useful diagnostics
-        #try:
-        #    self.icelat = self.subprocess['albedo'].subprocess['iceline'].icelat
-        #except KeyError, icelat:
-        #    self.icelat = None
-        #try:
-        #    self.ice_area = self.subprocess['albedo'].subprocess['iceline'].ice_area
-        #except KeyError, ice_area:
-        #    self.ice_area = None
-
+    def _compute(self):
+        self.net_radiation = self.subprocess['SW'].ASR - self.subprocess['LW'].OLR
+        return super(EBM, self)._compute()
 
     def global_mean_temperature(self):
         """Convenience method to compute global mean surface temperature.
@@ -258,19 +336,19 @@ class EBM(EnergyBudget):
         return (1E-15 * 2 * np.math.pi * const.a**2 *
                 integrate.cumtrapz(np.cos(phi)*energy_in, x=phi, initial=0.))
 
-    def heat_transport(self):
-        """Returns instantaneous heat transport in unit :math:`\\textrm{PW}`
-        on the staggered grid (bounds) through calling
-        :func:`diffusive_heat_transport`.
-
-        :Example:
-
-            .. plot:: code_input_manual/example_EBM_heat_transport.py
-                :include-source:
-
-        """
-        return self.diffusive_heat_transport()
-
+    # def heat_transport(self):
+    #     """Returns instantaneous heat transport in unit :math:`\\textrm{PW}`
+    #     on the staggered grid (bounds) through calling
+    #     :func:`diffusive_heat_transport`.
+    #
+    #     :Example:
+    #
+    #         .. plot:: code_input_manual/example_EBM_heat_transport.py
+    #             :include-source:
+    #
+    #     """
+    #     return self.diffusive_heat_transport()
+    #
     def diffusive_heat_transport(self):
         """Compute instantaneous diffusive heat transport in unit :math:`\\textrm{PW}`
         on the staggered grid (bounds) through calculating:
@@ -282,6 +360,8 @@ class EBM(EnergyBudget):
 
         :rtype: array of size ``np.size(self.lat_bounds)``
 
+        THIS IS DEPRECATED AND WILL BE REMOVED IN THE FUTURE. Use the diagnostic
+        ``heat_transport`` instead, which implements the same calculation.
         """
         phi = np.deg2rad(self.lat)
         phi_stag = np.deg2rad(self.lat_bounds)
@@ -292,29 +372,29 @@ class EBM(EnergyBudget):
         dTdphi = np.insert(dTdphi, 0, 0.)
         return (1E-15*-2*np.math.pi*np.cos(phi_stag)*const.a**2*D*dTdphi)
 
-    def heat_transport_convergence(self):
-        """Returns instantaneous convergence of heat transport.
-
-        .. math::
-
-            h(\\varphi) = - \\frac{1}{2 \pi R^2 cos(\\varphi)} \\frac{dH}{d\\varphi}
-                        \\approx - \\frac{1}{2 \pi R^2 cos(\\varphi)} \\frac{\Delta H}{\Delta \\varphi}
-
-        h is the *dynamical heating rate* in unit :math:`\\textrm{W}/ \\textrm{m}^2`
-        which is the convergence of energy transport into each latitude band,
-        namely the difference between what's coming in and what's going out.
-
-        :Example:
-
-            .. plot:: code_input_manual/example_EBM_heat_transport_convergence.py
-                :include-source:
-
-        """
-        phi = np.deg2rad(self.lat)
-        phi_stag = np.deg2rad(self.lat_bounds)
-        H = 1.E15*self.heat_transport()
-        return (-1./(2*np.math.pi*const.a**2*np.cos(phi)) *
-                np.diff(H)/np.diff(phi_stag))
+    # def heat_transport_convergence(self):
+    #     """Returns instantaneous convergence of heat transport.
+    #
+    #     .. math::
+    #
+    #         h(\\varphi) = - \\frac{1}{2 \pi R^2 cos(\\varphi)} \\frac{dH}{d\\varphi}
+    #                     \\approx - \\frac{1}{2 \pi R^2 cos(\\varphi)} \\frac{\Delta H}{\Delta \\varphi}
+    #
+    #     h is the *dynamical heating rate* in unit :math:`\\textrm{W}/ \\textrm{m}^2`
+    #     which is the convergence of energy transport into each latitude band,
+    #     namely the difference between what's coming in and what's going out.
+    #
+    #     :Example:
+    #
+    #         .. plot:: code_input_manual/example_EBM_heat_transport_convergence.py
+    #             :include-source:
+    #
+    #     """
+    #     phi = np.deg2rad(self.lat)
+    #     phi_stag = np.deg2rad(self.lat_bounds)
+    #     H = 1.E15*self.heat_transport()
+    #     return (-1./(2*np.math.pi*const.a**2*np.cos(phi)) *
+    #             np.diff(H)/np.diff(phi_stag))
 
 
 class EBM_seasonal(EBM):
@@ -322,10 +402,10 @@ class EBM_seasonal(EBM):
         """A class that implements Energy Balance Models with realistic
         daily insolation.
 
-        This class is inherited from the general :class:`~climlab.model.ebm.EBM`
+        This class is inherited from the general :class:`~climlab.EBM`
         class and uses the insolation subprocess
-        :class:`~climlab.radiation.insolation.DailyInsolation` instead of
-        :class:`~climlab.radiation.insolation.P2Insolation` to compute a
+        :class:`~climlab.radiation.DailyInsolation` instead of
+        :class:`~climlab.radiation.P2Insolation` to compute a
         realisitc distribution of solar radiation on a daily basis.
 
         If argument for ice albedo ``'ai'`` is not given, the model will not
@@ -378,24 +458,31 @@ class EBM_seasonal(EBM):
                 :include-source:
 
         """
+        if ai is None:
+            no_albedo_feedback = True
+            ai = 0. # ignored but need to set a number
+        else:
+            no_albedo_feedback = False
         super(EBM_seasonal, self).__init__(a0=a0, a2=a2, ai=ai, **kwargs)
-        sfc = self.domains['Ts']
-        self.add_subprocess('insolation',
-                            DailyInsolation(domains=sfc, **self.param))
         self.param['a0'] = a0
         self.param['a2'] = a2
-        if ai is None:
-            # No albedo feedback
+        sfc = self.domains['Ts']
+        ins = DailyInsolation(domains=sfc, **self.param)
+        if no_albedo_feedback:
             # Remove unused parameters here for clarity
             _ = self.param.pop('ai')
             _ = self.param.pop('Tf')
-            self.remove_diagnostic('icelat')
-            self.add_subprocess('albedo',
-                            albedo.P2Albedo(domains=sfc, **self.param))
+            alb = albedo.P2Albedo(domains=sfc, **self.param)
         else:
             self.param['ai'] = ai
-            self.add_subprocess('albedo',
-                    albedo.StepFunctionAlbedo(state=self.state, **self.param))
+            alb = albedo.StepFunctionAlbedo(state=self.state, **self.param)
+        sw = SimpleAbsorbedShortwave(state=self.state,
+                                     insolation=ins.insolation,
+                                     albedo=alb.albedo,
+                                     **self.param)
+        self.add_subprocess('insolation', ins)
+        self.add_subprocess('albedo', alb)
+        self.add_subprocess('SW', sw)
 
 
 class EBM_annual(EBM_seasonal):
@@ -405,12 +492,12 @@ class EBM_annual(EBM_seasonal):
         The annual solar distribution is calculated through averaging the
         :class:`~climlab.radiation.insolation.DailyInsolation` over time
         which has been used in used in the parent class
-        :class:`~climlab.model.ebm.EBM_seasonal`. That is done by the subprocess
-        :class:`~climlab.radiation.insolation.AnnualMeanInsolation` which is
-        more realistic than the :class:`~climlab.radiation.insolation.P2Insolation`
-        module used in the classical :class:`~climlab.model.ebm.EBM` class.
+        :class:`~climlab.EBM_seasonal`. That is done by the subprocess
+        :class:`~climlab.radiation.AnnualMeanInsolation` which is
+        more realistic than the :class:`~climlab.radiation.P2Insolation`
+        module used in the classical :class:`~climlab.EBM` class.
 
-        According to the parent class :class:`~climlab.model.ebm.EBM_seasonal`
+        According to the parent class :class:`~climlab.EBM_seasonal`
         the model will not have an ice-albedo feedback, if albedo ice parameter
         ``'ai'`` is not given. For details see there.
 
@@ -420,12 +507,12 @@ class EBM_annual(EBM_seasonal):
         Following object attributes are updated during initialization: \n
 
         :ivar dict subprocess:  suprocess ``'insolation'`` is overwritten by
-                                :class:`~climlab.radiation.insolation.AnnualMeanInsolation`
+                                :class:`~climlab.radiation.AnnualMeanInsolation`
 
         :Example:
 
-            The :class:`~climlab.model.ebm.EBM_annual` class uses a different
-            insolation subprocess than the :class:`~climlab.model.ebm.EBM` class::
+            The :class:`~climlab.EBM_annual` class uses a different
+            insolation subprocess than the :class:`~climlab.EBM` class::
 
                 >>> import climlab
                 >>> model_annual = climlab.EBM_annual()
@@ -439,17 +526,18 @@ class EBM_annual(EBM_seasonal):
                 State variables and domain shapes:
                   Ts: (90, 1)
                 The subprocess tree:
-                top: <class 'climlab.model.ebm.EBM_annual'>
-                   diffusion: <class 'climlab.dynamics.diffusion.MeridionalDiffusion'>
-                   LW: <class 'climlab.radiation.AplusBT.AplusBT'>
-                   albedo: <class 'climlab.surface.albedo.P2Albedo'>
-                   insolation: <class 'climlab.radiation.insolation.AnnualMeanInsolation'>
+                top: <class 'climlab.EBM_annual'>
+                   diffusion: <class 'climlab.dynamics.MeridionalHeatDiffusion'>
+                   LW: <class 'climlab.radiation.AplusBT'>
+                   albedo: <class 'climlab.surface.P2Albedo'>
+                   insolation: <class 'climlab.radiation.AnnualMeanInsolation'>
 
         """
         super(EBM_annual, self).__init__(**kwargs)
         sfc = self.domains['Ts']
-        self.add_subprocess('insolation',
-                            AnnualMeanInsolation(domains=sfc, **self.param))
+        ins = AnnualMeanInsolation(domains=sfc, **self.param)
+        self.add_subprocess('insolation', ins)
+        self.subprocess['SW'].insolation = ins.insolation
 
 # an EBM that computes degree-days has an additional state variable.
 #  Need to implement that

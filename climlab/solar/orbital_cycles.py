@@ -1,11 +1,15 @@
 from __future__ import division
+from __future__ import print_function
+from builtins import str
+from builtins import range
+from builtins import object
 import numpy as np
 from climlab import constants as const
 from climlab.solar.orbital import OrbitalTable
 from climlab.domain.field import global_mean
 
 
-class OrbitalCycles:
+class OrbitalCycles(object):
     def __init__(self,
                  model,
                  kyear_start=-20.,
@@ -141,14 +145,14 @@ class OrbitalCycles:
         self.orb_kyear = np.empty( self.num_segments )
 
         # Get orbital data table
-        orbtable = OrbitalTable()
+        #orbtable = OrbitalTable()
 
         for n in range(self.num_segments):
             if verbose:
                 print("-------------------------")
                 print("Segment " + str(n) + " out of " + str(self.num_segments) )
                 print( "Using orbital parameters from " + str(kyear_before_present) + " kyears before present." )
-            self.orb = orbtable.lookup_parameters(kyear_before_present)
+            self.orb = OrbitalTable.interp(kyear=kyear_before_present)
             #self.model.make_insolation_array( orb )
             self.model.subprocess['insolation'].orb = self.orb
             self.model.integrate_years(segment_length_years-1., verbose=False)

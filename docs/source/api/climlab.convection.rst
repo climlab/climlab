@@ -2,10 +2,12 @@ climlab.convection
 =============
 
 .. automodule:: climlab.convection
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   :members:
+   :private-members:
+   :undoc-members:
+   :show-inheritance:
 
 .. toctree::
 
-   climlab.convection.convadj
+    climlab.convection.convadj
+    climlab.convection.EmanuelConvection

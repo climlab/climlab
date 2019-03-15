@@ -1,7 +1,7 @@
-convadj
-------
+ConvectiveAdjustment
+--------------------
 
-.. inheritance-diagram:: climlab.convection.convadj
+.. inheritance-diagram:: climlab.convection.ConvectiveAdjustment
    :parts: 1
    :private-bases:
 

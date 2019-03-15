@@ -1,6 +1,9 @@
 '''
 climlab wrappers for the NCAR CAM3 radiation code
 
+Input arguments and diagnostics follow specifications in
+:class:`~climlab.radiation._Radiation`
+
     :Example:
 
         Here is a quick example of setting up a single-column
@@ -29,42 +32,34 @@ climlab wrappers for the NCAR CAM3 radiation code
 
 
 '''
-from __future__ import division
+from __future__ import division, print_function, absolute_import
 import numpy as np
 from climlab import constants as const
 from climlab.utils.thermo import vmr_to_mmr
 from climlab.radiation.radiation import _Radiation_SW, _Radiation_LW
-import os
-#  Wrapping these imports in try/except to avoid failures during documentation building on readthedocs
-try:
-    import _cam3
-except:
-    print 'Cannot import compiled Fortran extension, CAM3 module will not be functional.'
-try:
-    import netCDF4 as nc
-except:
-    print 'Cannot import netCDF4 interface. Will not be able to properly initialize the CAM3 module.'
+import os, warnings
+import xarray as xr
 
 
 def init_cam3(mod):
     # Initialise absorptivity / emissivity data
     here = os.path.dirname(__file__)
-    #datadir = os.path.abspath(os.path.join(here, os.pardir, 'data', 'cam3'))
     datadir = os.path.join(here, 'data')
     AbsEmsDataFile = os.path.join(datadir, 'abs_ems_factors_fastvx.c030508.nc')
     #  Open the absorption data file
-    data = nc.Dataset(AbsEmsDataFile)
-    #  The fortran module that holds the data
-    #mod = _cam3.absems
+    data = xr.open_dataset(AbsEmsDataFile)
     #  Populate storage arrays with values from netcdf file
     for field in ['ah2onw', 'eh2onw', 'ah2ow', 'ln_ah2ow', 'cn_ah2ow', 'ln_eh2ow', 'cn_eh2ow']:
-        setattr(mod, field, data.variables[field][:].T)
+        setattr(mod, field, data[field].transpose())
     data.close()
 
+#  Wrapping these imports in try/except to avoid failures during documentation building on readthedocs
 try:
+    from . import _cam3
     init_cam3(_cam3.absems)
 except:
-    print 'Cannot initialize the CAM3 module.'
+    warnings.warn('Cannot import and initialize compiled Fortran extension, CAM3 module will not be functional.')
+
 
 class CAM3(_Radiation_SW, _Radiation_LW):
     '''
@@ -197,26 +192,26 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         #  we compute everything from the up and downwelling fluxes
         #  Should probably simplify the fortran wrapper
         #  fluxes at layer interfaces
-        self.LW_flux_up = self._cam3_to_climlab(lwuflx)
-        self.LW_flux_down = self._cam3_to_climlab(lwdflx)
-        self.LW_flux_up_clr = self._cam3_to_climlab(lwuflxc)
-        self.LW_flux_down_clr = self._cam3_to_climlab(lwdflxc)
+        self.LW_flux_up = self._cam3_to_climlab(lwuflx) + 0.*self.LW_flux_up
+        self.LW_flux_down = self._cam3_to_climlab(lwdflx) + 0.*self.LW_flux_down
+        self.LW_flux_up_clr = self._cam3_to_climlab(lwuflxc) + 0.*self.LW_flux_up_clr
+        self.LW_flux_down_clr = self._cam3_to_climlab(lwdflxc) + 0.*self.LW_flux_down_clr
         #  fluxes at layer interfaces
-        self.SW_flux_up = self._cam3_to_climlab(swuflx)
-        self.SW_flux_down = self._cam3_to_climlab(swdflx)
-        self.SW_flux_up_clr = self._cam3_to_climlab(swuflxc)
-        self.SW_flux_down_clr = self._cam3_to_climlab(swdflxc)
+        self.SW_flux_up = self._cam3_to_climlab(swuflx) + 0.*self.SW_flux_up
+        self.SW_flux_down = self._cam3_to_climlab(swdflx) + 0.*self.SW_flux_down
+        self.SW_flux_up_clr = self._cam3_to_climlab(swuflxc) + 0.*self.SW_flux_up_clr
+        self.SW_flux_down_clr = self._cam3_to_climlab(swdflxc) + 0.*self.SW_flux_down_clr
         #  Compute quantities derived from fluxes
         self._compute_SW_flux_diagnostics()
         self._compute_LW_flux_diagnostics()
         #  calculate heating rates from flux divergence
         #   this is the total UPWARD flux
         total_flux = self.LW_flux_net - self.SW_flux_net
-        LWheating_Wm2 = np.diff(self.LW_flux_net, axis=-1)
-        LWheating_clr_Wm2 = np.diff(self.LW_flux_net_clr, axis=-1)
-        SWheating_Wm2 = -np.diff(self.SW_flux_net, axis=-1)
-        SWheating_clr_Wm2 = -np.diff(self.SW_flux_net_clr, axis=-1)
-        self.heating_rate['Ts'] = -total_flux[..., -1, np.newaxis]
+        LWheating_Wm2 = np.array(np.diff(self.LW_flux_net, axis=-1)) + 0.*self.Tatm
+        LWheating_clr_Wm2 = np.array(np.diff(self.LW_flux_net_clr, axis=-1)) + 0.*self.Tatm
+        SWheating_Wm2 = np.array(-np.diff(self.SW_flux_net, axis=-1)) + 0.*self.Tatm
+        SWheating_clr_Wm2 = np.array(-np.diff(self.SW_flux_net_clr, axis=-1)) + 0.*self.Tatm
+        self.heating_rate['Ts'] = np.array(-total_flux[..., -1, np.newaxis]) + 0.*self.Ts
         self.heating_rate['Tatm'] = LWheating_Wm2 + SWheating_Wm2
         #  Convert to K / day
         Catm = self.Tatm.domain.heat_capacity

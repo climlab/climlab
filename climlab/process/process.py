@@ -63,12 +63,15 @@
 #         - anything in the `input` dictionary of `subprocname` will remain fixed
 #==============================================================================
 
-from __future__ import division
+from __future__ import division, print_function
+from builtins import object
 import time, copy
 import numpy as np
 from climlab.domain.field import Field
 from climlab.domain.domain import _Domain, zonal_mean_surface
-from climlab.utils import walk, attr_dict
+from climlab.utils import walk
+from attrdict import AttrDict
+from climlab.domain.xarray import state_to_xarray
 
 
 def _make_dict(arg, argtype):
@@ -108,6 +111,8 @@ class Process(object):
     :param int num_levels:
                         number of altitudinal points (optional)
     :param dict input:  collection of input quantities
+    :param bool verbose: Flag to control text output during instantiation
+                         of the Process [default: True]
 
     **Object attributes** \n
 
@@ -132,15 +137,18 @@ class Process(object):
     def __str__(self):
         str1 = 'climlab Process of type {0}. \n'.format(type(self))
         str1 += 'State variables and domain shapes: \n'
-        for varname in self.state.keys():
+        for varname in list(self.state.keys()):
             str1 += '  {0}: {1} \n'.format(varname, self.domains[varname].shape)
         str1 += 'The subprocess tree: \n'
-        str1 += walk.process_tree(self)
+        str1 += walk.process_tree(self, name=self.name)
         return str1
 
-    def __init__(self, state=None, domains=None, subprocess=None,
+    def __init__(self, name='Untitled', state=None, domains=None, subprocess=None,
                  lat=None, lev=None, num_lat=None, num_levels=None,
-                 input=None, **kwargs):
+                 input=None, verbose=True, **kwargs):
+        # verbose flag used to control text output at process creation time
+        self.verbose = verbose
+        self.name = name
         # dictionary of domains. Keys are the domain names
         self.domains = _make_dict(domains, _Domain)
         #  If lat is given, create a simple domains
@@ -148,18 +156,14 @@ class Process(object):
             sfc = zonal_mean_surface()
             self.domains.update({'default': sfc})
         # dictionary of state variables (all of type Field)
-        self.state = attr_dict.AttrDict()
+        self.state = AttrDict()
         states = _make_dict(state, Field)
-        for name, value in states.iteritems():
+        for name, value in states.items():
             self.set_state(name, value)
-        #convert int dtype to float
-            if np.issubdtype(self.state[name].dtype, 'int'):
-                value = self.state[name].astype(float)
-                self.set_state(name, value)
         # dictionary of model parameters
         self.param = kwargs
         # dictionary of diagnostic quantities
-        #self.diagnostics = attr_dict.AttrDict()
+        #self.diagnostics = AttrDict()
         #self._diag_vars = frozenset()
         self._diag_vars = []
         # dictionary of input quantities
@@ -168,19 +172,19 @@ class Process(object):
             #self._input_vars = frozenset()
             self._input_vars = []
         else:
-            self.add_input(input.keys())
+            self.add_input(list(input.keys()))
             for name, var in input:
                 self.__dict__[name] = var
         self.creation_date = time.strftime("%a, %d %b %Y %H:%M:%S %z",
                                            time.localtime())
         # subprocess is a dictionary of any sub-processes
-        self.subprocess = attr_dict.AttrDict()
+        self.subprocess = AttrDict()
         if subprocess is not None:
             self.add_subprocesses(subprocess)
         #if subprocess is None:
         #    #self.subprocess = {}
         #    # a dictionary whose items can be accessed as attributes
-        #    self.subprocess = attr_dict.AttrDict()
+        #    self.subprocess = AttrDict()
         #else:
         #    self.add_subprocesses(subprocess)
 
@@ -196,9 +200,13 @@ class Process(object):
 
         """
         if isinstance(procdict, Process):
-            self.add_subprocess('default', procdict)
+            try:
+                name = procdict.name
+            except:
+                name = 'default'
+            self.add_subprocess(name, procdict)
         else:
-            for name, proc in procdict.iteritems():
+            for name, proc in procdict.items():
                 self.add_subprocess(name, proc)
 
     def add_subprocess(self, name, proc):
@@ -266,9 +274,10 @@ class Process(object):
             self.has_process_type_list = False
             # Add subprocess diagnostics to parent
             #  (if there are no name conflicts)
-            for diagname, value in proc.diagnostics.iteritems():
-                if not (diagname in self.diagnostics or hasattr(self, diagname)):
-                    self.add_diagnostic(diagname, value)
+            for diagname, value in proc.diagnostics.items():
+                #if not (diagname in self.diagnostics or hasattr(self, diagname)):
+                #    self.add_diagnostic(diagname, value)
+                self.add_diagnostic(diagname, value)
         else:
             raise ValueError('subprocess must be Process object')
 
@@ -317,7 +326,7 @@ class Process(object):
             self.subprocess.pop(name)
         except KeyError:
             if verbose:
-                print 'WARNING: {} not found in subprocess dictionary.'.format(name)
+                print('WARNING: {} not found in subprocess dictionary.'.format(name))
         self.has_process_type_list = False
 
     def set_state(self, name, value):
@@ -370,16 +379,16 @@ class Process(object):
                 raise ValueError('Shape mismatch between existing domain and new state variable.')
         # set the state dictionary
         self.state[name] = value
-        for name, value in self.state.iteritems():
+        for name, value in self.state.items():
         #convert int dtype to float
-            if np.issubdtype(self.state[name].dtype, 'int'):
+            if np.issubdtype(self.state[name].dtype, np.dtype('int').type):
                 value = self.state[name].astype(float)
                 self.state[name]=value
-        setattr(self, name, value)
+        self.__setattr__(name, value)
 
     def _guess_state_domains(self):
-        for name, value in self.state.iteritems():
-            for domname, dom in self.domains.iteritems():
+        for name, value in self.state.items():
+            for domname, dom in self.domains.items():
                 if value.shape == dom.shape:
                     # same shape, assume it's the right domain
                     self.state_domain[name] = dom
@@ -438,8 +447,8 @@ class Process(object):
         Quantity is accessible in two ways:
 
             * as a process attribute, i.e. ``proc.name``
-            * as a member of the diagnostics dictionary,
-              i.e. ``proc.diagnostics['name']``
+            * as a member of the input dictionary,
+              i.e. ``proc.input['name']``
 
         Use attribute method to set values, e.g.
         ```proc.name = value ```
@@ -491,7 +500,87 @@ class Process(object):
             delattr(self, name)
             self._diag_vars.remove(name)
         except:
-            print 'No diagnostic named {} was found.'.format(name)
+            print('No diagnostic named {} was found.'.format(name))
+
+    def to_xarray(self, diagnostics=False):
+        """ Convert process variables to ``xarray.Dataset`` format.
+
+        With ``diagnostics=True``, both state and diagnostic variables are included.
+
+        Otherwise just the state variables are included.
+
+        Returns an ``xarray.Dataset`` object with all spatial axes,
+        including 'bounds' axes indicating cell boundaries in each spatial dimension.
+
+        :Example:
+
+            Create a single column radiation model and view as ``xarray`` object::
+
+                >>> import climlab
+                >>> state = climlab.column_state(num_lev=20)
+                >>> model = climlab.radiation.RRTMG(state=state)
+
+                >>> # display model state as xarray:
+                >>> model.to_xarray()
+                <xarray.Dataset>
+                Dimensions:       (depth: 1, depth_bounds: 2, lev: 20, lev_bounds: 21)
+                Coordinates:
+                  * depth         (depth) float64 0.5
+                  * depth_bounds  (depth_bounds) float64 0.0 1.0
+                  * lev           (lev) float64 25.0 75.0 125.0 175.0 225.0 275.0 325.0 ...
+                  * lev_bounds    (lev_bounds) float64 0.0 50.0 100.0 150.0 200.0 250.0 ...
+                Data variables:
+                    Ts            (depth) float64 288.0
+                    Tatm          (lev) float64 200.0 204.1 208.2 212.3 216.4 220.5 224.6 ...
+
+                >>> # take a single timestep to populate the diagnostic variables
+                >>> model.step_forward()
+                >>> # Now look at the full output in xarray format
+                >>> model.to_xarray(diagnostics=True)
+                <xarray.Dataset>
+                Dimensions:           (depth: 1, depth_bounds: 2, lev: 20, lev_bounds: 21)
+                Coordinates:
+                  * depth             (depth) float64 0.5
+                  * depth_bounds      (depth_bounds) float64 0.0 1.0
+                  * lev               (lev) float64 25.0 75.0 125.0 175.0 225.0 275.0 325.0 ...
+                  * lev_bounds        (lev_bounds) float64 0.0 50.0 100.0 150.0 200.0 250.0 ...
+                Data variables:
+                    Ts                (depth) float64 288.7
+                    Tatm              (lev) float64 201.3 204.0 208.0 212.0 216.1 220.2 ...
+                    ASR               (depth) float64 240.0
+                    ASRcld            (depth) float64 0.0
+                    ASRclr            (depth) float64 240.0
+                    LW_flux_down      (lev_bounds) float64 0.0 12.63 19.47 26.07 32.92 40.1 ...
+                    LW_flux_down_clr  (lev_bounds) float64 0.0 12.63 19.47 26.07 32.92 40.1 ...
+                    LW_flux_net       (lev_bounds) float64 240.1 231.2 227.6 224.1 220.5 ...
+                    LW_flux_net_clr   (lev_bounds) float64 240.1 231.2 227.6 224.1 220.5 ...
+                    LW_flux_up        (lev_bounds) float64 240.1 243.9 247.1 250.2 253.4 ...
+                    LW_flux_up_clr    (lev_bounds) float64 240.1 243.9 247.1 250.2 253.4 ...
+                    LW_sfc            (depth) float64 128.9
+                    LW_sfc_clr        (depth) float64 128.9
+                    OLR               (depth) float64 240.1
+                    OLRcld            (depth) float64 0.0
+                    OLRclr            (depth) float64 240.1
+                    SW_flux_down      (lev_bounds) float64 341.3 323.1 318.0 313.5 309.5 ...
+                    SW_flux_down_clr  (lev_bounds) float64 341.3 323.1 318.0 313.5 309.5 ...
+                    SW_flux_net       (lev_bounds) float64 240.0 223.3 220.2 217.9 215.9 ...
+                    SW_flux_net_clr   (lev_bounds) float64 240.0 223.3 220.2 217.9 215.9 ...
+                    SW_flux_up        (lev_bounds) float64 101.3 99.88 97.77 95.64 93.57 ...
+                    SW_flux_up_clr    (lev_bounds) float64 101.3 99.88 97.77 95.64 93.57 ...
+                    SW_sfc            (depth) float64 163.8
+                    SW_sfc_clr        (depth) float64 163.8
+                    TdotLW            (lev) float64 -1.502 -0.6148 -0.5813 -0.6173 -0.6426 ...
+                    TdotLW_clr        (lev) float64 -1.502 -0.6148 -0.5813 -0.6173 -0.6426 ...
+                    TdotSW            (lev) float64 2.821 0.5123 0.3936 0.3368 0.3174 0.3299 ...
+                    TdotSW_clr        (lev) float64 2.821 0.5123 0.3936 0.3368 0.3174 0.3299 ...
+
+        """
+        if diagnostics:
+            dic = self.state.copy()
+            dic.update(self.diagnostics)
+            return state_to_xarray(dic)
+        else:
+            return state_to_xarray(self.state)
 
     @property
     def diagnostics(self):
@@ -500,8 +589,15 @@ class Process(object):
         :type:      dict
 
         """
-        return { key:getattr(self,key) for key in dir(self)
-                if key in self._diag_vars }
+        diag_dict = {}
+        for key in self._diag_vars:
+            try:
+                #diag_dict[key] = getattr(self,key)
+                #  using self.__dict__ doesn't count diagnostics defined as properties
+                diag_dict[key] = self.__dict__[key]
+            except:
+                pass
+        return diag_dict
     @property
     def input(self):
         """Dictionary access to all input variables
@@ -512,10 +608,13 @@ class Process(object):
         :type:      dict
 
         """
-        return { key:getattr(self,key) for key in dir(self)
-                 if key in self._input_vars }
-        #return { key:value for key, value in self.__dict__.items()
-        #         if key in self._input_vars }
+        input_dict = {}
+        for key in self._input_vars:
+            try:
+                input_dict[key] = getattr(self,key)
+            except:
+                pass
+        return input_dict
 
     # Some handy shortcuts... only really make sense when there is only
     # a single axis of that type in the process.
@@ -531,7 +630,7 @@ class Process(object):
 
         """
         try:
-            for domname, dom in self.domains.iteritems():
+            for domname, dom in self.domains.items():
                 try:
                     thislat = dom.axes['lat'].points
                 except:
@@ -551,7 +650,7 @@ class Process(object):
 
         """
         try:
-            for domname, dom in self.domains.iteritems():
+            for domname, dom in self.domains.items():
                 try:
                     thislat = dom.axes['lat'].bounds
                 except:
@@ -571,7 +670,7 @@ class Process(object):
 
         """
         try:
-            for domname, dom in self.domains.iteritems():
+            for domname, dom in self.domains.items():
                 try:
                     thislon = dom.axes['lon'].points
                 except:
@@ -591,7 +690,7 @@ class Process(object):
 
         """
         try:
-            for domname, dom in self.domains.iteritems():
+            for domname, dom in self.domains.items():
                 try:
                     thislon = dom.axes['lon'].bounds
                 except:
@@ -611,7 +710,7 @@ class Process(object):
 
         """
         try:
-            for domname, dom in self.domains.iteritems():
+            for domname, dom in self.domains.items():
                 try:
                     thislev = dom.axes['lev'].points
                 except:
@@ -631,7 +730,7 @@ class Process(object):
 
         """
         try:
-            for domname, dom in self.domains.iteritems():
+            for domname, dom in self.domains.items():
                 try:
                     thislev = dom.axes['lev'].bounds
                 except:
@@ -651,7 +750,7 @@ class Process(object):
 
         """
         try:
-            for domname, dom in self.domains.iteritems():
+            for domname, dom in self.domains.items():
                 try:
                     thisdepth = dom.axes['depth'].points
                 except:
@@ -671,7 +770,7 @@ class Process(object):
 
         """
         try:
-            for domname, dom in self.domains.iteritems():
+            for domname, dom in self.domains.items():
                 try:
                     thisdepth = dom.axes['depth'].bounds
                 except:
@@ -750,7 +849,7 @@ def get_axes(process_or_domain):
         return dom.axes
     elif isinstance(dom, dict):
         axes = {}
-        for thisdom in dom.values():
+        for thisdom in list(dom.values()):
             assert isinstance(thisdom, _Domain)
             axes.update(thisdom.axes)
         return axes
