@@ -60,6 +60,23 @@ def test_multidim():
     rad.step_forward()
     assert rad.OLR.shape == rad.Ts.shape
 
+
+@pytest.mark.compiled
+@pytest.mark.fast
+def test_time_invariant_insolation():
+    num_lat = 4
+    num_lev = 10
+    day_of_year = 80.
+    lat = np.linspace(-90., 90., num_lat)
+    state = climlab.column_state(num_lev=num_lev, lat=lat)
+    insolation = climlab.solar.insolation.daily_insolation(lat=lat,
+                                                           day=day_of_year)
+    rad = climlab.radiation.RRTMG(name='Radiation', state=state,
+                                  insolation=insolation)
+    rad.step_forward()
+    assert rad.coszen.shape == rad.Ts.shape
+
+
 @pytest.mark.compiled
 @pytest.mark.fast
 def test_cloud():
