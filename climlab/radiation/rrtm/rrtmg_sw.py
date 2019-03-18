@@ -147,7 +147,12 @@ class RRTMG_SW(_Radiation_SW):
         aldir = _climlab_to_rrtm_sfc(self.aldir * np.ones_like(self.Ts))
         asdif = _climlab_to_rrtm_sfc(self.asdif * np.ones_like(self.Ts))
         asdir = _climlab_to_rrtm_sfc(self.asdir * np.ones_like(self.Ts))
-        coszen = _climlab_to_rrtm_sfc(self.coszen * np.ones_like(self.Ts))
+        try:
+            coszen = _climlab_to_rrtm_sfc(self.coszen * np.ones_like(self.Ts))
+        except:
+            coszen = _climlab_to_rrtm_sfc(
+                self.coszen.expand_dims('x', axis=-1) * np.ones_like(self.Ts)
+            )
         #  These arrays have an extra dimension for number of bands
         # in-cloud optical depth [nbndsw,ncol,nlay]
         tauc = _climlab_to_rrtm(self.tauc * np.ones_like(self.Tatm))
