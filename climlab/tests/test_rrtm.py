@@ -71,8 +71,12 @@ def test_time_invariant_insolation():
     state = climlab.column_state(num_lev=num_lev, lat=lat)
     insolation = climlab.solar.insolation.daily_insolation(lat=lat,
                                                            day=day_of_year)
+    try:
+        insol_vals = insolation.values
+    except AttributeError:
+        insol_vals = insolation
     rad = climlab.radiation.RRTMG(name='Radiation', state=state,
-                                  insolation=insolation.values)
+                                  insolation=insol_vals)
     rad.step_forward()
 
 
