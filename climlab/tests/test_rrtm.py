@@ -72,9 +72,8 @@ def test_time_invariant_insolation():
     insolation = climlab.solar.insolation.daily_insolation(lat=lat,
                                                            day=day_of_year)
     rad = climlab.radiation.RRTMG(name='Radiation', state=state,
-                                  insolation=insolation)
+                                  insolation=insolation.values)
     rad.step_forward()
-    assert rad.coszen.shape == rad.Ts.shape
 
 
 @pytest.mark.compiled

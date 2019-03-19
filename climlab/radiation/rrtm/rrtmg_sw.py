@@ -147,7 +147,6 @@ class RRTMG_SW(_Radiation_SW):
         aldir = _climlab_to_rrtm_sfc(self.aldir * np.ones_like(self.Ts))
         asdif = _climlab_to_rrtm_sfc(self.asdif * np.ones_like(self.Ts))
         asdir = _climlab_to_rrtm_sfc(self.asdir * np.ones_like(self.Ts))
-        # coszen = _climlab_to_rrtm_sfc(self.coszen * np.ones_like(self.Ts))
         coszen = _climlab_to_rrtm_sfc(np.expand_dims(self.coszen, -1) *
                                       np.ones_like(self.Ts))
 
