@@ -98,7 +98,8 @@ class EmanuelConvection(TimeDependentProcess):
     Diagnostics computed:
 
         - CBMF (cloud base mass flux in kg/m2/s) -- this is actually stored internally and used as input for subsequent timesteps
-        - precipitation (convective precipitation rate in m/s)
+        - precipitation (convective precipitation rate in m/s or kg/m2/s)
+        - relative_humidity (dimensionless)
 
         :Example:
 
@@ -169,11 +170,17 @@ class EmanuelConvection(TimeDependentProcess):
         super(EmanuelConvection, self).__init__(**kwargs)
         self.time_type = 'explicit'
         #  Define inputs and diagnostics
-        #surface_shape = self.Tatm[...,0].shape
-        #  For some strange reason self.Tatm is breaking tests under Python 3.5 in some configurations
         surface_shape = self.state['Tatm'][...,0].shape
-        self.add_diagnostic('CBMF', np.zeros(surface_shape))  # cloud base mass flux
-        self.add_diagnostic('precipitation', np.atleast_1d(np.zeros(surface_shape))) # Precip rate (mm/day)
+        #  Hack to handle single column and multicolumn
+        if surface_shape is ():
+            init = np.atleast_1d(np.zeros(surface_shape))
+            self.multidim=False
+        else:
+            init = np.zeros(surface_shape)[...,np.newaxis]
+            self.multidim=True
+        self.add_diagnostic('CBMF', init*0.)  # cloud base mass flux
+        self.add_diagnostic('precipitation', init*0.) # Precip rate (m/s)
+        self.add_diagnostic('relative_humidity', 0*self.Tatm)
         self.add_input('MINORIG', MINORIG)
         self.add_input('ELCRIT', ELCRIT)
         self.add_input('TLCRIT', TLCRIT)
@@ -237,6 +244,11 @@ class EmanuelConvection(TimeDependentProcess):
             tendencies['V'] = _convect_to_climlab(FV) * np.ones_like(self.state['V'])
         self.CBMF = CBMFnew
         #  Need to convert from mm/day to m/s
-        self.precipitation[:] = _convect_to_climlab(PRECIP)*1E-3/const.seconds_per_day
+        #  Hack to handle single column and multicolumn
+        if self.multidim:
+            self.precipitation[:,0] = _convect_to_climlab(PRECIP)*1E-3/const.seconds_per_day
+        else:
+            self.precipitation[:] = _convect_to_climlab(PRECIP)*1E-3/const.seconds_per_day
         self.IFLAG = IFLAG
+        self.relative_humidity[:] = self.q / qsat(self.Tatm,self.lev)
         return tendencies
