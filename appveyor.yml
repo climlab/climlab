@@ -30,10 +30,9 @@ install:
   - "conda env create --file ./ci/requirements-%CONDA_ENV%.yml"
   - "activate test_env"
   - "conda list"
-  - "python setup.py install"
-  - "python xarray/util/print_versions.py"
+  - "python -m pip install . --no-deps -vv"
 
 build: false
 
 test_script:
-  - "py.test xarray --verbose"
+  - "pytest climlab --verbose"
