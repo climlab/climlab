@@ -50,7 +50,7 @@ class LatentHeatFlux(SurfaceFlux):
     def __init__(self, Cd=3E-3, **kwargs):
         super(LatentHeatFlux, self).__init__(Cd=Cd, **kwargs)
         self.add_diagnostic('LHF', 0.*self.Ts)
-        self.add_diagnostic('evaporation', 0.*self.Ts)
+        self.add_diagnostic('evaporation', 0.*self.Ts)  # in kg/m2/s or mm/s
 
     def _compute_flux(self):
         #  specific humidity at lowest model level
@@ -62,9 +62,9 @@ class LatentHeatFlux(SurfaceFlux):
         rho = self._air_density(Ta)
         #  flux from bulk formula
         self._flux = self.resistance * const.Lhvap * rho * self.Cd * self.U * Deltaq
-        self.LHF = self._flux
-        # evporation rate, convert from W/m2 to m/s
-        self.evaporation = self.LHF/const.Lhvap/const.rho_w
+        self.LHF[:] = self._flux
+        # evporation rate, convert from W/m2 to kg/m2/s (or mm/s)
+        self.evaporation[:] = self.LHF/const.Lhvap
 
     def _compute(self):
         '''Overides the _compute method of EnergyBudget'''
