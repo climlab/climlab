@@ -143,16 +143,27 @@ def default_absorbers(Tatm,
         ozonedata = xr.open_dataset(ozonefilepath)
         ##  zonal and time average
         ozone_zon = ozonedata.OZONE.mean(dim=('time','lon')).transpose('lat','lev')
-        weight = np.cos(np.deg2rad(ozonedata.lat))
-        ozone_global = (ozone_zon * weight).mean(dim='lat') / weight.mean(dim='lat')
+        if ('lat' in xTatm.dims):
+            O3source = ozone_zon
+        else:
+            weight = np.cos(np.deg2rad(ozonedata.lat))
+            ozone_global = (ozone_zon * weight).mean(dim='lat') / weight.mean(dim='lat')
+            O3source = ozone_global
         try:
-            if ('lat' in xTatm.dims):
-                O3 = ozone_zon.interp_like(xTatm)
-            else:
-                O3 = ozone_global.interp_like(xTatm)
+            O3 = O3source.interp_like(xTatm)
+            # There will be NaNs for gridpoints outside the ozone file domain
+            assert not np.any(np.isnan(O3))
         except:
-            print('Interpolation of ozone data failed.')
-            print('Setting O3 to zero instead.')
+            warnings.warn('Some grid points are beyond the bounds of the ozone file. Ozone values will be extrapolated.',
+                        FutureWarning, stacklevel=2)
+            try:
+                # passing fill_value=None to the underlying scipy interpolator
+                # will result in extrapolation instead of NaNs
+                O3 = O3source.interp_like(xTatm, kwargs={'fill_value':None})
+                assert not np.any(np.isnan(O3))
+            except:
+                warnings.warn('Interpolation of ozone data failed. Setting O3 to zero instead.')
+                O3 = 0. * xTatm
     absorber_vmr['O3'] = O3.values
     return absorber_vmr
 
