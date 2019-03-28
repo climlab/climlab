@@ -179,3 +179,13 @@ def test_fixed_insolation():
     ins_array = insolation.values
     rad = climlab.radiation.RRTMG(name='Radiation', state=state, insolation=ins_array)
     rad.step_forward()
+
+@pytest.mark.compiled
+@pytest.mark.fast
+def test_large_grid():
+    num_lev = 50; num_lat=90
+    state = climlab.column_state(num_lev=num_lev, num_lat=num_lat, water_depth=10.)
+    rad1 = climlab.radiation.CAM3(state=state)
+    rad1.step_forward()
+    rad2 = climlab.radiation.RRTMG(state=state)
+    rad2.step_forward()
