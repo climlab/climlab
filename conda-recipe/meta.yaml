@@ -2,7 +2,7 @@
 {% set version = "0.8.0.dev0" %}
 
 package:
-  name: {{ name|lower }}
+  name: climlab
   version: {{ version }}
 
 source:
@@ -19,7 +19,7 @@ requirements:
   host:
     - flang  # [win and py3k]
     - python
-    - setuptools
+    - pip
     - numpy
   run:
     - python

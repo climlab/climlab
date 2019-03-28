@@ -4,7 +4,7 @@ import warnings
 from climlab import constants as const
 from climlab.radiation.radiation import _Radiation_LW
 from .utils import _prepare_general_arguments
-from .utils import _climlab_to_rrtm, _climlab_to_rrtm_sfc, _rrtm_to_climlab
+from .utils import _climlab_to_rrtm, _rrtm_to_climlab
 # These values will get overridden by reading from Fortran extension
 nbndlw = 1; ngptlw = 1;
 try:

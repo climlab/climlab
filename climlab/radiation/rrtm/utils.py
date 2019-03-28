@@ -11,7 +11,7 @@ def _prepare_general_arguments(RRTMGobject):
     play = _climlab_to_rrtm(RRTMGobject.lev * np.ones_like(tlay))
     plev = _climlab_to_rrtm(RRTMGobject.lev_bounds * np.ones_like(tlev))
     ncol, nlay = tlay.shape
-    tsfc = _climlab_to_rrtm_sfc(RRTMGobject.Ts)
+    tsfc = _climlab_to_rrtm_sfc(RRTMGobject.Ts, RRTMGobject.Ts)
     # GASES -- put them in proper dimensions and units
     vapor_mixing_ratio = mmr_to_vmr(RRTMGobject.specific_humidity, gas='H2O')
     h2ovmr   = _climlab_to_rrtm(vapor_mixing_ratio * np.ones_like(RRTMGobject.Tatm))
@@ -100,10 +100,8 @@ def _rrtm_to_climlab(field):
             raise ValueError('field must be array_like or scalar.')
     return np.squeeze(field)
 
-def _climlab_to_rrtm_sfc(field):
-    if len(field.shape)==1:
-        return field  #  single column
-    elif len(field.shape)==2:
-        return np.squeeze(field)  # should handle case with num_lat > 1
-    else:
-        raise ValueError('Mix up with dimensions of surface field')
+def _climlab_to_rrtm_sfc(field, Ts):
+    '''Return an array of size np.squeeze(Ts) to remove the singleton depth dimension'''
+    fieldsqueeze = np.squeeze(field)
+    Tsqueeze = np.squeeze(Ts)
+    return fieldsqueeze * np.ones_like(Tsqueeze)

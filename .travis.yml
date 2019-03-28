@@ -1,41 +1,63 @@
 # Based on http://conda.pydata.org/docs/travis.html
-language: python
-#sudo: false # use container based build
+language: minimal
+
+sudo: false
+
 notifications:
   email: false
-dist: xenial
 
 matrix:
   fast_finish: true
 
-python:
-  - 2.7
-  - 3.5
-  - 3.6
-  - 3.7
+matrix:
+  fast_finish: true
+  include:
+  - name: linux_2.7
+    env: PY=2.7
+    os: linux
+  - name: linux_3.6
+    env: PY=3.6
+    os: linux
+  - name: linux_3.7
+    env: PY=3.7
+    os: linux
+  - name: osx_2.7
+    env: PY=2.7
+    os: osx
+  - name: osx_3.6
+    env: PY=3.6
+    os: osx
+  - name: osx_3.7
+    env: PY=3.7
+    os: osx
 
 env:
   - CONDA_PACKAGES="codecov pytest"
 
 before_install:
-  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" ]]; then
-      wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh;
-    else
-      wget http://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+  - |
+    if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+      URL="https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh"
+    elif [ "$TRAVIS_OS_NAME" == "linux" ] ; then
+      URL="https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh"
     fi
-  - bash miniconda.sh -b -p $HOME/miniconda
-  - export PATH="$HOME/miniconda/bin:$PATH"
-  - hash -r
+    wget $URL -O miniconda.sh
+    bash miniconda.sh -b -p $HOME/miniconda
+    export PATH="$HOME/miniconda/bin:$PATH"
 
 install:
   - |
-      echo ""
-      echo "Configuring conda."
-      conda config --set always_yes yes --set changeps1 no
-      conda config --add channels conda-forge
-      conda update -q conda
-      conda install conda-build
-      conda info -a
+    echo ""
+    echo "Configuring conda."
+    conda config --set always_yes yes --set changeps1 no --set show_channel_urls true
+    conda config --add channels conda-forge --force
+    conda config --add channels defaults --force
+    conda update conda --quiet
+    conda install pycryptosat conda-build
+    conda config --set sat_solver pycryptosat
+    conda config --set safety_checks disabled
+    conda config --set channel_priority strict
+    conda info --all
 
 script:
   - conda-build conda-recipe
