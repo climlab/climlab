@@ -154,8 +154,7 @@ def default_absorbers(Tatm,
             # There will be NaNs for gridpoints outside the ozone file domain
             assert not np.any(np.isnan(O3))
         except:
-            warnings.warn('Some grid points are beyond the bounds of the ozone file. Ozone values will be extrapolated.',
-                        FutureWarning, stacklevel=2)
+            warnings.warn('Some grid points are beyond the bounds of the ozone file. Ozone values will be extrapolated.')
             try:
                 # passing fill_value=None to the underlying scipy interpolator
                 # will result in extrapolation instead of NaNs
