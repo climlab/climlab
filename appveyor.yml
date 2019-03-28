@@ -35,4 +35,4 @@ install:
 build: false
 
 test_script:
-  - "pytest climlab --verbose"
+  - "pytest --pyargs climlab.tests --verbose"
