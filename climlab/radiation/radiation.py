@@ -137,10 +137,22 @@ def default_absorbers(Tatm,
     if ozone_file is not None:
         datadir = os.path.join(os.path.dirname(__file__), 'data', 'ozone')
         ozonefilepath = os.path.join(datadir, ozone_file)
-        #  Open the ozone data file
-        if verbose:
-            print('Getting ozone data from', ozonefilepath)
-        ozonedata = xr.open_dataset(ozonefilepath)
+        try:
+            ozonedata = xr.open_dataset(ozonefilepath)
+            if verbose:
+                print('Getting ozone data from', ozonefilepath)
+        except FileNotFoundError:
+            # try accessing from remote. If successful, save for later
+            threddspath = 'http://thredds.atmos.albany.edu:8080/thredds/dodsC/CLIMLAB/ozone/'
+            path = os.path.join(threddspath, ozone_file)
+            ozonedata = xr.open_dataset(path)
+            if verbose:
+                print('Getting ozone data from', path)
+                print('Attempting to save the data file locally for future use.')
+            try:
+                ozonedata.to_netcdf(ozonefilepath)
+            except:
+                warnings.warn('Attempt to save the ozone data to {} failed.'.format(datadir))
         ##  zonal and time average
         ozone_zon = ozonedata.OZONE.mean(dim=('time','lon')).transpose('lat','lev')
         if ('lat' in xTatm.dims):
