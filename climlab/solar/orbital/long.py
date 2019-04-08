@@ -28,6 +28,10 @@ def _get_Laskar_data():
     # add 180 degrees to long_peri (see lambda definition, Berger 1978 Appendix)
     longorbit['long_peri'] += 180.
     longorbit['precession'] = longorbit.ecc*np.sin(np.deg2rad(longorbit.long_peri))
+    longorbit.attrs['Description'] = 'The Laskar et al. (2004) orbital data table'
+    longorbit.attrs['Citation'] = 'https://doi.org/10.1051/0004-6361:20041335'
+    longorbit.attrs['Source'] = [base_url + past_file, base_url + future_file]
+    longorbit.attrs['Note'] = 'Longitude of perihelion is defined to be 0 degrees at Northern Vernal Equinox. This differs by 180 degrees from the source files.'
     return longorbit
 
 OrbitalTable = _get_Laskar_data()
