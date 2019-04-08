@@ -10,10 +10,10 @@ def _get_Laskar_data():
     print('Accessing Laskar et al. (2004) orbital data from ' + base_url)
     longorbit = {}
     xlongorbit = {}
-    longorbit['past'] = pd.read_table(base_url + past_file,
+    longorbit['past'] = pd.read_csv(base_url + past_file,
                             delim_whitespace=True, header=None, index_col=0,
                              names=['kyear','ecc','obliquity','long_peri'])
-    longorbit['future'] = pd.read_table(base_url + future_file,
+    longorbit['future'] = pd.read_csv(base_url + future_file,
                             delim_whitespace=True, header=None, index_col=0,
                             skiprows=1, # first row is kyear=0, redundant
                             names=['kyear','ecc','obliquity','long_peri'])
