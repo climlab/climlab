@@ -15,13 +15,13 @@ def _get_Berger_data():
         local_path = os.path.dirname(__file__)
         path = os.path.join(local_path, orbit91_file)
         # The first column of the data file is used as the row index, and represents kyr from present
-        orbit91_pd = pd.read_table(path, delim_whitespace=True, skiprows=1)
+        orbit91_pd = pd.read_csv(path, delim_whitespace=True, skiprows=1)
         print('Loaded Berger and Loutre (1991) orbital parameter data from file ' + path)
     except:
         print('Failed to load orbital data locally, trying to access it from NCDC archive.')
         try:
             path = os.path.join(orbit91_url, orbit91_file)
-            orbit91_pd = pd.read_table(path, delim_whitespace=True, skiprows=1)
+            orbit91_pd = pd.read_csv(path, delim_whitespace=True, skiprows=1)
             print('Accessed Berger and Loutre (1991) orbital data from ' + base_url)
         except:
             raise Exception('Failed to load the Berger and Loutre (1991) orbital data.')
