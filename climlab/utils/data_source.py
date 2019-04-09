@@ -10,6 +10,41 @@ def load_data_source(local_path,
                open_method,
                open_method_kwargs=dict(),
                verbose=True):
+    '''Flexible data retreiver to download and cache the data files locally.
+
+    Usage:
+    ```
+    from climlab.utils.data_source import load_data_source
+    from xarray import open_dataset
+    ozonename = 'apeozone_cam3_5_54.nc'
+    ozonepath = 'http://thredds.atmos.albany.edu:8080/thredds/fileServer/CLIMLAB/ozone/' + ozonename
+    data, path = load_data_source(local_path=ozonename,
+                                  remote_source_list=[ozonepath],
+                                  open_method=open_dataset)
+    print(data)
+    ```
+    (this makes a local copy of the ozone data file)
+
+    The order of operations is
+
+    1. Try to read the data directly from ``local_path``
+    2. If the file doesn't exist then iterate through ``remote_source_list``.
+       Try to download and save the file to ``local_path`` using http request
+       If that works then open the data from ``local_path``.
+    3. As a last resort, try to read the data remotely from URLs in ``remote_source_list``
+
+    In all cases the file is opened and read by the user-supplied ``open_method``,
+    e.g. xarray.open_dataset()
+
+    Additional keyword arguments in ``open_method_kwargs`` are passed to ``open_method``.
+
+    Quiet all output by passing ``verbose=False``.
+
+    Returns:
+
+    - ``data`` is the data object returned by the successful call to ``open_method``
+    - ``path`` is the path that resulted in a successful call to ``open_method``.
+    '''
     try:
         path = local_path
         data = open_method(path, **open_method_kwargs)
