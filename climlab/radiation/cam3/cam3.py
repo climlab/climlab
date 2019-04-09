@@ -49,7 +49,7 @@ def init_cam3(mod):
     datadir = os.path.join(here, 'data')
     local_path = os.path.join(datadir, filename)
     remotepath = 'http://thredds.atmos.albany.edu:8080/thredds/fileServer/CLIMLAB/absorptivity/' + filename
-    data, path = load_data_source(local_path=datadir,
+    data, path = load_data_source(local_path=local_path,
                             remote_source_list=[remotepath],
                             open_method=xr.open_dataset,
                             verbose=True,)

@@ -4,8 +4,10 @@
 *.so
 *.so.dSYM
 
-# Data file (no longer kept under version control)
+# Data files (no longer kept under version control)
 *.nc
+*.ASC
+*.dat
 
 *.DS_Store
 

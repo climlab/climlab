@@ -11,10 +11,6 @@ filenames = {'past': 'INSOLN.LA2004.BTL.ASC',
              'future': 'INSOLP.LA2004.BTL.ASC'}
 
 def _get_Laskar_data(verbose=True):
-    #base_url = 'http://vo.imcce.fr/insola/earth/online/earth/La2004/'
-    #past_file = 'INSOLN.LA2004.BTL.ASC'
-    #future_file = 'INSOLP.LA2004.BTL.ASC'
-    #print('Accessing Laskar et al. (2004) orbital data from ' + base_url)
     longorbit = {}
     sources = {}
     pandas_kwargs = {'delim_whitespace':True,
@@ -22,7 +18,7 @@ def _get_Laskar_data(verbose=True):
                      'index_col':0,
                      'names':['kyear','ecc','obliquity','long_peri'],}
     for time in filenames:
-        local_path = os.path.join(os.path.dirname(__file__), filenames[time])
+        local_path = os.path.join(os.path.dirname(__file__), "data", filenames[time])
         remote_path = base_url + filenames[time]
         if time is 'future':
             pandas_kwargs['skiprows'] = 1 # first row is kyear=0, redundant
@@ -32,18 +28,7 @@ def _get_Laskar_data(verbose=True):
                 open_method_kwargs=pandas_kwargs,
                 verbose=verbose)
         sources[time] = path
-    #
     xlongorbit = {}
-    #
-    #
-    #
-    # longorbit['past'] = pd.read_csv(base_url + past_file,
-    #                         delim_whitespace=True, header=None, index_col=0,
-    #                          names=['kyear','ecc','obliquity','long_peri'])
-    # longorbit['future'] = pd.read_csv(base_url + future_file,
-    #                         delim_whitespace=True, header=None, index_col=0,
-    #                         skiprows=1, # first row is kyear=0, redundant
-    #                         names=['kyear','ecc','obliquity','long_peri'])
     for time in ['past', 'future']:
         # Cannot convert to float until we replace the D notation with E for floating point numbers
         longorbit[time].replace(to_replace='D', value='E', regex=True, inplace=True)

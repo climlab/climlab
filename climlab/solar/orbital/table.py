@@ -8,8 +8,8 @@ from climlab.utils.data_source import load_data_source
 #  Two possible sources for the Berger and Loutre 1991 data table
 NCDCpath = "https://www1.ncdc.noaa.gov/pub/data/paleo/climate_forcing/orbital_variations/insolation/orbit91"
 threddspath = "http://thredds.atmos.albany.edu:8080/thredds/fileServer/CLIMLAB/orbital/orbit91"
-#  This gives the full local path to the data file, assuming it's in the same directory
-local_path = os.path.join(os.path.dirname(__file__), "orbit91")
+#  This gives the full local path to the data file
+local_path = os.path.join(os.path.dirname(__file__), "data", "orbit91.dat")
 
 def _get_Berger_data(verbose=True):
     '''Read in the Berger and Loutre orbital table as a pandas dataframe, convert to xarray
