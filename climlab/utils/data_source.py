@@ -8,7 +8,7 @@ except ImportError:
 def load_data_source(local_path,
                remote_source_list,
                open_method,
-               open_method_kwargs=None,
+               open_method_kwargs=dict(),
                verbose=True):
     try:
         path = local_path
