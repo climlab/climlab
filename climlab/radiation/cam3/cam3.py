@@ -37,21 +37,25 @@ import numpy as np
 from climlab import constants as const
 from climlab.utils.thermo import vmr_to_mmr
 from climlab.radiation.radiation import _Radiation_SW, _Radiation_LW
+from climlab.utils.data_source import load_data_source
 import os, warnings
 import xarray as xr
 
 
 def init_cam3(mod):
     # Initialise absorptivity / emissivity data
+    filename = 'abs_ems_factors_fastvx.c030508.nc'
     here = os.path.dirname(__file__)
     datadir = os.path.join(here, 'data')
-    AbsEmsDataFile = os.path.join(datadir, 'abs_ems_factors_fastvx.c030508.nc')
-    #  Open the absorption data file
-    data = xr.open_dataset(AbsEmsDataFile)
+    local_path = os.path.join(datadir, filename)
+    remotepath = 'http://thredds.atmos.albany.edu:8080/thredds/fileServer/CLIMLAB/ozone/' + filename
+    data, path = load_data_source(local_path=datadir,
+                            remote_source_list=[remotepath],
+                            open_method=xr.open_dataset,
+                            verbose=True,)
     #  Populate storage arrays with values from netcdf file
     for field in ['ah2onw', 'eh2onw', 'ah2ow', 'ln_ah2ow', 'cn_ah2ow', 'ln_eh2ow', 'cn_eh2ow']:
         setattr(mod, field, data[field].transpose())
-    data.close()
 
 #  Wrapping these imports in try/except to avoid failures during documentation building on readthedocs
 try:
