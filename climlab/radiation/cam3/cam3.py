@@ -48,7 +48,7 @@ def init_cam3(mod):
     here = os.path.dirname(__file__)
     datadir = os.path.join(here, 'data')
     local_path = os.path.join(datadir, filename)
-    remotepath = 'http://thredds.atmos.albany.edu:8080/thredds/fileServer/CLIMLAB/ozone/' + filename
+    remotepath = 'http://thredds.atmos.albany.edu:8080/thredds/fileServer/CLIMLAB/absorptivity/' + filename
     data, path = load_data_source(local_path=datadir,
                             remote_source_list=[remotepath],
                             open_method=xr.open_dataset,
