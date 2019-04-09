@@ -11,7 +11,6 @@ include .f2py_f2cmap
 include climlab/radiation/cam3/.f2py_f2cmap
 include climlab/radiation/rrtm/_rrtmg_lw/.f2py_f2cmap
 include climlab/radiation/rrtm/_rrtmg_sw/.f2py_f2cmap
-recursive-include climlab *.nc
 recursive-include climlab *.pyf
 recursive-include climlab *.sh
 recursive-include climlab *.f90
