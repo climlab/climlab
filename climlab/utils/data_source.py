@@ -56,21 +56,25 @@ def load_data_source(local_path,
         for source in remote_source_list:
             try:
                 response = _download_and_cache(source, local_path)
-                #urlretrieve(source, local_path)
-                path = local_path
-                data = open_method(path, **open_method_kwargs)
+                data = open_method(local_path, **open_method_kwargs)
                 if verbose:
                     print('Data retrieved from {} and saved locally.'.format(source))
                 break
             except Exception:
-                pass
+                continue
         else:
             # as a final resort, try opening the source remotely
             for source in remote_source_list:
                 path = source
-                data = open_method(path, **open_method_kwargs)
-                if verbose:
-                    print('Opened data remotely from {}'.format(source))
+                try:
+                    data = open_method(path, **open_method_kwargs)
+                    if verbose:
+                        print('Opened data remotely from {}'.format(source))
+                    break
+                except Exception:
+                    continue
+            else:
+                raise Exception('All data access methods have failed.')
     finally:
         return data, path
 
@@ -78,7 +82,8 @@ def _download_and_cache(source, local_path):
     import urllib3
     connection_pool = urllib3.PoolManager()
     resp = connection_pool.request('GET', source)
-    f = open(local_path, 'wb')
-    f.write(resp.data)
-    f.close()
+    if resp.status == 200:  # successful http request
+        f = open(local_path, 'wb')
+        f.write(resp.data)
+        f.close()
     return resp

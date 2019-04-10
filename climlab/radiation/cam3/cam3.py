@@ -62,7 +62,7 @@ def init_cam3(mod):
 try:
     from . import _cam3
     init_cam3(_cam3.absems)
-except:
+except Exception:
     warnings.warn('Cannot import and initialize compiled Fortran extension, CAM3 module will not be functional.')
 
 
