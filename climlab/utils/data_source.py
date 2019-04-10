@@ -55,7 +55,7 @@ def load_data_source(local_path,
         #  First try to load from remote sources and cache the file locally
         for source in remote_source_list:
             try:
-                _download_and_cache(source, local_path)
+                response = _download_and_cache(source, local_path)
                 #urlretrieve(source, local_path)
                 path = local_path
                 data = open_method(path, **open_method_kwargs)
