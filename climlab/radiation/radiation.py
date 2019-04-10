@@ -133,9 +133,10 @@ def default_absorbers(Tatm,
     O3 = 0. * xTatm
     if ozone_file is not None:
         ozonefilepath = os.path.join(os.path.dirname(__file__), 'data', 'ozone', ozone_file)
-        remotepath = 'http://thredds.atmos.albany.edu:8080/thredds/fileServer/CLIMLAB/ozone/' + ozone_file
+        remotepath_http = 'http://thredds.atmos.albany.edu:8080/thredds/fileServer/CLIMLAB/ozone/' + ozone_file
+        remotepath_opendap = 'http://thredds.atmos.albany.edu:8080/thredds/dodsC/CLIMLAB/ozone/' + ozone_file
         ozonedata, path = load_data_source(local_path=ozonefilepath,
-                                     remote_source_list=[remotepath],
+                                     remote_source_list=[remotepath_http, remotepath_opendap],
                                      open_method=xr.open_dataset,
                                      verbose=verbose,)
         ##  zonal and time average

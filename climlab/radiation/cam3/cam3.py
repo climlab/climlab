@@ -48,9 +48,10 @@ def init_cam3(mod):
     here = os.path.dirname(__file__)
     datadir = os.path.join(here, 'data')
     local_path = os.path.join(datadir, filename)
-    remotepath = 'http://thredds.atmos.albany.edu:8080/thredds/fileServer/CLIMLAB/absorptivity/' + filename
+    remotepath_http = 'http://thredds.atmos.albany.edu:8080/thredds/fileServer/CLIMLAB/absorptivity/' + filename
+    remotepath_opendap = 'http://thredds.atmos.albany.edu:8080/thredds/dodsC/CLIMLAB/absorptivity/' + filename
     data, path = load_data_source(local_path=local_path,
-                            remote_source_list=[remotepath],
+                            remote_source_list=[remotepath_http, remotepath_opendap],
                             open_method=xr.open_dataset,
                             verbose=True,)
     #  Populate storage arrays with values from netcdf file
