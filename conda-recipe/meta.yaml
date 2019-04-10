@@ -26,7 +26,7 @@ requirements:
     - libflang  # [win and py3k]
     - scipy
     - netcdf4
-    - urllib
+    - urllib3
     - xarray
     - future
     - attrdict

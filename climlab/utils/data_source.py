@@ -1,8 +1,9 @@
 from __future__ import division, print_function
-try:
-    from urllib.request import urlretrieve  # Python 3
-except ImportError:
-    from urllib import urlretrieve  # Python 2
+# try:
+#     from urllib.request import urlretrieve  # Python 3
+# except ImportError:
+#     from urllib import urlretrieve  # Python 2
+
 
 
 def load_data_source(local_path,
@@ -54,7 +55,8 @@ def load_data_source(local_path,
         #  First try to load from remote sources and cache the file locally
         for source in remote_source_list:
             try:
-                urlretrieve(source, local_path)
+                _download_and_cache(source, local_path)
+                #urlretrieve(source, local_path)
                 path = local_path
                 data = open_method(path, **open_method_kwargs)
                 if verbose:
@@ -71,3 +73,12 @@ def load_data_source(local_path,
                     print('Opened data remotely from {}'.format(source))
     finally:
         return data, path
+
+def _download_and_cache(source, local_path):
+    import urllib3
+    connection_pool = urllib3.PoolManager()
+    resp = connection_pool.request('GET', source)
+    f = open(local_path, 'wb')
+    f.write(resp.data)
+    f.close()
+    return resp
