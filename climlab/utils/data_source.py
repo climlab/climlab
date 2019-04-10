@@ -46,37 +46,41 @@ def load_data_source(local_path,
     - ``data`` is the data object returned by the successful call to ``open_method``
     - ``path`` is the path that resulted in a successful call to ``open_method``.
     '''
-    try:
-        path = local_path
-        data = open_method(path, **open_method_kwargs)
-        if verbose:
-            print('Opened data from {}'.format(path))
-    except FileNotFoundError:
-        #  First try to load from remote sources and cache the file locally
-        for source in remote_source_list:
-            try:
-                response = _download_and_cache(source, local_path)
-                data = open_method(local_path, **open_method_kwargs)
-                if verbose:
-                    print('Data retrieved from {} and saved locally.'.format(source))
-                break
-            except Exception:
-                continue
-        else:
-            # as a final resort, try opening the source remotely
-            for source in remote_source_list:
-                path = source
-                try:
-                    data = open_method(path, **open_method_kwargs)
-                    if verbose:
-                        print('Opened data remotely from {}'.format(source))
-                    break
-                except Exception:
-                    continue
-            else:
-                raise Exception('All data access methods have failed.')
-    finally:
-        return data, path
+    #  TEMP: forget download-and-cache, just read remotely using last time in remote list
+    path = remote_source_list[-1]
+    data = open_method(path, **open_method_kwargs)
+    return data, path
+    # try:
+    #     path = local_path
+    #     data = open_method(path, **open_method_kwargs)
+    #     if verbose:
+    #         print('Opened data from {}'.format(path))
+    # except FileNotFoundError:
+    #     #  First try to load from remote sources and cache the file locally
+    #     for source in remote_source_list:
+    #         try:
+    #             response = _download_and_cache(source, local_path)
+    #             data = open_method(local_path, **open_method_kwargs)
+    #             if verbose:
+    #                 print('Data retrieved from {} and saved locally.'.format(source))
+    #             break
+    #         except Exception:
+    #             continue
+    #     else:
+    #         # as a final resort, try opening the source remotely
+    #         for source in remote_source_list:
+    #             path = source
+    #             try:
+    #                 data = open_method(path, **open_method_kwargs)
+    #                 if verbose:
+    #                     print('Opened data remotely from {}'.format(source))
+    #                 break
+    #             except Exception:
+    #                 continue
+    #         else:
+    #             raise Exception('All data access methods have failed.')
+    # finally:
+    #     return data, path
 
 def _download_and_cache(source, local_path):
     import urllib3
