@@ -122,16 +122,27 @@ These are handled automatically if you install with conda_.
 
 Required
 ~~~~~~~~~~~~
-- Python 2.7, 3.5, 3.6, 3.7 (as of version 0.7.1)
-- ``numpy``
-- ``scipy``
-- ``xarray``
-- ``attrdict``
+- Python 2.7, 3.6, 3.7
+- numpy
+- scipy
+- xarray
+- future
+- attrdict
+
 
 Recommended for full functionality
 ~~~~~~~~~~~~
-- ``numba`` (used for acceleration of some components)
-- ``pytest`` (to run the automated tests, important if you are developing new code)
+- numba >=0.43.1 (used for acceleration of some components)
+
+*Note that there is a bug in previous numba versions that caused a hanging condition in climlab under Python 3.*
+
+
+Complete development environment
+~~~~~~~~~~~~
+To build from source and develop new code you will need some additional pieces:
+- pip
+- gfortran (OSX or linux) or flang (Windows)
+- pytest (to run the automated tests, important if you are developing new code)
 
 `Anaconda Python`_ is highly recommended and will provide everything you need.
 See "Installing pre-built binaries with conda" above.
