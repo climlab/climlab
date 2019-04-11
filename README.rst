@@ -139,7 +139,8 @@ Recommended for full functionality
 
 Complete development environment
 ~~~~~~~~~~~~
-To build from source and develop new code you will need some additional pieces:
+To build from source and develop new code you will need some additional pieces
+
 - pip
 - gfortran (OSX or linux) or flang (Windows)
 - pytest (to run the automated tests, important if you are developing new code)
