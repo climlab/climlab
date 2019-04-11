@@ -28,7 +28,7 @@ requirements:
     - xarray
     - future
     - attrdict
-    - numba  
+    - numba >=0.43.1
 
 test:
   requires:
