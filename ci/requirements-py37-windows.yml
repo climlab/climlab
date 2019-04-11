@@ -12,3 +12,4 @@ dependencies:
   - flang
   - future
   - attrdict
+  - numba

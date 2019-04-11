@@ -1,4 +1,4 @@
-{% set version = "0.7.2.dev2" %}
+{% set version = "0.7.2.dev3" %}
 
 package:
   name: climlab
@@ -28,7 +28,7 @@ requirements:
     - xarray
     - future
     - attrdict
-    - numba  # [py2k]
+    - numba  
 
 test:
   requires:
