@@ -12,4 +12,3 @@ dependencies:
   - flang
   - future
   - attrdict
-  - numba >=0.43.1
