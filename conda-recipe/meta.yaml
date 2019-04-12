@@ -30,7 +30,6 @@ requirements:
     - xarray
     - future
     - attrdict
-    - numba  # [py2k]
 
 test:
   requires:
