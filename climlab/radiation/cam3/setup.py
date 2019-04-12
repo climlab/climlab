@@ -27,6 +27,7 @@ def configuration(parent_package='', top_path=None):
         build = False
 
     config = Configuration(package_name='cam3', parent_name=parent_package, top_path=top_path)
+    config.add_data_files(join('data', 'README'))
     if build:
         config.add_extension(name='_cam3',
                          sources=[cam3_gen_source],

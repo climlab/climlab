@@ -8,6 +8,7 @@ def configuration(parent_package='',top_path=None):
     config = Configuration('radiation', parent_package, top_path)
     config.add_subpackage('rrtm')
     config.add_subpackage('cam3')
+    config.add_data_files(os.path.join('data','ozone','README'))
     return config
 
 if __name__ == '__main__':

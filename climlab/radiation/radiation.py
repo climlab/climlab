@@ -138,7 +138,7 @@ def default_absorbers(Tatm,
         ozonedata, path = load_data_source(local_path=ozonefilepath,
                                      remote_source_list=[remotepath_http, remotepath_opendap],
                                      open_method=xr.open_dataset,
-                                     open_method_kwargs={'engine':'pydap'},
+                                     remote_kwargs={'engine':'pydap'},
                                      verbose=verbose,)
         ##  zonal and time average
         ozone_zon = ozonedata.OZONE.mean(dim=('time','lon')).transpose('lat','lev')

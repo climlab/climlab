@@ -5,6 +5,7 @@ def load_data_source(local_path,
                remote_source_list,
                open_method,
                open_method_kwargs=dict(),
+               remote_kwargs=dict(),
                verbose=True):
     '''Flexible data retreiver to download and cache the data files locally.
 
@@ -34,6 +35,8 @@ def load_data_source(local_path,
 
     Additional keyword arguments in ``open_method_kwargs`` are passed to ``open_method``.
 
+    Additional keyword arguments in ``remote_kwargs`` are only passed to ``open_method`` in option 3 above (remote access, e.g. through OpenDAP)
+
     Quiet all output by passing ``verbose=False``.
 
     Returns:
@@ -62,7 +65,7 @@ def load_data_source(local_path,
             for source in remote_source_list:
                 path = source
                 try:
-                    data = open_method(path, **open_method_kwargs)
+                    data = open_method(path, **open_method_kwargs, **remote_kwargs)
                     if verbose:
                         print('Opened data remotely from {}'.format(source))
                     break

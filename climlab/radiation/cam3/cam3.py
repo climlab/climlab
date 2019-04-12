@@ -53,7 +53,7 @@ def init_cam3(mod):
     data, path = load_data_source(local_path=local_path,
                             remote_source_list=[remotepath_http, remotepath_opendap],
                             open_method=xr.open_dataset,
-                            open_method_kwargs={'engine':'pydap'},
+                            remote_kwargs={'engine':'pydap'},
                             verbose=True,)
     #  Populate storage arrays with values from netcdf file
     for field in ['ah2onw', 'eh2onw', 'ah2ow', 'ln_ah2ow', 'cn_ah2ow', 'ln_eh2ow', 'cn_eh2ow']:
