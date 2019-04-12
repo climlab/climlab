@@ -54,7 +54,7 @@ def init_cam3(mod):
                             remote_source_list=[remotepath_http, remotepath_opendap],
                             open_method=xr.open_dataset,
                             remote_kwargs={'engine':'pydap'},
-                            verbose=True,)
+                            verbose=False,)
     #  Populate storage arrays with values from netcdf file
     for field in ['ah2onw', 'eh2onw', 'ah2ow', 'ln_ah2ow', 'cn_ah2ow', 'ln_eh2ow', 'cn_eh2ow']:
         setattr(mod, field, data[field].transpose())

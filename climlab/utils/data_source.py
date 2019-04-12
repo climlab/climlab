@@ -9,18 +9,21 @@ def load_data_source(local_path,
                verbose=True):
     '''Flexible data retreiver to download and cache the data files locally.
 
-    Usage:
-    ```
-    from climlab.utils.data_source import load_data_source
-    from xarray import open_dataset
-    ozonename = 'apeozone_cam3_5_54.nc'
-    ozonepath = 'http://thredds.atmos.albany.edu:8080/thredds/fileServer/CLIMLAB/ozone/' + ozonename
-    data, path = load_data_source(local_path=ozonename,
-                                  remote_source_list=[ozonepath],
-                                  open_method=open_dataset)
-    print(data)
-    ```
-    (this makes a local copy of the ozone data file)
+    Usage example (this makes a local copy of the ozone data file):
+
+    :Example:
+
+        .. code-block:: python
+
+            from climlab.utils.data_source import load_data_source
+            from xarray import open_dataset
+            ozonename = 'apeozone_cam3_5_54.nc'
+            ozonepath = 'http://thredds.atmos.albany.edu:8080/thredds/fileServer/CLIMLAB/ozone/' + ozonename
+            data, path = load_data_source(local_path=ozonename,
+                                          remote_source_list=[ozonepath],
+                                          open_method=open_dataset)
+            print(data)
+
 
     The order of operations is
 
@@ -30,12 +33,14 @@ def load_data_source(local_path,
        If that works then open the data from ``local_path``.
     3. As a last resort, try to read the data remotely from URLs in ``remote_source_list``
 
-    In all cases the file is opened and read by the user-supplied ``open_method``,
-    e.g. xarray.open_dataset()
+    In all cases the file is opened and read by the user-supplied ``open_method``
+    (e.g. ``xarray.open_dataset``), with additional keyword arguments supplied
+    as a dictionary through ``open_method_kwargs``.
+    These are passed straight through to ``open_method``.
 
-    Additional keyword arguments in ``open_method_kwargs`` are passed to ``open_method``.
-
-    Additional keyword arguments in ``remote_kwargs`` are only passed to ``open_method`` in option 3 above (remote access, e.g. through OpenDAP)
+    Additional keyword arguments in ``remote_kwargs``
+    are only passed to ``open_method`` in option 3 above
+    (remote access, e.g. through OpenDAP)
 
     Quiet all output by passing ``verbose=False``.
 
