@@ -109,6 +109,7 @@ class EmanuelConvection(TimeDependentProcess):
             This example also demonstrates *asynchronous coupling*:
             the radiation uses a longer timestep than the other model components::
 
+                import numpy as np
                 import climlab
                 from climlab import constants as const
                 # Temperatures in a single column

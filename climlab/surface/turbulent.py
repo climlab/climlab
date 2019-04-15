@@ -2,8 +2,8 @@
 
 :class:`~climlab.surface.SensibleHeatFlux` and
 :class:`~climlab.surface.LatentHeatFlux` implement standard bulk formulae
-for the turbulent heat fluxes, assuming that the heating occurs in the lowest
-atmospheric model level.
+for the turbulent heat fluxes, assuming that the heating or moistening
+occurs in the lowest atmospheric model level.
 
         :Example:
 
@@ -14,6 +14,7 @@ atmospheric model level.
             This example also demonstrates *asynchronous coupling*:
             the radiation uses a longer timestep than the other model components::
 
+                import numpy as np
                 import climlab
                 from climlab import constants as const
                 # Temperatures in a single column
@@ -91,7 +92,8 @@ class SensibleHeatFlux(_SurfaceFlux):
 
     .. math::
 
-        F_{sens} &= r ~ c_p ~\rho ~ C_D ~ U \left( T_s - T_a \right)
+        SH = r ~ c_p ~\rho ~ C_D ~ U \left( T_s - T_a \right)
+
 
     where:
 
@@ -135,7 +137,8 @@ class LatentHeatFlux(_SurfaceFlux):
 
     .. math::
 
-        F_{sens} &= r ~ L ~\rho ~ C_D ~ U \left( q_s - q_a \right)
+        LH = r ~ L ~\rho ~ C_D ~ U \left( q_s - q_a \right)
+
 
     where:
 
@@ -168,7 +171,7 @@ class LatentHeatFlux(_SurfaceFlux):
     humidity tendency (i.e. the latent heat flux is applied in the same way
     as a sensible heat flux).
 
-    This process does not keep track of the surface water budget. 
+    This process does not keep track of the surface water budget.
     '''
     def __init__(self, Cd=3E-3, **kwargs):
         super(LatentHeatFlux, self).__init__(Cd=Cd, **kwargs)
