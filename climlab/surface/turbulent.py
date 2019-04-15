@@ -67,7 +67,7 @@ class _SurfaceFlux(EnergyBudget):
     def __init__(self, Cd=3E-3, resistance=1., **kwargs):
         super(_SurfaceFlux, self).__init__(**kwargs)
         self.Cd = Cd
-        self.resistance = resistance
+        self.add_input('resistance', resistance)
         self.heating_rate['Tatm'] = np.zeros_like(self.Tatm)
         #  fixed wind speed (for now)
         self.add_input('U', 5. * np.ones_like(self.Ts))
