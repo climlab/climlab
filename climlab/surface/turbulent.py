@@ -100,8 +100,7 @@ class SensibleHeatFlux(_SurfaceFlux):
     - :math:`c_p` and :math:`\rho` are the specific heat and density of air
     - :math:`C_D` is a drag coefficient (stored as ``self.Cd``, default value is 3E-3)
     - :math:`U` is the near-surface wind speed, stored as ``self.U``, default value is 5 m/s
-    - :math:`r` is an optional resistance parameter (stored as ``self.resistance``,
-    default value = 1)
+    - :math:`r` is an optional resistance parameter (stored as ``self.resistance``, default value = 1)
 
     The surface temperature :math:`T_s` is taken directly from ``self.state['Ts']``,
     while the near-surface air temperature :math:`T_a` is taken as the lowest model
@@ -145,8 +144,7 @@ class LatentHeatFlux(_SurfaceFlux):
     - :math:`L` and :math:`\rho` are the latent heat of vaporization and density of air
     - :math:`C_D` is a drag coefficient (stored as ``self.Cd``, default value is 3E-3)
     - :math:`U` is the near-surface wind speed, stored as ``self.U``, default value is 5 m/s
-    - :math:`r` is an optional resistance parameter (stored as ``self.resistance``,
-    default value = 1)
+    - :math:`r` is an optional resistance parameter (stored as ``self.resistance``, default value = 1)
 
     The surface specific humidity :math:`q_s` is computed as the saturation specific
     humidity at the surface temperature ``self.state['Ts']`` and surface pressure
@@ -161,17 +159,11 @@ class LatentHeatFlux(_SurfaceFlux):
     How the tendencies are computed depends on whether specific humidity ``q``
     is a state variable (i.e. is present in ``self.state``):
 
-    - If ``q`` is in ``self.state`` then the evaporation determines the
-    specific humidity tendency ``self.tendencies['q']``. The water vapor is
-    added to the lowest model level only. Evaporation cools the surface
-    throught the surface tendency ``self.tendencies['Ts']``. Air temperature
-    tendencies are zero everywhere.
-    - If ``q`` is not in ``self.state`` then we compute an equivalent air
-    temperature tendency for the lowest model layer instead of a specific
-    humidity tendency (i.e. the latent heat flux is applied in the same way
-    as a sensible heat flux).
+    - If ``q`` is in ``self.state`` then the evaporation determines the specific humidity tendency ``self.tendencies['q']``. The water vapor is added to the lowest model level only. Evaporation cools the surface through the surface tendency ``self.tendencies['Ts']``. Air temperature tendencies are zero everywhere.
+    - If ``q`` is not in ``self.state`` then we compute an equivalent air temperature tendency for the lowest model layer instead of a specific humidity tendency (i.e. the latent heat flux is applied in the same way as a sensible heat flux).
 
-    This process does not keep track of the surface water budget.
+    This process does not apply a tendency to the surface water amount.
+    In the absence of other water processes this implies an infinite water source at the surface (slab ocean).
     '''
     def __init__(self, Cd=3E-3, **kwargs):
         super(LatentHeatFlux, self).__init__(Cd=Cd, **kwargs)
