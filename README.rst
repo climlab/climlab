@@ -166,6 +166,16 @@ These are self-describing, and should all run out-of-the-box once the package is
 Release history
 ----------------------
 
+Version 0.7.2 (released April 2019)
+    Improvements to surface flux processes, a new data management strategy, and improved documentation.
+
+    Details:
+      - ``climlab.surface.LatentHeatFlux`` and ``climlab.surface.SensibleHeatFlux`` are now documented, more consistent with the climlab API, and have new optional ``resistance`` parameters to reduce the fluxes (e.g. for modeling stomatal resistance)
+      - ``climlab.surface.LatentHeatFlux`` now produces the diagnostic ``evaporation`` in kg/m2/s. ``climlab.convection.EmanuelConvection`` produces ``precipitation`` in the same units.
+      - The previous ``PRECIP`` diagnostic (mm/day) in ``climlab.convection.EmanuelConvection`` is removed. This is a BREAKING CHANGE.
+      - Data files have been removed from the climlab source repository. All data is now accessible remotely. climlab will attempt to download and cache data files upon first use.
+      - ``climlab.convection.ConvectiveAdjustement`` is now accelerated with ``numba`` if it is available (optional)
+
 Version 0.7.1 (released January 2019)
     Deeper xarray integration, include one breaking change to ``climlab.solar.orbital.OrbitalTable``, Python 3.7 compatibility, and minor enhancements.
 
