@@ -6,5 +6,5 @@ echo compiler=mingw32 >> "%CFG%"
 echo [build_ext] >> "%CFG%"
 echo compiler=mingw32 >> "%CFG%"
 
-"%PYTHON%" setup.py install --single-version-externally-managed --record=record.txt
+"%PYTHON%" -m pip install . --no-deps -vv
 if errorlevel 1 exit 1

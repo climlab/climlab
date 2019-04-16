@@ -98,7 +98,8 @@ class EmanuelConvection(TimeDependentProcess):
     Diagnostics computed:
 
         - CBMF (cloud base mass flux in kg/m2/s) -- this is actually stored internally and used as input for subsequent timesteps
-        - PRECIP (convective precipitation rate in mm/day)
+        - precipitation (convective precipitation rate in kg/m2/s or mm/s)
+        - relative_humidity (dimensionless)
 
         :Example:
 
@@ -108,6 +109,7 @@ class EmanuelConvection(TimeDependentProcess):
             This example also demonstrates *asynchronous coupling*:
             the radiation uses a longer timestep than the other model components::
 
+                import numpy as np
                 import climlab
                 from climlab import constants as const
                 # Temperatures in a single column
@@ -169,11 +171,17 @@ class EmanuelConvection(TimeDependentProcess):
         super(EmanuelConvection, self).__init__(**kwargs)
         self.time_type = 'explicit'
         #  Define inputs and diagnostics
-        #surface_shape = self.Tatm[...,0].shape
-        #  For some strange reason self.Tatm is breaking tests under Python 3.5 in some configurations
         surface_shape = self.state['Tatm'][...,0].shape
-        self.add_diagnostic('CBMF', np.zeros(surface_shape))  # cloud base mass flux
-        self.add_diagnostic('PRECIP', np.zeros(surface_shape)) # Precip rate (mm/day)
+        #  Hack to handle single column and multicolumn
+        if surface_shape is ():
+            init = np.atleast_1d(np.zeros(surface_shape))
+            self.multidim=False
+        else:
+            init = np.zeros(surface_shape)[...,np.newaxis]
+            self.multidim=True
+        self.add_diagnostic('CBMF', init*0.)  # cloud base mass flux
+        self.add_diagnostic('precipitation', init*0.) # Precip rate (kg/m2/s)
+        self.add_diagnostic('relative_humidity', 0*self.Tatm)
         self.add_input('MINORIG', MINORIG)
         self.add_input('ELCRIT', ELCRIT)
         self.add_input('TLCRIT', TLCRIT)
@@ -236,6 +244,12 @@ class EmanuelConvection(TimeDependentProcess):
         if 'V' in self.state:
             tendencies['V'] = _convect_to_climlab(FV) * np.ones_like(self.state['V'])
         self.CBMF = CBMFnew
-        self.PRECIP = PRECIP
+        #  Need to convert from mm/day to mm/s or kg/m2/s
+        #  Hack to handle single column and multicolumn
+        if self.multidim:
+            self.precipitation[:,0] = _convect_to_climlab(PRECIP)/const.seconds_per_day
+        else:
+            self.precipitation[:] = _convect_to_climlab(PRECIP)/const.seconds_per_day
         self.IFLAG = IFLAG
+        self.relative_humidity[:] = self.q / qsat(self.Tatm,self.lev)
         return tendencies

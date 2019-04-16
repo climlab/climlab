@@ -9,7 +9,7 @@ source:
 
 build:
   skip: True  # [win32 or (win and py27)]
-  number: 0
+  number: 2
 
 requirements:
   build:
