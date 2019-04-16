@@ -9,7 +9,8 @@ dependencies:
   - pytest
   - numpy
   - scipy
-  - flang
+  - gfortran_osx-64
   - future
   - attrdict
   - urllib3
+  - codecov
