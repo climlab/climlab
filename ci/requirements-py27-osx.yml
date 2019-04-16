@@ -8,8 +8,7 @@ dependencies:
   - xarray
   - numpy
   - scipy
-  - {{ compiler('fortran') }}
-  - {{ compiler('c') }}
+  - fortran-compiler
   - future
   - attrdict
   - urllib3
