@@ -76,15 +76,13 @@ from __future__ import print_function
 import numpy as np
 from climlab.process import EnergyBudget
 from climlab.radiation import ManabeWaterVapor
-import os
 from climlab import constants as const
 from climlab.domain.field import Field
+from climlab.utils.data_source import load_data_source
 import warnings
-try:
-    import xarray as xr
-except:
-    warnings.warn('Cannot import `xarray`. Will not be able to initialize ozone from data file.',
-                FutureWarning, stacklevel=2)
+import os
+import xarray as xr
+
 
 def default_specific_humidity(Tatm):
     '''Initialize a specific humidity distribution
@@ -99,8 +97,7 @@ def default_specific_humidity(Tatm):
 
 def default_absorbers(Tatm,
                 ozone_file = 'apeozone_cam3_5_54.nc',
-                verbose = True,
-                      ):
+                verbose = True,):
     '''Initialize a dictionary of well-mixed radiatively active gases
     All values are volumetric mixing ratios.
 
@@ -135,12 +132,14 @@ def default_absorbers(Tatm,
     xTatm = Tatm.to_xarray()
     O3 = 0. * xTatm
     if ozone_file is not None:
-        datadir = os.path.join(os.path.dirname(__file__), 'data', 'ozone')
-        ozonefilepath = os.path.join(datadir, ozone_file)
-        #  Open the ozone data file
-        if verbose:
-            print('Getting ozone data from', ozonefilepath)
-        ozonedata = xr.open_dataset(ozonefilepath)
+        ozonefilepath = os.path.join(os.path.dirname(__file__), 'data', 'ozone', ozone_file)
+        remotepath_http = 'http://thredds.atmos.albany.edu:8080/thredds/fileServer/CLIMLAB/ozone/' + ozone_file
+        remotepath_opendap = 'http://thredds.atmos.albany.edu:8080/thredds/dodsC/CLIMLAB/ozone/' + ozone_file
+        ozonedata, path = load_data_source(local_path=ozonefilepath,
+                                     remote_source_list=[remotepath_http, remotepath_opendap],
+                                     open_method=xr.open_dataset,
+                                     remote_kwargs={'engine':'pydap'},
+                                     verbose=verbose,)
         ##  zonal and time average
         ozone_zon = ozonedata.OZONE.mean(dim=('time','lon')).transpose('lat','lev')
         if ('lat' in xTatm.dims):

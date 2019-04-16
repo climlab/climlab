@@ -4,6 +4,11 @@
 *.so
 *.so.dSYM
 
+# Data files (no longer kept under version control)
+*.nc
+*.ASC
+*.dat
+
 *.DS_Store
 
 # Setuptools distribution and binary build folders.
