@@ -1,7 +1,7 @@
 import os, sys
 import textwrap
 
-VERSION = '0.7.2.dev4'
+VERSION = '0.7.2.dev5'
 
 # BEFORE importing setuptools, remove MANIFEST. Otherwise it may not be
 # properly updated when the contents of directories change (true for distutils,
