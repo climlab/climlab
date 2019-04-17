@@ -54,7 +54,8 @@ def load_data_source(local_path,
         data = open_method(path, **open_method_kwargs)
         if verbose:
             print('Opened data from {}'.format(path))
-    except FileNotFoundError:
+    #except FileNotFoundError:  # this is a more specific exception in Python 3
+    except IOError:  # works for Py2.7 and Py3.x
         #  First try to load from remote sources and cache the file locally
         for source in remote_source_list:
             try:
@@ -80,8 +81,7 @@ def load_data_source(local_path,
                     continue
             else:
                 raise Exception('All data access methods have failed.')
-    finally:
-        return data, path
+    return data, path
 
 def merge_two_dicts(x, y):
     """Given two dicts, merge them into a new dict as a shallow copy.
