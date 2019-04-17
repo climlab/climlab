@@ -70,7 +70,9 @@ def load_data_source(local_path,
             for source in remote_source_list:
                 path = source
                 try:
-                    data = open_method(path, **open_method_kwargs, **remote_kwargs)
+                    # This works fine for Python >= 3.5
+                    #data = open_method(path, **open_method_kwargs, **remote_kwargs)
+                    data = open_method(path, **merge_two_dicts(open_method_kwargs, remote_kwargs))
                     if verbose:
                         print('Opened data remotely from {}'.format(source))
                     break
@@ -80,6 +82,14 @@ def load_data_source(local_path,
                 raise Exception('All data access methods have failed.')
     finally:
         return data, path
+
+def merge_two_dicts(x, y):
+    """Given two dicts, merge them into a new dict as a shallow copy.
+    (this is only necessary for Python < 3.5)
+    https://stackoverflow.com/questions/38987/how-to-merge-two-dictionaries-in-a-single-expression"""
+    z = x.copy()
+    z.update(y)
+    return z
 
 def _download_and_cache(source, local_path):
     import requests
