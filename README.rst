@@ -166,6 +166,9 @@ These are self-describing, and should all run out-of-the-box once the package is
 Release history
 ----------------------
 
+Version 0.7.3 (released April 2019)
+    Bug fix and changes to continuous integration for Python 2.7 compatibility
+
 Version 0.7.2 (released April 2019)
     Improvements to surface flux processes, a new data management strategy, and improved documentation.
 
