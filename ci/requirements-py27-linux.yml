@@ -8,7 +8,7 @@ dependencies:
   - xarray
   - numpy
   - scipy
-  - fortran-compiler
+  - gcc
   - future
   - attrdict
   - urllib3
