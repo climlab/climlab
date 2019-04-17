@@ -12,7 +12,7 @@ dependencies:
   - toolchain3
   - future
   - attrdict
-  - urllib3
+  - requests
   - pytest
   - codecov
   - pytest-cov

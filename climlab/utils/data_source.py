@@ -82,10 +82,9 @@ def load_data_source(local_path,
         return data, path
 
 def _download_and_cache(source, local_path):
-    import urllib3
-    connection_pool = urllib3.PoolManager()
-    resp = connection_pool.request('GET', source)
-    if resp.status == 200:  # successful http request
+    import requests
+    resp = requests.get(source, allow_redirects=True)
+    if resp.status_code == 200:  # successful http request
         with open(local_path, 'wb') as file:
-            file.write(resp.data)
+            file.write(resp.content)
     return resp
