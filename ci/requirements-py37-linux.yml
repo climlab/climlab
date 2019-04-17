@@ -9,7 +9,7 @@ dependencies:
   - numpy
   - scipy
   - fortran-compiler
-  - toolchain
+  - toolchain3
   - future
   - attrdict
   - urllib3
