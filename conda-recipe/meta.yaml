@@ -1,4 +1,4 @@
-{% set version = "0.7.3" %}
+{% set version = "0.7.4.dev0" %}
 
 package:
   name: climlab

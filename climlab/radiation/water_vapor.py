@@ -58,3 +58,4 @@ class ManabeWaterVapor(FixedRelativeHumidity):
         p = self.lev
         Q = p / const.ps
         self.RH_profile = self.relative_humidity * ((Q - 0.02) / (1-0.02))
+        self._compute() # call this again so the diagnostic is correct initially
