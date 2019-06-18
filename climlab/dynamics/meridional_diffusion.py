@@ -23,7 +23,7 @@ In addition to the tendency over the implicit timestep,
 the solver also calculates two diagnostics from the updated state:
 
 - ``diffusive_flux`` given by :math:`F(\phi)` in units of :math:`[\Psi]` m/s
-- ``diffusive_flux_convergence`` given by :math:`-\frac{1}{a \cos\phi} \frac{\partial}{\partial \phi} \left[ \cos\phi ~ F(\phi,t) \right]` in units of :math:`[\Psi]`/s
+- ``flux_convergence`` given by :math:`-\frac{1}{a \cos\phi} \frac{\partial}{\partial \phi} \left[ \cos\phi ~ F(\phi,t) \right]` in units of :math:`[\Psi]`/s
 
 Non-uniform grid spacing is supported.
 
@@ -32,7 +32,7 @@ will operate along the latitude dimension only.
 """
 from __future__ import division
 import numpy as np
-from .diffusion import Diffusion
+from .advection_diffusion import Diffusion
 from climlab import constants as const
 
 

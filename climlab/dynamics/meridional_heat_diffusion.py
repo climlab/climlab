@@ -22,7 +22,7 @@ as part of the grid specification.
 A fully implicit timestep is used for computational efficiency. Thus the computed
 tendency :math:`\frac{\partial T}{\partial t}` will depend on the timestep.
 
-The diagnostics ``diffusive_flux`` and ``diffusive_flux_convergence`` are computed
+The diagnostics ``diffusive_flux`` and ``flux_convergence`` are computed
 as described in the parent class ``MeridionalDiffusion``.
 Two additional diagnostics are computed here,
 which are meaningful if :math:`T` represents a *zonally averaged temperature*:
@@ -73,7 +73,7 @@ class MeridionalHeatDiffusion(MeridionalDiffusion):
         #  Now initialize properly
         self.D = D
         self.add_diagnostic('heat_transport', 0.*self.diffusive_flux)
-        self.add_diagnostic('heat_transport_convergence', 0.*self.diffusive_flux_convergence)
+        self.add_diagnostic('heat_transport_convergence', 0.*self.flux_convergence)
 
     @property
     def D(self):
@@ -96,5 +96,5 @@ class MeridionalHeatDiffusion(MeridionalDiffusion):
         coslat_bounds = np.moveaxis(self._weight_bounds,-1,self.diffusion_axis_index)
         self.heat_transport[:] = (self.diffusive_flux * heat_capacity *
             2 * np.pi * const.a * coslat_bounds * 1E-15) # in PW
-        self.heat_transport_convergence[:] = (self.diffusive_flux_convergence *
+        self.heat_transport_convergence[:] = (self.flux_convergence *
                         heat_capacity)  # in W/m**2

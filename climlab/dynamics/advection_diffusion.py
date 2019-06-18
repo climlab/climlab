@@ -1,31 +1,35 @@
-r"""General solver of the 1D diffusion equation:
+r"""General solver of the 1D advection-diffusion equation:
 
 .. math::
 
-    \frac{\partial}{\partial t} \Psi(x,t) &= -\frac{1}{w(x)} \frac{\partial}{\partial x} \left[ w(x) ~ F(x,t) \right] \\
-    F &= -K ~ \frac{\partial \Psi}{\partial x}
+    \frac{\partial}{\partial t} \Psi(x,t) &= -\frac{1}{w(x)} \frac{\partial}{\partial x} \left[ w(x) ~ \mathcal{F}(x,t) \right] \\
+    \mathcal{F} &= U(x) \Psi(x) -K(x) ~ \frac{\partial \Psi}{\partial x} + F(x)
 
-for a state variable :math:`\Psi(x,t)` and arbitrary diffusivity :math:`K(x,t)`
-in units of :math:`x^2 ~ t^{-1}`.
+for a state variable :math:`\Psi(x,t)`, diffusivity :math:`K(x)`
+in units of :math:`x^2 ~ t^{-1}`, advecting velocity :math:`U(x)`
+in units of :math:`x ~ t^{-1}`, and a prescribed flux F(x)
+(including boundary conditions) in units of :math:`\Psi ~ x ~ t^{-1}`.
 
 :math:`w(x)` is an optional weighting function
 for the divergence operator on curvilinear grids.
 
-The diffusivity :math:`K` can be a single scalar,
-or optionally a vector *specified at grid cell boundaries*
-(so its length must be exactly 1 greater than the length of :math:`x`).
+The diffusivity :math:`K` and velocity :math:`U` can be scalars,
+or optionally vectors *specified at grid cell boundaries*
+(so their lengths must be exactly 1 greater than the length of :math:`x`).
 
-:math:`K` can be modified by the user at any time
-(e.g., after each timestep, if it depends on other state variables).
+:math:`K` and :math:`U` can be modified by the user at any time
+(e.g., after each timestep, if they depend on other state variables).
 
 A fully implicit timestep is used for computational efficiency. Thus the computed
 tendency :math:`\frac{\partial \Psi}{\partial t}` will depend on the timestep.
 
 In addition to the tendency over the implicit timestep,
-the solver also calculates two diagnostics from the updated state:
+the solver also calculates several diagnostics from the updated state:
 
-- ``diffusive_flux`` given by :math:`F(x)` in units of :math:`[\Psi]~[x]`/s
-- ``diffusive_flux_convergence`` given by the right hand side of the first equation above, in units of :math:`[\Psi]`/s
+- ``diffusive_flux`` given by :math:`-K(x) ~ \frac{\partial \Psi}{\partial x}` in units of :math:`[\Psi]~[x]`/s
+- ``advective_flux`` given by :math:`U(x) \Psi(x)` (same units)
+- ``total_flux``, the sum of advective, diffusive and prescribed fluxes
+- ``flux_convergence`` given by the right hand side of the first equation above, in units of :math:`[\Psi]`/s
 
 This base class can be used without modification for diffusion in
 Cartesian coordinates (:math:`w=1`). Non-uniformly spaced grids are supported.
@@ -42,8 +46,8 @@ from climlab.process.process import get_axes
 from . import adv_diff_numerics
 
 
-class Diffusion(ImplicitProcess):
-    """A parent class for one dimensional implicit diffusion modules.
+class AdvectionDiffusion(ImplicitProcess):
+    """A parent class for one dimensional implicit advection-diffusion modules.
 
     **Initialization parameters** \n
 
@@ -51,6 +55,8 @@ class Diffusion(ImplicitProcess):
                                     :math:`\\frac{[\\textrm{length}]^2}{\\textrm{time}}`
                                     where length is the unit of the spatial axis
                                     on which the diffusion is occuring.
+    :param float U:                 Advection velocity in units of
+                                    :math:`\\frac{[\\textrm{length}]}{\\textrm{time}}`
     :param str diffusion_axis:      dictionary key for axis on which the
                                     diffusion is occuring in process's domain
                                     axes dictionary
@@ -80,12 +86,7 @@ class Diffusion(ImplicitProcess):
                                     specified during initialization
                                     or output of method
                                     :func:`_guess_diffusion_axis`
-    :ivar array _K_dimensionless:    diffusion parameter K multiplied by the
-                                    timestep and divided by mean of diffusion
-                                    axis delta in the power of two. Array has
-                                    the size of diffusion axis bounds.
-                                    :math:`K_{\\textrm{dimensionless}}[i]= K \\frac{\\Delta t}{ \\left(\\overline{\\Delta \\textrm{bounds}} \\right)^2}`
-    :ivar array _diffTriDiag:        tridiagonal diffusion matrix made by
+    :ivar array _advdiffTriDiag:        tridiagonal diffusion matrix made by
                                     :func:`_make_diffusion_matrix()` with input
                                     ``self._K_dimensionless``
 
@@ -102,13 +103,13 @@ class Diffusion(ImplicitProcess):
     """
     def __init__(self,
                  K=None,
+                 U=None,
                  diffusion_axis=None,
                  use_banded_solver=False,
                  **kwargs):
-        super(Diffusion, self).__init__(**kwargs)
+        super(AdvectionDiffusion, self).__init__(**kwargs)
         self.use_banded_solver = use_banded_solver
-        #self.use_banded_solver = False
-        if diffusion_axis is None:
+        if diffusion_axis is None:   # diffusion axis is also advection axis!
             self.diffusion_axis = _guess_diffusion_axis(self)
         else:
             self.diffusion_axis = diffusion_axis
@@ -129,11 +130,16 @@ class Diffusion(ImplicitProcess):
             self._Xbounds[...,:] = bounds
         self._weight_bounds = np.ones_like(self._Xbounds)  # weights for curvilinear grids
         self._weight_center = np.ones_like(self._Xcenter)
-        self.K = K  # Diffusivity in units of [length]**2 / time
+        self.K = K  # Diffusivity in units of [length]**2 / [time]
+        if U is None:
+            U = 0.
+        self.U = U  # Advecting velocity in units of [length] / [time]
         self.add_diagnostic('diffusive_flux',
             np.moveaxis(0.*self.K*self._weight_bounds,-1,self.diffusion_axis_index))
+        self.add_diagnostic('advective_flux', 0.*self.diffusive_flux)
+        self.add_diagnostic('total_flux', 0.*self.diffusive_flux)
         for varname, value in self.state.items():
-            self.add_diagnostic('diffusive_flux_convergence',
+            self.add_diagnostic('flux_convergence',
                 np.moveaxis(0.*self._weight_center,-1,self.diffusion_axis_index))
 
     @property
@@ -142,72 +148,68 @@ class Diffusion(ImplicitProcess):
     @K.setter  # currently this assumes that Kvalue is scalar or has the right dimensions...
     def K(self, Kvalue):
         self._K = Kvalue
-        Karray = np.ones_like(self._Xbounds) * Kvalue
-        self._diffTriDiag = adv_diff_numerics.advdiff_tridiag(X=self._Xcenter,
-            Xb=self._Xbounds, K=Karray, U=0.*Karray, W=self._weight_center, Wb=self._weight_bounds,
+        self._compute_advdiff_matrix()
+
+    @property
+    def U(self):
+        return self._U
+    @U.setter
+    def U(self, Uvalue):
+        self._U = Uvalue
+        self._compute_advdiff_matrix()
+
+    def _compute_advdiff_matrix(self):
+        Karray = np.ones_like(self._Xbounds) * self._K
+        try:
+            Uarray = np.ones_like(self._Xbounds) * self._U
+        except Exception:
+            Uarray = 0.*Karray
+        self._advdiffTriDiag = adv_diff_numerics.advdiff_tridiag(X=self._Xcenter,
+            Xb=self._Xbounds, K=Karray, U=Uarray, W=self._weight_center, Wb=self._weight_bounds,
             use_banded_solver=self.use_banded_solver)
 
     def _implicit_solver(self):
-        """Inverts and solves the matrix problem for diffusion matrix
-        and temperature T.
-
-        The method is called by the
-        :func:`~climlab.process.implicit.ImplicitProcess._compute()` function
-        of the :class:`~climlab.process.implicit.ImplicitProcess` class and
-        solves the matrix problem
-
-        .. math::
-
-            A \\cdot T_{\\textrm{new}} = T_{\\textrm{old}}
-
-        for diffusion matrix A and corresponding temperatures.
-        :math:`T_{\\textrm{old}}` is in this case the current state variable
-        which already has been adjusted by the explicit processes.
-        :math:`T_{\\textrm{new}}` is the new state of the variable. To
-        derive the temperature tendency of the diffusion process the adjustment
-        has to be calculated and muliplied with the timestep which is done by
-        the :func:`~climlab.process.implicit.ImplicitProcess._compute()`
-        function of the :class:`~climlab.process.implicit.ImplicitProcess`
-        class.
-
-        This method calculates the matrix inversion for every state variable
-        and calling either :func:`solve_implicit_banded()` or
-        :py:func:`numpy.linalg.solve()` dependent on the flag
-        ``self.use_banded_solver``.
-
-        :ivar dict state:               method uses current state variables
-                                        but does not modify them
-        :ivar bool use_banded_solver:   input flag whether to use
-                                        :func:`_solve_implicit_banded()` or
-                                        :py:func:`numpy.linalg.solve()` to do
-                                        the matrix inversion
-        :ivar array _diffTriDiag:        the diffusion matrix which is given
-                                        with the current state variable to
-                                        the method solving the matrix problem
-
-        """
         newstate = {}
         for varname, value in self.state.items():
             field = np.moveaxis(value, self.diffusion_axis_index,-1)
             source = 0.*field
             result = adv_diff_numerics.implicit_step_forward(field,
-                        self._diffTriDiag, source, self.timestep,
+                        self._advdiffTriDiag, source, self.timestep,
                         use_banded_solver=self.use_banded_solver)
             newstate[varname] = np.moveaxis(result,-1,self.diffusion_axis_index)
         return newstate
 
     def _update_diagnostics(self, newstate):
         Karray = self._Xbounds * self.K
+        Uarray = self._Xbounds * self.U
         for varname, value in newstate.items():
             field = np.moveaxis(value, self.diffusion_axis_index,-1)
             #field = value.squeeze()
-            flux = adv_diff_numerics.diffusive_flux(self._Xcenter,
+            diff_flux = adv_diff_numerics.diffusive_flux(self._Xcenter,
                                         self._Xbounds, Karray, field)
-            self.diffusive_flux[:] = np.moveaxis(flux,-1,self.diffusion_axis_index)
+            adv_flux = adv_diff_numerics.advective_flux(self._Xcenter,
+                                        self._Xbounds, Uarray, field)
+            self.diffusive_flux[:] = np.moveaxis(diff_flux,-1,self.diffusion_axis_index)
+            self.advective_flux[:] = np.moveaxis(adv_flux,-1,self.diffusion_axis_index)
             source = 0.*field
             convergence = adv_diff_numerics.compute_tendency(field,
-                self._diffTriDiag, source, use_banded_solver=self.use_banded_solver)
-            self.diffusive_flux_convergence[:] = np.moveaxis(convergence,-1,self.diffusion_axis_index)
+                self._advdiffTriDiag, source, use_banded_solver=self.use_banded_solver)
+            self.flux_convergence[:] = np.moveaxis(convergence,-1,self.diffusion_axis_index)
+
+
+class Diffusion(AdvectionDiffusion):
+    '''1D diffusion only, with advection set to zero.
+
+    Otherwise identical to the parent class AdvectionDiffusion.
+    '''
+    def __init__(self,
+                 K=None,
+                 diffusion_axis=None,
+                 use_banded_solver=False,
+                 **kwargs):
+        super(Diffusion, self).__init__(K=K, U=None,
+            diffusion_axis=diffusion_axis,
+            use_banded_solver=use_banded_solver, **kwargs)
 
 
 def _guess_diffusion_axis(process_or_domain):
