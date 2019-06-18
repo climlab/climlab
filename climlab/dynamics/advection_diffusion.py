@@ -10,6 +10,10 @@ in units of :math:`x^2 ~ t^{-1}`, advecting velocity :math:`U(x)`
 in units of :math:`x ~ t^{-1}`, and a prescribed flux F(x)
 (including boundary conditions) in units of :math:`\Psi ~ x ~ t^{-1}`.
 
+The prescribed flux :math:`F(x)` defaults to zero everywhere. The user can
+implement a non-zero boundary flux condition by passing a non-zero array
+``prescribed_flux`` as input.
+
 :math:`w(x)` is an optional weighting function
 for the divergence operator on curvilinear grids.
 
@@ -102,10 +106,11 @@ class AdvectionDiffusion(ImplicitProcess):
 
     """
     def __init__(self,
-                 K=None,
-                 U=None,
+                 K=0.,
+                 U=0.,
                  diffusion_axis=None,
                  use_banded_solver=False,
+                 prescribed_flux=0.,
                  **kwargs):
         super(AdvectionDiffusion, self).__init__(**kwargs)
         self.use_banded_solver = use_banded_solver
@@ -130,9 +135,8 @@ class AdvectionDiffusion(ImplicitProcess):
             self._Xbounds[...,:] = bounds
         self._weight_bounds = np.ones_like(self._Xbounds)  # weights for curvilinear grids
         self._weight_center = np.ones_like(self._Xcenter)
+        self.prescribed_flux = prescribed_flux  # flux including boundary conditions
         self.K = K  # Diffusivity in units of [length]**2 / [time]
-        if U is None:
-            U = 0.
         self.U = U  # Advecting velocity in units of [length] / [time]
         self.add_diagnostic('diffusive_flux',
             np.moveaxis(0.*self.K*self._weight_bounds,-1,self.diffusion_axis_index))
@@ -158,6 +162,20 @@ class AdvectionDiffusion(ImplicitProcess):
         self._U = Uvalue
         self._compute_advdiff_matrix()
 
+    @property
+    def prescribed_flux(self):
+        return self._prescribed_flux
+    @prescribed_flux.setter
+    def prescribed_flux(self, fluxvalue):
+        self._prescribed_flux = fluxvalue
+        for varname, value in self.state.items():
+            field = np.moveaxis(value, self.diffusion_axis_index,-1)
+        fluxarray = np.ones_like(self._Xbounds) * self._prescribed_flux
+        self._source = adv_diff_numerics.compute_source(X=self._Xcenter,
+            Xb=self._Xbounds, prescribed_flux=fluxarray,
+            prescribed_source=0.*field,
+            W=self._weight_center, Wb=self._weight_bounds)
+
     def _compute_advdiff_matrix(self):
         Karray = np.ones_like(self._Xbounds) * self._K
         try:
@@ -172,9 +190,8 @@ class AdvectionDiffusion(ImplicitProcess):
         newstate = {}
         for varname, value in self.state.items():
             field = np.moveaxis(value, self.diffusion_axis_index,-1)
-            source = 0.*field
             result = adv_diff_numerics.implicit_step_forward(field,
-                        self._advdiffTriDiag, source, self.timestep,
+                        self._advdiffTriDiag, self._source, self.timestep,
                         use_banded_solver=self.use_banded_solver)
             newstate[varname] = np.moveaxis(result,-1,self.diffusion_axis_index)
         return newstate
@@ -207,7 +224,7 @@ class Diffusion(AdvectionDiffusion):
                  diffusion_axis=None,
                  use_banded_solver=False,
                  **kwargs):
-        super(Diffusion, self).__init__(K=K, U=None,
+        super(Diffusion, self).__init__(K=K, U=0.,
             diffusion_axis=diffusion_axis,
             use_banded_solver=use_banded_solver, **kwargs)
 
