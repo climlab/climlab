@@ -94,12 +94,11 @@ class MeridionalDiffusion(Diffusion):
         super(MeridionalDiffusion, self).__init__(K=K,
                                                 diffusion_axis='lat', **kwargs)
         # Conversion of delta from degrees (grid units) to physical length units
-        self.delta *= (np.deg2rad(1.) * const.a)
-        for dom in list(self.domains.values()):
-            lataxis = dom.axes['lat']
-        phi_stag = np.deg2rad(lataxis.bounds)
-        phi = np.deg2rad(lataxis.points)
-        self._weight1 = np.cos(phi_stag)
-        self._weight2 = np.cos(phi)
+        phi_stag = np.deg2rad(self.lat_bounds)
+        phi = np.deg2rad(self.lat)
+        self._Xcenter[...,:] = phi*const.a
+        self._Xbounds[...,:] = phi_stag*const.a
+        self._weight_bounds[...,:] = np.cos(phi_stag)
+        self._weight_center[...,:] = np.cos(phi)
         #  Now properly compute the weighted diffusion matrix
         self.K = K

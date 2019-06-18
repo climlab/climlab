@@ -72,8 +72,8 @@ class MeridionalHeatDiffusion(MeridionalDiffusion):
                         use_banded_solver=use_banded_solver, **kwargs)
         #  Now initialize properly
         self.D = D
-        self.add_diagnostic('heat_transport', np.zeros_like(self.lat_bounds))
-        self.add_diagnostic('heat_transport_convergence', np.zeros_like(self.lat))
+        self.add_diagnostic('heat_transport', 0.*self.diffusive_flux)
+        self.add_diagnostic('heat_transport_convergence', 0.*self.diffusive_flux_convergence)
 
     @property
     def D(self):
@@ -93,7 +93,8 @@ class MeridionalHeatDiffusion(MeridionalDiffusion):
         super(MeridionalHeatDiffusion, self)._update_diagnostics(newstate)
         for varname, value in self.state.items():
             heat_capacity = value.domain.heat_capacity
+        coslat_bounds = np.moveaxis(self._weight_bounds,-1,self.diffusion_axis_index)
         self.heat_transport[:] = (self.diffusive_flux * heat_capacity *
-                        2 * np.pi * const.a * self._weight1 * 1E-15) # in PW
+            2 * np.pi * const.a * coslat_bounds * 1E-15) # in PW
         self.heat_transport_convergence[:] = (self.diffusive_flux_convergence *
                         heat_capacity)  # in W/m**2

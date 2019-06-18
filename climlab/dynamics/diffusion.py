@@ -37,10 +37,9 @@ Other classes implement the weighting for spherical geometry.
 """
 from __future__ import division
 import numpy as np
-from scipy.linalg import solve_banded
 from climlab.process.implicit import ImplicitProcess
 from climlab.process.process import get_axes
-
+from . import adv_diff_numerics
 
 class Diffusion(ImplicitProcess):
     """A parent class for one dimensional implicit diffusion modules.
@@ -106,42 +105,49 @@ class Diffusion(ImplicitProcess):
                  use_banded_solver=False,
                  **kwargs):
         super(Diffusion, self).__init__(**kwargs)
-        self.use_banded_solver = use_banded_solver
+        #self.use_banded_solver = use_banded_solver
+        self.use_banded_solver = False
         if diffusion_axis is None:
             self.diffusion_axis = _guess_diffusion_axis(self)
         else:
             self.diffusion_axis = diffusion_axis
-        # This currently only works with evenly spaced points
         for dom in list(self.domains.values()):
             points = dom.axes[self.diffusion_axis].points
-            delta = np.mean(dom.axes[self.diffusion_axis].delta)
             bounds = dom.axes[self.diffusion_axis].bounds
         self.diffusion_axis_index = dom.axis_index[self.diffusion_axis]
-        self.delta = delta  # grid interval in length units
-        self._weight1 = np.ones_like(bounds)  # weights for curvilinear grids
-        self._weight2 = np.ones_like(points)
+        #  Cell bounds and centers in length units for diffusion operator
+        #  Ensure they have shame dimensions as state var
+        for varname, value in self.state.items():
+            arr = np.moveaxis(0.*value, self.diffusion_axis_index, -1)
+            J = arr.shape[-1]
+            sizeJ = tuple([n for n in arr.shape[:-1]] + [J])
+            sizeJplus1 = tuple([n for n in arr.shape[:-1]] + [J+1])
+            arr[...,:] = points
+            self._Xcenter = arr
+            self._Xbounds = np.zeros(sizeJplus1)
+            self._Xbounds[...,:] = bounds
+        self._weight_bounds = np.ones_like(self._Xbounds)  # weights for curvilinear grids
+        self._weight_center = np.ones_like(self._Xcenter)
         self.K = K  # Diffusivity in units of [length]**2 / time
-        # These diagnostics currently only implemented for 1D state variable
-        self.add_diagnostic('diffusive_flux', 0.*self._K_dimensionless*self._weight1)
-        self.add_diagnostic('diffusive_flux_convergence',
-                0.*np.diff(self.diffusive_flux, axis=self.diffusion_axis_index))
+        self.add_diagnostic('diffusive_flux',
+            np.moveaxis(0.*self.K*self._weight_bounds,-1,self.diffusion_axis_index))
+        for varname, value in self.state.items():
+            self.add_diagnostic('diffusive_flux_convergence',
+                np.moveaxis(0.*self._weight_center,-1,self.diffusion_axis_index))
 
     @property
     def K(self):
         return self._K
-    @K.setter
+    @K.setter  # currently this assumes that Kvalue is scalar or has the right dimensions...
     def K(self, Kvalue):
         self._K = Kvalue
-        # This currently only works with evenly spaced points
-        for dom in list(self.domains.values()):
-            bounds = dom.axes[self.diffusion_axis].bounds
-        self._K_dimensionless = (Kvalue * np.ones_like(bounds) *
-                                self.timestep / self.delta**2)
-        self._diffTriDiag = _make_diffusion_matrix(self._K_dimensionless,
-                                        self._weight1, self._weight2)
+        Karray = np.ones_like(self._Xbounds) * Kvalue
+        self._diffTriDiag = adv_diff_numerics.advdiff_tridiag(X=self._Xcenter,
+            Xb=self._Xbounds, K=Karray, U=0.*Karray, W=self._weight_center, Wb=self._weight_bounds,
+            use_banded_solver=self.use_banded_solver)
 
     def _implicit_solver(self):
-        """Invertes and solves the matrix problem for diffusion matrix
+        """Inverts and solves the matrix problem for diffusion matrix
         and temperature T.
 
         The method is called by the
@@ -179,206 +185,203 @@ class Diffusion(ImplicitProcess):
                                         the method solving the matrix problem
 
         """
-        #if self.update_diffusivity:
-
-        # Time-stepping the diffusion is just inverting this matrix problem:
         newstate = {}
         for varname, value in self.state.items():
-            if self.use_banded_solver:
-                newvar = _solve_implicit_banded(value, self._diffTriDiag)
-            else:
-                newvar = np.linalg.solve(self._diffTriDiag, value)
-            newstate[varname] = newvar
+            field = np.moveaxis(value, self.diffusion_axis_index,-1)
+            source = 0.*field
+            result = adv_diff_numerics.implicit_step_forward(field,
+                        self._diffTriDiag, source, self.timestep,
+                        use_banded_solver=self.use_banded_solver)
+            newstate[varname] = np.moveaxis(result,-1,self.diffusion_axis_index)
         return newstate
 
     def _update_diagnostics(self, newstate):
+        Karray = self._Xbounds * self.K
         for varname, value in newstate.items():
-            if np.squeeze(value).ndim == 1:
-                # Diagnostic calculations of flux and convergence
-                #  These assume 1D state variables...
-                ax = self.state[varname].domain.axis_index[self.diffusion_axis] # axis index
-                K = self._K_dimensionless * self.delta**2/self.timestep  # length**2 / time
+            field = np.moveaxis(value, self.diffusion_axis_index,-1)
+            #field = value.squeeze()
+            flux = adv_diff_numerics.diffusive_flux(self._Xcenter,
+                                        self._Xbounds, Karray, field)
+            self.diffusive_flux[:] = np.moveaxis(flux,-1,self.diffusion_axis_index)
+            source = 0.*field
+            convergence = adv_diff_numerics.compute_tendency(field,
+                self._diffTriDiag, source, use_banded_solver=self.use_banded_solver)
+            self.diffusive_flux_convergence[:] = np.moveaxis(convergence,-1,self.diffusion_axis_index)
 
-                self.diffusive_flux[1:-1] = -K[1:-1] * np.diff(np.squeeze(value), axis=ax)/self.delta  # length / time
-                self.diffusive_flux_convergence[:] = -np.diff(self.diffusive_flux*self._weight1, axis=ax)/self.delta/self._weight2 # 1/time
-            else:
-                pass  # To do: implement flux diagnostics for arbitrary dimension state variables
-
-
-def _make_diffusion_matrix(K, weight1=None, weight2=None):
-    """Builds the general diffusion matrix with dimension nxn.
-
-    .. note::
-
-        :math:`n`   = number of points of diffusion axis
-        :math:`n+1` = number of bounts of diffusion axis
-
-
-    **Function-all argument** \n
-
-    :param array K:         dimensionless diffusivities at cell boundaries
-                            *(size: 1xn+1)*
-    :param array weight1:   weight_1 *(size: 1xn+1)*
-    :param array weight2:   weight_2 *(size: 1xn)*
-    :returns:               completely listed tridiagonal diffusion matrix *(size: nxn)*
-    :rtype:                 array
-
-    .. note::
-
-        The elements of array K are acutally dimensionless:
-
-        .. math::
-
-            K[i] = K_{\\textrm{physical}}  \\frac{\\Delta t}{(\\Delta y)^2}
-
-        where :math:`K_{\\textrm{physical}}` is in unit :math:`\\frac{\\textrm{length}^2}{\\textrm{time}}`
-
-
-    The diffusion matrix is build like the following
-
-    .. math::
-
-        \\textrm{diffTriDiag}=
-        \\left[ \\begin{array}{cccccc}
-        1+\\frac{s_1 }{w_{2,0}} & -\\frac{s_1}{w_{2,0}} & 0 &  & ... & 0  \\\\
-        -\\frac{s_1}{w_{2,1}} & 1+\\frac{s_1 + s_2}{w_{2,1}} & -\\frac{s_2}{w_{2,1}} & 0 & ... & 0 \\\\
-        0 & -\\frac{s_2}{w_{2,2}}  & 1+\\frac{s_2 + s_3}{w_{2,2}} & -\\frac{s_3}{w_{2,2}} &... & 0  \\\\
-          &  & \\ddots & \\ddots & \\ddots & \\\\
-        0 & 0 & ... & -\\frac{s_{n-2}}{w_{2,n-2}}  & 1+\\frac{s_{n-2} + s_{n-1}}{w_{2,{n-2}}} & -\\frac{s_{n-1}}{w_{2,{n-2}}} \\\\
-        0 & 0 & ... & 0 & -\\frac{s_{n-1}}{w_{2,n-1}}  & 1+\\frac{s_{n-1}}{w_{2,n-1}} \\\\
-        \\end{array} \\right]
-
-    where
-
-    .. math::
-
-           \\begin{array}{lllllll}
-                K   &= [K_0,     &K_1,    &K_2,    &...,&K_{n-1},  &K_{n}] \\\\
-                w_1 &= [w_{1,0}, &w_{1,1},&w_{1,2},&...,&w_{1,n-1},&w_{1,n}] \\\\
-                w_2 &= [w_{2,0}, &w_{2,1},&w_{2,2},&...,&w_{2,n-1}]
-           \\end{array}
-
-    and following subsitute:
-
-    .. math::
-
-        s_i = w_{1,i} K_i
-
-    """
-
-#           \\begin{eqnarray}
-#              y    & = & ax^2 + bx + c \\\\
-#              f(x) & = & x^2 + 2xy + y^2
-#           \\end{eqnarray}
-
-#    .. math::
+# def _make_diffusion_matrix(K, weight1=None, weight2=None):
+#     """Builds the general diffusion matrix with dimension nxn.
 #
-#        K   &= [K_0,        &K_1,        &K_2,        &...    ,    &K_{n-1},      &K_{n}] \\\\
-#        w_1 &= [w_{1,0},    &w_{1,1},    &w_{1,2},    &...    ,    &w_{1,n-1}, \\ &w_{1,n}] \\\\
-#        w_2 &= [w_{2,0}, \\ &w_{2,1}, \\ &w_{2,2}, \\ &... \\ , \\ &w_{2,n-1}]    &o \\\\
+#     .. note::
 #
-#    """
-    J = K.size - 1
-    if weight1 is None:
-        weight1 = np.ones_like(K)
-    if weight2 is None:
-        weight2 = np.ones(J)
-    weightedK = weight1 * K
-    Ka1 = weightedK[0:J] / weight2
-    Ka3 = weightedK[1:J+1] / weight2
-    Ka2 = np.insert(Ka1[1:J], 0, 0) + np.append(Ka3[0:J-1], 0)
-    #  Atmosphere tridiagonal matrix
-    #  this code makes a 3xN matrix, suitable for use with solve_banded
-    #diag = np.empty((3, J))
-    #diag[0, 1:] = -Ka3[0:J-1]
-    #diag[1, :] = 1 + Ka2
-    #diag[2, 0:J-1] = -Ka1[1:J]
-    #  Build the full banded matrix instead
-    A = (np.diag(1 + Ka2, k=0) +
-         np.diag(-Ka3[0:J-1], k=1) +
-         np.diag(-Ka1[1:J], k=-1))
-    return A
-
-
-def _make_meridional_diffusion_matrix(K, lataxis):
-    """Calls :func:`_make_diffusion_matrix` with appropriate weights for
-    the meridional diffusion case.
-
-    :param array K:         dimensionless diffusivities at cell boundaries
-                            of diffusion axis ``lataxis``
-    :param axis lataxis:    latitude axis where diffusion is occuring
-
-    Weights are computed as the following:
-
-    .. math::
-
-        \\begin{array}{ll}
-            w_1 &= \\cos(\\textrm{bounds}) \\\\
-                &= \\left[ \\cos(b_0), \\cos(b_1), \\cos(b_2), \\ ... \\ , \\cos(b_{n-1}), \\cos(b_n) \\right] \\\\
-            w_2 &= \\cos(\\textrm{points}) \\\\
-                &= \\left[ \\cos(p_0), \\cos(p_1), \\cos(p_2), \\ ... \\ , \\cos(p_{n-1}) \\right]
-        \\end{array}
-
-    when bounds and points from ``lataxis`` are written as
-
-    .. math::
-
-        \\begin{array}{ll}
-            \\textrm{bounds}   &= [b_0, b_1, b_2, \\ ... \\ , b_{n-1}, b_{n}] \\\\
-            \\textrm{points}   &= [p_0, p_1, p_2, \\ ... \\ , p_{n-1}]
-        \\end{array}
-
-    Giving this input to :func:`_make_diffusion_matrix` results in a matrix like:
-
-    .. math::
-
-        \\textrm{diffTriDiag}=
-        \\left[ \\begin{array}{cccccc}
-        1+\\frac{u_1 }{\\cos(p_0)} & -\\frac{u_1}{\\cos(p_0)} & 0 &  & ... & 0  \\\\
-        -\\frac{u_1}{\\cos(p_1)} & 1+\\frac{u_1 + u_2}{\\cos(p_1)} & -\\frac{u_2}{\\cos(b_1)} & 0 & ... & 0 \\\\
-        0 & -\\frac{u_2}{\\cos(p_2)}  & 1+\\frac{u_2 + u_3}{\\cos(p_2)} & -\\frac{u_3}{\\cos(p_2)} &... & 0  \\\\
-          &  & \\ddots & \\ddots & \\ddots & \\\\
-        0 & 0 & ... & -\\frac{u_{n-2}}{\\cos(p_{n-2})}  & 1+\\frac{u_{n-2} + u_{n-1}}{\\cos(p_{n-2})} & -\\frac{u_{n-1}}{\\cos(p_{n-2})} \\\\
-        0 & 0 & ... & 0 & -\\frac{u_{n-1}}{\\cos(p_{n-1})}  & 1+\\frac{u_{n-1}}{\\cos(p_{n-1})} \\\\
-        \\end{array} \\right]
-
-    with the substitue of:
-
-    .. math::
-
-        u_i = \\cos(b_i) K_i
-
-    """
-    phi_stag = np.deg2rad(lataxis.bounds)
-    phi = np.deg2rad(lataxis.points)
-    weight1 = np.cos(phi_stag)
-    weight2 = np.cos(phi)
-    diag = _make_diffusion_matrix(K, weight1, weight2)
-    return diag, weight1, weight2
-
-
-def _solve_implicit_banded(current, banded_matrix):
-    """Uses a banded solver for matrix inversion of a tridiagonal matrix.
-
-    Converts the complete listed tridiagonal matrix *(nxn)* into a three row
-    matrix *(3xn)* and calls :py:func:`scipy.linalg.solve_banded()`.
-
-    :param array current:           the current state of the variable for which
-                                    matrix inversion should be computed
-    :param array banded_matrix:     complete diffusion matrix (*dimension: nxn*)
-    :returns:                       output of :py:func:`scipy.linalg.solve_banded()`
-    :rtype:                         array
-
-    """
-    #  can improve performance by storing the banded form once and not
-    #  recalculating it...
-    #  but whatever
-    J = banded_matrix.shape[0]
-    diag = np.zeros((3, J))
-    diag[1, :] = np.diag(banded_matrix, k=0)
-    diag[0, 1:] = np.diag(banded_matrix, k=1)
-    diag[2, :-1] = np.diag(banded_matrix, k=-1)
-    return solve_banded((1, 1), diag, current)
+#         :math:`n`   = number of points of diffusion axis
+#         :math:`n+1` = number of bounts of diffusion axis
+#
+#
+#     **Function-all argument** \n
+#
+#     :param array K:         dimensionless diffusivities at cell boundaries
+#                             *(size: 1xn+1)*
+#     :param array weight1:   weight_1 *(size: 1xn+1)*
+#     :param array weight2:   weight_2 *(size: 1xn)*
+#     :returns:               completely listed tridiagonal diffusion matrix *(size: nxn)*
+#     :rtype:                 array
+#
+#     .. note::
+#
+#         The elements of array K are acutally dimensionless:
+#
+#         .. math::
+#
+#             K[i] = K_{\\textrm{physical}}  \\frac{\\Delta t}{(\\Delta y)^2}
+#
+#         where :math:`K_{\\textrm{physical}}` is in unit :math:`\\frac{\\textrm{length}^2}{\\textrm{time}}`
+#
+#
+#     The diffusion matrix is build like the following
+#
+#     .. math::
+#
+#         \\textrm{diffTriDiag}=
+#         \\left[ \\begin{array}{cccccc}
+#         1+\\frac{s_1 }{w_{2,0}} & -\\frac{s_1}{w_{2,0}} & 0 &  & ... & 0  \\\\
+#         -\\frac{s_1}{w_{2,1}} & 1+\\frac{s_1 + s_2}{w_{2,1}} & -\\frac{s_2}{w_{2,1}} & 0 & ... & 0 \\\\
+#         0 & -\\frac{s_2}{w_{2,2}}  & 1+\\frac{s_2 + s_3}{w_{2,2}} & -\\frac{s_3}{w_{2,2}} &... & 0  \\\\
+#           &  & \\ddots & \\ddots & \\ddots & \\\\
+#         0 & 0 & ... & -\\frac{s_{n-2}}{w_{2,n-2}}  & 1+\\frac{s_{n-2} + s_{n-1}}{w_{2,{n-2}}} & -\\frac{s_{n-1}}{w_{2,{n-2}}} \\\\
+#         0 & 0 & ... & 0 & -\\frac{s_{n-1}}{w_{2,n-1}}  & 1+\\frac{s_{n-1}}{w_{2,n-1}} \\\\
+#         \\end{array} \\right]
+#
+#     where
+#
+#     .. math::
+#
+#            \\begin{array}{lllllll}
+#                 K   &= [K_0,     &K_1,    &K_2,    &...,&K_{n-1},  &K_{n}] \\\\
+#                 w_1 &= [w_{1,0}, &w_{1,1},&w_{1,2},&...,&w_{1,n-1},&w_{1,n}] \\\\
+#                 w_2 &= [w_{2,0}, &w_{2,1},&w_{2,2},&...,&w_{2,n-1}]
+#            \\end{array}
+#
+#     and following subsitute:
+#
+#     .. math::
+#
+#         s_i = w_{1,i} K_i
+#
+#     """
+#
+# #           \\begin{eqnarray}
+# #              y    & = & ax^2 + bx + c \\\\
+# #              f(x) & = & x^2 + 2xy + y^2
+# #           \\end{eqnarray}
+#
+# #    .. math::
+# #
+# #        K   &= [K_0,        &K_1,        &K_2,        &...    ,    &K_{n-1},      &K_{n}] \\\\
+# #        w_1 &= [w_{1,0},    &w_{1,1},    &w_{1,2},    &...    ,    &w_{1,n-1}, \\ &w_{1,n}] \\\\
+# #        w_2 &= [w_{2,0}, \\ &w_{2,1}, \\ &w_{2,2}, \\ &... \\ , \\ &w_{2,n-1}]    &o \\\\
+# #
+# #    """
+#     J = K.size - 1
+#     if weight1 is None:
+#         weight1 = np.ones_like(K)
+#     if weight2 is None:
+#         weight2 = np.ones(J)
+#     weightedK = weight1 * K
+#     Ka1 = weightedK[0:J] / weight2
+#     Ka3 = weightedK[1:J+1] / weight2
+#     Ka2 = np.insert(Ka1[1:J], 0, 0) + np.append(Ka3[0:J-1], 0)
+#     #  Atmosphere tridiagonal matrix
+#     #  this code makes a 3xN matrix, suitable for use with solve_banded
+#     #diag = np.empty((3, J))
+#     #diag[0, 1:] = -Ka3[0:J-1]
+#     #diag[1, :] = 1 + Ka2
+#     #diag[2, 0:J-1] = -Ka1[1:J]
+#     #  Build the full banded matrix instead
+#     A = (np.diag(1 + Ka2, k=0) +
+#          np.diag(-Ka3[0:J-1], k=1) +
+#          np.diag(-Ka1[1:J], k=-1))
+#     return A
+#
+#
+# def _make_meridional_diffusion_matrix(K, lataxis):
+#     """Calls :func:`_make_diffusion_matrix` with appropriate weights for
+#     the meridional diffusion case.
+#
+#     :param array K:         dimensionless diffusivities at cell boundaries
+#                             of diffusion axis ``lataxis``
+#     :param axis lataxis:    latitude axis where diffusion is occuring
+#
+#     Weights are computed as the following:
+#
+#     .. math::
+#
+#         \\begin{array}{ll}
+#             w_1 &= \\cos(\\textrm{bounds}) \\\\
+#                 &= \\left[ \\cos(b_0), \\cos(b_1), \\cos(b_2), \\ ... \\ , \\cos(b_{n-1}), \\cos(b_n) \\right] \\\\
+#             w_2 &= \\cos(\\textrm{points}) \\\\
+#                 &= \\left[ \\cos(p_0), \\cos(p_1), \\cos(p_2), \\ ... \\ , \\cos(p_{n-1}) \\right]
+#         \\end{array}
+#
+#     when bounds and points from ``lataxis`` are written as
+#
+#     .. math::
+#
+#         \\begin{array}{ll}
+#             \\textrm{bounds}   &= [b_0, b_1, b_2, \\ ... \\ , b_{n-1}, b_{n}] \\\\
+#             \\textrm{points}   &= [p_0, p_1, p_2, \\ ... \\ , p_{n-1}]
+#         \\end{array}
+#
+#     Giving this input to :func:`_make_diffusion_matrix` results in a matrix like:
+#
+#     .. math::
+#
+#         \\textrm{diffTriDiag}=
+#         \\left[ \\begin{array}{cccccc}
+#         1+\\frac{u_1 }{\\cos(p_0)} & -\\frac{u_1}{\\cos(p_0)} & 0 &  & ... & 0  \\\\
+#         -\\frac{u_1}{\\cos(p_1)} & 1+\\frac{u_1 + u_2}{\\cos(p_1)} & -\\frac{u_2}{\\cos(b_1)} & 0 & ... & 0 \\\\
+#         0 & -\\frac{u_2}{\\cos(p_2)}  & 1+\\frac{u_2 + u_3}{\\cos(p_2)} & -\\frac{u_3}{\\cos(p_2)} &... & 0  \\\\
+#           &  & \\ddots & \\ddots & \\ddots & \\\\
+#         0 & 0 & ... & -\\frac{u_{n-2}}{\\cos(p_{n-2})}  & 1+\\frac{u_{n-2} + u_{n-1}}{\\cos(p_{n-2})} & -\\frac{u_{n-1}}{\\cos(p_{n-2})} \\\\
+#         0 & 0 & ... & 0 & -\\frac{u_{n-1}}{\\cos(p_{n-1})}  & 1+\\frac{u_{n-1}}{\\cos(p_{n-1})} \\\\
+#         \\end{array} \\right]
+#
+#     with the substitue of:
+#
+#     .. math::
+#
+#         u_i = \\cos(b_i) K_i
+#
+#     """
+#     phi_stag = np.deg2rad(lataxis.bounds)
+#     phi = np.deg2rad(lataxis.points)
+#     weight1 = np.cos(phi_stag)
+#     weight2 = np.cos(phi)
+#     diag = _make_diffusion_matrix(K, weight1, weight2)
+#     return diag, weight1, weight2
+#
+#
+# def _solve_implicit_banded(current, banded_matrix):
+#     """Uses a banded solver for matrix inversion of a tridiagonal matrix.
+#
+#     Converts the complete listed tridiagonal matrix *(nxn)* into a three row
+#     matrix *(3xn)* and calls :py:func:`scipy.linalg.solve_banded()`.
+#
+#     :param array current:           the current state of the variable for which
+#                                     matrix inversion should be computed
+#     :param array banded_matrix:     complete diffusion matrix (*dimension: nxn*)
+#     :returns:                       output of :py:func:`scipy.linalg.solve_banded()`
+#     :rtype:                         array
+#
+#     """
+#     #  can improve performance by storing the banded form once and not
+#     #  recalculating it...
+#     #  but whatever
+#     J = banded_matrix.shape[0]
+#     diag = np.zeros((3, J))
+#     diag[1, :] = np.diag(banded_matrix, k=0)
+#     diag[0, 1:] = np.diag(banded_matrix, k=1)
+#     diag[2, :-1] = np.diag(banded_matrix, k=-1)
+#     return solve_banded((1, 1), diag, current)
 
 
 def _guess_diffusion_axis(process_or_domain):
