@@ -25,7 +25,7 @@ the solver also calculates two diagnostics from the updated state:
 - ``diffusive_flux`` given by :math:`F(\phi)` in units of :math:`[\Psi]` m/s
 - ``diffusive_flux_convergence`` given by :math:`-\frac{1}{a \cos\phi} \frac{\partial}{\partial \phi} \left[ \cos\phi ~ F(\phi,t) \right]` in units of :math:`[\Psi]`/s
 
-The grid must be *evenly spaced in latitude*.
+Non-uniform grid spacing is supported.
 
 The state variable :math:`\Psi` may be multi-dimensional, but the diffusion
 will operate along the latitude dimension only.

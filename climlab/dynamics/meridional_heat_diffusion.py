@@ -30,7 +30,7 @@ which are meaningful if :math:`T` represents a *zonally averaged temperature*:
 - ``heat_transport`` given by :math:`\mathcal{H}(\phi) = -2 \pi ~ a^2 ~ \cos\phi ~ D ~ \frac{\partial T}{\partial \phi}` in units of PW (petawatts).
 - ``heat_transport_convergence`` given by :math:`-\frac{1}{2 \pi ~a^2 \cos\phi} \frac{\partial \mathcal{H}}{\partial \phi}` in units of W/m2
 
-The grid must be *evenly spaced in latitude*.
+Non-uniform grid spacing is supported.
 
 The state variable :math:`T` may be multi-dimensional, but the diffusion
 will operate along the latitude dimension only.
@@ -65,7 +65,7 @@ class MeridionalHeatDiffusion(MeridionalDiffusion):
     '''
     def __init__(self,
                  D=0.555,  # in W / m^2 / degC
-                 use_banded_solver=True,
+                 use_banded_solver=False,
                  **kwargs):
         #  First just use a dummy value for K
         super(MeridionalHeatDiffusion, self).__init__(K=1.,
