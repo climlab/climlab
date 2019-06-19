@@ -268,7 +268,7 @@ class EBM(TimeDependentProcess):
                                      insolation=ins.insolation,
                                      albedo=alb.albedo,
                                      **self.param)
-        diff = MeridionalHeatDiffusion(state=self.state, **self.param)
+        diff = MeridionalHeatDiffusion(state=self.state, use_banded_solver=False, **self.param)
         self.add_subprocess('LW', lw)
         self.add_subprocess('insolation', ins)
         self.add_subprocess('albedo', alb)

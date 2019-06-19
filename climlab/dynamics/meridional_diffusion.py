@@ -23,16 +23,16 @@ In addition to the tendency over the implicit timestep,
 the solver also calculates two diagnostics from the updated state:
 
 - ``diffusive_flux`` given by :math:`F(\phi)` in units of :math:`[\Psi]` m/s
-- ``diffusive_flux_convergence`` given by :math:`-\frac{1}{a \cos\phi} \frac{\partial}{\partial \phi} \left[ \cos\phi ~ F(\phi,t) \right]` in units of :math:`[\Psi]`/s
+- ``flux_convergence`` given by :math:`-\frac{1}{a \cos\phi} \frac{\partial}{\partial \phi} \left[ \cos\phi ~ F(\phi,t) \right]` in units of :math:`[\Psi]`/s
 
-The grid must be *evenly spaced in latitude*.
+Non-uniform grid spacing is supported.
 
 The state variable :math:`\Psi` may be multi-dimensional, but the diffusion
 will operate along the latitude dimension only.
 """
 from __future__ import division
 import numpy as np
-from .diffusion import Diffusion
+from .advection_diffusion import Diffusion
 from climlab import constants as const
 
 
@@ -94,12 +94,11 @@ class MeridionalDiffusion(Diffusion):
         super(MeridionalDiffusion, self).__init__(K=K,
                                                 diffusion_axis='lat', **kwargs)
         # Conversion of delta from degrees (grid units) to physical length units
-        self.delta *= (np.deg2rad(1.) * const.a)
-        for dom in list(self.domains.values()):
-            lataxis = dom.axes['lat']
-        phi_stag = np.deg2rad(lataxis.bounds)
-        phi = np.deg2rad(lataxis.points)
-        self._weight1 = np.cos(phi_stag)
-        self._weight2 = np.cos(phi)
+        phi_stag = np.deg2rad(self.lat_bounds)
+        phi = np.deg2rad(self.lat)
+        self._Xcenter[...,:] = phi*const.a
+        self._Xbounds[...,:] = phi_stag*const.a
+        self._weight_bounds[...,:] = np.cos(phi_stag)
+        self._weight_center[...,:] = np.cos(phi)
         #  Now properly compute the weighted diffusion matrix
         self.K = K
