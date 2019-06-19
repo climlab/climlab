@@ -1,14 +1,14 @@
-r"""General solver of the 1D advection-diffusion equation:
+r"""CLIMLAB Process objects for advection-diffusion processes of the form
 
 .. math::
 
-    \frac{\partial}{\partial t} \Psi(x,t) &= -\frac{1}{w(x)} \frac{\partial}{\partial x} \left[ w(x) ~ \mathcal{F}(x,t) \right] \\
-    \mathcal{F} &= U(x) \Psi(x) -K(x) ~ \frac{\partial \Psi}{\partial x} + F(x)
+    \frac{\partial}{\partial t} \psi(x,t) &= -\frac{1}{w(x)} \frac{\partial}{\partial x} \left[ w(x) ~ \mathcal{F}(x,t) \right] \\
+    \mathcal{F} &= U(x) \psi(x) -K(x) ~ \frac{\partial \psi}{\partial x} + F(x)
 
-for a state variable :math:`\Psi(x,t)`, diffusivity :math:`K(x)`
+for a state variable :math:`\psi(x,t)`, diffusivity :math:`K(x)`
 in units of :math:`x^2 ~ t^{-1}`, advecting velocity :math:`U(x)`
 in units of :math:`x ~ t^{-1}`, and a prescribed flux F(x)
-(including boundary conditions) in units of :math:`\Psi ~ x ~ t^{-1}`.
+(including boundary conditions) in units of :math:`\psi ~ x ~ t^{-1}`.
 
 The prescribed flux :math:`F(x)` defaults to zero everywhere. The user can
 implement a non-zero boundary flux condition by passing a non-zero array
@@ -25,20 +25,20 @@ or optionally vectors *specified at grid cell boundaries*
 (e.g., after each timestep, if they depend on other state variables).
 
 A fully implicit timestep is used for computational efficiency. Thus the computed
-tendency :math:`\frac{\partial \Psi}{\partial t}` will depend on the timestep.
+tendency :math:`\frac{\partial \psi}{\partial t}` will depend on the timestep.
 
 In addition to the tendency over the implicit timestep,
 the solver also calculates several diagnostics from the updated state:
 
-- ``diffusive_flux`` given by :math:`-K(x) ~ \frac{\partial \Psi}{\partial x}` in units of :math:`[\Psi]~[x]`/s
-- ``advective_flux`` given by :math:`U(x) \Psi(x)` (same units)
+- ``diffusive_flux`` given by :math:`-K(x) ~ \frac{\partial \psi}{\partial x}` in units of :math:`[\psi]~[x]`/s
+- ``advective_flux`` given by :math:`U(x) \psi(x)` (same units)
 - ``total_flux``, the sum of advective, diffusive and prescribed fluxes
-- ``flux_convergence`` given by the right hand side of the first equation above, in units of :math:`[\Psi]`/s
+- ``flux_convergence`` given by the right hand side of the first equation above, in units of :math:`[\psi]`/s
 
 This base class can be used without modification for diffusion in
 Cartesian coordinates (:math:`w=1`). Non-uniformly spaced grids are supported.
 
-The state variable :math:`\Psi` may be multi-dimensional, but the diffusion
+The state variable :math:`\psi` may be multi-dimensional, but the diffusion
 will operate along a single dimension only.
 
 Other classes implement the weighting for spherical geometry.
