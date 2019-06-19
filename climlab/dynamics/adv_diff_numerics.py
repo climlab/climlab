@@ -1,6 +1,6 @@
 r'''
 The 1D advection-diffusion problem
-------------------------------------------------
+----------------------------------
 
 The equation to be solved is
 
