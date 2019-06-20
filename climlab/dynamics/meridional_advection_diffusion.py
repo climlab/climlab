@@ -3,7 +3,7 @@ r"""General solver of the 1D meridional advection-diffusion equation on the sphe
 .. math::
 
     \frac{\partial}{\partial t} \psi(\phi,t) &= -\frac{1}{a \cos\phi} \frac{\partial}{\partial \phi} \left[ \cos\phi ~ F(\phi,t) \right] \\
-    F &= U(\phi) \psi(\phi) -\frac{K}{a} ~ \frac{\partial \psi}{\partial \phi}
+    F &= U(\phi) \psi(\phi) -\frac{K(\phi)}{a} ~ \frac{\partial \psi}{\partial \phi}
 
 for a state variable :math:`\psi(\phi,t)`, arbitrary diffusivity :math:`K(\phi)`
 in units of :math:`x^2 ~ t^{-1}`, and advecting velocity :math:`U(\phi)`.
@@ -22,8 +22,8 @@ tendency :math:`\frac{\partial \psi}{\partial t}` will depend on the timestep.
 In addition to the tendency over the implicit timestep,
 the solver also calculates several diagnostics from the updated state:
 
-- ``diffusive_flux`` given by :math:`-K(x) ~ \frac{\partial \psi}{\partial x}` in units of :math:`[\psi]~[x]`/s
-- ``advective_flux`` given by :math:`U(x) \psi(x)` (same units)
+- ``diffusive_flux`` given by :math:`-\frac{K(\phi)}{a} ~ \frac{\partial \psi}{\partial \phi}` in units of :math:`[\psi]~[x]`/s
+- ``advective_flux`` given by :math:`U(\phi) \psi(\phi)` (same units)
 - ``total_flux``, the sum of advective, diffusive and prescribed fluxes
 - ``flux_convergence`` (or instantanous scalar tendency) given by the right hand side of the first equation above, in units of :math:`[\psi]`/s
 
