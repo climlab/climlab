@@ -19,6 +19,6 @@ with transport down an approximate gradient in near-surface moist static energy.
 from __future__ import absolute_import
 from .budyko_transport import BudykoTransport
 from .advection_diffusion import AdvectionDiffusion, Diffusion
-from .meridional_diffusion import MeridionalDiffusion
+from .meridional_advection_diffusion import MeridionalAdvectionDiffusion, MeridionalDiffusion
 from .meridional_heat_diffusion import MeridionalHeatDiffusion
 from .meridional_moist_diffusion import MeridionalMoistDiffusion

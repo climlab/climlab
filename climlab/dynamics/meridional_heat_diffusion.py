@@ -37,7 +37,7 @@ will operate along the latitude dimension only.
 """
 from __future__ import division
 import numpy as np
-from .meridional_diffusion import MeridionalDiffusion
+from .meridional_advection_diffusion import MeridionalDiffusion
 from climlab import constants as const
 
 
@@ -46,22 +46,22 @@ class MeridionalHeatDiffusion(MeridionalDiffusion):
 
     Solves the meridional heat diffusion equation
 
-    $$ C \frac{\partial T}{\partial t} = -\frac{1}{\cos\phi} \frac{\partial}{\partial \phi} \left[ -D \cos\phi \frac{\partial T}{\partial \phi} \right]$$
+    .. math::
 
-    on an evenly-spaced latitude grid, with a state variable $T$, a heat capacity $C$ and diffusivity $D$.
+        C \frac{\partial T}{\partial t} = -\frac{1}{\cos\phi} \frac{\partial}{\partial \phi} \left[ -D \cos\phi \frac{\partial T}{\partial \phi} \right]
 
-    Assuming $T$ is a temperature in $K$ or $^\circ$C, then the units are:
+    on an evenly-spaced latitude grid, with a state variable :math:`T`,
+    a heat capacity :math:`C` and diffusivity :math:`D`.
 
-    - $D$ in W m$^{-2}$ K$^{-1}$
-    - $C$ in J m$^{-2}$ K$^{-1}$
+    Assuming :math:`T` is a temperature in K or degC, then the units are:
 
-    If the state variable has other units, then $D$ and $C$ should be expressed
-    per state variabe unit.
+    - :math:`D` in W m-2 K-1
+    - :math:`C` in J m-2 K-1
 
-    $D$ is provided as input, and can be either scalar
-    or vector defined at latitude boundaries (length).
+    :math:`D` is provided as input, and can be either scalar
+    or vector defined at latitude boundaries.
 
-    $C$ is normally handled automatically for temperature state variables in CLIMLAB.
+    :math:`C` is normally handled automatically for temperature state variables in CLIMLAB.
     '''
     def __init__(self,
                  D=0.555,  # in W / m^2 / degC
