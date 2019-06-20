@@ -206,6 +206,31 @@ where :math:`\boldsymbol{I}` is the :math:`J\times J` identity matrix.
 Solving for the future value :math:`\boldsymbol{\psi}^{n+1}` is then accomplished
 by solving the :math:`J \times J` tridiagonal linear system using standard routines.
 
+Analytical benchmark
+--------------------
+
+Here is an analytical case to be used for testing purposes to validate the numerical code.
+This is implemented in the CLIMLAB test suite.
+
+- :math:`K=K_0` is constant
+- :math:`w(x) = 1` everywhere (Cartesian coordinates)
+- :math:`F = 0` everywhere
+- :math:`\psi(x,0) = \psi_0 \sin^2\left(\frac{\pi x}{L}\right)`
+- :math:`u(x) = U_0 \sin\left(\frac{\pi x}{L}\right)`
+for a domain with endpoints at :math:`x=0` and :math:`x=L`.
+
+The analytical solution is
+
+.. math::
+
+    \begin{align}
+    \mathcal{F} &= \psi_0 \sin\left(\frac{\pi x}{L}\right) \left[U_0 \sin^2\left(\frac{\pi x}{L}\right) - 2K \frac{\pi}{L} \cos\left(\frac{\pi x}{L}\right) \right]  \\
+    \frac{\partial \psi}{\partial t} &= -\psi_0 \frac{\pi}{L} \left\{ 3 U_0 \sin^2\left(\frac{\pi x}{L}\right) \cos\left(\frac{\pi x}{L}\right) -2K\frac{\pi}{L} \left[\cos^2\left(\frac{\pi x}{L}\right) -\sin^2\left(\frac{\pi x}{L}\right) \right] \right\}
+    \end{align}
+
+which satisfies the boundary condition :math:`\mathcal{F} = 0` at :math:`x=0` and :math:`x=L`.
+
+
 Module function reference
 -------------------------
 
