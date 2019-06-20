@@ -3,10 +3,15 @@ Modules for simple dynamics, mostly for use in Energy Balance Models.
 
 :class:`~climlab.dynamics.BudykoTransport` is a relaxation to global mean.
 
-Other modules are 1D advection- diffusion solvers (implemented using implicit timestepping).
+Other modules are 1D advection-diffusion solvers (implemented using implicit timestepping).
 
 :class:`~climlab.dynamics.AdvectionDiffusion` is a general-purpose 1D
-advection-diffusion process.
+advection-diffusion process. It can be used out-of-the-box for models with
+Cartesian grid geometry, but also accepts weighting functions for the
+divergence operator on curvilinear grids.
+
+:class:`~climlab.dynamics.MeridionalAdvectionDiffusion` implements the
+1D advection-diffusion process on the sphere (flux in the north-south direction).
 
 Subclass :class:`~climlab.dynamics.MeridionalHeatDiffusion` is the appropriate class
 for the traditional diffusive EBM, in which transport is parameterized as a
