@@ -4,9 +4,9 @@ climlab
 
 |docs| |JOSS| |DOI| |pypi| |Build Status| |Appveyor Status| |coverage|
 
-----------
+-----------------------------------------------------
  Python package for process-oriented climate modeling
-----------
+-----------------------------------------------------
 
 Author
 --------------
@@ -51,7 +51,7 @@ Installation
 --------------
 
 Installing pre-built binaries with conda (Mac OSX, Linux, and Windows)
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 By far the simplest and recommended way to install ``climlab`` is using conda_
 (which is the wonderful package manager that comes with `Anaconda Python`_).
 
@@ -90,7 +90,7 @@ You will need a Fortran compiler on your system.
 The build has been tested with both gcc/gfortran and ifort (Linux)
 
 Installing from source without a Fortran compiler
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Many parts of ``climlab`` are written in pure Python and should work on any system.
 Fortran builds are necessary for the RRTMG and CAM3 radiation schemes and for the Emanuel convection scheme.
 If you follow the instructions for installing from source (above) without a valid Fortran compiler,
@@ -131,14 +131,14 @@ Required
 
 
 Recommended for full functionality
-~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 - numba >=0.43.1 (used for acceleration of some components)
 
 *Note that there is a bug in previous numba versions that caused a hanging condition in climlab under Python 3.*
 
 
 Complete development environment
-~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 To build from source and develop new code you will need some additional pieces
 
 - pip
@@ -150,7 +150,7 @@ See "Installing pre-built binaries with conda" above.
 
 
 Documentation and Examples
-------------------
+--------------------------
 Full user manual is available here_.
 
 The directory ``climlab/courseware/`` also contains a collection of Jupyter notebooks (``*.ipynb``) used for teaching some basics of climate science, and documenting use of the ``climlab`` package.
@@ -288,7 +288,7 @@ The documentation_ was first created by Moritz Kreuzer
 
 
 Contact and Bug Reports
-----------------------
+-----------------------
 Users are strongly encouraged to submit bug reports and feature requests on
 github at
 https://github.com/brian-rose/climlab
