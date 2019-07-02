@@ -30,7 +30,8 @@ install:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
 
   # install xarray and dependencies
-  - "conda init cmd.exe"
+  #- "conda init cmd.exe"
+  - "conda update --yes conda"
   - "conda env create --file ./ci/requirements-%CONDA_ENV%.yml"
   - "conda activate test_env"
   - "conda list"
