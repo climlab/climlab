@@ -27,10 +27,10 @@ install:
   - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
 
   # install xarray and dependencies
-  - "conda activate"
-  - "conda env create --file ./ci/requirements-%CONDA_ENV%.yml"
-  - "conda activate test_env"
-  - "conda list"
+  - "CALL conda.bat activate"
+  - "CALL conda.bat env create --file ./ci/requirements-%CONDA_ENV%.yml"
+  - "CALL conda.bat activate test_env"
+  - "CALL conda.bat list"
   - "python -m pip install . --no-deps -vv"
 
 build: false
