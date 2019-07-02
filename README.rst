@@ -38,13 +38,14 @@ Currently, ``climlab`` has out-of-the-box support and documented examples for
 - Convection schemes:
     - Emanuel moist convection scheme
     - Hard convective adjustment (to constant lapse rate or to moist adiabat)
-- Diffusion solvers for moist and dry Energy Balance Models
+- 1D Advection-Diffusion solvers
+- Moist and dry Energy Balance Models
 - Flexible insolation including:
   - Seasonal and annual-mean models
   - Arbitrary orbital parameters
 - Boundary layer scheme including sensible and latent heat fluxes
 - Arbitrary combinations of the above, for example:
-    - 2D latitude-pressure models with radiation, horizontally-varying diffusion, and fixed relative humidity
+    - 2D latitude-pressure models with radiation, horizontally-varying meridional diffusion, and fixed relative humidity
 
 
 Installation
@@ -68,7 +69,6 @@ and then simply do::
     conda install climlab
 
 Binaries are available for OSX, Linux, and Windows.
-You may need to update your ``numpy`` if you are using are using a version prior to 1.11
 
 Installing from source
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -84,7 +84,7 @@ Alternatively, clone the source code repository with::
 
 and, from the ``climlab`` directory, do::
 
-    python setup.py install
+    python -m pip install . --no-deps -vv
 
 You will need a Fortran compiler on your system.
 The build has been tested with both gcc/gfortran and ifort (Linux)
@@ -165,6 +165,9 @@ These are self-describing, and should all run out-of-the-box once the package is
 
 Release history
 ----------------------
+
+Version 0.7.5 (released July 2019)
+    Bug fix
 
 Version 0.7.4 (released June 2019)
     New flexible solver for 1D advection-diffusion processes on non-uniform grids, along with some bug fixes.
