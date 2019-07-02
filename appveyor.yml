@@ -33,7 +33,7 @@ install:
   #- "conda init cmd.exe"
   - "conda update --yes conda"
   - "conda env create --file ./ci/requirements-%CONDA_ENV%.yml"
-  - "conda activate test_env"
+  - "CALL conda.bat activate test_env"
   - "conda list"
   - "python -m pip install . --no-deps -vv"
 
