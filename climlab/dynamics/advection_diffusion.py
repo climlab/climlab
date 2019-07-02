@@ -177,9 +177,9 @@ class AdvectionDiffusion(ImplicitProcess):
             W=self._weight_center, Wb=self._weight_bounds)
 
     def _compute_advdiff_matrix(self):
-        Karray = np.ones_like(self._Xbounds) * self._K
+        Karray = np.ones_like(self._Xbounds) * self.K
         try:
-            Uarray = np.ones_like(self._Xbounds) * self._U
+            Uarray = np.ones_like(self._Xbounds) * self.U
         except Exception:
             Uarray = 0.*Karray
         self._advdiffTriDiag = adv_diff_numerics.advdiff_tridiag(X=self._Xcenter,
@@ -197,11 +197,10 @@ class AdvectionDiffusion(ImplicitProcess):
         return newstate
 
     def _update_diagnostics(self, newstate):
-        Karray = self._Xbounds * self.K
-        Uarray = self._Xbounds * self.U
+        Karray = np.ones_like(self._Xbounds) * self.K
+        Uarray = np.ones_like(self._Xbounds) * self.U
         for varname, value in newstate.items():
             field = np.moveaxis(value, self.diffusion_axis_index,-1)
-            #field = value.squeeze()
             diff_flux = adv_diff_numerics.diffusive_flux(self._Xcenter,
                                         self._Xbounds, Karray, field)
             adv_flux = adv_diff_numerics.advective_flux(self._Xcenter,

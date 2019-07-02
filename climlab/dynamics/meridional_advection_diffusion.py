@@ -56,7 +56,7 @@ class MeridionalAdvectionDiffusion(AdvectionDiffusion):
         self._Xbounds[...,:] = phi_stag*const.a
         self._weight_bounds[...,:] = np.cos(phi_stag)
         self._weight_center[...,:] = np.cos(phi)
-        #  Now properly compute the weighted diffusion matrix
+        #  Now properly compute the weighted advection-diffusion matrix
         self.prescribed_flux = prescribed_flux
         self.K = K
         self.U = U
