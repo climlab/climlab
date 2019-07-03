@@ -15,7 +15,9 @@ def readme():
 
 # Patch the GNU Fortran compiler not to optimize certain sources
 def patch_gnu_fortran():
-    from numpy.distutils.fcompiler import gnu
+    #from numpy.distutils.fcompiler import gnu
+    from numpy.distutils import fcompiler
+    #.fcompiler import FCompiler
 
     def monkeypatched_spawn(old_spawn):
         def spawn(self, cmd, *args, **kw):
@@ -33,8 +35,9 @@ def patch_gnu_fortran():
             return old_spawn(self, cmd, *args, **kw)
         return spawn
 
-    gnu.GnuFCompiler.spawn = monkeypatched_spawn(gnu.GnuFCompiler.spawn)
-    gnu.Gnu95FCompiler.spawn = monkeypatched_spawn(gnu.Gnu95FCompiler.spawn)
+    #gnu.GnuFCompiler.spawn = monkeypatched_spawn(gnu.GnuFCompiler.spawn)
+    #gnu.Gnu95FCompiler.spawn = monkeypatched_spawn(gnu.Gnu95FCompiler.spawn)
+    fcompiler.FCompiler.spawn = monkeypatched_spawn(fcompiler.FCompiler.spawn)
 
 def configuration(parent_package='',top_path=None):
     from numpy.distutils.misc_util import Configuration
@@ -44,10 +47,7 @@ def configuration(parent_package='',top_path=None):
                        assume_default_configuration=True,
                        delegate_options_to_subpackages=True,
                        quiet=True)
-
     config.add_subpackage('climlab')
-
-    #config.get_version('numpy/version.py') # sets config.version
     return config
 
 def setup_package():
@@ -70,11 +70,6 @@ def setup_package():
           author_email='brose@albany.edu',
           license='MIT',
     )
-    # if "--force" in sys.argv:
-    #     run_build = True
-    # else:
-    #     # Raise errors for unsupported commands, improve help output, etc.
-    #     run_build = parse_setuppy_commands()
     run_build = True
 
     # This import is here because it needs to be done before importing setup()
