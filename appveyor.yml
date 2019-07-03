@@ -12,11 +12,11 @@ environment:
 
   matrix:
     - PYTHON: "C:\\Miniconda36-x64"
-      PYTHON_VERSION: "3.6"
+      #PYTHON_VERSION: "3.6"
       PYTHON_ARCH: "64"
       CONDA_ENV: "py36-windows"
-    - PYTHON: "C:\\Miniconda37-x64"
-      PYTHON_VERSION: "3.7"
+    - PYTHON: "C:\\Miniconda36-x64"
+      #PYTHON_VERSION: "3.7"
       PYTHON_ARCH: "64"
       CONDA_ENV: "py37-windows"
 
