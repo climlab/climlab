@@ -167,7 +167,7 @@ Release history
 ----------------------
 
 Version 0.7.5 (released July 2019)
-    Bug fix
+    Bug fixes and improvements to continuous integration
 
 Version 0.7.4 (released June 2019)
     New flexible solver for 1D advection-diffusion processes on non-uniform grids, along with some bug fixes.
