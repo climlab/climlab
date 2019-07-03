@@ -1,5 +1,4 @@
-import os, sys
-import textwrap
+import os
 
 VERSION = '0.7.5'
 
@@ -13,11 +12,10 @@ def readme():
     with open('README.rst') as f:
         return f.read()
 
-# Patch the GNU Fortran compiler not to optimize certain sources
-def patch_gnu_fortran():
-    #from numpy.distutils.fcompiler import gnu
+# Patch the Fortran compiler not to optimize certain sources
+def patch_fortran():
+    # This should work for all subclasses of FCompiler
     from numpy.distutils import fcompiler
-    #.fcompiler import FCompiler
 
     def monkeypatched_spawn(old_spawn):
         def spawn(self, cmd, *args, **kw):
@@ -34,9 +32,6 @@ def patch_gnu_fortran():
 
             return old_spawn(self, cmd, *args, **kw)
         return spawn
-
-    #gnu.GnuFCompiler.spawn = monkeypatched_spawn(gnu.GnuFCompiler.spawn)
-    #gnu.Gnu95FCompiler.spawn = monkeypatched_spawn(gnu.Gnu95FCompiler.spawn)
     fcompiler.FCompiler.spawn = monkeypatched_spawn(fcompiler.FCompiler.spawn)
 
 def configuration(parent_package='',top_path=None):
@@ -77,7 +72,7 @@ def setup_package():
     # higher up in this file.
     from setuptools import setup
 
-    patch_gnu_fortran()
+    patch_fortran()
 
     if run_build:
         from numpy.distutils.core import setup
