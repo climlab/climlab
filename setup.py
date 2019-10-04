@@ -63,6 +63,8 @@ def setup_package():
           url='http://github.com/brian-rose/climlab',
           author='Brian E. J. Rose',
           author_email='brose@albany.edu',
+          install_requires=['numpy'],
+          requires=['xarray','attrdict','scipy'],
           license='MIT',
     )
     run_build = True
