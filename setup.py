@@ -15,7 +15,12 @@ def readme():
 # Patch the Fortran compiler not to optimize certain sources
 def patch_fortran():
     # This should work for all subclasses of FCompiler
-    from numpy.distutils import fcompiler
+    try:
+        from numpy.distutils import fcompiler
+    except ImportError:
+        import sys
+        print("\nPlease install numpy before installing climlab\n", file=sys.stderr)
+        sys.exit(-1)
 
     def monkeypatched_spawn(old_spawn):
         def spawn(self, cmd, *args, **kw):
