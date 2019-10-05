@@ -70,8 +70,7 @@ def setup_package():
           author='Brian E. J. Rose',
           author_email='brose@albany.edu',
           setup_requires=['numpy'],
-          install_requires=['numpy'],
-          requires=['xarray','attrdict','scipy'],
+          install_requires=['numpy','xarray','attrdict','scipy'],
           license='MIT',
     )
     run_build = True
