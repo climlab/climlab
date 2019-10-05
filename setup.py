@@ -19,6 +19,7 @@ def patch_fortran():
         from numpy.distutils import fcompiler
     except ImportError:
         import sys
+        from __future__ import print_function
         print("\nPlease install numpy before installing climlab\n", file=sys.stderr)
         sys.exit(-1)
 
