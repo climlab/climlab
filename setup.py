@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 
 VERSION = '0.7.5'
@@ -19,7 +20,6 @@ def patch_fortran():
         from numpy.distutils import fcompiler
     except ImportError:
         import sys
-        from __future__ import print_function
         print("\nPlease install numpy before installing climlab\n", file=sys.stderr)
         sys.exit(-1)
 
@@ -69,6 +69,7 @@ def setup_package():
           url='http://github.com/brian-rose/climlab',
           author='Brian E. J. Rose',
           author_email='brose@albany.edu',
+          setup_requires=['numpy'],
           install_requires=['numpy'],
           requires=['xarray','attrdict','scipy'],
           license='MIT',
