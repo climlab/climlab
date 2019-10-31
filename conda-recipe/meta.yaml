@@ -1,8 +1,7 @@
-{% set name = "climlab" %}
-{% set version = "0.7.2.dev0" %}
+{% set version = "0.7.5" %}
 
 package:
-  name: {{ name|lower }}
+  name: climlab
   version: {{ version }}
 
 source:
@@ -19,17 +18,18 @@ requirements:
   host:
     - flang  # [win and py3k]
     - python
-    - setuptools
+    - pip
     - numpy
   run:
     - python
     - {{ pin_compatible('numpy') }}
     - libflang  # [win and py3k]
     - scipy
+    - pydap
+    - urllib3
     - xarray
     - future
     - attrdict
-    - numba  # [py2k]
 
 test:
   requires:

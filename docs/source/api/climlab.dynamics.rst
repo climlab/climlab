@@ -10,7 +10,8 @@ climlab.dynamics
 .. toctree::
 
     climlab.dynamics.BudykoTransport
-    climlab.dynamics.Diffusion
-    climlab.dynamics.MeridionalDiffusion
+    climlab.dynamics.AdvectionDiffusion
+    climlab.dynamics.MeridionalAdvectionDiffusion
     climlab.dynamics.MeridionalHeatDiffusion
     climlab.dynamics.MeridionalMoistDiffusion
+    climlab.dynamics.adv_diff_numerics

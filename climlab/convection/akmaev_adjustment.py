@@ -132,15 +132,8 @@ def Akmaev_adjustment(theta, q, beta, n_k, theta_k, s_k, t_k):
 #  which gives at least 10x speedup
 #   If numba is not available or compilation fails, the code will be executed
 #   in pure Python. Results should be identical
-
-###  ONLY DO THIS IN PYTHON 2!
-#  Because of a bug in numba for while / break loops that is causing all calls
-#  to ConvectiveAdjustment to hang forever!
-#   https://github.com/numba/numba/issues/2273
-if sys.version_info < (3,0):
-    try:
-        from numba import jit
-        Akmaev_adjustment = jit(signature_or_function=Akmaev_adjustment)
-        #print 'Compiling Akmaev_adjustment() with numba.'
-    except:
-        pass
+try:
+    from numba import jit
+    Akmaev_adjustment = jit(signature_or_function=Akmaev_adjustment)
+except ImportError:
+    pass

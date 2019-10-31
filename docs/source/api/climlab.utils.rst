@@ -1,10 +1,17 @@
 climlab.utils
 =============
 
+.. automodule:: climlab.utils
+    :members:
+    :private-members:
+    :undoc-members:
+    :show-inheritance:
+
 .. toctree::
 
    climlab.utils.attr_dict
    climlab.utils.constants
+   climlab.utils.data_source
    climlab.utils.heat_capacity
    climlab.utils.legendre
    climlab.utils.thermo

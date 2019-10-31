@@ -2,11 +2,11 @@
 climlab
 ================
 
-|docs| |JOSS| |DOI| |pypi| |Build Status| |coverage|
+|docs| |JOSS| |DOI| |pypi| |Build Status| |Appveyor Status| |coverage|
 
-----------
+-----------------------------------------------------
  Python package for process-oriented climate modeling
-----------
+-----------------------------------------------------
 
 Author
 --------------
@@ -38,20 +38,21 @@ Currently, ``climlab`` has out-of-the-box support and documented examples for
 - Convection schemes:
     - Emanuel moist convection scheme
     - Hard convective adjustment (to constant lapse rate or to moist adiabat)
-- Diffusion solvers for moist and dry Energy Balance Models
+- 1D Advection-Diffusion solvers
+- Moist and dry Energy Balance Models
 - Flexible insolation including:
   - Seasonal and annual-mean models
   - Arbitrary orbital parameters
 - Boundary layer scheme including sensible and latent heat fluxes
 - Arbitrary combinations of the above, for example:
-    - 2D latitude-pressure models with radiation, horizontally-varying diffusion, and fixed relative humidity
+    - 2D latitude-pressure models with radiation, horizontally-varying meridional diffusion, and fixed relative humidity
 
 
 Installation
 --------------
 
 Installing pre-built binaries with conda (Mac OSX, Linux, and Windows)
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 By far the simplest and recommended way to install ``climlab`` is using conda_
 (which is the wonderful package manager that comes with `Anaconda Python`_).
 
@@ -68,7 +69,6 @@ and then simply do::
     conda install climlab
 
 Binaries are available for OSX, Linux, and Windows.
-You may need to update your ``numpy`` if you are using are using a version prior to 1.11
 
 Installing from source
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -84,13 +84,13 @@ Alternatively, clone the source code repository with::
 
 and, from the ``climlab`` directory, do::
 
-    python setup.py install
+    python -m pip install . --no-deps -vv
 
 You will need a Fortran compiler on your system.
 The build has been tested with both gcc/gfortran and ifort (Linux)
 
 Installing from source without a Fortran compiler
-~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Many parts of ``climlab`` are written in pure Python and should work on any system.
 Fortran builds are necessary for the RRTMG and CAM3 radiation schemes and for the Emanuel convection scheme.
 If you follow the instructions for installing from source (above) without a valid Fortran compiler,
@@ -122,23 +122,35 @@ These are handled automatically if you install with conda_.
 
 Required
 ~~~~~~~~~~~~
-- Python 2.7, 3.5, 3.6, 3.7 (as of version 0.7.1)
-- ``numpy``
-- ``scipy``
-- ``xarray``
-- ``attrdict``
+- Python 2.7, 3.6, 3.7
+- numpy
+- scipy
+- xarray
+- future
+- attrdict
+
 
 Recommended for full functionality
-~~~~~~~~~~~~
-- ``numba`` (used for acceleration of some components)
-- ``pytest`` (to run the automated tests, important if you are developing new code)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+- numba >=0.43.1 (used for acceleration of some components)
+
+*Note that there is a bug in previous numba versions that caused a hanging condition in climlab under Python 3.*
+
+
+Complete development environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+To build from source and develop new code you will need some additional pieces
+
+- pip
+- gfortran (OSX or linux) or flang (Windows)
+- pytest (to run the automated tests, important if you are developing new code)
 
 `Anaconda Python`_ is highly recommended and will provide everything you need.
 See "Installing pre-built binaries with conda" above.
 
 
 Documentation and Examples
-------------------
+--------------------------
 Full user manual is available here_.
 
 The directory ``climlab/courseware/`` also contains a collection of Jupyter notebooks (``*.ipynb``) used for teaching some basics of climate science, and documenting use of the ``climlab`` package.
@@ -153,6 +165,25 @@ These are self-describing, and should all run out-of-the-box once the package is
 
 Release history
 ----------------------
+
+Version 0.7.5 (released July 2019)
+    Bug fixes and improvements to continuous integration
+
+Version 0.7.4 (released June 2019)
+    New flexible solver for 1D advection-diffusion processes on non-uniform grids, along with some bug fixes.
+
+Version 0.7.3 (released April 2019)
+    Bug fix and changes to continuous integration for Python 2.7 compatibility
+
+Version 0.7.2 (released April 2019)
+    Improvements to surface flux processes, a new data management strategy, and improved documentation.
+
+    Details:
+      - ``climlab.surface.LatentHeatFlux`` and ``climlab.surface.SensibleHeatFlux`` are now documented, more consistent with the climlab API, and have new optional ``resistance`` parameters to reduce the fluxes (e.g. for modeling stomatal resistance)
+      - ``climlab.surface.LatentHeatFlux`` now produces the diagnostic ``evaporation`` in kg/m2/s. ``climlab.convection.EmanuelConvection`` produces ``precipitation`` in the same units.
+      - The previous ``PRECIP`` diagnostic (mm/day) in ``climlab.convection.EmanuelConvection`` is removed. This is a BREAKING CHANGE.
+      - Data files have been removed from the climlab source repository. All data is now accessible remotely. climlab will attempt to download and cache data files upon first use.
+      - ``climlab.convection.ConvectiveAdjustement`` is now accelerated with ``numba`` if it is available (optional)
 
 Version 0.7.1 (released January 2019)
     Deeper xarray integration, include one breaking change to ``climlab.solar.orbital.OrbitalTable``, Python 3.7 compatibility, and minor enhancements.
@@ -260,7 +291,7 @@ The documentation_ was first created by Moritz Kreuzer
 
 
 Contact and Bug Reports
-----------------------
+-----------------------
 Users are strongly encouraged to submit bug reports and feature requests on
 github at
 https://github.com/brian-rose/climlab
@@ -277,6 +308,8 @@ See the accompanying LICENSE file.
    :target: https://badge.fury.io/py/climlab
 .. |Build Status| image:: https://travis-ci.org/brian-rose/climlab.svg?branch=master
     :target: https://travis-ci.org/brian-rose/climlab
+.. |Appveyor Status| image:: https://ci.appveyor.com/api/projects/status/github/brian-rose/climlab?svg=true&passingText=passing&failingText=failing&pendingText=pending
+   :target: https://ci.appveyor.com/project/brian-rose/climlab
 .. |coverage| image:: https://codecov.io/github/brian-rose/climlab/coverage.svg?branch=master
    :target: https://codecov.io/github/brian-rose/climlab?branch=master
 .. |DOI| image:: https://zenodo.org/badge/24968065.svg

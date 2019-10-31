@@ -22,7 +22,7 @@ as part of the grid specification.
 A fully implicit timestep is used for computational efficiency. Thus the computed
 tendency :math:`\frac{\partial T}{\partial t}` will depend on the timestep.
 
-The diagnostics ``diffusive_flux`` and ``diffusive_flux_convergence`` are computed
+The diagnostics ``diffusive_flux`` and ``flux_convergence`` are computed
 as described in the parent class ``MeridionalDiffusion``.
 Two additional diagnostics are computed here,
 which are meaningful if :math:`T` represents a *zonally averaged temperature*:
@@ -30,14 +30,14 @@ which are meaningful if :math:`T` represents a *zonally averaged temperature*:
 - ``heat_transport`` given by :math:`\mathcal{H}(\phi) = -2 \pi ~ a^2 ~ \cos\phi ~ D ~ \frac{\partial T}{\partial \phi}` in units of PW (petawatts).
 - ``heat_transport_convergence`` given by :math:`-\frac{1}{2 \pi ~a^2 \cos\phi} \frac{\partial \mathcal{H}}{\partial \phi}` in units of W/m2
 
-The grid must be *evenly spaced in latitude*.
+Non-uniform grid spacing is supported.
 
 The state variable :math:`T` may be multi-dimensional, but the diffusion
 will operate along the latitude dimension only.
 """
 from __future__ import division
 import numpy as np
-from .meridional_diffusion import MeridionalDiffusion
+from .meridional_advection_diffusion import MeridionalDiffusion
 from climlab import constants as const
 
 
@@ -46,34 +46,34 @@ class MeridionalHeatDiffusion(MeridionalDiffusion):
 
     Solves the meridional heat diffusion equation
 
-    $$ C \frac{\partial T}{\partial t} = -\frac{1}{\cos\phi} \frac{\partial}{\partial \phi} \left[ -D \cos\phi \frac{\partial T}{\partial \phi} \right]$$
+    .. math::
 
-    on an evenly-spaced latitude grid, with a state variable $T$, a heat capacity $C$ and diffusivity $D$.
+        C \frac{\partial T}{\partial t} = -\frac{1}{\cos\phi} \frac{\partial}{\partial \phi} \left[ -D \cos\phi \frac{\partial T}{\partial \phi} \right]
 
-    Assuming $T$ is a temperature in $K$ or $^\circ$C, then the units are:
+    on an evenly-spaced latitude grid, with a state variable :math:`T`,
+    a heat capacity :math:`C` and diffusivity :math:`D`.
 
-    - $D$ in W m$^{-2}$ K$^{-1}$
-    - $C$ in J m$^{-2}$ K$^{-1}$
+    Assuming :math:`T` is a temperature in K or degC, then the units are:
 
-    If the state variable has other units, then $D$ and $C$ should be expressed
-    per state variabe unit.
+    - :math:`D` in W m-2 K-1
+    - :math:`C` in J m-2 K-1
 
-    $D$ is provided as input, and can be either scalar
-    or vector defined at latitude boundaries (length).
+    :math:`D` is provided as input, and can be either scalar
+    or vector defined at latitude boundaries.
 
-    $C$ is normally handled automatically for temperature state variables in CLIMLAB.
+    :math:`C` is normally handled automatically for temperature state variables in CLIMLAB.
     '''
     def __init__(self,
                  D=0.555,  # in W / m^2 / degC
-                 use_banded_solver=True,
+                 use_banded_solver=False,
                  **kwargs):
         #  First just use a dummy value for K
         super(MeridionalHeatDiffusion, self).__init__(K=1.,
                         use_banded_solver=use_banded_solver, **kwargs)
         #  Now initialize properly
         self.D = D
-        self.add_diagnostic('heat_transport', np.zeros_like(self.lat_bounds))
-        self.add_diagnostic('heat_transport_convergence', np.zeros_like(self.lat))
+        self.add_diagnostic('heat_transport', 0.*self.diffusive_flux)
+        self.add_diagnostic('heat_transport_convergence', 0.*self.flux_convergence)
 
     @property
     def D(self):
@@ -93,7 +93,8 @@ class MeridionalHeatDiffusion(MeridionalDiffusion):
         super(MeridionalHeatDiffusion, self)._update_diagnostics(newstate)
         for varname, value in self.state.items():
             heat_capacity = value.domain.heat_capacity
+        coslat_bounds = np.moveaxis(self._weight_bounds,-1,self.diffusion_axis_index)
         self.heat_transport[:] = (self.diffusive_flux * heat_capacity *
-                        2 * np.pi * const.a * self._weight1 * 1E-15) # in PW
-        self.heat_transport_convergence[:] = (self.diffusive_flux_convergence *
+            2 * np.pi * const.a * coslat_bounds * 1E-15) # in PW
+        self.heat_transport_convergence[:] = (self.flux_convergence *
                         heat_capacity)  # in W/m**2
