@@ -8,6 +8,7 @@ dependencies:
   - xarray
   - numpy
   - scipy
+  - c-compiler
   - fortran-compiler
   - future
   - attrdict
