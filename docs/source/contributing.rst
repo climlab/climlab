@@ -1,15 +1,15 @@
 .. highlight:: rst
 
 Contributing to CLIMLAB
-================
+=======================
 
-This is an open project, and contributions of all kinds are welcome.
+This is an open project, and contributions of all kinds are welcome!
 
 Here are some guidelines for how to get involved.
 
 
 Usage in publications, teaching, etc.
----------------------
+-------------------------------------
 
 If you use CLIMLAB in any way for published research or theses, online teaching materials, or anything else, we would appreciate hearing about it. Our goal is to maintain a list of links and references to use cases. This is essential information for our funders (NSF) but will also be a great resource for new users looking to find out more about what you can do with CLIMLAB.
 
@@ -21,7 +21,7 @@ For publications, please cite the `CLIMLAB description paper in JOSS`_. The full
 
 
 Reporting bugs, issues, new feature requests, and documentation problems
------------------------
+------------------------------------------------------------------------
 
 These can all be raised as new issues at <https://github.com/brian-rose/climlab/issues>
 
@@ -37,7 +37,7 @@ Feel free to point out any inaccuracies or omissions in the documentation_ here 
 
 
 Seeking help and support
--------------------
+------------------------
 
 Although CLIMLAB is offered to the community "as-is", we are very interested in helping people actually use it for scientific purposes.
 
@@ -47,7 +47,7 @@ Then, feel free to ask questions by opening a new issue at <https://github.com/b
 
 
 Contributing bug fixes and new features
------------------------
+---------------------------------------
 
 We are thrilled to have any and all help. You may want to browse through <https://github.com/brian-rose/climlab/issues> to see if there is any low-hanging fruit already identified.
 
@@ -81,65 +81,134 @@ and push your branch to github::
     git branch -d cool_new_feature
 
 
-Building and Testing CLIMLAB
-----------------------
+Building CLIMLAB from source
+----------------------------
 
-CLIMLAB has an extensive set of tests designed to work with `pytest`_. The test code is found in the ``climlab/tests`` directory inside the source repo.
+CLIMLAB is a mix of pure Python and compiled Fortran. If you're developing new code, you'll need a Fortran compiler that plays well with `numpy.f2py`_. There are a few different ways to do this.
 
-To run the full set of tests on the currently installed version of CLIMLAB, you can always do this::
+Also see below for special instructions for Mac OSX!
+
+Method 1: Automated build-and-test with conda-build
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We use (and recommend) `conda build`_ which will handle all the dependencies including Fortran compiler. This is actually how CLIMLAB is built for public consumption on conda-forge.
+
+In your base conda environment (where you should have ``conda-build`` installed), do this from the root directory of the CLIMLAB source repo::
+
+    conda-build conda-recipe
+
+This will automatically install all build dependencies in a temporary new conda environment, build all the Fortran extensions, bundle everything together, install the new package in a temporary test environment, and run the entire automated test suite. The whole procedure will take several minutes to run through.
+
+Assuming the tests pass successfully, you will see a message like::
+
+    TEST END: /Users/br546577/opt/anaconda3/conda-bld/osx-64/climlab-0.7.6-py37hdde6e19_0.tar.bz2
+
+(though obviously with different paths and version numbers)
+
+To use and test your new build further, you can install it in a new test environment (with all dependencies)::
+
+    conda create --name newtest climlab --use-local
+    conda activate newtest
+
+Once you're happy with this you can safely delete the test environment with::
+
+    conda deactivate
+    conda remove --name newtest --all
+
+If you encounter problems with the conda build recipe (which is found within ``conda-recipe`` in the source repo), please raise an issue at <https://github.com/brian-rose/climlab/issues>. You could also take a look at the `CLIMLAB recipe used on conda-forge`_, which should be very similar.
+
+
+Method 2: Using conda to set up a complete build environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Included with the CLIMLAB source repo are some YAML files that describe complete conda environments for building, testing and running the code (including compilers). We can use these to quickly create an environment with everything we need. We then build and test manually within this environment.
+
+First, create the environment (called by default ``test_env``). Do this from the top level of the CLIMLAB source repo::
+
+    conda env create --file ./ci/requirements-[pyversion]-[ostype].yml
+
+where ``[pyversion]`` can be any of ``py27``, ``py36``, or ``py37`` (your desired Python version), and ``[ostype]`` can by any of ``osx``, ``linux``, or ``windows`` (self-explanatory). For example,::
+
+    conda env create --file ./ci/requirements-py37-osx.yml
+
+Then activate the new environment::
+
+    conda activate test_env
+
+Now build from source and install in this new environment::
+
+    python -m pip install . --no-deps -vv
+
+You can now test-drive your new build. To run the full test suite, you can do this (from any directory other than the CLIMLAB repo)::
 
     pytest -v --pyargs climlab
 
 All tests should report ``PASSED``.
 
-CLIMLAB is a mix of pure Python and compiled Fortran. If you are developing new code that does not rely on the compiled components, it is useful to run tests directly from the source code directory. From the ``climlab`` root directory, do the following::
+When you are done with your test environment, you can safely deactivate and delete it with::
+
+    conda deactivate
+    conda remove -n test_env --all
+
+
+Special Caveat for Mac OSX only
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Method 1 and Method 2 both rely on gfortran supplied by conda. Currently for these to work on Mac OSX the user needs some old SDKs that are no longer provided by default from Apple, and that cannot be bundled automatically by conda due to licensing issues. `See here for discussion`_.
+
+The short answer is that you should download ``MacOSX10.9.sdk`` from <https://github.com/phracker/MacOSX-SDKs> or <https://github.com/devernay/xcodelegacy>, and save it at ``$HOME/opt/MacOSX10.9.sdk`` on your Mac.
+
+
+Method 3: Rolling your own fortran compiler
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+You don't need to use conda at all in order to build and test CLIMLAB. If you have a different fortran compiler that you want to use, we suggest starting with `these f2py examples`_. If you cannot get these examples to work, then you will almost surely not be able to build CLIMLAB.
+
+Take a look at the requirements in ``/ci/requirements-*.yml``. Most but not all of these are strictly required in order to build and run CLIMLAB. Your mileage may vary.
+
+You can build and install CLIMLAB by doing this from the source code repository::
+
+    python -m pip install . --no-deps -vv
+
+
+Testing
+-------
+
+CLIMLAB has an extensive set of tests designed to work with `pytest`_. The test code is found in the ``climlab/tests`` directory inside the source repo.
+
+To run the full set of tests on the currently installed version of CLIMLAB, you can always do this (from any directory except the CLIMLAB repo)::
+
+    pytest -v --pyargs climlab
+
+All tests should report ``PASSED``.
+
+CLIMLAB is a mix of pure Python and compiled Fortran. If you are developing new code that does not rely on the compiled components, it is useful (and quicker) to run tests directly from the source code directory. From the ``climlab`` root directory, do the following::
 
     pytest -v -m "not compiled"
 
 which excludes the tests marked as requiring the compiled components. Again, look for all tests to report ``PASSED``. For more details see the `pytest`_ documentation.
 
-If you are interacting with compiled components (e.g. RRTMG radiation), testing is a little more complicated. You will need to rebuild and install a new version. We use (and recommend) `conda build`_ to handle the dependencies including Fortran compiler.
+If you're working on a new feature, we suggest that in the spirit of good software design you `write the new test before you write the new code`_! But we will be happy to help and discuss on github.
 
-To build CLIMLAB, do this from the root directory of the CLIMLAB source repo::
-
-    conda-build conda-recipe
-
-This will automatically install all build dependencies in a temporary new conda environment, build all the Fortran extensions, bundle everything together, install the new pacakge in a temporary test environment, and run a minimal set of tests on the package (only the tests marked as ``fast``). The whole procedure will take several minutes to run through.
-
-Assuming the tests pass successfully, you will see a message like::
-
-    TEST END: /Users/br546577/anaconda3/conda-bld/osx-64/climlab-0.6.5.dev0-py36_5.tar.bz2
-
-(though obviously with different paths and version numbers)
-
-To fully test your new build (including the tests not marked as ``fast``), you can now install it in a new test environment (with all dependencies) and run the full set of tests::
-
-    conda create --name newtest climlab --use-local
-    source activate newtest
-    pytest -v --pyargs climlab
-
-Once you're happy with this you can safely delete the test environment with::
-
-    source deactivate
-    conda remove --name newtest --all
-
-If you encounter problems with the conda build recipe, please raise an issue at <https://github.com/brian-rose/climlab/issues>. You could also take a look at the `CLIMLAB recipe used on conda-forge`_, which might be a little more up-to-date.
 
 
 Contributing improved documentation
----------------------
+-----------------------------------
 
-The documentation_ is generated with Sphinx from docstrings in the source code itself, along with a small collection of ReStructuredText_ (.rst) files. You can help improve the documentation!
+The documentation_ is generated with Sphinx from docstrings in the source code itself, along with a small collection of ReStructuredText_ (.rst) files. You can help improve the documentation! This is often the simplest way to get involved with any open source project.
 
+- Create and checkout a new feature branch as described above.
 - Edit doctrings and/or .rst files in ``climlab/docs/``
+- Make sure you have all the necessary tools to build the docs in your current Python environment! Check the file ``climlab/docs/environment.yml`` for guidance.
 - Build the improved docs locally with::
 
     make html
 
 from the ``climlab/docs`` directory.
-
 - The new and improved docs should now be available locally in the ``climlab/docs/build/html`` directory. Check them out in your web browser.
 - Once you are satisfied, commit changes as described above and submit a new Pull Request describing your changes.
+
+*This section will hopefully be updated soon to reflect some coming changes (simplifications!) to how the docs are built.*
 
 
 .. _`CLIMLAB description paper in JOSS`: http://joss.theoj.org/papers/10.21105/joss.00659
@@ -152,3 +221,7 @@ from the ``climlab/docs`` directory.
 .. _`open issue on the CLIMLAB github page`: https://github.com/brian-rose/climlab/issues/68
 .. _documentation: http://climlab.readthedocs.io
 .. _`pull request`: https://help.github.com/articles/about-pull-requests/
+.. _`numpy.f2py`: https://docs.scipy.org/doc/numpy/f2py/
+.. _`these f2py examples`: https://docs.scipy.org/doc/numpy/f2py/getting-started.html
+.. _`See here for discussion`: https://www.anaconda.com/utilizing-the-new-compilers-in-anaconda-distribution-5/
+.. _`write the new test before you write the new code`: https://softwareengineering.stackexchange.com/questions/36175/what-are-the-disadvantages-of-writing-code-before-writing-unit-tests
