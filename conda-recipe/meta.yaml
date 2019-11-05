@@ -1,4 +1,4 @@
-{% set version = "0.7.5" %}
+{% set version = "0.7.6.dev0" %}
 
 package:
   name: climlab
@@ -18,6 +18,7 @@ requirements:
   host:
     - flang  # [win and py3k]
     - python
+    - setuptools
     - pip
     - numpy
   run:
@@ -26,7 +27,7 @@ requirements:
     - libflang  # [win and py3k]
     - scipy
     - pydap
-    - urllib3
+    - requests
     - xarray
     - future
     - attrdict
@@ -39,7 +40,7 @@ test:
   imports:
     - climlab
   commands:
-    - pytest -v -m fast --pyargs climlab.tests --cov=climlab --cov-config .coveragerc --cov-report term-missing -v
+    - pytest -v --pyargs climlab.tests --cov=climlab --cov-config .coveragerc --cov-report term-missing -v
     - codecov
 
 about:

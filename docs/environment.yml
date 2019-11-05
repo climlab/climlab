@@ -3,18 +3,18 @@ channels:
   - conda-forge
 dependencies:
     - python=3.7
-    - numpy=1.16.0
-    - pandas=0.23.3
-    - scipy=1.2.0
-    - matplotlib=3.0.2
-    - netCDF4=1.4.2
+    - numpy
+    - pandas
+    - scipy
+    - matplotlib
+    - netCDF4
     - xarray
     - attrdict
-    - sphinx=1.8.2
-    - ipython=7.2.0
+    - sphinx
+    - ipython
     - jupyter
     - future
-    - sphinx_rtd_theme=0.4.2
+    - sphinx_rtd_theme
     #- nbsphinx
     - sphinxcontrib-bibtex
-    - numpydoc=0.8.0
+    - numpydoc
