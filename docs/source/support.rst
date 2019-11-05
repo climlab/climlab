@@ -1,7 +1,7 @@
 .. highlight:: rst
 
 Acknowledgement
-=======
+===============
 
 
 Development of CLIMLAB and associated documentation is partially supported

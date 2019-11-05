@@ -1,7 +1,7 @@
 .. highlight:: rst
 
 Integration with ``xarray``
-=========================
+===========================
 
 xarray_ is a powerful Python package for geospatial data analysis.
 It provides ``DataArray`` and ``Dataset`` structures for self-describing gridded data.

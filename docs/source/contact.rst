@@ -15,7 +15,7 @@ Bugs can be reported through the `issue tracker <https://github.com/brian-rose/c
 
 
 The documentation was originally created by **Moritz Kreuzer**, Potsdam Institut for Climate Impact Research (PIK).
-Other contributers include
+Other contributors include
 
 - Ryan Abernathey
 - Christopher Cardinale

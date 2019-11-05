@@ -1,5 +1,8 @@
 .. highlight:: rst
 
+.. _`Contributing to CLIMLAB`:
+
+
 Contributing to CLIMLAB
 =======================
 
@@ -61,7 +64,7 @@ Contributions will happen through Pull Requests on github. You will need a free 
 (choose a more descriptive name for your new feature).
 
 3. Work on your new feature, using ``git add`` to add your changes.
-4. Build and Test your modified code! See `Building and Testing CLIMLAB`_ below for instructions. Make sure to add new tests for your cool new feature.
+4. Build and Test your modified code! See below for instructions. Make sure to add new tests for your cool new feature.
 
 5. When your feature is complete and tested, commit your changes::
 
@@ -156,7 +159,10 @@ Special Caveat for Mac OSX only
 
 Method 1 and Method 2 both rely on gfortran supplied by conda. Currently for these to work on Mac OSX the user needs some old SDKs that are no longer provided by default from Apple, and that cannot be bundled automatically by conda due to licensing issues. `See here for discussion`_.
 
-The short answer is that you should download ``MacOSX10.9.sdk`` from <https://github.com/phracker/MacOSX-SDKs> or <https://github.com/devernay/xcodelegacy>, and save it at ``$HOME/opt/MacOSX10.9.sdk`` on your Mac.
+The short answer is that you should download ``MacOSX10.9.sdk`` from either of
+- <https://github.com/phracker/MacOSX-SDKs> or
+- <https://github.com/devernay/xcodelegacy>
+and save it at ``$HOME/opt/MacOSX10.9.sdk`` on your Mac.
 
 
 Method 3: Rolling your own fortran compiler

@@ -72,33 +72,7 @@ Binaries are available for OSX, Linux, and Windows.
 
 Installing from source
 ~~~~~~~~~~~~~~~~~~~~~~
-If you do not use conda, you can install ``climlab`` from source with::
-
-    pip install climlab
-
-(which will download the latest stable release from the `pypi repository`_ and trigger the build process.)
-
-Alternatively, clone the source code repository with::
-
-    git clone https://github.com/brian-rose/climlab.git
-
-and, from the ``climlab`` directory, do::
-
-    python -m pip install . --no-deps -vv
-
-You will need a Fortran compiler on your system.
-The build has been tested with both gcc/gfortran and ifort (Linux)
-
-Installing from source without a Fortran compiler
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Many parts of ``climlab`` are written in pure Python and should work on any system.
-Fortran builds are necessary for the RRTMG and CAM3 radiation schemes and for the Emanuel convection scheme.
-If you follow the instructions for installing from source (above) without a valid Fortran compiler,
-you should find that you can still::
-
-    import climlab
-
-and use most of the package. You will see warning messages about the missing components.
+Consult the documentation_ for detailed instructions.
 
 .. _conda: https://conda.io/docs/
 .. _`Anaconda Python`: https://www.continuum.io/downloads
@@ -125,9 +99,10 @@ Required
 - Python 2.7, 3.6, 3.7
 - numpy
 - scipy
-- xarray
-- future
+- xarray (for data i/o)
 - attrdict
+- future
+- requests
 
 
 Recommended for full functionality
@@ -144,6 +119,18 @@ To build from source and develop new code you will need some additional pieces
 - pip
 - gfortran (OSX or linux) or flang (Windows)
 - pytest (to run the automated tests, important if you are developing new code)
+
+To build the docs, yet another list of requirements
+
+- sphinx
+- ipython
+- jupyter
+- future
+- sphinx_rtd_theme
+- nbsphinx
+- sphinxcontrib-bibtex
+- numpydoc
+- matplotlib
 
 `Anaconda Python`_ is highly recommended and will provide everything you need.
 See "Installing pre-built binaries with conda" above.

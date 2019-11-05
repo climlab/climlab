@@ -23,7 +23,6 @@ and then simply do::
     conda install climlab
 
 Binaries are available for OSX, Linux, and Windows.
-You may need to update your ``numpy`` if you are using are using a version prior to 1.11
 
 
 Single-column Radiative-Convective model
@@ -55,4 +54,4 @@ RRTMG radiation scheme::
             print rcm.ASR - rcm.OLR
 
 .. _conda: https://conda.io/docs/
-.. _`Anaconda Python`: https://www.continuum.io/downloads
+.. _`Anaconda Python`: https://www.anaconda.com/distribution/
