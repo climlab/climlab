@@ -18,6 +18,9 @@ matrix:
   - name: linux_3.7
     env: CONDA_ENV=py37-linux
     os: linux
+  - name: linux_3.8
+    env: CONDA_ENV=py38-linux
+    os: linux
   - name: osx_2.7
     env: CONDA_ENV=py27-osx
     os: osx
@@ -26,6 +29,9 @@ matrix:
     os: osx
   - name: osx_3.7
     env: CONDA_ENV=py37-osx
+    os: osx
+  - name: osx_3.8
+    env: CONDA_ENV=py38-osx
     os: osx
 
 env:
