@@ -49,12 +49,12 @@ before_install:
   - echo ""
   - conda config --set always_yes yes --set changeps1 no --set show_channel_urls true
   - conda config --add channels conda-forge --force
-  - conda config --add channels defaults --force
+#  - conda config --add channels defaults --force
   - conda update conda --quiet
-  - conda install pycryptosat conda-build
-  - conda config --set sat_solver pycryptosat
-  - conda config --set safety_checks disabled
-  - conda config --set channel_priority strict
+#  - conda install pycryptosat conda-build
+#  - conda config --set sat_solver pycryptosat
+#  - conda config --set safety_checks disabled
+#  - conda config --set channel_priority strict
   - conda info --all
 
 install:
