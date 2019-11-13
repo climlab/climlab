@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os
 
 VERSION = '0.7.6.dev2'
@@ -15,7 +16,12 @@ def readme():
 # Patch the Fortran compiler not to optimize certain sources
 def patch_fortran():
     # This should work for all subclasses of FCompiler
-    from numpy.distutils import fcompiler
+    try:
+        from numpy.distutils import fcompiler
+    except ImportError:
+        import sys
+        print("\nPlease install numpy before installing climlab\n", file=sys.stderr)
+        sys.exit(-1)
 
     def monkeypatched_spawn(old_spawn):
         def spawn(self, cmd, *args, **kw):
@@ -63,6 +69,8 @@ def setup_package():
           url='http://github.com/brian-rose/climlab',
           author='Brian E. J. Rose',
           author_email='brose@albany.edu',
+          setup_requires=['numpy'],
+          install_requires=['numpy','xarray','attrdict','scipy'],
           license='MIT',
     )
     run_build = True
