@@ -93,7 +93,7 @@ def merge_two_dicts(x, y):
 
 def _download_and_cache(source, local_path):
     import requests
-    resp = requests.get(source, allow_redirects=True)
+    resp = requests.get(source, allow_redirects=True, timeout=300)
     if resp.status_code == 200:  # successful http request
         with open(local_path, 'wb') as file:
             file.write(resp.content)
