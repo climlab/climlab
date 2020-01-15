@@ -35,7 +35,6 @@ will operate along the latitude dimension only.
 from __future__ import division
 import numpy as np
 from .advection_diffusion import AdvectionDiffusion, Diffusion
-from climlab.utils.constants import const_dict as const
 
 
 class MeridionalAdvectionDiffusion(AdvectionDiffusion):
@@ -52,8 +51,8 @@ class MeridionalAdvectionDiffusion(AdvectionDiffusion):
         # Conversion of delta from degrees (grid units) to physical length units
         phi_stag = np.deg2rad(self.lat_bounds)
         phi = np.deg2rad(self.lat)
-        self._Xcenter[...,:] = phi*const.a
-        self._Xbounds[...,:] = phi_stag*const.a
+        self._Xcenter[...,:] = phi*self.const.a
+        self._Xbounds[...,:] = phi_stag*self.const.a
         self._weight_bounds[...,:] = np.cos(phi_stag)
         self._weight_center[...,:] = np.cos(phi)
         #  Now properly compute the weighted advection-diffusion matrix

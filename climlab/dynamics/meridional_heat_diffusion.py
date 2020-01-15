@@ -38,7 +38,6 @@ will operate along the latitude dimension only.
 from __future__ import division
 import numpy as np
 from .meridional_advection_diffusion import MeridionalDiffusion
-from climlab.utils.constants import const_dict as const
 
 
 class MeridionalHeatDiffusion(MeridionalDiffusion):
@@ -87,7 +86,7 @@ class MeridionalHeatDiffusion(MeridionalDiffusion):
         for varname, value in self.state.items():
             heat_capacity = value.domain.heat_capacity
         # diffusivity in units of m**2/s
-        self.K = self.D / heat_capacity * const.a**2
+        self.K = self.D / heat_capacity * self.const.a**2
 
     def _update_diagnostics(self, newstate):
         super(MeridionalHeatDiffusion, self)._update_diagnostics(newstate)
@@ -95,6 +94,6 @@ class MeridionalHeatDiffusion(MeridionalDiffusion):
             heat_capacity = value.domain.heat_capacity
         coslat_bounds = np.moveaxis(self._weight_bounds,-1,self.diffusion_axis_index)
         self.heat_transport[:] = (self.diffusive_flux * heat_capacity *
-            2 * np.pi * const.a * coslat_bounds * 1E-15) # in PW
+            2 * np.pi * self.const.a * coslat_bounds * 1E-15) # in PW
         self.heat_transport_convergence[:] = (self.flux_convergence *
                         heat_capacity)  # in W/m**2

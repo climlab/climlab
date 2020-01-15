@@ -131,10 +131,10 @@ class MeridionalMoistDiffusion(MeridionalHeatDiffusion):
 
     def _update_diffusivity(self):
         Tinterp = np.interp(self.lat_bounds, self.lat, np.squeeze(self.Ts))
-        Tkelvin = Tinterp + const.tempCtoK
-        f = moist_amplification_factor(Tkelvin, self.relative_humidity)
+        Tkelvin = Tinterp + self.const.tempCtoK
+        f = moist_amplification_factor(Tkelvin, self.relative_humidity, self.const)
         heat_capacity = self.Ts.domain.heat_capacity
-        self.K = self.D / heat_capacity * const.a**2 * (1+f)
+        self.K = self.D / heat_capacity * self.const.a**2 * (1+f)
 
     def _implicit_solver(self):
         self._update_diffusivity()
@@ -142,10 +142,11 @@ class MeridionalMoistDiffusion(MeridionalHeatDiffusion):
         return super(MeridionalMoistDiffusion, self)._implicit_solver()
 
 
-def moist_amplification_factor(Tkelvin, relative_humidity=0.8):
+def moist_amplification_factor(Tkelvin, relative_humidity=0.8, constants=const):
     '''Compute the moisture amplification factor for the moist diffusivity
     given relative humidity and reference temperature profile.'''
     deltaT = 0.01
     #  slope of saturation specific humidity at 1000 hPa
-    dqsdTs = (qsat(Tkelvin+deltaT/2, 1000.) - qsat(Tkelvin-deltaT/2, 1000.)) / deltaT
-    return const.Lhvap / const.cp * relative_humidity * dqsdTs
+    dqsdTs = (qsat(Tkelvin+deltaT/2, 1000., constants=constants) -
+                qsat(Tkelvin-deltaT/2, 1000., constants=constants)) / deltaT
+    return constants.Lhvap / constants.cp * relative_humidity * dqsdTs
