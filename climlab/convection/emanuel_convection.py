@@ -7,7 +7,7 @@ import numpy as np
 import warnings
 from climlab.process import TimeDependentProcess
 from climlab.utils.thermo import qsat
-from climlab import constants as const
+from climlab.utils.constants import const_dict as const
 try:
     from ._emanuel_convection import emanuel_convection as convect
 except:
@@ -111,7 +111,7 @@ class EmanuelConvection(TimeDependentProcess):
 
                 import numpy as np
                 import climlab
-                from climlab import constants as const
+                from climlab.utils.constants import const_dict as const
                 # Temperatures in a single column
                 full_state = climlab.column_state(num_lev=30, water_depth=2.5)
                 temperature_state = {'Tatm':full_state.Tatm,'Ts':full_state.Ts}

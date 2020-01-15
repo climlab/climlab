@@ -1,7 +1,7 @@
 """Routines for calculating heat capacities for grid boxes."""
 
 from __future__ import division
-from climlab import constants as const
+from climlab.utils.constants import const_dict as const
 
 
 def atmosphere(dp):

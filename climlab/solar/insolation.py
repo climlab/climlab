@@ -38,7 +38,7 @@ following :cite:`Berger_1978`. Further references: :cite:`Berger_1991`.
 
 from __future__ import division
 import numpy as np
-from climlab import constants as const
+from climlab.utils.constants import const_dict as const
 from numpy import sqrt, deg2rad, rad2deg, sin, cos, tan, arcsin, arccos, pi
 import xarray as xr
 

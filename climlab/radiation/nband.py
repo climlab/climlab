@@ -2,7 +2,7 @@ from __future__ import division
 from builtins import range
 import numpy as np
 from climlab.radiation.greygas import GreyGas
-from climlab import constants as const
+from climlab.utils.constants import const_dict as const
 from climlab.domain import domain, axis, field
 from copy import copy
 

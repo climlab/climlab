@@ -1,7 +1,7 @@
 from __future__ import division
 import numpy as np
 from climlab.process.diagnostic import DiagnosticProcess
-from climlab import constants as const
+from climlab.utils.constants import const_dict as const
 from climlab.utils.thermo import clausius_clapeyron
 
 

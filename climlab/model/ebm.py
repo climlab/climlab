@@ -78,7 +78,7 @@ We can run both models out to equilibrium and compare the results as follows:
 """
 from __future__ import division
 import numpy as np
-from climlab import constants as const
+from climlab.utils.constants import const_dict as const
 from climlab.domain.field import Field, global_mean
 from climlab.process import EnergyBudget, TimeDependentProcess
 from climlab.utils import legendre

@@ -4,7 +4,7 @@ from builtins import str
 from builtins import range
 from builtins import object
 import numpy as np
-from climlab import constants as const
+from climlab.utils.constants import const_dict as const
 from climlab.solar.orbital import OrbitalTable
 from climlab.domain.field import global_mean
 

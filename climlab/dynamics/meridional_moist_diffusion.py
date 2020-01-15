@@ -120,7 +120,7 @@ from __future__ import division
 import numpy as np
 from .meridional_heat_diffusion import MeridionalHeatDiffusion
 from climlab.utils.thermo import qsat
-from climlab import constants as const
+from climlab.utils.constants import const_dict as const
 
 
 class MeridionalMoistDiffusion(MeridionalHeatDiffusion):

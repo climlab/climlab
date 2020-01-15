@@ -76,7 +76,7 @@ from __future__ import print_function
 import numpy as np
 from climlab.process import EnergyBudget
 from climlab.radiation import ManabeWaterVapor
-from climlab import constants as const
+from climlab.utils.constants import const_dict as const
 from climlab.domain.field import Field
 from climlab.utils.data_source import load_data_source
 import warnings
