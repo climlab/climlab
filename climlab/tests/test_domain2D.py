@@ -26,6 +26,17 @@ def test_2D_EBM():
     m.to_xarray()
 
 @pytest.mark.fast
+def test_2D_EBM_seasonal():
+    '''Can we step forward a 2D seasonal lat/lon EBM?'''
+    #state = climlab.surface_state(num_lon=4)
+    #m = climlab.EBM_annual(state=state)
+    m = climlab.EBM_seasonal(num_lon=4)
+    m.step_forward()
+    assert m.state.Ts.shape == (90, 4, 1)
+    # Test the xarray interface
+    m.to_xarray()
+
+@pytest.mark.fast
 def test_2D_insolation():
     #state = climlab.surface_state(num_lon=4)
     #m = climlab.EBM_annual(state=state)
