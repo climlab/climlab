@@ -548,11 +548,16 @@ class DailyInsolation(AnnualMeanInsolation):
             pass
 
     def _get_current_insolation(self):
-        #  this probably only works for 1D (latitude) domains
         insolation_array = self.insolation_array
         # make sure that the diagnostic has the correct field dimensions.
         dom = self.domains['default']
         time_index = self.time['day_of_year_index']   # THIS ONLY WORKS IF self IS THE MASTER PROCESS
         insolation = insolation_array[..., time_index]
+        if 'lon' in dom.axes:
+            # insolation is latitude-only, need to broadcast across longitude
+            #  assumption is axes are ordered (lat, lon, depth)
+            #  NOTE this is a clunky hack and all this will go away
+            #  when we use xarray structures for these internals
+            insolation = np.tile(insolation[...,np.newaxis], dom.axes['lon'].num_points)
         self.insolation[:] = Field(insolation, domain=dom)
         self.coszen[:] = self._coszen_from_insolation()
