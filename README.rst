@@ -96,7 +96,7 @@ These are handled automatically if you install with conda_.
 
 Required
 ~~~~~~~~~~~~
-- Python 2.7, 3.6, 3.7
+- Python 2.7, 3.6, 3.7, 3.8
 - numpy
 - scipy
 - xarray (for data i/o)
@@ -152,6 +152,9 @@ These are self-describing, and should all run out-of-the-box once the package is
 
 Release history
 ----------------------
+
+Version 0.7.6 (released January 2020)
+    Bug fixes, Python 3.8 compatibility, improvements to build and docs.
 
 Version 0.7.5 (released July 2019)
     Bug fixes and improvements to continuous integration
