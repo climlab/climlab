@@ -308,7 +308,7 @@ def SPEEDY_band_fraction(T):
     # EPSLW is the fraction of longwave emission that goes directly to space
     #  It is set to zero by default in MITgcm code. We won't use it here.
     Tarray = np.array(T)
-    Tarray = np.minimum(Tarray, 230.)
+    Tarray = np.minimum(Tarray, 320.)
     Tarray = np.maximum(Tarray, 200.)
     num_band = 4
     dims = [num_band]
