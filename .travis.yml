@@ -51,8 +51,6 @@ before_install:
   - conda config --add channels conda-forge --force
   - conda config --add channels defaults --force
   - conda update conda --quiet
-  - conda install pycryptosat conda-build
-  - conda config --set sat_solver pycryptosat
   - conda config --set safety_checks disabled
   - conda config --set channel_priority strict
   - conda info --all
