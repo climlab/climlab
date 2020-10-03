@@ -153,6 +153,9 @@ These are self-describing, and should all run out-of-the-box once the package is
 Release history
 ----------------------
 
+Version 0.7.7 (released October 2020)
+    Bug fixes.
+
 Version 0.7.6 (released January 2020)
     Bug fixes, Python 3.8 compatibility, improvements to build and docs.
 
