@@ -40,6 +40,18 @@ def test_orbital_parameters():
         assert orb[k].min() > orb_expected[k][0]
         assert orb[k].max() < orb_expected[k][1]
 
+@pytest.mark.fast
+def test_orbital_interpolation():
+    # check to see if we get smooth results when we interpolate
+    # orbital parameters at high temporal frequency
+    kyears = np.linspace(-11, 0, 1001)
+    orb = OrbitalTable.interp(kyear=kyears)
+    S30 = daily_insolation(lat=30, day=172, orb=orb)
+    # there should be no abrupt changes
+    # test if insolation varies by more than 0.1 W/m2 per year
+    assert S30.diff(dim='kyear').max() < 0.1
+
+
 @pytest.mark.slow
 def test_long_orbital_parameters():
     kyears = np.arange( -1000., +500.)

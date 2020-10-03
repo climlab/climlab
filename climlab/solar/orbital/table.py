@@ -27,6 +27,8 @@ def _get_Berger_data(verbose=True):
                           'OBL': 'obliquity', 'PREC': 'precession'})
     # add 180 degrees to long_peri (see lambda definition, Berger 1978 Appendix)
     orbit['long_peri'] += 180.
+    # apply np.unwrap to remove discontinuities in the longitude of perihelion
+    orbit['long_peri'] = np.rad2deg(xr.apply_ufunc(np.unwrap, np.deg2rad(orbit.long_peri)))
     orbit['precession'] *= -1.
 
     orbit.attrs['Description'] = 'The Berger and Loutre (1991) orbital data table'
