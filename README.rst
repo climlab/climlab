@@ -96,7 +96,7 @@ These are handled automatically if you install with conda_.
 
 Required
 ~~~~~~~~~~~~
-- Python 2.7, 3.6, 3.7, 3.8
+- Python 2.7, 3.6, 3.7, 3.8, 3.9
 - numpy
 - scipy
 - xarray (for data i/o)

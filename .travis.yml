@@ -38,6 +38,7 @@ matrix:
     os: osx
   - name: osx_3.9
     env: CONDA_ENV=py39-osx
+    os: osx
 
 env:
   - CONDA_PACKAGES="codecov pytest"
