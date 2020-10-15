@@ -1,0 +1,19 @@
+name: test_env
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.9
+  - pip
+  - pydap
+  - xarray
+  - numpy
+  - scipy
+  - gfortran_osx-64
+  - libgfortran
+  - future
+  - attrdict
+  - requests
+  - pytest
+  - codecov
+  - pytest-cov

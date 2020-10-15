@@ -16,6 +16,8 @@ environment:
       CONDA_ENV: "py37-windows"
     - PYTHON: "C:\\Miniconda36-x64"
       CONDA_ENV: "py38-windows"
+    - PYTHON: "C:\\Miniconda36-x64"
+      CONDA_ENV: "py39-windows"
 
 install:
   # Prepend the Miniconda to the PATH of this build

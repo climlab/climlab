@@ -1,0 +1,18 @@
+name: test_env
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - pip
+  - pydap
+  - xarray
+  - numpy
+  - scipy
+  - fortran-compiler
+  - toolchain3
+  - future
+  - attrdict
+  - requests
+  - pytest
+  - codecov
+  - pytest-cov
