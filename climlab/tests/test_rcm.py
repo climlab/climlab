@@ -75,3 +75,25 @@ def test_coupled_rcm(rcm):
     model.add_subprocess('Ocean Heat Uptake', diff)
     for i in range(10):
         model.step_forward()
+
+@pytest.mark.fast
+def test_convective_adjustment_multidim():
+    #  can we do convective adjustment on a multidimensional grid?
+    num_lev = 3
+    state = climlab.column_state(num_lev=num_lev, num_lat=2)
+    conv = climlab.convection.ConvectiveAdjustment(state=state)
+    #  test non-scalar critical lapse rate
+    conv.adj_lapse_rate = np.linspace(5., 8., num_lev+1)
+    conv.step_forward()
+    #  Test two flags for dry adiabatic adjustment
+    conv.adj_lapse_rate = 'DALR'
+    conv.step_forward()
+    conv.adj_lapse_rate = 'dry adiabat'
+    conv.step_forward()
+    #  test pseudoadiabatic critical lapse rate
+    conv.adj_lapse_rate = 'pseudoadiabat'
+    conv.step_forward()
+    conv.adj_lapse_rate = 'MALR'
+    conv.step_forward()
+    conv.adj_lapse_rate = 'moist adiabat'
+    conv.step_forward()
