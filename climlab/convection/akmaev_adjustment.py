@@ -20,12 +20,16 @@ def convective_adjustment_direct(p, T, c, lapserate=6.5):
 
     Implements the conservative adjustment algorithm from Akmaev (1991) MWR
     """
+    # make sure lapserate has same dimensionality as T
+    lapserate = lapserate * np.ones_like(T)
     # largely follows notation and algorithm in Akmaev (1991) MWR
     alpha = const.Rd / const.g * lapserate / 1.E3 # same dimensions as lapserate
     L = p.size
-    ###  now handles variable lapse rate
-    pextended = np.insert(p,0,const.ps)  # prepend const.ps = 1000 hPa as ref pressure to compute potential temperature
-    Pi = np.cumprod((p / pextended[:-1])**alpha)  # Akmaev's equation 14 recurrence formula
+    ###  now handles variable lapse rate in multiple dimensions
+    # prepend const.ps = 1000 hPa as ref pressure to compute potential temperature
+    pextended = np.insert(p,0,const.ps)
+    #  For now, let's assume that the vertical axis is the last axis
+    Pi = np.cumprod((p / pextended[:-1])**alpha, axis=-1)  # Akmaev's equation 14 recurrence formula
     beta = 1./Pi
     theta = T * beta
     q = Pi * c
@@ -39,18 +43,19 @@ def convective_adjustment_direct(p, T, c, lapserate=6.5):
     return T
 
 
-# @jit  # numba.jit not working here. Not clear why.
-#  At least we get something like 10x speedup from the inner loop
 def Akmaev_adjustment_multidim(theta, q, beta, n_k, theta_k, s_k, t_k):
-    L = q.size  # number of vertical levels
-    size0 = theta.shape[0] #np.size(T, axis=0)
-    if size0 != L:
-        num_lat = size0
-        for lat in range(num_lat):
-            theta[lat,:] = Akmaev_adjustment(theta[lat,:], q, beta, n_k,
-                                              theta_k, s_k, t_k)
+    num_lev = theta.shape[-1]  # number of vertical levels
+    otherdims = theta.shape[:-1] # everything except last dimension, which we assume is vertical
+    if otherdims is not ():
+        othersize = np.prod(otherdims)
+        theta_reshape = theta.reshape((othersize, num_lev))
+        q_reshape = q.reshape((othersize, num_lev))
+        beta_reshape = beta.reshape((othersize, num_lev))
+        for n in range(othersize):
+            theta_reshape[n,:] = Akmaev_adjustment(theta_reshape[n,:],
+               q_reshape[n,:], beta_reshape[n,:], n_k, theta_k, s_k, t_k)
+        theta = theta_reshape.reshape(theta.shape)
     else:
-        num_lat = 1
         theta = Akmaev_adjustment(theta, q, beta, n_k, theta_k, s_k, t_k)
     return theta
 
