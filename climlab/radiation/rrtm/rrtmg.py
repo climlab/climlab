@@ -172,7 +172,7 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
                      ssac = ssac_sw,
                      asmc = asmc_sw,
                      fsfc = fsfc_sw,
-                     tauaer = tauc_sw,
+                     tauaer = tauaer_sw,
                      ssaaer = ssaaer_sw,
                      asmaer = asmaer_sw,
                      ecaer = ecaer_sw,
