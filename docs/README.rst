@@ -20,19 +20,37 @@ About
 -----
 Sphinx-based documentation for the `climlab` (https://github.com/brian-rose/climlab) package.
 
-Installation
-------
-To build the html documenation locally, from the `climlab/docs` directory run
-```
-make html
-```
+The latest rendered version is always available online at `http://climlab.readthedocs.io`
+
+Installation and Requirements
+-----------------------------
+Building the docs locally requires `sphinx` plus several extensions detailed in
+the file `docs/environment.yml`.
+
+You can use conda to set up a self-contained environment for building the docs.
+From the `climlab` root directory, do this::
+
+    conda env create --file docs/environment.yml
+    conda activate climlab-docs
+
+Now do a "soft install" of climlab into the new environment (this is necessary for building the docs, but the fortran components do not need to be compiled)::
+
+    python setup.py install
+
+Finally, build the docs from the `climlab/docs` directory with::
+
+    make html
+
 The documentation will be built in `climlab/docs/build/html`
+and you can view them offline with a web browser.
 
-Or just read the latest rendered version online at `http://climlab.readthedocs.io`
+When you are satisfied with your changes, you can deactivate the build environment with::
 
-Requires
------
-Building the docs locally requires `sphinx` plus several extensions. See the file `environment.yml`
+    conda deactivate
+
+and (optionally) delete the build environment with::
+
+    conda remove -n climlab-docs --all
 
 
 Status

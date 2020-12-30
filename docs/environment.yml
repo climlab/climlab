@@ -1,4 +1,4 @@
-name: climlab
+name: climlab-docs
 channels:
   - conda-forge
 dependencies:
