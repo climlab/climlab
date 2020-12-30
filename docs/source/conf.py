@@ -150,6 +150,8 @@ intersphinx_mapping = {	'python':('http://docs.python.org/', None),
 			'scipy': ('http://docs.scipy.org/doc/scipy/reference/', None)
 		      }
 
+bibtex_bibfiles = ['bibliography.bib']
+
 # -- Options for HTML output ----------------------------------------------
 
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
