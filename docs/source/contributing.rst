@@ -42,21 +42,31 @@ Feel free to point out any inaccuracies or omissions in the documentation_ here 
 Seeking help and support
 ------------------------
 
-Although CLIMLAB is offered to the community "as-is", we are very interested in helping people actually use it for scientific purposes.
+Although CLIMLAB is offered to the community "as-is", we are very interested in
+helping people actually use it for scientific purposes.
 
-Have a question about how to do something with CLIMLAB? First, make sure you've perused the documentation_ and the issue tracker at <https://github.com/brian-rose/climlab/issues>. Also look through published examples including the repository of lecture notes at <https://github.com/brian-rose/ClimateModeling_courseware>.
+Have a question about how to do something with CLIMLAB? First, make sure you've
+perused the documentation_ and the issue tracker at <https://github.com/brian-rose/climlab/issues>.
+Also look through published examples including the online book `The Climate Laboratory`_.
 
-Then, feel free to ask questions by opening a new issue at <https://github.com/brian-rose/climlab/issues>. This requires a free github account but is the best way to engage the community for answers. We will do our best to respond. If the functionality you're looking for doesn't yet exist, we'll probably encourage you to get involved in developing the next big feature.
+Then, feel free to ask questions by opening a new issue at <https://github.com/brian-rose/climlab/issues>.
+This requires a free github account but is the best way to engage the community for answers.
+We will do our best to respond. If the functionality you're looking for doesn't
+yet exist, we'll probably encourage you to get involved in developing the next big feature.
 
 
 Contributing bug fixes and new features
 ---------------------------------------
 
-We are thrilled to have any and all help. You may want to browse through <https://github.com/brian-rose/climlab/issues> to see if there is any low-hanging fruit already identified.
+We are thrilled to have any and all help.
+You may want to browse through <https://github.com/brian-rose/climlab/issues>
+to see if there is any low-hanging fruit already identified.
 
-Contributions will happen through Pull Requests on github. You will need a free github account. Here's how to get started:
+Contributions will happen through Pull Requests on github.
+You will need a free github account. Here's how to get started:
 
-1. Follow `these instructions`_ to fork the main CLIMAB repo at <https://github.com/brian-rose/climlab>, clone it on your local machine, and keep your local master branch synced with the main repo.
+1. Follow `these instructions`_ to fork the main CLIMAB repo at <https://github.com/brian-rose/climlab>,
+clone it on your local machine, and keep your local master branch synced with the main repo.
 2. Don't make any commits on your local master branch. Instead open a feature branch for every new development task::
 
     git checkout -b cool_new_feature
@@ -87,7 +97,9 @@ and push your branch to github::
 Building CLIMLAB from source
 ----------------------------
 
-CLIMLAB is a mix of pure Python and compiled Fortran. If you're developing new code, you'll need a Fortran compiler that plays well with `numpy.f2py`_. There are a few different ways to do this.
+CLIMLAB is a mix of pure Python and compiled Fortran.
+If you're developing new code, you'll need a Fortran compiler that plays well with `numpy.f2py`_.
+There are a few different ways to do this.
 
 Also see below for special instructions for Mac OSX!
 
@@ -201,33 +213,50 @@ If you're working on a new feature, we suggest that in the spirit of good softwa
 Contributing improved documentation
 -----------------------------------
 
-The documentation_ is generated with Sphinx from docstrings in the source code itself, along with a small collection of ReStructuredText_ (.rst) files. You can help improve the documentation! This is often the simplest way to get involved with any open source project.
+The documentation_ is generated with Sphinx from docstrings in the source code itself,
+along with a small collection of ReStructuredText_ (.rst) files.
+You can help improve the documentation!
+This is often the simplest way to get involved with any open source project.
 
 - Create and checkout a new feature branch as described above.
 - Edit doctrings and/or .rst files in ``climlab/docs/``
-- Make sure you have all the necessary tools to build the docs in your current Python environment! Check the file ``climlab/docs/environment.yml`` for guidance.
-- Build the improved docs locally with::
+
+- Use conda to set up a complete build environment for the docs! From the ``climlab`` root directory, do this::
+
+    conda env create --file docs/environment.yml
+    conda activate climlab-docs
+
+- Now do a "soft install" of climlab into the new environment (this is necessary for building the docs, but the fortran components do not need to be compiled)::
+
+    python setup.py install
+
+- Finally, build the docs from the ``climlab/docs`` directory with::
 
     make html
 
-from the ``climlab/docs`` directory.
 - The new and improved docs should now be available locally in the ``climlab/docs/build/html`` directory. Check them out in your web browser.
 - Once you are satisfied, commit changes as described above and submit a new Pull Request describing your changes.
+- You can deactivate the build environment with::
 
-*This section will hopefully be updated soon to reflect some coming changes (simplifications!) to how the docs are built.*
+    conda deactivate
+
+and (optionally) delete the build environment with::
+
+    conda remove -n climlab-docs --all
 
 
 .. _`CLIMLAB description paper in JOSS`: http://joss.theoj.org/papers/10.21105/joss.00659
 .. _`CLIMLAB recipe used on conda-forge`: https://github.com/conda-forge/climlab-feedstock
 .. _`pytest`: https://docs.pytest.org/en/latest/
-.. _`conda build`: https://conda.io/docs/user-guide/tasks/build-packages/index.html
+.. _`conda build`: https://docs.conda.io/projects/conda-build/en/latest/
 .. _`Contact page`: contact.html
 .. _ReStructuredText: http://docutils.sourceforge.net/docs/user/rst/quickstart.html
 .. _`these instructions`: https://help.github.com/articles/fork-a-repo/
 .. _`open issue on the CLIMLAB github page`: https://github.com/brian-rose/climlab/issues/68
 .. _documentation: http://climlab.readthedocs.io
 .. _`pull request`: https://help.github.com/articles/about-pull-requests/
-.. _`numpy.f2py`: https://docs.scipy.org/doc/numpy/f2py/
-.. _`these f2py examples`: https://docs.scipy.org/doc/numpy/f2py/getting-started.html
+.. _`numpy.f2py`: https://numpy.org/doc/stable/f2py/
+.. _`these f2py examples`: https://numpy.org/doc/stable/f2py/f2py.getting-started.html
 .. _`See here for discussion`: https://www.anaconda.com/utilizing-the-new-compilers-in-anaconda-distribution-5/
 .. _`write the new test before you write the new code`: https://softwareengineering.stackexchange.com/questions/36175/what-are-the-disadvantages-of-writing-code-before-writing-unit-tests
+.. _`The Climate Laboratory`: https://brian-rose.github.io/ClimateLaboratoryBook

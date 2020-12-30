@@ -21,8 +21,8 @@ import climlab
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
-print "python exec:", sys.executable
-print "sys.path:", sys.path
+print("python exec:", sys.executable)
+print("sys.path:", sys.path)
 
 # -- General configuration ------------------------------------------------
 
@@ -149,6 +149,8 @@ intersphinx_mapping = {	'python':('http://docs.python.org/', None),
 			'numpy': ('http://docs.scipy.org/doc/numpy/', None),
 			'scipy': ('http://docs.scipy.org/doc/scipy/reference/', None)
 		      }
+
+bibtex_bibfiles = ['bibliography.bib']
 
 # -- Options for HTML output ----------------------------------------------
 
