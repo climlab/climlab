@@ -153,6 +153,9 @@ These are self-describing, and should all run out-of-the-box once the package is
 Release history
 ----------------------
 
+Version 0.7.9 (released December 2020)
+    Bug fixes and doc improvements.
+
 Version 0.7.8 (released December 2020)
     Bug fixes.
 
