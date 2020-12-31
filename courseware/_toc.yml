@@ -1,0 +1,8 @@
+- file: index.md
+  numbered: true
+
+- file: week1/week1_topics.md
+  chapters:
+    - file: week1/syllabus.rst
+    - file: week1/integrity.md
+    - file: week1/texts.rst
