@@ -206,9 +206,7 @@ Our model has no equivalent of the stratosphere, where temperature increases wit
 We can load the observed ozone climatology from the input files for the CESM model:
 
 ```{code-cell}
-datapath = "http://ramadda.atmos.albany.edu:8080/repository/opendap/latest/Top/Users/BrianRose/CESM_runs/"
-endstr = "/entry.das"
-ozone = nc.Dataset( datapath + 'som_input/ozone_1.9x2.5_L26_2000clim_c091112.nc' + endstr )
+ozone = nc.Dataset( 'ozone_1.9x2.5_L26_2000clim_c091112.nc')
 ```
 
 ```{code-cell}

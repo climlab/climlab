@@ -372,29 +372,29 @@ class EBM(TimeDependentProcess):
         dTdphi = np.insert(dTdphi, 0, 0.)
         return (1E-15*-2*np.math.pi*np.cos(phi_stag)*const.a**2*D*dTdphi)
 
-    # def heat_transport_convergence(self):
-    #     """Returns instantaneous convergence of heat transport.
-    #
-    #     .. math::
-    #
-    #         h(\\varphi) = - \\frac{1}{2 \pi R^2 cos(\\varphi)} \\frac{dH}{d\\varphi}
-    #                     \\approx - \\frac{1}{2 \pi R^2 cos(\\varphi)} \\frac{\Delta H}{\Delta \\varphi}
-    #
-    #     h is the *dynamical heating rate* in unit :math:`\\textrm{W}/ \\textrm{m}^2`
-    #     which is the convergence of energy transport into each latitude band,
-    #     namely the difference between what's coming in and what's going out.
-    #
-    #     :Example:
-    #
-    #         .. plot:: code_input_manual/example_EBM_heat_transport_convergence.py
-    #             :include-source:
-    #
-    #     """
-    #     phi = np.deg2rad(self.lat)
-    #     phi_stag = np.deg2rad(self.lat_bounds)
-    #     H = 1.E15*self.heat_transport()
-    #     return (-1./(2*np.math.pi*const.a**2*np.cos(phi)) *
-    #             np.diff(H)/np.diff(phi_stag))
+    def heat_transport_convergence(self):
+        """Returns instantaneous convergence of heat transport.
+    
+        .. math::
+    
+            h(\\varphi) = - \\frac{1}{2 \pi R^2 cos(\\varphi)} \\frac{dH}{d\\varphi}
+                        \\approx - \\frac{1}{2 \pi R^2 cos(\\varphi)} \\frac{\Delta H}{\Delta \\varphi}
+    
+        h is the *dynamical heating rate* in unit :math:`\\textrm{W}/ \\textrm{m}^2`
+        which is the convergence of energy transport into each latitude band,
+        namely the difference between what's coming in and what's going out.
+    
+        :Example:
+    
+            .. plot:: code_input_manual/example_EBM_heat_transport_convergence.py
+                :include-source:
+    
+        """
+        phi = np.deg2rad(self.lat)
+        phi_stag = np.deg2rad(self.lat_bounds)
+        H = 1.E15*self.heat_transport()
+        return (-1./(2*np.math.pi*const.a**2*np.cos(phi)) *
+                np.diff(H)/np.diff(phi_stag))
 
 
 class EBM_seasonal(EBM):
