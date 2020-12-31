@@ -12,6 +12,18 @@ affiliations:
   index: 1
 date: 22 March 2018
 bibliography: paper.bib
+jupyter:
+  jupytext:
+    cell_metadata_filter: -all
+    text_representation:
+      extension: .md
+      format_name: markdown
+      format_version: '1.2'
+      jupytext_version: 1.8.0
+  kernelspec:
+    display_name: Python 3
+    language: python
+    name: python3
 ---
 
 # Summary

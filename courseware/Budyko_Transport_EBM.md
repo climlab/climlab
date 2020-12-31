@@ -1,5 +1,6 @@
 ---
 jupytext:
+  formats: ipynb,md:myst,py:percent
   text_representation:
     extension: .md
     format_name: myst
@@ -29,7 +30,7 @@ where $T(\varphi)$ is the surface temperature across the latitude $\varphi$, $\b
 
 $$C(\varphi) \frac{dT(\varphi)}{dt} = R\downarrow (\varphi) - R\uparrow (\varphi) + H(\varphi)$$
 
-```{code-cell} ipython3
+```{code-cell}
 from __future__ import division, print_function
 %matplotlib inline
 import numpy as np
@@ -44,14 +45,14 @@ from climlab import constants as const
 
 An EBM model instance is created through
 
-```{code-cell} ipython3
+```{code-cell}
 # model creation
 ebm_budyko = climlab.EBM()
 ```
 
 The model is set up by default with a meridional diffusion term.
 
-```{code-cell} ipython3
+```{code-cell}
 # print model states and suprocesses
 print(ebm_budyko)
 ```
@@ -62,7 +63,7 @@ print(ebm_budyko)
 
 The creation of a subprocess needs some information from the model, especially on which model state the subprocess should be defined on.
 
-```{code-cell} ipython3
+```{code-cell}
 # create Budyko subprocess
 budyko_transp = climlab.dynamics.BudykoTransport(b=3.81,
                                                  state=ebm_budyko.state,
@@ -75,7 +76,7 @@ Note that the model's **whole state dictionary** is given as **input** to the su
 
 Now the new transport subprocess has to be merged into the model. The `diffusion` subprocess has to be removed.
 
-```{code-cell} ipython3
+```{code-cell}
 # add the new transport subprocess
 ebm_budyko.add_subprocess('budyko_transport',budyko_transp)
 
@@ -83,7 +84,7 @@ ebm_budyko.add_subprocess('budyko_transport',budyko_transp)
 ebm_budyko.remove_subprocess('diffusion')
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 print(ebm_budyko)
 ```
 
@@ -93,14 +94,14 @@ print(ebm_budyko)
 
 To visualize the model state at beginning of integration we first integrate the model only for one timestep:
 
-```{code-cell} ipython3
+```{code-cell}
 # integrate model for a single timestep
 ebm_budyko.step_forward()
 ```
 
 The following code plots the current surface temperature, albedo and energy budget:
 
-```{code-cell} ipython3
+```{code-cell}
 # creating plot figure
 fig = plt.figure(figsize=(15,10))
 
@@ -168,12 +169,12 @@ The two right sided plots show that the model is not in equilibrium. The net rad
 
 Now we integrate the model as long there are no more changes in the surface temperature and the model reached equilibrium:
 
-```{code-cell} ipython3
+```{code-cell}
 # integrate model until solution converges
 ebm_budyko.integrate_converge()
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 # creating plot figure
 fig = plt.figure(figsize=(15,10))
 
@@ -242,13 +243,13 @@ Now we can see that the latitudinal energy balance is statisfied. Each latitude 
 ### Global mean temperature
 We use climlab to compute the global mean temperature and print the ice edge latitude:
 
-```{code-cell} ipython3
+```{code-cell}
 print('The global mean temperature is %.2f deg C.' %climlab.global_mean(ebm_budyko.Ts))
 print('The modeled ice edge is at %.2f deg latitude.' %np.max(ebm_budyko.icelat))
 ```
 
 The temperature is a bit too cold for current climate as model parameters are not tuned. Sensitive parameters are ``a0, a2, ai`` and ``Tf`` (albedo), ``A`` and ``B`` (OLR), ``b`` (transport) and ``num_lat`` (grid resolution).
 
-```{code-cell} ipython3
+```{code-cell}
 
 ```

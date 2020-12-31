@@ -1,5 +1,6 @@
 ---
 jupytext:
+  formats: ipynb,md:myst,py:percent
   text_representation:
     extension: .md
     format_name: myst
@@ -25,7 +26,7 @@ Contents are how to
   * access and plot various model variables
   * calculate the global mean of the temperature
 
-```{code-cell} ipython3
+```{code-cell}
 from __future__ import division, print_function
 %matplotlib inline
 import numpy as np
@@ -42,7 +43,7 @@ The regular path for the EBM class is ``climlab.model.ebm.EBM`` but it can also 
 
 An EBM model instance is created through
 
-```{code-cell} ipython3
+```{code-cell}
 # model creation
 ebm_model = climlab.EBM()
 ```
@@ -55,14 +56,14 @@ For further details see the climlab documentation.
 
 Many of the input parameters are stored in the following dictionary:
 
-```{code-cell} ipython3
+```{code-cell}
 # print model parameters
 ebm_model.param
 ```
 
 The model consists of one state variable (surface temperature) and a couple of defined subprocesses.
 
-```{code-cell} ipython3
+```{code-cell}
 # print model states and suprocesses
 print(ebm_model)
 ```
@@ -73,19 +74,19 @@ print(ebm_model)
 
 The subprocesses are stored in a dictionary and can be accessed through
 
-```{code-cell} ipython3
+```{code-cell}
 # access model subprocesses
 ebm_model.subprocess.keys()
 ```
 
 So to access the time type of the Longwave Radiation subprocess for example, type:
 
-```{code-cell} ipython3
+```{code-cell}
 # access specific subprocess through dictionary
 ebm_model.subprocess['LW'].time_type
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 #  For interactive convenience, you can also use attribute access for the same thing:
 ebm_model.subprocess.LW.time_type
 ```
@@ -96,35 +97,35 @@ ebm_model.subprocess.LW.time_type
 
 The model time dictionary shows information about all the time related content and quantities.
 
-```{code-cell} ipython3
+```{code-cell}
 # accessing the model time dictionary
 ebm_model.time
 ```
 
-To integrate the model forward in time different methods are availible: 
+To integrate the model forward in time different methods are availible:
 
-```{code-cell} ipython3
+```{code-cell}
 # integrate model for a single timestep
 ebm_model.step_forward()
 ```
 
 The model time step has increased from 0 to 1:
 
-```{code-cell} ipython3
+```{code-cell}
 ebm_model.time['steps']
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 # integrate model for a 50 days
 ebm_model.integrate_days(50.)
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 # integrate model for two years
 ebm_model.integrate_years(1.)
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 # integrate model until solution converges
 ebm_model.integrate_converge()
 ```
@@ -135,7 +136,7 @@ ebm_model.integrate_converge()
 
 A couple of interesting model variables are stored in a dictionary named ``diagnostics``. It has following entries:
 
-```{code-cell} ipython3
+```{code-cell}
 ebm_model.diagnostics.keys()
 ```
 
@@ -144,13 +145,13 @@ They can be accessed in two ways:
 - Through dictionary methods like ``ebm_model.diagnostics['ASR']``
 - As process attributes like ``ebm_model.ASR``
 
-```{code-cell} ipython3
+```{code-cell}
 ebm_model.icelat
 ```
 
 The following code does the plotting for some model variables.
 
-```{code-cell} ipython3
+```{code-cell}
 # creating plot figure
 fig = plt.figure(figsize=(15,10))
 
@@ -220,7 +221,7 @@ The energy balance is zero at every latitude. That means the model is in equilib
 
 The model's state dictionary has following entries:
 
-```{code-cell} ipython3
+```{code-cell}
 ebm_model.state.keys()
 ```
 
@@ -231,17 +232,17 @@ Like diagnostics, state variables can be accessed in two ways:
 
 These are entirely equivalent:
 
-```{code-cell} ipython3
+```{code-cell}
 ebm_model.Ts is ebm_model.state['Ts']
 ```
 
 The global mean of the model's surface temperature can be calculated through
 
-```{code-cell} ipython3
+```{code-cell}
 print('The global mean temperature is %.2f deg C.' %climlab.global_mean(ebm_model.Ts))
 print('The modeled ice edge is at %.2f deg latitude.' %np.max(ebm_model.icelat))
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 
 ```

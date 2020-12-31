@@ -1,5 +1,6 @@
 ---
 jupytext:
+  formats: ipynb,md:myst,py:percent
   notebook_metadata_filter: all,-language_info,-toc,-latex_envs
   text_representation:
     extension: .md
@@ -47,7 +48,7 @@ The longwave decomposition is not as easily related to specific wavelengths, as 
 
 ### Example usage of the spectral model
 
-```{code-cell} ipython3
+```{code-cell}
 from __future__ import division, print_function
 %matplotlib inline
 import numpy as np
@@ -58,7 +59,7 @@ from climlab import constants as const
 
 First try a model with all default parameters. Usage is very similar to the familiar `RadiativeConvectiveModel`.
 
-```{code-cell} ipython3
+```{code-cell}
 col1 = climlab.BandRCModel()
 print(col1)
 ```
@@ -69,22 +70,22 @@ We now have a process called `H2O`, in addition to things we've seen before.
 
 This model keeps track of water vapor. We see the specific humidity in the list of state variables:
 
-```{code-cell} ipython3
+```{code-cell}
 col1.state
 ```
 
 The water vapor field is initialized to zero. The `H2O` process will set the specific humidity field at every timestep to a specified profile. More on that below. For now, let's compute a radiative equilibrium state.
 
-```{code-cell} ipython3
+```{code-cell}
 col1.integrate_years(2)
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 # Check for energy balance
 col1.ASR - col1.OLR
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 fig = plt.figure()
 ax = fig.add_subplot(111)
 ax.plot( col1.Tatm, col1.lev, 'c-', label='default' )
@@ -112,7 +113,7 @@ More reasonable-looking troposphere, but still no stratosphere.
 
 The Band model is aware of three different absorbing gases: O3 (ozone), CO2, and H2O (water vapor). The abundances of these gases are stored in a dictionary of arrays as follows:
 
-```{code-cell} ipython3
+```{code-cell}
 col1.absorber_vmr
 ```
 
@@ -135,7 +136,7 @@ We need to provide some ozone data to the model in order to simulate a stratosph
 See here for more information, including some plots of the ozone data:
 <http://www.atmos.albany.edu/facstaff/brose/classes/ENV480_Spring2014/styled-5/code-3/index.html>
 
-```{code-cell} ipython3
+```{code-cell}
 import netCDF4 as nc
 from pathlib import Path
 
@@ -143,20 +144,20 @@ datapath = Path() / "ozone_1.9x2.5_L26_2000clim_c091112.nc"
 ozone = nc.Dataset(datapath)
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 #  Dimensions of the ozone file
 lat = ozone.variables['lat'][:]
 lon = ozone.variables['lon'][:]
 lev = ozone.variables['lev'][:]
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 # Taking annual, zonal, and global averages of the ozone data
 O3_zon = np.mean( ozone.variables['O3'],axis=(0,3) )
 O3_global = np.sum( O3_zon * np.cos(np.deg2rad(lat)), axis=1 ) / sum( np.cos(np.deg2rad(lat) ) )
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 fig = plt.figure()
 ax = fig.add_subplot(111)
 ax.plot( O3_global*1E6, lev)
@@ -165,23 +166,23 @@ ax.invert_yaxis()
 
 We are going to create another instance of the model, this time using the same vertical coordinates as the ozone data.
 
-```{code-cell} ipython3
+```{code-cell}
 #  Create the column with appropriate vertical coordinate, surface albedo and convective adjustment
 col2 = climlab.BandRCModel(lev=lev)
 print(col2)
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 #  Set the ozone mixing ratio
 col2.absorber_vmr['O3'] = O3_global
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 #  Run the model out to equilibrium!
 col2.integrate_years(2.)
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 fig = plt.figure()
 ax = fig.add_subplot(111)
 ax.plot( col1.Tatm, np.log(col1.lev/1000), 'c-', label='RCE' )
@@ -206,59 +207,59 @@ Things to consider / try:
 - An important shortcoming of the model: there are no clouds! (that would be the next step in the hierarchy of column models)
 - Clouds would act both in the shortwave (increasing the albedo, cooling the climate) and in the longwave (greenhouse effect, warming the climate). Which effect is stronger depends on the vertical structure of the clouds (high or low clouds) and their optical properties (e.g. thin cirrus clouds are nearly transparent to solar radiation but are good longwave absorbers).
 
-```{code-cell} ipython3
+```{code-cell}
 col3 = climlab.process_like(col2)
 print(col3)
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 # Let's double CO2.
 col3.absorber_vmr['CO2'] *= 2.
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 col3.compute_diagnostics()
 print('The radiative forcing for doubling CO2 is %f W/m2.' % (col2.OLR - col3.OLR))
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 col3.integrate_years(3)
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 col3.ASR - col3.OLR
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 print('The Equilibrium Climate Sensitivity is %f K.' % (col3.Ts - col2.Ts))
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 col4 = climlab.process_like(col1)
 print(col4)
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 col4.absorber_vmr
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 col4.absorber_vmr['CO2'] *= 2.
 col4.compute_diagnostics()
 print('The radiative forcing for doubling CO2 is %f W/m2.' % (col1.OLR - col4.OLR))
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 col4.integrate_years(3.)
 col4.ASR - col4.OLR
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 print('The Equilibrium Climate Sensitivity is %f K.' % (col4.Ts - col1.Ts))
 ```
 
 Interesting that the model is MORE sensitive when ozone is set to zero.
 
-```{code-cell} ipython3
+```{code-cell}
 
 ```

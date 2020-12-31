@@ -1,5 +1,7 @@
 ---
 jupytext:
+  encoding: '# -*- coding: utf-8 -*-'
+  formats: ipynb,md:myst,py:percent
   text_representation:
     extension: .md
     format_name: myst
@@ -23,9 +25,9 @@ Here are some examples calculating daily average insolation at different locatio
 
 These all use a function called `daily_insolation` in the module `insolation.py` to do the calculation. The code calculates daily average insolation anywhere on Earth at any time of year for a given set of orbital parameters.
 
-To look at past orbital variations and their effects on insolation, we use the module `orbital.py` which accesses tables of values for the past 5 million years. We can easily lookup parameters for any point in the past and pass these to `daily_insolation`. 
+To look at past orbital variations and their effects on insolation, we use the module `orbital.py` which accesses tables of values for the past 5 million years. We can easily lookup parameters for any point in the past and pass these to `daily_insolation`.
 
-```{code-cell} ipython3
+```{code-cell}
 from __future__ import division, print_function
 %matplotlib inline
 import numpy as np
@@ -40,7 +42,7 @@ from climlab.solar.insolation import daily_insolation
 
 Calculate an array of insolation over the year and all latitudes (for present-day orbital parameters).
 
-```{code-cell} ipython3
+```{code-cell}
 lat = np.linspace( -90., 90., 500)
 days = np.linspace(0, const.days_per_year, 365)
 Q = daily_insolation( lat, days )
@@ -48,7 +50,7 @@ Q = daily_insolation( lat, days )
 
 And make a contour plot of Q as function of latitude and time of year.
 
-```{code-cell} ipython3
+```{code-cell}
 ax = plt.figure( figsize=(10,8) ).add_subplot(111)
 CS = ax.contour( days, lat, Q , levels = np.arange(0., 600., 50.) )
 ax.clabel(CS, CS.levels, inline=True, fmt='%r', fontsize=10)
@@ -61,13 +63,13 @@ plt.show()
 
 Take the area-weighted global, annual average of Q...
 
-```{code-cell} ipython3
+```{code-cell}
 print(np.sum( np.mean( Q, axis=1 ) * np.cos( np.deg2rad(lat) ) ) / np.sum( np.cos( np.deg2rad( lat ) ) ))
 ```
 
 Also plot the zonally averaged insolation at a few different times of the year:
 
-```{code-cell} ipython3
+```{code-cell}
 summer_solstice = 170
 winter_solstice = 353
 ax = plt.figure( figsize=(10,8) ).add_subplot(111)
@@ -85,13 +87,13 @@ plt.show()
 
 +++
 
-The `orbital.py` code allows us to look up the orbital parameters for Earth over the last 5 million years. 
+The `orbital.py` code allows us to look up the orbital parameters for Earth over the last 5 million years.
 
 +++
 
 Make reference plots of the variation in the three orbital parameter over the last 1 million years
 
-```{code-cell} ipython3
+```{code-cell}
 from climlab.solar.orbital import OrbitalTable
 
 kyears = np.arange( -1000., 1.)
@@ -102,7 +104,7 @@ orb
 
 The `xarray` object `orb` now holds 1 million years worth of orbital data, total of 1001 data points for each element: eccentricity `ecc`, obliquity angle `obliquity`, and solar longitude of perihelion `long_peri`.
 
-```{code-cell} ipython3
+```{code-cell}
 fig = plt.figure( figsize = (10,10) )
 ax1 = fig.add_subplot(3,1,1)
 ax1.plot( kyears, orb['ecc'] )
@@ -123,14 +125,14 @@ plt.show()
 
 Create a large array of insolation over the whole globe, whole year, and for every set of orbital parameters.
 
-```{code-cell} ipython3
+```{code-cell}
 lat = np.linspace(-90, 90, 181)
 days = np.linspace(1.,50.)/50 * const.days_per_year
 Q = daily_insolation(lat, days, orb)
 print(Q.shape)
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 Qann = np.mean(Q, axis=1)  # time average over the year
 print(Qann.shape)
 Qglobal = np.empty_like( kyears )
@@ -145,7 +147,7 @@ We are going to create a figure showing past time variations in three quantities
 2. Annual mean insolation at high northern latitudes
 3. Summer solstice insolation at high northern latitudes
 
-```{code-cell} ipython3
+```{code-cell}
 fig = plt.figure( figsize = (10,14) )
 
 ax1 = fig.add_subplot(3,1,1)
@@ -178,7 +180,7 @@ And comparing with the plots of orbital variations above, we see that
 
 Last Glacial Maximum or "LGM" occurred around 23,000 years before present, when the ice sheets were at their greatest extent. By 10,000 years ago, the ice sheets were mostly gone and the last ice age was over. Let's plot the changes in the seasonal distribution of insolation from 23 kyrs to 10 kyrs.
 
-```{code-cell} ipython3
+```{code-cell}
 orb_0 = OrbitalTable.interp(kyear=0)  # present-day orbital parameters
 orb_10 = OrbitalTable.interp(kyear=-10)  # orbital parameters for 10 kyrs before present
 orb_23 = OrbitalTable.interp(kyear=-23)   # 23 kyrs before present
@@ -187,7 +189,7 @@ Q_10 = daily_insolation( lat, days, orb_10 )   # insolation arrays for each of t
 Q_23 = daily_insolation( lat, days, orb_23 )
 ```
 
-```{code-cell} ipython3
+```{code-cell}
 fig = plt.figure( figsize=(20,8) )
 
 ax1 = fig.add_subplot(1,2,1)
@@ -214,7 +216,7 @@ The annual mean plot shows a classic obliquity signal: at 10 kyrs, the axis clos
 
 Finally, take the area-weighted global average of the difference:
 
-```{code-cell} ipython3
+```{code-cell}
 print(np.average(np.mean(Qdiff,axis=1), weights=np.cos(np.deg2rad(lat))))
 ```
 
