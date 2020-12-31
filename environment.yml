@@ -5,7 +5,7 @@ channels:
 dependencies:
   - base-notebook=2020.09.05
   # NOTE: pip required for running tests in this repo
-  - python=3.8
+  - python=3.7
   - pip=20
   - ipython
   - xarray
@@ -16,11 +16,14 @@ dependencies:
   - climlab
   - numpy
   - scipy
+  - sympy
+  - numba
   - matplotlib
   - netcdf4
   - pyhdf
   - hdf4
   - h5py
+  - attrdict
   - jupytext
   - cartopy
   - pandas

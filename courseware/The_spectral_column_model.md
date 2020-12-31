@@ -1,5 +1,6 @@
 ---
 jupytext:
+  notebook_metadata_filter: all,-language_info,-toc,-latex_envs
   text_representation:
     extension: .md
     format_name: myst
@@ -136,10 +137,10 @@ See here for more information, including some plots of the ozone data:
 
 ```{code-cell} ipython3
 import netCDF4 as nc
+from pathlib import Path
 
-datapath = "http://ramadda.atmos.albany.edu:8080/repository/opendap/latest/Top/Users/BrianRose/CESM_runs/"
-endstr = "/entry.das"
-ozone = nc.Dataset( datapath + 'som_input/ozone_1.9x2.5_L26_2000clim_c091112.nc' + endstr )
+datapath = Path() / "ozone_1.9x2.5_L26_2000clim_c091112.nc"
+ozone = nc.Dataset(datapath)
 ```
 
 ```{code-cell} ipython3

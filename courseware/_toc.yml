@@ -1,8 +1,18 @@
 - file: index.md
   numbered: true
 
-- file: week1/week1_topics.md
-  chapters:
-    - file: week1/syllabus.rst
-    - file: week1/integrity.md
-    - file: week1/texts.rst
+- file: Preconfigured_EBM.md 
+- file: Two_layer_atmosphere.md
+- file: The_spectral_column_model.md
+- file: Soundings_from_Observations_and_RCE_Models.md
+- file: Snowball_Earth_in_the_EBM.md
+- file: Seasonal_cycle_and_heat_capacity.md
+- file: RCE_with_CAM3_radiation.md
+- file: Preconfigured_EBM.md
+- file: PolarAmplification.md
+- file: Latitude-dependent_grey_radiation.md
+- file: Introducing_the_Column_Model.md
+- file: Insolation.md
+- file: Budyko_Transport_EBM.md
+- file: Boltzmann_EBM.md
+
