@@ -1,6 +1,7 @@
 # ---
 # jupyter:
 #   jupytext:
+#     formats: ipynb,md:myst,py:percent
 #     notebook_metadata_filter: all,-language_info,-toc,-latex_envs
 #     text_representation:
 #       extension: .py
@@ -47,7 +48,6 @@
 
 # %%
 from __future__ import division, print_function
-# %matplotlib inline
 import numpy as np
 import matplotlib.pyplot as plt
 import climlab

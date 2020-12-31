@@ -1,15 +1,16 @@
 # ---
 # jupyter:
 #   jupytext:
+#     formats: ipynb,md:myst,py:percent
 #     text_representation:
 #       extension: .py
 #       format_name: percent
 #       format_version: '1.3'
 #       jupytext_version: 1.8.0
 #   kernelspec:
-#     display_name: Python [default]
+#     display_name: Python 3
 #     language: python
-#     name: python2
+#     name: python3
 # ---
 
 # %% [markdown]
@@ -173,7 +174,6 @@ def T2(Te, e1, e2):
 
 
 # %%
-# %matplotlib inline
 import numpy as np
 from climlab import constants as const
 import climlab

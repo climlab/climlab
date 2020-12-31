@@ -23,7 +23,7 @@ In this document an Energy Balance Model (EBM) is set up with the Outgoing Longw
 
 $$ OLR(\varphi) = \sigma \cdot \varepsilon \cdot T_s(\varphi)^4$$
 
-```{code-cell}
+```{code-cell} ipython3
 from __future__ import division, print_function
 import numpy as np
 import matplotlib.pyplot as plt
@@ -37,14 +37,14 @@ from climlab import constants as const
 
 An EBM model instance is created through
 
-```{code-cell}
+```{code-cell} ipython3
 # model creation
 ebm_boltz = climlab.EBM(D=0.8, Tf=-2)
 ```
 
 The model is set up by default with a linearized OLR parametrization (A+BT).
 
-```{code-cell}
+```{code-cell} ipython3
 # print model states and suprocesses
 print(ebm_boltz)
 ```
@@ -55,7 +55,7 @@ print(ebm_boltz)
 
 The creation of a subprocess needs some information from the model, especially on which model state the subprocess should be defined on.
 
-```{code-cell}
+```{code-cell} ipython3
 # create Boltzmann subprocess
 LW_boltz = climlab.radiation.Boltzmann(eps=0.65, tau=0.95,
                                        state=ebm_boltz.state,
@@ -68,7 +68,7 @@ Note that the model's **whole state dictionary** is given as **input** to the su
 
 Now the new OLR subprocess has to be merged into the model. Therefore, the `AplusBT` subprocess has to be removed first.
 
-```{code-cell}
+```{code-cell} ipython3
 # remove the old longwave subprocess
 ebm_boltz.remove_subprocess('LW')
 
@@ -80,7 +80,7 @@ Note that the new OLR subprocess has to have the **same key `'LW'`** as the old 
 
 That is why the old process has to be removed before the new one is added.
 
-```{code-cell}
+```{code-cell} ipython3
 print(ebm_boltz)
 ```
 
@@ -90,14 +90,14 @@ print(ebm_boltz)
 
 To visualize the model state at beginning of integration we first integrate the model only for one timestep:
 
-```{code-cell}
+```{code-cell} ipython3
 # integrate model for a single timestep
 ebm_boltz.step_forward()
 ```
 
 The following code plots the current surface temperature, albedo and energy budget:
 
-```{code-cell}
+```{code-cell} ipython3
 # creating plot figure
 fig = plt.figure(figsize=(15,10))
 
@@ -163,14 +163,14 @@ The two right sided plots show that the model is not in equilibrium. The net rad
 
 Now we integrate the model as long there are no more changes in the surface temperature and the model reached equilibrium:
 
-```{code-cell}
+```{code-cell} ipython3
 # integrate model until solution converges
 ebm_boltz.integrate_converge()
 ```
 
 We run the same code as above to plot the results:
 
-```{code-cell}
+```{code-cell} ipython3
 # creating plot figure
 fig = plt.figure(figsize=(15,10))
 
@@ -237,11 +237,11 @@ Now we can see that the latitudinal energy balance is statisfied. Each latitude 
 ### Global mean temperature
 We use climlab to compute the global mean temperature and print the ice edge latitude:
 
-```{code-cell}
+```{code-cell} ipython3
 print('The global mean temperature is %.2f deg C.' %climlab.global_mean(ebm_boltz.Ts))
 print('The modeled ice edge is at %.2f deg latitude.' %np.max(ebm_boltz.icelat))
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 
 ```

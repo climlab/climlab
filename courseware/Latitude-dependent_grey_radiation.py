@@ -1,6 +1,7 @@
 # ---
 # jupyter:
 #   jupytext:
+#     formats: ipynb,md:myst,py:percent
 #     text_representation:
 #       extension: .py
 #       format_name: percent
@@ -20,7 +21,6 @@
 
 # %%
 from __future__ import division, print_function
-# %matplotlib inline
 import numpy as np
 import matplotlib.pyplot as plt
 import climlab
@@ -107,7 +107,7 @@ import netCDF4 as nc
 datapath = "http://ramadda.atmos.albany.edu:8080/repository/opendap/latest/Top/Users/BrianRose/CESM_runs/"
 endstr = "/entry.das"
 
-ozone = nc.Dataset( datapath + 'som_input/ozone_1.9x2.5_L26_2000clim_c091112.nc' + endstr )
+ozone = nc.Dataset('ozone_1.9x2.5_L26_2000clim_c091112.nc')
 
 #  Dimensions of the ozone file
 lat = ozone.variables['lat'][:]

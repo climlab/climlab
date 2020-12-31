@@ -15,6 +15,8 @@ dependencies:
   - pytest-cov
   - climlab
   - numpy
+  - jupyter
+  - nbconvert<6
   - scipy
   - sympy
   - numba
@@ -23,6 +25,7 @@ dependencies:
   - pyhdf
   - hdf4
   - h5py
+  - jupyterlab<3
   - attrdict
   - jupytext
   - cartopy

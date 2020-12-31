@@ -14,9 +14,8 @@ kernelspec:
 
 # Radiative-Convective Equilibrium with CAM3 scheme
 
-```{code-cell}
+```{code-cell} ipython3
 from __future__ import division, print_function
-%matplotlib inline
 import numpy as np
 import matplotlib.pyplot as plt
 import climlab
@@ -29,12 +28,12 @@ By initializing each component with the same state object, the components are al
 
 No extra coupling code is necessary.
 
-```{code-cell}
+```{code-cell} ipython3
 # initial state (temperatures)
 state = climlab.column_state(num_lev=20, num_lat=1, water_depth=5.)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 #  Create a parent process
 rce = climlab.TimeDependentProcess(state=state)
 ## Create individual physical process models:
@@ -51,43 +50,43 @@ rce.add_subprocess('ConvectiveAdjustment', convadj)
 rce.add_subprocess('H2O', h2o)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 print(rce)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 #  Current state
 rce.state
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 #  Integrate the model forward
 rce.integrate_years(5)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 #  Current state
 rce.state
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 #  Current specific humidity
 rce.q
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 #  Here is the dictionary of input fields for the CAM3 radiation module
 rce.subprocess.Radiation.input
 ```
 
 ## Latitudinally, seasonally varying RCE
 
-```{code-cell}
+```{code-cell} ipython3
 # initial state (temperatures)
 state2 = climlab.column_state(num_lev=20, num_lat=30, water_depth=10.)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 #  Create a parent process
 rcelat = climlab.TimeDependentProcess(state=state2)
 ## Create individual physical process models:
@@ -110,15 +109,15 @@ rcelat.add_subprocess('ConvectiveAdjustment', convadj)
 rcelat.add_subprocess('H2O', h2o)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 rcelat.integrate_years(5)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 rcelat.integrate_years(1)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 def plot_temp_section(model, timeave=True):
     fig = plt.figure()
     ax = fig.add_subplot(111)
@@ -133,18 +132,18 @@ def plot_temp_section(model, timeave=True):
     fig.colorbar(cax)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 plot_temp_section(rcelat)
 ```
 
 ## Same thing, but also including meridional temperature diffusion
 
-```{code-cell}
+```{code-cell} ipython3
 #  Create and exact clone of the previous model
 diffmodel = climlab.process_like(rcelat)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 # thermal diffusivity in W/m**2/degC
 D = 0.05
 # meridional diffusivity in 1/s
@@ -152,28 +151,28 @@ K = D / diffmodel.Tatm.domain.heat_capacity[0]
 print(K)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 d = climlab.dynamics.MeridionalDiffusion(K=K, state={'Tatm': diffmodel.Tatm}, **diffmodel.param)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 diffmodel.add_subprocess('diffusion', d)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 diffmodel.integrate_years(5)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 diffmodel.integrate_years(1)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 plot_temp_section(rcelat)
 plot_temp_section(diffmodel)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 def inferred_heat_transport( energy_in, lat_deg ):
     '''Returns the inferred heat transport (in PW) by integrating the net energy imbalance from pole to pole.'''
     from scipy import integrate
@@ -183,7 +182,7 @@ def inferred_heat_transport( energy_in, lat_deg ):
             x=lat_rad, initial=0. ) )
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 #  Plot the northward heat transport in this model
 Rtoa = np.squeeze(diffmodel.timeave['ASR'] - diffmodel.timeave['OLR'])
 plt.plot(diffmodel.lat, inferred_heat_transport(Rtoa, diffmodel.lat))
@@ -197,7 +196,7 @@ We can instead limit the convective adjustment to just the atmosphere. To do thi
 
 Then we can invoke process models for **sensible and latent heat fluxes** that use simple bulk formulae. Tunable parameters for these include drag coefficient and surface wind speed.
 
-```{code-cell}
+```{code-cell} ipython3
 diffmodel2 = climlab.process_like(diffmodel)
 
 #  Hard convective adjustment -- ATMOSPHERE ONLY
@@ -207,7 +206,7 @@ diffmodel2.add_subprocess('ConvectiveAdjustment', convadj2)
 print(diffmodel2)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 #  Now add surface flux processes
 #  Add surface heat fluxes
 
@@ -221,25 +220,25 @@ diffmodel2.add_subprocess('LHF', lhf)
 print(diffmodel2)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 diffmodel2.integrate_years(5)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 diffmodel2.integrate_years(1)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 plot_temp_section(rcelat)
 plot_temp_section(diffmodel2)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 #  Plot the northward heat transport in this model
 Rtoa = np.squeeze(diffmodel2.timeave['ASR'] - diffmodel2.timeave['OLR'])
 plt.plot(diffmodel2.lat, inferred_heat_transport(Rtoa, diffmodel2.lat))
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 
 ```

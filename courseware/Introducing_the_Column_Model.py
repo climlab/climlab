@@ -1,6 +1,7 @@
 # ---
 # jupyter:
 #   jupytext:
+#     formats: ipynb,md:myst,py:percent
 #     text_representation:
 #       extension: .py
 #       format_name: percent
@@ -49,7 +50,6 @@
 # To then access variables and functions in a module, we usually type the name of the module, followed by period (.), followed by the variable or function name. You've already seen a bit of this with the netCDF4 module you used in the last homework. You'll practice these skills again here.
 
 # %%
-# %matplotlib inline
 import numpy as np
 import climlab
 from climlab import constants as const
@@ -122,9 +122,6 @@ print(mycolumn.domains['Tatm'].axes['lev'].points)
 
 # %% [markdown]
 # You might want to try typing the same thing without the # in front.
-
-# %%
-this is not valid Python code
 
 # %% [markdown]
 # ### OK but what does this code actually do?

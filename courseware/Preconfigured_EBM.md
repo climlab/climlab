@@ -28,7 +28,6 @@ Contents are how to
 
 ```{code-cell}
 from __future__ import division, print_function
-%matplotlib inline
 import numpy as np
 import matplotlib.pyplot as plt
 import climlab

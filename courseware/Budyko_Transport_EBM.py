@@ -1,6 +1,7 @@
 # ---
 # jupyter:
 #   jupytext:
+#     formats: ipynb,md:myst,py:percent
 #     text_representation:
 #       extension: .py
 #       format_name: percent
@@ -29,7 +30,6 @@
 
 # %%
 from __future__ import division, print_function
-# %matplotlib inline
 import numpy as np
 import matplotlib.pyplot as plt
 import climlab

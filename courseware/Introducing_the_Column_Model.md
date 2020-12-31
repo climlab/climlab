@@ -53,8 +53,7 @@ The real beauty of the import statement is that it makes the Python language ver
 
 To then access variables and functions in a module, we usually type the name of the module, followed by period (.), followed by the variable or function name. You've already seen a bit of this with the netCDF4 module you used in the last homework. You'll practice these skills again here.
 
-```{code-cell}
-%matplotlib inline
+```{code-cell} ipython3
 import numpy as np
 import climlab
 from climlab import constants as const
@@ -68,13 +67,13 @@ To begin working with the model, we just need to tell Python to create a new obj
 
 Try this:
 
-```{code-cell}
+```{code-cell} ipython3
 mycolumn = climlab.GreyRadiationModel( num_lev=2 )
 ```
 
 You have just created a new column object. What is that? Let's take a look:
 
-```{code-cell}
+```{code-cell} ipython3
 print(mycolumn)
 ```
 
@@ -86,7 +85,7 @@ Our object called mycolumn contains a bunch of data, and it also contains some f
 
 Try this:
 
-```{code-cell}
+```{code-cell} ipython3
 print(mycolumn.state)
 ```
 
@@ -96,7 +95,7 @@ When you created mycolumn a few lines ago, you specifically asked for a column w
 
 We can see where those levels are in the atmosphere as follows:
 
-```{code-cell}
+```{code-cell} ipython3
 #  Three ways to get this:
 print(mycolumn.lev)
 print(mycolumn.Tatm.domain.axes['lev'].points)
@@ -125,15 +124,13 @@ Notice, though, that there are lots of comments sprinkled throughout the code. C
 
 Convince yourself of this by typing something like this:
 
-```{code-cell}
+```{code-cell} ipython3
 # this is not valid Python code
 ```
 
 You might want to try typing the same thing without the # in front.
 
-```{code-cell}
-this is not valid Python code
-```
++++
 
 ### OK but what does this code actually do?
 
@@ -143,7 +140,7 @@ It calculates the warming and cooling of the air and the surface based on the gr
 
 Try this:
 
-```{code-cell}
+```{code-cell} ipython3
 mycolumn.compute_diagnostics()
 print(mycolumn.LW_absorbed_sfc)
 print(mycolumn.LW_absorbed_atm)
@@ -155,7 +152,7 @@ You then printed out some quantities that were calculated and stored by the func
 
 Now try this:
 
-```{code-cell}
+```{code-cell} ipython3
 print(mycolumn.SW_absorbed_sfc)
 print(mycolumn.SW_absorbed_atm)
 ```
@@ -173,7 +170,7 @@ $(1-\alpha) Q$ based on some default parameter values for $\alpha$ and $Q$. We'l
 
 To get the total energy sources and sinks at each point, we just need to add up the shortwave and longwave terms:
 
-```{code-cell}
+```{code-cell} ipython3
 print(mycolumn.LW_absorbed_atm + mycolumn.SW_absorbed_atm)
 print(mycolumn.LW_absorbed_sfc + mycolumn.SW_absorbed_sfc)
 ```
@@ -188,7 +185,7 @@ Evidently this column is NOT in energy balance! The surface is gaining energy at
 
 The code will not just calculate the energy imbalance, but also change the temperatures in response to the imbalance. It does this by time-stepping, just like we did with the zero-dimensional model in the first homework.
 
-```{code-cell}
+```{code-cell} ipython3
 mycolumn.step_forward()
 print(mycolumn.state)
 ```
@@ -213,7 +210,7 @@ Have the temperatures gone up or down at the surface and at each level from wher
 
 Just like we did with the zero-dimensional model in the first homework, we will use loops to time-step the model towards equilibrium. Try this:
 
-```{code-cell}
+```{code-cell} ipython3
 for n in range(10):
     mycolumn.step_forward()
     print(mycolumn.Ts)
@@ -223,7 +220,7 @@ This little loop just repeated the call to Step_Forward 10 times, and printed ou
 
 Notice that the temperature is changing each time. That means we are not at equilibrium. Try it again!
 
-```{code-cell}
+```{code-cell} ipython3
 for n in range(10):
     mycolumn.step_forward()
     print(mycolumn.Ts)
@@ -233,7 +230,7 @@ Still changing, but not by as much.
 
 Here's a trick:
 
-```{code-cell}
+```{code-cell} ipython3
 mycolumn.integrate_years(0.3)
 print(mycolumn.Ts)
 ```
@@ -246,7 +243,7 @@ In this case the function Step_Forward() takes an optional input argument which 
 
 Has the model reached equilibrium yet? We can always keep on time-stepping and see if anything changes:
 
-```{code-cell}
+```{code-cell} ipython3
 mycolumn.integrate_years(0.3)
 print(mycolumn.Ts)
 ```
@@ -255,12 +252,12 @@ The changes are now minimal, and it is close to equilibrium.
 
 Let's look at the whole column temperature:
 
-```{code-cell}
+```{code-cell} ipython3
 for key, item in mycolumn.state.items():
     print(key, item)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 mycolumn.diagnostics
 ```
 
@@ -278,13 +275,13 @@ Compare the temperatures you found here (after time-stepping to equilibrium) wit
 
 Now that our column is in equilibrium, let's look at the Outgoing Longwave Radiation. The model keeps track of this for us:
 
-```{code-cell}
+```{code-cell} ipython3
 print(mycolumn.OLR)
 ```
 
 This should hopefully be almost exactly equal to the shortwave absorption:
 
-```{code-cell}
+```{code-cell} ipython3
 print(mycolumn.ASR)
 ```
 
@@ -292,7 +289,7 @@ Now you are going to do a "global warming" experiment, like we started in class.
 
 The following will increase the emissivity / absorptivity of each layer by 10%, which is analagous to an increase in greenhouse gases in the atmosphere:
 
-```{code-cell}
+```{code-cell} ipython3
 #  Make an exact clone of the model
 column2 = climlab.process_like(mycolumn)
 absorptivity = column2.subprocess['LW'].absorptivity
@@ -303,7 +300,7 @@ print(column2.subprocess['LW'].absorptivity)
 
 Let's now re-calculate the longwave radiation with this new value of eps:
 
-```{code-cell}
+```{code-cell} ipython3
 column2.compute_diagnostics()
 ```
 
@@ -313,14 +310,14 @@ column2.compute_diagnostics()
 
 Find the new value of OLR after this change. Is it larger or smaller than it was before we added greenhouse gases? What do you think should happen to the surface temperature as a result? Why?
 
-```{code-cell}
+```{code-cell} ipython3
 print(column2.OLR)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 column2.diagnostics
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 
 ```

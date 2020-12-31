@@ -19,9 +19,8 @@ kernelspec:
 
 Here we will use the 1-dimensional diffusive Energy Balance Model (EBM) to explore the effects of albedo feedback and heat transport on climate sensitivity.
 
-```{code-cell}
+```{code-cell} ipython3
 from __future__ import division, print_function
-%matplotlib inline
 import numpy as np
 import matplotlib.pyplot as plt
 import climlab
@@ -35,12 +34,12 @@ from climlab import legendre
 
 A version of the EBM in which albedo adjusts to the current position of the ice line, wherever $T < T_f$
 
-```{code-cell}
+```{code-cell} ipython3
 model1 = climlab.EBM_annual( num_points = 180, a0=0.3, a2=0.078, ai=0.62)
 print(model1)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 model1.integrate_years(5)
 Tequil = np.array(model1.Ts)
 ALBequil = np.array(model1.albedo)
@@ -50,14 +49,14 @@ ASRequil = np.array(model1.ASR)
 
 Let's look at what happens if we perturb the temperature -- make it 20ºC colder everywhere!
 
-```{code-cell}
+```{code-cell} ipython3
 model1.Ts -= 20.
 model1.compute_diagnostics()
 ```
 
 Let's take a look at how we have just perturbed the absorbed shortwave:
 
-```{code-cell}
+```{code-cell} ipython3
 my_ticks = [-90,-60,-30,0,30,60,90]
 lat = model1.lat
 
@@ -88,7 +87,7 @@ plt.show()
 
 So there is less absorbed shortwave now, because of the increased albedo. The global mean difference is:
 
-```{code-cell}
+```{code-cell} ipython3
 climlab.global_mean( model1.ASR - ASRequil )
 ```
 
@@ -110,7 +109,7 @@ The feedback is negative, as we expect! The tendency to warm up from reduced OLR
 
 Let's let the temperature evolve one year at a time and add extra lines to the graph:
 
-```{code-cell}
+```{code-cell} ipython3
 plt.plot( lat, Tequil, 'k--', label='equil' )
 plt.plot( lat, model1.Ts, 'k-', label='pert' )
 plt.grid()
@@ -128,14 +127,14 @@ Temperature drifts back towards equilibrium, as we expected!
 
 What if we cool the climate **so much** that the entire planet is ice covered?
 
-```{code-cell}
+```{code-cell} ipython3
 model1.Ts -= 40.
 model1.compute_diagnostics()
 ```
 
 Look again at the change in absorbed shortwave:
 
-```{code-cell}
+```{code-cell} ipython3
 climlab.global_mean( model1.ASR - ASRequil )
 ```
 
@@ -147,7 +146,7 @@ $\lambda = - 2 + \frac{-109}{-40} = -2 + 2.7 = +0.7$ W m$^{-2}$ $^{\circ}$C$^{-1
 
 What? Looks like the **positive** albedo feedback is so strong here that it has outweighed the **negative** longwave feedback. What will happen to the system now? Let's find out...
 
-```{code-cell}
+```{code-cell} ipython3
 plt.plot( lat, Tequil, 'k--', label='equil' )
 plt.plot( lat, model1.Ts, 'k-', label='pert' )
 plt.grid()
@@ -179,30 +178,30 @@ $S_0$ during the Neoproterozoic Snowball Earth events is believed to be about 93
 
 We are going to look at how the **equilibrium** ice edge depends on $S_0$, by integrating the model out to equilibrium for lots of different values of $S_0$. We will start by slowly decreasing $S_0$, and then slowly increasing $S_0$.
 
-```{code-cell}
+```{code-cell} ipython3
 model2 = climlab.EBM_annual(num_points = 360, a0=0.3, a2=0.078, ai=0.62)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 S0array = np.linspace(1400., 1200., 200.)
 #S0array = np.linspace(1400., 1200., 10.)
 #print S0array
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 model2.integrate_years(5)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 print(model2.icelat)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 icelat_cooling = np.empty_like(S0array)
 icelat_warming = np.empty_like(S0array)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 # First cool....
 for n in range(S0array.size):
     model2.subprocess['insolation'].S0 = S0array[n]
@@ -217,21 +216,21 @@ for n in range(S0array.size):
 
 For completeness: also start from present-day conditions and warm up.
 
-```{code-cell}
+```{code-cell} ipython3
 model3 = climlab.EBM_annual(num_points = 360, a0=0.3, a2=0.078, ai=0.62)
 S0array3 = np.linspace(1350., 1400., 50.)
 #S0array3 = np.linspace(1350., 1400., 5.)
 icelat3 = np.empty_like(S0array3)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 for n in range(S0array3.size):
     model3.subprocess['insolation'].S0 = S0array3[n]
     model3.integrate_years(10, verbose=False)
     icelat3[n] = np.max(model3.icelat)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 fig = plt.figure( figsize=(10,6) )
 ax = fig.add_subplot(111)
 ax.plot(S0array, icelat_cooling, 'r-', label='cooling' )
@@ -264,7 +263,7 @@ We need to increase the avaible energy sufficiently to get the equatorial temper
 
 Let's crank up the sun to 1830 W m$^{-2}$ (about a 34% increase from present-day).
 
-```{code-cell}
+```{code-cell} ipython3
 model4 = climlab.process_like(model2)  # initialize with cold Snowball temperature
 model4.subprocess['insolation'].S0 = 1830.
 model4.integrate_years(40)
@@ -287,7 +286,7 @@ Try to imagine what might happen once it starts to melt. The solar constant is h
 
 We're going to increase $S_0$ one more time...
 
-```{code-cell}
+```{code-cell} ipython3
 model4.subprocess['insolation'].S0 = 1845.
 model4.integrate_years(10)
 
@@ -302,13 +301,13 @@ plt.show()
 
 Suddenly the climate looks very very different again! The global mean temperature is
 
-```{code-cell}
+```{code-cell} ipython3
 print( model4.global_mean_temperature() )
 ```
 
 A roasty 60ºC, and the poles are above 20ºC. A tiny increase in $S_0$ has led to a very drastic change in the climate.
 
-```{code-cell}
+```{code-cell} ipython3
 S0array_snowballmelt = np.linspace(1400., 1900., 50)
 icelat_snowballmelt = np.empty_like(S0array_snowballmelt)
 icelat_snowballmelt_cooling = np.empty_like(S0array_snowballmelt)
@@ -326,7 +325,7 @@ for n in range(S0array_snowballmelt.size):
 
 Now we will complete the plot of ice edge versus solar constant.
 
-```{code-cell}
+```{code-cell} ipython3
 fig = plt.figure( figsize=(10,6) )
 ax = fig.add_subplot(111)
 ax.plot(S0array, icelat_cooling, 'r-', label='cooling' )
@@ -352,6 +351,6 @@ The upshot:
 - For a large range of $S_0$ including the present-day value, more than one climate is possible!
 - Once we get into a Snowball Earth state, getting out again is rather difficult!
 
-```{code-cell}
+```{code-cell} ipython3
 
 ```

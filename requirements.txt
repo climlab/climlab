@@ -3,7 +3,6 @@ click_completion
 docutils>=0.15
 sphinx>=2,<4
 myst-nb~=0.10.1
-nbconvert<6
 jsonschema
 sphinx_togglebutton
 sphinx-copybutton
@@ -13,4 +12,4 @@ sphinx_book_theme>=0.0.39
 sphinx-thebe>=0.0.6
 sphinx-panels~=0.5.2
 nested-lookup~=0.2.21
-markdown-it-py
+markdown-it-py==0.5.4

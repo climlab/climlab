@@ -23,9 +23,8 @@ Read in the necessary data from the online server.
 
 The catalog is here: <http://www.esrl.noaa.gov/psd/thredds/dodsC/Datasets/ncep.reanalysis.derived/catalog.html>
 
-```{code-cell}
+```{code-cell} ipython3
 from __future__ import division, print_function
-%matplotlib inline
 import numpy as np
 import matplotlib.pyplot as plt
 import netCDF4 as nc
@@ -37,7 +36,7 @@ datapath = "http://ramadda.atmos.albany.edu:8080/repository/opendap/latest/Top/U
 endstr = "/entry.das"
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 ncep_url = "http://www.esrl.noaa.gov/psd/thredds/dodsC/Datasets/ncep.reanalysis.derived/"
 ncep_air = nc.Dataset( ncep_url + "pressure/air.mon.1981-2010.ltm.nc" )
 ncep_Ts = nc.Dataset( ncep_url + "surface_gauss/skt.sfc.mon.1981-2010.ltm.nc" )
@@ -48,7 +47,7 @@ print(Ts_ncep.shape)
 
 Load the topography file from CESM, just so we can plot the continents.
 
-```{code-cell}
+```{code-cell} ipython3
 topo = nc.Dataset( datapath + 'som_input/USGS-gtopo30_1.9x2.5_remap_c050602.nc' + endstr )
 lat_cesm = topo.variables['lat'][:]
 lon_cesm = topo.variables['lon'][:]
@@ -56,12 +55,12 @@ lon_cesm = topo.variables['lon'][:]
 
 Make two maps: one of annual mean surface temperature, another of the seasonal range (max minus min).
 
-```{code-cell}
+```{code-cell} ipython3
 maxTs = np.max(Ts_ncep,axis=0)
 minTs = np.min(Ts_ncep,axis=0)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 fig = plt.figure( figsize=(16,6) )
 
 ax1 = fig.add_subplot(1,2,1)
@@ -82,15 +81,15 @@ for ax in [ax1,ax2]:
 
 Make a contour plot of the zonal mean temperature as a function of time of year
 
-```{code-cell}
+```{code-cell} ipython3
 [-65,-55,-45,-35,-25,-15,-5,5,15,25,35,45,55,65]
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 np.arange(-65,75,10)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 Tmax = 65; Tmin = -Tmax; delT = 10
 clevels = np.arange(Tmin,Tmax+delT,delT)
 
@@ -128,7 +127,7 @@ One handy feature of `climlab` process code: the function `integrate_years()` au
 
 We will look at the seasonal cycle of temperature in three different models with different heat capacities (which we express through an equivalent depth of water in meters):
 
-```{code-cell}
+```{code-cell} ipython3
 model1 = climlab.EBM_seasonal()
 model1.integrate_years(1, verbose=True)
 
@@ -147,7 +146,7 @@ for n in range(num_depths):
 
 All models should have the same annual mean temperature:
 
-```{code-cell}
+```{code-cell} ipython3
 lat = model1.lat
 
 plt.plot(lat, Tann)
@@ -163,7 +162,7 @@ There is no automatic function in `climlab.EBM` to keep track of minimum and max
 
 Instead we'll step through one year "by hand" and save all the temperatures.
 
-```{code-cell}
+```{code-cell} ipython3
 num_steps_per_year = int(model1.time['num_steps_per_year'])
 Tyear = np.empty((lat.size, num_steps_per_year, num_depths))
 for n in range(num_depths):
@@ -174,7 +173,7 @@ for n in range(num_depths):
 
 Make a figure to compare the observed zonal mean seasonal temperature cycle to what we get from the EBM with different heat capacities:
 
-```{code-cell}
+```{code-cell} ipython3
 fig = plt.figure( figsize=(20,10) )
 
 ax = fig.add_subplot(2,num_depths,2)
@@ -204,7 +203,7 @@ Which one looks more realistic? Depends a bit on where you look. But overall, th
 
 ### Making an animation of the EBM solutions
 
-```{code-cell}
+```{code-cell} ipython3
 fpath = '/Users/Brian/Dropbox/PythonStuff/ebm_seasonal_frames/'
 
 fig = plt.figure( figsize=(20,5) )
@@ -248,7 +247,7 @@ for m in range(1):
 
 The EBM code uses our familiar `insolation.py` code to calculate insolation, and therefore it's easy to set up a model with different orbital parameters. Here is an example with **very** different orbital parameters: 90º obliquity. We looked at the distribution of insolation by latitude and season for this type of planet in the last homework.
 
-```{code-cell}
+```{code-cell} ipython3
 orb_highobl = {'ecc':0., 'obliquity':90., 'long_peri':0.}
 print(orb_highobl)
 model_highobl = climlab.EBM_seasonal(orb=orb_highobl)
@@ -257,7 +256,7 @@ print(model_highobl.param['orb'])
 
 Repeat the same procedure to calculate and store temperature throughout one year, after letting the models run out to equilibrium.
 
-```{code-cell}
+```{code-cell} ipython3
 Tann_highobl = np.empty( [lat.size, num_depths] )
 models_highobl = []
 
@@ -276,7 +275,7 @@ for n in range(num_depths):
 
 And plot the seasonal temperature cycle same as we did above:
 
-```{code-cell}
+```{code-cell} ipython3
 fig = plt.figure( figsize=(20,5) )
 Tmax_highobl = 125; Tmin_highobl = -Tmax_highobl; delT_highobl = 10
 clevels_highobl = np.arange(Tmin_highobl, Tmax_highobl+delT_highobl, delT_highobl)
@@ -301,7 +300,7 @@ Why is the temperature so uniform in the north-south direction with 50 meters of
 
 To see the reason, let's plot the annual mean insolation at 90º obliquity, alongside the present-day annual mean insolation:
 
-```{code-cell}
+```{code-cell} ipython3
 lat2 = np.linspace(-90, 90, 181)
 days = np.linspace(1.,50.)/50 * const.days_per_year
 Q_present = daily_insolation( lat2, days )
@@ -310,7 +309,7 @@ Q_present_ann = np.mean( Q_present, axis=1 )
 Q_highobl_ann = np.mean( Q_highobl, axis=1 )
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 plt.plot( lat2, Q_present_ann, label='Earth' )
 plt.plot( lat2, Q_highobl_ann, label='90deg obliquity' )
 plt.grid()
@@ -323,6 +322,6 @@ plt.show()
 
 Though this is a bit misleading, because our model prescribes an increase in albedo from the equator to the pole. So the absorbed shortwave gradients look even more different.
 
-```{code-cell}
+```{code-cell} ipython3
 
 ```

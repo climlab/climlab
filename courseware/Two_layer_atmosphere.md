@@ -104,7 +104,7 @@ $$ \epsilon_2 (1-\epsilon_1) T_s^4 + \epsilon_1 \epsilon_2 T_1^4 - 2 \epsilon_2 
 
 Here we use the `sympy` module to solve the algebraic system symbolically.
 
-```{code-cell}
+```{code-cell} ipython3
 import sympy
 sympy.init_printing()
 T_s, T_1, T_2, T_e, e_1, e_2 = sympy.symbols('T_s, T_1, T_2, T_e, e_1, e_2', positive=True )
@@ -115,7 +115,7 @@ out1 = sympy.solve( system, [T_s**4, T_1**4, T_2**4])
 out1
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 quarter = sympy.Rational(1,4)
 out2 = {}
 for var4, formula in out1.items():
@@ -124,7 +124,7 @@ for var4, formula in out1.items():
 out2
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 #  The special case of equal absorptivities
 e = sympy.symbols('e')
 out3 = {}
@@ -153,16 +153,16 @@ T_1^4 &= T_e^4 \frac{1+\epsilon}{2-\epsilon} \\
 T_2^4 &= T_e^4 \frac{ 1}{2 - \epsilon}
 \end{align}
 
-```{code-cell}
+```{code-cell} ipython3
 out2[T_s].subs([(T_e, 255), (e_1, 0.4), (e_2, 0.4)])
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 for var, formula in out2.items():
     print(formula.subs([(T_e, 255), (e_1, 0.4), (e_2, 0.4)]))
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 # Coding up the analytical solutions for radiative equilibrium
 #  These use the analytical results returned by sympy and wrap them in callable functions
 
@@ -177,36 +177,35 @@ def T2(Te, e1, e2):
     return out2[T_2].subs([(T_e, Te), (e_1, e1), (e_2, e2)])
 ```
 
-```{code-cell}
-%matplotlib inline
+```{code-cell} ipython3
 import numpy as np
 from climlab import constants as const
 import climlab
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 mycolumn = climlab.GreyRadiationModel( num_lev=2 )
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 print(mycolumn)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 mycolumn.integrate_years(10.)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 print(mycolumn.Ts)
 print(mycolumn.Tatm)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 (e1, e2)= mycolumn.subprocess['LW'].absorptivity
 print(e1, e2)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 ASR = (1-mycolumn.param['albedo_sfc'])*mycolumn.param['Q']
 Te = (ASR/const.sigma)**0.25
 print(Te)
@@ -216,7 +215,7 @@ print(Te)
 
 Use a tolerance value to test if the results are the same.
 
-```{code-cell}
+```{code-cell} ipython3
 tol = 0.01
 
 def test_2level(col):
@@ -237,22 +236,22 @@ def test_2level(col):
     print('  Numerical: %.2f   Analytical: %.2f    Same:' %(num, anal) , abs(num - anal)<tol)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 test_2level(mycolumn)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 e1 = 0.3
 e2 = 0.4
 mycolumn.subprocess['LW'].absorptivity = np.array([e1,e2])
 mycolumn.integrate_years(10.)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 test_2level(mycolumn)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 e1 = 0.6
 e2 = 0.6
 mycolumn.subprocess['LW'].absorptivity = np.array([e1,e2])
@@ -260,7 +259,7 @@ mycolumn.integrate_years(10.)
 test_2level(mycolumn)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 col1 = climlab.GreyRadiationModel(num_lev=2, abs_coeff=1.9E-4)
 (e1, e2) = col1.subprocess['LW'].absorptivity
 print(e1, e2)
@@ -268,7 +267,7 @@ col1.integrate_years(10.)
 test_2level(col1)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 col1 = climlab.GreyRadiationModel(num_lev=2, abs_coeff=1.9E-4)
 lw = col1.subprocess['LW']
 (e1, e2) = lw.absorptivity
@@ -287,14 +286,14 @@ test_2level(col1)
 Extend the analysis to three layers.
 Start numbering the layers from 0 to be consistent with array indexing.
 
-```{code-cell}
+```{code-cell} ipython3
 T_s, T_0, T_1, T_2, T_e, epsilon_0, epsilon_1, epsilon_2, sigma = \
     sympy.symbols('T_s, T_0, T_1, T_2, T_e, epsilon_0, epsilon_1, epsilon_2, sigma', positive=True )
 ```
 
 Define the transmissivities $\tau_i$ for layers $i=0, 1, \dots, N-1$
 
-```{code-cell}
+```{code-cell} ipython3
 tau_0 = (1-epsilon_0)
 tau_1 = (1-epsilon_1)
 tau_2 = (1-epsilon_2)
@@ -305,7 +304,7 @@ Note that if the atmosphere has $N$ layers then $\epsilon_N = 0$
 
 Define the emissions for each layer:
 
-```{code-cell}
+```{code-cell} ipython3
 E_s = sigma*T_s**4
 E_0 = epsilon_0*sigma*T_0**4
 E_1 = epsilon_1*sigma*T_1**4
@@ -317,7 +316,7 @@ Define the longwave fluxes incident on each layer, $F_{i}$
 
 Note that if the atmosphere has $N$ layers then $F_{N}$ is the OLR (emission to space)
 
-```{code-cell}
+```{code-cell} ipython3
 F_s = E_0 + tau_0*E_1 + tau_0*tau_1*E_2
 F_0 = E_s + E_1 + tau_1*E_2
 F_1 = tau_0*E_s + E_0 + E_2
@@ -329,7 +328,7 @@ F_s, F_0, F_1, F_2, F_3
 
 Now define the net absorbed longwave radiation (flux divergence) in each layer.
 
-```{code-cell}
+```{code-cell} ipython3
 R_s = F_s - E_s
 R_0 = epsilon_0*F_0 - 2*E_0
 R_1 = epsilon_1*F_1 - 2*E_1
@@ -347,13 +346,13 @@ We will solve for the **radiative equilibrium temperatures** in two steps:
 - First solve for $T_i^4$, which is a purely linear problem.
 - Then take the fourth roots to solve for the temperatures.
 
-```{code-cell}
+```{code-cell} ipython3
 out1 = sympy.solve([R_s + sigma*T_e**4, R_0, R_1, R_2],
             [T_s**4, T_0**4, T_1**4, T_2**4])
 out1
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 quarter = sympy.Rational(1,4)
 out2 = {}
 for var4, formula in out1.items():
@@ -364,7 +363,7 @@ out2
 
 Now wrap these analytical radiative equilibrium solutions in callable functions:
 
-```{code-cell}
+```{code-cell} ipython3
 def Ts(Te, e0, e1, e2):
     return out2[T_s].subs([(T_e, Te), (epsilon_0, e0), (epsilon_1, e1), (epsilon_2, e2)])
 def T0(Te, e0, e1, e2):
@@ -379,7 +378,7 @@ def T2(Te, e0, e1, e2):
 
 Define a function that takes a `climlab.GreyRadiationModel` object (which should be first integrated out to equilibrium), and compares the numerical solution to our analytical solution.
 
-```{code-cell}
+```{code-cell} ipython3
 tol = 0.01
 
 def test_3level(col):
@@ -404,13 +403,13 @@ def test_3level(col):
     print('  Numerical: %.2f   Analytical: %.2f    Same:' %(num, anal) , abs(num - anal)<tol)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 col = climlab.GreyRadiationModel( num_lev=3 )
 col.integrate_years(10.)
 test_3level(col)
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 e0 = 0.3
 e1 = 0.6
 e2 = 0.2
@@ -421,7 +420,7 @@ test_3level(col)
 
 ### Conclusion: The three-level model works
 
-```{code-cell}
+```{code-cell} ipython3
 # The 3-layer solution reduces to two layer solution if we set e_2 = 0
 out3 = {}
 for var, formula in out2.items():
@@ -542,19 +541,19 @@ Same for the downwelling flux ${\bf{D}} = [D_0, D_1, ..., D_N]$. So $D_N$ is the
 
 The absorptivity vector is ${\bf{\epsilon}} = [\epsilon_0, \epsilon_1, ..., \epsilon_{N-1}]$ ($N$ elements)
 
-```{code-cell}
+```{code-cell} ipython3
 epsilon, epsilon_i, N = sympy.symbols('epsilon, epsilon_i, N', nonnegative=True )
 ```
 
 ##  Will do the 3 layer version first
 
-```{code-cell}
+```{code-cell} ipython3
 # vector of emissions
 E = sympy.Matrix([E_0, E_1, E_2])
 E
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 # upwelling flux
 fromsurface = E_s
 U = sympy.Matrix([fromsurface, tau_0*fromsurface + E_0, tau_1*(tau_0*fromsurface + E_0) + E_1, 
@@ -562,7 +561,7 @@ U = sympy.Matrix([fromsurface, tau_0*fromsurface + E_0, tau_1*(tau_0*fromsurface
 U
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 # downwelling flux...
 fromspace = 0
 D = sympy.Matrix([ tau_0*(tau_1*(tau_2*fromspace + E_2) + E_1) + E_0, 
@@ -570,13 +569,13 @@ D = sympy.Matrix([ tau_0*(tau_1*(tau_2*fromspace + E_2) + E_1) + E_0,
 D
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 # Net flux, positive up
 F = U - D
 F
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 # The absorption is then simply the flux convergence in each layer
 
 # define a vector of absorbed radiation -- same size as emissions
@@ -589,13 +588,13 @@ for n in range(3):
 A
 ```
 
-```{code-cell}
+```{code-cell} ipython3
 # this should reduce to zero if I did it right
 sympy.simplify(A - sympy.Matrix([R_0, R_1, R_2]))
 ```
 
 ## So that works. I can formulate the tests against numerical code this way
 
-```{code-cell}
+```{code-cell} ipython3
 
 ```

@@ -24,7 +24,6 @@ The catalog is here: <http://www.esrl.noaa.gov/psd/thredds/dodsC/Datasets/ncep.r
 
 ```{code-cell}
 from __future__ import division, print_function
-%matplotlib inline
 import numpy as np
 import matplotlib.pyplot as plt
 import netCDF4 as nc
