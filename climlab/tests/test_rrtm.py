@@ -119,6 +119,34 @@ def test_radiative_forcing():
     #  Test the xarray interface
     to_xarray(rcm2)
 
+    @pytest.mark.compiled
+    @pytest.mark.slow
+    def test_spectral_olr():
+        '''Run a single-column radiative-convective model with RRTMG_LW radiation
+        out to equilibrium, outputting the spectrally-decomposed TOA flux. Then check
+        that the spectrally decomposed TOA flux adds up to the normal OLR output.'''
+        from scipy.integrate import simps
+        #  State variables (Air and surface temperature)
+        state = climlab.column_state(num_lev=30, water_depth=1.)
+        #  Fixed relative humidity
+        h2o = climlab.radiation.ManabeWaterVapor(name='WaterVapor', state=state)
+        #  Couple water vapor to radiation
+        #   Set icld=0 for clear-sky only (no need to call cloud overlap routine)
+        rad = climlab.radiation.RRTMG(name='Radiation',
+                                      state=state,
+                                      specific_humidity=h2o.q,
+                                      icld=0)
+        #  Convective adjustment
+        conv = climlab.convection.ConvectiveAdjustment(name='Convection',
+                                                       state=state,
+                                                       adj_lapse_rate=6.5)
+        #  Couple everything together
+        rcm = climlab.couple([rad,h2o,conv], name='Radiative-Convective Model')
+
+        rcm.integrate_years(5.)
+        assert np.abs(rcm.ASR - rcm.OLR) < 0.1  # close to energy balance
+        assert np.allclose(simps(rcm.OLR_sr, rcm.RRTMG_LW_bands), rcm.OLR)
+
 @pytest.mark.compiled
 @pytest.mark.slow
 def test_latitude():
