@@ -145,7 +145,7 @@ subroutine climlab_rrtmg_lw &
     real(kind=rb), intent(in) :: taucmcl(ngptlw,ncol,nlay)    ! in-cloud optical depth [mcica]
 
 ! Output
-    real(kind=rb), intent(out) :: olr_sr(nbndlw,ncol)    ! Spectrally-decomposed OLR (W/m2)
+    real(kind=rb), intent(out) :: olr_sr(ncol,nbndlw)    ! Spectrally-decomposed OLR (W/m2)
     real(kind=rb), intent(out) :: uflx(ncol,nlay+1)      ! Total sky longwave upward flux (W/m2)
     real(kind=rb), intent(out) :: dflx(ncol,nlay+1)      ! Total sky longwave downward flux (W/m2)
     real(kind=rb), intent(out) :: hr(ncol,nlay)          ! Total sky longwave radiative heating rate (K/d)
