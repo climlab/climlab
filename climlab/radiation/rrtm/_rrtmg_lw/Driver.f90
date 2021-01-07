@@ -98,7 +98,7 @@ subroutine climlab_rrtmg_lw &
     cfc11vmr, cfc12vmr, cfc22vmr, ccl4vmr , emis    , &
     inflglw , iceflglw, liqflglw, cldfmcl , &
     taucmcl , ciwpmcl , clwpmcl , reicmcl , relqmcl , tauaer  , &
-    uflx    , dflx    , hr      , uflxc   , dflxc,  hrc, &
+    olr_sr  , uflx    , dflx    , hr      , uflxc   , dflxc,  hrc, &
     duflx_dt,duflxc_dt)
 
 ! Modules
@@ -145,6 +145,7 @@ subroutine climlab_rrtmg_lw &
     real(kind=rb), intent(in) :: taucmcl(ngptlw,ncol,nlay)    ! in-cloud optical depth [mcica]
 
 ! Output
+    real(kind=rb), intent(out) :: olr_sr(nbndlw,ncol)    ! Spectrally-decomposed OLR (W/m2)
     real(kind=rb), intent(out) :: uflx(ncol,nlay+1)      ! Total sky longwave upward flux (W/m2)
     real(kind=rb), intent(out) :: dflx(ncol,nlay+1)      ! Total sky longwave downward flux (W/m2)
     real(kind=rb), intent(out) :: hr(ncol,nlay)          ! Total sky longwave radiative heating rate (K/d)
@@ -162,6 +163,7 @@ subroutine climlab_rrtmg_lw &
 !f2py depend(ncol,nlay) h2ovmr,o3vmr,co2vmr,ch4vmr,n2ovmr,o2vmr
 !f2py depend(ncol,nlay) cfc11vmr,cfc12vmr,cfc22vmr,ccl4vmr
 !f2py depend(ncol) tsfc, emis
+!f2py depend(ncol) olr_sr
 !f2py depend(ncol,nlay) tauaer
 !f2py depend(ncol,nlay) cldfmcl,ciwpmcl,clwpmcl,taucmcl
 !f2py depend(ncol,nlay) reicmcl,relqmcl
@@ -174,7 +176,7 @@ subroutine climlab_rrtmg_lw &
              cfc11vmr, cfc12vmr, cfc22vmr, ccl4vmr , emis    , &
              inflglw , iceflglw, liqflglw, cldfmcl , &
              taucmcl , ciwpmcl , clwpmcl , reicmcl , relqmcl , tauaer  , &
-             uflx    , dflx    , hr      , uflxc   , dflxc,  hrc, &
+             olr_sr  , uflx    , dflx    , hr      , uflxc   , dflxc,  hrc, &
              duflx_dt,duflxc_dt )
 
 end subroutine climlab_rrtmg_lw
