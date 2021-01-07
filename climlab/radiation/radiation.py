@@ -41,6 +41,7 @@ Additional input arguments for SW:
 
 Additional input arguments for LW:
     - ``emissivity = 1.``,  # surface emissivity
+    - ``return_spectral_olr = False``,  # Whether or not to return spectrally-decomposed OLR
 
 Shortave processes compute these diagnostics (minimum):
 
@@ -284,7 +285,7 @@ class _Radiation_LW(_Radiation):
         self.add_diagnostic('LW_sfc_clr', 0.*self.Ts)
 
         # Spectrally-decomposed OLR
-        if return_spectral_olr:
+        if self.return_spectral_olr:
             self.add_diagnostic('OLR_sr', 0. * self.Ts)
 
             # RRTMG_LW band central wavenumbers, [cm-1]
