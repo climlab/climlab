@@ -111,7 +111,7 @@ class RRTMG_LW(_Radiation_LW):
         #  Output is all (ncol,nlay+1) or (ncol,nlay)
         # Except for spectrally-decomposed TOA flux, olr_sr (ncol, nbndlw)
         if self.return_spectral_olr:
-            self.OLR_sr = _rrtm_to_climlab(olr_sr) + 0.*self.OLR_sr
+            self.OLR_sr = olr_sr + 0.*self.OLR_sr
         self.LW_flux_up = _rrtm_to_climlab(uflx) + 0.*self.LW_flux_up
         self.LW_flux_down = _rrtm_to_climlab(dflx) + 0.*self.LW_flux_down
         self.LW_flux_up_clr = _rrtm_to_climlab(uflxc) + 0.*self.LW_flux_up_clr
