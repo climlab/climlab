@@ -269,12 +269,16 @@ class _Radiation_SW(_Radiation):
 class _Radiation_LW(_Radiation):
     def __init__(self,
                  emissivity = 1.,  # surface emissivity
+                 return_spectral_olr = False,
                  **kwargs):
         super(_Radiation_LW, self).__init__(**kwargs)
         self.add_input('emissivity', emissivity)
+        self.add_input('return_spectral_olr', return_spectral_olr)
         # initialize diagnostics
+        if return_spectral_olr:
+            self.add_diagnostic('OLR_sr', 0. * self.Ts)
+
         self.add_diagnostic('OLR', 0. * self.Ts)
-        self.add_diagnostic('OLR_sr', 0. * self.Ts)
         self.add_diagnostic('OLRclr', 0. * self.Ts)
         self.add_diagnostic('OLRcld', 0. * self.Ts)
         self.add_diagnostic('TdotLW', 0. * self.Tatm)
