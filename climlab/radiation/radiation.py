@@ -283,7 +283,7 @@ class _Radiation_LW(_Radiation):
         self.add_diagnostic('LW_sfc', 0.*self.Ts)
         self.add_diagnostic('LW_sfc_clr', 0.*self.Ts)
 
-        # Spectrally-decomposed OLR 
+        # Spectrally-decomposed OLR
         if return_spectral_olr:
             self.add_diagnostic('OLR_sr', 0. * self.Ts)
 
@@ -291,7 +291,7 @@ class _Radiation_LW(_Radiation):
             central_rrtmg_lw_bands = np.array([180,425,565,665,760,900,
                                                1030,1130,1285,1435,1640,
                                                1940,2165,2315,2490,2925])
-            self.add_diagnostic('RRTMG_LW_bands', central_rrtmg_lw_bands)
+            self.RRTMG_LW_bands = central_rrtmg_lw_bands
 
         #  Flux diagnostics at layer interfaces
         #   These need an extra vertical level
