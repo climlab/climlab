@@ -30,6 +30,7 @@ class RRTMG_LW(_Radiation_LW):
             liqflglw = 1,
             tauc = 0.,  # in-cloud optical depth
             tauaer = 0.,   # Aerosol optical depth at mid-point of LW spectral bands
+            return_spectral_olr = False, # Whether or not to return OLR at mid-point of LW spectral bands
             **kwargs):
         super(RRTMG_LW, self).__init__(**kwargs)
         #  define INPUTS
@@ -42,6 +43,18 @@ class RRTMG_LW(_Radiation_LW):
         self.add_input('liqflglw', liqflglw)
         self.add_input('tauc', tauc)
         self.add_input('tauaer', tauaer)
+        self.add_input('return_spectral_olr', return_spectral_olr)
+
+        # Spectrally-decomposed OLR
+        if self.return_spectral_olr:
+            print("YESSSSSSS")
+            self.add_diagnostic('OLR_sr', 0. * self.Ts)
+
+            # RRTMG_LW band central wavenumbers, [cm-1]
+            central_rrtmg_lw_bands = np.array([180,425,565,665,760,900,
+                                               1030,1130,1285,1435,1640,
+                                               1940,2165,2315,2490,2925])
+            self.RRTMG_LW_bands = central_rrtmg_lw_bands
 
     def _prepare_lw_arguments(self):
         #  scalar integer arguments

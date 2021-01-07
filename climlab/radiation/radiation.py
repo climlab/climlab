@@ -270,11 +270,9 @@ class _Radiation_SW(_Radiation):
 class _Radiation_LW(_Radiation):
     def __init__(self,
                  emissivity = 1.,  # surface emissivity
-                 return_spectral_olr = False,
                  **kwargs):
         super(_Radiation_LW, self).__init__(**kwargs)
         self.add_input('emissivity', emissivity)
-        self.add_input('return_spectral_olr', return_spectral_olr)
         # initialize diagnostics
         self.add_diagnostic('OLR', 0. * self.Ts)
         self.add_diagnostic('OLRclr', 0. * self.Ts)
@@ -284,15 +282,15 @@ class _Radiation_LW(_Radiation):
         self.add_diagnostic('LW_sfc', 0.*self.Ts)
         self.add_diagnostic('LW_sfc_clr', 0.*self.Ts)
 
-        # Spectrally-decomposed OLR
-        if self.return_spectral_olr:
-            self.add_diagnostic('OLR_sr', 0. * self.Ts)
-
-            # RRTMG_LW band central wavenumbers, [cm-1]
-            central_rrtmg_lw_bands = np.array([180,425,565,665,760,900,
-                                               1030,1130,1285,1435,1640,
-                                               1940,2165,2315,2490,2925])
-            self.RRTMG_LW_bands = central_rrtmg_lw_bands
+        ## Spectrally-decomposed OLR
+        #if self.return_spectral_olr:
+    #        self.add_diagnostic('OLR_sr', 0. * self.Ts)
+##
+#            # RRTMG_LW band central wavenumbers, [cm-1]
+#            central_rrtmg_lw_bands = np.array([180,425,565,665,760,900,
+#                                               1030,1130,1285,1435,1640,
+#                                               1940,2165,2315,2490,2925])
+#            self.RRTMG_LW_bands = central_rrtmg_lw_bands
 
         #  Flux diagnostics at layer interfaces
         #   These need an extra vertical level
