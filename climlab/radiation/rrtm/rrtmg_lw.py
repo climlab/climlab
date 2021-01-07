@@ -47,7 +47,6 @@ class RRTMG_LW(_Radiation_LW):
 
         # Spectrally-decomposed OLR
         if self.return_spectral_olr:
-            print("YESSSSSSS")
             self.add_diagnostic('OLR_sr', 0. * self.Ts)
 
             # RRTMG_LW band central wavenumbers, [cm-1]
