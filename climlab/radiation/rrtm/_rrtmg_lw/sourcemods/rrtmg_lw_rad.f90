@@ -414,7 +414,7 @@
                                               !   (lw scattering not yet available)
 
 ! Output
-      real(kind=rb) :: toaflux(nbndlw)        ! toa upward flux, spectrally-decomposed (w/m2)
+      real(kind=rb) :: toaflux_sr(nbndlw)     ! toa upward flux, spectrally-decomposed (w/m2)
       real(kind=rb) :: totuflux(0:nlay+1)     ! upward longwave flux (w/m2)
       real(kind=rb) :: totdflux(0:nlay+1)     ! downward longwave flux (w/m2)
       real(kind=rb) :: fnet(0:nlay+1)         ! net longwave flux (w/m2)
