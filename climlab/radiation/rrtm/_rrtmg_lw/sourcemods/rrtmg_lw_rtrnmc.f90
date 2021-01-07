@@ -540,9 +540,9 @@
          enddo
 
 ! Write TOA upward longwave flux in this band to output array
-! TOA lev = ?
+! TOA lev = nlayers
 ! But first, need to add in correction due to fluxfac
-         toaflux_sr(iband) = uflux(TOAlev) * delwave(iband) * fluxfac
+         toaflux_sr(iband) = uflux(nlayers) * delwave(iband) * fluxfac
 
 
 ! Calculate total change in upward flux wrt surface temperature
