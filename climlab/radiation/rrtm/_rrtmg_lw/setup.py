@@ -38,7 +38,7 @@ src = ['rrtmg_lw_k_g.f90',
 unoptimized_src = ['rrtmg_lw_k_g.f90']
 mod_src = ['rrtmg_lw_setcoef.f90',
            'rrtmg_lw_rad.f90',
-           'rrtmg_lw_rtrncm.f90',]
+           'rrtmg_lw_rtrnmc.f90',]
 
 def configuration(parent_package='', top_path=None):
     global config
