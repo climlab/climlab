@@ -274,6 +274,7 @@ class _Radiation_LW(_Radiation):
         self.add_input('emissivity', emissivity)
         # initialize diagnostics
         self.add_diagnostic('OLR', 0. * self.Ts)
+        self.add_diagnostic('OLR_sr', 0. * self.Ts)
         self.add_diagnostic('OLRclr', 0. * self.Ts)
         self.add_diagnostic('OLRcld', 0. * self.Ts)
         self.add_diagnostic('TdotLW', 0. * self.Tatm)

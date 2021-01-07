@@ -100,7 +100,7 @@ class RRTMG_LW(_Radiation_LW):
                             permuteseed, irng, play,
                             cldfrac, ciwp, clwp, reic, relq, tauc)
             #  Call the RRTMG_LW driver to compute radiative fluxes
-        (uflx, dflx, hr, uflxc, dflxc, hrc, duflx_dt, duflxc_dt) = \
+        (olr_sr, uflx, dflx, hr, uflxc, dflxc, hrc, duflx_dt, duflxc_dt) = \
             _rrtmg_lw.climlab_rrtmg_lw(ncol, nlay, icld, idrv,
                  play, plev, tlay, tlev, tsfc,
                  h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr,
@@ -109,6 +109,8 @@ class RRTMG_LW(_Radiation_LW):
                  taucmcl, ciwpmcl, clwpmcl, reicmcl, relqmcl,
                  tauaer)
         #  Output is all (ncol,nlay+1) or (ncol,nlay)
+        # Except for spectrally-decomposed TOA flux, olr_sr (ncol, nbndlw)
+        self.OLR_sr = _rrtm_to_climlab(olr_sr) + 0.*self.OLR_sr
         self.LW_flux_up = _rrtm_to_climlab(uflx) + 0.*self.LW_flux_up
         self.LW_flux_down = _rrtm_to_climlab(dflx) + 0.*self.LW_flux_down
         self.LW_flux_up_clr = _rrtm_to_climlab(uflxc) + 0.*self.LW_flux_up_clr
