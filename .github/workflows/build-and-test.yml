@@ -31,9 +31,7 @@ jobs:
           #channel-priority: strict
           activate-environment: test_env
           environment-file: ci/requirements-py37-linux.yml
-          auto-update-conda: false
-          python-version: ${{ matrix.python-version }}
-          auto-activate-base: false
+          miniforge-version: latest
       # - name: Install conda dependencies
       #   run: |
       #     mamba env update -f $CONDA_ENV_FILE
