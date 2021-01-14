@@ -4,3 +4,9 @@ requires = [
     "setuptools",
     "numpy",
 ]
+[tool.pytest.ini_options]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "fast: marks tests as fast (select these only with '-m fast')",
+    "compiled: marks tests as requiring compiled components (deselect with '-m \"not compiled\"')",
+]
