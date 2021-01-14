@@ -1,4 +1,5 @@
 # shamelessly cribbed from https://github.com/pydata/xarray/blob/master/.github/workflows/ci.yaml
+# and from https://github.com/conda-incubator/setup-miniconda
 name: Build and test climlab
 
 on: push
@@ -14,30 +15,17 @@ jobs:
         python-version: ["3.7",]
     steps:
       - uses: actions/checkout@v2
-      # - name: Set environment variables
-      #   run: |
-      #     echo "CONDA_ENV_FILE=ci/requirements-py37-linux.yml" >> $GITHUB_ENV
-      #     echo "PYTHON_VERSION=${{ matrix.python-version }}" >> $GITHUB_ENV
-      # - name: Cache conda
-      #   uses: actions/cache@v2
-      #   with:
-      #     path: ~/conda_pkgs_dir
-      #     key:
-      #       ${{ runner.os }}-conda-py${{ matrix.python-version }}-${{
-      #       hashFiles('ci/requirements/**.yml') }}
       - uses: conda-incubator/setup-miniconda@v2
         with:
-          #channels: conda-forge
-          #channel-priority: strict
           activate-environment: test_env
           environment-file: ci/requirements-py37-linux.yml
           miniforge-version: latest
-      # - name: Install conda dependencies
-      #   run: |
-      #     mamba env update -f $CONDA_ENV_FILE
+      - name: Version info  #just to figure out what's going on
+        run: |
+          conda info -a
+          conda list
       - name: Build and install climlab
         run: |
-          conda activate test_env
           python -m pip install --no-deps -e .
       - name: Import climlab
         run: |
@@ -47,11 +35,3 @@ jobs:
           python -m pytest -n 4 \
              --cov=climlab \
              --cov-report=xml
-      # - name: Upload code coverage to Codecov
-      #   uses: codecov/codecov-action@v1
-      #   with:
-      #     file: ./coverage.xml
-      #     flags: unittests
-      #     env_vars: RUNNER_OS,PYTHON_VERSION
-      #     name: codecov-umbrella
-      #     fail_ci_if_error: false
