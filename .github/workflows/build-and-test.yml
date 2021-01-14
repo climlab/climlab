@@ -10,8 +10,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ox: ["ubuntu-latest"]
-        python-version: ["3.7"]
+        ox: ["ubuntu-latest",]
+        python-version: ["3.7",]
     steps:
       - uses: actions/checkout@v2
       - name: Set environment variables
