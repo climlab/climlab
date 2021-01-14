@@ -27,9 +27,9 @@ jobs:
       #       hashFiles('ci/requirements/**.yml') }}
       - uses: conda-incubator/setup-miniconda@v2
         with:
-          channels: conda-forge
-          channel-priority: strict
-          activate-environment: anaconda-client-env
+          #channels: conda-forge
+          #channel-priority: strict
+          #activate-environment: anaconda-client-env
           environment-file: ci/requirements-py37-linux.yml
           auto-update-conda: false
           python-version: ${{ matrix.python-version }}
