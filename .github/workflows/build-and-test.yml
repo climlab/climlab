@@ -14,27 +14,26 @@ jobs:
         python-version: ["3.7",]
     steps:
       - uses: actions/checkout@v2
-      - name: Set environment variables
-        run: |
-          echo "CONDA_ENV_FILE=ci/requirements-py37-linux.yml" >> $GITHUB_ENV
-          echo "PYTHON_VERSION=${{ matrix.python-version }}" >> $GITHUB_ENV
-      - name: Cache conda
-        uses: actions/cache@v2
-        with:
-          path: ~/conda_pkgs_dir
-          key:
-            ${{ runner.os }}-conda-py${{ matrix.python-version }}-${{
-            hashFiles('ci/requirements/**.yml') }}
+      # - name: Set environment variables
+      #   run: |
+      #     echo "CONDA_ENV_FILE=ci/requirements-py37-linux.yml" >> $GITHUB_ENV
+      #     echo "PYTHON_VERSION=${{ matrix.python-version }}" >> $GITHUB_ENV
+      # - name: Cache conda
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: ~/conda_pkgs_dir
+      #     key:
+      #       ${{ runner.os }}-conda-py${{ matrix.python-version }}-${{
+      #       hashFiles('ci/requirements/**.yml') }}
       - uses: conda-incubator/setup-miniconda@v2
         with:
           channels: conda-forge
           channel-priority: strict
-          mamba-version: "*"
-          activate-environment: test-env
+          activate-environment: anaconda-client-env
+          environment-file: ci/requirements-py37-linux.yml
           auto-update-conda: false
           python-version: ${{ matrix.python-version }}
-          use-only-tar-bz2: true
-
+          auto-activate-base: false
       # - name: Install conda dependencies
       #   run: |
       #     mamba env update -f $CONDA_ENV_FILE
