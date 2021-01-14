@@ -35,9 +35,9 @@ jobs:
           python-version: ${{ matrix.python-version }}
           use-only-tar-bz2: true
 
-      - name: Install conda dependencies
-        run: |
-          mamba env update -f $CONDA_ENV_FILE
+      # - name: Install conda dependencies
+      #   run: |
+      #     mamba env update -f $CONDA_ENV_FILE
       - name: Build and install climlab
         run: |
           python -m pip install --no-deps -e .
