@@ -35,6 +35,8 @@ jobs:
           python -c "import climlab"
       - name: Run tests
         run: |
-          python -m pytest -n 4 \
-             --cov=climlab \
-             --cov-report=xml
+          pytest -v --pyargs climlab.tests
+        # run: |
+        #   python -m pytest -n 4 \
+        #      --cov=climlab \
+        #      --cov-report=xml
