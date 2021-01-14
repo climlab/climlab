@@ -29,7 +29,7 @@ jobs:
         with:
           #channels: conda-forge
           #channel-priority: strict
-          #activate-environment: anaconda-client-env
+          activate-environment: test_env
           environment-file: ci/requirements-py37-linux.yml
           auto-update-conda: false
           python-version: ${{ matrix.python-version }}
