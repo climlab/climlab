@@ -37,6 +37,7 @@ jobs:
       #     mamba env update -f $CONDA_ENV_FILE
       - name: Build and install climlab
         run: |
+          conda activate test_env
           python -m pip install --no-deps -e .
       - name: Import climlab
         run: |
