@@ -155,9 +155,9 @@ def default_absorbers(Tatm,
         except:
             warnings.warn('Some grid points are beyond the bounds of the ozone file. Ozone values will be extrapolated.')
             try:
-                # passing fill_value=None to the underlying scipy interpolator
+                # passing fill_value='extrapolate' to the underlying scipy interpolator
                 # will result in extrapolation instead of NaNs
-                O3 = O3source.interp_like(xTatm, kwargs={'fill_value':None})
+                O3 = O3source.interp_like(xTatm, kwargs={'fill_value':'extrapolate'})
                 assert not np.any(np.isnan(O3))
             except:
                 warnings.warn('Interpolation of ozone data failed. Setting O3 to zero instead.')
