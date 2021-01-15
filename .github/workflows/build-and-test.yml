@@ -14,14 +14,20 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ["ubuntu-latest",]
         python-version: ["36","37","38"]
+        os: ["ubuntu-latest","macos-latest"]
+        include:
+          - os: ubuntu-latest
+            environment-file: ci/requirements-py${{ matrix.python-version }}-linux.yml
+          - os: macos-latest
+            environment-file: ci/requirements-py${{ matrix.python-version }}-osx.yml
+
     steps:
       - uses: actions/checkout@v2
       - uses: conda-incubator/setup-miniconda@v2
         with:
           activate-environment: test_env
-          environment-file: ci/requirements-py${{ matrix.python-version }}-linux.yml
+          environment-file: ${{ matrix.environment-file }}
           miniforge-version: latest
       - name: Build and install climlab
         run: |
