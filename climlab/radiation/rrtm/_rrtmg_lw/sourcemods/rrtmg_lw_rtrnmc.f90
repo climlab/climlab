@@ -97,7 +97,7 @@
                                                       !    Dimensions: (nbndlw)
 
 ! ----- Output -----
-      real(kind=rb), intent(out) :: toaflux_sr(0:)    ! toa upward flux, spectrally-decomposed (w/m2)
+      real(kind=rb), intent(out) :: toaflux_sr(:)    ! toa upward flux, spectrally-decomposed (w/m2)
                                                       !    Dimensions: (nbndlw)
       real(kind=rb), intent(out) :: totuflux(0:)      ! upward longwave flux (w/m2)
                                                       !    Dimensions: (0:nlayers)
