@@ -15,18 +15,14 @@ jobs:
       fail-fast: false
       matrix:
         os: ["ubuntu-latest",]
-        python-version: ["3.7",]
+        python-version: ["36","37","38"]
     steps:
       - uses: actions/checkout@v2
       - uses: conda-incubator/setup-miniconda@v2
         with:
           activate-environment: test_env
-          environment-file: ci/requirements-py37-linux.yml
+          environment-file: ci/requirements-py${{ matrix.python-version }}-linux.yml
           miniforge-version: latest
-      - name: Version info  #just to figure out what's going on
-        run: |
-          conda info -a
-          conda list
       - name: Build and install climlab
         run: |
           python -m pip install --no-deps -e .
