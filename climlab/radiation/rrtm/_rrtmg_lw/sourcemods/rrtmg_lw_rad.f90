@@ -326,6 +326,7 @@
       integer(kind=im) :: ims                 ! value for changing mcica permute seed
       integer(kind=im) :: k                   ! layer loop index
       integer(kind=im) :: ig                  ! g-point loop index
+      integer(kind=im) :: iband                  ! band loop index
 
 ! Atmosphere
       real(kind=rb) :: pavel(nlay+1)          ! layer pressures (mb)
@@ -550,8 +551,9 @@
                      idrv, dplankbnd_dt, dtotuflux_dt, dtotuclfl_dt )
 
 ! Write spectrally-decomposed OLR in this column to output array
-         olr_sr(iplon,:) = toaflux_sr(:)
-
+         do iband = istart, iend
+            olr_sr(iplon,iband) = toaflux_sr(iband)
+         enddo
 !  Transfer up and down fluxes and heating rate to output arrays.
 !  Vertical indexing goes from bottom to top; reverse here for GCM if necessary.
 
