@@ -5,7 +5,7 @@ name: Build and test climlab
 on: push
 
 jobs:
-  build-linux:
+  build-and-test:
     name: ${{ matrix.os }} py${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
     defaults:
