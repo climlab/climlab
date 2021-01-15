@@ -554,6 +554,7 @@
          do iband = istart, iend
             olr_sr(iplon,iband) = toaflux_sr(iband)
          enddo
+         
 !  Transfer up and down fluxes and heating rate to output arrays.
 !  Vertical indexing goes from bottom to top; reverse here for GCM if necessary.
 
