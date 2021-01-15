@@ -3,33 +3,11 @@ channels:
   - eoas_ubc
   - conda-forge
 dependencies:
-  - base-notebook=2020.09.05
   # NOTE: pip required for running tests in this repo
-  - python=3.7
+  - python=3.8
   - pip=20
-  - ipython
-  - xarray
-  - pytest
-  - codecov
-  - click
-  - pytest-cov
-  - climlab
-  - numpy
-  - jupyter
-  - nbconvert<6
-  - scipy
-  - sympy
-  - numba
-  - matplotlib
-  - netcdf4
-  - pyhdf
-  - hdf4
-  - h5py
-  - jupyterlab<3
-  - attrdict
-  - jupytext
-  - cartopy
-  - pandas
-  - pytest
+  - conda-build
+  - anaconda-client
+  - conda-verify
   - conda-lock
 # conda-lock -f environment.yml -p linux-64

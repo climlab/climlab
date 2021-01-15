@@ -1,4 +1,4 @@
-{% set version = "0.7.9" %}
+{% set version = "0.8.1" %}
 
 package:
   name: climlab
@@ -13,16 +13,19 @@ build:
 
 requirements:
   build:
+    - python=3.8
     - {{ compiler('fortran') }}
     - {{ compiler('c') }}
+    - numpy=1.19
   host:
     - flang  # [win and py3k]
-    - python
+    - python=3.8
     - setuptools
     - pip
-    - numpy
+    - numpy=1.19
   run:
-    - python
+    - python=3.8
+    - numpy=1.19
     - {{ pin_compatible('numpy') }}
     - libflang  # [win and py3k]
     - scipy
