@@ -1,0 +1,2 @@
+default_jupytext_formats = "ipynb,myst,py:percent" 
+outdated_text_notebook_margin = 5

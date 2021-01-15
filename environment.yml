@@ -1,0 +1,13 @@
+name: notebook
+channels:
+  - eoas_ubc
+  - conda-forge
+dependencies:
+  # NOTE: pip required for running tests in this repo
+  - python=3.8
+  - pip=20
+  - conda-build
+  - anaconda-client
+  - conda-verify
+  - conda-lock
+# conda-lock -f environment.yml -p linux-64
