@@ -22,6 +22,7 @@ class RRTMG_LW(_Radiation_LW):
     def __init__(self,
             # GENERAL, used in both SW and LW
             icld = 1,    # Cloud overlap method, 0: Clear only, 1: Random, 2,  Maximum/random] 3: Maximum
+            ispec = 0,  # Spectral OLR output flag, 0: only calculate total fluxes, 1: also return spectral OLR
             irng = 1,  # more monte carlo stuff
             idrv = 0,  # whether to also calculate the derivative of flux with respect to surface temp
             permuteseed =  300,
@@ -30,11 +31,12 @@ class RRTMG_LW(_Radiation_LW):
             liqflglw = 1,
             tauc = 0.,  # in-cloud optical depth
             tauaer = 0.,   # Aerosol optical depth at mid-point of LW spectral bands
-            return_spectral_olr = False, # Whether or not to return OLR at mid-point of LW spectral bands
+            return_spectral_olr = False, # Whether or not to return OLR averaged over each band
             **kwargs):
         super(RRTMG_LW, self).__init__(**kwargs)
         #  define INPUTS
         self.add_input('icld', icld)
+        self.add_input('icld', ispec)
         self.add_input('irng', irng)
         self.add_input('idrv', idrv)
         self.add_input('permuteseed', permuteseed)
@@ -47,6 +49,8 @@ class RRTMG_LW(_Radiation_LW):
 
         # Spectrally-decomposed OLR
         if self.return_spectral_olr:
+            # Adjust output flag
+            self.ispec = 1
             self.add_diagnostic('OLR_sr', 0. * self.Ts)
 
             # RRTMG_LW band central wavenumbers, [cm-1]
@@ -57,9 +61,10 @@ class RRTMG_LW(_Radiation_LW):
 
     def _prepare_lw_arguments(self):
         #  scalar integer arguments
-        icld = self.icld
-        irng = self.irng
-        idrv = self.idrv
+        icld  = self.icld
+        ispec = self.ispec
+        irng  = self.irng
+        idrv  = self.idrv
         permuteseed = self.permuteseed
         inflglw = self.inflglw
         iceflglw = self.iceflglw
@@ -80,7 +85,7 @@ class RRTMG_LW(_Radiation_LW):
         tauaer = _climlab_to_rrtm(self.tauaer * np.ones_like(self.Tatm))
         #  broadcast and transpose to get [ncol,nlay,nbndlw]
         tauaer = np.transpose(tauaer * np.ones([nbndlw,ncol,nlay]), (1,2,0))
-        args = [ncol, nlay, icld, permuteseed, irng, idrv, const.cp,
+        args = [ncol, nlay, icld, ispec, permuteseed, irng, idrv, const.cp,
                 play, plev, tlay, tlev, tsfc,
                 h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr,
                 cfc11vmr, cfc12vmr, cfc22vmr, ccl4vmr, emis,
@@ -91,7 +96,7 @@ class RRTMG_LW(_Radiation_LW):
     def _compute_heating_rates(self):
         '''Prepare arguments and call the RRTGM_LW driver to calculate
         radiative fluxes and heating rates'''
-        (ncol, nlay, icld, permuteseed, irng, idrv, cp,
+        (ncol, nlay, icld, ispec, permuteseed, irng, idrv, cp,
                 play, plev, tlay, tlev, tsfc,
                 h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr,
                 cfc11vmr, cfc12vmr, cfc22vmr, ccl4vmr, emis,
@@ -113,7 +118,7 @@ class RRTMG_LW(_Radiation_LW):
                             cldfrac, ciwp, clwp, reic, relq, tauc)
             #  Call the RRTMG_LW driver to compute radiative fluxes
         (olr_sr, uflx, dflx, hr, uflxc, dflxc, hrc, duflx_dt, duflxc_dt) = \
-            _rrtmg_lw.climlab_rrtmg_lw(ncol, nlay, icld, idrv,
+            _rrtmg_lw.climlab_rrtmg_lw(ncol, nlay, icld, ispec, idrv,
                  play, plev, tlay, tlev, tsfc,
                  h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr,
                  cfc11vmr, cfc12vmr, cfc22vmr, ccl4vmr, emis,

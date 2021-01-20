@@ -78,7 +78,7 @@
 !------------------------------------------------------------------
 
       subroutine rrtmg_lw &
-            (ncol    ,nlay    ,icld    ,idrv    , &
+            (ncol    ,nlay    ,icld    ,ispec   ,idrv    , &
              play    ,plev    ,tlay    ,tlev    ,tsfc    , &
              h2ovmr  ,o3vmr   ,co2vmr  ,ch4vmr  ,n2ovmr  ,o2vmr , &
              cfc11vmr,cfc12vmr,cfc22vmr,ccl4vmr ,emis    , &
@@ -196,6 +196,8 @@
 ! by scaling mass mixing ratio (g/g) with the appropriate molecular weights (g/mol)
       integer(kind=im), intent(in) :: ncol            ! Number of horizontal columns
       integer(kind=im), intent(in) :: nlay            ! Number of model layers
+      integer(kind=im) :: ispec                       ! spectral output flag
+                                                      ! (ispec=0 for total fluxes, =1 for spectral toa flux too)
       integer(kind=im), intent(inout) :: icld         ! Cloud overlap method
                                                       !    0: Clear only
                                                       !    1: Random
@@ -319,14 +321,14 @@
       integer(kind=im) :: nlayers             ! total number of layers
       integer(kind=im) :: istart              ! beginning band of calculation
       integer(kind=im) :: iend                ! ending band of calculation
-      integer(kind=im) :: iout                ! output option flag (inactive)
+      integer(kind=im) :: iout                ! output option flag (active)
       integer(kind=im) :: iaer                ! aerosol option flag
       integer(kind=im) :: iplon               ! column loop index
       integer(kind=im) :: imca                ! flag for mcica [0=off, 1=on]
       integer(kind=im) :: ims                 ! value for changing mcica permute seed
       integer(kind=im) :: k                   ! layer loop index
       integer(kind=im) :: ig                  ! g-point loop index
-      integer(kind=im) :: iband                  ! band loop index
+      integer(kind=im) :: iband               ! band loop index
 
 ! Atmosphere
       real(kind=rb) :: pavel(nlay+1)          ! layer pressures (mb)
@@ -415,7 +417,6 @@
                                               !   (lw scattering not yet available)
 
 ! Output
-      real(kind=rb) :: toaflux_sr(nbndlw)     ! toa upward flux, spectrally-decomposed (w/m2)
       real(kind=rb) :: totuflux(0:nlay+1)     ! upward longwave flux (w/m2)
       real(kind=rb) :: totdflux(0:nlay+1)     ! downward longwave flux (w/m2)
       real(kind=rb) :: fnet(0:nlay+1)         ! net longwave flux (w/m2)
@@ -465,6 +466,140 @@
 ! In a GCM this call should be placed in the model initialization
 ! area, since this has to be called only once.
 !      call rrtmg_lw_ini(cpdair)
+
+!  INITIAL COLUMN LOOP
+!  Only called if ispec = 1, so spectral OLR required
+!  Sets iout = 99 and istart=iend=iband so that each band
+!  is calculated individually.
+      if (ispec .eq. 1) then
+         iout = 99
+         do iplon = 1, ncol
+            do iband = 1,16
+               istart = iband
+               iend   = iband
+
+!  Prepare atmospheric profile from GCM for use in RRTMG, and define
+!  other input parameters.
+
+               call inatm (iplon, nlay, icld, iaer, &
+                           play, plev, tlay, tlev, tsfc, h2ovmr, &
+                           o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr, cfc11vmr, cfc12vmr, &
+                           cfc22vmr, ccl4vmr, emis, inflglw, iceflglw, liqflglw, &
+                           cldfmcl, taucmcl, ciwpmcl, clwpmcl, reicmcl, relqmcl, tauaer, &
+                           nlayers, pavel, pz, tavel, tz, tbound, semiss, coldry, &
+                           wkl, wbrodl, wx, pwvcm, inflag, iceflag, liqflag, &
+                           cldfmc, taucmc, ciwpmc, clwpmc, reicmc, relqmc, taua)
+
+!  For cloudy atmosphere, use cldprmc to set cloud optical properties based on
+!  input cloud physical properties.  Select method based on choices described
+!  in cldprmc.  Cloud fraction, water path, liquid droplet and ice particle
+!  effective radius must be passed into cldprmc.  Cloud fraction and cloud
+!  optical depth are transferred to rrtmg_lw arrays in cldprmc.
+
+               call cldprmc(nlayers, inflag, iceflag, liqflag, cldfmc, ciwpmc, &
+                            clwpmc, reicmc, relqmc, ncbands, taucmc)
+
+! Calculate information needed by the radiative transfer routine
+! that is specific to this atmosphere, especially some of the
+! coefficients and indices needed to compute the optical depths
+! by interpolating data from stored reference atmospheres.
+
+               call setcoef(nlayers, istart, pavel, tavel, tz, tbound, semiss, &
+                            coldry, wkl, wbrodl, &
+                            laytrop, jp, jt, jt1, planklay, planklev, plankbnd, &
+                            idrv, dplankbnd_dt, &
+                            colh2o, colco2, colo3, coln2o, colco, colch4, colo2, &
+                            colbrd, fac00, fac01, fac10, fac11, &
+                            rat_h2oco2, rat_h2oco2_1, rat_h2oo3, rat_h2oo3_1, &
+                            rat_h2on2o, rat_h2on2o_1, rat_h2och4, rat_h2och4_1, &
+                            rat_n2oco2, rat_n2oco2_1, rat_o3co2, rat_o3co2_1, &
+                            selffac, selffrac, indself, forfac, forfrac, indfor, &
+                            minorfrac, scaleminor, scaleminorn2, indminor)
+
+!  Calculate the gaseous optical depths and Planck fractions for
+!  each longwave spectral band.
+
+               call taumol(nlayers, pavel, wx, coldry, &
+                           laytrop, jp, jt, jt1, planklay, planklev, plankbnd, &
+                           colh2o, colco2, colo3, coln2o, colco, colch4, colo2, &
+                           colbrd, fac00, fac01, fac10, fac11, &
+                           rat_h2oco2, rat_h2oco2_1, rat_h2oo3, rat_h2oo3_1, &
+                           rat_h2on2o, rat_h2on2o_1, rat_h2och4, rat_h2och4_1, &
+                           rat_n2oco2, rat_n2oco2_1, rat_o3co2, rat_o3co2_1, &
+                           selffac, selffrac, indself, forfac, forfrac, indfor, &
+                           minorfrac, scaleminor, scaleminorn2, indminor, &
+                           fracs, taug)
+
+
+! Combine gaseous and aerosol optical depths, if aerosol active
+               if (iaer .eq. 0) then
+                  do k = 1, nlayers
+                     do ig = 1, ngptlw
+                        taut(k,ig) = taug(k,ig)
+                     enddo
+                  enddo
+               elseif (iaer .eq. 10) then
+                  do k = 1, nlayers
+                     do ig = 1, ngptlw
+                        taut(k,ig) = taug(k,ig) + taua(k,ngb(ig))
+                     enddo
+                  enddo
+               endif
+
+! Call the radiative transfer routine.
+! Either routine can be called to do clear sky calculation.  If clouds
+! are present, then select routine based on cloud overlap assumption
+! to be used.  Clear sky calculation is done simultaneously.
+! For McICA, RTRNMC is called for clear and cloudy calculations.
+
+!  Do a loop over bands by setting istart=iend = 1,2,3,4,5,...16
+
+               call rtrnmc(nlayers, istart, iend, iout, pz, semiss, ncbands, &
+                           cldfmc, taucmc, planklay, planklev, plankbnd, &
+                           pwvcm, fracs, taut, &
+                           totuflux, totdflux, fnet, htr, &
+                           totuclfl, totdclfl, fnetc, htrc, &
+                           idrv, dplankbnd_dt, dtotuflux_dt, dtotuclfl_dt )
+
+               olr_sr(iplon,iband) = totuflux(nlayers)
+
+!  Transfer up and down fluxes and heating rate to output arrays.
+!  Vertical indexing goes from bottom to top; reverse here for GCM if necessary.
+
+               do k = 0, nlayers
+                  uflx(iplon,k+1) = totuflux(k)
+                  dflx(iplon,k+1) = totdflux(k)
+                  uflxc(iplon,k+1) = totuclfl(k)
+                  dflxc(iplon,k+1) = totdclfl(k)
+               enddo
+               do k = 0, nlayers-1
+                  hr(iplon,k+1) = htr(k)
+                  hrc(iplon,k+1) = htrc(k)
+               enddo
+
+!  If idrv=1 option is active, transfer upward flux derivatives to output arrays.
+
+               if (idrv .eq. 1) then
+                  do k = 0, nlayers
+                     duflx_dt(iplon,k+1) = dtotuflux_dt(k)
+                     duflxc_dt(iplon,k+1) = dtotuclfl_dt(k)
+                  enddo
+               endif
+
+! End band loop
+            enddo
+! End longitude/column loop
+         enddo
+! Close ispec if statement
+    endif
+
+
+!  SECOND COLUMN LOOP, ALWAYS CALLED
+!  Calculates total fluxes
+!  Reset flags for normal calculation of total fluxes
+      istart = 1
+      iend = 16
+      iout = 0
 
 !  This is the main longitude/column loop within RRTMG.
       do iplon = 1, ncol
@@ -543,18 +678,15 @@
 ! to be used.  Clear sky calculation is done simultaneously.
 ! For McICA, RTRNMC is called for clear and cloudy calculations.
 
+         iout=0
+
          call rtrnmc(nlayers, istart, iend, iout, pz, semiss, ncbands, &
                      cldfmc, taucmc, planklay, planklev, plankbnd, &
                      pwvcm, fracs, taut, &
-                     toaflux_sr, totuflux, totdflux, fnet, htr, &
+                     totuflux, totdflux, fnet, htr, &
                      totuclfl, totdclfl, fnetc, htrc, &
                      idrv, dplankbnd_dt, dtotuflux_dt, dtotuclfl_dt )
 
-! Write spectrally-decomposed OLR in this column to output array
-         do iband = istart, iend
-            olr_sr(iplon,iband) = toaflux_sr(iband)
-         enddo
-         
 !  Transfer up and down fluxes and heating rate to output arrays.
 !  Vertical indexing goes from bottom to top; reverse here for GCM if necessary.
 
@@ -580,6 +712,8 @@
 
 ! End longitude/column loop
       enddo
+
+
 
       end subroutine rrtmg_lw
 

@@ -438,13 +438,14 @@ python module _rrtmg_lw ! in
             real(kind=8) dimension(ncol,nlay),intent(out),depend(ncol,nlay) :: relqmcl
             real(kind=8) dimension(140,ncol,nlay),intent(out),depend(ncol,nlay) :: taucmcl
         end subroutine climlab_mcica_subcol_lw
-        subroutine climlab_rrtmg_lw(ncol,nlay,icld,idrv,play,plev,tlay,tlev,tsfc,h2ovmr,o3vmr,co2vmr,ch4vmr,n2ovmr,o2vmr,cfc11vmr,cfc12vmr,cfc22vmr,ccl4vmr,emis,inflglw,iceflglw,liqflglw,cldfmcl,taucmcl,ciwpmcl,clwpmcl,reicmcl,relqmcl,tauaer,olr_sr,uflx,dflx,hr,uflxc,dflxc,hrc,duflx_dt,duflxc_dt) ! in :_rrtmg_lw:Driver.f90
+        subroutine climlab_rrtmg_lw(ncol,nlay,icld,ispec,idrv,play,plev,tlay,tlev,tsfc,h2ovmr,o3vmr,co2vmr,ch4vmr,n2ovmr,o2vmr,cfc11vmr,cfc12vmr,cfc22vmr,ccl4vmr,emis,inflglw,iceflglw,liqflglw,cldfmcl,taucmcl,ciwpmcl,clwpmcl,reicmcl,relqmcl,tauaer,olr_sr,uflx,dflx,hr,uflxc,dflxc,hrc,duflx_dt,duflxc_dt) ! in :_rrtmg_lw:Driver.f90
             use rrtmg_lw_rad, only: rrtmg_lw
             use parkind, only: im=>kind_im
             use parrrtm, only: nbndlw,ngptlw
             integer(kind=im) intent(in) :: ncol
             integer(kind=im) intent(in) :: nlay
             integer :: icld
+            integer :: ispec
             integer(kind=im) intent(in) :: idrv
             real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: play
             real(kind=8) dimension(ncol,nlay + 1),intent(in),depend(ncol,nlay) :: plev

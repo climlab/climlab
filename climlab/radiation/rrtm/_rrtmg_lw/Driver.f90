@@ -92,7 +92,7 @@ end subroutine climlab_mcica_subcol_lw
 
 
 subroutine climlab_rrtmg_lw &
-    (ncol    ,nlay    ,icld    ,idrv    , &
+    (ncol    ,nlay    ,icld     , ispec   , idrv    , &
     play    , plev    , tlay    , tlev    , tsfc    , &
     h2ovmr  , o3vmr   , co2vmr  , ch4vmr  , n2ovmr  , o2vmr , &
     cfc11vmr, cfc12vmr, cfc22vmr, ccl4vmr , emis    , &
@@ -110,6 +110,8 @@ subroutine climlab_rrtmg_lw &
     integer, parameter :: rb = selected_real_kind(12)
     integer(kind=im), intent(in) :: ncol            ! number of columns
     integer(kind=im), intent(in) :: nlay            ! number of model layers
+    integer(kind=im), intent(inout) :: icld         ! Cloud overlap method
+    integer(kind=im), intent(inout) :: ispec        ! spectral OLR output flag
     integer(kind=im), intent(in) :: idrv            ! Flag for calculation of dFdT, the change
                                                     !    in upward flux as a function of
                                                     !    surface temperature [0=off, 1=on]
@@ -170,7 +172,7 @@ subroutine climlab_rrtmg_lw &
 !f2py depend(ncol,nlay) uflx,dflx,hr,uflxc,dflxc,hrc,duflx_dt,duflxc_dt
 
     !  Call the RRTMG_LW driver to compute radiative fluxes
-    call rrtmg_lw(ncol    ,nlay    ,icld    ,idrv    , &
+    call rrtmg_lw(ncol    ,nlay    ,icld    ,ispec           ,idrv  , &
              play    , plev    , tlay    , tlev    , tsfc    , &
              h2ovmr  , o3vmr   , co2vmr  , ch4vmr  , n2ovmr  , o2vmr , &
              cfc11vmr, cfc12vmr, cfc22vmr, ccl4vmr , emis    , &
