@@ -36,7 +36,7 @@ class RRTMG_LW(_Radiation_LW):
         super(RRTMG_LW, self).__init__(**kwargs)
         #  define INPUTS
         self.add_input('icld', icld)
-        self.add_input('icld', ispec)
+        self.add_input('ispec', ispec)
         self.add_input('irng', irng)
         self.add_input('idrv', idrv)
         self.add_input('permuteseed', permuteseed)

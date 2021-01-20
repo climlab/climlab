@@ -144,7 +144,7 @@ def test_spectral_olr():
     rcm = climlab.couple([rad,h2o,conv], name='Radiative-Convective Model')
 
     rcm.integrate_years(5.)
-    assert np.allclose(rcm.OLR_sr.sum(), rcm.OLR)
+    assert np.abs(rcm.OLR - rcm.OLR_sr.sum())<0.1
 
 @pytest.mark.compiled
 @pytest.mark.slow
