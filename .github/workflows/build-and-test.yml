@@ -1,6 +1,6 @@
 # shamelessly cribbed from https://github.com/pydata/xarray/blob/master/.github/workflows/ci.yaml
 # and from https://github.com/conda-incubator/setup-miniconda
-name: Build and test climlab
+name: Build and test climlab (linux / macos)
 
 on: push
 
@@ -38,7 +38,8 @@ jobs:
           python -c "import climlab"
       - name: Run tests
         run: |
-          pytest -v --pyargs climlab.tests
+          pytest -v --pyargs climlab.tests --cov=climlab --cov-config .coveragerc --cov-report term-missing -v
+          codecov
         # run: |
         #   python -m pytest -n 4 \
         #      --cov=climlab \
