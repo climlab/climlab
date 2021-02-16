@@ -40,5 +40,8 @@ jobs:
           python -c "import climlab"
       - name: Run tests
         run: |
-          pytest -v --pyargs climlab.tests --cov=climlab --cov-config .coveragerc --cov-report term-missing -v
-          codecov
+          pytest -v --pyargs climlab.tests
+        #   when we're ready to use codecov again
+        # run: |
+        #   pytest -v --pyargs climlab.tests --cov=climlab --cov-config .coveragerc --cov-report term-missing -v
+        #   codecov
