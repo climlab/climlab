@@ -38,7 +38,7 @@ jobs:
         # Seems that doing egg_info before building solves a mysterious Windows problem
         run: |
           python setup.py egg_info
-          python -m pip install --verbose --no-deps --editable .
+          python -m pip install --verbose --no-deps .
       - name: Import climlab
         run: |
           python -c "import climlab"
