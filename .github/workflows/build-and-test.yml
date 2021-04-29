@@ -34,7 +34,10 @@ jobs:
           environment-file: ${{ matrix.environment-file }}
           miniconda-version: latest
       - name: Build and install climlab
+        # Borrowing a hack from metpy https://github.com/Unidata/MetPy/blob/main/.github/workflows/tests-conda.yml
+        # Seems that doing egg_info before building solves a mysterious Windows problem
         run: |
+          python setup.py egg_info
           python -m pip install --verbose --no-deps --editable .
       - name: Import climlab
         run: |
