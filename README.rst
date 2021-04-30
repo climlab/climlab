@@ -2,7 +2,7 @@
 climlab
 ================
 
-|docs| |JOSS| |DOI| |pypi| |Build Status| |Appveyor Status| |coverage|
+|docs| |JOSS| |DOI| |pypi| |Build Status| |coverage|
 
 -----------------------------------------------------
  Python package for process-oriented climate modeling
@@ -305,10 +305,8 @@ See the accompanying LICENSE file.
    :target: https://doi.org/10.21105/joss.00659
 .. |pypi| image:: https://badge.fury.io/py/climlab.svg
    :target: https://badge.fury.io/py/climlab
-.. |Build Status| image:: https://travis-ci.org/brian-rose/climlab.svg?branch=master
-    :target: https://travis-ci.org/brian-rose/climlab
-.. |Appveyor Status| image:: https://ci.appveyor.com/api/projects/status/github/brian-rose/climlab?svg=true&passingText=passing&failingText=failing&pendingText=pending
-   :target: https://ci.appveyor.com/project/brian-rose/climlab
+.. |Build Status| image:: https://github.com/brian-rose/minimalf2py/actions/workflows/build-and-test.yaml/badge.svg
+    :target: https://github.com/brian-rose/climlab/actions/workflows/build-and-test.yml
 .. |coverage| image:: https://codecov.io/github/brian-rose/climlab/coverage.svg?branch=master
    :target: https://codecov.io/github/brian-rose/climlab?branch=master
 .. |DOI| image:: https://zenodo.org/badge/24968065.svg
