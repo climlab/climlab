@@ -5,13 +5,13 @@
 Tutorials
 =========
 
-Below is a collection of Jupyter notebooks giving example climlab usage.
+For a comprehensive set of climlab usage examples embeded within lecture notes on climate science,
+see Brian's online textbook `The Climate Laboratory <https://brian-rose.github.io/ClimateLaboratoryBook/>`_.
+
+Below is a older collection of Jupyter notebooks giving example climlab usage.
 These notebooks are based on classroom material developed by Brian Rose at the University at Albany.
 
-*WARNING, many of these may be out of date.*
-
-For a more comprehensive set of examples lecture notes,
-see Brian's online textbook `The Climate Laboratory <https://brian-rose.github.io/ClimateLaboratoryBook/>`_.
+*WARNING, many of these may be out of date. You're probably better off looking at the Climate Laboratory book!*
 
 The notebooks can be viewed on `nbviewer <http://nbviewer.jupyter.org>`_ through the links below. If you want to run the code yourself, these notes are all available as Jupyter *.ipynb files
 in the ``courseware`` directory of the `climlab source <https://github.com/brian-rose/climlab>`_.
