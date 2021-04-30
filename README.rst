@@ -96,7 +96,7 @@ These are handled automatically if you install with conda_.
 
 Required
 ~~~~~~~~~~~~
-- Python 2.7, 3.6, 3.7, 3.8
+- Python (currently testing on versions 3.7, 3.8, 3.9)
 - numpy
 - scipy
 - xarray (for data i/o)
@@ -104,6 +104,7 @@ Required
 - future
 - requests
 
+*climlab will still run on Python 2.7 on some systems but we are no longer supporting this*
 
 Recommended for full functionality
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

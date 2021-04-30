@@ -22,28 +22,21 @@ and then simply do::
 
 Binaries are available for OSX, Linux, and Windows.
 
-For Windows, builds are available for 64-bit versions of Python 3.5 and Python 3.6, and will require numpy 1.14 or later.
-
 Installing from source
 ----------------------
 
 *This will only work if you have a properly configured Fortran compiler installed and available.*
 
-If you do not use conda, it is **possible** to install CLIMLAB from source with::
-
-    pip install climlab
-
-which will download the latest stable release from the `pypi repository`_ and trigger the build process.
-
-Alternatively, clone the source code repository with::
+You can clone the source code repository with::
 
     git clone https://github.com/brian-rose/climlab.git
 
-and, from the ``climlab`` directory, do::
+and, if your system is properly configured *(it probably isn't right out of the box)*,
+from the ``climlab`` directory, do::
 
     python -m pip install . --no-deps -vv
 
-Please see :ref:`Contributing to CLIMLAB` for more details about how to build from source.
+Please see :ref:`Contributing to CLIMLAB` for details about how to set up a working build environment and building from source.
 
 Installing from source without a Fortran compiler
 -------------------------------------------------
@@ -83,13 +76,15 @@ These are handled automatically if you install with conda_.
 
 Required
 ------------
-- Python 2.7, 3.6, 3.7, 3.8
+- Python (currently testing on versions 3.7, 3.8, 3.9)
 - numpy
 - scipy
 - xarray (for data i/o)
 - attrdict
 - future
 - requests
+
+*climlab will still run on Python 2.7 on some systems but we are no longer supporting this*
 
 Recommended for full functionality
 ----------------------------------
