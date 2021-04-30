@@ -65,15 +65,17 @@ to see if there is any low-hanging fruit already identified.
 Contributions will happen through Pull Requests on github.
 You will need a free github account. Here's how to get started:
 
-1. Follow `these instructions`_ to fork the main CLIMAB repo at <https://github.com/brian-rose/climlab>,
-clone it on your local machine, and keep your local master branch synced with the main repo.
-2. Don't make any commits on your local master branch. Instead open a feature branch for every new development task::
+1. Follow `these instructions`_ to fork the CLIMLAB repo at <https://github.com/brian-rose/climlab>,
+clone it on your local machine, and keep your local main branch synced with the main repo.
+
+2. Don't make any commits on your local main branch. Instead open a feature branch for every new development task::
 
     git checkout -b cool_new_feature
 
 (choose a more descriptive name for your new feature).
 
 3. Work on your new feature, using ``git add`` to add your changes.
+
 4. Build and Test your modified code! See below for instructions. Make sure to add new tests for your cool new feature.
 
 5. When your feature is complete and tested, commit your changes::
@@ -84,13 +86,16 @@ and push your branch to github::
 
     git push origin cool_new_feature
 
-6. At this point, you go find your fork on github and create a `pull request`_. Clearly describe what you have done in the comments. We will gladly merge any pull requests that fix outstanding issues with the code or documentation. If you are adding a new feature, it is important to also add appropriate tests of the new feature to the automated test suite. If you don't know how to do this, submit your pull request anyway and we will assist.
+6. At this point, you go find your fork on github and create a `pull request`_.
+Clearly describe what you have done in the comments. We will gladly merge any pull requests that fix outstanding issues with the code or documentation.
+If you are adding a new feature, it is important to also add appropriate tests of the new feature to the automated test suite.
+If you don't know how to do this, submit your pull request anyway and we will assist.
 
-7. After your pull request is merged, you can switch back to the master branch, rebase, and delete your feature branch. You will find your improvements are incorporated into CLIMLAB::
+7. After your pull request is merged, you can switch back to the main branch, rebase, and delete your feature branch. You will find your improvements are incorporated into CLIMLAB::
 
-    git checkout master
+    git checkout main
     git fetch upstream
-    git rebase upstream/master
+    git rebase upstream/main
     git branch -d cool_new_feature
 
 
@@ -181,8 +186,10 @@ Special Caveat for Mac OSX only
 Method 1 and Method 2 both rely on gfortran supplied by conda. Currently for these to work on Mac OSX the user needs some old SDKs that are no longer provided by default from Apple, and that cannot be bundled automatically by conda due to licensing issues. `See here for discussion`_.
 
 The short answer is that you should download ``MacOSX10.9.sdk`` from either of
+
 - <https://github.com/phracker/MacOSX-SDKs> or
 - <https://github.com/devernay/xcodelegacy>
+
 and save it at ``$HOME/opt/MacOSX10.9.sdk`` on your Mac.
 
 
