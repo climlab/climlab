@@ -18,11 +18,11 @@ jobs:
         python-version: [3.8]
         os: [Ubuntu, macOS, Windows]
         include:
-          - os: ubuntu-latest
+          - os: Ubuntu
             environment-file: ci/requirements-linux.yml
-          - os: macos-latest
+          - os: macOS
             environment-file: ci/requirements-macos.yml
-          - os: windows-latest
+          - os: Windows
             environment-file: ci/requirements-windows.yml
 
     steps:
