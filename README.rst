@@ -159,6 +159,9 @@ Use caution as some of this material is probably out of date and incompatible wi
 Release history
 ----------------------
 
+Version 0.7.10 (released April 2021)
+    Improvements to docs and build.
+
 Version 0.7.9 (released December 2020)
     Bug fixes and doc improvements.
 
