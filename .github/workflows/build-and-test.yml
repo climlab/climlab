@@ -1,6 +1,6 @@
 name: Build and test climlab
 
-on: push
+on: [push, pull_request]
 
 jobs:
   build-and-test:
@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.7, 3.8]
+        python-version: [3.7, 3.8, 3.9]
         os: [Ubuntu, macOS, Windows]
         include:
           - os: Ubuntu
