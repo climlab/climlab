@@ -136,21 +136,30 @@ If you encounter problems with the conda build recipe (which is found within ``c
 Method 2: Using conda to set up a complete build environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Included with the CLIMLAB source repo are some YAML files that describe complete conda environments for building, testing and running the code (including compilers). We can use these to quickly create an environment with everything we need. We then build and test manually within this environment.
+Included with the CLIMLAB source repo are some YAML files that describe complete conda environments for building, testing and running the code (including compilers).
+We can use these to quickly create an environment with everything we need. We then build and test manually within this environment.
 
-First, create the environment (called by default ``test_env``). Do this from the top level of the CLIMLAB source repo::
+First, create and activate a test environment with your desired python version, for example::
 
-    conda env create --file ./ci/requirements-[pyversion]-[ostype].yml
-
-where ``[pyversion]`` can be any of ``py27``, ``py36``, or ``py37`` (your desired Python version), and ``[ostype]`` can by any of ``osx``, ``linux``, or ``windows`` (self-explanatory). For example,::
-
-    conda env create --file ./ci/requirements-py37-osx.yml
-
-Then activate the new environment::
-
+    conda create --name test_env python=3.7 --channel conda-forge
     conda activate test_env
 
-Now build from source and install in this new environment::
+Next, update the test environment with all the necessary build dependencies.
+Do this from the top level of the CLIMLAB source repo::
+
+    conda env update --file ./ci/requirements-[ostype].yml
+
+where ``[ostype]`` can by any of ``macos``, ``linux``, or ``windows``. For example::
+
+    conda env update --file ./ci/requirements-macos.yml
+
+Alternatively, if you don't need to specify the Python version and just want to use the default,
+you can create the complete environment in a single step like this::
+
+    conda env create --file ./ci/requirements-macos.yml
+    conda activate test_env
+
+Either way, you are now ready to build from source and install in this new environment::
 
     python -m pip install . --no-deps -vv
 
@@ -163,7 +172,7 @@ All tests should report ``PASSED``.
 When you are done with your test environment, you can safely deactivate and delete it with::
 
     conda deactivate
-    conda remove -n test_env --all
+    conda env remove --name test_env
 
 
 Special Caveat for Mac OSX only
@@ -242,7 +251,7 @@ This is often the simplest way to get involved with any open source project.
 
 and (optionally) delete the build environment with::
 
-    conda remove -n climlab-docs --all
+    conda env remove --name climlab-docs
 
 
 .. _`CLIMLAB description paper in JOSS`: http://joss.theoj.org/papers/10.21105/joss.00659

@@ -2,14 +2,16 @@ name: test_env
 channels:
   - conda-forge
 dependencies:
-  - python=3.8
   - pip
   - pydap
   - xarray
-  - pytest
   - numpy
   - scipy
-  - flang
+  - gfortran_osx-64
+  - libgfortran
   - future
   - attrdict
   - requests
+  - pytest
+  - codecov
+  - pytest-cov

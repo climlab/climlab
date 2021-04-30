@@ -1,0 +1,54 @@
+name: Build and test climlab
+
+on: [push, pull_request]
+
+jobs:
+  build-and-test:
+    name: ${{ matrix.os }} py${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}-latest
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.7, 3.8, 3.9]
+        os: [Ubuntu, macOS, Windows]
+        include:
+          - os: Ubuntu
+            environment-file: ci/requirements-linux.yml
+            shell: bash -l {0}
+          - os: macOS
+            environment-file: ci/requirements-macos.yml
+            shell: bash -l {0}
+          - os: Windows
+            environment-file: ci/requirements-windows.yml
+            shell: powershell
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniconda-version: "latest"
+          python-version: ${{ matrix.python-version }}
+          activate-environment: test_env
+          channel-priority: strict
+          environment-file: ${{ matrix.environment-file }}
+
+      - name: Setup Fortran compiler for Windows
+        if: ${{ matrix.os == 'Windows' }}
+        run: |
+          echo "[build]`ncompiler=mingw32" | Out-File -Encoding ASCII ~/pydistutils.cfg
+      - name: Build and install climlab
+        run: |
+          python -m pip install --no-deps --editable .
+      - name: Import climlab
+        run: |
+          python -c "import climlab"
+      - name: Run tests
+        run: |
+          pytest -v --pyargs climlab.tests
+        #   when we're ready to use codecov again
+        # run: |
+        #   pytest -v --pyargs climlab.tests --cov=climlab --cov-config .coveragerc --cov-report term-missing -v
+        #   codecov
