@@ -128,7 +128,7 @@ To use and test your new build further, you can install it in a new test environ
 Once you're happy with this you can safely delete the test environment with::
 
     conda deactivate
-    conda remove --name newtest --all
+    conda env remove --name newtest
 
 If you encounter problems with the conda build recipe (which is found within ``conda-recipe`` in the source repo), please raise an issue at <https://github.com/brian-rose/climlab/issues>. You could also take a look at the `CLIMLAB recipe used on conda-forge`_, which should be very similar.
 
