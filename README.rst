@@ -2,7 +2,7 @@
 climlab
 ================
 
-|docs| |JOSS| |DOI| |pypi| |Build Status| |Appveyor Status| |coverage|
+|docs| |JOSS| |DOI| |pypi| |Build Status| |coverage|
 
 -----------------------------------------------------
  Python package for process-oriented climate modeling
@@ -96,7 +96,7 @@ These are handled automatically if you install with conda_.
 
 Required
 ~~~~~~~~~~~~
-- Python 2.7, 3.6, 3.7, 3.8
+- Python (currently testing on versions 3.7, 3.8, 3.9)
 - numpy
 - scipy
 - xarray (for data i/o)
@@ -104,6 +104,7 @@ Required
 - future
 - requests
 
+*climlab will still run on Python 2.7 on some systems but we are no longer supporting this*
 
 Recommended for full functionality
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -140,18 +141,26 @@ Documentation and Examples
 --------------------------
 Full user manual is available here_.
 
-The directory ``climlab/courseware/`` also contains a collection of Jupyter notebooks (``*.ipynb``) used for teaching some basics of climate science, and documenting use of the ``climlab`` package.
+A rich and up-to-date collection of example usage can be found in Brian Rose's online textbook
+`The Climate Laboratory`_.
 
-These are self-describing, and should all run out-of-the-box once the package is installed, e.g:
+The directory ``climlab/courseware/`` also contains a older collection of Jupyter notebooks (``*.ipynb``) used for teaching some basics of climate science, and documenting use of the ``climlab`` package.
+
+These are self-describing, and may run out-of-the-box once the package is installed, e.g:
 
 ``jupyter notebook Insolation.ipynb``
 
+Use caution as some of this material is probably out of date and incompatible with the latest version of climlab.
 
 .. _here: http://climlab.readthedocs.io
+.. _`The Climate Laboratory`: https://brian-rose.github.io/ClimateLaboratoryBook/
 
 
 Release history
 ----------------------
+
+Version 0.7.10 (released April 2021)
+    Improvements to docs and build.
 
 Version 0.7.9 (released December 2020)
     Bug fixes and doc improvements.
@@ -305,12 +314,10 @@ See the accompanying LICENSE file.
    :target: https://doi.org/10.21105/joss.00659
 .. |pypi| image:: https://badge.fury.io/py/climlab.svg
    :target: https://badge.fury.io/py/climlab
-.. |Build Status| image:: https://travis-ci.org/brian-rose/climlab.svg?branch=master
-    :target: https://travis-ci.org/brian-rose/climlab
-.. |Appveyor Status| image:: https://ci.appveyor.com/api/projects/status/github/brian-rose/climlab?svg=true&passingText=passing&failingText=failing&pendingText=pending
-   :target: https://ci.appveyor.com/project/brian-rose/climlab
-.. |coverage| image:: https://codecov.io/github/brian-rose/climlab/coverage.svg?branch=master
-   :target: https://codecov.io/github/brian-rose/climlab?branch=master
+.. |Build Status| image:: https://github.com/brian-rose/minimalf2py/actions/workflows/build-and-test.yaml/badge.svg
+    :target: https://github.com/brian-rose/climlab/actions/workflows/build-and-test.yml
+.. |coverage| image:: https://codecov.io/github/brian-rose/climlab/coverage.svg?branch=main
+   :target: https://codecov.io/github/brian-rose/climlab?branch=main
 .. |DOI| image:: https://zenodo.org/badge/24968065.svg
    :target: https://zenodo.org/badge/latestdoi/24968065
 .. |docs| image:: http://readthedocs.org/projects/climlab/badge/?version=latest

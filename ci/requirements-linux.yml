@@ -1,16 +1,14 @@
 name: test_env
 channels:
-  - defaults
   - conda-forge
 dependencies:
-  - python=2.7
   - pip
   - pydap
   - xarray
   - numpy
   - scipy
-  - gfortran_osx-64
-  - libgfortran
+  - fortran-compiler
+  - toolchain3
   - future
   - attrdict
   - requests

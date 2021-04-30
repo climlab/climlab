@@ -65,15 +65,17 @@ to see if there is any low-hanging fruit already identified.
 Contributions will happen through Pull Requests on github.
 You will need a free github account. Here's how to get started:
 
-1. Follow `these instructions`_ to fork the main CLIMAB repo at <https://github.com/brian-rose/climlab>,
-clone it on your local machine, and keep your local master branch synced with the main repo.
-2. Don't make any commits on your local master branch. Instead open a feature branch for every new development task::
+1. Follow `these instructions`_ to fork the CLIMLAB repo at <https://github.com/brian-rose/climlab>,
+clone it on your local machine, and keep your local main branch synced with the main repo.
+
+2. Don't make any commits on your local main branch. Instead open a feature branch for every new development task::
 
     git checkout -b cool_new_feature
 
 (choose a more descriptive name for your new feature).
 
 3. Work on your new feature, using ``git add`` to add your changes.
+
 4. Build and Test your modified code! See below for instructions. Make sure to add new tests for your cool new feature.
 
 5. When your feature is complete and tested, commit your changes::
@@ -84,13 +86,16 @@ and push your branch to github::
 
     git push origin cool_new_feature
 
-6. At this point, you go find your fork on github and create a `pull request`_. Clearly describe what you have done in the comments. We will gladly merge any pull requests that fix outstanding issues with the code or documentation. If you are adding a new feature, it is important to also add appropriate tests of the new feature to the automated test suite. If you don't know how to do this, submit your pull request anyway and we will assist.
+6. At this point, you go find your fork on github and create a `pull request`_.
+Clearly describe what you have done in the comments. We will gladly merge any pull requests that fix outstanding issues with the code or documentation.
+If you are adding a new feature, it is important to also add appropriate tests of the new feature to the automated test suite.
+If you don't know how to do this, submit your pull request anyway and we will assist.
 
-7. After your pull request is merged, you can switch back to the master branch, rebase, and delete your feature branch. You will find your improvements are incorporated into CLIMLAB::
+7. After your pull request is merged, you can switch back to the main branch, rebase, and delete your feature branch. You will find your improvements are incorporated into CLIMLAB::
 
-    git checkout master
+    git checkout main
     git fetch upstream
-    git rebase upstream/master
+    git rebase upstream/main
     git branch -d cool_new_feature
 
 
@@ -128,7 +133,7 @@ To use and test your new build further, you can install it in a new test environ
 Once you're happy with this you can safely delete the test environment with::
 
     conda deactivate
-    conda remove --name newtest --all
+    conda env remove --name newtest
 
 If you encounter problems with the conda build recipe (which is found within ``conda-recipe`` in the source repo), please raise an issue at <https://github.com/brian-rose/climlab/issues>. You could also take a look at the `CLIMLAB recipe used on conda-forge`_, which should be very similar.
 
@@ -136,21 +141,30 @@ If you encounter problems with the conda build recipe (which is found within ``c
 Method 2: Using conda to set up a complete build environment
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Included with the CLIMLAB source repo are some YAML files that describe complete conda environments for building, testing and running the code (including compilers). We can use these to quickly create an environment with everything we need. We then build and test manually within this environment.
+Included with the CLIMLAB source repo are some YAML files that describe complete conda environments for building, testing and running the code (including compilers).
+We can use these to quickly create an environment with everything we need. We then build and test manually within this environment.
 
-First, create the environment (called by default ``test_env``). Do this from the top level of the CLIMLAB source repo::
+First, create and activate a test environment with your desired python version, for example::
 
-    conda env create --file ./ci/requirements-[pyversion]-[ostype].yml
-
-where ``[pyversion]`` can be any of ``py27``, ``py36``, or ``py37`` (your desired Python version), and ``[ostype]`` can by any of ``osx``, ``linux``, or ``windows`` (self-explanatory). For example,::
-
-    conda env create --file ./ci/requirements-py37-osx.yml
-
-Then activate the new environment::
-
+    conda create --name test_env python=3.7 --channel conda-forge
     conda activate test_env
 
-Now build from source and install in this new environment::
+Next, update the test environment with all the necessary build dependencies.
+Do this from the top level of the CLIMLAB source repo::
+
+    conda env update --file ./ci/requirements-[ostype].yml
+
+where ``[ostype]`` can by any of ``macos``, ``linux``, or ``windows``. For example::
+
+    conda env update --file ./ci/requirements-macos.yml
+
+Alternatively, if you don't need to specify the Python version and just want to use the default,
+you can create the complete environment in a single step like this::
+
+    conda env create --file ./ci/requirements-macos.yml
+    conda activate test_env
+
+Either way, you are now ready to build from source and install in this new environment::
 
     python -m pip install . --no-deps -vv
 
@@ -163,7 +177,7 @@ All tests should report ``PASSED``.
 When you are done with your test environment, you can safely deactivate and delete it with::
 
     conda deactivate
-    conda remove -n test_env --all
+    conda env remove --name test_env
 
 
 Special Caveat for Mac OSX only
@@ -172,8 +186,10 @@ Special Caveat for Mac OSX only
 Method 1 and Method 2 both rely on gfortran supplied by conda. Currently for these to work on Mac OSX the user needs some old SDKs that are no longer provided by default from Apple, and that cannot be bundled automatically by conda due to licensing issues. `See here for discussion`_.
 
 The short answer is that you should download ``MacOSX10.9.sdk`` from either of
+
 - <https://github.com/phracker/MacOSX-SDKs> or
 - <https://github.com/devernay/xcodelegacy>
+
 and save it at ``$HOME/opt/MacOSX10.9.sdk`` on your Mac.
 
 
@@ -242,7 +258,7 @@ This is often the simplest way to get involved with any open source project.
 
 and (optionally) delete the build environment with::
 
-    conda remove -n climlab-docs --all
+    conda env remove --name climlab-docs
 
 
 .. _`CLIMLAB description paper in JOSS`: http://joss.theoj.org/papers/10.21105/joss.00659
