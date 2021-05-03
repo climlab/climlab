@@ -1,10 +1,8 @@
 from __future__ import division, print_function
 import numpy as np
-import os
+import os, pooch
 import pandas as pd
 import xarray as xr
-# from climlab.utils.data_source import load_data_source
-import pooch
 
 
 base_url = 'http://vo.imcce.fr/insola/earth/online/earth/La2004/'
@@ -22,18 +20,12 @@ def _get_Laskar_data(verbose=True):
                      'index_col':0,
                      'names':['kyear','ecc','obliquity','long_peri'],}
     for time in filenames:
-        # local_path = os.path.join(os.path.dirname(__file__), "data", filenames[time])
         remote_path = base_url + filenames[time]
         if time == 'future':
             pandas_kwargs['skiprows'] = 1 # first row is kyear=0, redundant
         path = remote_path
         longorbithandle[time] = pooch.retrieve(url=path, known_hash=hashes[time])
         longorbit[time] = pd.read_csv(longorbithandle[time], **pandas_kwargs)
-        # longorbit[time], path = load_data_source(local_path=local_path,
-        #         remote_source_list=[remote_path],
-        #         open_method = pd.read_csv,
-        #         open_method_kwargs=pandas_kwargs,
-        #         verbose=verbose)
         sources[time] = path
     xlongorbit = {}
     for time in ['past', 'future']:

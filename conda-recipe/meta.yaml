@@ -9,7 +9,7 @@ source:
 
 build:
   skip: True  # [win32 or (win and py27)]
-  number: 0
+  number: 1
 
 requirements:
   build:
@@ -27,8 +27,6 @@ requirements:
     - libflang  # [win and py3k]
     - scipy
     - pooch
-    - pydap
-    - requests
     - xarray
     - future
     - attrdict
