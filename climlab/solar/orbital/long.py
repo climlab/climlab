@@ -3,14 +3,18 @@ import numpy as np
 import os
 import pandas as pd
 import xarray as xr
-from climlab.utils.data_source import load_data_source
+# from climlab.utils.data_source import load_data_source
+import pooch
 
 
 base_url = 'http://vo.imcce.fr/insola/earth/online/earth/La2004/'
 filenames = {'past': 'INSOLN.LA2004.BTL.ASC',
              'future': 'INSOLP.LA2004.BTL.ASC'}
+hashes = {'past': "3f13b9f8e69085baf40bc67a2669e6f6af4148fef9218ed2158772aa91e35f8c",
+          'future': "8e5ac423374802a4ce2a0958672271ed408054cc70214056c0c221c3d5b14750"}
 
 def _get_Laskar_data(verbose=True):
+    longorbithandle = {}
     longorbit = {}
     sources = {}
     pandas_kwargs = {'delim_whitespace':True,
@@ -18,15 +22,18 @@ def _get_Laskar_data(verbose=True):
                      'index_col':0,
                      'names':['kyear','ecc','obliquity','long_peri'],}
     for time in filenames:
-        local_path = os.path.join(os.path.dirname(__file__), "data", filenames[time])
+        # local_path = os.path.join(os.path.dirname(__file__), "data", filenames[time])
         remote_path = base_url + filenames[time]
-        if time is 'future':
+        if time == 'future':
             pandas_kwargs['skiprows'] = 1 # first row is kyear=0, redundant
-        longorbit[time], path = load_data_source(local_path=local_path,
-                remote_source_list=[remote_path],
-                open_method = pd.read_csv,
-                open_method_kwargs=pandas_kwargs,
-                verbose=verbose)
+        path = remote_path
+        longorbithandle[time] = pooch.retrieve(url=path, known_hash=hashes[time])
+        longorbit[time] = pd.read_csv(longorbithandle[time], **pandas_kwargs)
+        # longorbit[time], path = load_data_source(local_path=local_path,
+        #         remote_source_list=[remote_path],
+        #         open_method = pd.read_csv,
+        #         open_method_kwargs=pandas_kwargs,
+        #         verbose=verbose)
         sources[time] = path
     xlongorbit = {}
     for time in ['past', 'future']:

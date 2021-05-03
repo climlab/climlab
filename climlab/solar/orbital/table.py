@@ -3,7 +3,8 @@ import numpy as np
 import os
 import pandas as pd
 import xarray as xr
-from climlab.utils.data_source import load_data_source
+#from climlab.utils.data_source import load_data_source
+import pooch
 
 #  Two possible sources for the Berger and Loutre 1991 data table
 NCDCpath = "https://www1.ncdc.noaa.gov/pub/data/paleo/climate_forcing/orbital_variations/insolation/orbit91"
@@ -15,11 +16,14 @@ def _get_Berger_data(verbose=True):
     '''Read in the Berger and Loutre orbital table as a pandas dataframe, convert to xarray
     '''
     # The first column of the data file is used as the row index, and represents kyr from present
-    orbit91_pd, path = load_data_source(local_path = local_path,
-                    remote_source_list = [threddspath, NCDCpath],
-                    open_method = pd.read_csv,
-                    open_method_kwargs = {'delim_whitespace': True, 'skiprows':1},
-                    verbose=verbose,)
+    # orbit91_pd, path = load_data_source(local_path = local_path,
+    #                 remote_source_list = [threddspath, NCDCpath],
+    #                 open_method = pd.read_csv,
+    #                 open_method_kwargs = {'delim_whitespace': True, 'skiprows':1},
+    #                 verbose=verbose,)
+    path = threddspath
+    orbit91handle = pooch.retrieve(path, known_hash="3afc20dda7b385bdd366bc4c9cf60be02d8defdb4c0f317430ca8386d62f81a3")
+    orbit91_pd = pd.read_csv(orbit91handle, delim_whitespace=True, skiprows=1, verbose=True)
     #  As xarray structure with the dimension named 'kyear'
     orbit = xr.Dataset(orbit91_pd).rename({'dim_0': 'kyear'})
     #  Now change names

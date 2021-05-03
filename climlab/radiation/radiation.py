@@ -78,10 +78,11 @@ from climlab.process import EnergyBudget
 from climlab.radiation import ManabeWaterVapor
 from climlab import constants as const
 from climlab.domain.field import Field
-from climlab.utils.data_source import load_data_source
+# from climlab.utils.data_source import load_data_source
 import warnings
 import os
 import xarray as xr
+import pooch
 
 
 def default_specific_humidity(Tatm):
@@ -132,14 +133,16 @@ def default_absorbers(Tatm,
     xTatm = Tatm.to_xarray()
     O3 = 0. * xTatm
     if ozone_file is not None:
-        ozonefilepath = os.path.join(os.path.dirname(__file__), 'data', 'ozone', ozone_file)
+        # ozonefilepath = os.path.join(os.path.dirname(__file__), 'data', 'ozone', ozone_file)
         remotepath_http = 'http://thredds.atmos.albany.edu:8080/thredds/fileServer/CLIMLAB/ozone/' + ozone_file
-        remotepath_opendap = 'http://thredds.atmos.albany.edu:8080/thredds/dodsC/CLIMLAB/ozone/' + ozone_file
-        ozonedata, path = load_data_source(local_path=ozonefilepath,
-                                     remote_source_list=[remotepath_http, remotepath_opendap],
-                                     open_method=xr.open_dataset,
-                                     remote_kwargs={'engine':'pydap'},
-                                     verbose=verbose,)
+        ozonefilehandle = pooch.retrieve(url=remotepath_http, known_hash="bc659bfa129fafa4ed9368bb19278ae15724a5a66599affd317c143ba511ff84")
+        ozonedata = xr.open_dataset(ozonefilehandle)
+        # remotepath_opendap = 'http://thredds.atmos.albany.edu:8080/thredds/dodsC/CLIMLAB/ozone/' + ozone_file
+        # ozonedata, path = load_data_source(local_path=ozonefilepath,
+        #                              remote_source_list=[remotepath_http, remotepath_opendap],
+        #                              open_method=xr.open_dataset,
+        #                              remote_kwargs={'engine':'pydap'},
+        #                              verbose=verbose,)
         ##  zonal and time average
         ozone_zon = ozonedata.OZONE.mean(dim=('time','lon')).transpose('lat','lev')
         if ('lat' in xTatm.dims):
