@@ -9,6 +9,7 @@ dependencies:
     - matplotlib
     - netCDF4
     - xarray
+    - pooch
     - attrdict
     - sphinx
     - ipython

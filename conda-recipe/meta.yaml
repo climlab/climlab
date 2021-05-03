@@ -1,4 +1,4 @@
-{% set version = "0.7.10" %}
+{% set version = "0.7.11.dev0" %}
 
 package:
   name: climlab
@@ -9,7 +9,7 @@ source:
 
 build:
   skip: True  # [win32 or (win and py27)]
-  number: 0
+  number: 1
 
 requirements:
   build:
@@ -26,8 +26,7 @@ requirements:
     - {{ pin_compatible('numpy') }}
     - libflang  # [win and py3k]
     - scipy
-    - pydap
-    - requests
+    - pooch
     - xarray
     - future
     - attrdict
