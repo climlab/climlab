@@ -160,8 +160,8 @@ Use caution as some of this material is probably out of date and incompatible wi
 Release history
 ----------------------
 
-Version 0.7.11 (NOT YET RELEASED)
-    Improvements to data file download and caching.
+Version 0.7.11 (released May 2021)
+    Improvements to data file download and caching (outsourcing this to [pooch](https://www.fatiando.org/pooch/latest/index.html))
 
 Version 0.7.10 (released April 2021)
     Improvements to docs and build.
