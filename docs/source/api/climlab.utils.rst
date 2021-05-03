@@ -11,7 +11,6 @@ climlab.utils
 
    climlab.utils.attr_dict
    climlab.utils.constants
-   climlab.utils.data_source
    climlab.utils.heat_capacity
    climlab.utils.legendre
    climlab.utils.thermo
