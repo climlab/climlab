@@ -161,7 +161,7 @@ Release history
 ----------------------
 
 Version 0.7.11 (released May 2021)
-    Improvements to data file download and caching (outsourcing this to [pooch](https://www.fatiando.org/pooch/latest/index.html))
+    Improvements to data file download and caching (outsourcing this to `pooch`_)
 
 Version 0.7.10 (released April 2021)
     Improvements to docs and build.
@@ -300,7 +300,7 @@ The documentation_ was first created by Moritz Kreuzer
 
 .. _documentation: http://climlab.readthedocs.io
 .. _xarray: http://xarray.pydata.org/en/stable/
-
+.. _pooch: https://www.fatiando.org/pooch/latest/index.html
 
 Contact and Bug Reports
 -----------------------
