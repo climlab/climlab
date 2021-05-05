@@ -196,7 +196,7 @@
 ! by scaling mass mixing ratio (g/g) with the appropriate molecular weights (g/mol)
       integer(kind=im), intent(in) :: ncol            ! Number of horizontal columns
       integer(kind=im), intent(in) :: nlay            ! Number of model layers
-      integer(kind=im) :: ispec                       ! spectral output flag
+      integer(kind=im) :: ispec                       ! CLIMLAB spectral output flag
                                                       ! (ispec=0 for total fluxes, =1 for spectral toa flux too)
       integer(kind=im), intent(inout) :: icld         ! Cloud overlap method
                                                       !    0: Clear only
@@ -467,7 +467,7 @@
 ! area, since this has to be called only once.
 !      call rrtmg_lw_ini(cpdair)
 
-!  INITIAL COLUMN LOOP
+!  CLIMLAB INITIAL COLUMN LOOP
 !  Only called if ispec = 1, so spectral OLR required
 !  Sets iout = 99 and istart=iend=iband so that each band
 !  is calculated individually.
