@@ -22,7 +22,6 @@ class RRTMG_LW(_Radiation_LW):
     def __init__(self,
             # GENERAL, used in both SW and LW
             icld = 1,    # Cloud overlap method, 0: Clear only, 1: Random, 2,  Maximum/random] 3: Maximum
-            ispec = 0,  # Spectral OLR output flag, 0: only calculate total fluxes, 1: also return spectral OLR
             irng = 1,  # more monte carlo stuff
             idrv = 0,  # whether to also calculate the derivative of flux with respect to surface temp
             permuteseed =  300,
@@ -36,7 +35,6 @@ class RRTMG_LW(_Radiation_LW):
         super(RRTMG_LW, self).__init__(**kwargs)
         #  define INPUTS
         self.add_input('icld', icld)
-        self.add_input('ispec', ispec)
         self.add_input('irng', irng)
         self.add_input('idrv', idrv)
         self.add_input('permuteseed', permuteseed)
@@ -50,7 +48,7 @@ class RRTMG_LW(_Radiation_LW):
         # Spectrally-decomposed OLR
         if self.return_spectral_olr:
             # Adjust output flag
-            self.ispec = 1
+            self._ispec = 1  # Spectral OLR output flag, 0: only calculate total fluxes, 1: also return spectral OLR
             self.add_diagnostic('OLR_sr', 0. * self.Ts)
 
             # RRTMG_LW band central wavenumbers, [cm-1]
@@ -58,11 +56,14 @@ class RRTMG_LW(_Radiation_LW):
                                                1030,1130,1285,1435,1640,
                                                1940,2165,2315,2490,2925])
             self.RRTMG_LW_bands = central_rrtmg_lw_bands
+        else:
+            self._ispec = 0,  # Spectral OLR output flag, 0: only calculate total fluxes, 1: also return spectral OLR
+
 
     def _prepare_lw_arguments(self):
         #  scalar integer arguments
         icld  = self.icld
-        ispec = self.ispec
+        ispec = self._ispec
         irng  = self.irng
         idrv  = self.idrv
         permuteseed = self.permuteseed
