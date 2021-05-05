@@ -121,33 +121,6 @@ def test_radiative_forcing():
 
 @pytest.mark.compiled
 @pytest.mark.slow
-def test_spectral_olr():
-    '''Run a single-column radiative-convective model with RRTMG_LW radiation
-    out to equilibrium, outputting the spectrally-decomposed TOA flux. Then check
-    that the spectrally decomposed TOA flux adds up to the normal OLR output.'''
-    #  State variables (Air and surface temperature)
-    state = climlab.column_state(num_lev=30, water_depth=1.)
-    #  Fixed relative humidity
-    h2o = climlab.radiation.ManabeWaterVapor(name='WaterVapor', state=state)
-    #  Couple water vapor to radiation
-    #   Set icld=0 for clear-sky only (no need to call cloud overlap routine)
-    rad = climlab.radiation.RRTMG(name='Radiation',
-                                  state=state,
-                                  specific_humidity=h2o.q,
-                                  return_spectral_olr=True,
-                                  icld=0)
-    #  Convective adjustment
-    conv = climlab.convection.ConvectiveAdjustment(name='Convection',
-                                                   state=state,
-                                                   adj_lapse_rate=6.5)
-    #  Couple everything together
-    rcm = climlab.couple([rad,h2o,conv], name='Radiative-Convective Model')
-
-    rcm.integrate_years(5.)
-    assert np.abs(rcm.OLR - rcm.OLR_sr.sum())<0.1
-
-@pytest.mark.compiled
-@pytest.mark.slow
 def test_latitude():
     '''
     Run a radiative equilibrum model with RRTMG radiation out to equilibrium
@@ -216,3 +189,9 @@ def test_large_grid():
     rad1.step_forward()
     rad2 = climlab.radiation.RRTMG(state=state)
     rad2.step_forward()
+
+    # Spectral OLR test
+    # check that the spectrally decomposed TOA flux adds up to the normal OLR output
+    rad3 = climlab.radiation.RRTMG(state=state, return_spectral_olr=True)
+    rad3.step_forward()
+    assert np.all(np.abs(rad3.OLR - rad3.OLR_sr.sum(axis=-1)[:, np.newaxis])<0.1)
