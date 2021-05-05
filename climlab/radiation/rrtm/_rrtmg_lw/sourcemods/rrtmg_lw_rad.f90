@@ -290,7 +290,7 @@
                                                       !   (lw aerosols/scattering not yet available)
 
 ! ----- Output -----
-      real(kind=rb), intent(out) :: olr_sr(:,:)       ! Spectrally-decomposed OLR (W/m2)
+      real(kind=rb), intent(out) :: olr_sr(:,:)       ! CLIMLAB Spectrally-decomposed OLR (W/m2)
                                                       !    Dimensions: (ncol,nbndlw)
       real(kind=rb), intent(out) :: uflx(:,:)         ! Total sky longwave upward flux (W/m2)
                                                       !    Dimensions: (ncol,nlay+1)
@@ -475,6 +475,7 @@
          iout = 99
          do iplon = 1, ncol
             do iband = 1,16
+               ! CLIMLAB
                istart = iband
                iend   = iband
 
@@ -552,7 +553,7 @@
 ! to be used.  Clear sky calculation is done simultaneously.
 ! For McICA, RTRNMC is called for clear and cloudy calculations.
 
-!  Do a loop over bands by setting istart=iend = 1,2,3,4,5,...16
+!  CLIMLAB Do a loop over bands by setting istart=iend = 1,2,3,4,5,...16
 
                call rtrnmc(nlayers, istart, iend, iout, pz, semiss, ncbands, &
                            cldfmc, taucmc, planklay, planklev, plankbnd, &
@@ -561,6 +562,7 @@
                            totuclfl, totdclfl, fnetc, htrc, &
                            idrv, dplankbnd_dt, dtotuflux_dt, dtotuclfl_dt )
 
+! CLIMLAB write to spectrally-resolved output
                olr_sr(iplon,iband) = totuflux(nlayers)
 
 !  Transfer up and down fluxes and heating rate to output arrays.
@@ -594,7 +596,7 @@
     endif
 
 
-!  SECOND COLUMN LOOP, ALWAYS CALLED
+!  CLIMLAB SECOND COLUMN LOOP, ALWAYS CALLED
 !  Calculates total fluxes
 !  Reset flags for normal calculation of total fluxes
       istart = 1
