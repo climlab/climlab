@@ -194,4 +194,4 @@ def test_large_grid():
     # check that the spectrally decomposed TOA flux adds up to the normal OLR output
     rad3 = climlab.radiation.RRTMG(state=state, return_spectral_olr=True)
     rad3.step_forward()
-    assert np.all(np.abs(rad3.OLR - rad3.OLR_sr.sum(axis=-1)[:, np.newaxis])<0.1)
+    assert np.all(np.abs(rad3.OLR - rad3.OLR_sr.sum(axis=-1))<0.1)

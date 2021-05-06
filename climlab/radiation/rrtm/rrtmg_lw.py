@@ -3,6 +3,7 @@ import numpy as np
 import warnings
 from climlab import constants as const
 from climlab.radiation.radiation import _Radiation_LW
+from climlab.domain import Field, Axis, domain
 from .utils import _prepare_general_arguments
 from .utils import _climlab_to_rrtm, _rrtm_to_climlab
 # These values will get overridden by reading from Fortran extension
@@ -16,6 +17,13 @@ try:
     _rrtmg_lw.climlab_rrtmg_lw_ini(const.cp)
 except:
     warnings.warn('Cannot import and initialize compiled Fortran extension, RRTMG_LW module will not be functional.')
+
+# Longwave spectral band limits (wavenumbers in cm^-1)
+# Data copied from rrtmg_lw_v4.85/gcm_model/src/rrtmg_lw_init.f90
+wavenum_bounds = np.array([  10., 350., 500., 630., 700., 820.,
+                      980.,1080.,1180.,1390.,1480.,1800.,
+                     2080.,2250.,2380.,2600.,3250.])
+wavenum_delta = np.diff(wavenum_bounds)
 
 
 class RRTMG_LW(_Radiation_LW):
@@ -49,13 +57,17 @@ class RRTMG_LW(_Radiation_LW):
         if self.return_spectral_olr:
             # Adjust output flag
             self._ispec = 1  # Spectral OLR output flag, 0: only calculate total fluxes, 1: also return spectral OLR
-            self.add_diagnostic('OLR_sr', 0. * self.Ts)
-
-            # RRTMG_LW band central wavenumbers, [cm-1]
-            central_rrtmg_lw_bands = np.array([180,425,565,665,760,900,
-                                               1030,1130,1285,1435,1640,
-                                               1940,2165,2315,2490,2925])
-            self.RRTMG_LW_bands = central_rrtmg_lw_bands
+            # set up appropriately sized Field object to store the spectral OLR diagnostic
+            wavenum_ax = Axis(axis_type='abstract', bounds=wavenum_bounds)
+            spectral_axes = {**self.OLR.domain.axes, 'wavenumber': wavenum_ax}
+            spectral_domain = domain._Domain(axes=spectral_axes)
+            #  HACK need to reorder axes in the domain object
+            shape = list(self.OLR.shape)
+            shape.append(wavenum_ax.num_points)
+            spectral_domain.shape = tuple(shape)
+            # This ensures that the spectral dimension (length: nbndlw) is appended after existing grid dimensions
+            blank_field = Field((self.OLR[...,np.newaxis] * wavenum_delta), domain=spectral_domain)
+            self.add_diagnostic('OLR_sr', blank_field)
         else:
             self._ispec = 0,  # Spectral OLR output flag, 0: only calculate total fluxes, 1: also return spectral OLR
 
@@ -127,15 +139,22 @@ class RRTMG_LW(_Radiation_LW):
                  taucmcl, ciwpmcl, clwpmcl, reicmcl, relqmcl,
                  tauaer)
         #  Output is all (ncol,nlay+1) or (ncol,nlay)
-        # Except for spectrally-decomposed TOA flux, olr_sr (ncol, nbndlw)
-        if self.return_spectral_olr:
-            self.OLR_sr = olr_sr + 0.*self.OLR_sr
         self.LW_flux_up = _rrtm_to_climlab(uflx) + 0.*self.LW_flux_up
         self.LW_flux_down = _rrtm_to_climlab(dflx) + 0.*self.LW_flux_down
         self.LW_flux_up_clr = _rrtm_to_climlab(uflxc) + 0.*self.LW_flux_up_clr
         self.LW_flux_down_clr = _rrtm_to_climlab(dflxc) + 0.*self.LW_flux_down_clr
         #  Compute quantities derived from fluxes, including OLR
         self._compute_LW_flux_diagnostics()
+        # Except for spectrally-decomposed TOA flux, olr_sr (ncol, nbndlw)
+        if self.return_spectral_olr:
+            #  Need to deal with broadcasting for two different cases: single column and latitude axis
+            # case single column: self.OLR is (1,),  self.OLR_sr is (1, nbndlw),  olr_sr is (1,nbndlw)
+            #  squeeze olr_sr down to (nbndlw,)
+            # then use np.squeeze(olr_sr)[..., np.newaxis, :] to get back to (1, nbndlw)
+            # case latitude axis: self.OLR is (num_lat,1), self.OLR_sr is (num_lat, 1, nbndlw), olr_sr is (num_lat, nbndlw)
+            #  np.squeeze(olr_sr) has no effect in this case
+            # add the newaxis because the domain has a size-1 depth axis ---> (num_lat, 1, nbndlw)
+            self.OLR_sr = np.squeeze(olr_sr)[...,np.newaxis,:] + 0.*self.OLR_sr
         #  calculate heating rates from flux divergence
         LWheating_Wm2 = np.array(np.diff(self.LW_flux_net, axis=-1)) + 0.*self.Tatm
         LWheating_clr_Wm2 = np.array(np.diff(self.LW_flux_net_clr, axis=-1)) + 0.*self.Tatm
