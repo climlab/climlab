@@ -65,6 +65,7 @@ class RRTMG_LW(_Radiation_LW):
             shape = list(self.OLR.shape)
             shape.append(wavenum_ax.num_points)
             spectral_domain.shape = tuple(shape)
+            spectral_domain.axis_index = {**self.OLR.domain.axis_index, 'wavenumber': len(shape)-1}
             # This ensures that the spectral dimension (length: nbndlw) is appended after existing grid dimensions
             blank_field = Field((self.OLR[...,np.newaxis] * wavenum_delta), domain=spectral_domain)
             self.add_diagnostic('OLR_sr', blank_field)
