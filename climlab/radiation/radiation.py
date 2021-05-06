@@ -41,6 +41,7 @@ Additional input arguments for SW:
 
 Additional input arguments for LW:
     - ``emissivity = 1.``,  # surface emissivity
+    - ``return_spectral_olr = False``,  # Whether or not to return spectrally-decomposed Outgoing Longwave Radiation (implemented for RRTMG only)
 
 Shortave processes compute these diagnostics (minimum):
 
@@ -69,6 +70,10 @@ Longwave processes compute these diagnostics (minimum):
     - ``LW_flux_net_clr``  (clear-sky flux)
     - ``TdotLW``   (K/day, radiative heating rate)
     - ``TdotLW_clr`` (clear-sky heating rate)
+
+If ``return_spectral_olr = True`` (RRTMG only), an additional diagnostic is produced:
+
+    - ``OLR_spectral`` (W/m2, Outgoing Longwave Radiation at TOA in spectral bands, **positive up**)
 '''
 
 from __future__ import division
@@ -274,6 +279,7 @@ class _Radiation_LW(_Radiation):
         self.add_diagnostic('TdotLW_clr', 0.*self.Tatm)
         self.add_diagnostic('LW_sfc', 0.*self.Ts)
         self.add_diagnostic('LW_sfc_clr', 0.*self.Ts)
+
         #  Flux diagnostics at layer interfaces
         #   These need an extra vertical level
         interface_zero = init_interface(self.Tatm)

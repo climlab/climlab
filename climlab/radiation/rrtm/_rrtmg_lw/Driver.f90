@@ -92,13 +92,13 @@ end subroutine climlab_mcica_subcol_lw
 
 
 subroutine climlab_rrtmg_lw &
-    (ncol    ,nlay    ,icld    ,idrv    , &
+    (ncol    ,nlay    ,icld     , ispec   , idrv    , &
     play    , plev    , tlay    , tlev    , tsfc    , &
     h2ovmr  , o3vmr   , co2vmr  , ch4vmr  , n2ovmr  , o2vmr , &
     cfc11vmr, cfc12vmr, cfc22vmr, ccl4vmr , emis    , &
     inflglw , iceflglw, liqflglw, cldfmcl , &
     taucmcl , ciwpmcl , clwpmcl , reicmcl , relqmcl , tauaer  , &
-    uflx    , dflx    , hr      , uflxc   , dflxc,  hrc, &
+    olr_sr  , uflx    , dflx    , hr      , uflxc   , dflxc,  hrc, &
     duflx_dt,duflxc_dt)
 
 ! Modules
@@ -110,6 +110,8 @@ subroutine climlab_rrtmg_lw &
     integer, parameter :: rb = selected_real_kind(12)
     integer(kind=im), intent(in) :: ncol            ! number of columns
     integer(kind=im), intent(in) :: nlay            ! number of model layers
+    integer(kind=im), intent(inout) :: icld         ! Cloud overlap method
+    integer(kind=im), intent(inout) :: ispec        ! spectral OLR output flag
     integer(kind=im), intent(in) :: idrv            ! Flag for calculation of dFdT, the change
                                                     !    in upward flux as a function of
                                                     !    surface temperature [0=off, 1=on]
@@ -145,6 +147,7 @@ subroutine climlab_rrtmg_lw &
     real(kind=rb), intent(in) :: taucmcl(ngptlw,ncol,nlay)    ! in-cloud optical depth [mcica]
 
 ! Output
+    real(kind=rb), intent(out) :: olr_sr(ncol,nbndlw)    ! Spectrally-decomposed OLR (W/m2)
     real(kind=rb), intent(out) :: uflx(ncol,nlay+1)      ! Total sky longwave upward flux (W/m2)
     real(kind=rb), intent(out) :: dflx(ncol,nlay+1)      ! Total sky longwave downward flux (W/m2)
     real(kind=rb), intent(out) :: hr(ncol,nlay)          ! Total sky longwave radiative heating rate (K/d)
@@ -162,19 +165,20 @@ subroutine climlab_rrtmg_lw &
 !f2py depend(ncol,nlay) h2ovmr,o3vmr,co2vmr,ch4vmr,n2ovmr,o2vmr
 !f2py depend(ncol,nlay) cfc11vmr,cfc12vmr,cfc22vmr,ccl4vmr
 !f2py depend(ncol) tsfc, emis
+!f2py depend(ncol) olr_sr
 !f2py depend(ncol,nlay) tauaer
 !f2py depend(ncol,nlay) cldfmcl,ciwpmcl,clwpmcl,taucmcl
 !f2py depend(ncol,nlay) reicmcl,relqmcl
 !f2py depend(ncol,nlay) uflx,dflx,hr,uflxc,dflxc,hrc,duflx_dt,duflxc_dt
 
     !  Call the RRTMG_LW driver to compute radiative fluxes
-    call rrtmg_lw(ncol    ,nlay    ,icld    ,idrv    , &
+    call rrtmg_lw(ncol    ,nlay    ,icld    ,ispec           ,idrv  , &
              play    , plev    , tlay    , tlev    , tsfc    , &
              h2ovmr  , o3vmr   , co2vmr  , ch4vmr  , n2ovmr  , o2vmr , &
              cfc11vmr, cfc12vmr, cfc22vmr, ccl4vmr , emis    , &
              inflglw , iceflglw, liqflglw, cldfmcl , &
              taucmcl , ciwpmcl , clwpmcl , reicmcl , relqmcl , tauaer  , &
-             uflx    , dflx    , hr      , uflxc   , dflxc,  hrc, &
+             olr_sr  , uflx    , dflx    , hr      , uflxc   , dflxc,  hrc, &
              duflx_dt,duflxc_dt )
 
 end subroutine climlab_rrtmg_lw

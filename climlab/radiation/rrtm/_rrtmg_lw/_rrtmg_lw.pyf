@@ -1,7 +1,7 @@
 !    -*- f90 -*-
 ! Note: the context of this file is case sensitive.
 
-python module _rrtmg_lw ! in 
+python module _rrtmg_lw ! in
     interface  ! in :_rrtmg_lw
         module parrrtm ! in :_rrtmg_lw:rrtmg_lw_v4.85/gcm_model/modules/parrrtm.f90
             use parkind, only: im=>kind_im
@@ -438,13 +438,14 @@ python module _rrtmg_lw ! in
             real(kind=8) dimension(ncol,nlay),intent(out),depend(ncol,nlay) :: relqmcl
             real(kind=8) dimension(140,ncol,nlay),intent(out),depend(ncol,nlay) :: taucmcl
         end subroutine climlab_mcica_subcol_lw
-        subroutine climlab_rrtmg_lw(ncol,nlay,icld,idrv,play,plev,tlay,tlev,tsfc,h2ovmr,o3vmr,co2vmr,ch4vmr,n2ovmr,o2vmr,cfc11vmr,cfc12vmr,cfc22vmr,ccl4vmr,emis,inflglw,iceflglw,liqflglw,cldfmcl,taucmcl,ciwpmcl,clwpmcl,reicmcl,relqmcl,tauaer,uflx,dflx,hr,uflxc,dflxc,hrc,duflx_dt,duflxc_dt) ! in :_rrtmg_lw:Driver.f90
+        subroutine climlab_rrtmg_lw(ncol,nlay,icld,ispec,idrv,play,plev,tlay,tlev,tsfc,h2ovmr,o3vmr,co2vmr,ch4vmr,n2ovmr,o2vmr,cfc11vmr,cfc12vmr,cfc22vmr,ccl4vmr,emis,inflglw,iceflglw,liqflglw,cldfmcl,taucmcl,ciwpmcl,clwpmcl,reicmcl,relqmcl,tauaer,olr_sr,uflx,dflx,hr,uflxc,dflxc,hrc,duflx_dt,duflxc_dt) ! in :_rrtmg_lw:Driver.f90
             use rrtmg_lw_rad, only: rrtmg_lw
             use parkind, only: im=>kind_im
             use parrrtm, only: nbndlw,ngptlw
             integer(kind=im) intent(in) :: ncol
             integer(kind=im) intent(in) :: nlay
             integer :: icld
+            integer :: ispec
             integer(kind=im) intent(in) :: idrv
             real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: play
             real(kind=8) dimension(ncol,nlay + 1),intent(in),depend(ncol,nlay) :: plev
@@ -472,6 +473,7 @@ python module _rrtmg_lw ! in
             real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: reicmcl
             real(kind=8) dimension(ncol,nlay),intent(in),depend(ncol,nlay) :: relqmcl
             real(kind=8) dimension(ncol,nlay,16),intent(in),depend(ncol,nlay) :: tauaer
+            real(kind=8) dimension(ncol,16),intent(out),depend(ncol) :: olr_sr
             real(kind=8) dimension(ncol,nlay + 1),intent(out),depend(ncol,nlay) :: uflx
             real(kind=8) dimension(ncol,nlay + 1),intent(out),depend(ncol,nlay) :: dflx
             real(kind=8) dimension(ncol,nlay),intent(out),depend(ncol,nlay) :: hr
@@ -481,7 +483,7 @@ python module _rrtmg_lw ! in
             real(kind=8) dimension(ncol,nlay + 1),intent(out),depend(ncol,nlay) :: duflx_dt
             real(kind=8) dimension(ncol,nlay + 1),intent(out),depend(ncol,nlay) :: duflxc_dt
         end subroutine climlab_rrtmg_lw
-    end interface 
+    end interface
 end python module _rrtmg_lw
 
 ! This file was auto-generated with f2py (version:2).
