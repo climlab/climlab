@@ -195,3 +195,5 @@ def test_large_grid():
     rad3 = climlab.radiation.RRTMG(state=state, return_spectral_olr=True)
     rad3.step_forward()
     assert np.all(np.abs(rad3.OLR - rad3.OLR_sr.sum(axis=-1))<0.1)
+    #  Test the xarray interface
+    to_xarray(rad3)
