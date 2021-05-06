@@ -68,7 +68,7 @@ class RRTMG_LW(_Radiation_LW):
             spectral_domain.axis_index = {**self.OLR.domain.axis_index, 'wavenumber': len(shape)-1}
             # This ensures that the spectral dimension (length: nbndlw) is appended after existing grid dimensions
             blank_field = Field((self.OLR[...,np.newaxis] * wavenum_delta), domain=spectral_domain)
-            self.add_diagnostic('OLR_sr', blank_field)
+            self.add_diagnostic('OLR_spectral', blank_field)
         else:
             self._ispec = 0,  # Spectral OLR output flag, 0: only calculate total fluxes, 1: also return spectral OLR
 
@@ -149,13 +149,13 @@ class RRTMG_LW(_Radiation_LW):
         # Except for spectrally-decomposed TOA flux, olr_sr (ncol, nbndlw)
         if self.return_spectral_olr:
             #  Need to deal with broadcasting for two different cases: single column and latitude axis
-            # case single column: self.OLR is (1,),  self.OLR_sr is (1, nbndlw),  olr_sr is (1,nbndlw)
+            # case single column: self.OLR is (1,),  self.OLR_spectral is (1, nbndlw),  olr_sr is (1,nbndlw)
             #  squeeze olr_sr down to (nbndlw,)
             # then use np.squeeze(olr_sr)[..., np.newaxis, :] to get back to (1, nbndlw)
-            # case latitude axis: self.OLR is (num_lat,1), self.OLR_sr is (num_lat, 1, nbndlw), olr_sr is (num_lat, nbndlw)
+            # case latitude axis: self.OLR is (num_lat,1), self.OLR_spectral is (num_lat, 1, nbndlw), olr_sr is (num_lat, nbndlw)
             #  np.squeeze(olr_sr) has no effect in this case
             # add the newaxis because the domain has a size-1 depth axis ---> (num_lat, 1, nbndlw)
-            self.OLR_sr = np.squeeze(olr_sr)[...,np.newaxis,:] + 0.*self.OLR_sr
+            self.OLR_spectral = np.squeeze(olr_sr)[...,np.newaxis,:] + 0.*self.OLR_spectral
         #  calculate heating rates from flux divergence
         LWheating_Wm2 = np.array(np.diff(self.LW_flux_net, axis=-1)) + 0.*self.Tatm
         LWheating_clr_Wm2 = np.array(np.diff(self.LW_flux_net_clr, axis=-1)) + 0.*self.Tatm
