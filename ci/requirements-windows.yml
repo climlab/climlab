@@ -3,7 +3,7 @@ channels:
   - conda-forge
 dependencies:
   - pip
-  - pydap
+  - pooch
   - xarray
   - pytest
   - numpy
@@ -11,4 +11,3 @@ dependencies:
   - flang
   - future
   - attrdict
-  - requests

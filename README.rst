@@ -99,10 +99,11 @@ Required
 - Python (currently testing on versions 3.7, 3.8, 3.9)
 - numpy
 - scipy
-- xarray (for data i/o)
 - attrdict
 - future
-- requests
+- pooch (for remote data access and caching)
+- xarray (for data handling)
+
 
 *climlab will still run on Python 2.7 on some systems but we are no longer supporting this*
 
@@ -158,6 +159,9 @@ Use caution as some of this material is probably out of date and incompatible wi
 
 Release history
 ----------------------
+
+Version 0.7.11 (released May 2021)
+    Improvements to data file download and caching (outsourcing this to `pooch`_)
 
 Version 0.7.10 (released April 2021)
     Improvements to docs and build.
@@ -296,7 +300,7 @@ The documentation_ was first created by Moritz Kreuzer
 
 .. _documentation: http://climlab.readthedocs.io
 .. _xarray: http://xarray.pydata.org/en/stable/
-
+.. _pooch: https://www.fatiando.org/pooch/latest/index.html
 
 Contact and Bug Reports
 -----------------------

@@ -37,24 +37,16 @@ import numpy as np
 from climlab import constants as const
 from climlab.utils.thermo import vmr_to_mmr
 from climlab.radiation.radiation import _Radiation_SW, _Radiation_LW
-from climlab.utils.data_source import load_data_source
-import os, warnings
+import os, warnings, pooch
 import xarray as xr
 
 
 def init_cam3(mod):
     # Initialise absorptivity / emissivity data
     filename = 'abs_ems_factors_fastvx.c030508.nc'
-    here = os.path.dirname(__file__)
-    datadir = os.path.join(here, 'data')
-    local_path = os.path.join(datadir, filename)
     remotepath_http = 'http://thredds.atmos.albany.edu:8080/thredds/fileServer/CLIMLAB/absorptivity/' + filename
-    remotepath_opendap = 'http://thredds.atmos.albany.edu:8080/thredds/dodsC/CLIMLAB/absorptivity/' + filename
-    data, path = load_data_source(local_path=local_path,
-                            remote_source_list=[remotepath_http, remotepath_opendap],
-                            open_method=xr.open_dataset,
-                            remote_kwargs={'engine':'pydap'},
-                            verbose=False,)
+    filehandle = pooch.retrieve(url=remotepath_http, known_hash="261043a01b15ebb82ba2baa71311a6807ba9ea6d720baa15bc091f0e61b2a8f2")
+    data = xr.open_dataset(filehandle)
     #  Populate storage arrays with values from netcdf file
     for field in ['ah2onw', 'eh2onw', 'ah2ow', 'ln_ah2ow', 'cn_ah2ow', 'ln_eh2ow', 'cn_eh2ow']:
         setattr(mod, field, data[field].transpose())

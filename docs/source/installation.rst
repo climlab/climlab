@@ -79,10 +79,10 @@ Required
 - Python (currently testing on versions 3.7, 3.8, 3.9)
 - numpy
 - scipy
-- xarray (for data i/o)
 - attrdict
 - future
-- requests
+- pooch (for remote data access and caching)
+- xarray (for data handling)
 
 *climlab will still run on Python 2.7 on some systems but we are no longer supporting this*
 
