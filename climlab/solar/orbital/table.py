@@ -3,7 +3,9 @@ import numpy as np
 import os, pooch
 import pandas as pd
 import xarray as xr
-from climlab import _datapath_http
+
+# Root URL for the climlab data repository
+_datapath_http = "http://www.atmos.albany.edu/facstaff/brose/resources/climlab_data/"
 
 #  Three possible sources for the Berger and Loutre 1991 data table
 NCDCpath = "https://www1.ncdc.noaa.gov/pub/data/paleo/climate_forcing/orbital_variations/insolation/orbit91"

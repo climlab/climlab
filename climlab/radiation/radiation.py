@@ -83,10 +83,11 @@ from climlab.process import EnergyBudget
 from climlab.radiation import ManabeWaterVapor
 from climlab import constants as const
 from climlab.domain.field import Field
-from climlab import _datapath_http
 import os, warnings, pooch
 import xarray as xr
 
+# Root URL for the climlab data repository
+_datapath_http = "http://www.atmos.albany.edu/facstaff/brose/resources/climlab_data/"
 
 def default_specific_humidity(Tatm):
     '''Initialize a specific humidity distribution

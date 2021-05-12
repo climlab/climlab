@@ -37,10 +37,11 @@ import numpy as np
 from climlab import constants as const
 from climlab.utils.thermo import vmr_to_mmr
 from climlab.radiation.radiation import _Radiation_SW, _Radiation_LW
-from climlab import _datapath_http
 import os, warnings, pooch
 import xarray as xr
 
+# Root URL for the climlab data repository
+_datapath_http = "http://www.atmos.albany.edu/facstaff/brose/resources/climlab_data/"
 
 def init_cam3(mod):
     # Initialise absorptivity / emissivity data
