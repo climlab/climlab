@@ -20,3 +20,6 @@ from .domain.initial import column_state, surface_state
 from .process import Process, TimeDependentProcess, ImplicitProcess, DiagnosticProcess, EnergyBudget
 from .process import process_like, get_axes, couple
 from .domain.xarray import to_xarray
+
+# Root URL for the climlab data repository
+_datapath_http = "http://www.atmos.albany.edu/facstaff/brose/resources/climlab_data/"

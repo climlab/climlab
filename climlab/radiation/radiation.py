@@ -83,6 +83,7 @@ from climlab.process import EnergyBudget
 from climlab.radiation import ManabeWaterVapor
 from climlab import constants as const
 from climlab.domain.field import Field
+from climlab import _datapath_http
 import os, warnings, pooch
 import xarray as xr
 
@@ -135,8 +136,8 @@ def default_absorbers(Tatm,
     xTatm = Tatm.to_xarray()
     O3 = 0. * xTatm
     if ozone_file is not None:
-        remotepath_http = 'http://thredds.atmos.albany.edu:8080/thredds/fileServer/CLIMLAB/ozone/' + ozone_file
-        ozonefilehandle = pooch.retrieve(url=remotepath_http,
+        ozonepath_http = _datapath_http + 'ozone/' + ozone_file
+        ozonefilehandle = pooch.retrieve(url=ozonepath_http,
             known_hash="bc659bfa129fafa4ed9368bb19278ae15724a5a66599affd317c143ba511ff84")
         ozonedata = xr.open_dataset(ozonefilehandle)
         ##  zonal and time average
