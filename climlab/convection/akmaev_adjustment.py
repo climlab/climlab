@@ -46,7 +46,7 @@ def convective_adjustment_direct(p, T, c, lapserate=6.5):
 def Akmaev_adjustment_multidim(theta, q, beta, n_k, theta_k, s_k, t_k):
     num_lev = theta.shape[-1]  # number of vertical levels
     otherdims = theta.shape[:-1] # everything except last dimension, which we assume is vertical
-    if otherdims is not ():
+    if otherdims != ():
         othersize = np.prod(otherdims)
         theta_reshape = theta.reshape((othersize, num_lev))
         q_reshape = q.reshape((othersize, num_lev))

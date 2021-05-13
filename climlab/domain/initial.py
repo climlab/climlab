@@ -62,7 +62,7 @@ def column_state(num_lev=30,
     if lev is not None:
         num_lev = np.array(lev).size
 
-    if num_lat is 1:
+    if num_lat == 1:
         sfc, atm = domain.single_column(water_depth=water_depth,
                                         num_lev=num_lev,
                                         lev=lev)

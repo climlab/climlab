@@ -173,7 +173,7 @@ class EmanuelConvection(TimeDependentProcess):
         #  Define inputs and diagnostics
         surface_shape = self.state['Tatm'][...,0].shape
         #  Hack to handle single column and multicolumn
-        if surface_shape is ():
+        if surface_shape == ():
             init = np.atleast_1d(np.zeros(surface_shape))
             self.multidim=False
         else:
