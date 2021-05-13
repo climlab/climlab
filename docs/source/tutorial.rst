@@ -24,6 +24,7 @@ in the ``courseware`` directory of the `climlab source <https://github.com/brian
 - `The seasonal cycle of surface temperature <http://nbviewer.jupyter.org/github/brian-rose/climlab/blob/main/courseware/Seasonal%20cycle%20and%20heat%20capacity.ipynb>`_
 - `Vertical structure of air temperature <http://nbviewer.jupyter.org/github/brian-rose/climlab/blob/main/courseware/Soundings%20from%20Observations%20and%20RCE%20Models.ipynb>`_
 - `The spectral band model <http://nbviewer.jupyter.org/github/brian-rose/climlab/blob/main/courseware/The%20spectral%20column%20model.ipynb>`_
+- `Using RRTMG_LW for spectral modeling <http://nbviewer.jupyter.org/github/brian-rose/climlab/blob/main/courseware/Spectral_OLR_with_RRTMG.ipynb>`_
 - `Grey Radiation models <http://nbviewer.jupyter.org/github/brian-rose/climlab/blob/main/courseware/Latitude-dependent%20grey%20radiation.ipynb>`_
 - `Radiative-Convective Equilibrium with the CAM3 radiation model <http://nbviewer.jupyter.org/github/brian-rose/climlab/blob/main/courseware/RCE%20with%20CAM3%20radiation.ipynb>`_
 - `Models of polar amplification <http://nbviewer.jupyter.org/github/brian-rose/climlab/blob/main/courseware/PolarAmplification.ipynb>`_
