@@ -167,12 +167,12 @@ class _Domain(object):
         #   But for now we're just going to "try" to slice to avoid
         #   some failures
         for key, value in self.__dict__.items():
-            if key is 'heat_capacity':
+            if key == 'heat_capacity':
                 try:
                     dout.heat_capacity = self.heat_capacity[indx]
                 except:
                     dout.heat_capacity = self.heat_capacity
-            elif key is 'shape':
+            elif key == 'shape':
                 try:
                     dout.shape = self.heat_capacity[indx].shape
                 except:

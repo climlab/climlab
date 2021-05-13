@@ -77,7 +77,7 @@ class GreyGas(EnergyBudget):
         except:
             axis = self.Tatm.domain.axis_index['lev']
             # if a single scalar is given, broadcast that to all levels
-            if len(np.shape(np.array(value))) is 0:
+            if len(np.shape(np.array(value))) == 0:
                 value = np.ones_like(self.Tatm) * value
             elif value.shape != self.Tatm.shape:
                 raise ValueError('absorptivity must be a Field, a scalar, or match atm grid dimensions')
@@ -111,7 +111,7 @@ class GreyGas(EnergyBudget):
         except:
             axis = self.Tatm.domain.axis_index['lev']
             # if a single scalar is given, broadcast that to all levels
-            if len(np.shape(np.array(value))) is 0:
+            if len(np.shape(np.array(value))) == 0:
                 value = np.ones_like(self.Tatm) * value
             elif value.shape != self.Tatm.shape:
                 raise ValueError('reflectivity must be a Field, a scalar, or match atm grid dimensions')

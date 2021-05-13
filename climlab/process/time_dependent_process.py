@@ -235,7 +235,7 @@ class TimeDependentProcess(Process):
         self_tend = self._compute()
         #  Adjustment processes _compute method returns absolute adjustment
         #  Needs to be converted to rate of change
-        if self.time_type is 'adjustment':
+        if self.time_type == 'adjustment':
             for varname, adj in self_tend.items():
                 self_tend[varname] /= self.timestep
         for varname, tend in self_tend.items():

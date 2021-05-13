@@ -69,7 +69,7 @@ class NbandRadiation(GreyGas):
                             self.absorption_cross_section['CO2'])
         for gas, vmr in self.absorber_vmr.items():
             # convert to mass of absorber per unit total mass
-            if gas is 'H2O':  # H2O is stored as specific humidity, not VMR
+            if gas == 'H2O':  # H2O is stored as specific humidity, not VMR
                 q = vmr
             else:
                 q = vmr / (1.+vmr)
