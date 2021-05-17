@@ -21,6 +21,7 @@
 # ipynb checkpoints
 /courseware/.ipynb_checkpoints/
 /docs/source/notebooks/.ipynb_checkpoints/
+/docs/source/courseware/.ipynb_checkpoints/
 
 # documentation built by sphinx
 /docs/build/
