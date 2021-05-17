@@ -5,26 +5,28 @@
 Tutorials
 =========
 
-For a comprehensive set of climlab usage examples embeded within lecture notes on climate science,
+Below is a collection of notebooks illustrating some typical climlab use cases.
+These documents are built from Jupyter notebooks,
+mostly based on class material developed by Brian Rose at the University at Albany.
+
+For a more comprehensive set of climlab usage examples embedded within lecture notes on climate science,
 see Brian's online textbook `The Climate Laboratory <https://brian-rose.github.io/ClimateLaboratoryBook/>`_.
 
-Below is a older collection of Jupyter notebooks giving example climlab usage.
-These notebooks are based on classroom material developed by Brian Rose at the University at Albany.
+If you want to run the code yourself, these notes are all available as Jupyter *.ipynb files
+in the ``docs/source/courseware`` directory of the `climlab source <https://github.com/brian-rose/climlab>`_.
 
-*WARNING, many of these may be out of date. You're probably better off looking at the Climate Laboratory book!*
+.. toctree::
+   :titlesonly:
 
-The notebooks can be viewed on `nbviewer <http://nbviewer.jupyter.org>`_ through the links below. If you want to run the code yourself, these notes are all available as Jupyter *.ipynb files
-in the ``courseware`` directory of the `climlab source <https://github.com/brian-rose/climlab>`_.
-
-- `Basic EBM <http://nbviewer.jupyter.org/github/brian-rose/climlab/blob/main/courseware/Preconfigured_EBM.ipynb>`_
-- `EBM with Boltzmann radiation <http://nbviewer.jupyter.org/github/brian-rose/climlab/blob/main/courseware/Boltzmann_EBM.ipynb>`_
-- `EBM with Budkyko transport <http://nbviewer.jupyter.org/github/brian-rose/climlab/blob/main/courseware/Budyko_Transport_EBM.ipynb>`_
-- `Snowball Earth in the EBM <http://nbviewer.jupyter.org/github/brian-rose/climlab/blob/main/courseware/Snowball%20Earth%20in%20the%20EBM.ipynb>`_
-- `Insolation <http://nbviewer.jupyter.org/github/brian-rose/climlab/blob/main/courseware/Insolation.ipynb>`_
-- `The seasonal cycle of surface temperature <http://nbviewer.jupyter.org/github/brian-rose/climlab/blob/main/courseware/Seasonal%20cycle%20and%20heat%20capacity.ipynb>`_
-- `Vertical structure of air temperature <http://nbviewer.jupyter.org/github/brian-rose/climlab/blob/main/courseware/Soundings%20from%20Observations%20and%20RCE%20Models.ipynb>`_
-- `The spectral band model <http://nbviewer.jupyter.org/github/brian-rose/climlab/blob/main/courseware/The%20spectral%20column%20model.ipynb>`_
-- `Using RRTMG_LW for spectral modeling <http://nbviewer.jupyter.org/github/brian-rose/climlab/blob/main/courseware/Spectral_OLR_with_RRTMG.ipynb>`_
-- `Grey Radiation models <http://nbviewer.jupyter.org/github/brian-rose/climlab/blob/main/courseware/Latitude-dependent%20grey%20radiation.ipynb>`_
-- `Radiative-Convective Equilibrium with the CAM3 radiation model <http://nbviewer.jupyter.org/github/brian-rose/climlab/blob/main/courseware/RCE%20with%20CAM3%20radiation.ipynb>`_
-- `Models of polar amplification <http://nbviewer.jupyter.org/github/brian-rose/climlab/blob/main/courseware/PolarAmplification.ipynb>`_
+   courseware/Preconfigured_EBM
+   courseware/Boltzmann_EBM
+   courseware/Budyko_Transport_EBM
+   courseware/Snowball_Earth_in_the_EBM
+   courseware/Insolation
+   courseware/Seasonal_cycle_and_heat_capacity
+   courseware/Soundings_from_Observations_and_RCE_Models
+   courseware/The_spectral_column_model
+   courseware/Spectral_OLR_with_RRTMG
+   courseware/Latitude-dependent_grey_radiation
+   courseware/RCE_with_CAM3_radiation
+   courseware/PolarAmplification

@@ -145,20 +145,18 @@ Full user manual is available here_.
 A rich and up-to-date collection of example usage can be found in Brian Rose's online textbook
 `The Climate Laboratory`_.
 
-The directory ``climlab/courseware/`` also contains a older collection of Jupyter notebooks (``*.ipynb``) used for teaching some basics of climate science, and documenting use of the ``climlab`` package.
+Source notebooks for the `tutorials in the docs`_ can be found in the ``climlab/docs/source/courseware/`` directory of the source repo.
 
-These are self-describing, and may run out-of-the-box once the package is installed, e.g:
+These are self-describing, and should run out-of-the-box once the package is installed, e.g:
 
 ``jupyter notebook Insolation.ipynb``
-
-Use caution as some of this material is probably out of date and incompatible with the latest version of climlab.
-
-.. _here: http://climlab.readthedocs.io
-.. _`The Climate Laboratory`: https://brian-rose.github.io/ClimateLaboratoryBook/
 
 
 Release history
 ----------------------
+
+Version 0.7.12 (released May 2021)
+    New feature: spectral output from RRTMG (accompanied by a new tutorial)
 
 Version 0.7.11 (released May 2021)
     Improvements to data file download and caching (outsourcing this to `pooch`_)
@@ -301,6 +299,10 @@ The documentation_ was first created by Moritz Kreuzer
 .. _documentation: http://climlab.readthedocs.io
 .. _xarray: http://xarray.pydata.org/en/stable/
 .. _pooch: https://www.fatiando.org/pooch/latest/index.html
+.. _`tutorials in the docs`: https://climlab.readthedocs.io/en/latest/tutorial.html
+.. _here: http://climlab.readthedocs.io
+.. _`The Climate Laboratory`: https://brian-rose.github.io/ClimateLaboratoryBook/
+
 
 Contact and Bug Reports
 -----------------------

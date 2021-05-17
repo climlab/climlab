@@ -51,7 +51,10 @@ extensions = [
     'IPython.sphinxext.ipython_console_highlighting',
     'sphinxcontrib.bibtex',
     'numpydoc',
+    'nbsphinx'
 ]
+
+nbsphinx_execute = 'never'
 
 #inheritance_graph_attrs = dict(rankdir="TB", size='"6.0, 8.0"', fontsize=14, ratio='compress')
 inheritance_graph_attrs = dict(rankdir="LR", size='""', ratio='expand')
