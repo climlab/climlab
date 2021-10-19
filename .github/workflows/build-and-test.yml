@@ -1,6 +1,11 @@
 name: Build and test climlab
 
 on: [push, pull_request]
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '35 4 * * TUE' # Tuesday at 04:35 UTC”
 
 jobs:
   build-and-test:
