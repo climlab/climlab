@@ -3,7 +3,7 @@ from __future__ import division
 import numpy as np
 from climlab.domain import domain
 from climlab.domain.field import Field
-from attrdict import AttrDict
+from climlab.utils.attrdict import AttrDict
 from climlab.utils import legendre
 
 

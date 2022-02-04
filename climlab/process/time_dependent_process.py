@@ -7,7 +7,7 @@ import copy
 from climlab import constants as const
 from .process import Process
 from climlab.utils import walk
-from attrdict import AttrDict
+from climlab.utils.attrdict import AttrDict
 
 
 def couple(proclist, name='Parent'):

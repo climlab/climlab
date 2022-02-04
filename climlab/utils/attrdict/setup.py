@@ -3,8 +3,7 @@ from __future__ import division, print_function
 
 def configuration(parent_package='',top_path=None):
     from numpy.distutils.misc_util import Configuration
-    config = Configuration(package_name='utils', parent_name=parent_package, top_path=top_path)
-    config.add_subpackage('attrdict')
+    config = Configuration(package_name='attrdict', parent_name=parent_package, top_path=top_path)
     return config
 
 if __name__ == '__main__':
