@@ -10,4 +10,3 @@ dependencies:
   - scipy
   - flang
   - future
-  - attrdict

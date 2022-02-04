@@ -1,7 +1,7 @@
 from __future__ import print_function
 import os
 
-VERSION = '0.7.12'
+VERSION = '0.7.13dev0'
 
 # BEFORE importing setuptools, remove MANIFEST. Otherwise it may not be
 # properly updated when the contents of directories change (true for distutils,
@@ -70,7 +70,7 @@ def setup_package():
           author='Brian E. J. Rose',
           author_email='brose@albany.edu',
           setup_requires=['numpy'],
-          install_requires=['numpy','xarray','attrdict','scipy'],
+          install_requires=['numpy','xarray','scipy'],
           license='MIT',
     )
     run_build = True

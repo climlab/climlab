@@ -10,7 +10,6 @@ dependencies:
   - fortran-compiler
   - toolchain3
   - future
-  - attrdict
   - pytest
   - codecov
   - pytest-cov
