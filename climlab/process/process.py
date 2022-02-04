@@ -70,7 +70,7 @@ import numpy as np
 from climlab.domain.field import Field
 from climlab.domain.domain import _Domain, zonal_mean_surface
 from climlab.utils import walk
-from attrdict import AttrDict
+from climlab.utils.attrdict import AttrDict
 from climlab.domain.xarray import state_to_xarray
 
 

@@ -10,8 +10,9 @@ dependencies:
     - netCDF4
     - xarray
     - pooch
-    - attrdict
     - sphinx
+    - fortran-compiler
+    - toolchain3
     - ipython
     - jupyter
     - future

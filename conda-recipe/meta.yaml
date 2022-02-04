@@ -1,4 +1,4 @@
-{% set version = "0.7.12" %}
+{% set version = "0.7.13dev0" %}
 
 package:
   name: climlab
@@ -29,7 +29,6 @@ requirements:
     - pooch
     - xarray
     - future
-    - attrdict
 
 test:
   requires:
