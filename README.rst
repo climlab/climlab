@@ -96,10 +96,9 @@ These are handled automatically if you install with conda_.
 
 Required
 ~~~~~~~~~~~~
-- Python (currently testing on versions 3.7, 3.8, 3.9)
+- Python (currently testing on versions 3.7, 3.8, 3.9, 3.10)
 - numpy
 - scipy
-- attrdict
 - future
 - pooch (for remote data access and caching)
 - xarray (for data handling)
@@ -154,6 +153,12 @@ These are self-describing, and should run out-of-the-box once the package is ins
 
 Release history
 ----------------------
+
+Version 0.7.13 (released February 2022)
+    Maintenance release to support Python 3.10.
+
+    The `attrdict package`_ by `Brendan Curran-Johnson`_ has been removed from the dependencies since it is broken on Python 3.10 and no longer under development.
+    A modified version of the MIT-licensed attrdict source is now bundled internally with climlab. There are no changes to climlab's public API.
 
 Version 0.7.12 (released May 2021)
     New feature: spectral output from RRTMG (accompanied by a new tutorial)
@@ -302,6 +307,8 @@ The documentation_ was first created by Moritz Kreuzer
 .. _`tutorials in the docs`: https://climlab.readthedocs.io/en/latest/tutorial.html
 .. _here: http://climlab.readthedocs.io
 .. _`The Climate Laboratory`: https://brian-rose.github.io/ClimateLaboratoryBook/
+.. _`attrdict package`: https://github.com/bcj/AttrDict
+.. _`Brendan Curran-Johnson`: https://github.com/bcj
 
 
 Contact and Bug Reports

@@ -76,10 +76,9 @@ These are handled automatically if you install with conda_.
 
 Required
 ------------
-- Python (currently testing on versions 3.7, 3.8, 3.9)
+- Python (currently testing on versions 3.7, 3.8, 3.9, 3.10)
 - numpy
 - scipy
-- attrdict
 - future
 - pooch (for remote data access and caching)
 - xarray (for data handling)
