@@ -10,7 +10,6 @@ dependencies:
   - gfortran_osx-arm64
   - libgfortran
   - future
-  - attrdict
   - pytest
   - codecov
   - pytest-cov
