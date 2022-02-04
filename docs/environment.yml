@@ -11,6 +11,8 @@ dependencies:
     - xarray
     - pooch
     - sphinx
+    - fortran-compiler
+    - toolchain3
     - ipython
     - jupyter
     - future
