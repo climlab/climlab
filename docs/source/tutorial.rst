@@ -30,3 +30,4 @@ in the ``docs/source/courseware`` directory of the `climlab source <https://gith
    courseware/Latitude-dependent_grey_radiation
    courseware/RCE_with_CAM3_radiation
    courseware/PolarAmplification
+   courseware/Reset-time
