@@ -4,7 +4,7 @@ from builtins import str
 from builtins import range
 import numpy as np
 import copy
-from climlab import constants as const
+from climlab.utils.constants import const_dict as const
 from .process import Process
 from climlab.utils import walk
 from climlab.utils.attrdict import AttrDict

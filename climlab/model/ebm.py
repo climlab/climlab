@@ -78,7 +78,7 @@ We can run both models out to equilibrium and compare the results as follows:
 """
 from __future__ import division
 import numpy as np
-from climlab import constants as const
+from climlab.utils.constants import const_dict as const
 from climlab.domain.field import Field, global_mean
 from climlab.process import EnergyBudget, TimeDependentProcess
 from climlab.utils import legendre
@@ -261,14 +261,16 @@ class EBM(TimeDependentProcess):
         self.param['a2'] = a2
         self.param['ai'] = ai
         # create sub-models
-        lw = AplusBT(state=self.state, **self.param)
-        ins = P2Insolation(domains=sfc, **self.param)
-        alb = albedo.StepFunctionAlbedo(state=self.state, **self.param)
+        lw = AplusBT(state=self.state, const=self.const, **self.param)
+        ins = P2Insolation(domains=sfc, const=self.const, **self.param)
+        alb = albedo.StepFunctionAlbedo(state=self.state, const=self.const, **self.param)
         sw = SimpleAbsorbedShortwave(state=self.state,
                                      insolation=ins.insolation,
                                      albedo=alb.albedo,
+                                     const=self.const,
                                      **self.param)
-        diff = MeridionalHeatDiffusion(state=self.state, use_banded_solver=False, **self.param)
+        diff = MeridionalHeatDiffusion(state=self.state, const=self.const,
+                                       use_banded_solver=False, **self.param)
         self.add_subprocess('LW', lw)
         self.add_subprocess('insolation', ins)
         self.add_subprocess('albedo', alb)
@@ -333,7 +335,7 @@ class EBM(TimeDependentProcess):
         """
         phi = np.deg2rad(self.lat)
         energy_in = np.squeeze(self.net_radiation)
-        return (1E-15 * 2 * np.math.pi * const.a**2 *
+        return (1E-15 * 2 * np.math.pi * self.const.a**2 *
                 integrate.cumtrapz(np.cos(phi)*energy_in, x=phi, initial=0.))
 
     # def heat_transport(self):
@@ -370,7 +372,7 @@ class EBM(TimeDependentProcess):
         dTdphi = np.diff(T) / np.diff(phi)
         dTdphi = np.append(dTdphi, 0.)
         dTdphi = np.insert(dTdphi, 0, 0.)
-        return (1E-15*-2*np.math.pi*np.cos(phi_stag)*const.a**2*D*dTdphi)
+        return (1E-15*-2*np.math.pi*np.cos(phi_stag)*self.const.a**2*D*dTdphi)
 
     # def heat_transport_convergence(self):
     #     """Returns instantaneous convergence of heat transport.

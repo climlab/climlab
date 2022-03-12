@@ -1,7 +1,7 @@
 from __future__ import division
 from __future__ import absolute_import
 import numpy as np
-from climlab import constants as const
+from climlab.utils.constants import const_dict as const
 from climlab.radiation.radiation import _Radiation_SW, _Radiation_LW
 from .rrtmg_lw import RRTMG_LW
 from .rrtmg_sw import RRTMG_SW, nbndsw

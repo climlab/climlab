@@ -3,7 +3,7 @@ import numpy as np
 import climlab
 import pytest
 from climlab.tests.xarray_test import to_xarray
-
+from climlab.utils.constants import const_dict as const
 
 @pytest.fixture()
 def model():
@@ -28,7 +28,7 @@ def rcmodel():
 def diffmodel(rcmodel):
     diffmodel = climlab.process_like(rcmodel)
     # meridional diffusivity in m**2/s
-    K = 0.05 / diffmodel.Tatm.domain.heat_capacity[0] *  climlab.constants.a**2
+    K = 0.05 / diffmodel.Tatm.domain.heat_capacity[0] *  const.a**2
     d = climlab.dynamics.MeridionalDiffusion(K=K,
                 state={'Tatm': diffmodel.state['Tatm']},
                 **diffmodel.param)

@@ -1,6 +1,6 @@
 from __future__ import division, print_function, absolute_import
 import numpy as np
-from climlab import constants as const
+from climlab.utils.constants import const_dict as const
 from climlab.solar.insolation import daily_insolation
 from climlab.solar.orbital import OrbitalTable
 from climlab.solar.orbital.long import OrbitalTable as LongOrbitalTable

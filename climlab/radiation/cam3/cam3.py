@@ -34,7 +34,7 @@ Input arguments and diagnostics follow specifications in
 '''
 from __future__ import division, print_function, absolute_import
 import numpy as np
-from climlab import constants as const
+from climlab.utils.constants import const_dict as const
 from climlab.utils.thermo import vmr_to_mmr
 from climlab.radiation.radiation import _Radiation_SW, _Radiation_LW
 import os, warnings, pooch

@@ -36,7 +36,7 @@ calculated for 45N.
 """
 from __future__ import division
 import numpy as np
-from climlab import constants as const
+from climlab.utils.constants import const_dict as const
 from climlab.process.time_dependent_process import TimeDependentProcess
 from climlab.domain.initial import column_state
 from climlab.domain.field import Field

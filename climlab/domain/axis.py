@@ -2,7 +2,7 @@ from __future__ import division
 from builtins import str
 from builtins import object
 import numpy as np
-from climlab import constants as const
+from climlab.utils.constants import const_dict as const
 
 
 axis_types = ['lev', 'lat', 'lon', 'depth', 'abstract']

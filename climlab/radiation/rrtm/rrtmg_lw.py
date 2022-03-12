@@ -1,7 +1,7 @@
 from __future__ import division, print_function, absolute_import
 import numpy as np
 import warnings
-from climlab import constants as const
+from climlab.utils.constants import const_dict as const
 from climlab.radiation.radiation import _Radiation_LW
 from climlab.domain import Field, Axis, domain
 from .utils import _prepare_general_arguments

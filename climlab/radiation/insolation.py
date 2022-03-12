@@ -22,7 +22,7 @@ from climlab.process.diagnostic import DiagnosticProcess
 from climlab.domain.field import Field
 from climlab.domain.field import to_latlon
 from climlab.utils.legendre import P2
-from climlab import constants as const
+from climlab.utils.constants import const_dict as const
 from climlab.solar.insolation import daily_insolation
 
 # REVISE TO MAKE ALL OF THESE CALLABLE WITH NO ARGUMENTS.

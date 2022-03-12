@@ -72,6 +72,7 @@ from climlab.domain.domain import _Domain, zonal_mean_surface
 from climlab.utils import walk
 from climlab.utils.attrdict import AttrDict
 from climlab.domain.xarray import state_to_xarray
+from climlab.utils.constants import const_dict as const
 
 
 def _make_dict(arg, argtype):
@@ -145,10 +146,13 @@ class Process(object):
 
     def __init__(self, name='Untitled', state=None, domains=None, subprocess=None,
                  lat=None, lev=None, num_lat=None, num_levels=None,
-                 input=None, verbose=True, **kwargs):
+                 input=None, verbose=True,
+                 const=const,
+                 **kwargs):
         # verbose flag used to control text output at process creation time
         self.verbose = verbose
         self.name = name
+        self.const = const
         # dictionary of domains. Keys are the domain names
         self.domains = _make_dict(domains, _Domain)
         #  If lat is given, create a simple domains

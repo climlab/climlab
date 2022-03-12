@@ -16,7 +16,7 @@ occurs in the lowest atmospheric model level.
 
                 import numpy as np
                 import climlab
-                from climlab import constants as const
+                from climlab.utils.constants import const_dict as const
                 # Temperatures in a single column
                 full_state = climlab.column_state(num_lev=30, water_depth=2.5)
                 temperature_state = {'Tatm':full_state.Tatm,'Ts':full_state.Ts}
@@ -57,7 +57,7 @@ occurs in the lowest atmospheric model level.
 from __future__ import division
 import numpy as np
 from climlab.utils.thermo import qsat
-from climlab import constants as const
+from climlab.utils.constants import const_dict as const
 from climlab.process.energy_budget import EnergyBudget
 from climlab.domain.field import Field
 

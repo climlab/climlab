@@ -3,6 +3,7 @@ import numpy as np
 import climlab
 from climlab.convection import emanuel_convection
 from climlab.tests.xarray_test import to_xarray
+from climlab.utils.constants import const_dict as const
 import pytest
 import sys
 
@@ -119,7 +120,7 @@ def test_rcm_emanuel():
     #  Initialize a nearly dry column (small background stratospheric humidity)
     state['q'] = np.ones_like(state.Tatm) * 5.E-6
     #  ASYNCHRONOUS COUPLING -- the radiation uses a much longer timestep
-    short_timestep = climlab.constants.seconds_per_hour
+    short_timestep = const.seconds_per_hour
     #  The top-level model
     model = climlab.TimeDependentProcess(name='Radiative-Convective Model',
                         state=state,
@@ -137,7 +138,7 @@ def test_rcm_emanuel():
     #  Surface heat flux processes
     shf = climlab.surface.SensibleHeatFlux(name='SHF',
                                   state=state, Cd=0.5E-3,
-                                  timestep=climlab.constants.seconds_per_hour)
+                                  timestep=const.seconds_per_hour)
     lhf = climlab.surface.LatentHeatFlux(name='LHF',
                                   state=state, Cd=0.5E-3,
                                   timestep=short_timestep)

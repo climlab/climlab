@@ -1,5 +1,5 @@
 import climlab
-from climlab.utils import constants as const
+from climlab.utils.constants import const_dict as const
 import numpy as np
 import matplotlib.pyplot as plt
 

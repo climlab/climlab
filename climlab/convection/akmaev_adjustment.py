@@ -1,6 +1,6 @@
 from __future__ import division
 import numpy as np
-from climlab import constants as const
+from climlab.utils.constants import const_dict as const
 import sys
 
 

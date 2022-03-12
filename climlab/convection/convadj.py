@@ -1,7 +1,7 @@
 from __future__ import division
 from builtins import range
 import numpy as np
-from climlab import constants as const
+from climlab.utils.constants import const_dict as const
 from climlab.utils.thermo import rho_moist, pseudoadiabat
 from climlab.process.time_dependent_process import TimeDependentProcess
 from climlab.domain.field import Field
