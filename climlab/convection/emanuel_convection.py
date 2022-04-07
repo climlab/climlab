@@ -9,7 +9,7 @@ from climlab.process import TimeDependentProcess
 from climlab.utils.thermo import qsat
 from climlab import constants as const
 try:
-    from ._emanuel_convection import emanuel_convection as convect
+    from climlab_emanuel_convection import emanuel_convection as convect
 except:
     warnings.warn('Cannot import EmanuelConvection fortran extension, this module will not be functional.')
 # The array conversion routines we are borrowing from the RRTMG wrapper
