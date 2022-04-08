@@ -22,29 +22,29 @@ U = np.flipud([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0,
 V = 5. * np.ones_like(U)
 DELT = 60.0*10.
 #  TENDENCIES FROM FORTRAN CODE
-FT = np.flipud(np.array([[-1.79012722e-05, -5.30474102e-06, -1.31791678e-05,
+FT = np.flipud(np.array([-1.79012722e-05, -5.30474102e-06, -1.31791678e-05,
         -1.52691407e-06,  2.39796248e-05,  5.00321776e-05,
          5.81085251e-05,  3.53241836e-05,  2.92659212e-05,
          1.72941819e-05, -1.29258611e-05, -1.95583598e-05,
          0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
          0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
-         0.00000000e+00,  0.00000000e+00]]))
-FQ = np.flipud(np.array([[-1.25265799e-07, -1.77207007e-08,  2.25623932e-08,
+         0.00000000e+00,  0.00000000e+00]))
+FQ = np.flipud(np.array([-1.25265799e-07, -1.77207007e-08,  2.25623932e-08,
          1.20605250e-08, -2.24795916e-09, -8.65551558e-09,
          1.32081499e-08,  3.48952331e-08,  4.61431533e-09,
          3.59264661e-09,  3.54263054e-09,  1.12591034e-09,
          0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
          0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
-         0.00000000e+00,  0.00000000e+00]]))
-FU = np.flipud(np.array([[ 6.96135486e-05,  2.54272652e-05, -4.23745237e-06,
+         0.00000000e+00,  0.00000000e+00]))
+FU = np.flipud(np.array([ 6.96135486e-05,  2.54272652e-05, -4.23745237e-06,
         -2.25829445e-06,  5.97676516e-06,  1.29817497e-05,
         -7.07183988e-06, -5.06040666e-05, -8.67351863e-06,
         -1.08615293e-05, -1.97420065e-05, -1.05506113e-05,
          0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
          0.00000000e+00,  0.00000000e+00,  0.00000000e+00,
-         0.00000000e+00,  0.00000000e+00]]))
+         0.00000000e+00,  0.00000000e+00]))
 FV = np.zeros_like(FU)
-
+CBMF = 0.0310373
 
 #  Set thermodynamic constants to their defaults from Emanuel's code
 #   so that we get same tendencies
@@ -76,14 +76,13 @@ def test_convect_tendencies():
     assert conv.IFLAG == 1
     #  relative tolerance for these tests ...
     tol = 1E-5
-    assert conv.CBMF == pytest.approx(3.10377218E-02, rel=tol)
+    assert conv.CBMF == pytest.approx(CBMF, rel=tol)
     tend = conv.tendencies
     assert FT == pytest.approx(tend['Tatm'], rel=tol)
     assert FQ == pytest.approx(tend['q'], rel=tol)
     assert FU == pytest.approx(tend['U'], rel=tol)
     assert FV == pytest.approx(tend['V'], rel=tol)
 
-@pytest.mark.skipif(sys.platform == "darwin", reason="problematic on Mac OS for some reason")
 @pytest.mark.compiled
 @pytest.mark.fast
 def test_multidim_tendencies():
@@ -108,7 +107,7 @@ def test_multidim_tendencies():
     assert np.all(conv.IFLAG == 1)
     #  relative tolerance for these tests ...
     tol = 1E-5
-    assert np.all(conv.CBMF == pytest.approx(3.10377218E-02, rel=tol))
+    assert np.all(conv.CBMF == pytest.approx(CBMF, rel=tol))
     tend = conv.tendencies
     assert np.tile(FT,(num_lat,1)) == pytest.approx(tend['Tatm'], rel=tol)
     assert np.tile(FQ,(num_lat,1)) == pytest.approx(tend['q'], rel=tol)
