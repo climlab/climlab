@@ -54,7 +54,7 @@ def init_cam3(mod):
 
 #  Wrapping these imports in try/except to avoid failures during documentation building on readthedocs
 try:
-    from . import _cam3
+    from climlab_cam3_radiation import cam3 as _cam3
     init_cam3(_cam3.absems)
 except Exception:
     warnings.warn('Cannot import and initialize compiled Fortran extension, CAM3 module will not be functional.')
