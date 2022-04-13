@@ -1,7 +1,7 @@
 from __future__ import print_function
 import os
 
-VERSION = '0.8.0'
+VERSION = '0.8.0.dev0'
 
 # BEFORE importing setuptools, remove MANIFEST. Otherwise it may not be
 # properly updated when the contents of directories change (true for distutils,

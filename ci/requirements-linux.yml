@@ -13,3 +13,5 @@ dependencies:
   - pytest
   - codecov
   - pytest-cov
+  - climlab-rrtmg
+  - climlab-emanuel-convection

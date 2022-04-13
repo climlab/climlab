@@ -10,3 +10,5 @@ dependencies:
   - scipy
   - flang
   - future
+  - climlab-rrtmg
+  - climlab-emanuel-convection
