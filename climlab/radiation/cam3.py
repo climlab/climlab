@@ -37,25 +37,11 @@ import numpy as np
 from climlab import constants as const
 from climlab.utils.thermo import vmr_to_mmr
 from climlab.radiation.radiation import _Radiation_SW, _Radiation_LW
-import os, warnings, pooch
-import xarray as xr
-from climlab.utils import _datapath_http
-
-
-def init_cam3(mod):
-    # Initialise absorptivity / emissivity data
-    remotepath_http = _datapath_http + 'absorptivity/abs_ems_factors_fastvx.c030508.nc'
-    filehandle = pooch.retrieve(url=remotepath_http,
-        known_hash="261043a01b15ebb82ba2baa71311a6807ba9ea6d720baa15bc091f0e61b2a8f2")
-    data = xr.open_dataset(filehandle)
-    #  Populate storage arrays with values from netcdf file
-    for field in ['ah2onw', 'eh2onw', 'ah2ow', 'ln_ah2ow', 'cn_ah2ow', 'ln_eh2ow', 'cn_eh2ow']:
-        setattr(mod, field, data[field].transpose())
+import warnings
 
 #  Wrapping these imports in try/except to avoid failures during documentation building on readthedocs
 try:
     import climlab_cam3_radiation as _cam3
-    init_cam3(_cam3.absems)
 except Exception:
     warnings.warn('Cannot import and initialize compiled Fortran extension, CAM3 module will not be functional.')
 
