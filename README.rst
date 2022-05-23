@@ -113,30 +113,6 @@ Recommended for full functionality
 *Note that there is a bug in previous numba versions that caused a hanging condition in climlab under Python 3.*
 
 
-Complete development environment
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-To build from source and develop new code you will need some additional pieces
-
-- pip
-- gfortran (OSX or linux) or flang (Windows)
-- pytest (to run the automated tests, important if you are developing new code)
-
-To build the docs, yet another list of requirements
-
-- sphinx
-- ipython
-- jupyter
-- future
-- sphinx_rtd_theme
-- nbsphinx
-- sphinxcontrib-bibtex
-- numpydoc
-- matplotlib
-
-`Anaconda Python`_ is highly recommended and will provide everything you need.
-See "Installing pre-built binaries with conda" above.
-
-
 Documentation and Examples
 --------------------------
 Full user manual is available here_.
@@ -153,6 +129,18 @@ These are self-describing, and should run out-of-the-box once the package is ins
 
 Release history
 ----------------------
+
+Version 0.8.0 (released May 2022)
+    A major refactor of the internals: all the Fortran code has been moved into external companion
+    packages `climlab-rrtmg`_, `climlab-cam3-radiation`_, and `climlab-emanuel-convection`_.
+    Climlab is now (once again!) a pure Python package.
+    Builds of these helper packages are available through conda-forge and will be
+    automatically installed as dependencies by conda / mamba.
+
+    There should be no breaking changes to the user-facing API.
+
+    The major motivation for this change was to (vastly) simplify the development
+    and testing of new-and-improved climlab internals (coming soon).
 
 Version 0.7.13 (released February 2022)
     Maintenance release to support Python 3.10.
@@ -336,6 +324,9 @@ See the accompanying LICENSE file.
 .. |docs| image:: http://readthedocs.org/projects/climlab/badge/?version=latest
    :target: http://climlab.readthedocs.io/en/latest/intro.html
    :alt: Documentation Status
+.. _`climlab-rrtmg`: https://github.com/climlab/climlab-rrtmg
+.. _`climlab-cam3-radiation`: https://github.com/climlab/climlab-cam3-radiation
+.. _`climlab-emanuel-convection`: https://github.com/climlab/climlab-emanuel-convection
 
 =======
 

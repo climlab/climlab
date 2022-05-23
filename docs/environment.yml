@@ -2,19 +2,22 @@ name: climlab-docs
 channels:
   - conda-forge
 dependencies:
-    - python=3.8
-    - numpy
-    - pandas
-    - scipy
-    - matplotlib
-    - netCDF4
-    - xarray
-    - pooch
-    - sphinx
-    - ipython
-    - jupyter
-    - future
-    - sphinx_rtd_theme
-    - nbsphinx
-    - sphinxcontrib-bibtex
-    - numpydoc
+  - python
+  - numpy
+  - pandas
+  - scipy
+  - matplotlib
+  - netCDF4
+  - xarray
+  - pooch
+  - sphinx
+  - ipython
+  - jupyter
+  - future
+  - sphinx_rtd_theme
+  - nbsphinx
+  - sphinxcontrib-bibtex
+  - numpydoc
+  - climlab-rrtmg
+  - climlab-cam3-radiation
+  - climlab-emanuel-convection
