@@ -5,10 +5,12 @@ dependencies:
   - pip
   - pooch
   - xarray
-  - pytest
   - numpy
   - scipy
-  - flang
   - future
+  - pytest
+  - codecov
+  - pytest-cov
   - climlab-rrtmg
   - climlab-emanuel-convection
+  - climlab-cam3-radiation
