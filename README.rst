@@ -130,7 +130,7 @@ These are self-describing, and should run out-of-the-box once the package is ins
 Release history
 ----------------------
 
-Version 0.8.0 (released May 2022)
+Version 0.8.1 (released May 2022)
     A major refactor of the internals: all the Fortran code has been moved into external companion
     packages `climlab-rrtmg`_, `climlab-cam3-radiation`_, and `climlab-emanuel-convection`_.
     Climlab is now (once again!) a pure Python package.
