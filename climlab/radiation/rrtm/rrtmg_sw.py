@@ -9,7 +9,7 @@ from .utils import _climlab_to_rrtm, _climlab_to_rrtm_sfc, _rrtm_to_climlab
 nbndsw = 1; naerec = 1; ngptsw = 1;
 try:
     #  The compiled fortran extension module
-    from . import _rrtmg_sw
+    from climlab_rrtmg import rrtmg_sw as _rrtmg_sw
     nbndsw = int(_rrtmg_sw.parrrsw.nbndsw)
     naerec = int(_rrtmg_sw.parrrsw.naerec)
     ngptsw = int(_rrtmg_sw.parrrsw.ngptsw)

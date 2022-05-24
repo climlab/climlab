@@ -102,66 +102,34 @@ If you don't know how to do this, submit your pull request anyway and we will as
 Building CLIMLAB from source
 ----------------------------
 
-CLIMLAB is a mix of pure Python and compiled Fortran.
-If you're developing new code, you'll need a Fortran compiler that plays well with `numpy.f2py`_.
-There are a few different ways to do this.
+As of version 0.8.0, all the Fortran code has been moved into external companion
+packages `climlab-rrtmg`_, `climlab-cam3-radiation`_, and `climlab-emanuel-convection`_.
+You no longer need a Fortran compiler to build climlab from source.
 
-Also see below for special instructions for Mac OSX!
+Here are some basic instructions for setting up an environment to build and test climlab.
 
-Method 1: Automated build-and-test with conda-build
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Using conda to set up a complete build environment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-We use (and recommend) `conda build`_ which will handle all the dependencies including Fortran compiler. This is actually how CLIMLAB is built for public consumption on conda-forge.
-
-In your base conda environment (where you should have ``conda-build`` installed), do this from the root directory of the CLIMLAB source repo::
-
-    conda-build conda-recipe
-
-This will automatically install all build dependencies in a temporary new conda environment, build all the Fortran extensions, bundle everything together, install the new package in a temporary test environment, and run the entire automated test suite. The whole procedure will take several minutes to run through.
-
-Assuming the tests pass successfully, you will see a message like::
-
-    TEST END: /Users/br546577/opt/anaconda3/conda-bld/osx-64/climlab-0.7.6-py37hdde6e19_0.tar.bz2
-
-(though obviously with different paths and version numbers)
-
-To use and test your new build further, you can install it in a new test environment (with all dependencies)::
-
-    conda create --name newtest climlab --use-local
-    conda activate newtest
-
-Once you're happy with this you can safely delete the test environment with::
-
-    conda deactivate
-    conda env remove --name newtest
-
-If you encounter problems with the conda build recipe (which is found within ``conda-recipe`` in the source repo), please raise an issue at <https://github.com/brian-rose/climlab/issues>. You could also take a look at the `CLIMLAB recipe used on conda-forge`_, which should be very similar.
-
-
-Method 2: Using conda to set up a complete build environment
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Included with the CLIMLAB source repo are some YAML files that describe complete conda environments for building, testing and running the code (including compilers).
-We can use these to quickly create an environment with everything we need. We then build and test manually within this environment.
+Included with the CLIMLAB source repo are some YAML files that describe complete
+conda environments for building, testing and running the code.
+We can use these to quickly create an environment with everything we need.
+We then build and test manually within this environment.
 
 First, create and activate a test environment with your desired python version, for example::
 
-    conda create --name test_env python=3.7 --channel conda-forge
+    conda create --name test_env python=3.10 --channel conda-forge
     conda activate test_env
 
 Next, update the test environment with all the necessary build dependencies.
 Do this from the top level of the CLIMLAB source repo::
 
-    conda env update --file ./ci/requirements-[ostype].yml
-
-where ``[ostype]`` can by any of ``macos``, ``linux``, or ``windows``. For example::
-
-    conda env update --file ./ci/requirements-macos.yml
+    conda env update --file environment.yml
 
 Alternatively, if you don't need to specify the Python version and just want to use the default,
 you can create the complete environment in a single step like this::
 
-    conda env create --file ./ci/requirements-macos.yml
+    conda env create --file environment.yml
     conda activate test_env
 
 Either way, you are now ready to build from source and install in this new environment::
@@ -180,31 +148,6 @@ When you are done with your test environment, you can safely deactivate and dele
     conda env remove --name test_env
 
 
-Special Caveat for Mac OSX only
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Method 1 and Method 2 both rely on gfortran supplied by conda. Currently for these to work on Mac OSX the user needs some old SDKs that are no longer provided by default from Apple, and that cannot be bundled automatically by conda due to licensing issues. `See here for discussion`_.
-
-The short answer is that you should download ``MacOSX10.9.sdk`` from either of
-
-- <https://github.com/phracker/MacOSX-SDKs> or
-- <https://github.com/devernay/xcodelegacy>
-
-and save it at ``$HOME/opt/MacOSX10.9.sdk`` on your Mac.
-
-
-Method 3: Rolling your own fortran compiler
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-You don't need to use conda at all in order to build and test CLIMLAB. If you have a different fortran compiler that you want to use, we suggest starting with `these f2py examples`_. If you cannot get these examples to work, then you will almost surely not be able to build CLIMLAB.
-
-Take a look at the requirements in ``/ci/requirements-*.yml``. Most but not all of these are strictly required in order to build and run CLIMLAB. Your mileage may vary.
-
-You can build and install CLIMLAB by doing this from the source code repository::
-
-    python -m pip install . --no-deps -vv
-
-
 Testing
 -------
 
@@ -216,9 +159,10 @@ To run the full set of tests on the currently installed version of CLIMLAB, you 
 
 All tests should report ``PASSED``.
 
-CLIMLAB is a mix of pure Python and compiled Fortran. If you are developing new code that does not rely on the compiled components, it is useful (and quicker) to run tests directly from the source code directory. From the ``climlab`` root directory, do the following::
+If you are developing new code, it is useful (and quicker) to run tests directly
+from the source code directory. From the ``climlab`` root directory, do the following::
 
-    pytest -v -m "not compiled"
+    pytest -v
 
 which excludes the tests marked as requiring the compiled components. Again, look for all tests to report ``PASSED``. For more details see the `pytest`_ documentation.
 
@@ -242,9 +186,9 @@ This is often the simplest way to get involved with any open source project.
     conda env create --file docs/environment.yml
     conda activate climlab-docs
 
-- Now do a "soft install" of climlab into the new environment (this is necessary for building the docs, but the fortran components do not need to be compiled)::
+- Now install climlab into the new environment (this is necessary for building the docs)::
 
-    python setup.py install
+    python -m pip install . --no-deps -vv
 
 - Finally, build the docs from the ``climlab/docs`` directory with::
 
@@ -276,3 +220,6 @@ and (optionally) delete the build environment with::
 .. _`See here for discussion`: https://www.anaconda.com/utilizing-the-new-compilers-in-anaconda-distribution-5/
 .. _`write the new test before you write the new code`: https://softwareengineering.stackexchange.com/questions/36175/what-are-the-disadvantages-of-writing-code-before-writing-unit-tests
 .. _`The Climate Laboratory`: https://brian-rose.github.io/ClimateLaboratoryBook
+.. _`climlab-rrtmg`: https://github.com/climlab/climlab-rrtmg
+.. _`climlab-cam3-radiation`: https://github.com/climlab/climlab-cam3-radiation
+.. _`climlab-emanuel-convection`: https://github.com/climlab/climlab-emanuel-convection

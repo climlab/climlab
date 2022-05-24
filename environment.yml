@@ -7,9 +7,10 @@ dependencies:
   - xarray
   - numpy
   - scipy
-  - gfortran_osx-64
-  - libgfortran
   - future
   - pytest
   - codecov
   - pytest-cov
+  - climlab-rrtmg
+  - climlab-emanuel-convection
+  - climlab-cam3-radiation

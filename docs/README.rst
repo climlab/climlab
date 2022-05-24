@@ -33,9 +33,9 @@ From the `climlab` root directory, do this::
     conda env create --file docs/environment.yml
     conda activate climlab-docs
 
-Now do a "soft install" of climlab into the new environment (this is necessary for building the docs, but the fortran components do not need to be compiled)::
+Now install climlab into the new environment (this is necessary for building the docs)::
 
-    python setup.py install
+    python -m pip install . --no-deps -vv
 
 Finally, build the docs from the `climlab/docs` directory with::
 
@@ -50,7 +50,7 @@ When you are satisfied with your changes, you can deactivate the build environme
 
 and (optionally) delete the build environment with::
 
-    conda remove -n climlab-docs --all
+    conda env remove --name climlab-docs
 
 
 Status

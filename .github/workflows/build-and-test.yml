@@ -21,13 +21,13 @@ jobs:
         os: [Ubuntu, macOS, Windows]
         include:
           - os: Ubuntu
-            environment-file: ci/requirements-linux.yml
+            environment-file: environment.yml
             shell: bash -l {0}
           - os: macOS
-            environment-file: ci/requirements-macos.yml
+            environment-file: environment.yml
             shell: bash -l {0}
           - os: Windows
-            environment-file: ci/requirements-windows.yml
+            environment-file: environment.yml
             shell: powershell
 
     steps:
@@ -40,10 +40,6 @@ jobs:
           channel-priority: strict
           environment-file: ${{ matrix.environment-file }}
 
-      - name: Setup Fortran compiler for Windows
-        if: ${{ matrix.os == 'Windows' }}
-        run: |
-          echo "[build]`ncompiler=mingw32" | Out-File -Encoding ASCII ~/pydistutils.cfg
       - name: Build and install climlab
         run: |
           python -m pip install --no-deps --editable .

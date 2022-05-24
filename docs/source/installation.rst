@@ -25,29 +25,28 @@ Binaries are available for OSX, Linux, and Windows.
 Installing from source
 ----------------------
 
-*This will only work if you have a properly configured Fortran compiler installed and available.*
-
 You can clone the source code repository with::
 
     git clone https://github.com/brian-rose/climlab.git
 
-and, if your system is properly configured *(it probably isn't right out of the box)*,
-from the ``climlab`` directory, do::
+and from the ``climlab`` directory, do::
 
     python -m pip install . --no-deps -vv
 
-Please see :ref:`Contributing to CLIMLAB` for details about how to set up a working build environment and building from source.
+Please see :ref:`Contributing to CLIMLAB` for more details.
 
-Installing from source without a Fortran compiler
--------------------------------------------------
+About the compiled Fortran components
+--------------------------------------------------
 
-Many parts of CLIMLAB are written in pure Python and should work on any system. Fortran builds are necessary for the Emanuel convection scheme and the RRTMG and CAM3 radiation schemes.
+Climlab itself is pure Python and should work on any system.
+As of version 0.8.0, all the Fortran code has been moved into external companion
+packages `climlab-rrtmg`_, `climlab-cam3-radiation`_, and `climlab-emanuel-convection`_.
 
-If you obtain the source code repository and do this from the repository root::
+If you install climlab via conda-forge, these pre-compiled dependencies will be
+installed automatically.
 
-    python setup.py install
-
-You should then find that you can still::
+It is possible to install and run climlab without the compiled dependencies.
+In this case you should then find that you can still::
 
     import climlab
 
@@ -56,7 +55,9 @@ and use most of the package. You will see warning messages about the missing com
 .. _conda: https://conda.io/docs/
 .. _`Anaconda Python`: https://www.continuum.io/downloads
 .. _`pypi repository`: https://pypi.python.org
-
+.. _`climlab-rrtmg`: https://github.com/climlab/climlab-rrtmg
+.. _`climlab-cam3-radiation`: https://github.com/climlab/climlab-cam3-radiation
+.. _`climlab-emanuel-convection`: https://github.com/climlab/climlab-emanuel-convection
 
 
 
