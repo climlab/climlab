@@ -316,7 +316,7 @@ See the accompanying LICENSE file.
    :target: https://doi.org/10.21105/joss.00659
 .. |pypi| image:: https://badge.fury.io/py/climlab.svg
    :target: https://badge.fury.io/py/climlab
-.. |Build Status| image:: https://github.com/climlab/climlab/actions/workflows/build-and-test.yaml/badge.svg
+.. |Build Status| image:: https://github.com/climlab/climlab/actions/workflows/build-and-test.yml/badge.svg
     :target: https://github.com/climlab/climlab/actions/workflows/build-and-test.yml
 .. |coverage| image:: https://codecov.io/github/climlab/climlab/coverage.svg?branch=main
    :target: https://codecov.io/github/climlab/climlab?branch=main
