@@ -27,7 +27,7 @@ Installing from source
 
 You can clone the source code repository with::
 
-    git clone https://github.com/brian-rose/climlab.git
+    git clone https://github.com/climlab/climlab.git
 
 and from the ``climlab`` directory, do::
 
@@ -66,8 +66,8 @@ Source Code
 
 Stables releases as well as the current development version can be found on github:
 
-  * `Stable Releases <https://github.com/brian-rose/climlab/releases>`_
-  * `Development Version <https://github.com/brian-rose/climlab>`_
+  * `Stable Releases <https://github.com/climlab/climlab/releases>`_
+  * `Development Version <https://github.com/climlab/climlab>`_
 
 
 Dependencies

@@ -11,7 +11,7 @@ The lead developer and maintainer of `climlab` is
 	| brose@albany.edu
 
 Community contributions are very welcome!
-Bugs can be reported through the `issue tracker <https://github.com/brian-rose/climlab/issues>`_ on github.
+Bugs can be reported through the `issue tracker <https://github.com/climlab/climlab/issues>`_ on github.
 
 
 The documentation was originally created by **Moritz Kreuzer**, Potsdam Institut for Climate Impact Research (PIK).

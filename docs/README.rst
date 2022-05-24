@@ -18,7 +18,7 @@ Authors
 
 About
 -----
-Sphinx-based documentation for the `climlab` (https://github.com/brian-rose/climlab) package.
+Sphinx-based documentation for the `climlab` (https://github.com/climlab/climlab) package.
 
 The latest rendered version is always available online at `http://climlab.readthedocs.io`
 
@@ -60,4 +60,4 @@ focussing specifically on the EBM (energy balance model) code.
 
 We are gradually expanding and updating the documentation to reflect the full capabilities of `climlab`.
 It is a work-in-progress, and contributions to the documentation
-as pull requests on `github <https://github.com/brian-rose/climlab>`_ are very welcome.
+as pull requests on `github <https://github.com/climlab/climlab>`_ are very welcome.

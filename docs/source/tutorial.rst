@@ -13,7 +13,7 @@ For a more comprehensive set of climlab usage examples embedded within lecture n
 see Brian's online textbook `The Climate Laboratory <https://brian-rose.github.io/ClimateLaboratoryBook/>`_.
 
 If you want to run the code yourself, these notes are all available as Jupyter *.ipynb files
-in the ``docs/source/courseware`` directory of the `climlab source <https://github.com/brian-rose/climlab>`_.
+in the ``docs/source/courseware`` directory of the `climlab source <https://github.com/climlab/climlab>`_.
 
 .. toctree::
    :titlesonly:

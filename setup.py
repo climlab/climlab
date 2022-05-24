@@ -25,7 +25,7 @@ setuptools.setup(
       'Topic :: Scientific/Engineering :: Atmospheric Science',
     ],
     keywords='climate modeling modelling model ebm radiation radiative-convective earth',
-    url='http://github.com/brian-rose/climlab',
+    url='http://github.com/climlab/climlab',
     author='Brian E. J. Rose',
     author_email='brose@albany.edu',
     setup_requires=['numpy'],
