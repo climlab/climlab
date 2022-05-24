@@ -60,7 +60,6 @@ and use most of the package. You will see warning messages about the missing com
 .. _`climlab-emanuel-convection`: https://github.com/climlab/climlab-emanuel-convection
 
 
-
 Source Code
 =============
 
