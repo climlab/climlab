@@ -7,8 +7,12 @@ Nevertheless also the underlying code of the ``climlab`` architecture
 has been documented for a comprehensive understanding and traceability.
 '''
 # Version number is declared in setup.py
-from importlib import metadata
-__version__ = metadata.version(__name__)
+try:
+    from importlib import metadata
+    __version__ = metadata.version(__name__)
+except ImportError:  # for Python < 3.8, importlib.metadata will not work
+    from pkg_resources import get_distribution
+    __version__ = get_distribution(__name__).version
 
 # this should ensure that we can still import constants.py as climlab.constants
 from .utils import constants, thermo, legendre
