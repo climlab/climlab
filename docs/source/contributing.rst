@@ -26,7 +26,7 @@ For publications, please cite the `CLIMLAB description paper in JOSS`_. The full
 Reporting bugs, issues, new feature requests, and documentation problems
 ------------------------------------------------------------------------
 
-These can all be raised as new issues at <https://github.com/brian-rose/climlab/issues>
+These can all be raised as new issues at <https://github.com/climlab/climlab/issues>
 
 If you are reporting a bug, try to include:
 
@@ -46,10 +46,10 @@ Although CLIMLAB is offered to the community "as-is", we are very interested in
 helping people actually use it for scientific purposes.
 
 Have a question about how to do something with CLIMLAB? First, make sure you've
-perused the documentation_ and the issue tracker at <https://github.com/brian-rose/climlab/issues>.
+perused the documentation_ and the issue tracker at <https://github.com/climlab/climlab/issues>.
 Also look through published examples including the online book `The Climate Laboratory`_.
 
-Then, feel free to ask questions by opening a new issue at <https://github.com/brian-rose/climlab/issues>.
+Then, feel free to ask questions by opening a new issue at <https://github.com/climlab/climlab/issues>.
 This requires a free github account but is the best way to engage the community for answers.
 We will do our best to respond. If the functionality you're looking for doesn't
 yet exist, we'll probably encourage you to get involved in developing the next big feature.
@@ -59,13 +59,13 @@ Contributing bug fixes and new features
 ---------------------------------------
 
 We are thrilled to have any and all help.
-You may want to browse through <https://github.com/brian-rose/climlab/issues>
+You may want to browse through <https://github.com/climlab/climlab/issues>
 to see if there is any low-hanging fruit already identified.
 
 Contributions will happen through Pull Requests on github.
 You will need a free github account. Here's how to get started:
 
-1. Follow `these instructions`_ to fork the CLIMLAB repo at <https://github.com/brian-rose/climlab>,
+1. Follow `these instructions`_ to fork the CLIMLAB repo at <https://github.com/climlab/climlab>,
 clone it on your local machine, and keep your local main branch synced with the main repo.
 
 2. Don't make any commits on your local main branch. Instead open a feature branch for every new development task::
@@ -212,7 +212,7 @@ and (optionally) delete the build environment with::
 .. _`Contact page`: contact.html
 .. _ReStructuredText: http://docutils.sourceforge.net/docs/user/rst/quickstart.html
 .. _`these instructions`: https://help.github.com/articles/fork-a-repo/
-.. _`open issue on the CLIMLAB github page`: https://github.com/brian-rose/climlab/issues/68
+.. _`open issue on the CLIMLAB github page`: https://github.com/climlab/climlab/issues/68
 .. _documentation: http://climlab.readthedocs.io
 .. _`pull request`: https://help.github.com/articles/about-pull-requests/
 .. _`numpy.f2py`: https://numpy.org/doc/stable/f2py/

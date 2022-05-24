@@ -42,13 +42,13 @@ test:
     - codecov
 
 about:
-  home: https://github.com/brian-rose/climlab
+  home: https://github.com/climlab/climlab
   license: MIT
   license_family: MIT
   license_file: LICENSE
   summary: Python package for process-oriented climate modeling
   doc_url: http://climlab.readthedocs.io/
-  dev_url: https://github.com/brian-rose/climlab
+  dev_url: https://github.com/climlab/climlab
 
 extra:
   recipe-maintainers:

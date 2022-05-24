@@ -1,6 +1,6 @@
-================
+=======
 climlab
-================
+=======
 
 |docs| |JOSS| |DOI| |pypi| |Build Status| |coverage|
 
@@ -9,7 +9,7 @@ climlab
 -----------------------------------------------------
 
 Author
---------------
+------
 | **Brian E. J. Rose**
 | Department of Atmospheric and Environmental Sciences
 | University at Albany
@@ -84,8 +84,8 @@ Links
 -----
 
 -  HTML documentation: http://climlab.readthedocs.io/en/latest/intro.html
--  Issue tracker: http://github.com/brian-rose/climlab/issues
--  Source code: http://github.com/brian-rose/climlab
+-  Issue tracker: http://github.com/climlab/climlab/issues
+-  Source code: http://github.com/climlab/climlab
 -  JOSS meta-paper: https://doi.org/10.21105/joss.00659
 
 
@@ -136,6 +136,8 @@ Version 0.8.0 (released May 2022)
     Climlab is now (once again!) a pure Python package.
     Builds of these helper packages are available through conda-forge and will be
     automatically installed as dependencies by conda / mamba.
+
+    The climlab source repo also moved to https://github.com/climlab/climlab
 
     There should be no breaking changes to the user-facing API.
 
@@ -243,7 +245,7 @@ Version 0.6.0 (released December 2017)
     Provides full Python 3 compatibility, updated documentation, and minor enhancements and bug fixes.
 
 Version 0.5.5 (released early April 2017)
-    Finally provides easy binary distrbution with conda_
+    Finally provides easy binary distribution with conda_
 
 Version 0.5.2 (released late March 2017)
     Many under-the-hood improvements to the build procedure,
@@ -302,8 +304,7 @@ The documentation_ was first created by Moritz Kreuzer
 Contact and Bug Reports
 -----------------------
 Users are strongly encouraged to submit bug reports and feature requests on
-github at
-https://github.com/brian-rose/climlab
+github at https://github.com/climlab/climlab
 
 
 License
@@ -315,10 +316,10 @@ See the accompanying LICENSE file.
    :target: https://doi.org/10.21105/joss.00659
 .. |pypi| image:: https://badge.fury.io/py/climlab.svg
    :target: https://badge.fury.io/py/climlab
-.. |Build Status| image:: https://github.com/brian-rose/minimalf2py/actions/workflows/build-and-test.yaml/badge.svg
-    :target: https://github.com/brian-rose/climlab/actions/workflows/build-and-test.yml
-.. |coverage| image:: https://codecov.io/github/brian-rose/climlab/coverage.svg?branch=main
-   :target: https://codecov.io/github/brian-rose/climlab?branch=main
+.. |Build Status| image:: https://github.com/climlab/climlab/actions/workflows/build-and-test.yaml/badge.svg
+    :target: https://github.com/climlab/climlab/actions/workflows/build-and-test.yml
+.. |coverage| image:: https://codecov.io/github/climlab/climlab/coverage.svg?branch=main
+   :target: https://codecov.io/github/climlab/climlab?branch=main
 .. |DOI| image:: https://zenodo.org/badge/24968065.svg
    :target: https://zenodo.org/badge/latestdoi/24968065
 .. |docs| image:: http://readthedocs.org/projects/climlab/badge/?version=latest
