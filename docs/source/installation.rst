@@ -5,6 +5,7 @@ Installation
 
 Installing pre-built binaries with conda (Mac OSX, Linux, and Windows)
 ----------------------------------------------------------------------
+
 By far the simplest and recommended way to install ``climlab`` is using conda_
 (which is the wonderful package manager that comes with `Anaconda Python`_).
 
@@ -21,6 +22,25 @@ and then simply do::
     conda install climlab
 
 Binaries are available for OSX, Linux, and Windows.
+
+Installing into a self-contained conda environment
+--------------------------------------------------
+
+To avoid issues with package conflicts, it's often best to work in self-contained environments.
+This example installs climlab and jupyter along with all their dependencies in a fresh environment::
+
+    conda create --name climlab-test --channel conda-forge climlab jupyter
+    conda activate climlab-test
+
+Installing on Google Colab
+--------------------------
+
+The following code will install climlab and its dependencies on `Google Colab`_::
+
+    !pip install -q condacolab
+    import condacolab
+    condacolab.install()
+    !conda install -c conda-forge climlab
 
 Installing from source
 ----------------------
@@ -58,7 +78,7 @@ and use most of the package. You will see warning messages about the missing com
 .. _`climlab-rrtmg`: https://github.com/climlab/climlab-rrtmg
 .. _`climlab-cam3-radiation`: https://github.com/climlab/climlab-cam3-radiation
 .. _`climlab-emanuel-convection`: https://github.com/climlab/climlab-emanuel-convection
-
+.. _`Google Colab`: https://colab.research.google.com
 
 Source Code
 =============
