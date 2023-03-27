@@ -78,7 +78,7 @@ and use most of the package. You will see warning messages about the missing com
 .. _`climlab-rrtmg`: https://github.com/climlab/climlab-rrtmg
 .. _`climlab-cam3-radiation`: https://github.com/climlab/climlab-cam3-radiation
 .. _`climlab-emanuel-convection`: https://github.com/climlab/climlab-emanuel-convection
-.. _`Google Colab`: https://colab.google.com
+.. _`Google Colab`: https://colab.research.google.com
 
 Source Code
 =============
