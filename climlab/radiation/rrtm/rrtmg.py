@@ -134,6 +134,9 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
         # we need to convert insolation into _insolation so:
         # (we define getters and setters for this at the end)
         self._insolation = self.insolation
+        
+        # we repeat the above work to fix this issue for coszen
+        self._coszen = self.coszen
 
         LW = RRTMG_LW(absorber_vmr = self.absorber_vmr,
                      cldfrac = self.cldfrac,
@@ -225,3 +228,15 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
         # propagate to 'SW'
         if 'SW' in self.subprocess:
             self.subprocess['SW'].insolation = x
+            
+    @property
+    def coszen(self):
+        return self._coszen
+    
+    @coszen.setter
+    def coszen(self, x):
+        self._coszen = x
+        # propagate to 'SW'
+        if 'SW' in self.subprocess:
+            self.subprocess['SW'].coszen = x
+            

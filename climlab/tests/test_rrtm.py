@@ -207,3 +207,12 @@ def test_sw_insol_propagate():
     rad.insolation *= 1.01
     assert rad.insolation == rad.subprocess['SW'].insolation
 
+@pytest.mark.compiled
+@pytest.mark.fast
+def test_coszen_insol_propagate():
+    state = climlab.column_state()
+    rad = climlab.radiation.RRTMG(state=state)
+    assert rad.coszen == rad.subprocess['SW'].coszen
+    rad.coszen *= 1.01
+    assert rad.coszen == rad.subprocess['SW'].coszen
+    
