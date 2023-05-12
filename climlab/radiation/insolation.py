@@ -559,5 +559,10 @@ class DailyInsolation(AnnualMeanInsolation):
             #  NOTE this is a clunky hack and all this will go away
             #  when we use xarray structures for these internals
             insolation = np.tile(insolation[...,np.newaxis], dom.axes['lon'].num_points)
+            # this factor should make the insolation vary by longitude in accordance with day-night cycle
+            lon_f = np.maximum(np.cos(np.deg2rad(self.lon) + 
+                2 * np.pi * np.fmod(self.time['days_elapsed'], 1.0)), 0)
+            # apply factor
+            insolation = insolation * lon_f
         self.insolation[:] = Field(insolation, domain=dom)
         self.coszen[:] = self._coszen_from_insolation()
