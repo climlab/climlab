@@ -131,6 +131,10 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
             if item in kwargs:
                 ignored = kwargs.pop(item)
 
+        # we need to convert insolation into _insolation so:
+        # (we define getters and setters for this at the end)
+        self._insolation = self.insolation
+
         LW = RRTMG_LW(absorber_vmr = self.absorber_vmr,
                      cldfrac = self.cldfrac,
                      clwp = self.clwp,
@@ -210,3 +214,14 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
         self.add_input('indsolvar', indsolvar)
         self.add_input('bndsolvar', bndsolvar)
         self.add_input('solcycfrac', solcycfrac)
+    
+    @property
+    def insolation(self):
+        return self._insolation
+    
+    @insolation.setter
+    def insolation(self, x):
+        self._insolation = x
+        # propagate to 'SW'
+        if 'SW' in self.subprocess:
+            self.subprocess['SW'].insolation = x
