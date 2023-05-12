@@ -12,7 +12,7 @@ class ZonalMoistDiffusion(ZonalHeatDiffusion):
         self._update_diffusivity()
 
     def _update_diffusivity(self):
-        Tinterp = np.interp(self.lat_bounds, self.lat, np.squeeze(self.Ts))
+        Tinterp = np.interp(self.lon_bounds, self.lon, np.squeeze(self.Ts))
         Tkelvin = Tinterp + const.tempCtoK
         f = moist_amplification_factor(Tkelvin, self.relative_humidity)
         heat_capacity = self.Ts.domain.heat_capacity

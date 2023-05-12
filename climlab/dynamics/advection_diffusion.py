@@ -111,8 +111,12 @@ class AdvectionDiffusion(ImplicitProcess):
                  diffusion_axis=None,
                  use_banded_solver=False,
                  prescribed_flux=0.,
+                 is_periodic=False,
                  **kwargs):
         super(AdvectionDiffusion, self).__init__(**kwargs)
+        if is_periodic:
+            self.use_banded_solver = False # cant mix and match
+        self.is_periodic = is_periodic
         self.use_banded_solver = use_banded_solver
         if diffusion_axis is None:   # diffusion axis is also advection axis!
             self.diffusion_axis = _guess_diffusion_axis(self)
@@ -184,7 +188,7 @@ class AdvectionDiffusion(ImplicitProcess):
             Uarray = 0.*Karray
         self._advdiffTriDiag = adv_diff_numerics.advdiff_tridiag(X=self._Xcenter,
             Xb=self._Xbounds, K=Karray, U=Uarray, W=self._weight_center, Wb=self._weight_bounds,
-            use_banded_solver=self.use_banded_solver)
+            use_banded_solver=self.use_banded_solver, periodic=self.is_periodic)
 
     def _implicit_solver(self):
         newstate = {}
