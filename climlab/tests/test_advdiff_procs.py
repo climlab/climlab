@@ -2,7 +2,7 @@ from __future__ import division
 import numpy as np
 import climlab
 import pytest
-
+from climlab import constants as const
 def test_zonal_meridional_ebm_eq():
     # create control model
     ctrls2 = climlab.surface_state(num_lat=40, num_lon=40, water_depth=2.5)
