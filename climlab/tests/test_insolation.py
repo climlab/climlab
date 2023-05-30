@@ -24,6 +24,12 @@ def test_daily_insolation():
     Q_area_int = (np.sum(np.mean(Q, axis=1) * np.cos(np.deg2rad(lat))) /
                   np.sum(np.cos(np.deg2rad(lat))) )
     np.testing.assert_almost_equal(Q_area_int, 341.384184481)
+    
+def test_instant_insolation():
+    days = np.linspace(0.5, 1.5, 1000)
+    Q    = climlab.solar.insolation.daily_insolation(0.0, 1.5); Q
+    Qs   = climlab.solar.insolation.instant_insolation(0.0, days)
+    assert all(Qs <= Q)
 
 @pytest.mark.fast
 def test_orbital_parameters():
