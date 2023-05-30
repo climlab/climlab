@@ -266,7 +266,7 @@ def instant_insolation(lat, day, lon=0, orb=const.orb_present, S0=const.S0):
     # instantaneous "coszen"
     coszen = np.sin(phi)*np.sin(delta) + np.cos(phi)*np.cos(delta)*np.cos(h)
     # Compute insolation: Berger 1978 eq (10)
-    Fsw = S0/pi*( (1+ecc*cos(lambda_long -deg2rad(long_peri)))**2 / (1-ecc**2)**2 * coszen)
+    Fsw = S0*( (1+ecc*cos(lambda_long -deg2rad(long_peri)))**2 / (1-ecc**2)**2 * coszen)
     # assert |h|<Ho
     Fsw *= (np.abs(h) < Ho)
     if not (lat_is_xarray or day_is_xarray or lon_is_xarray):

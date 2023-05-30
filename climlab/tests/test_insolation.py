@@ -28,9 +28,9 @@ def test_daily_insolation():
 @pytest.mark.fast    
 def test_instant_insolation():
     days = np.linspace(0.5, 1.5, 1000)
-    Q    = climlab.solar.insolation.daily_insolation(0.0, 1.5); Q
+    Q    = climlab.solar.insolation.daily_insolation(0.0, 1.0)
     Qs   = climlab.solar.insolation.instant_insolation(0.0, days)
-    assert all(Qs <= Q)
+    assert ((Qs.mean() - Q) / Q * 100.0) < 0.2 # maximum 0.2% error
 
 @pytest.mark.fast
 def test_orbital_parameters():
