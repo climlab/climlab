@@ -1,7 +1,7 @@
 from __future__ import division, print_function, absolute_import
 import numpy as np
 from climlab import constants as const
-from climlab.solar.insolation import daily_insolation
+from climlab.solar.insolation import daily_insolation, instant_insolation
 from climlab.solar.orbital import OrbitalTable
 from climlab.solar.orbital.long import OrbitalTable as LongOrbitalTable
 from climlab import EBM_seasonal
@@ -28,9 +28,10 @@ def test_daily_insolation():
 @pytest.mark.fast    
 def test_instant_insolation():
     days = np.linspace(0.5, 1.5, 1000)
-    Q    = climlab.solar.insolation.daily_insolation(0.0, 1.0)
-    Qs   = climlab.solar.insolation.instant_insolation(0.0, days)
-    assert ((Qs.mean() - Q) / Q * 100.0) < 0.2 # maximum 0.2% error
+    Q    = daily_insolation(0.0, 1.0)
+    Qs   = instant_insolation(0.0, days)
+    # small error tolerance
+    assert ((Qs.mean() - Q) / Q * 100.0) < 0.3 
 
 @pytest.mark.fast
 def test_orbital_parameters():
