@@ -95,7 +95,15 @@ class MeridionalHeatDiffusion(MeridionalDiffusion):
         for varname, value in self.state.items():
             heat_capacity = value.domain.heat_capacity
         coslat_bounds = np.moveaxis(self._weight_bounds,-1,self.diffusion_axis_index)
+        if (not np.isscalar(heat_capacity)) and (len(heat_capacity.shape) > 2):
+            # downsample along necessary axis
+            heat_capacity = (heat_capacity[:,1:,:] + heat_capacity[:,:-1,:]) / 2
+            #heat_capacity = (heat_capacity[1:,:,:] + heat_capacity[:-1,:,:]) / 2
         self.heat_transport_meridional[:] = (self.diffusive_flux_meridional * heat_capacity *
             2 * np.pi * const.a * coslat_bounds * 1E-15) # in PW
+        if (not np.isscalar(heat_capacity)) and (len(heat_capacity.shape) > 2):
+            # downsample agian along the other axis
+            #heat_capacity = (heat_capacity[:,1:,:] + heat_capacity[:,:-1,:]) / 2
+            heat_capacity = (heat_capacity[1:,:,:] + heat_capacity[:-1,:,:]) / 2
         self.heat_transport_convergence_meridional[:] = (self.flux_convergence_meridional *
                         heat_capacity)  # in W/m**2
