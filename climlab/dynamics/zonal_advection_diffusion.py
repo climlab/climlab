@@ -15,7 +15,7 @@ class ZonalAdvectionDiffusion(AdvectionDiffusion):
                  **kwargs):
         super(ZonalAdvectionDiffusion, self).__init__(K=K, U=U,
                 diffusion_axis='lon', use_banded_solver=use_banded_solver, 
-                is_periodic=True, **kwargs)
+                is_periodic=True, diag_suffix='_zonal', **kwargs)
         # Conversion of delta from degrees (grid units) to physical length units
         lambd_stag = np.deg2rad(self.lon_bounds)
         lambd = np.deg2rad(self.lon)

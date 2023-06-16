@@ -48,7 +48,8 @@ class MeridionalAdvectionDiffusion(AdvectionDiffusion):
                  prescribed_flux=0.,
                  **kwargs):
         super(MeridionalAdvectionDiffusion, self).__init__(K=K, U=U,
-                diffusion_axis='lat', use_banded_solver=use_banded_solver, **kwargs)
+                diffusion_axis='lat', use_banded_solver=use_banded_solver, 
+                diag_suffix='_meridional', **kwargs)
         # Conversion of delta from degrees (grid units) to physical length units
         phi_stag = np.deg2rad(self.lat_bounds)
         phi = np.deg2rad(self.lat)
