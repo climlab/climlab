@@ -7,6 +7,7 @@ from __future__ import absolute_import
 from .aplusbt import AplusBT, AplusBT_CO2
 from .absorbed_shorwave import SimpleAbsorbedShortwave
 from .boltzmann import Boltzmann
+from .greygas import GreyGas, GreyGasSW
 from .insolation import FixedInsolation, P2Insolation, AnnualMeanInsolation, DailyInsolation
 from .nband import NbandRadiation, ThreeBandSW
 from .water_vapor import ManabeWaterVapor
