@@ -159,7 +159,7 @@ def daily_insolation(lat, day, orb=const.orb_present, S0=const.S0, day_type=1):
     else:
         return Fsw
 
-def instant_insolation(lat, day, lon=0, orb=const.orb_present, S0=const.S0):
+def instant_insolation(lat, day, lon=0., orb=const.orb_present, S0=const.S0):
     """Compute instantaneous insolation given latitude, longitude, time of year and orbital parameters.
 
     Orbital parameters can be interpolated to any time in the last 5 Myears with
