@@ -273,7 +273,7 @@ def to_latlon(array, domain, axis = 'lon'):
 
     """
     #  if array is latitude dependent (has the same shape as lat)
-    axis, array, depth = np.meshgrid(domain.axes[axis].points, array,
+    theaxis, array, depth = np.meshgrid(domain.axes[axis].points, array,
                                     domain.axes['depth'].points)
     if axis == 'lat':
     #  if array is longitude dependent (has the same shape as lon)
