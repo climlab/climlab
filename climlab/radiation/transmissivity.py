@@ -61,7 +61,7 @@ class Transmissivity(object):
 
     .. math::
 
-        Tdown= \\left[ \\begin{array}{cccc}
+        T_{down} = \\left[ \\begin{array}{cccc}
                                1 &               0 &       0 &  0   \\\\
                          \\tau_0 &               1 &       0 &  0   \\\\
                  \\tau_0 \\tau_1 &         \\tau_1 &       1 &  0   \\\\
@@ -74,8 +74,8 @@ class Transmissivity(object):
 
     .. math::
         
-        Edown = \\left[ \\begin{array}{c}
-            fromspace \\\\
+        E_{down} = \\left[ \\begin{array}{c}
+            \text{flux_from_space} \\\\
             E0 \\\\
             E1 \\\\
             E2 \\\\
