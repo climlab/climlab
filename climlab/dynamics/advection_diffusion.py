@@ -145,8 +145,8 @@ class AdvectionDiffusion(ImplicitProcess):
         self.U = U  # Advecting velocity in units of [length] / [time]
         # names of fluxes in case multiple advective-diffusive processes are necessary
         self.diff_flux_name = 'diffusive_flux' + diag_suffix 
-        self.total_flux_name = 'advective_flux' + diag_suffix 
-        self.adv_flux_name = 'total_flux' + diag_suffix     
+        self.total_flux_name = 'total_flux' + diag_suffix 
+        self.adv_flux_name = 'advective_flux' + diag_suffix     
         self.flux_conv_name = 'flux_convergence' + diag_suffix     
         self.add_diagnostic(self.diff_flux_name,
             np.moveaxis(0.*self.K*self._weight_bounds,-1,self.diffusion_axis_index))
