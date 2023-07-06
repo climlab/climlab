@@ -17,7 +17,7 @@ climlab.radiation
    climlab.radiation.AplusBT
    climlab.radiation.Boltzmann
    climlab.radiation.CAM3
-   climlab.radiation.GreyGas
+   climlab.radiation.greygas
    climlab.radiation.insolation
    climlab.radiation.nband
    climlab.radiation.Radiation

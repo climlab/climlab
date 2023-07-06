@@ -197,3 +197,22 @@ def test_large_grid():
     assert np.all(np.abs(rad3.OLR - rad3.OLR_spectral.sum(axis=-1))<0.1)
     #  Test the xarray interface
     to_xarray(rad3)
+    
+@pytest.mark.compiled
+@pytest.mark.fast
+def test_sw_insol_propagate():
+    state = climlab.column_state()
+    rad = climlab.radiation.RRTMG(state=state)
+    assert rad.insolation == rad.subprocess['SW'].insolation
+    rad.insolation *= 1.01
+    assert rad.insolation == rad.subprocess['SW'].insolation
+
+@pytest.mark.compiled
+@pytest.mark.fast
+def test_coszen_insol_propagate():
+    state = climlab.column_state()
+    rad = climlab.radiation.RRTMG(state=state)
+    assert rad.coszen == rad.subprocess['SW'].coszen
+    rad.coszen *= 1.01
+    assert rad.coszen == rad.subprocess['SW'].coszen
+    
