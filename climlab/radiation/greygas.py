@@ -11,7 +11,7 @@ class GreyGas(EnergyBudget):
     including grey and semi-grey model.
 
     Input argument absorptivity is band absorptivity
-    (should same size as grid).
+    (should be same size as the grid).
 
     By default emissivity = absorptivity.
     Subclasses can override this is necessary (e.g. for shortwave model).

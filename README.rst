@@ -96,7 +96,7 @@ These are handled automatically if you install with conda_.
 
 Required
 ~~~~~~~~~~~~
-- Python (currently testing on versions 3.7, 3.8, 3.9, 3.10)
+- Python (currently testing on versions 3.8, 3.9, 3.10, 3.11)
 - numpy
 - scipy
 - future
