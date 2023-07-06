@@ -96,7 +96,7 @@ class Transmissivity(object):
             E0 \\\\
             E1 \\\\
             E2 \\\\
-            emit_sfc + albedo_sfc * D[-1]
+            emit_{sfc} + albedo_{sfc} * D[-1]
         \\end{array} \\right]
 
     So that the upwelling flux is
