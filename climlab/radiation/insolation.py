@@ -23,7 +23,7 @@ from climlab.domain.field import Field
 from climlab.domain.field import to_latlon
 from climlab.utils.legendre import P2
 from climlab import constants as const
-from climlab.solar.insolation import daily_insolation
+from climlab.solar.insolation import daily_insolation, instant_insolation
 
 # REVISE TO MAKE ALL OF THESE CALLABLE WITH NO ARGUMENTS.
 # SET SOME SENSIBLE DEFAULTS FOR DOMAINS
@@ -561,3 +561,126 @@ class DailyInsolation(AnnualMeanInsolation):
             insolation = np.tile(insolation[...,np.newaxis], dom.axes['lon'].num_points)
         self.insolation[:] = Field(insolation, domain=dom)
         self.coszen[:] = self._coszen_from_insolation()
+        
+class InstantInsolation(AnnualMeanInsolation):
+    """A class to compute latitudewise instantaneous solar insolation for specific
+    days of the year.
+
+    This class computes the solar insolation on basis of orbital parameters and
+    astronomical formulas.
+
+    Therefore it uses the method :func:`~climlab.solar.insolation.instant_insolation`.
+    For details how the solar distribution is dependend on orbital parameters
+    see there.
+
+    **Initialization parameters** \n
+
+    :param float S0:    solar constant                              \n
+                        - unit: :math:`\\frac{\\textrm{W}}{\\textrm{m}^2}`   \n
+                        - default value: ``1365.2``
+
+    :param dict orb:    a dictionary with orbital parameters:
+
+                        * ``'ecc'`` - eccentricity
+
+                            * unit: dimensionless
+                            * default value: ``0.017236``
+
+                        * ``'long_peri'`` - longitude of perihelion (precession angle)
+
+                            * unit: degrees
+                            * default value: ``281.37``
+
+                        * ``'obliquity'`` - obliquity angle
+
+                            * unit: degrees
+                            * default value: ``23.446``
+
+    **Object attributes** \n
+
+    Additional to the parent class :class:`~climlab.radiation.insolation._Insolation`
+    following object attributes are generated and updated during initialization:
+
+    :ivar insolation:       Current insolation in W/m2
+    :vartype insolation:    Field
+
+    :ivar coszen:           Cosine of the current solar zenith angle
+    :vartype coszen:    Field
+
+    :ivar dict orb:         initialized with given argument ``orb``
+
+
+    :Example:
+
+        Create regular EBM and replace standard insolation subprocess by
+        :class:`~climlab.radation.DailyInsolation`::
+
+            >>> import climlab
+            >>> from climlab.radiation import InstantInsolation
+
+            >>> # model creation
+            >>> model = climlab.EBM()
+
+            >>> print model
+
+        .. code-block:: none
+            :emphasize-lines: 12
+
+            climlab Process of type <class 'climlab.model.ebm.EBM'>.
+            State variables and domain shapes:
+              Ts: (90, 1)
+            The subprocess tree:
+            top: <class 'climlab.model.ebm.EBM'>
+               diffusion: <class 'climlab.dynamics.diffusion.MeridionalDiffusion'>
+               LW: <class 'climlab.radiation.AplusBT.AplusBT'>
+               albedo: <class 'climlab.surface.albedo.StepFunctionAlbedo'>
+                  iceline: <class 'climlab.surface.albedo.Iceline'>
+                  cold_albedo: <class 'climlab.surface.albedo.ConstantAlbedo'>
+                  warm_albedo: <class 'climlab.surface.albedo.P2Albedo'>
+               insolation: <class 'climlab.radiation.insolation.P2Insolation'>
+
+        ::
+
+            >>> # catch model domain for subprocess creation
+            >>> sfc = model.domains['Ts']
+
+            >>> # create InstantInsolation subprocess and add it to the model
+            >>> model.add_subprocess('insolation',InstantInsolation(domains=sfc, **model.param))
+
+            >>> print model
+
+        .. code-block:: none
+            :emphasize-lines: 12
+
+            climlab Process of type <class 'climlab.model.ebm.EBM'>.
+            State variables and domain shapes:
+              Ts: (90, 1)
+            The subprocess tree:
+            top: <class 'climlab.model.ebm.EBM'>
+               diffusion: <class 'climlab.dynamics.diffusion.MeridionalDiffusion'>
+               LW: <class 'climlab.radiation.AplusBT.AplusBT'>
+               albedo: <class 'climlab.surface.albedo.StepFunctionAlbedo'>
+                  iceline: <class 'climlab.surface.albedo.Iceline'>
+                  cold_albedo: <class 'climlab.surface.albedo.ConstantAlbedo'>
+                  warm_albedo: <class 'climlab.surface.albedo.P2Albedo'>
+               insolation: <class 'climlab.radiation.insolation.InstantInsolation'>
+
+    """
+
+    def _compute_fixed(self):
+        try:
+            self.insolation_array = self._daily_insolation_array()
+        except AttributeError:
+            pass
+
+    def _get_current_insolation(self):
+        # make sure that the diagnostic has the correct field dimensions.
+        dom = self.domains['default']
+        lon = 0
+        if 'lon' in dom.axes:
+            lon = self.lon
+        insolation = instant_insolation(self.lat, self.time['days_elapsed'], 
+            lon=lon, orb=self.orb, S0=self.S0)
+        self.insolation[:] = Field(insolation, domain=dom)
+        self.coszen[:] = self._coszen_from_insolation()
+                
