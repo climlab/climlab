@@ -27,11 +27,13 @@ def test_daily_insolation():
 
 @pytest.mark.fast    
 def test_instant_insolation():
-    days = np.linspace(0.5, 1.5, 1000)
-    Q    = daily_insolation(0.0, 1.0)
-    Qs   = instant_insolation(0.0, days)
-    # small error tolerance
-    assert ((Qs.mean() - Q) / Q * 100.0) < 0.3 
+    lats = np.linspace(-90., 90., 181)
+    days = np.arange(0.5, 1.5, 0.001)
+    Q    = daily_insolation(lats, 1.0)
+    Qs   = instant_insolation(lats, days)
+    # small error tolerance (in W/m2)
+    error = np.abs(Qs.mean(dim='day') - Q)
+    assert np.all(error < 0.01)
 
 @pytest.mark.fast
 def test_orbital_parameters():
