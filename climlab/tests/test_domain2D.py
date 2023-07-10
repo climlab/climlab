@@ -70,7 +70,7 @@ def test_diurnal_cycle():
 
     state_daily = climlab.surface_state(num_lat=num_lat, 
                               water_depth=0.5)
-    deltat_daily = 3600.*24.
+    deltat_daily = 3600.*12. # 12 hour timestep
     olr_daily = climlab.radiation.AplusBT(name='OLR (daily)', 
                                     state=state_daily, 
                                     timestep=deltat_daily)
@@ -88,8 +88,14 @@ def test_diurnal_cycle():
     # zonal average diurnally-varying insolation should match daily mean insolation
     assert np.allclose(ebm.ASR.mean(axis=1), ebm_daily.ASR)
 
-    # Now we will check to see if the average ASR over one day at each point in longitude
+    # Now we will check to see if the average ASR over one day and all longitudes
     # is equal to ASR over a single one-day step in the daily insolation model
-    for model in [ebm, ebm_daily]:
-        model.integrate_days(1)
-    assert np.allclose(ebm.ti)  # how do we access the time mean again?
+
+    # advance the daily model forward by half a day to align the calendars
+    ebm_daily.step_forward()
+    # and recalculate the diagnostics at the updated time
+    ebm_daily.compute_diagnostics()
+    # Now do one full day for the diurnal model
+    ebm.integrate_days(1.)
+    # Results should match within a small absolute tolerance in W/m2.
+    assert np.allclose(ebm.timeave['ASR'].mean(axis=1), ebm_daily.ASR, atol=0.05)
