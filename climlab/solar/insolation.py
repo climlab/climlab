@@ -323,7 +323,6 @@ def _standardize_inputs(lat, day, orb, lon=None):
             lon = xr.DataArray(lon, coords=[lon], dims=['lon'])
         input_is_xarray = input_is_xarray or lon_is_xarray
         lam = deg2rad(lon)
-        print(lam)
         return phi, day, ecc, long_peri, obliquity, input_is_xarray, lam
     else:
         return phi, day, ecc, long_peri, obliquity, input_is_xarray, lon
