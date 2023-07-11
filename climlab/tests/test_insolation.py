@@ -1,7 +1,7 @@
 from __future__ import division, print_function, absolute_import
 import numpy as np
 from climlab import constants as const
-from climlab.solar.insolation import daily_insolation, instant_insolation
+from climlab.solar.insolation import daily_insolation, instant_insolation, solar_longitude
 from climlab.solar.orbital import OrbitalTable
 from climlab.solar.orbital.long import OrbitalTable as LongOrbitalTable
 from climlab import EBM_seasonal
@@ -24,6 +24,14 @@ def test_daily_insolation():
     Q_area_int = (np.sum(np.mean(Q, axis=1) * np.cos(np.deg2rad(lat))) /
                   np.sum(np.cos(np.deg2rad(lat))) )
     np.testing.assert_almost_equal(Q_area_int, 341.384184481)
+
+@pytest.mark.fast
+def test_solar_longitude():
+    lat = np.linspace(-90., 90., 500)
+    days = np.linspace(0, const.days_per_year, 365)
+    Q1 = daily_insolation(lat, days, day_type=1)
+    Q2 = daily_insolation(lat, solar_longitude(days), day_type=2)
+    np.testing.assert_allclose(Q1, Q2)
 
 @pytest.mark.fast    
 def test_instant_insolation():
