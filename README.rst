@@ -130,6 +130,13 @@ These are self-describing, and should run out-of-the-box once the package is ins
 Release history
 ----------------------
 
+Version 0.8.2 (released November 2023)
+    New feature: process class `climlab.radiation.InstantInsolation()` which correctly interprets longitude, respects local solar time and calculates hour angle. 
+    A utility function `climlab.solar.insolation.instant_insolation()` is also available, with usage mirroring the existing `climlab.solar.insolation.daily_insolation()`.
+    Thanks to `@HenryDane <https://github.com/HenryDane>`_ for this contribution!
+
+    This release also includes numerous bug fixes, updates for Python 3.11, and improvements to documentation and CI builds.
+
 Version 0.8.1 (released May 2022)
     A major refactor of the internals: all the Fortran code has been moved into external companion
     packages `climlab-rrtmg`_, `climlab-cam3-radiation`_, and `climlab-emanuel-convection`_.
