@@ -53,15 +53,22 @@ class RRTMG_LW(_Radiation_LW):
         self.add_input('tauaer', tauaer)
         self.add_input('return_spectral_olr', return_spectral_olr)
 
+        wavenum_ax = Axis(axis_type='abstract', bounds=wavenum_bounds)
+        full_spectral_axes = {**self.Tatm.domain.axes, 'wavenumber': wavenum_ax}
+        full_spectral_domain = domain._Domain(axes=full_spectral_axes)
+        self.tauaer = Field(self.tauaer * (np.ones((nbndlw,1)) * self.Tatm[np.newaxis, ...]), 
+                            domain=full_spectral_domain)
+        # self.tauc = np.ones_like(self.tauaer) * self.tauc
+
         # Spectrally-decomposed OLR
         if self.return_spectral_olr:
             # Adjust output flag
             self._ispec = 1  # Spectral OLR output flag, 0: only calculate total fluxes, 1: also return spectral OLR
             # set up appropriately sized Field object to store the spectral OLR diagnostic
-            wavenum_ax = Axis(axis_type='abstract', bounds=wavenum_bounds)
             spectral_axes = {**self.OLR.domain.axes, 'wavenumber': wavenum_ax}
             spectral_domain = domain._Domain(axes=spectral_axes)
             #  HACK need to reorder axes in the domain object
+            ###  I think we want to change this. Should be consistent with dimension ordering for tauaer and other spectrally resolved fields
             shape = list(self.OLR.shape)
             shape.append(wavenum_ax.num_points)
             spectral_domain.shape = tuple(shape)
@@ -96,9 +103,17 @@ class RRTMG_LW(_Radiation_LW):
         #  broadcast to get [nbndlw,ncol,nlay]
         tauc = tauc * np.ones([nbndlw,ncol,nlay])
         # Aerosol optical depth at mid-point of LW spectral bands [ncol,nlay,nbndlw]
-        tauaer = _climlab_to_rrtm(self.tauaer * np.ones_like(self.Tatm))
+        # tauaer = _climlab_to_rrtm(self.tauaer * np.ones_like(self.Tatm))
         #  broadcast and transpose to get [ncol,nlay,nbndlw]
-        tauaer = np.transpose(tauaer * np.ones([nbndlw,ncol,nlay]), (1,2,0))
+        # tauaer = np.transpose(tauaer * np.ones([nbndlw,ncol,nlay]), (1,2,0))
+         # For now assume that self.Tatm.shape is (nlay) only
+        #  Need to append an extra dimension for singleton horizontal ncol and flip pressure order
+        tauaer = self.tauaer[..., np.newaxis, ::-1]  # [nbndlw, ncol, nlay]
+        # transpose to get [ncol,nlay,nbndlw]
+        tauaer = np.transpose(tauaer, (1,2,0))
+        # and same for tauc
+        # tauc = self.tauc[..., np.newaxis, ::-1]
+        # tauc = np.transpose(tauc, (1,2,0))
         args = [ncol, nlay, icld, ispec, permuteseed, irng, idrv, const.cp,
                 play, plev, tlay, tlev, tsfc,
                 h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr,
