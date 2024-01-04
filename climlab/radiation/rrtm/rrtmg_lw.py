@@ -7,7 +7,7 @@ from climlab.domain import Field, Axis, domain
 from .utils import _prepare_general_arguments
 from .utils import _climlab_to_rrtm, _rrtm_to_climlab
 # These values will get overridden by reading from Fortran extension
-nbndlw = 1; ngptlw = 1;
+nbndlw = 1; ngptlw = 1
 try:
     #  The compiled fortran extension module
     from climlab_rrtmg import rrtmg_lw as _rrtmg_lw
@@ -56,9 +56,11 @@ class RRTMG_LW(_Radiation_LW):
         wavenum_ax = Axis(axis_type='abstract', bounds=wavenum_bounds)
         full_spectral_axes = {**self.Tatm.domain.axes, 'wavenumber': wavenum_ax}
         full_spectral_domain = domain._Domain(axes=full_spectral_axes)
-        self.tauaer = Field(self.tauaer * (np.ones((nbndlw,1)) * self.Tatm[np.newaxis, ...]), 
+        try:
+            self.tauaer = Field(self.tauaer * np.repeat(np.ones_like(self.Tatm[np.newaxis, ...]), nbndlw, axis=0), 
                             domain=full_spectral_domain)
-        # self.tauc = np.ones_like(self.tauaer) * self.tauc
+        except:
+            raise ValueError('Input value for tauaer has the wrong dimensions.')
 
         # Spectrally-decomposed OLR
         if self.return_spectral_olr:
@@ -102,18 +104,13 @@ class RRTMG_LW(_Radiation_LW):
         tauc = _climlab_to_rrtm(self.tauc * np.ones_like(self.Tatm))
         #  broadcast to get [nbndlw,ncol,nlay]
         tauc = tauc * np.ones([nbndlw,ncol,nlay])
-        # Aerosol optical depth at mid-point of LW spectral bands [ncol,nlay,nbndlw]
-        # tauaer = _climlab_to_rrtm(self.tauaer * np.ones_like(self.Tatm))
-        #  broadcast and transpose to get [ncol,nlay,nbndlw]
-        # tauaer = np.transpose(tauaer * np.ones([nbndlw,ncol,nlay]), (1,2,0))
-         # For now assume that self.Tatm.shape is (nlay) only
-        #  Need to append an extra dimension for singleton horizontal ncol and flip pressure order
-        tauaer = self.tauaer[..., np.newaxis, ::-1]  # [nbndlw, ncol, nlay]
+        # Aerosol optical depth at mid-point of LW spectral bands, needs to be [ncol,nlay,nbndlw]
+        tauaer = self.tauaer[..., ::-1]  #  flip pressure order
+        if len(self.Tatm.shape)==1:  #  (num_lev)
+            #  Need to append an extra dimension for singleton horizontal ncol
+            tauaer = tauaer[..., np.newaxis, :]  # [nbndlw, ncol, nlay]
         # transpose to get [ncol,nlay,nbndlw]
         tauaer = np.transpose(tauaer, (1,2,0))
-        # and same for tauc
-        # tauc = self.tauc[..., np.newaxis, ::-1]
-        # tauc = np.transpose(tauc, (1,2,0))
         args = [ncol, nlay, icld, ispec, permuteseed, irng, idrv, const.cp,
                 play, plev, tlay, tlev, tsfc,
                 h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr,
