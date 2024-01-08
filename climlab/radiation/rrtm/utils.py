@@ -63,7 +63,7 @@ def _climlab_to_rrtm(field, spectral_axis=False):
 
         But lat-lon grids not yet supported here!
 
-    spectral_axis should be set to True if the field has an additional axis for spectral bands 
+    spectral_axis should be set to True if the field has an additional axis for spectral bands (nbndlw or nbndsw)
     '''
     # Make this work just with 1D (KM,) arrays
     #  (KM,)  -->  (1, nlay)
