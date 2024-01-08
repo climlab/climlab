@@ -104,13 +104,14 @@ class RRTMG_LW(_Radiation_LW):
         tauc = _climlab_to_rrtm(self.tauc * np.ones_like(self.Tatm))
         #  broadcast to get [nbndlw,ncol,nlay]
         tauc = tauc * np.ones([nbndlw,ncol,nlay])
-        # Aerosol optical depth at mid-point of LW spectral bands, needs to be [ncol,nlay,nbndlw]
-        tauaer = self.tauaer[..., ::-1]  #  flip pressure order
-        if len(self.Tatm.shape)==1:  #  (num_lev)
-            #  Need to append an extra dimension for singleton horizontal ncol
-            tauaer = tauaer[..., np.newaxis, :]  # [nbndlw, ncol, nlay]
-        # transpose to get [ncol,nlay,nbndlw]
-        tauaer = np.transpose(tauaer, (1,2,0))
+        tauaer = _climlab_to_rrtm(self.tauaer, spectral_axis=True)
+        # # Aerosol optical depth at mid-point of LW spectral bands, needs to be [ncol,nlay,nbndlw]
+        # tauaer = self.tauaer[..., ::-1]  #  flip pressure order
+        # if len(self.Tatm.shape)==1:  #  (num_lev)
+        #     #  Need to append an extra dimension for singleton horizontal ncol
+        #     tauaer = tauaer[..., np.newaxis, :]  # [nbndlw, ncol, nlay]
+        # # transpose to get [ncol,nlay,nbndlw]
+        # tauaer = np.transpose(tauaer, (1,2,0))
         args = [ncol, nlay, icld, ispec, permuteseed, irng, idrv, const.cp,
                 play, plev, tlay, tlev, tsfc,
                 h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr,
