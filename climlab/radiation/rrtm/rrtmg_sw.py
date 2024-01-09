@@ -114,17 +114,12 @@ class RRTMG_SW(_Radiation_SW):
         self.add_input('tauaer', self._spectral_field(tauaer))
         self.add_input('ssaaer', self._spectral_field(ssaaer))
         self.add_input('asmaer', self._spectral_field(asmaer))
-        self.add_input('ecaer', ecaer)
+        self.add_input('ecaer', ecaer * np.repeat(np.ones_like(self.Tatm[np.newaxis, ...]), naerec, axis=0))
         self.add_input('isolvar', isolvar)
         self.add_input('indsolvar', indsolvar)
         self.add_input('bndsolvar', bndsolvar)
         self.add_input('solcycfrac', solcycfrac)
 
-        # try:
-        #     self.ecaer = Field(self.ecaer * np.repeat(np.ones_like(self.Tatm[np.newaxis, ...]), naerec, axis=0), 
-        #                     domain=full_spectral_domain)
-        # except:
-        #     raise ValueError('Input value for ecaer has the wrong dimensions.')
     def _spectral_field(self, field):
         wavenum_ax = Axis(axis_type='abstract', bounds=wavenum_bounds)
         full_spectral_axes = {**self.Tatm.domain.axes, 'wavenumber': wavenum_ax}
@@ -190,8 +185,7 @@ class RRTMG_SW(_Radiation_SW):
         # Aerosol asymmetry parameter (iaer=10 only), Dimensions,  (ncol,nlay,nbndsw)] #  (non-delta scaled)
         asmaer = _climlab_to_rrtm(self.asmaer, spectral_axis=True, reorder_sw_bands=True)
         # Aerosol optical depth at 0.55 micron (iaer=6 only), Dimensions,  (ncol,nlay,naerec)] #  (non-delta scaled)
-        #  STILL NEED TO IMPLEMENT THE CORRECT AXIS FOR THIS ONE
-        ecaer = np.transpose(_climlab_to_rrtm(self.ecaer * np.ones_like(self.Tatm)) * np.ones([naerec,ncol,nlay]), (1,2,0))
+        ecaer = _climlab_to_rrtm(self.ecaer, spectral_axis=True)
 
         args = [ncol, nlay, icld, iaer, permuteseed, irng,
                 play, plev, tlay, tlev, tsfc,

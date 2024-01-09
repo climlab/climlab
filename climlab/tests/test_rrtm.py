@@ -37,7 +37,7 @@ def test_rrtm_creation():
 @pytest.mark.fast
 def test_rrtm_aerosols():
     from climlab.radiation.rrtm.rrtmg_lw import nbndlw
-    from climlab.radiation.rrtm.rrtmg_sw import nbndsw
+    from climlab.radiation.rrtm.rrtmg_sw import nbndsw, naerec
     # single column version
     state = climlab.column_state(num_lev=num_lev)
     #  these value are meaningless, just testing dimensions and making sure code runs
@@ -45,6 +45,13 @@ def test_rrtm_aerosols():
     tauaer_sw = np.zeros((nbndsw,num_lev)) + 0.1
     ssaaer_sw = np.zeros((nbndsw,num_lev)) + 0.1
     asmaer_sw = np.zeros((nbndsw,num_lev)) + 0.1
+    ecaer_sw = np.zeros((naerec,num_lev)) + 0.1
+    # ECMWF aerosols
+    rad = climlab.radiation.RRTMG(state=state, iaer_sw=6, ecaer_sw=ecaer_sw)
+    #  Is the aerosol flag passed through appropriately?
+    assert rad.subprocess['SW'].iaer==6
+    rad.step_forward()
+    # Full aerosols
     rad = climlab.radiation.RRTMG(state=state, iaer_sw=10, 
                                   tauaer_lw=tauaer_lw,
                                   tauaer_sw=tauaer_sw,
@@ -61,6 +68,9 @@ def test_rrtm_aerosols():
     tauaer_sw = np.zeros((nbndsw,num_lat,num_lev)) + 0.1
     ssaaer_sw = np.zeros((nbndsw,num_lat,num_lev)) + 0.1
     asmaer_sw = np.zeros((nbndsw,num_lat,num_lev)) + 0.1
+    ecaer_sw = np.zeros((naerec,num_lat,num_lev)) + 0.1
+    rad = climlab.radiation.RRTMG(state=state, iaer_sw=6, ecaer_sw=ecaer_sw)
+    rad.step_forward()
     rad = climlab.radiation.RRTMG(state=state, iaer_sw=10, 
                                   tauaer_lw=tauaer_lw,
                                   tauaer_sw=tauaer_sw,
