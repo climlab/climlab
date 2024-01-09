@@ -35,6 +35,41 @@ def test_rrtm_creation():
 
 @pytest.mark.compiled
 @pytest.mark.fast
+def test_rrtm_aerosols():
+    from climlab.radiation.rrtm.rrtmg_lw import nbndlw
+    from climlab.radiation.rrtm.rrtmg_sw import nbndsw
+    # single column version
+    state = climlab.column_state(num_lev=num_lev)
+    #  these value are meaningless, just testing dimensions and making sure code runs
+    tauaer_lw = np.zeros((nbndlw,num_lev)) + 0.1
+    tauaer_sw = np.zeros((nbndsw,num_lev)) + 0.1
+    ssaaer_sw = np.zeros((nbndsw,num_lev)) + 0.1
+    asmaer_sw = np.zeros((nbndsw,num_lev)) + 0.1
+    rad = climlab.radiation.RRTMG(state=state, iaer_sw=10, 
+                                  tauaer_lw=tauaer_lw,
+                                  tauaer_sw=tauaer_sw,
+                                  ssaaer_sw=ssaaer_sw,
+                                  asmaer_sw=asmaer_sw)
+    #  Is the aerosol flag passed through appropriately?
+    assert rad.subprocess['SW'].iaer==10
+    #  Can we step forward?
+    rad.step_forward()
+    # 2D version
+    num_lat = 4
+    state = climlab.column_state(num_lat=num_lat, num_lev=num_lev)
+    tauaer_lw = np.zeros((nbndlw,num_lat,num_lev)) + 0.1
+    tauaer_sw = np.zeros((nbndsw,num_lat,num_lev)) + 0.1
+    ssaaer_sw = np.zeros((nbndsw,num_lat,num_lev)) + 0.1
+    asmaer_sw = np.zeros((nbndsw,num_lat,num_lev)) + 0.1
+    rad = climlab.radiation.RRTMG(state=state, iaer_sw=10, 
+                                  tauaer_lw=tauaer_lw,
+                                  tauaer_sw=tauaer_sw,
+                                  ssaaer_sw=ssaaer_sw,
+                                  asmaer_sw=asmaer_sw)
+    rad.step_forward()
+
+@pytest.mark.compiled
+@pytest.mark.fast
 def test_swap_component():
     # initial state (temperatures)
     state = climlab.column_state(num_lev=num_lev, num_lat=1, water_depth=5.)
