@@ -131,4 +131,4 @@ def test_moist_EBM_creation():
     diff = climlab.dynamics.MeridionalMoistDiffusion(state=m.state, timestep=m.timestep)
     m.add_subprocess('diffusion', diff)
     m.step_forward()
-    assert hasattr(m, 'heat_transport')
+    assert hasattr(m, 'heat_transport_meridional')

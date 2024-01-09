@@ -111,8 +111,13 @@ class AdvectionDiffusion(ImplicitProcess):
                  diffusion_axis=None,
                  use_banded_solver=False,
                  prescribed_flux=0.,
+                 is_periodic=False,
+                 diag_suffix='',
                  **kwargs):
         super(AdvectionDiffusion, self).__init__(**kwargs)
+        if is_periodic:
+            self.use_banded_solver = False # cant mix and match
+        self.is_periodic = is_periodic
         self.use_banded_solver = use_banded_solver
         if diffusion_axis is None:   # diffusion axis is also advection axis!
             self.diffusion_axis = _guess_diffusion_axis(self)
@@ -138,12 +143,17 @@ class AdvectionDiffusion(ImplicitProcess):
         self.prescribed_flux = prescribed_flux  # flux including boundary conditions
         self.K = K  # Diffusivity in units of [length]**2 / [time]
         self.U = U  # Advecting velocity in units of [length] / [time]
-        self.add_diagnostic('diffusive_flux',
+        # names of fluxes in case multiple advective-diffusive processes are necessary
+        self.diff_flux_name = 'diffusive_flux' + diag_suffix 
+        self.total_flux_name = 'total_flux' + diag_suffix 
+        self.adv_flux_name = 'advective_flux' + diag_suffix     
+        self.flux_conv_name = 'flux_convergence' + diag_suffix     
+        self.add_diagnostic(self.diff_flux_name,
             np.moveaxis(0.*self.K*self._weight_bounds,-1,self.diffusion_axis_index))
-        self.add_diagnostic('advective_flux', 0.*self.diffusive_flux)
-        self.add_diagnostic('total_flux', 0.*self.diffusive_flux)
+        self.add_diagnostic(self.adv_flux_name, 0.*getattr(self, self.diff_flux_name))
+        self.add_diagnostic(self.total_flux_name, 0.*getattr(self, self.diff_flux_name))
         for varname, value in self.state.items():
-            self.add_diagnostic('flux_convergence',
+            self.add_diagnostic(self.flux_conv_name,
                 np.moveaxis(0.*self._weight_center,-1,self.diffusion_axis_index))
 
     @property
@@ -184,7 +194,7 @@ class AdvectionDiffusion(ImplicitProcess):
             Uarray = 0.*Karray
         self._advdiffTriDiag = adv_diff_numerics.advdiff_tridiag(X=self._Xcenter,
             Xb=self._Xbounds, K=Karray, U=Uarray, W=self._weight_center, Wb=self._weight_bounds,
-            use_banded_solver=self.use_banded_solver)
+            use_banded_solver=self.use_banded_solver, periodic=self.is_periodic)
 
     def _implicit_solver(self):
         newstate = {}
@@ -205,12 +215,12 @@ class AdvectionDiffusion(ImplicitProcess):
                                         self._Xbounds, Karray, field)
             adv_flux = adv_diff_numerics.advective_flux(self._Xcenter,
                                         self._Xbounds, Uarray, field)
-            self.diffusive_flux[:] = np.moveaxis(diff_flux,-1,self.diffusion_axis_index)
-            self.advective_flux[:] = np.moveaxis(adv_flux,-1,self.diffusion_axis_index)
+            getattr(self, self.diff_flux_name)[:] = np.moveaxis(diff_flux,-1,self.diffusion_axis_index)
+            getattr(self, self.adv_flux_name)[:] = np.moveaxis(adv_flux,-1,self.diffusion_axis_index)
             source = 0.*field
             convergence = adv_diff_numerics.compute_tendency(field,
                 self._advdiffTriDiag, source, use_banded_solver=self.use_banded_solver)
-            self.flux_convergence[:] = np.moveaxis(convergence,-1,self.diffusion_axis_index)
+            getattr(self, self.flux_conv_name)[:] = np.moveaxis(convergence,-1,self.diffusion_axis_index)
 
 
 class Diffusion(AdvectionDiffusion):

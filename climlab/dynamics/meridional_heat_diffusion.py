@@ -72,8 +72,8 @@ class MeridionalHeatDiffusion(MeridionalDiffusion):
                         use_banded_solver=use_banded_solver, **kwargs)
         #  Now initialize properly
         self.D = D
-        self.add_diagnostic('heat_transport', 0.*self.diffusive_flux)
-        self.add_diagnostic('heat_transport_convergence', 0.*self.flux_convergence)
+        self.add_diagnostic('heat_transport_meridional', 0.*self.diffusive_flux_meridional)
+        self.add_diagnostic('heat_transport_convergence_meridional', 0.*self.flux_convergence_meridional)
 
     @property
     def D(self):
@@ -91,10 +91,19 @@ class MeridionalHeatDiffusion(MeridionalDiffusion):
 
     def _update_diagnostics(self, newstate):
         super(MeridionalHeatDiffusion, self)._update_diagnostics(newstate)
+        #self.diffusive_flux_meridional = self._diffusive_flux
         for varname, value in self.state.items():
             heat_capacity = value.domain.heat_capacity
         coslat_bounds = np.moveaxis(self._weight_bounds,-1,self.diffusion_axis_index)
-        self.heat_transport[:] = (self.diffusive_flux * heat_capacity *
+        if (not np.isscalar(heat_capacity)) and (len(heat_capacity.shape) > 2):
+            # downsample along necessary axis
+            heat_capacity = (heat_capacity[:,1:,:] + heat_capacity[:,:-1,:]) / 2
+            #heat_capacity = (heat_capacity[1:,:,:] + heat_capacity[:-1,:,:]) / 2
+        self.heat_transport_meridional[:] = (self.diffusive_flux_meridional * heat_capacity *
             2 * np.pi * const.a * coslat_bounds * 1E-15) # in PW
-        self.heat_transport_convergence[:] = (self.flux_convergence *
+        if (not np.isscalar(heat_capacity)) and (len(heat_capacity.shape) > 2):
+            # downsample agian along the other axis
+            #heat_capacity = (heat_capacity[:,1:,:] + heat_capacity[:,:-1,:]) / 2
+            heat_capacity = (heat_capacity[1:,:,:] + heat_capacity[:-1,:,:]) / 2
+        self.heat_transport_convergence_meridional[:] = (self.flux_convergence_meridional *
                         heat_capacity)  # in W/m**2

@@ -267,7 +267,7 @@ def total_flux(X, Xb, K, U, field, prescribed_flux=None):
         prescribed_flux = zeros_like(U)
     return advective_flux(X, Xb, U, field) + diffusive_flux(X, Xb, K, field) + prescribed_flux
 
-def advdiff_tridiag(X, Xb, K, U, W=None, Wb=None, use_banded_solver=False):
+def advdiff_tridiag(X, Xb, K, U, W=None, Wb=None, use_banded_solver=False, periodic=False):
     r'''Compute the tridiagonal matrix operator for the advective-diffusive
        flux convergence.
 
@@ -334,6 +334,19 @@ def advdiff_tridiag(X, Xb, K, U, W=None, Wb=None, use_banded_solver=False):
         tridiag[...,inds_main[0][:-1],inds_main[1][:-1]] += main_diagonal_term1
         # Main diagonal, term 2, length J-1
         tridiag[...,inds_main[0][1:],inds_main[1][1:]] += main_diagonal_term2
+        if periodic:
+            # top right
+            tridiag[...,0,-1] = (Wb[...,0]/W[...,0] * 
+                (K[...,0]+U[...,0]*(X[...,0]-Xb[...,0])) /
+                ((Xb[...,1]-Xb[...,0])*(X[...,1]-X[...,0])))
+            # bottom left
+            tridiag[...,-1,0] = (Wb[...,-1]/W[...,-1] * 
+                (K[...,-1]-U[...,-1]*(Xb[...,-1]-X[...,-1])) /
+                ((Xb[...,-1]-Xb[...,-2])*(X[...,-1]-X[...,-2])))
+            # correct top left
+            tridiag[...,0,0] += main_diagonal_term2[...,0]
+            # correct bottom right
+            tridiag[...,-1,-1] += main_diagonal_term1[...,-1]
         return tridiag
 
 def make_the_actual_tridiagonal_matrix(tridiag_banded):
