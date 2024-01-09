@@ -51,7 +51,7 @@ def interface_temperature(Ts, Tatm, **kwargs):
     Tinterp = np.concatenate((Ttoa[..., np.newaxis], Tinterp, Ts), axis=-1)
     return Tinterp
 
-def _climlab_to_rrtm(field):
+def _climlab_to_rrtm(field, spectral_axis=False, reorder_sw_bands=False):
     '''Prepare field with proper dimension order.
     RRTM code expects arrays with (ncol, nlay)
     and with pressure decreasing from surface at element 0
@@ -63,10 +63,11 @@ def _climlab_to_rrtm(field):
 
         But lat-lon grids not yet supported here!
 
-    Case single column
+    spectral_axis should be set to True if the field has an additional axis for spectral bands (nbndlw or nbndsw)
+    
+    reorder_sw_bands should be set to True for shortwave fields with spectral bands to account for RRTMG_SW band ordering
+    (ignored if spectral_axis=False)
     '''
-    # Make this work just with 1D (KM,) arrays
-    #  (KM,)  -->  (1, nlay)
     try:
         #  Flip along the last axis to reverse the pressure order
         field = field[..., ::-1]
@@ -75,16 +76,24 @@ def _climlab_to_rrtm(field):
             return field
         else:
             raise ValueError('field must be array_like or scalar.')
-    shape = field.shape
-    if len(shape)==1:  #  (num_lev)
+    num_dims = len(field.shape)
+    if spectral_axis:
+        num_dims -= 1
+    if num_dims==1:  #  (num_lev)
         #  Need to append an extra dimension for singleton horizontal ncol
-        return field[np.newaxis, ...]
-    elif len(shape)==2:  # (num_lat, num_lev)
-        return field
-    elif len(shape) > 2:
+        modfield = field[..., np.newaxis, :]  # [ncol,nlay] or [nbnd,ncol,nlay]
+    elif num_dims==2:  # (num_lat, num_lev)
+        modfield = field  # [ncol,nlay] or [nbnd,ncol,nlay]
+    elif num_dims > 2:
         raise ValueError('lat-lon grids not yet supported here.')
-    #elif len(shape)==3:  # (num_lat, num_lon, num_lev)
+    #elif num_dims==3:  # (num_lat, num_lon, num_lev)
         #  Need to reshape this array
+    if spectral_axis:
+        if reorder_sw_bands:
+            modfield = np.roll(modfield, -1, axis=0)  # Make Band 29 the last element of array
+        # transpose to get [ncol,nlay,nbnd]
+        modfield = np.transpose(modfield, (1,2,0))
+    return modfield
 
 def _rrtm_to_climlab(field):
     try:

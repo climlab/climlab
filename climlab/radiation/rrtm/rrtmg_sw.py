@@ -3,10 +3,11 @@ import numpy as np
 import warnings
 from climlab import constants as const
 from climlab.radiation.radiation import _Radiation_SW
+from climlab.domain import Field, Axis, domain
 from .utils import _prepare_general_arguments
 from .utils import _climlab_to_rrtm, _climlab_to_rrtm_sfc, _rrtm_to_climlab
 # These values will get overridden by reading from Fortran extension
-nbndsw = 1; naerec = 1; ngptsw = 1;
+nbndsw = 1; naerec = 1; ngptsw = 1
 try:
     #  The compiled fortran extension module
     from climlab_rrtmg import rrtmg_sw as _rrtmg_sw
@@ -18,6 +19,16 @@ try:
 except:
     warnings.warn('Cannot import and initialize compiled Fortran extension, RRTMG_SW module will not be functional.')
 
+
+# Shortwave spectral band limits (wavenumbers in cm^-1)
+# Data copied from rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90
+band_numbers = np.array([29,16,17,18,19,20,21,22,23,24,25,26,27,28])
+wavenum_bounds = np.array([820., 2600., 3250., 4000., 4650., 5150., 6150., 7700., 8050., 
+                            12850., 16000., 22650., 29000., 38000.,  50000.,])
+wavenum_delta = np.diff(wavenum_bounds)
+# For some reason the band 820 - 2600 cm-1 is the last element in RRTMG_SW (Band 29) 
+# instead of first element (Band 16)
+# Climlab will keep bands in numerical order by wavenumber and reorder before passing to RRTMG_SW
 
 class RRTMG_SW(_Radiation_SW):
     def __init__(self,
@@ -100,14 +111,22 @@ class RRTMG_SW(_Radiation_SW):
         self.add_input('ssac', ssac)
         self.add_input('asmc', asmc)
         self.add_input('fsfc', fsfc)
-        self.add_input('tauaer', tauaer)
-        self.add_input('ssaaer', ssaaer)
-        self.add_input('asmaer', asmaer)
-        self.add_input('ecaer', ecaer)
+        self.add_input('tauaer', self._spectral_field(tauaer))
+        self.add_input('ssaaer', self._spectral_field(ssaaer))
+        self.add_input('asmaer', self._spectral_field(asmaer))
+        self.add_input('ecaer', ecaer * np.repeat(np.ones_like(self.Tatm[np.newaxis, ...]), naerec, axis=0))
         self.add_input('isolvar', isolvar)
         self.add_input('indsolvar', indsolvar)
         self.add_input('bndsolvar', bndsolvar)
         self.add_input('solcycfrac', solcycfrac)
+
+    def _spectral_field(self, field):
+        wavenum_ax = Axis(axis_type='abstract', bounds=wavenum_bounds)
+        full_spectral_axes = {**self.Tatm.domain.axes, 'wavenumber': wavenum_ax}
+        full_spectral_domain = domain._Domain(axes=full_spectral_axes)
+        return Field(field * 
+                    np.repeat(np.ones_like(self.Tatm[np.newaxis, ...]), nbndsw, axis=0), 
+                    domain=full_spectral_domain)
 
     def _prepare_sw_arguments(self):
         #  prepare insolation
@@ -160,15 +179,13 @@ class RRTMG_SW(_Radiation_SW):
         # In-cloud forward scattering fraction (delta function pointing forward "forward peaked scattering")
         fsfc = _climlab_to_rrtm(self.fsfc * np.ones_like(self.Tatm)) * np.ones([nbndsw,ncol,nlay])
         # Aerosol optical depth (iaer=10 only), (ncol,nlay,nbndsw)] #  (non-delta scaled)
-        tauaer = _climlab_to_rrtm(self.tauaer * np.ones_like(self.Tatm))
-        #  broadcast and transpose to get [ncol,nlay,nbndsw]
-        tauaer = np.transpose(tauaer * np.ones([nbndsw,ncol,nlay]), (1,2,0))
+        tauaer = _climlab_to_rrtm(self.tauaer, spectral_axis=True, reorder_sw_bands=True)
         # Aerosol single scattering albedo (iaer=10 only), Dimensions,  (ncol,nlay,nbndsw)] #  (non-delta scaled)
-        ssaaer = np.transpose(_climlab_to_rrtm(self.ssaaer * np.ones_like(self.Tatm)) * np.ones([nbndsw,ncol,nlay]), (1,2,0))
+        ssaaer = _climlab_to_rrtm(self.ssaaer, spectral_axis=True, reorder_sw_bands=True)
         # Aerosol asymmetry parameter (iaer=10 only), Dimensions,  (ncol,nlay,nbndsw)] #  (non-delta scaled)
-        asmaer = np.transpose(_climlab_to_rrtm(self.asmaer * np.ones_like(self.Tatm)) * np.ones([nbndsw,ncol,nlay]), (1,2,0))
+        asmaer = _climlab_to_rrtm(self.asmaer, spectral_axis=True, reorder_sw_bands=True)
         # Aerosol optical depth at 0.55 micron (iaer=6 only), Dimensions,  (ncol,nlay,naerec)] #  (non-delta scaled)
-        ecaer = np.transpose(_climlab_to_rrtm(self.ecaer * np.ones_like(self.Tatm)) * np.ones([naerec,ncol,nlay]), (1,2,0))
+        ecaer = _climlab_to_rrtm(self.ecaer, spectral_axis=True)
 
         args = [ncol, nlay, icld, iaer, permuteseed, irng,
                 play, plev, tlay, tlev, tsfc,

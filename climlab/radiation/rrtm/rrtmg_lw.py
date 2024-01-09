@@ -7,7 +7,7 @@ from climlab.domain import Field, Axis, domain
 from .utils import _prepare_general_arguments
 from .utils import _climlab_to_rrtm, _rrtm_to_climlab
 # These values will get overridden by reading from Fortran extension
-nbndlw = 1; ngptlw = 1;
+nbndlw = 1; ngptlw = 1
 try:
     #  The compiled fortran extension module
     from climlab_rrtmg import rrtmg_lw as _rrtmg_lw
@@ -24,6 +24,7 @@ wavenum_bounds = np.array([  10., 350., 500., 630., 700., 820.,
                       980.,1080.,1180.,1390.,1480.,1800.,
                      2080.,2250.,2380.,2600.,3250.])
 wavenum_delta = np.diff(wavenum_bounds)
+wavenum_ax = Axis(axis_type='abstract', bounds=wavenum_bounds)
 
 
 class RRTMG_LW(_Radiation_LW):
@@ -50,7 +51,7 @@ class RRTMG_LW(_Radiation_LW):
         self.add_input('iceflglw', iceflglw)
         self.add_input('liqflglw', liqflglw)
         self.add_input('tauc', tauc)
-        self.add_input('tauaer', tauaer)
+        self.add_input('tauaer', self._spectral_field(tauaer))
         self.add_input('return_spectral_olr', return_spectral_olr)
 
         # Spectrally-decomposed OLR
@@ -58,10 +59,10 @@ class RRTMG_LW(_Radiation_LW):
             # Adjust output flag
             self._ispec = 1  # Spectral OLR output flag, 0: only calculate total fluxes, 1: also return spectral OLR
             # set up appropriately sized Field object to store the spectral OLR diagnostic
-            wavenum_ax = Axis(axis_type='abstract', bounds=wavenum_bounds)
             spectral_axes = {**self.OLR.domain.axes, 'wavenumber': wavenum_ax}
             spectral_domain = domain._Domain(axes=spectral_axes)
             #  HACK need to reorder axes in the domain object
+            ###  I think we want to change this. Should be consistent with dimension ordering for tauaer and other spectrally resolved fields
             shape = list(self.OLR.shape)
             shape.append(wavenum_ax.num_points)
             spectral_domain.shape = tuple(shape)
@@ -72,6 +73,12 @@ class RRTMG_LW(_Radiation_LW):
         else:
             self._ispec = 0,  # Spectral OLR output flag, 0: only calculate total fluxes, 1: also return spectral OLR
 
+    def _spectral_field(self, field):
+        full_spectral_axes = {**self.Tatm.domain.axes, 'wavenumber': wavenum_ax}
+        full_spectral_domain = domain._Domain(axes=full_spectral_axes)
+        return Field(field * 
+                    np.repeat(np.ones_like(self.Tatm[np.newaxis, ...]), nbndlw, axis=0), 
+                    domain=full_spectral_domain)
 
     def _prepare_lw_arguments(self):
         #  scalar integer arguments
@@ -95,10 +102,14 @@ class RRTMG_LW(_Radiation_LW):
         tauc = _climlab_to_rrtm(self.tauc * np.ones_like(self.Tatm))
         #  broadcast to get [nbndlw,ncol,nlay]
         tauc = tauc * np.ones([nbndlw,ncol,nlay])
-        # Aerosol optical depth at mid-point of LW spectral bands [ncol,nlay,nbndlw]
-        tauaer = _climlab_to_rrtm(self.tauaer * np.ones_like(self.Tatm))
-        #  broadcast and transpose to get [ncol,nlay,nbndlw]
-        tauaer = np.transpose(tauaer * np.ones([nbndlw,ncol,nlay]), (1,2,0))
+        tauaer = _climlab_to_rrtm(self.tauaer, spectral_axis=True)
+        # # Aerosol optical depth at mid-point of LW spectral bands, needs to be [ncol,nlay,nbndlw]
+        # tauaer = self.tauaer[..., ::-1]  #  flip pressure order
+        # if len(self.Tatm.shape)==1:  #  (num_lev)
+        #     #  Need to append an extra dimension for singleton horizontal ncol
+        #     tauaer = tauaer[..., np.newaxis, :]  # [nbndlw, ncol, nlay]
+        # # transpose to get [ncol,nlay,nbndlw]
+        # tauaer = np.transpose(tauaer, (1,2,0))
         args = [ncol, nlay, icld, ispec, permuteseed, irng, idrv, const.cp,
                 play, plev, tlay, tlev, tsfc,
                 h2ovmr, o3vmr, co2vmr, ch4vmr, n2ovmr, o2vmr,
