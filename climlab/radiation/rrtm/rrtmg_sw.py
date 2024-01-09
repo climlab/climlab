@@ -22,12 +22,13 @@ except:
 
 # Shortwave spectral band limits (wavenumbers in cm^-1)
 # Data copied from rrtmg_sw_v4.0/gcm_model/src/rrtmg_sw_init.f90
+band_numbers = np.array([29,16,17,18,19,20,21,22,23,24,25,26,27,28])
 wavenum_bounds = np.array([820., 2600., 3250., 4000., 4650., 5150., 6150., 7700., 8050., 
                             12850., 16000., 22650., 29000., 38000.,  50000.,])
 wavenum_delta = np.diff(wavenum_bounds)
-# For some reason the band 820 - 2600 cm-1 is the last element in RRTMG_SW instead of first element
-# Not sure right now if we should follow this ordering in climlab, or (more likely) reorder before passing to RRTMG_SW
-# should be able to reorder with np.roll(somearray, -1, axis=0)
+# For some reason the band 820 - 2600 cm-1 is the last element in RRTMG_SW (Band 29) 
+# instead of first element (Band 16)
+# Climlab will keep bands in numerical order by wavenumber and reorder before passing to RRTMG_SW
 
 class RRTMG_SW(_Radiation_SW):
     def __init__(self,
@@ -194,11 +195,11 @@ class RRTMG_SW(_Radiation_SW):
         # In-cloud forward scattering fraction (delta function pointing forward "forward peaked scattering")
         fsfc = _climlab_to_rrtm(self.fsfc * np.ones_like(self.Tatm)) * np.ones([nbndsw,ncol,nlay])
         # Aerosol optical depth (iaer=10 only), (ncol,nlay,nbndsw)] #  (non-delta scaled)
-        tauaer = _climlab_to_rrtm(self.tauaer, spectral_axis=True)
+        tauaer = _climlab_to_rrtm(self.tauaer, spectral_axis=True, reorder_sw_bands=True)
         # Aerosol single scattering albedo (iaer=10 only), Dimensions,  (ncol,nlay,nbndsw)] #  (non-delta scaled)
-        ssaaer = _climlab_to_rrtm(self.ssaaer, spectral_axis=True)
+        ssaaer = _climlab_to_rrtm(self.ssaaer, spectral_axis=True, reorder_sw_bands=True)
         # Aerosol asymmetry parameter (iaer=10 only), Dimensions,  (ncol,nlay,nbndsw)] #  (non-delta scaled)
-        asmaer = _climlab_to_rrtm(self.asmaer, spectral_axis=True)
+        asmaer = _climlab_to_rrtm(self.asmaer, spectral_axis=True, reorder_sw_bands=True)
         # Aerosol optical depth at 0.55 micron (iaer=6 only), Dimensions,  (ncol,nlay,naerec)] #  (non-delta scaled)
         #  STILL NEED TO IMPLEMENT THE CORRECT AXIS FOR THIS ONE
         ecaer = np.transpose(_climlab_to_rrtm(self.ecaer * np.ones_like(self.Tatm)) * np.ones([naerec,ncol,nlay]), (1,2,0))
