@@ -51,10 +51,9 @@ class RRTMG_LW(_Radiation_LW):
         self.add_input('iceflglw', iceflglw)
         self.add_input('liqflglw', liqflglw)
         self.add_input('tauc', tauc)
-        self.add_input('tauaer', tauaer)
+        self.add_input('tauaer', self._spectral_field(tauaer))
         self.add_input('return_spectral_olr', return_spectral_olr)
 
-        self.tauaer = self._spectral_field(self.tauaer)
         # Spectrally-decomposed OLR
         if self.return_spectral_olr:
             # Adjust output flag

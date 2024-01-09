@@ -111,24 +111,21 @@ class RRTMG_SW(_Radiation_SW):
         self.add_input('ssac', ssac)
         self.add_input('asmc', asmc)
         self.add_input('fsfc', fsfc)
-        self.add_input('tauaer', tauaer)
-        self.add_input('ssaaer', ssaaer)
-        self.add_input('asmaer', asmaer)
+        self.add_input('tauaer', self._spectral_field(tauaer))
+        self.add_input('ssaaer', self._spectral_field(ssaaer))
+        self.add_input('asmaer', self._spectral_field(asmaer))
         self.add_input('ecaer', ecaer)
         self.add_input('isolvar', isolvar)
         self.add_input('indsolvar', indsolvar)
         self.add_input('bndsolvar', bndsolvar)
         self.add_input('solcycfrac', solcycfrac)
 
-        self.tauaer = self._spectral_field(self.tauaer)
-        self.ssaaer = self._spectral_field(self.ssaaer)
-        self.asmaer = self._spectral_field(self.asmaer)
         # try:
         #     self.ecaer = Field(self.ecaer * np.repeat(np.ones_like(self.Tatm[np.newaxis, ...]), naerec, axis=0), 
         #                     domain=full_spectral_domain)
         # except:
         #     raise ValueError('Input value for ecaer has the wrong dimensions.')
-    def _spectral_field(field):
+    def _spectral_field(self, field):
         wavenum_ax = Axis(axis_type='abstract', bounds=wavenum_bounds)
         full_spectral_axes = {**self.Tatm.domain.axes, 'wavenumber': wavenum_ax}
         full_spectral_domain = domain._Domain(axes=full_spectral_axes)
