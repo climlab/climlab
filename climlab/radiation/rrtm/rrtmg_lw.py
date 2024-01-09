@@ -24,6 +24,7 @@ wavenum_bounds = np.array([  10., 350., 500., 630., 700., 820.,
                       980.,1080.,1180.,1390.,1480.,1800.,
                      2080.,2250.,2380.,2600.,3250.])
 wavenum_delta = np.diff(wavenum_bounds)
+wavenum_ax = Axis(axis_type='abstract', bounds=wavenum_bounds)
 
 
 class RRTMG_LW(_Radiation_LW):
@@ -53,15 +54,7 @@ class RRTMG_LW(_Radiation_LW):
         self.add_input('tauaer', tauaer)
         self.add_input('return_spectral_olr', return_spectral_olr)
 
-        wavenum_ax = Axis(axis_type='abstract', bounds=wavenum_bounds)
-        full_spectral_axes = {**self.Tatm.domain.axes, 'wavenumber': wavenum_ax}
-        full_spectral_domain = domain._Domain(axes=full_spectral_axes)
-        try:
-            self.tauaer = Field(self.tauaer * np.repeat(np.ones_like(self.Tatm[np.newaxis, ...]), nbndlw, axis=0), 
-                            domain=full_spectral_domain)
-        except:
-            raise ValueError('Input value for tauaer has the wrong dimensions.')
-
+        self.tauaer = self._spectral_field(self.tauaer)
         # Spectrally-decomposed OLR
         if self.return_spectral_olr:
             # Adjust output flag
@@ -81,6 +74,12 @@ class RRTMG_LW(_Radiation_LW):
         else:
             self._ispec = 0,  # Spectral OLR output flag, 0: only calculate total fluxes, 1: also return spectral OLR
 
+    def _spectral_field(self, field):
+        full_spectral_axes = {**self.Tatm.domain.axes, 'wavenumber': wavenum_ax}
+        full_spectral_domain = domain._Domain(axes=full_spectral_axes)
+        return Field(field * 
+                    np.repeat(np.ones_like(self.Tatm[np.newaxis, ...]), nbndlw, axis=0), 
+                    domain=full_spectral_domain)
 
     def _prepare_lw_arguments(self):
         #  scalar integer arguments

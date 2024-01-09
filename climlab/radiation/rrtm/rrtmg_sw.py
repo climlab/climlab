@@ -120,29 +120,21 @@ class RRTMG_SW(_Radiation_SW):
         self.add_input('bndsolvar', bndsolvar)
         self.add_input('solcycfrac', solcycfrac)
 
-        wavenum_ax = Axis(axis_type='abstract', bounds=wavenum_bounds)
-        full_spectral_axes = {**self.Tatm.domain.axes, 'wavenumber': wavenum_ax}
-        full_spectral_domain = domain._Domain(axes=full_spectral_axes)
-        try:
-            self.tauaer = Field(self.tauaer * np.repeat(np.ones_like(self.Tatm[np.newaxis, ...]), nbndsw, axis=0), 
-                            domain=full_spectral_domain)
-        except:
-            raise ValueError('Input value for tauaer has the wrong dimensions.')
-        try:
-            self.ssaaer = Field(self.ssaaer * np.repeat(np.ones_like(self.Tatm[np.newaxis, ...]), nbndsw, axis=0), 
-                            domain=full_spectral_domain)
-        except:
-            raise ValueError('Input value for ssaaer has the wrong dimensions.')
-        try:
-            self.asmaer = Field(self.asmaer * np.repeat(np.ones_like(self.Tatm[np.newaxis, ...]), nbndsw, axis=0), 
-                            domain=full_spectral_domain)
-        except:
-            raise ValueError('Input value for asmaer has the wrong dimensions.')
+        self.tauaer = self._spectral_field(self.tauaer)
+        self.ssaaer = self._spectral_field(self.ssaaer)
+        self.asmaer = self._spectral_field(self.asmaer)
         # try:
         #     self.ecaer = Field(self.ecaer * np.repeat(np.ones_like(self.Tatm[np.newaxis, ...]), naerec, axis=0), 
         #                     domain=full_spectral_domain)
         # except:
         #     raise ValueError('Input value for ecaer has the wrong dimensions.')
+    def _spectral_field(field):
+        wavenum_ax = Axis(axis_type='abstract', bounds=wavenum_bounds)
+        full_spectral_axes = {**self.Tatm.domain.axes, 'wavenumber': wavenum_ax}
+        full_spectral_domain = domain._Domain(axes=full_spectral_axes)
+        return Field(field * 
+                    np.repeat(np.ones_like(self.Tatm[np.newaxis, ...]), nbndsw, axis=0), 
+                    domain=full_spectral_domain)
 
     def _prepare_sw_arguments(self):
         #  prepare insolation
