@@ -70,7 +70,7 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
             asmc_sw = 0.,  # In-cloud asymmetry parameter
             fsfc_sw = 0.,  # In-cloud forward scattering fraction (delta function pointing forward "forward peaked scattering")
             # AEROSOLS
-            iaer_sw = 0,   #! Aerosol option flag
+            iaer    = 0,   #! Aerosol option flag
                            #!    0: No aerosol
                            #!    6: ECMWF method: use six ECMWF aerosol types input aerosol optical depth at 0.55 microns for each aerosol type (ecaer)
                            #!    10:Input aerosol optical properties: input total aerosol optical depth, single scattering albedo and asymmetry parameter (tauaer, ssaaer, asmaer) directly
@@ -183,7 +183,7 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
                      ssac = ssac_sw,
                      asmc = asmc_sw,
                      fsfc = fsfc_sw,
-                     iaer = iaer_sw,
+                     iaer = iaer,
                      tauaer = tauaer_sw,
                      ssaaer = ssaaer_sw,
                      asmaer = asmaer_sw,

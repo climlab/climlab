@@ -47,12 +47,12 @@ def test_rrtm_aerosols():
     asmaer_sw = np.zeros((nbndsw,num_lev)) + 0.1
     ecaer_sw = np.zeros((naerec,num_lev)) + 0.1
     # ECMWF aerosols
-    rad = climlab.radiation.RRTMG(state=state, iaer_sw=6, ecaer_sw=ecaer_sw)
+    rad = climlab.radiation.RRTMG(state=state, iaer=6, ecaer_sw=ecaer_sw)
     #  Is the aerosol flag passed through appropriately?
     assert rad.subprocess['SW'].iaer==6
     rad.step_forward()
     # Full aerosols
-    rad = climlab.radiation.RRTMG(state=state, iaer_sw=10, 
+    rad = climlab.radiation.RRTMG(state=state, iaer=10, 
                                   tauaer_lw=tauaer_lw,
                                   tauaer_sw=tauaer_sw,
                                   ssaaer_sw=ssaaer_sw,
@@ -69,9 +69,9 @@ def test_rrtm_aerosols():
     ssaaer_sw = np.zeros((nbndsw,num_lat,num_lev)) + 0.1
     asmaer_sw = np.zeros((nbndsw,num_lat,num_lev)) + 0.1
     ecaer_sw = np.zeros((naerec,num_lat,num_lev)) + 0.1
-    rad = climlab.radiation.RRTMG(state=state, iaer_sw=6, ecaer_sw=ecaer_sw)
+    rad = climlab.radiation.RRTMG(state=state, iaer=6, ecaer_sw=ecaer_sw)
     rad.step_forward()
-    rad = climlab.radiation.RRTMG(state=state, iaer_sw=10, 
+    rad = climlab.radiation.RRTMG(state=state, iaer=10, 
                                   tauaer_lw=tauaer_lw,
                                   tauaer_sw=tauaer_sw,
                                   ssaaer_sw=ssaaer_sw,
