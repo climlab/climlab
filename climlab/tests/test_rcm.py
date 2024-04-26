@@ -47,7 +47,7 @@ def test_convective_adjustment():
 @pytest.mark.compiled
 @pytest.mark.fast
 def test_convective_adjustment_highres():
-    convective_adjustment_tester(num_lev=100)
+    convective_adjustment_tester(num_lev=200)
 
 @pytest.mark.compiled
 @pytest.mark.fast
