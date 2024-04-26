@@ -33,7 +33,7 @@ def convective_adjustment_direct(p, T, c, lapserate=6.5):
     beta = 1./Pi
     theta = T * beta
     q = Pi * c
-    n_k = np.zeros(L, dtype=np.int8)
+    n_k = np.zeros(L, dtype=int)
     theta_k = np.zeros_like(p)
     s_k = np.zeros_like(p)
     t_k = np.zeros_like(p)
