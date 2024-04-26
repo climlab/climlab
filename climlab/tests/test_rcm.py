@@ -3,11 +3,10 @@ import numpy as np
 import climlab
 import pytest
 
-@pytest.mark.compiled
-@pytest.fixture()
-def rcm():
+
+def make_rcm(num_lev=40):
     # initial state (temperatures)
-    state = climlab.column_state(num_lev=40, num_lat=1, water_depth=5.)
+    state = climlab.column_state(num_lev=num_lev, num_lat=1, water_depth=5.)
     ## Create individual physical process models:
     #  fixed relative humidity
     h2o = climlab.radiation.ManabeWaterVapor(state=state, name='H2O')
@@ -20,9 +19,8 @@ def rcm():
     rcm = climlab.couple([h2o,convadj,rad], name='RCM')
     return rcm
 
-@pytest.mark.compiled
-@pytest.mark.fast
-def test_convective_adjustment(rcm):
+def convective_adjustment_tester(num_lev=40):
+    rcm = make_rcm(num_lev=num_lev)
     rcm.step_forward()
     #  test non-scalar critical lapse rate
     num_lev = rcm.lev.size
@@ -43,7 +41,18 @@ def test_convective_adjustment(rcm):
 
 @pytest.mark.compiled
 @pytest.mark.fast
-def test_coupled_rcm(rcm):
+def test_convective_adjustment():
+    convective_adjustment_tester(num_lev=40)
+
+@pytest.mark.compiled
+@pytest.mark.fast
+def test_convective_adjustment_highres():
+    convective_adjustment_tester(num_lev=200)
+
+@pytest.mark.compiled
+@pytest.mark.fast
+def test_coupled_rcm():
+    rcm = make_rcm()
     deltat = rcm.timestep
     ocean_bounds = np.arange(0., 2010., 100.)
     depthax = climlab.Axis(axis_type='depth', bounds=ocean_bounds)
