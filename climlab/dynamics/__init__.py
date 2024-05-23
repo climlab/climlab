@@ -27,3 +27,6 @@ from .advection_diffusion import AdvectionDiffusion, Diffusion
 from .meridional_advection_diffusion import MeridionalAdvectionDiffusion, MeridionalDiffusion
 from .meridional_heat_diffusion import MeridionalHeatDiffusion
 from .meridional_moist_diffusion import MeridionalMoistDiffusion
+from .zonal_advection_diffusion import ZonalAdvectionDiffusion, ZonalDiffusion
+from .zonal_heat_diffusion import ZonalHeatDiffusion
+from .zonal_moist_diffusion import ZonalMoistDiffusion
