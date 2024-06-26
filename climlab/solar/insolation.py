@@ -135,21 +135,25 @@ def daily_insolation(lat, day, orb=const.orb_present, S0=const.S0, day_type=1,
               arccos(-tan(phi)*tan(delta)),
               # otherwise figure out if it's all night or all day
               xr.where(phi*delta>0., pi, 0.) )
-    # this is not really the daily average cosine of the zenith angle...
-    #  it's the integral from sunrise to sunset of that quantity...
-    coszen = Ho*sin(phi)*sin(delta) + cos(phi)*cos(delta)*sin(Ho)
+    # This is the cosine of the solar zenith angle averaged over 24 hours:
+    coszen = (Ho*sin(phi)*sin(delta) + cos(phi)*cos(delta)*sin(Ho)) / pi
+    # solar distance factor
+    rho = _solar_distance_Berger(ecc, lambda_long, long_peri)
     # Compute daily average insolation
-    Fsw = _compute_insolation_Berger(S0, ecc, lambda_long, long_peri, coszen)
+    Fsw = _compute_insolation(S0, rho, coszen)
     if input_is_xarray:
         return Fsw
     else:
         # Dimensional ordering consistent with previous numpy code
         return Fsw.transpose().values
 
+def _solar_distance_Berger(ecc, lambda_long, long_peri):
+    '''Earth-Sun distance relative to its reference value at which the solar constant is measured
+    See Berger (JAS 1978), unnumbered equation on page 2367'''
+    return (1-ecc**2) / (1 + ecc*cos(lambda_long - long_peri))
 
-def _compute_insolation_Berger(S0, ecc, lambda_long, long_peri, coszen):
-    # Compute insolation: Berger 1978 eq (10)
-    return S0/pi*coszen*(1+ecc*cos(lambda_long - long_peri))**2 / (1-ecc**2)**2
+def _compute_insolation(S0, rho, coszen):
+    return S0 / rho**2 * coszen
 
 
 def instant_insolation(lat, day, lon=0., orb=const.orb_present, S0=const.S0, 
@@ -230,9 +234,11 @@ def instant_insolation(lat, day, lon=0., orb=const.orb_present, S0=const.S0,
     # hour angle in rad
     h = (LST - 0.5) * 2*pi
     # instantaneous cosine of solar zenith angle
-    coszen = (sin(phi)*sin(delta) + cos(phi)*cos(delta)*cos(h)) * pi
+    coszen = (sin(phi)*sin(delta) + cos(phi)*cos(delta)*cos(h))
+    # solar distance factor
+    rho = _solar_distance_Berger(ecc, lambda_long, long_peri)
     # Compute insolation
-    Fsw = _compute_insolation_Berger(S0, ecc, lambda_long, long_peri, coszen)
+    Fsw = _compute_insolation(S0, rho, coszen)
     # assert |h|<=Ho, i.e. it is day time (same as checking Fsw >= 0)
     Fsw = np.maximum(Fsw, 0.0)
     if input_is_xarray:
