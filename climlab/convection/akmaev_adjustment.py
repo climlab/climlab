@@ -139,6 +139,6 @@ def Akmaev_adjustment(theta, q, beta, n_k, theta_k, s_k, t_k):
 #   in pure Python. Results should be identical
 try:
     from numba import jit
-    Akmaev_adjustment = jit(signature_or_function=Akmaev_adjustment)
+    Akmaev_adjustment = jit(signature_or_function=Akmaev_adjustment, nopython=True)
 except ImportError:
     pass
