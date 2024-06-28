@@ -46,8 +46,9 @@ import xarray as xr
 oldsettings = np.seterr(invalid='ignore')
 
 
-def daily_insolation(lat, day, orb=const.orb_present, S0=const.S0, day_type=1, 
-                     days_per_year=const.days_per_year):
+def daily_insolation(lat, day, orb=const.orb_present, S0=const.S0, 
+                     day_type=1, days_per_year=const.days_per_year,
+                     ):
     """Compute daily average insolation given latitude, time of year and orbital parameters.
 
     Orbital parameters can be interpolated to any time in the last 5 Myears with
@@ -127,16 +128,9 @@ def daily_insolation(lat, day, orb=const.orb_present, S0=const.S0, day_type=1,
     else:
         raise ValueError('Invalid day_type.')
 
-    # Compute declination angle of the sun
-    delta = arcsin(sin(obliquity) * sin(lambda_long))
-    # Compute Ho, the hour angle at sunrise / sunset
-    #  Check for no sunrise or no sunset: Berger 1978 eqn (8),(9)
-    Ho = xr.where( abs(delta)-pi/2+abs(phi) < 0., # there is sunset/sunrise
-              arccos(-tan(phi)*tan(delta)),
-              # otherwise figure out if it's all night or all day
-              xr.where(phi*delta>0., pi, 0.) )
+    delta = declination_angle(obliquity, lambda_long)
     # This is the cosine of the solar zenith angle averaged over 24 hours:
-    coszen = (Ho*sin(phi)*sin(delta) + cos(phi)*cos(delta)*sin(Ho)) / pi
+    coszen = coszen_daily_time_weighted(phi, delta)
     # solar distance factor
     rho = _solar_distance_Berger(ecc, lambda_long, long_peri)
     # Compute daily average insolation
@@ -148,8 +142,14 @@ def daily_insolation(lat, day, orb=const.orb_present, S0=const.S0, day_type=1,
         return Fsw.transpose().values
 
 def _solar_distance_Berger(ecc, lambda_long, long_peri):
-    '''Earth-Sun distance relative to its reference value at which the solar constant is measured
-    See Berger (JAS 1978), unnumbered equation on page 2367'''
+    """Earth-Sun distance relative to its reference value at which the solar constant is measured
+    See Berger (JAS 1978), unnumbered equation on page 2367.
+    
+    Inputs:
+    - ecc: eccentricity (dimensionless)
+    - lambda_long: solar longitude angle (radians)
+    - long_peri: longitude of perihelion (radians)
+    """
     return (1-ecc**2) / (1 + ecc*cos(lambda_long - long_peri))
 
 def _compute_insolation(S0, rho, coszen):
@@ -219,7 +219,7 @@ def instant_insolation(lat, day, lon=0., orb=const.orb_present, S0=const.S0,
     # measured from spring equinox (21 March)
     lambda_long = deg2rad(solar_longitude(day, orb, days_per_year))
     # Compute declination angle of the sun
-    delta = arcsin(sin(obliquity) * sin(lambda_long))
+    delta = declination_angle(obliquity, lambda_long)
     
     # np.fmod(day, 1.0) finds the "fractional" time of day with a range of [0,1)
     # where 0 is midnight, and 0.9999... is 23:59. lon/360 converts longitude 
@@ -234,7 +234,7 @@ def instant_insolation(lat, day, lon=0., orb=const.orb_present, S0=const.S0,
     # hour angle in rad
     h = (LST - 0.5) * 2*pi
     # instantaneous cosine of solar zenith angle
-    coszen = (sin(phi)*sin(delta) + cos(phi)*cos(delta)*cos(h))
+    coszen = coszen_instantaneous(phi, delta, h)
     # solar distance factor
     rho = _solar_distance_Berger(ecc, lambda_long, long_peri)
     # Compute insolation
@@ -247,6 +247,70 @@ def instant_insolation(lat, day, lon=0., orb=const.orb_present, S0=const.S0,
         # Dimensional ordering consistent with previous numpy code
         return Fsw.transpose().values
 
+def declination_angle(obliquity, lambda_long):
+    """Compute solar declination angle in radians.
+
+    Inputs:
+    - obliquity: obliquity angle in radians
+    - lambda_long: solar longitude angle in radians
+    """
+    return arcsin(sin(obliquity) * sin(lambda_long))
+
+def hour_angle_at_sunset(phi, delta):
+    """Compute the hour angle (in radians) at sunset.
+    Formulas based on Berger (1978) eqns (8), (9).
+    
+    Inputs:
+    - phi: latitude in radians
+    - delta: solar declination angle in radians
+    """
+    return xr.where( abs(delta)-pi/2+abs(phi) < 0., # there is sunset/sunrise
+              arccos(-tan(phi)*tan(delta)),
+              # otherwise figure out if it's all night or all day
+              xr.where(phi*delta>0., pi, 0.) )
+
+def coszen_instantaneous(phi, delta, h):
+    """Cosine of solar zenith angle (instantaneous)
+    
+    Inputs:
+    - phi: latitude in radians
+    - delta: solar declination angle in radians
+    - h: hour angle in radians
+    """
+    return (sin(phi)*sin(delta) + cos(phi)*cos(delta)*cos(h))
+
+def coszen_daily_time_weighted(phi, delta):
+    """Cosine of solar zenith angle averaged in time over 24 hours.
+    
+    Inputs:
+    - phi: latitude in radians
+    - delta: solar declination angle in radians
+    """
+    h0 = hour_angle_at_sunset(phi, delta)
+    return (h0*sin(phi)*sin(delta) + cos(phi)*cos(delta)*sin(h0)) / pi
+
+def coszen_daily_insolation_weighted(phi, delta):
+    """Cosine of solar zenith angle, insolation-weighted daily average.
+    
+    Inputs:
+    - phi: latitude in radians
+    - delta: solar declination angle in radians
+    """
+    h0 = hour_angle_at_sunset(phi, delta)
+    denominator = h0*sin(phi)*sin(delta) + cos(phi)*cos(delta)*sin(h0)
+    numerator = (h0*(2* sin(phi)**2*sin(delta)**2 + cos(phi)**2*cos(delta)**2) + 
+        cos(phi)*cos(delta)*sin(h0)*(4*sin(phi)*sin(delta) + cos(phi)*cos(delta)*cos(h0)))
+    return numerator / denominator / 2
+
+def coszen_daily_time_weighted_sunlit(delta, phi):
+    """Cosine of solar zenith angle averaged in time sunlit hours only.
+    
+    Inputs:
+    - phi: latitude in radians
+    - delta: solar declination angle in radians
+    """
+    h0 = hour_angle_at_sunset(delta, phi)
+    return sin(phi)*sin(delta) + cos(phi)*cos(delta)*sin(h0)/h0
 
 def solar_longitude(day, orb=const.orb_present, days_per_year=const.days_per_year):
     """Estimates solar longitude from calendar day.
@@ -284,9 +348,6 @@ def solar_longitude(day, orb=const.orb_present, days_per_year=const.days_per_yea
     :rtype:                     array
 
     Works for both scalar and vector orbital parameters.
-
-
-
     """
     ecc = orb['ecc']
     long_peri_rad = deg2rad( orb['long_peri'])
