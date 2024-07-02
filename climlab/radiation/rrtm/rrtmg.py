@@ -130,7 +130,7 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
         #  We want any changes implemented in the parent __init__ method to be preserved here
         remove_list = ['absorber_vmr','cldfrac','clwp','ciwp','r_liq','r_ice',
                        'emissivity','aldif','aldir','asdif','asdir','S0','coszen',
-                       'eccentricity_factor','insolation',]
+                       'irradiance_factor','insolation',]
         for item in remove_list:
             if item in kwargs:
                 ignored = kwargs.pop(item)
@@ -174,9 +174,9 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
                      asdir = self.asdir,
                      S0 = self.S0,
                      coszen = self.coszen,
-                     eccentricity_factor = self.eccentricity_factor,
+                     irradiance_factor = self.irradiance_factor,
                      dyofyr = dyofyr,
-                     insolation = self.insolation,
+                    #  insolation = self.insolation,
                      inflgsw = inflgsw,
                      iceflgsw = iceflgsw,
                      tauc = tauc_sw,
@@ -223,16 +223,16 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
         self.add_input('bndsolvar', bndsolvar)
         self.add_input('solcycfrac', solcycfrac)
     
-    @property
-    def insolation(self):
-        return self._insolation
+    # @property
+    # def insolation(self):
+    #     return self._insolation
     
-    @insolation.setter
-    def insolation(self, x):
-        self._insolation = x
-        # propagate to 'SW'
-        if 'SW' in self.subprocess:
-            self.subprocess['SW'].insolation = x
+    # @insolation.setter
+    # def insolation(self, x):
+    #     self._insolation = x
+    #     # propagate to 'SW'
+    #     if 'SW' in self.subprocess:
+    #         self.subprocess['SW'].insolation = x
             
     @property
     def coszen(self):
