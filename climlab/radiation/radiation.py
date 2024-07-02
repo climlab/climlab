@@ -37,7 +37,7 @@ Additional input arguments for SW:
      - ``S0 = const.S0``,  (solar constant, W/m2)
      - ``insolation = const.S0/4.``,  (time-mean insolaltion, W/m2)
      - ``coszen = None``,    # cosine of the solar zenith angle
-     - ``eccentricity_factor = 1.``,  # instantaneous irradiance = S0 * eccentricity_factor
+     - ``irradiance_factor = 1.``,  # instantaneous irradiance = S0 * irradiance_factor
 
 Additional input arguments for LW:
     - ``emissivity = 1.``,  # surface emissivity
@@ -212,20 +212,23 @@ class _Radiation_SW(_Radiation):
                  asdif = 0.3,
                  asdir = 0.3,
                  S0    = const.S0,
-                 insolation = const.S0/4.,
-                 coszen = None,    # cosine of the solar zenith angle
-                 eccentricity_factor = 1.,  # instantaneous irradiance = S0 * eccentricity_factor
+                 insolation = None,
+                 coszen = 0.25,    # cosine of the solar zenith angle
+                 irradiance_factor = 1.,  # instantaneous irradiance = S0 * irradiance_factor
                  **kwargs):
         super(_Radiation_SW, self).__init__(**kwargs)
         #  coszen is cosine of solar zenith angle
         #  If unspecified, infer it from the insolation
         #  (assuming a circular orbit and standard solar constant)
-        if coszen is None:
-            coszen = insolation / S0
+        # if insolation is None:
+        #     insolation = coszen * S0
+        # if coszen is None:
+        #     coszen = insolation / S0
         self.add_input('S0', S0)
-        self.add_input('insolation', insolation)
         self.add_input('coszen', coszen)
-        self.add_input('eccentricity_factor', eccentricity_factor)
+        self.add_input('irradiance_factor', irradiance_factor)
+        if insolation is not None:
+            self.add_input('insolation', insolation)
         if albedo is not None:
             aldif = albedo
             aldir = albedo
@@ -252,6 +255,13 @@ class _Radiation_SW(_Radiation):
         self.add_diagnostic('SW_flux_up_clr', 0. * interface_zero)
         self.add_diagnostic('SW_flux_down_clr', 0. * interface_zero)
         self.add_diagnostic('SW_flux_net_clr', 0. * interface_zero)
+
+    @property
+    def insolation(self):
+        return self.S0 * self.irradiance_factor * self.coszen
+    @insolation.setter
+    def insolation(self, value):
+        self.coszen = value / self.S0 / self.irradiance_factor
 
     def _compute_SW_flux_diagnostics(self):
         #  positive down, consistent with ASR

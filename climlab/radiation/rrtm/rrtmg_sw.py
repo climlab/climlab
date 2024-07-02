@@ -152,7 +152,7 @@ class RRTMG_SW(_Radiation_SW):
         solcycfrac = self.solcycfrac
         iaer = self.iaer
         #  scalar real arguments
-        adjes = self.eccentricity_factor
+        adjes = self.irradiance_factor
         scon = self.S0
         indsolvar = self.indsolvar
         bndsolvar = self.bndsolvar

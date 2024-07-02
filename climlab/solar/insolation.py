@@ -46,6 +46,49 @@ import xarray as xr
 oldsettings = np.seterr(invalid='ignore')
 
 
+def _compute_solar_angles(lat, day, orb, lon=None, day_type=1, days_per_year=const.days_per_year):
+    phi, day, ecc, long_peri, obliquity, input_is_xarray, lam = _standardize_inputs(lat, day, orb, lon)
+    if day_type==1: # calendar days
+        lambda_long = deg2rad(solar_longitude(day, orb, days_per_year))
+    elif day_type==2: #solar longitude (1-360) is specified in input, no need to convert days to longitude
+        lambda_long = deg2rad(day)
+    else:
+        raise ValueError('Invalid day_type.')
+    delta = declination_angle(obliquity, lambda_long)
+    rho = _solar_distance_Berger(ecc, lambda_long, long_peri)
+    irradiance_factor = rho**(-2)
+    if lon is not None:
+        # np.fmod(day, 1.0) finds the "fractional" time of day with a range of [0,1)
+        # where 0 is midnight, and 0.9999... is 23:59. lon/360 converts longitude 
+        # to time since moving along the longitude axis produces the same effect as
+        # changing time while keeping longitude the same. the fractional time and
+        # fractional longitude are added together since they now both represent 
+        # longitude/time of day. This lets us calculate the local solar time (in 
+        # "fractional" units) and then convert to hour angle. The -0.5 is included
+        # in order to assert that noon occurs when the sun is overhead (so h=0 at
+        # LST=0.5 aka time=noon).
+        LST = np.fmod((np.fmod(day, 1.0) + (lam/(2*pi))), 1.0)
+        # hour angle in rad
+        h = (LST - 0.5) * 2*pi
+    else:
+        h = None
+    return phi, delta, irradiance_factor, h, input_is_xarray
+
+
+def daily_something(lat, day, orb=const.orb_present, S0=const.S0, 
+                     day_type=1, days_per_year=const.days_per_year,):
+    phi, delta, irradiance_factor, h, input_is_xarray = _compute_solar_angles(lat, day, orb, day_type=day_type, days_per_year=days_per_year)
+    # This is the cosine of the solar zenith angle averaged over 24 hours:
+    coszen = coszen_daily_time_weighted(phi, delta)
+    # Compute daily average insolation
+    Fsw = _compute_insolation(S0, irradiance_factor, coszen)
+    if not input_is_xarray:
+        Fsw = Fsw.transpose().values
+        coszen = coszen.transpose().values
+        irradiance_factor = irradiance_factor.tranpose().values
+    return Fsw, coszen, irradiance_factor
+
+
 def daily_insolation(lat, day, orb=const.orb_present, S0=const.S0, 
                      day_type=1, days_per_year=const.days_per_year,
                      ):
@@ -117,24 +160,12 @@ def daily_insolation(lat, day, orb=const.orb_present, S0=const.S0,
         For more information about computation of solar insolation see the
         :ref:`Tutorial` chapter.
 
-     """
-    phi, day, ecc, long_peri, obliquity, input_is_xarray, _ignored = _standardize_inputs(lat, day, orb)
-    # lambda_long (solar longitude) is the angular distance along Earth's orbit 
-    # measured from spring equinox (21 March)
-    if day_type==1: # calendar days
-        lambda_long = deg2rad(solar_longitude(day, orb, days_per_year))
-    elif day_type==2: #solar longitude (1-360) is specified in input, no need to convert days to longitude
-        lambda_long = deg2rad(day)
-    else:
-        raise ValueError('Invalid day_type.')
-
-    delta = declination_angle(obliquity, lambda_long)
+    """
+    phi, delta, irradiance_factor, h, input_is_xarray = _compute_solar_angles(lat, day, orb, day_type=day_type, days_per_year=days_per_year)
     # This is the cosine of the solar zenith angle averaged over 24 hours:
     coszen = coszen_daily_time_weighted(phi, delta)
-    # solar distance factor
-    rho = _solar_distance_Berger(ecc, lambda_long, long_peri)
     # Compute daily average insolation
-    Fsw = _compute_insolation(S0, rho, coszen)
+    Fsw = _compute_insolation(S0, irradiance_factor, coszen)
     if input_is_xarray:
         return Fsw
     else:
@@ -152,8 +183,8 @@ def _solar_distance_Berger(ecc, lambda_long, long_peri):
     """
     return (1-ecc**2) / (1 + ecc*cos(lambda_long - long_peri))
 
-def _compute_insolation(S0, rho, coszen):
-    return S0 / rho**2 * coszen
+def _compute_insolation(S0, irradiance_factor, coszen):
+    return S0 * irradiance_factor * coszen
 
 
 def instant_insolation(lat, day, lon=0., orb=const.orb_present, S0=const.S0, 
@@ -214,31 +245,11 @@ def instant_insolation(lat, day, lon=0., orb=const.orb_present, S0=const.S0,
         :ref:`Tutorial` chapter.
 
      """
-    phi, day, ecc, long_peri, obliquity, input_is_xarray, lam = _standardize_inputs(lat, day, orb, lon)
-    # lambda_long (solar longitude) is the angular distance along Earth's orbit 
-    # measured from spring equinox (21 March)
-    lambda_long = deg2rad(solar_longitude(day, orb, days_per_year))
-    # Compute declination angle of the sun
-    delta = declination_angle(obliquity, lambda_long)
-    
-    # np.fmod(day, 1.0) finds the "fractional" time of day with a range of [0,1)
-    # where 0 is midnight, and 0.9999... is 23:59. lon/360 converts longitude 
-    # to time since moving along the longitude axis produces the same effect as
-    # changing time while keeping longitude the same. the fractional time and
-    # fractional longitude are added together since they now both represent 
-    # longitude/time of day. This lets us calculate the local solar time (in 
-    # "fractional" units) and then convert to hour angle. The -0.5 is included
-    # in order to assert that noon occurs when the sun is overhead (so h=0 at
-    # LST=0.5 aka time=noon).
-    LST = np.fmod((np.fmod(day, 1.0) + (lam/(2*pi))), 1.0)
-    # hour angle in rad
-    h = (LST - 0.5) * 2*pi
+    phi, delta, irradiance_factor, h, input_is_xarray = _compute_solar_angles(lat, day, orb, lon=lon, days_per_year=days_per_year)
     # instantaneous cosine of solar zenith angle
     coszen = coszen_instantaneous(phi, delta, h)
-    # solar distance factor
-    rho = _solar_distance_Berger(ecc, lambda_long, long_peri)
     # Compute insolation
-    Fsw = _compute_insolation(S0, rho, coszen)
+    Fsw = _compute_insolation(S0, irradiance_factor, coszen)
     # assert |h|<=Ho, i.e. it is day time (same as checking Fsw >= 0)
     Fsw = np.maximum(Fsw, 0.0)
     if input_is_xarray:

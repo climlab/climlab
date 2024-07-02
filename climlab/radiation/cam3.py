@@ -120,7 +120,7 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         epsilon = const.Rd / const.Rv
         stebol = const.sigma
         scon = self.S0
-        eccf = self.eccentricity_factor
+        eccf = self.irradiance_factor
         #  Well-mixed greenhouse gases -- scalar values
         CO2vmr = self.absorber_vmr['CO2']
         N2Ovmr = self.absorber_vmr['N2O']
