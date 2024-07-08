@@ -89,6 +89,17 @@ def daily_something(lat, day, orb=const.orb_present, S0=const.S0,
     return Fsw, coszen, irradiance_factor
 
 
+def instant_something(lat, day, lon=0., orb=const.orb_present, S0=const.S0, 
+                        days_per_year=const.days_per_year):
+    phi, delta, irradiance_factor, h, input_is_xarray = _compute_solar_angles(lat, day, orb, lon=lon,
+                                                                        days_per_year=days_per_year)
+    coszen = coszen_instantaneous(phi, delta, h)
+    if not input_is_xarray:
+        coszen = coszen.transpose().values
+        irradiance_factor = irradiance_factor.tranpose().values
+    return coszen, irradiance_factor
+
+
 def daily_insolation(lat, day, orb=const.orb_present, S0=const.S0, 
                      day_type=1, days_per_year=const.days_per_year,
                      ):
@@ -250,8 +261,6 @@ def instant_insolation(lat, day, lon=0., orb=const.orb_present, S0=const.S0,
     coszen = coszen_instantaneous(phi, delta, h)
     # Compute insolation
     Fsw = _compute_insolation(S0, irradiance_factor, coszen)
-    # assert |h|<=Ho, i.e. it is day time (same as checking Fsw >= 0)
-    Fsw = np.maximum(Fsw, 0.0)
     if input_is_xarray:
         return Fsw
     else:
@@ -282,13 +291,15 @@ def hour_angle_at_sunset(phi, delta):
 
 def coszen_instantaneous(phi, delta, h):
     """Cosine of solar zenith angle (instantaneous)
+    Returns zero if the sun is below the horizon.
     
     Inputs:
     - phi: latitude in radians
     - delta: solar declination angle in radians
     - h: hour angle in radians
     """
-    return (sin(phi)*sin(delta) + cos(phi)*cos(delta)*cos(h))
+    coszen = (sin(phi)*sin(delta) + cos(phi)*cos(delta)*cos(h))
+    return np.maximum(coszen, 0.0)
 
 def coszen_daily_time_weighted(phi, delta):
     """Cosine of solar zenith angle averaged in time over 24 hours.
