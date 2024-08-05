@@ -51,7 +51,7 @@ def interface_temperature(Ts, Tatm, **kwargs):
     Tinterp = np.concatenate((Ttoa[..., np.newaxis], Tinterp, Ts), axis=-1)
     return Tinterp
 
-def _climlab_to_rrtm(field, spectral_axis=False, reorder_sw_bands=False):
+def _climlab_to_rrtm(field, spectral_axis=False, do_lev_flip=True):
     '''Prepare field with proper dimension order.
     RRTM code expects arrays with (ncol, nlay)
     and with pressure decreasing from surface at element 0
@@ -65,12 +65,11 @@ def _climlab_to_rrtm(field, spectral_axis=False, reorder_sw_bands=False):
 
     spectral_axis should be set to True if the field has an additional axis for spectral bands (nbndlw or nbndsw)
     
-    reorder_sw_bands should be set to True for shortwave fields with spectral bands to account for RRTMG_SW band ordering
-    (ignored if spectral_axis=False)
     '''
     try:
         #  Flip along the last axis to reverse the pressure order
-        field = field[..., ::-1]
+        if do_lev_flip:
+            field = field[..., ::-1]
     except:
         if np.isscalar(field):
             return field
@@ -89,8 +88,6 @@ def _climlab_to_rrtm(field, spectral_axis=False, reorder_sw_bands=False):
     #elif num_dims==3:  # (num_lat, num_lon, num_lev)
         #  Need to reshape this array
     if spectral_axis:
-        if reorder_sw_bands:
-            modfield = np.roll(modfield, -1, axis=0)  # Make Band 29 the last element of array
         # transpose to get [ncol,nlay,nbnd]
         modfield = np.transpose(modfield, (1,2,0))
     return modfield
