@@ -28,7 +28,6 @@ wavenum_bounds = np.array([820., 2600., 3250., 4000., 4650., 5150., 6150., 7700.
 wavenum_delta = np.diff(wavenum_bounds)
 # For some reason the band 820 - 2600 cm-1 is the last element in RRTMG_SW (Band 29) 
 # instead of first element (Band 16)
-# Climlab will keep bands in numerical order by wavenumber and reorder before passing to RRTMG_SW
 
 class RRTMG_SW(_Radiation_SW):
     def __init__(self,
@@ -179,11 +178,11 @@ class RRTMG_SW(_Radiation_SW):
         # In-cloud forward scattering fraction (delta function pointing forward "forward peaked scattering")
         fsfc = _climlab_to_rrtm(self.fsfc * np.ones_like(self.Tatm)) * np.ones([nbndsw,ncol,nlay])
         # Aerosol optical depth (iaer=10 only), (ncol,nlay,nbndsw)] #  (non-delta scaled)
-        tauaer = _climlab_to_rrtm(self.tauaer, spectral_axis=True, reorder_sw_bands=True)
+        tauaer = _climlab_to_rrtm(self.tauaer, spectral_axis=True)
         # Aerosol single scattering albedo (iaer=10 only), Dimensions,  (ncol,nlay,nbndsw)] #  (non-delta scaled)
-        ssaaer = _climlab_to_rrtm(self.ssaaer, spectral_axis=True, reorder_sw_bands=True)
+        ssaaer = _climlab_to_rrtm(self.ssaaer, spectral_axis=True)
         # Aerosol asymmetry parameter (iaer=10 only), Dimensions,  (ncol,nlay,nbndsw)] #  (non-delta scaled)
-        asmaer = _climlab_to_rrtm(self.asmaer, spectral_axis=True, reorder_sw_bands=True)
+        asmaer = _climlab_to_rrtm(self.asmaer, spectral_axis=True)
         # Aerosol optical depth at 0.55 micron (iaer=6 only), Dimensions,  (ncol,nlay,naerec)] #  (non-delta scaled)
         ecaer = _climlab_to_rrtm(self.ecaer, spectral_axis=True)
 
