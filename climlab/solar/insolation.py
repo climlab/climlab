@@ -80,13 +80,10 @@ def daily_something(lat, day, orb=const.orb_present, S0=const.S0,
     phi, delta, irradiance_factor, h, input_is_xarray = _compute_solar_angles(lat, day, orb, day_type=day_type, days_per_year=days_per_year)
     # This is the cosine of the solar zenith angle averaged over 24 hours:
     coszen = coszen_daily_time_weighted(phi, delta)
-    # Compute daily average insolation
-    Fsw = _compute_insolation(S0, irradiance_factor, coszen)
     if not input_is_xarray:
-        Fsw = Fsw.transpose().values
         coszen = coszen.transpose().values
         irradiance_factor = irradiance_factor.tranpose().values
-    return Fsw, coszen, irradiance_factor
+    return coszen, irradiance_factor
 
 
 def instant_something(lat, day, lon=0., orb=const.orb_present, S0=const.S0, 
