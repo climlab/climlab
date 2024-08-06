@@ -5,6 +5,7 @@ import climlab
 def to_xarray(model):
     model.to_xarray()
     model.to_xarray(diagnostics=True)
+    model.to_xarray(timeave=True)
     if hasattr(model, 'timeave'):
         climlab.to_xarray(model.timeave)
     # We should be able to render all tendencies as xarray
