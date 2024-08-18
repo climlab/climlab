@@ -138,13 +138,11 @@ class AdvectionDiffusion(ImplicitProcess):
         self.prescribed_flux = prescribed_flux  # flux including boundary conditions
         self.K = K  # Diffusivity in units of [length]**2 / [time]
         self.U = U  # Advecting velocity in units of [length] / [time]
-        self.add_diagnostic('diffusive_flux',
-            np.moveaxis(0.*self.K*self._weight_bounds,-1,self.diffusion_axis_index))
-        self.add_diagnostic('advective_flux', 0.*self.diffusive_flux)
-        self.add_diagnostic('total_flux', 0.*self.diffusive_flux)
+        self.diffusive_flux = np.moveaxis(0.*self.K*self._weight_bounds,-1,self.diffusion_axis_index)
+        self.advective_flux = 0.*self.diffusive_flux
+        self.total_flux = 0.*self.diffusive_flux
         for varname, value in self.state.items():
-            self.add_diagnostic('flux_convergence',
-                np.moveaxis(0.*self._weight_center,-1,self.diffusion_axis_index))
+            self.flux_convergence = np.moveaxis(0.*self._weight_center,-1,self.diffusion_axis_index)
 
     @property
     def K(self):
