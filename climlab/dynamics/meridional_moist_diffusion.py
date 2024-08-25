@@ -219,5 +219,12 @@ class MoistMeridionalAdvectionDiffusion(TimeDependentProcess):
         self.mse_obj._compute_mse()
         dict_q = self.diff_q._compute()
         dict_mse = self.diff_mse._compute()
+        if hasattr(self, 'do_fixed_cells'):
+            if self.do_fixed_cells:
+                print('has attribute')
+                if 'q' in self.fixed_cells_dict:
+                    dict_q['q'][self.fixed_cells_dict['q']] *= 0.
+                if 'Tatm' in self.fixed_cells_dict:
+                    dict_mse['mse'][self.fixed_cells_dict['Tatm']] *= 0.
         dict_t = {'Tatm': self.mse_obj.get_T_part(dict_mse['mse'], dict_q['q'])}
         return {'q': dict_q['q'], 'Tatm': dict_t['Tatm']}
