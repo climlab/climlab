@@ -241,6 +241,10 @@ class TimeDependentProcess(Process):
         if self.time_type == 'adjustment':
             for varname, adj in self_tend.items():
                 self_tend[varname] /= self.timestep
+        if self.do_fixed_cells:
+            for varname, tend in self_tend.items():
+                if varname in self.fixed_cells_dict:
+                    tend[self.fixed_cells_dict[varname]] *= 0.
         for varname, tend in self_tend.items():
             self.tendencies[varname] += tend
         return self.tendencies

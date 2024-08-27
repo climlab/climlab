@@ -47,7 +47,7 @@ def test_rcm_emanuel_bound_1col():
     #  ASYNCHRONOUS COUPLING -- the radiation uses a much longer timestep
     short_timestep = climlab.constants.seconds_per_hour
     #  The top-level model
-    model = climlab.TimeDependentProcess(name='Radiative-Convective Model',
+    model0 = climlab.TimeDependentProcess(name='Radiative-Convective Model',
                         state=state,
                         timestep=short_timestep, bound_dict=bound_dict)
     #  Radiation coupled to water vapor
@@ -69,16 +69,29 @@ def test_rcm_emanuel_bound_1col():
                                   timestep=short_timestep)
     #  Couple all the submodels together
     for proc in [rad, conv, shf, lhf]:
-        model.add_subprocess(proc.name, proc)
+        model0.add_subprocess(proc.name, proc)
+    model = deepcopy(model0)
     model.do_fixed_cells = True
     model.fixed_cells_dict = fixed_cells_1d_dict
-    model0 = deepcopy(model)
-    model.integrate_years(1.0)
+    model.integrate_days(10.0)
     for key, ind in fixed_cells_1d_dict.items():
         assert model.__dict__[key][ind] == pytest.approx(model0.__dict__[key][ind], rel=0.001)
     for key, bound in bound_dict.items():
         assert np.all(model.__dict__[key] <= bound[1])
         assert np.all(model.__dict__[key] >= bound[0])
+    model = deepcopy(model0)
+    conv = model.subprocess['Convection']
+    conv.do_fixed_cells = True
+    conv.fixed_cells_dict = fixed_cells_1d_dict
+    model.integrate_days(10.0)
+    key = 'Tatm'
+    ind = fixed_cells_1d_dict[key]
+    # testing the Tatm is changing now
+    assert not model.__dict__[key][ind] == pytest.approx(model0.__dict__[key][ind], rel=0.001)
+    # but conv does not change q
+    key = 'q'
+    ind = fixed_cells_1d_dict[key]
+    assert np.all(conv.compute()[key][ind] == 0.0)
 
 
 @pytest.mark.compiled
@@ -116,10 +129,10 @@ def test_rcm_emanuel_bound_2d():
     #  Couple all the submodels together
     for proc in [rad, conv, shf, lhf]:
         model.add_subprocess(proc.name, proc)
+    model0 = deepcopy(model)
     model.do_fixed_cells = True
     model.fixed_cells_dict = fixed_cells_2d_dict
-    model0 = deepcopy(model)
-    model.integrate_years(1.0)
+    model.integrate_days(30.0)
     for key, ind in fixed_cells_2d_dict.items():
         assert model.__dict__[key][ind] == pytest.approx(model0.__dict__[key][ind], rel=0.001)
     for key, bound in bound_dict.items():
