@@ -47,6 +47,7 @@ from __future__ import division
 import numpy as np
 from climlab.process.implicit import ImplicitProcess
 from climlab.process.process import get_axes
+from climlab.domain.field import Field
 from . import adv_diff_numerics
 
 
@@ -138,13 +139,17 @@ class AdvectionDiffusion(ImplicitProcess):
         self.prescribed_flux = prescribed_flux  # flux including boundary conditions
         self.K = K  # Diffusivity in units of [length]**2 / [time]
         self.U = U  # Advecting velocity in units of [length] / [time]
-        self.add_diagnostic('diffusive_flux',
-            np.moveaxis(0.*self.K*self._weight_bounds,-1,self.diffusion_axis_index))
+        diff = np.moveaxis(0.*self.K*self._weight_bounds,-1,self.diffusion_axis_index)
+        #  Create a Field object defined at the cell interfaces along the diffusion axis
+        interfaces = np.tile(False, dom.numdims)
+        interfaces[self.diffusion_axis_index] = True
+        diffusive_flux = Field(diff, domain=dom, interfaces=interfaces)
+        self.add_diagnostic('diffusive_flux', diffusive_flux)
         self.add_diagnostic('advective_flux', 0.*self.diffusive_flux)
         self.add_diagnostic('total_flux', 0.*self.diffusive_flux)
         for varname, value in self.state.items():
-            self.add_diagnostic('flux_convergence',
-                np.moveaxis(0.*self._weight_center,-1,self.diffusion_axis_index))
+            flux_convergence = Field(np.moveaxis(0.*self._weight_center,-1,self.diffusion_axis_index), domain=dom)
+            self.add_diagnostic('flux_convergence', flux_convergence)
 
     @property
     def K(self):
