@@ -137,12 +137,15 @@ def test_moist_EBM_creation():
 def test_bounded_EBM():
     '''Test adding a Limiter process that keeps the temperature bounded 
     with a specified range.'''
+    max = 25.
+    min = -4.
+    tol = 1E-10  # avoid failing the test due to some numerical issues with the clipping
     ebm = climlab.EBM()
     mylimiter = climlab.process.Limiter(state=ebm.state, timestep=ebm.timestep)
-    mylimiter.bounds['Ts']['maximum'] = 25.
+    mylimiter.bounds['Ts']['maximum'] = max
     ebm.add_subprocess('TempLimiter', mylimiter)
     ebm.step_forward()
-    assert np.all(ebm.Ts<=25)
-    mylimiter.bounds['Ts']['minimum'] = -4.
+    assert np.all(ebm.Ts<=(max+tol))
+    mylimiter.bounds['Ts']['minimum'] = min
     ebm.step_forward()
-    assert np.all(ebm.Ts>=-4)
+    assert np.all(np.array(ebm.Ts)>=(min-tol))
