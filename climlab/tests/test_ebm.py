@@ -132,3 +132,17 @@ def test_moist_EBM_creation():
     m.add_subprocess('diffusion', diff)
     m.step_forward()
     assert hasattr(m, 'heat_transport')
+
+@pytest.mark.fast
+def test_bounded_EBM():
+    '''Test adding a Limiter process that keeps the temperature bounded 
+    with a specified range.'''
+    ebm = climlab.EBM()
+    mylimiter = climlab.process.Limiter(state=ebm.state, timestep=ebm.timestep)
+    mylimiter.bounds['Ts']['maximum'] = 25.
+    ebm.add_subprocess('TempLimiter', mylimiter)
+    ebm.step_forward()
+    assert np.all(ebm.Ts<=25)
+    mylimiter.bounds['Ts']['minimum'] = -4.
+    ebm.step_forward()
+    assert np.all(ebm.Ts>=-4)
