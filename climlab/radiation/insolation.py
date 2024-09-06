@@ -130,7 +130,7 @@ class _Insolation(DiagnosticProcess):
         pass
 
     def _get_current_insolation(self):
-        pass
+        self._compute_fixed()
 
     def _compute(self):
         self._get_current_insolation()
