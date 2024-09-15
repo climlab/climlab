@@ -19,8 +19,7 @@ At least two diagnostics are provided:
 from __future__ import division
 import numpy as np
 from climlab.process.diagnostic import DiagnosticProcess
-from climlab.domain.field import Field
-from climlab.domain.field import to_latlon
+from climlab.domain.field import Field, to_latlon
 from climlab.utils.legendre import P2
 from climlab import constants as const
 from climlab.solar.insolation import daily_insolation, instant_insolation

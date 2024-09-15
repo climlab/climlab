@@ -37,14 +37,11 @@ calculated for 45N.
 from __future__ import division
 import numpy as np
 from climlab import constants as const
-from climlab.process.time_dependent_process import TimeDependentProcess
-from climlab.domain.initial import column_state
-from climlab.domain.field import Field
-from climlab.radiation.insolation import FixedInsolation
-from climlab.radiation.greygas import GreyGas, GreyGasSW
-from climlab.convection.convadj import ConvectiveAdjustment
-from climlab.radiation.nband import ThreeBandSW, FourBandLW, FourBandSW
-from climlab.radiation.water_vapor import ManabeWaterVapor
+from climlab.process import TimeDependentProcess
+from climlab.domain import column_state, Field
+from climlab.radiation import (FixedInsolation, GreyGas, GreyGasSW,
+        ThreeBandSW, FourBandLW, ManabeWaterVapor)
+from climlab.convection import ConvectiveAdjustment
 
 class GreyRadiationModel(TimeDependentProcess):
     def __init__(self,
