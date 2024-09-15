@@ -158,18 +158,13 @@ class BandRCModel(RadiativeConvectiveModel):
         #  Initialize specific humidity
         h2o = ManabeWaterVapor(state=self.state, **self.param)
         self.add_subprocess('H2O', h2o)
-        # q is an input field for this process, which is set by subproc
-        #  (though in this sense it is actually diagnostic...)
-        newinput = ['q']
-        self.add_input('q')
-        self.q = self.subprocess['H2O'].q
 
         #  initialize radiatively active gas inventories
         self.absorber_vmr = {}
         self.absorber_vmr['CO2'] = 380.E-6 * np.ones_like(self.Tatm)
         self.absorber_vmr['O3'] = np.zeros_like(self.Tatm)
         # water vapor is actually specific humidity, not VMR.
-        self.absorber_vmr['H2O'] = self.q
+        self.absorber_vmr['H2O'] = h2o.q
 
         longwave = FourBandLW(state=self.state,
                               absorber_vmr=self.absorber_vmr,
