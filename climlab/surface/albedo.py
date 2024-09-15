@@ -122,8 +122,8 @@ class P2Albedo(DiagnosticProcess):
         super(P2Albedo, self).__init__(**kwargs)
         self.a0 = a0
         self.a2 = a2
-        self.add_diagnostic('albedo')
         self._compute_fixed()
+        self.add_diagnostic('albedo', self._albedo.copy())
 
     @property
     def a0(self):
@@ -178,7 +178,6 @@ class P2Albedo(DiagnosticProcess):
         # make sure that the diagnostic has the correct field dimensions.
         dom = next(iter(self.domains.values()))
         self._albedo = Field(albedo, domain=dom)
-        self.albedo = self._albedo.copy()
 
     def _compute(self):
         self.albedo[:] = self._albedo
@@ -218,8 +217,8 @@ class Iceline(DiagnosticProcess):
     def __init__(self, Tf=-10., **kwargs):
         super(Iceline, self).__init__(**kwargs)
         self.param['Tf'] = Tf
-        self.add_diagnostic('icelat')
-        self.add_diagnostic('ice_area')
+        self.add_diagnostic('icelat', np.array([-90., 90.]))
+        self.add_diagnostic('ice_area', np.array(0.))
         #  Set diagnostics based on initial conditions
         self.find_icelines()
 

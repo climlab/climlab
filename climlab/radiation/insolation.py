@@ -83,15 +83,12 @@ class _Insolation(DiagnosticProcess):
     def __init__(self, S0=const.S0, **kwargs):
         super(_Insolation, self).__init__(**kwargs)
         #  initialize diagnostics with correct shape
-        self.add_diagnostic('insolation')
-        self.add_diagnostic('coszen')
         try:
             domain = self.domains['sfc']
         except:
             domain = self.domains['default']
-        self.insolation = Field(np.zeros(domain.shape), domain=domain)
-        self.coszen = Field(np.zeros(domain.shape), domain=domain)
-        self.declare_diagnostics(['insolation','coszen'])
+        self.add_diagnostic('insolation', Field(np.zeros(domain.shape), domain=domain))
+        self.add_diagnostic('coszen', Field(np.zeros(domain.shape), domain=domain))
         self.S0 = S0
         #  Now that we have a value for self.S0 we can compute the correct coszen
         self.coszen = self._coszen_from_insolation()

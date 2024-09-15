@@ -101,7 +101,7 @@ class GreyRadiationModel(TimeDependentProcess):
                     'SW_down_TOA',
                     'planetary_albedo']
         for name in newdiags:
-            self.add_diagnostic(name)
+            self.add_diagnostic(name, 0. * self.Ts)
         # This process has to handle the coupling between
         # insolation and column radiation
         self.subprocess['SW'].flux_from_space = \
@@ -183,7 +183,7 @@ class BandRCModel(RadiativeConvectiveModel):
         # This process has to handle the coupling between
         # insolation and column radiation
         self.subprocess['SW'].flux_from_space = \
-            self.subprocess['insolation'].diagnostics['insolation']
+            self.subprocess['insolation'].insolation
 
 
 def compute_layer_absorptivity(abs_coeff, dp):

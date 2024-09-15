@@ -246,7 +246,8 @@ class TimeDependentProcess(Process):
         #  Now accumulate additive diagnostics from subprocesses
         for procname, proc in self.subprocess.items():
             for diagname, value in proc.diagnostics.items():
-                self.__dict__[diagname] += value
+                if self.__dict__[diagname].shape == value.shape:
+                    self.__dict__[diagname] += value
         return self.tendencies
 
     def _compute_type(self, proctype):
