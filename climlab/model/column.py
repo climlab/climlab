@@ -88,17 +88,18 @@ class GreyRadiationModel(TimeDependentProcess):
                     'LW_down_sfc',
                     'LW_up_sfc',
                     'LW_absorbed_sfc',
-                    'LW_absorbed_atm',
-                    'LW_emission',
                     'ASR',
                     'SW_absorbed_sfc',
-                    'SW_absorbed_atm',
                     'SW_up_sfc',
                     'SW_up_TOA',
                     'SW_down_TOA',
+                    'SW_down_sfc',
                     'planetary_albedo']
+        pressure_diags = ['LW_emission', 'LW_absorbed_atm', 'SW_absorbed_atm']
         for name in newdiags:
             self.add_diagnostic(name, 0. * self.Ts)
+        for name in pressure_diags:
+            self.add_diagnostic(name, 0. * self.Tatm)
         # This process has to handle the coupling between
         # insolation and column radiation
         self.subprocess['SW'].flux_from_space = \
@@ -176,6 +177,24 @@ class BandRCModel(RadiativeConvectiveModel):
         # insolation and column radiation
         self.subprocess['SW'].flux_from_space = \
             self.subprocess['insolation'].insolation
+
+    def do_diagnostics(self):
+        '''Set all the diagnostics from long and shortwave radiation.
+        Here we need to sum over the spectral bands.'''
+        self.OLR[:] = np.sum(self.subprocess['LW'].flux_to_space, axis=0)
+        self.LW_down_sfc[:] = np.sum(self.subprocess['LW'].flux_to_sfc, axis=0)
+        self.LW_up_sfc[:] = np.sum(self.subprocess['LW'].flux_from_sfc, axis=0)
+        self.LW_absorbed_sfc[:] = self.LW_down_sfc - self.LW_up_sfc
+        self.LW_absorbed_atm[:] = np.sum(self.subprocess['LW'].absorbed, axis=0)
+        self.LW_emission[:] = np.sum(self.subprocess['LW'].emission, axis=0)
+        self.SW_down_TOA[:] = self.subprocess['SW'].flux_from_space
+        self.SW_up_TOA[:] = np.sum(self.subprocess['SW'].flux_to_space, axis=0)
+        self.ASR[:] = (self.SW_down_TOA - self.SW_up_TOA)
+        self.SW_absorbed_atm[:] = np.sum(self.subprocess['SW'].absorbed, axis=0)
+        self.SW_down_sfc[:] = np.sum(self.subprocess['SW'].flux_to_sfc, axis=0)
+        self.SW_up_sfc[:] = np.sum(self.subprocess['SW'].flux_from_sfc, axis=0)
+        self.SW_absorbed_sfc[:] = self.SW_down_sfc - self.SW_up_sfc
+        self.planetary_albedo[:] = self.SW_up_TOA / self.SW_down_TOA
 
 
 def compute_layer_absorptivity(abs_coeff, dp):
