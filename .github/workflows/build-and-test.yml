@@ -33,16 +33,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Python environment with Mambaforge
+      - name: Setup Python environment with Miniforge
         uses: conda-incubator/setup-miniconda@v3
         with:
-          miniforge-variant: Mambaforge
           miniforge-version: latest
           python-version: ${{ matrix.python-version }}
           activate-environment: test_env
           channel-priority: strict
           environment-file: ${{ matrix.environment-file }}
-          use-mamba: true
 
       - name: Build and install climlab
         run: |
