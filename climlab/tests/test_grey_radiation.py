@@ -94,3 +94,17 @@ def test_external_tendency():
     model2.step_forward()
     assert model.tendencies['Tatm'] + temp_tend == pytest.approx(model2.tendencies['Tatm'])
     #assert np.all(np.isclose(model.tendencies['Tatm'] == (model2.tendencies['Tatm']-temp_tend))
+
+@pytest.mark.fast
+def test_additive_diagnostics(model):
+    """Check to see that diagnostics in parent process are the sum of 
+    same-named diagnostics in subprocesses."""
+    model.step_forward()
+    for diagname in ['flux_from_sfc',
+                 'flux_to_sfc',
+                 'flux_to_space',
+                 'absorbed',
+                 'absorbed_total']:
+        assert np.all(model.diagnostics[diagname] == 
+            model.subprocess['SW'].diagnostics[diagname] 
+            + model.subprocess['LW'].diagnostics[diagname])
