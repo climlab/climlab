@@ -3,7 +3,7 @@ from builtins import range
 import numpy as np
 from climlab.radiation.greygas import GreyGas
 from climlab import constants as const
-from climlab.domain import domain, axis, field
+from climlab.domain import domain, axis, Field
 from copy import copy
 
 
@@ -49,6 +49,25 @@ class NbandRadiation(GreyGas):
         dp = self.Tatm.domain.lev.delta
         self.mass_per_layer = dp * const.mb_to_Pa / const.g
         self.albedo_sfc = np.ones_like(self.band_fraction) * self.albedo_sfc
+        self._define_diagnostics()
+
+    def _define_diagnostics(self):
+        atmaxes = copy(self.Tatm.domain.axes)
+        atmaxes.update(self.channel_ax)
+        atmdom = domain.Atmosphere(axes=atmaxes)
+        sfcaxes = copy(self.Ts.domain.axes)
+        sfcaxes.update(self.channel_ax)
+        sfcdom = domain.SlabOcean(axes=sfcaxes)
+        atmdiag = Field(np.zeros(atmdom.shape), domain=atmdom)
+        sfcdiag = Field(np.zeros(sfcdom.shape), domain=sfcdom)
+
+        self.add_diagnostic('flux_from_sfc', 0. * sfcdiag)
+        self.add_diagnostic('flux_to_sfc', 0. * sfcdiag)
+        self.add_diagnostic('flux_to_space', 0. * sfcdiag)
+        self.add_diagnostic('absorbed', 0. * atmdiag)
+        self.add_diagnostic('absorbed_total', 0. * sfcdiag)
+        self.add_diagnostic('emission', 0. * atmdiag)
+        self.add_diagnostic('emission_sfc', 0. * sfcdiag)
 
     @property
     def band_fraction(self):
@@ -61,7 +80,7 @@ class NbandRadiation(GreyGas):
         self.channel_ax = {'channel': ax}
         dom = domain._Domain(axes=self.channel_ax)
         #   fraction of the total solar flux in each band:
-        self._band_fraction = field.Field(value, domain=dom)
+        self._band_fraction = Field(value, domain=dom)
 
     def _compute_optical_path(self):
         # this will cause a problem for a model without CO2
@@ -91,7 +110,7 @@ class NbandRadiation(GreyGas):
         # add these to the dictionary of axes
         axes.update(self.channel_ax)
         dom = domain.Atmosphere(axes=axes)
-        self.absorptivity = field.Field(absorptivity, domain=dom)
+        self.absorptivity = Field(absorptivity, domain=dom)
 
     def _compute_emission_sfc(self):
         #  need to split the total emission across the bands
@@ -162,6 +181,7 @@ class ThreeBandSW(NbandRadiation):
         self.absorption_cross_section['CO2'] = \
             np.zeros_like(self.absorption_cross_section['O3'])
         self.cosZen = 0.5  # cosine of the average solar zenith angle
+        self._define_diagnostics()
 
     @property
     def emissivity(self):
@@ -212,6 +232,7 @@ class FourBandSW(NbandRadiation):
         self.absorption_cross_section['CO2'] = \
             np.zeros_like(self.absorption_cross_section['O3'])
         self.cosZen = 0.5  # cosine of the average solar zenith angle
+        self._define_diagnostics()
 
     @property
     def emissivity(self):
@@ -270,6 +291,7 @@ class FourBandLW(NbandRadiation):
             self.absorber_vmr['O3'] = np.zeros_like(self.Tatm)
         if 'H2O' not in self.absorber_vmr:
             self.absorber_vmr['H2O'] = self.q
+        self._define_diagnostics()
 
 
 def SPEEDY_band_fraction(T):

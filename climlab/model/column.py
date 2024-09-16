@@ -37,14 +37,11 @@ calculated for 45N.
 from __future__ import division
 import numpy as np
 from climlab import constants as const
-from climlab.process.time_dependent_process import TimeDependentProcess
-from climlab.domain.initial import column_state
-from climlab.domain.field import Field
-from climlab.radiation.insolation import FixedInsolation
-from climlab.radiation.greygas import GreyGas, GreyGasSW
-from climlab.convection.convadj import ConvectiveAdjustment
-from climlab.radiation.nband import ThreeBandSW, FourBandLW, FourBandSW
-from climlab.radiation.water_vapor import ManabeWaterVapor
+from climlab.process import TimeDependentProcess
+from climlab.domain import column_state, Field
+from climlab.radiation import (FixedInsolation, GreyGas, GreyGasSW,
+        ThreeBandSW, FourBandLW, ManabeWaterVapor)
+from climlab.convection import ConvectiveAdjustment
 
 class GreyRadiationModel(TimeDependentProcess):
     def __init__(self,
@@ -101,7 +98,7 @@ class GreyRadiationModel(TimeDependentProcess):
                     'SW_down_TOA',
                     'planetary_albedo']
         for name in newdiags:
-            self.add_diagnostic(name)
+            self.add_diagnostic(name, 0. * self.Ts)
         # This process has to handle the coupling between
         # insolation and column radiation
         self.subprocess['SW'].flux_from_space = \
@@ -158,18 +155,13 @@ class BandRCModel(RadiativeConvectiveModel):
         #  Initialize specific humidity
         h2o = ManabeWaterVapor(state=self.state, **self.param)
         self.add_subprocess('H2O', h2o)
-        # q is an input field for this process, which is set by subproc
-        #  (though in this sense it is actually diagnostic...)
-        newinput = ['q']
-        self.add_input('q')
-        self.q = self.subprocess['H2O'].q
 
         #  initialize radiatively active gas inventories
         self.absorber_vmr = {}
         self.absorber_vmr['CO2'] = 380.E-6 * np.ones_like(self.Tatm)
         self.absorber_vmr['O3'] = np.zeros_like(self.Tatm)
         # water vapor is actually specific humidity, not VMR.
-        self.absorber_vmr['H2O'] = self.q
+        self.absorber_vmr['H2O'] = h2o.q
 
         longwave = FourBandLW(state=self.state,
                               absorber_vmr=self.absorber_vmr,
@@ -183,7 +175,7 @@ class BandRCModel(RadiativeConvectiveModel):
         # This process has to handle the coupling between
         # insolation and column radiation
         self.subprocess['SW'].flux_from_space = \
-            self.subprocess['insolation'].diagnostics['insolation']
+            self.subprocess['insolation'].insolation
 
 
 def compute_layer_absorptivity(abs_coeff, dp):
