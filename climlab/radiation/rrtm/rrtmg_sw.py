@@ -209,7 +209,7 @@ class RRTMG_SW(_Radiation_SW):
          cldfrac, ciwp, clwp, reic, relq, tauc, ssac, asmc, fsfc,
          tauaer, ssaaer, asmaer, ecaer,) = self._prepare_sw_arguments()
 
-        n_rrtmg_repeat = self.n_rrtmg_repeat if (icld == 0 and self.do_seed_permutation) else 1
+        n_rrtmg_repeat = self.n_rrtmg_repeat if (icld > 0 and self.do_seed_permutation) else 1
         for ind_rrtmg_call in range(n_rrtmg_repeat):
             if icld == 0:  # clear-sky only
                 cldfmcl = np.zeros((ngptsw,ncol,nlay))
