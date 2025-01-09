@@ -42,11 +42,9 @@ def test_sbm_column():
                                  state=full_state,)
     conv.step_forward()
 
-
-def test_moist_column():
-    '''This test sets up a complete single-column model.
-    The initial condition is completely dry.
-    We test to see if the column moistens itself via surface evaporation and convection'''
+@pytest.fixture()
+def moist_column():
+    '''Set up a complete single-column model.'''
     full_state = make_initial_column()
     short_timestep = const.seconds_per_hour * 3
     long_timestep = short_timestep*3
@@ -76,5 +74,14 @@ def test_moist_column():
                     )
     atm = couple([rad, conv], name='Atmosphere')
     moistmodel = couple([atm,surface], name='Moist column model')
+    return moistmodel
 
+@pytest.mark.compiled
+@pytest.mark.fast
+def test_moist_column(moistmodel):
+    '''This test sets up a complete single-column model.
+    The initial condition is completely dry.
+    We test to see if the column moistens itself via surface evaporation and convection.
+    
+    Actually a basic test to see if we can create a single column and step forward.'''
     moistmodel.step_forward()
