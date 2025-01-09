@@ -9,6 +9,8 @@ from climlab.utils import constants as const
 import pytest
 
 
+qStrat = 5.E-6
+
 def make_initial_column():
     '''Create a single column state dictionary with initial conditions'''
     num_lev = 30
@@ -29,7 +31,6 @@ def make_initial_column():
     Q = full_state['Tatm'].domain.axes['lev'].points / const.ps
     RHprofile = 0.7 * ((Q-0.02) / (1-0.02))
     e = climlab.utils.thermo.clausius_clapeyron(full_state['Tatm']) * RHprofile
-    qStrat = 5.E-6
     qinitial = np.maximum(qStrat, e/full_state['Tatm'].domain.axes['lev'].points * const.Rd / const.Rv)
     full_state['q'] = 0.*full_state.Tatm + qinitial
     return full_state
@@ -79,9 +80,13 @@ def moist_column():
 @pytest.mark.compiled
 @pytest.mark.fast
 def test_moist_column(moist_column):
-    '''This test sets up a complete single-column model.
-    The initial condition is completely dry.
-    We test to see if the column moistens itself via surface evaporation and convection.
-    
-    Actually a basic test to see if we can create a single column and step forward.'''
+    '''A basic test of a single timestep for a complete single-column model.'''
     moist_column.step_forward()
+
+@pytest.mark.compiled
+def test_self_moistening(moist_column):
+    '''Here we set initial conditions to be completely dry.
+    We test to see if the column moistens itself via surface evaporation and convection.'''
+    moist_column.q[:] = qStrat
+    moist_column.integrate_years(0.4)
+    assert np.all(moist_column.q[10:] > qStrat)
