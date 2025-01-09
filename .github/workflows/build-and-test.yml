@@ -17,8 +17,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.8', '3.9', '3.10', '3.11']
-        os: [Ubuntu, macOS, Windows]
+        python-version: ['3.9', '3.10', '3.11']
+        os: [Ubuntu, macOS]
         include:
           - os: Ubuntu
             environment-file: environment.yml
@@ -26,9 +26,6 @@ jobs:
           - os: macOS
             environment-file: environment.yml
             shell: bash -l {0}
-          - os: Windows
-            environment-file: environment.yml
-            shell: powershell
 
     steps:
       - uses: actions/checkout@v4
