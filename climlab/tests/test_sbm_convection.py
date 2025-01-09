@@ -5,6 +5,7 @@ from climlab.surface import SensibleHeatFlux, LatentHeatFlux
 from climlab.radiation import RRTMG
 from climlab import couple
 from climlab.tests.xarray_test import to_xarray
+from climlab.utils import constants as const
 import pytest
 
 
@@ -77,4 +78,3 @@ def test_moist_column():
     moistmodel = couple([atm,surface], name='Moist column model')
 
     moistmodel.step_forward()
-    
