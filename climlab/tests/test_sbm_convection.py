@@ -78,10 +78,10 @@ def moist_column():
 
 @pytest.mark.compiled
 @pytest.mark.fast
-def test_moist_column(moistmodel):
+def test_moist_column(moist_column):
     '''This test sets up a complete single-column model.
     The initial condition is completely dry.
     We test to see if the column moistens itself via surface evaporation and convection.
     
     Actually a basic test to see if we can create a single column and step forward.'''
-    moistmodel.step_forward()
+    moist_column.step_forward()
