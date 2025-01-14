@@ -22,9 +22,8 @@ A climlab process for the Frierson Simplified Betts Miller convection scheme
             equilibrium will be determined by the interactions between 
             moist convection, radiation, and surface fluxes::
 
-                from climlab.surface import SensibleHeatFlux, LatentHeatFlux
-                from climlab.radiation import RRTMG, DailyInsolation, AnnualMeanInsolation
-                from climlab import couple
+                import numpy as np
+                import climlab
                 from climlab.utils import constants as const
 
                 num_lev = 30
@@ -51,19 +50,19 @@ A climlab process for the Frierson Simplified Betts Miller convection scheme
 
                 temperature_state = {'Tatm':full_state.Tatm,'Ts':full_state.Ts}
                 #  Surface model
-                shf = SensibleHeatFlux(name='Sensible Heat Flux',
+                shf = climlab.surface.SensibleHeatFlux(name='Sensible Heat Flux',
                                     state=temperature_state, Cd=3E-3,
                                     timestep=short_timestep)
-                lhf = LatentHeatFlux(name='Latent Heat Flux',
+                lhf = climlab.surface.LatentHeatFlux(name='Latent Heat Flux',
                                     state=full_state, Cd=3E-3,
                                     timestep=short_timestep)
-                surface = couple([shf,lhf], name="Slab")
+                surface = climlab.couple([shf,lhf], name="Slab")
                 #  Convection scheme -- water vapor is a state variable
-                conv = SimplifiedBettsMiller(name='Convection',
+                conv = climlab.convection.SimplifiedBettsMiller(name='Convection',
                                             state=full_state,
                                             timestep=short_timestep,
                                         )  
-                rad = RRTMG(name='Radiation',
+                rad = climlab.radiation.RRTMG(name='Radiation',
                                 state=temperature_state,
                                 specific_humidity=full_state.q,  # water vapor is an input here, not a state variable
                                 albedo=albedo,
@@ -71,8 +70,8 @@ A climlab process for the Frierson Simplified Betts Miller convection scheme
                                 timestep=long_timestep,
                                 icld=0, # no clouds
                                 )
-                atm = couple([rad, conv], name='Atmosphere')
-                moistmodel = couple([atm,surface], name='Moist column model')
+                atm = climlab.couple([rad, conv], name='Atmosphere')
+                moistmodel = climlab.couple([atm,surface], name='Moist column model')
 
                 print(moistmodel)
             
