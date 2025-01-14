@@ -51,7 +51,8 @@ extensions = [
     'IPython.sphinxext.ipython_console_highlighting',
     'sphinxcontrib.bibtex',
     'numpydoc',
-    'nbsphinx'
+    'nbsphinx',
+    'sphinx_rtd_theme',
 ]
 
 nbsphinx_execute = 'never'
@@ -157,11 +158,14 @@ bibtex_bibfiles = ['bibliography.bib']
 
 # -- Options for HTML output ----------------------------------------------
 
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-if not on_rtd:  # only import and set the theme if we're building docs locally
-    import sphinx_rtd_theme
-    html_theme = 'sphinx_rtd_theme'
-    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+# on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+# if not on_rtd:  # only import and set the theme if we're building docs locally
+#     import sphinx_rtd_theme
+#     html_theme = 'sphinx_rtd_theme'
+#     html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+import sphinx_rtd_theme
+html_theme = 'sphinx_rtd_theme'
+html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
