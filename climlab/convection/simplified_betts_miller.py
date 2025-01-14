@@ -120,7 +120,29 @@ es0 = 1.0
 
 class SimplifiedBettsMiller(TimeDependentProcess):
     '''
-    to do
+    The climlab wrapper for Dargan Frierson's Simplified Betts Miller moist 
+    convection scheme (Frierson 2007, J. Atmos. Sci. 64, doi:10.1175/JAS3935.1)
+
+    Basic characteristics:
+
+    State:
+
+    - Tatm (air temperature in K)
+    - q (specific humidity in kg/kg)
+
+    Input arguments and default values:
+
+    - ``tau_bm = 7200.``: Betts-Miller relaxation timescale (seconds)
+    - ``rhbm = 0.8``: relative humidity profile to which the scheme is relaxing
+    - ``do_simp = False``: do the simple method where you adjust timescales to make precip continuous always.    
+    - ``do_shallower = True``: do the shallow convection scheme where it chooses a smaller depth such that precipitation is zero.
+    - ``do_changeqref = True``: do the shallow convection scheme where it changes the profile of both q and T in order make precip zero.
+    - ``do_envsat = True``: reference profile is rhbm times saturated wrt environment (if false, it's rhbm times parcel).
+    - ``do_taucape = False``: scheme where taubm is proportional to CAPE**-1/2
+    - ``capetaubm = 900.``: for the above scheme, the value of CAPE (J/kg) for which tau = tau_bm. Ignored unless ``do_taucape == True``.
+    - ``tau_min = 2400.``: for the above scheme, the minimum relaxation time allowed (seconds). Ignored unless ``do_taucape == True``.
+
+    See Frierson (2007) for more details.
     '''
     def __init__(self,
                 tau_bm=7200.,
