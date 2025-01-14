@@ -21,3 +21,4 @@ dependencies:
   - climlab-rrtmg
   - climlab-cam3-radiation
   - climlab-emanuel-convection
+  - climlab-sbm-convection

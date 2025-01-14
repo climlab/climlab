@@ -11,3 +11,4 @@ climlab.convection
 
     climlab.convection.convadj
     climlab.convection.EmanuelConvection
+    climlab.convection.SimplifiedBettsMiller
