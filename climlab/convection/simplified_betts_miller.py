@@ -1,5 +1,99 @@
 '''
 A climlab process for the Frierson Simplified Betts Miller convection scheme
+
+        :Example:
+
+            Here is an example of setting up a complete single-column
+            Radiative-Convective model with interactive water vapor.
+            The model includes the following processes:
+            
+            - Constant insolation
+            - Longwave and Shortwave radiation
+            - Surface turbulent fluxes of sensible and latent heat
+            - Moist convection using the Simplified Betts Miller scheme
+
+            The state variables for this model will be surface temperature, 
+            air temperature, and specific humidity. 
+            This model has a simple but self-contained hydrological cycle: 
+            water is evaporated from the surface and transported aloft by 
+            the moist convection scheme.
+
+            The vertical distribution of temperature and humidity at 
+            equilibrium will be determined by the interactions between 
+            moist convection, radiation, and surface fluxes::
+
+                from climlab.surface import SensibleHeatFlux, LatentHeatFlux
+                from climlab.radiation import RRTMG, DailyInsolation, AnnualMeanInsolation
+                from climlab import couple
+                from climlab.utils import constants as const
+
+                num_lev = 30
+                water_depth = 10.
+                short_timestep = const.seconds_per_hour * 3
+                long_timestep = short_timestep*3
+                insolation = 342.
+                albedo = 0.18
+
+                # set initial conditions -- 24C at the surface, -60C at 200 hPa, isothermal stratosphere
+                strat_idx = 6
+                Tinitial = np.zeros(num_lev)
+                Tinitial[:strat_idx] = -60. + const.tempCtoK
+                Tinitial[strat_idx:] = np.linspace(-60, 22, num_lev-strat_idx) + const.tempCtoK
+                Tsinitial = 24. + const.tempCtoK
+
+                full_state = climlab.column_state(water_depth=water_depth, num_lev=num_lev)
+                full_state['Tatm'][:] = Tinitial
+                full_state['Ts'][:] = Tsinitial
+
+                # Initialize the model with a nearly dry atmosphere
+                qStrat = 5.E-6   #  a very small background specific humidity value
+                full_state['q'] = 0.*full_state.Tatm + qStrat
+
+                temperature_state = {'Tatm':full_state.Tatm,'Ts':full_state.Ts}
+                #  Surface model
+                shf = SensibleHeatFlux(name='Sensible Heat Flux',
+                                    state=temperature_state, Cd=3E-3,
+                                    timestep=short_timestep)
+                lhf = LatentHeatFlux(name='Latent Heat Flux',
+                                    state=full_state, Cd=3E-3,
+                                    timestep=short_timestep)
+                surface = couple([shf,lhf], name="Slab")
+                #  Convection scheme -- water vapor is a state variable
+                conv = SimplifiedBettsMiller(name='Convection',
+                                            state=full_state,
+                                            timestep=short_timestep,
+                                        )  
+                rad = RRTMG(name='Radiation',
+                                state=temperature_state,
+                                specific_humidity=full_state.q,  # water vapor is an input here, not a state variable
+                                albedo=albedo,
+                                insolation=insolation,
+                                timestep=long_timestep,
+                                icld=0, # no clouds
+                                )
+                atm = couple([rad, conv], name='Atmosphere')
+                moistmodel = couple([atm,surface], name='Moist column model')
+
+                print(moistmodel)
+            
+            Try running this model and verifying that the atmosphere moistens
+            itself via convection, e.g::
+
+                moistmodel.integrate_years(1)
+                moistmodel.q
+
+            which should produce something like::
+
+                Field([5.00000000e-06, 5.00000000e-06, 5.00000000e-06, 5.00000000e-06,
+                    5.00000000e-06, 5.00000000e-06, 8.55725020e-05, 2.02525334e-04,
+                    4.03568410e-04, 6.98905819e-04, 1.08494727e-03, 1.54761989e-03,
+                    2.06592591e-03, 2.62545894e-03, 3.22046387e-03, 3.84210271e-03,
+                    4.48057560e-03, 5.12535633e-03, 5.76585382e-03, 6.39443880e-03,
+                    7.00456365e-03, 7.47003956e-03, 8.02017591e-03, 8.57294739e-03,
+                    9.10816435e-03, 9.63014344e-03, 1.01386863e-02, 1.06365703e-02,
+                    1.11337461e-02, 1.51187832e-02])
+            
+            showing that humidity is now penetrating up to tropopause.
 '''
 import numpy as np
 import warnings
