@@ -5,7 +5,7 @@ CAM3
    :parts: 1
    :private-bases:
 
-.. automodule:: climlab.radiation.cam3.cam3
+.. automodule:: climlab.radiation.cam3
     :members:
     :private-members:
     :undoc-members:
