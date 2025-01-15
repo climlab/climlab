@@ -14,6 +14,11 @@ State variables:
 - Air temperature ``Tatm``
 - Specific humidity ``q``
 
+Input parameters and default values:
+
+- Condensation time constant ``condensation_time`` (4 hours in units of seconds)
+- Reference relative humidity value ``RH_ref`` (0.9, dimensionless)
+
 Diagnostics:
 
 - Latent heating rate (every grid cell) ``latent_heating`` (in units of W m\ :sup:`-2`)
@@ -82,7 +87,26 @@ from climlab.utils.thermo import qsat
 
 
 class LargeScaleCondensation(TimeDependentProcess):
-    '''Still to do.'''
+    '''Climlab process class for LargeScaleCondensation. 
+    Condensation is modeled as a relaxation of relative humidity toward a 
+    specified reference value wherever the tropospheric relative humidity 
+    exceeds the target.
+    
+    State variables:
+
+    - Air temperature ``Tatm``
+    - Specific humidity ``q``
+
+    Input parameters and default values:
+
+    - Condensation time constant ``condensation_time`` (4 hours in units of seconds)
+    - Reference relative humidity value ``RH_ref`` (0.9, dimensionless)
+
+    Diagnostics:
+
+    - Latent heating rate (every grid cell) ``latent_heating`` (in units of W m\ :sup:`-2`)
+    - Precipitation rate (column total) ``precipitation`` (units of kg m\ :sup:`-2` s\ :sup:`-1` or mm s\ :sup:`-1`)
+    '''
     def __init__(self, 
                  condensation_time = 4*const.seconds_per_hour, 
                  RH_ref = 0.9,
