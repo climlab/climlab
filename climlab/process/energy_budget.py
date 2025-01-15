@@ -14,7 +14,7 @@ class EnergyBudget(TimeDependentProcess):
 
     .. math::
 
-        C \frac{dT}{dt} = R\downarrow - R\uparrow - H  \n
+        C \frac{dT}{dt} = R\downarrow - R\uparrow - H  \\
         \frac{dT}{dt} = \frac{R\downarrow}{C} - \frac{R\uparrow}{C} - \frac{H}{C}
 
     Every EnergyBudget object has a ``heating_rate`` dictionary with items
@@ -37,7 +37,7 @@ class EnergyBudget(TimeDependentProcess):
 
     :ivar str time_type:        is set to ``'explicit'``
     :ivar dict heating_rate:    energy share for given subprocess in unit
-                                :math:`\\textrm{W}/ \\textrm{m}^2` stored
+                                :math:`\textrm{W}/ \textrm{m}^2` stored
                                 in a dictionary sorted by model states
 
     """
