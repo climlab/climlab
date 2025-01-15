@@ -11,18 +11,18 @@ The process object ``climlab.dynamics.LargeScaleCondensation`` does the followin
 
 State variables:
 
-- Air temperature ``Tatm``
-- Specific humidity ``q``
+- ``Tatm``: air temperature in K
+- ``q``: specific humidity in kg kg\ :sup:`-1`
 
 Input parameters and default values:
 
-- Condensation time constant ``condensation_time`` (4 hours in units of seconds)
-- Reference relative humidity value ``RH_ref`` (0.9, dimensionless)
+- ``condensation_time``: condensation time constant in units of seconds (default: 4 hours)
+- ``RH_ref``: reference relative humidity value, dimensionless (default value 0.9)
 
 Diagnostics:
 
-- Latent heating rate (every grid cell) ``latent_heating`` (in units of W m\ :sup:`-2`)
-- Precipitation rate (column total) ``precipitation`` (units of kg m\ :sup:`-2` s\ :sup:`-1` or mm s\ :sup:`-1`)
+- ``latent_heating``: latent heating rate (every grid cell) in units of W m\ :sup:`-2`
+- ``precipitation``: precipitation rate (column total) in units of kg m\ :sup:`-2` s\ :sup:`-1` or mm s\ :sup:`-1`
 
 The condensation rule follows the SPEEDY model (Molteni 2003 doi:10.1007/s00382-002-0268-2). 
 Condensation is modeled as a relaxation of relative humidity toward a 
@@ -94,18 +94,18 @@ class LargeScaleCondensation(TimeDependentProcess):
     
     State variables:
 
-    - Air temperature ``Tatm``
-    - Specific humidity ``q``
+    - ``Tatm``: air temperature in K
+    - ``q``: specific humidity in kg kg\ :sup:`-1`
 
     Input parameters and default values:
 
-    - Condensation time constant ``condensation_time`` (4 hours in units of seconds)
-    - Reference relative humidity value ``RH_ref`` (0.9, dimensionless)
+    - ``condensation_time``: condensation time constant in units of seconds (default: 4 hours)
+    - ``RH_ref``: reference relative humidity value, dimensionless (default value 0.9)
 
     Diagnostics:
 
-    - Latent heating rate (every grid cell) ``latent_heating`` (in units of W m\ :sup:`-2`)
-    - Precipitation rate (column total) ``precipitation`` (units of kg m\ :sup:`-2` s\ :sup:`-1` or mm s\ :sup:`-1`)
+    - ``latent_heating``: latent heating rate (every grid cell) in units of W m\ :sup:`-2`
+    - ``precipitation``: precipitation rate (column total) in units of kg m\ :sup:`-2` s\ :sup:`-1` or mm s\ :sup:`-1`
     '''
     def __init__(self, 
                  condensation_time = 4*const.seconds_per_hour, 

@@ -127,20 +127,26 @@ class SimplifiedBettsMiller(TimeDependentProcess):
 
     State:
 
-    - Tatm (air temperature in K)
-    - q (specific humidity in kg/kg)
+    - ``Tatm``: air temperature in K
+    - ``q``: specific humidity in kg kg\ :sup:`-1`
 
     Input arguments and default values:
 
     - ``tau_bm = 7200.``: Betts-Miller relaxation timescale (seconds)
-    - ``rhbm = 0.8``: relative humidity profile to which the scheme is relaxing
+    - ``rhbm = 0.8``: relative humidity profile to which the scheme is relaxing (dimensionless)
     - ``do_simp = False``: do the simple method where you adjust timescales to make precip continuous always.    
     - ``do_shallower = True``: do the shallow convection scheme where it chooses a smaller depth such that precipitation is zero.
     - ``do_changeqref = True``: do the shallow convection scheme where it changes the profile of both q and T in order make precip zero.
     - ``do_envsat = True``: reference profile is rhbm times saturated wrt environment (if false, it's rhbm times parcel).
-    - ``do_taucape = False``: scheme where taubm is proportional to CAPE**-1/2
+    - ``do_taucape = False``: scheme where taubm is proportional to CAPE\ :sup:`-1/2`
     - ``capetaubm = 900.``: for the above scheme, the value of CAPE (J/kg) for which tau = tau_bm. Ignored unless ``do_taucape == True``.
     - ``tau_min = 2400.``: for the above scheme, the minimum relaxation time allowed (seconds). Ignored unless ``do_taucape == True``.
+
+    Diagnostics:
+
+    - ``precipitation``: Precipitation rate (column total) in units of kg m\ :sup:`-2` s\ :sup:`-1` or mm s\ :sup:`-1`
+    - ``cape``: Convective Available Potential Energy (CAPE) in units of J kg\ :sup:`-1`
+    - ``cin``: Convective Inhibition (CIN) in units of J kg\ :sup:`-1`
 
     See Frierson (2007) for more details.
     '''
