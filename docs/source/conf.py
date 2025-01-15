@@ -41,7 +41,7 @@ extensions = [
     'sphinx.ext.doctest',
     #'sphinx.ext.imgmath',
     'sphinx.ext.viewcode',
-    #'sphinx.ext.graphviz',
+    'sphinx.ext.graphviz',
     'sphinx.ext.inheritance_diagram',
     'sphinx.ext.intersphinx',
     'sphinx.ext.mathjax',
