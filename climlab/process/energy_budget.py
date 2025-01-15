@@ -7,15 +7,15 @@ class EnergyBudget(TimeDependentProcess):
     r"""A parent class for explicit energy budget processes.
 
     This class solves equations that include a heat capacitiy term like
-    :math:`C \\frac{dT}{dt} = \\textrm{flux convergence}`
+    :math:`C \frac{dT}{dt} = \textrm{flux convergence}`
 
     In an Energy Balance Model with model state :math:`T` this equation
     will look like this:
 
     .. math::
 
-        C \\frac{dT}{dt} = R\downarrow - R\uparrow - H  \n
-        \\frac{dT}{dt} = \\frac{R\downarrow}{C} - \\frac{R\uparrow}{C} - \\frac{H}{C}
+        C \frac{dT}{dt} = R\downarrow - R\uparrow - H  \n
+        \frac{dT}{dt} = \frac{R\downarrow}{C} - \frac{R\uparrow}{C} - \frac{H}{C}
 
     Every EnergyBudget object has a ``heating_rate`` dictionary with items
     corresponding to each state variable. The heating rate accounts the actual
