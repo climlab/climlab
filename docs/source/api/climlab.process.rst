@@ -16,3 +16,4 @@ climlab.process
    climlab.process.implicit
    climlab.process.process
    climlab.process.time_dependent_process
+   climlab.process.limiter

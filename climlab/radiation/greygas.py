@@ -63,7 +63,7 @@ class GreyGas(EnergyBudget):
         #  Initialize diagnostics
         self.add_diagnostic('emission', 0. * self.Tatm)
         self.add_diagnostic('emission_sfc', 0. * self.Ts)
-        self.add_diagnostic('flux_reflected_up')
+        # self.add_diagnostic('flux_reflected_up', 0. * self.Ts) 
 
     @property
     def absorptivity(self):
@@ -134,16 +134,16 @@ class GreyGas(EnergyBudget):
         self.flux_down = self.trans.flux_down(fromspace, self.emission)
         self.flux_reflected_up = self.trans.flux_reflected_up(self.flux_down, self.albedo_sfc)
         # this ensure same dimensions as other fields
-        self.flux_to_sfc = self.flux_down[..., -1, np.newaxis]
-        self.flux_from_sfc = (self.emission_sfc +
+        self.flux_to_sfc[:] = self.flux_down[..., -1, np.newaxis]
+        self.flux_from_sfc[:] = (self.emission_sfc +
                               self.flux_reflected_up[..., -1, np.newaxis])
         self.flux_up = self.trans.flux_up(self.flux_from_sfc,
                             self.emission + self.flux_reflected_up[...,0:-1])
         self.flux_net = self.flux_up - self.flux_down
         # absorbed radiation (flux convergence) in W / m**2 (per band)
-        self.absorbed = np.diff(self.flux_net, axis=-1)
-        self.absorbed_total = np.sum(self.absorbed, axis=-1)
-        self.flux_to_space = self._compute_flux_top()
+        self.absorbed[:] = np.diff(self.flux_net, axis=-1)
+        self.absorbed_total[:] = np.sum(self.absorbed, axis=-1, keepdims=True) 
+        self.flux_to_space[:] = self._compute_flux_top()
 
     def _compute_flux_top(self):
         bandflux = self.flux_up[..., 0, np.newaxis]

@@ -9,7 +9,7 @@ from .absorbed_shorwave import SimpleAbsorbedShortwave
 from .boltzmann import Boltzmann
 from .greygas import GreyGas, GreyGasSW
 from .insolation import FixedInsolation, P2Insolation, AnnualMeanInsolation, DailyInsolation, InstantInsolation
-from .nband import NbandRadiation, ThreeBandSW
+from .nband import NbandRadiation, ThreeBandSW, FourBandLW, FourBandSW
 from .water_vapor import ManabeWaterVapor
 #from radiation import Radiation, Radiation_SW, Radiation_LW
 from .cam3 import CAM3, CAM3_LW, CAM3_SW

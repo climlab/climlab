@@ -63,43 +63,43 @@ class EmanuelConvection(TimeDependentProcess):
 
     State:
 
-        - Ts (surface radiative temperature -- optional, and ignored)
-        - Tatm (air temperature in K)
-        - q (specific humidity in kg/kg)
-        - U (zonal velocity in m/s -- optional)
-        - V (meridional velocity in m/s -- optional)
+        - ``Ts``: surface radiative temperature -- optional, and ignored
+        - ``Tatm``: air temperature in K
+        - ``q``: specific humidity in kg kg\ :sup:`-1`
+        - ``U``: zonal velocity in m s\ :sup:`-1` (optional)
+        - ``V``: meridional velocity in m s\ :sup:`-1` (optional)
 
     Input arguments and default values (taken from convect43.f fortran source):
 
-        - MINORIG = 0,  index of lowest level from which convection may originate (zero means lowest)
-        - ELCRIT = 0.0011,  autoconversion threshold water content (g/g)
-        - TLCRIT = -55.0, critical temperature below which the auto-conversion threshold is assumed to be zero (the autoconversion threshold varies linearly between 0 C and TLCRIT)
-        - ENTP = 1.5, coefficient of mixing in the entrainment formulation
-        - SIGD = 0.05, fractional area covered by unsaturated downdraft
-        - SIGS = 0.12, fraction of precipitation falling outside of cloud
-        - OMTRAIN = 50.0, assumed fall speed (Pa/s) of rain
-        - OMTSNOW = 5.5, assumed fall speed (Pa/s) of snow
-        - COEFFR = 1.0, coefficient governing the rate of evaporation of rain
-        - COEFFS = 0.8, coefficient governing the rate of evaporation of snow
-        - CU = 0.7, coefficient governing convective momentum transport
-        - BETA = 10.0, coefficient used in downdraft velocity scale calculation
-        - DTMAX = 0.9, maximum negative temperature perturbation a lifted parcel is allowed to have below its LFC
-        - ALPHA = 0.2, first parameter that controls the rate of approach to quasi-equilibrium
-        - DAMP = 0.1, second parameter that controls the rate of approach to quasi-equilibrium (DAMP must be less than 1)
-        - IPBL = 0, switch to bypass the dry convective adjustment (bypass if IPBL==0)
+        - ``MINORIG = 0``,  index of lowest level from which convection may originate (zero means lowest)
+        - ``ELCRIT = 0.0011``,  autoconversion threshold water content (g/g)
+        - ``TLCRIT = -55.0``, critical temperature below which the auto-conversion threshold is assumed to be zero (the autoconversion threshold varies linearly between 0 C and TLCRIT)
+        - ``ENTP = 1.5``, coefficient of mixing in the entrainment formulation
+        - ``SIGD = 0.05``, fractional area covered by unsaturated downdraft
+        - ``SIGS = 0.12``, fraction of precipitation falling outside of cloud
+        - ``OMTRAIN = 50.0``, assumed fall speed (Pa/s) of rain
+        - ``OMTSNOW = 5.5``, assumed fall speed (Pa/s) of snow
+        - ``COEFFR = 1.0``, coefficient governing the rate of evaporation of rain
+        - ``COEFFS = 0.8``, coefficient governing the rate of evaporation of snow
+        - ``CU = 0.7``, coefficient governing convective momentum transport
+        - ``BETA = 10.0``, coefficient used in downdraft velocity scale calculation
+        - ``DTMAX = 0.9``, maximum negative temperature perturbation a lifted parcel is allowed to have below its LFC
+        - ``ALPHA = 0.2``, first parameter that controls the rate of approach to quasi-equilibrium
+        - ``DAMP = 0.1``, second parameter that controls the rate of approach to quasi-equilibrium (DAMP must be less than 1)
+        - ``IPBL = 0``, switch to bypass the dry convective adjustment (bypass if IPBL==0)
 
     Tendencies computed:
 
-        - air temperature (K/s)
-        - specific humidity (kg/kg/s)
+        - air temperature (K s\ :sup:`-1`)
+        - specific humidity (kg kg\ :sup:`-1` s\ :sup:`-1`)
         - optional:
-            - U and V wind components (m/s/s), if U and V are included in state dictionary
+            - U and V wind components (m s\ :sup:`-1` s\ :sup:`-1`), if ``U`` and ``V`` are included in state dictionary
 
     Diagnostics computed:
 
-        - CBMF (cloud base mass flux in kg/m2/s) -- this is actually stored internally and used as input for subsequent timesteps
-        - precipitation (convective precipitation rate in kg/m2/s or mm/s)
-        - relative_humidity (dimensionless)
+        - ``CBMF`` (cloud base mass flux in kg m\ :sup:`-2` s\ :sup:`-1`) -- this is actually stored internally and used as input for subsequent timesteps
+        - ``precipitation`` (convective precipitation rate in kg m\ :sup:`-2` s\ :sup:`-1` or mm s\ :sup:`-1`)
+        - ``relative_humidity`` (dimensionless)
 
         :Example:
 

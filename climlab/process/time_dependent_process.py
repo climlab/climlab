@@ -206,6 +206,9 @@ class TimeDependentProcess(Process):
         #  First reset tendencies to zero -- recomputing them is the point of this method
         for varname in self.tendencies:
             self.tendencies[varname] *= 0.
+        #  Also reset all diagnostics to zero -- they will be accumulated from subprocesses
+        for diagname, diag in self.diagnostics.items():
+            diag *= 0.
         if not self.has_process_type_list:
             self._build_process_type_list()
         tendencies = {}
@@ -240,6 +243,11 @@ class TimeDependentProcess(Process):
                 self_tend[varname] /= self.timestep
         for varname, tend in self_tend.items():
             self.tendencies[varname] += tend
+        #  Now accumulate additive diagnostics from subprocesses
+        for procname, proc in self.subprocess.items():
+            for diagname, value in proc.diagnostics.items():
+                if self.__dict__[diagname].shape == value.shape:
+                    self.__dict__[diagname] += value
         return self.tendencies
 
     def _compute_type(self, proctype):
@@ -265,8 +273,9 @@ class TimeDependentProcess(Process):
                 tenddict = proc.tendencies
             for name, tend in tenddict.items():
                 tendencies[name] += tend
-            for diagname, value in proc.diagnostics.items():
-                self.__setattr__(diagname, value)
+            # for diagname, value in proc.diagnostics.items():
+            #     #  additive diagnostics...
+            #     self.__setattr__(diagname, value)
         return tendencies
 
     def _compute(self):

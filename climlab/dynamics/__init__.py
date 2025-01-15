@@ -3,6 +3,9 @@ Modules for simple dynamics, mostly for use in Energy Balance Models.
 
 :class:`~climlab.dynamics.BudykoTransport` is a relaxation to global mean.
 
+:class:`~climlab.dynamics.LargeScaleCondensation` handles condensation due to
+convergence of water vapor associated with the dynamics.
+
 Other modules are 1D advection-diffusion solvers (implemented using implicit timestepping).
 
 :class:`~climlab.dynamics.AdvectionDiffusion` is a general-purpose 1D
@@ -27,3 +30,4 @@ from .advection_diffusion import AdvectionDiffusion, Diffusion
 from .meridional_advection_diffusion import MeridionalAdvectionDiffusion, MeridionalDiffusion
 from .meridional_heat_diffusion import MeridionalHeatDiffusion
 from .meridional_moist_diffusion import MeridionalMoistDiffusion
+from .large_scale_condensation import LargeScaleCondensation

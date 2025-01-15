@@ -19,8 +19,7 @@ At least two diagnostics are provided:
 from __future__ import division
 import numpy as np
 from climlab.process.diagnostic import DiagnosticProcess
-from climlab.domain.field import Field
-from climlab.domain.field import to_latlon
+from climlab.domain.field import Field, to_latlon
 from climlab.utils.legendre import P2
 from climlab import constants as const
 from climlab.solar.insolation import daily_insolation, instant_insolation
@@ -83,15 +82,12 @@ class _Insolation(DiagnosticProcess):
     def __init__(self, S0=const.S0, **kwargs):
         super(_Insolation, self).__init__(**kwargs)
         #  initialize diagnostics with correct shape
-        self.add_diagnostic('insolation')
-        self.add_diagnostic('coszen')
         try:
             domain = self.domains['sfc']
         except:
             domain = self.domains['default']
-        self.insolation = Field(np.zeros(domain.shape), domain=domain)
-        self.coszen = Field(np.zeros(domain.shape), domain=domain)
-        self.declare_diagnostics(['insolation','coszen'])
+        self.add_diagnostic('insolation', Field(np.zeros(domain.shape), domain=domain))
+        self.add_diagnostic('coszen', Field(np.zeros(domain.shape), domain=domain))
         self.S0 = S0
         #  Now that we have a value for self.S0 we can compute the correct coszen
         self.coszen = self._coszen_from_insolation()
@@ -130,7 +126,7 @@ class _Insolation(DiagnosticProcess):
         pass
 
     def _get_current_insolation(self):
-        pass
+        self._compute_fixed()
 
     def _compute(self):
         self._get_current_insolation()

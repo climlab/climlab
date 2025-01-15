@@ -37,14 +37,11 @@ calculated for 45N.
 from __future__ import division
 import numpy as np
 from climlab import constants as const
-from climlab.process.time_dependent_process import TimeDependentProcess
-from climlab.domain.initial import column_state
-from climlab.domain.field import Field
-from climlab.radiation.insolation import FixedInsolation
-from climlab.radiation.greygas import GreyGas, GreyGasSW
-from climlab.convection.convadj import ConvectiveAdjustment
-from climlab.radiation.nband import ThreeBandSW, FourBandLW, FourBandSW
-from climlab.radiation.water_vapor import ManabeWaterVapor
+from climlab.process import TimeDependentProcess
+from climlab.domain import column_state, Field
+from climlab.radiation import (FixedInsolation, GreyGas, GreyGasSW,
+        ThreeBandSW, FourBandLW, ManabeWaterVapor)
+from climlab.convection import ConvectiveAdjustment
 
 class GreyRadiationModel(TimeDependentProcess):
     def __init__(self,
@@ -91,17 +88,18 @@ class GreyRadiationModel(TimeDependentProcess):
                     'LW_down_sfc',
                     'LW_up_sfc',
                     'LW_absorbed_sfc',
-                    'LW_absorbed_atm',
-                    'LW_emission',
                     'ASR',
                     'SW_absorbed_sfc',
-                    'SW_absorbed_atm',
                     'SW_up_sfc',
                     'SW_up_TOA',
                     'SW_down_TOA',
+                    'SW_down_sfc',
                     'planetary_albedo']
+        pressure_diags = ['LW_emission', 'LW_absorbed_atm', 'SW_absorbed_atm']
         for name in newdiags:
-            self.add_diagnostic(name)
+            self.add_diagnostic(name, 0. * self.Ts)
+        for name in pressure_diags:
+            self.add_diagnostic(name, 0. * self.Tatm)
         # This process has to handle the coupling between
         # insolation and column radiation
         self.subprocess['SW'].flux_from_space = \
@@ -158,18 +156,13 @@ class BandRCModel(RadiativeConvectiveModel):
         #  Initialize specific humidity
         h2o = ManabeWaterVapor(state=self.state, **self.param)
         self.add_subprocess('H2O', h2o)
-        # q is an input field for this process, which is set by subproc
-        #  (though in this sense it is actually diagnostic...)
-        newinput = ['q']
-        self.add_input('q')
-        self.q = self.subprocess['H2O'].q
 
         #  initialize radiatively active gas inventories
         self.absorber_vmr = {}
         self.absorber_vmr['CO2'] = 380.E-6 * np.ones_like(self.Tatm)
         self.absorber_vmr['O3'] = np.zeros_like(self.Tatm)
         # water vapor is actually specific humidity, not VMR.
-        self.absorber_vmr['H2O'] = self.q
+        self.absorber_vmr['H2O'] = h2o.q
 
         longwave = FourBandLW(state=self.state,
                               absorber_vmr=self.absorber_vmr,
@@ -183,7 +176,25 @@ class BandRCModel(RadiativeConvectiveModel):
         # This process has to handle the coupling between
         # insolation and column radiation
         self.subprocess['SW'].flux_from_space = \
-            self.subprocess['insolation'].diagnostics['insolation']
+            self.subprocess['insolation'].insolation
+
+    def do_diagnostics(self):
+        '''Set all the diagnostics from long and shortwave radiation.
+        Here we need to sum over the spectral bands.'''
+        self.OLR[:] = np.sum(self.subprocess['LW'].flux_to_space, axis=0)
+        self.LW_down_sfc[:] = np.sum(self.subprocess['LW'].flux_to_sfc, axis=0)
+        self.LW_up_sfc[:] = np.sum(self.subprocess['LW'].flux_from_sfc, axis=0)
+        self.LW_absorbed_sfc[:] = self.LW_down_sfc - self.LW_up_sfc
+        self.LW_absorbed_atm[:] = np.sum(self.subprocess['LW'].absorbed, axis=0)
+        self.LW_emission[:] = np.sum(self.subprocess['LW'].emission, axis=0)
+        self.SW_down_TOA[:] = self.subprocess['SW'].flux_from_space
+        self.SW_up_TOA[:] = np.sum(self.subprocess['SW'].flux_to_space, axis=0)
+        self.ASR[:] = (self.SW_down_TOA - self.SW_up_TOA)
+        self.SW_absorbed_atm[:] = np.sum(self.subprocess['SW'].absorbed, axis=0)
+        self.SW_down_sfc[:] = np.sum(self.subprocess['SW'].flux_to_sfc, axis=0)
+        self.SW_up_sfc[:] = np.sum(self.subprocess['SW'].flux_from_sfc, axis=0)
+        self.SW_absorbed_sfc[:] = self.SW_down_sfc - self.SW_up_sfc
+        self.planetary_albedo[:] = self.SW_up_TOA / self.SW_down_TOA
 
 
 def compute_layer_absorptivity(abs_coeff, dp):

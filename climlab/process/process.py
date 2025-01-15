@@ -273,11 +273,9 @@ class Process(object):
             self.subprocess.update({name: proc})
             self.has_process_type_list = False
             # Add subprocess diagnostics to parent
-            #  (if there are no name conflicts)
+            #  (same-named diagnostics are assumed to be additive)
             for diagname, value in proc.diagnostics.items():
-                #if not (diagname in self.diagnostics or hasattr(self, diagname)):
-                #    self.add_diagnostic(diagname, value)
-                self.add_diagnostic(diagname, value)
+                self.add_diagnostic(diagname, 0.*value)
         else:
             raise ValueError('subprocess must be Process object')
 
@@ -502,7 +500,7 @@ class Process(object):
         except:
             print('No diagnostic named {} was found.'.format(name))
 
-    def to_xarray(self, diagnostics=False):
+    def to_xarray(self, diagnostics=False, timeave=False):
         """ Convert process variables to ``xarray.Dataset`` format.
 
         With ``diagnostics=True``, both state and diagnostic variables are included.
@@ -575,7 +573,11 @@ class Process(object):
                     TdotSW_clr        (lev) float64 2.821 0.5123 0.3936 0.3368 0.3174 0.3299 ...
 
         """
-        if diagnostics:
+        if timeave and hasattr(self, 'timeave'):
+            dic = self.state.copy()
+            dic.update(self.timeave)
+            return state_to_xarray(dic)
+        elif diagnostics:
             dic = self.state.copy()
             dic.update(self.diagnostics)
             return state_to_xarray(dic)

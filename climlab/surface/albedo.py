@@ -42,31 +42,20 @@ class ConstantAlbedo(DiagnosticProcess):
     def __init__(self, albedo=0.33, **kwargs):
         '''Uniform prescribed albedo.'''
         super(ConstantAlbedo, self).__init__(**kwargs)
-        dom = next(iter(self.domains.values()))
-        self.add_diagnostic('albedo', Field(albedo, domain=dom))
-        #self.albedo = albedo
+        self.add_diagnostic('albedo', albedo)
 
-    # @property
-    # def albedo(self):
-    #     """Property of albedo value.
-    #
-    #     :getter:    Returns the albedo value which is stored in diagnostic dict
-    #                 ``self.diagnostic['albedo']``
-    #     :setter:    * sets albedo which is addressed as ``diagnostics['albedo']``
-    #                   to the new value through creating a Field on the basis
-    #                   of domain ``self.domain['default']``
-    #                 * updates the parameter dictionary ``self.param['albedo']``
-    #     :type:      Field
-    #
-    #     """
-    #     return self.diagnostics['albedo']
-    # @albedo.setter
-    # def albedo(self, value):
-    #     #dom = self.domains['default']
-    #     #  this is a more robust way to get the single value from dictionary:
-    #     dom = self.domains.itervalues().next()
-    #     self.diagnostics['albedo'] = Field(value, domain=dom)
-    #     self.param['albedo'] = value
+    @property
+    def albedo(self):
+        return self._albedo
+    @albedo.setter
+    def albedo(self, value):
+        dom = next(iter(self.domains.values()))
+        self._albedo = Field(value, domain=dom)
+        self.param['albedo'] = value
+
+    def _compute(self):
+        self.albedo[:] = self.param['albedo']
+        return {}
 
 
 class P2Albedo(DiagnosticProcess):
@@ -129,13 +118,12 @@ class P2Albedo(DiagnosticProcess):
 
 
     """
-
     def __init__(self, a0=0.33, a2=0.25, **kwargs):
         super(P2Albedo, self).__init__(**kwargs)
         self.a0 = a0
         self.a2 = a2
-        self.add_diagnostic('albedo')
         self._compute_fixed()
+        self.add_diagnostic('albedo', self._albedo.copy())
 
     @property
     def a0(self):
@@ -188,11 +176,12 @@ class P2Albedo(DiagnosticProcess):
         except:
             albedo = np.zeros_like(phi)
         # make sure that the diagnostic has the correct field dimensions.
-        #dom = self.domains['default']
-        #  this is a more robust way to get the single value from dictionary:
         dom = next(iter(self.domains.values()))
-        self.albedo = Field(albedo, domain=dom)
+        self._albedo = Field(albedo, domain=dom)
 
+    def _compute(self):
+        self.albedo[:] = self._albedo
+        return {}
 
 
 class Iceline(DiagnosticProcess):
@@ -228,8 +217,8 @@ class Iceline(DiagnosticProcess):
     def __init__(self, Tf=-10., **kwargs):
         super(Iceline, self).__init__(**kwargs)
         self.param['Tf'] = Tf
-        self.add_diagnostic('icelat')
-        self.add_diagnostic('ice_area')
+        self.add_diagnostic('icelat', np.array([-90., 90.]))
+        self.add_diagnostic('ice_area', np.array(0.))
         #  Set diagnostics based on initial conditions
         self.find_icelines()
 

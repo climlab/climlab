@@ -119,6 +119,30 @@ appropriate `input`.
 		Thereby anything in the `input` dictionary of ``'subprocname'`` will remain fixed.
 
 
+Additive diagnostics for subprocesses
+#####################################
+
+.. note::
+
+	This functionality is new in climlab v0.9
+
+Every subprocess is a self-contained model that produces its own diagnostics. 
+In many cases it makes sense for multiple subprocesses to contribute additively 
+to a diagnostic of the parent process. 
+
+This additive assumption is built-in to the subprocess coupling. 
+Diagnostics that have the **same name** within the subprocess tree are assumed to be
+**additive**, and are **summed** at every timestep within the parent process.
+
+For example, multiple ``precipitation`` diagnostics may be produced in a moist model
+by the convection scheme and large-scale condensation. The ``precipitation`` diagnostic
+of the parent process that couples the subprocesses together will always represent 
+the total precipitation.
+
+It's up to the user or process developer to ensure consistency of meaning and units
+in cases where same-named diagnostics are defined. If the additive diagnostic 
+in the parent process is not meaningful, it can safely be ignored. 
+Diagnostics produced by individual subprocesses are never overwritten. 
 
 
 Process Integration over time
@@ -256,7 +280,6 @@ The description of :class:`~climlab.process.time_dependent_process.TimeDependent
         object, for which the
 	:class:`~climlab.process.time_dependent_process.TimeDependentProcess.compute()`
 	method has been called.
-
 
 
 ******

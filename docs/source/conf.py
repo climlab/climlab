@@ -41,7 +41,7 @@ extensions = [
     'sphinx.ext.doctest',
     #'sphinx.ext.imgmath',
     'sphinx.ext.viewcode',
-    #'sphinx.ext.graphviz',
+    'sphinx.ext.graphviz',
     'sphinx.ext.inheritance_diagram',
     'sphinx.ext.intersphinx',
     'sphinx.ext.mathjax',
@@ -51,7 +51,8 @@ extensions = [
     'IPython.sphinxext.ipython_console_highlighting',
     'sphinxcontrib.bibtex',
     'numpydoc',
-    'nbsphinx'
+    'nbsphinx',
+    'sphinx_rtd_theme',
 ]
 
 nbsphinx_execute = 'never'
@@ -102,7 +103,7 @@ else:
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -157,11 +158,12 @@ bibtex_bibfiles = ['bibliography.bib']
 
 # -- Options for HTML output ----------------------------------------------
 
-on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
-if not on_rtd:  # only import and set the theme if we're building docs locally
-    import sphinx_rtd_theme
-    html_theme = 'sphinx_rtd_theme'
-    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+# on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+# if not on_rtd:  # only import and set the theme if we're building docs locally
+#     import sphinx_rtd_theme
+#     html_theme = 'sphinx_rtd_theme'
+#     html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+html_theme = 'sphinx_rtd_theme'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.

@@ -15,3 +15,4 @@ climlab.dynamics
     climlab.dynamics.MeridionalHeatDiffusion
     climlab.dynamics.MeridionalMoistDiffusion
     climlab.dynamics.adv_diff_numerics
+    climlab.dynamics.LargeScaleCondensation
