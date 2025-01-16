@@ -21,7 +21,7 @@ daily-average incoming solar radiation at the top of the atmosphere.
 
 .. note::
 
-    Ported and modified from MATLAB code daily_insolation.m         \n
+    This code was originally inspired by MATLAB code daily_insolation.m         \n
     *Original authors:*                                             \n
 
      Ian Eisenman and Peter Huybers, Harvard University, August 2006
@@ -99,11 +99,13 @@ def daily_insolation_factors(lat, day, orb=const.orb_present,
     - ``irradiance_factor``: ratio of current total irradiance to its annual average (dimensionless)
 
     For ``weighting='sunlit'`` and ``weighting='insolation'``, the irradiance factor
-    is reduced to account for 
+    is reduced commensurate with the increased coszen value to ensure that the 
+    product ``coszen * irrandiance_factor`` always gives the 
+    24 hour time-weighted daily average irradiance relative to the solar constant.
 
     In all cases, daily average insolation can then be computed from 
     ``S0 * coszen * irradiance_factor`` 
-    where ``S0`` is the solar constant (annual average total irradiance).
+    where ``S0`` is the solar constant.
     """
     phi, delta, irradiance_factor, h, input_is_xarray = \
         _compute_solar_angles(lat, day, orb, 
@@ -229,6 +231,16 @@ def daily_insolation(lat, day, orb=const.orb_present, S0=const.S0,
         For more information about computation of solar insolation see the
         :ref:`Tutorial` chapter.
 
+    .. note::
+
+        Calling ``insolation = daily_insolation(lat, day, orb, S0)`` is equivalent to::
+
+            coszen, irradiance_factor = daily_insolation_factors(lat, day, orb)
+            insolation = S0 * irradiance_factor * coszen
+        
+        Computing the zenith angle with ``daily_insolation_factors`` allows for 
+        optional time averaging choices which may be important for certain 
+        radiative transfer calculations that are sensitive to zenith angle.
     """
     coszen, irradiance_factor = daily_insolation_factors(lat, day, 
             orb=orb, day_type=day_type, days_per_year=days_per_year,)
