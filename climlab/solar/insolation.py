@@ -73,38 +73,72 @@ def _compute_solar_angles(lat, day, orb, lon=None, day_type=1, days_per_year=con
         h = None
     return phi, delta, irradiance_factor, h, input_is_xarray
 
-def daily_insolation_factors(lat, day, orb=const.orb_present, S0=const.S0, 
-                     day_type=1, days_per_year=const.days_per_year,):
+def daily_insolation_factors(lat, day, orb=const.orb_present, 
+                     day_type=1, days_per_year=const.days_per_year,
+                     weighting='time'):
     """
     Compute daily average cosine of solar zenith angle and irradiance factor
-    given latitude, time of year and orbital parameters.
+    given latitude, time of year and orbital parameters. Multiple zenith angle
+    averaging methods are supported.
 
-    Same options and call signature as ``daily_insolation`` 
-    but rather than returning the insolation, this function retuns two values:
+    Input arguments:
 
-    - ``coszen``: the cosine of the daily average zenith angle (dimensionless)
+    - ``lat``: Latitude in degrees (-90 to 90)
+    - ``day``: Indicator of time of year. See docs for ``daily_insolation()``.
+    - ``orb``: Orbital parameter dictionary. See docs for ``daily_insolation()``.
+    - ``day_type``: Convention for specifying time of year. See docs for ``daily_insolation()``.
+    - ``days_per_year``: length of calendar year in days (default = 365.2422)
+    - ``weighting``: flag to specify averaging method for solar zenith angle. Valid options are:
+        - ``'time'`` (default): unweighted 24 hour daily average
+        - ``'sunlit'``: time average over sunlit hours
+        - ``'insolation'``: insolation-weighted average
+    
+    This function retuns two values:
+
+    - ``coszen``: the cosine of the average zenith angle (dimensionless), averaged according to the ``weighting`` argument
     - ``irradiance_factor``: ratio of current total irradiance to its annual average (dimensionless)
-   
-    Insolation can then be computed from ``S0 * coszen * irradiance_factor`` 
+
+    For ``weighting='sunlit'`` and ``weighting='insolation'``, the irradiance factor
+    is reduced to account for 
+
+    In all cases, daily average insolation can then be computed from 
+    ``S0 * coszen * irradiance_factor`` 
     where ``S0`` is the solar constant (annual average total irradiance).
     """
     phi, delta, irradiance_factor, h, input_is_xarray = \
         _compute_solar_angles(lat, day, orb, 
                               day_type=day_type, 
                               days_per_year=days_per_year)
-    # This is the cosine of the solar zenith angle averaged over 24 hours:
-    coszen = coszen_daily_time_weighted(phi, delta)
+    if weighting=='time':
+        coszen = coszen_daily_time_weighted(phi, delta)
+    elif weighting=='sunlit':
+        coszen = coszen_daily_time_weighted_sunlit(phi, delta)
+    elif weighting=='insolation':
+        coszen = coszen_daily_insolation_weighted(phi, delta)
+    else:
+        raise ValueError('Invalid weighting argument. \
+            Valid options are time, sunlit, or insolation')
     if not input_is_xarray:
         coszen = coszen.transpose().values
-        irradiance_factor = irradiance_factor.tranpose().values
+        irradiance_factor = irradiance_factor.transpose().values
     return coszen, irradiance_factor
 
-def instant_insolation_factors(lat, day, lon=0., orb=const.orb_present, S0=const.S0, 
-                        days_per_year=const.days_per_year):
+def instant_insolation_factors(lat, day, lon=0., orb=const.orb_present, 
+                        day_type=1, days_per_year=const.days_per_year):
     """
     Compute instantaneous cosine of solar zenith angle and irradiance factor
     given latitude, longitude, time of year and orbital parameters.
 
+    Input arguments:
+
+    - ``lat``: Latitude in degrees (-90 to 90)
+    - ``day``: Indicator of time of year. See docs for ``daily_insolation()``.
+    - ``lon``: Longitude in degrees (0 to 360) (default = 0.)
+    - ``orb``: Orbital parameter dictionary. See docs for ``daily_insolation()``.
+    - ``day_type``: Convention for specifying time of year. See docs for ``daily_insolation()``.
+    - ``days_per_year``: length of calendar year in days (default = 365.2422)
+
+    
     Same options and call signature as ``instant_insolation`` 
     but rather than returning the insolation, this function retuns two values:
 
@@ -115,9 +149,11 @@ def instant_insolation_factors(lat, day, lon=0., orb=const.orb_present, S0=const
     where ``S0`` is the solar constant (annual average total irradiance).
     """
     phi, delta, irradiance_factor, h, input_is_xarray = \
-        _compute_solar_angles(lat, day, orb, lon=lon, days_per_year=days_per_year)
+        _compute_solar_angles(lat, day, orb, lon=lon, 
+                day_type=day_type, days_per_year=days_per_year)
     coszen = coszen_instantaneous(phi, delta, h)
     if not input_is_xarray:
+        # Dimensional ordering consistent with previous numpy code
         coszen = coszen.transpose().values
         irradiance_factor = irradiance_factor.tranpose().values
     return coszen, irradiance_factor
@@ -194,19 +230,10 @@ def daily_insolation(lat, day, orb=const.orb_present, S0=const.S0,
         :ref:`Tutorial` chapter.
 
     """
-    phi, delta, irradiance_factor, h, input_is_xarray = \
-        _compute_solar_angles(lat, day, orb, 
-                              day_type=day_type, 
-                              days_per_year=days_per_year)
-    # This is the cosine of the solar zenith angle averaged over 24 hours:
-    coszen = coszen_daily_time_weighted(phi, delta)
-    # Compute daily average insolation
+    coszen, irradiance_factor = daily_insolation_factors(lat, day, 
+            orb=orb, day_type=day_type, days_per_year=days_per_year,)
     Fsw = _compute_insolation(S0, irradiance_factor, coszen)
-    if input_is_xarray:
-        return Fsw
-    else:
-        # Dimensional ordering consistent with previous numpy code
-        return Fsw.transpose().values
+    return Fsw
 
 def _solar_distance_Berger(ecc, lambda_long, long_peri):
     """Earth-Sun distance relative to its reference value at which the solar constant is measured.
@@ -225,7 +252,7 @@ def _compute_insolation(S0, irradiance_factor, coszen):
     return S0 * irradiance_factor * coszen
 
 def instant_insolation(lat, day, lon=0., orb=const.orb_present, S0=const.S0, 
-                       days_per_year=const.days_per_year):
+                       day_type=1, days_per_year=const.days_per_year):
     """Compute instantaneous insolation given latitude, longitude, time of year and orbital parameters.
 
     Orbital parameters can be interpolated to any time in the last 5 Myears with
@@ -281,18 +308,11 @@ def instant_insolation(lat, day, lon=0., orb=const.orb_present, S0=const.S0,
         For more information about computation of solar insolation see the
         :ref:`Tutorial` chapter.
 
-     """
-    phi, delta, irradiance_factor, h, input_is_xarray = \
-        _compute_solar_angles(lat, day, orb, lon=lon, days_per_year=days_per_year)
-    # instantaneous cosine of solar zenith angle
-    coszen = coszen_instantaneous(phi, delta, h)
-    # Compute insolation
+    """
+    coszen, irradiance_factor = instant_insolation_factors(lat, day, 
+        lon=lon, orb=orb, day_type=day_type, days_per_year=days_per_year)
     Fsw = _compute_insolation(S0, irradiance_factor, coszen)
-    if input_is_xarray:
-        return Fsw
-    else:
-        # Dimensional ordering consistent with previous numpy code
-        return Fsw.transpose().values
+    return Fsw
 
 def declination_angle(obliquity, lambda_long):
     """Compute solar declination angle in radians.
@@ -320,7 +340,8 @@ def hour_angle_at_sunset(phi, delta):
               xr.where(phi*delta>0., pi, 0.) )
 
 def coszen_instantaneous(phi, delta, h):
-    """Cosine of solar zenith angle (instantaneous)
+    """Cosine of solar zenith angle (instantaneous).
+
     Returns zero if the sun is below the horizon.
     
     Inputs:
