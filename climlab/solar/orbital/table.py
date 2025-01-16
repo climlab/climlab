@@ -15,7 +15,7 @@ def _get_Berger_data(verbose=True):
     '''
     orbit91handle = pooch.retrieve(path,
         known_hash="3afc20dda7b385bdd366bc4c9cf60be02d8defdb4c0f317430ca8386d62f81a3")
-    orbit91_pd = pd.read_csv(orbit91handle, delim_whitespace=True, skiprows=1, verbose=True)
+    orbit91_pd = pd.read_csv(orbit91handle, sep='\s+', skiprows=1,)
     #  As xarray structure with the dimension named 'kyear'
     orbit = xr.Dataset(orbit91_pd).rename({'dim_0': 'kyear'})
     #  Now change names
