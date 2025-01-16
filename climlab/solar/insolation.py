@@ -111,15 +111,19 @@ def daily_insolation_factors(lat, day, orb=const.orb_present,
         _compute_solar_angles(lat, day, orb, 
                               day_type=day_type, 
                               days_per_year=days_per_year)
+    coszen_daily = coszen_daily_time_weighted(phi, delta)
     if weighting=='time':
-        coszen = coszen_daily_time_weighted(phi, delta)
+        coszen = coszen_daily
     elif weighting=='sunlit':
         coszen = coszen_daily_time_weighted_sunlit(phi, delta)
     elif weighting=='insolation':
         coszen = coszen_daily_insolation_weighted(phi, delta)
     else:
-        raise ValueError('Invalid weighting argument. \
-            Valid options are time, sunlit, or insolation')
+        raise ValueError('Invalid weighting argument. Valid options are time, sunlit, or insolation')
+    #  Rescale the irradiance factor to account for hours of sunlight
+    #   This ensures that we get the correct daily mean insolation 
+    #  By multiplying S0 * coszen * irrandiance_factor
+    irradiance_factor = xr.where(coszen>0, irradiance_factor * coszen_daily / coszen, irradiance_factor)
     if not input_is_xarray:
         coszen = coszen.transpose().values
         irradiance_factor = irradiance_factor.transpose().values
