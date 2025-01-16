@@ -378,7 +378,8 @@ def coszen_daily_time_weighted(phi, delta):
     - ``delta``: solar declination angle in radians
     """
     h0 = hour_angle_at_sunset(phi, delta)
-    return (h0*sin(phi)*sin(delta) + cos(phi)*cos(delta)*sin(h0)) / pi
+    coszen = (h0*sin(phi)*sin(delta) + cos(phi)*cos(delta)*sin(h0)) / pi
+    return np.maximum(coszen, 0.0)
 
 def coszen_daily_insolation_weighted(phi, delta):
     """Cosine of solar zenith angle, insolation-weighted daily average.
@@ -392,7 +393,8 @@ def coszen_daily_insolation_weighted(phi, delta):
     denominator = h0*sin(phi)*sin(delta) + cos(phi)*cos(delta)*sin(h0)
     numerator = (h0*(2* sin(phi)**2*sin(delta)**2 + cos(phi)**2*cos(delta)**2) + 
         cos(phi)*cos(delta)*sin(h0)*(4*sin(phi)*sin(delta) + cos(phi)*cos(delta)*cos(h0)))
-    return numerator / denominator / 2
+    coszen = xr.where(h0>0., numerator / denominator / 2, 0.)
+    return coszen
 
 def coszen_daily_time_weighted_sunlit(delta, phi):
     """Cosine of solar zenith angle averaged in time sunlit hours only.
@@ -403,7 +405,8 @@ def coszen_daily_time_weighted_sunlit(delta, phi):
     - ``delta``: solar declination angle in radians
     """
     h0 = hour_angle_at_sunset(delta, phi)
-    return sin(phi)*sin(delta) + cos(phi)*cos(delta)*sin(h0)/h0
+    coszen = xr.where(h0>0., sin(phi)*sin(delta) + cos(phi)*cos(delta)*sin(h0)/h0, 0.)
+    return coszen
 
 def solar_longitude(day, orb=const.orb_present, days_per_year=const.days_per_year):
     """Estimates solar longitude from calendar day.
