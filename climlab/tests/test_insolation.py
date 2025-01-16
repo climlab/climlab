@@ -1,7 +1,7 @@
 from __future__ import division, print_function, absolute_import
 import numpy as np
 from climlab import constants as const
-from climlab.solar.insolation import daily_insolation, instant_insolation, solar_longitude
+from climlab.solar.insolation import daily_insolation, daily_insolation_factors, instant_insolation, solar_longitude
 from climlab.solar.orbital import OrbitalTable
 from climlab.solar.orbital.long import OrbitalTable as LongOrbitalTable
 from climlab import EBM_seasonal
@@ -42,6 +42,17 @@ def test_instant_insolation():
     # small error tolerance (in W/m2)
     error = np.abs(Qs.mean(dim='day') - Q)
     assert np.all(error < 0.01)
+
+@pytest.mark.fast
+def test_coszen_averages():
+    lat = np.linspace(-90., 90., 500)
+    days = np.linspace(0, const.days_per_year, 365)
+    coszen_insolation, irradiance_factor_insolation = daily_insolation_factors(lat, days, weighting='insolation')
+    coszen_sunlit, irradiance_factor_sunlit = daily_insolation_factors(lat, days, weighting='sunlit')
+    Q = daily_insolation(lat, days)
+    S0 = const.S0
+    np.testing.assert_allclose(Q, S0*coszen_insolation*irradiance_factor_insolation)
+    np.testing.assert_allclose(Q, S0*coszen_sunlit*irradiance_factor_sunlit)
 
 @pytest.mark.fast
 def test_orbital_parameters():
