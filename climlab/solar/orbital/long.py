@@ -15,7 +15,7 @@ def _get_Laskar_data(verbose=True):
     longorbithandle = {}
     longorbit = {}
     sources = {}
-    pandas_kwargs = {'delim_whitespace':True,
+    pandas_kwargs = {'sep': '\s+',
                      'header':None,
                      'index_col':0,
                      'names':['kyear','ecc','obliquity','long_peri'],}
