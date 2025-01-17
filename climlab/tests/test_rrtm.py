@@ -175,7 +175,6 @@ def test_latitude():
     #  State variables (Air and surface temperature)
     state = climlab.column_state(num_lev=30, num_lat=num_lat, water_depth=1.)
     #  insolation
-    #sol = climlab.radiation.AnnualMeanInsolation(domains=model.Ts.domain)
     sol = climlab.radiation.AnnualMeanInsolation(name='Insolation',
                                                  domains=state.Ts.domain)
     #  radiation module with insolation as input
@@ -195,6 +194,47 @@ def test_latitude():
     grad = np.diff(model.Ts, axis=0)
     assert np.all(grad[0:(int(num_lat/2)-1)] > 0.)
     assert np.all(grad[int(num_lat/2):] < 0.)
+
+@pytest.mark.compiled
+@pytest.mark.fast
+def test_cozen():
+    '''
+    Create 2D models with RRTMG radiation and latitudinally-varying radiation.
+    Check to see that different ways of time-averaging the solar zenith angle
+    result in different ASR despite same insolation
+    due to zenith-angle dependence of clear-sky scattering
+    '''
+    num_lat = 180
+    model_list = []
+    for weighting in ['time', 'sunlit', 'insolation']:
+        #  State variables (Air and surface temperature)
+        state = climlab.column_state(num_lev=30, num_lat=num_lat, water_depth=1.)
+        #  insolation using specified zenith angle weighting
+        sol = climlab.radiation.AnnualMeanInsolation(name='Insolation',
+                                                 domains=state.Ts.domain,
+                                                 weighting=weighting)
+        #  radiation module with insolation as input
+        #   Set icld=0 for clear-sky only (no need to call cloud overlap routine)
+        rad = climlab.radiation.RRTMG(name='Radiation', state=state, icld=0,
+                                      S0=sol.S0,
+                                      coszen=sol.coszen,
+                                      irradiance_factor=sol.irradiance_factor)
+        #  Couple everything together
+        m = climlab.couple([rad, sol], name='model')
+        m.compute_diagnostics()
+        model_list.append(m)
+    # Do all models that the same insolation?
+    assert np.allclose(model_list[0].insolation, model_list[1].insolation)
+    assert np.allclose(model_list[1].insolation, model_list[2].insolation)
+    # Does the cosine of zenith angle increase as we weight the average towards times of day with more insolation?
+    assert np.all(model_list[0].coszen < model_list[1].coszen)
+    assert np.all(model_list[1].coszen < model_list[2].coszen)
+    # Does the ASR increase for higher zenith angle (away from the poles)?
+    ASR0 = climlab.to_xarray(model_list[0].ASR)
+    ASR1 = climlab.to_xarray(model_list[1].ASR)
+    ASR2 = climlab.to_xarray(model_list[2].ASR)
+    assert ((ASR1-ASR0).sel(lat=slice(-75,75)) > 0.).all()
+    assert ((ASR2-ASR1).sel(lat=slice(-75,75)) > 0.).all()
 
 @pytest.mark.compiled
 @pytest.mark.fast
