@@ -22,7 +22,7 @@ from climlab.process.diagnostic import DiagnosticProcess
 from climlab.domain.field import Field, to_latlon
 from climlab.utils.legendre import P2
 from climlab import constants as const
-from climlab.solar.insolation import daily_insolation_factors, instant_insolation
+from climlab.solar.insolation import daily_insolation_factors, instant_insolation_factors
 
 # REVISE TO MAKE ALL OF THESE CALLABLE WITH NO ARGUMENTS.
 # SET SOME SENSIBLE DEFAULTS FOR DOMAINS
@@ -668,21 +668,15 @@ class InstantInsolation(AnnualMeanInsolation):
                insolation: <class 'climlab.radiation.insolation.InstantInsolation'>
 
     """
-
-    def _compute_fixed(self):
-        try:
-            self.insolation_array = self._daily_insolation_array()
-        except AttributeError:
-            pass
-
     def _get_current_insolation(self):
         # make sure that the diagnostic has the correct field dimensions.
         dom = self.domains['default']
         lon = 0
         if 'lon' in dom.axes:
             lon = self.lon
-        insolation = instant_insolation(self.lat, self.time['days_elapsed'], 
-            lon=lon, orb=self.orb, S0=self.S0)
+        coszen, irradiance_factor = instant_insolation_factors(self.lat, 
+                                            self.time['days_elapsed'], 
+                                            lon=lon, orb=self.orb,)
+        insolation = self.S0 * coszen * irradiance_factor
         self.insolation[:] = Field(insolation, domain=dom)
-        self.coszen[:] = self._coszen_from_insolation()
-                
+        self.coszen[:] = Field(coszen, domain=dom)
