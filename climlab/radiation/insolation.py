@@ -7,14 +7,16 @@ Options include
 - ``climlab.radiation.FixedInsolation`` (generic steady-state insolation)
 - ``climlab.radiation.AnnualMeanInsolation`` (steady-state annual-mean insolation computed from orbital parameters and latitude)
 - ``climlab.radiation.DailyInsolation`` (time-varying daily-mean insolation computed from orbital parameters, latitude and time of year)
+- ``climlab.radiation.InstantInsolation`` (time-varying instantaneous insolation computed from orbital parameters, latitude, longitude, and time of year)
 
 All are subclasses of ``climlab.process.DiagnosticProcess``
-and do add any tendencies to any state variables.
+and do not add any tendencies to any state variables.
 
-At least two diagnostics are provided:
+At least three diagnostics are provided:
 
 - ``insolation``, the incoming solar radiation in :math:`\textrm{W}}{\textrm{m}^2}``
-- ``coszen``, cosine of the solar zenith angle
+- ``coszen``, cosine of the solar zenith angle (dimensionless)
+- ``irradiance_factor``, ratio of current total irradiance to its annual average, i.e. solar constant (dimensionless)
 """
 from __future__ import division
 import numpy as np
@@ -90,8 +92,6 @@ class _Insolation(DiagnosticProcess):
         self.add_diagnostic('coszen', Field(np.zeros(domain.shape), domain=domain))
         self.add_diagnostic('irradiance_factor', Field(np.ones(domain.shape), domain=domain))
         self.S0 = S0
-        #  Now that we have a value for self.S0 we can compute the correct coszen
-        self.coszen = self._coszen_from_insolation()
         self.declare_input(['S0'])
 
     @property
@@ -120,7 +120,7 @@ class _Insolation(DiagnosticProcess):
         self._compute_fixed()
 
     def _coszen_from_insolation(self):
-        return self.insolation / self.S0 / self.irradiance_factor
+        return self.insolation / self.S0
 
     def _compute_fixed(self):
         '''Recompute any fixed quantities after a change in parameters'''
@@ -168,8 +168,6 @@ class FixedInsolation(_Insolation):
         super(FixedInsolation, self).__init__(S0=S0, **kwargs)
 
     def _compute_fixed(self):
-        #ins_adjustment = self.S0 - self.insolation
-        #self.insolation += ins_adjustment
         self.insolation[:] = self.S0
         self.coszen[:] = self._coszen_from_insolation()
 
@@ -380,7 +378,7 @@ class AnnualMeanInsolation(_Insolation):
         super(AnnualMeanInsolation, self).__init__(S0=S0, **kwargs)
         self.orb = orb
         self._compute_fixed()
-
+    
     @property
     def orb(self):
         """Property of dictionary for orbital parameters.
@@ -548,7 +546,6 @@ class DailyInsolation(AnnualMeanInsolation):
             coszen, irradiance_factor = self._daily_insolation_factor_arrays()
             self.coszen_array = coszen
             self.irradiance_factor_array = irradiance_factor
-            self.insolation_array = self.S0 * coszen * irradiance_factor
         except AttributeError:
             pass
 
@@ -556,20 +553,18 @@ class DailyInsolation(AnnualMeanInsolation):
         # make sure that the diagnostic has the correct field dimensions.
         dom = self.domains['default']
         time_index = self.time['day_of_year_index']   # THIS ONLY WORKS IF self IS THE MASTER PROCESS
-        insolation = self.insolation_array[..., time_index]
         coszen = self.coszen_array[..., time_index]
         irradiance_factor = self.irradiance_factor_array[..., time_index]
         if 'lon' in dom.axes:
-            # insolation is latitude-only, need to broadcast across longitude
+            #  coszen is latitude-only, need to broadcast across longitude
             #  assumption is axes are ordered (lat, lon, depth)
             #  NOTE this is a clunky hack and all this will go away
             #  when we use xarray structures for these internals
-            insolation = np.tile(insolation[...,np.newaxis], dom.axes['lon'].num_points)
             coszen = np.tile(coszen[...,np.newaxis], dom.axes['lon'].num_points)
             irradiance_factor = np.tile(irradiance_factor[...,np.newaxis], dom.axes['lon'].num_points)
-        self.insolation[:] = Field(insolation, domain=dom)
         self.coszen[:] = Field(coszen, domain=dom)
         self.irradiance_factor[:] = Field(irradiance_factor, domain=dom)
+        self.insolation[:] = self.S0 * self.coszen * self.irradiance_factor
         
 class InstantInsolation(AnnualMeanInsolation):
     """A class to compute latitudewise instantaneous solar insolation for specific
@@ -684,7 +679,6 @@ class InstantInsolation(AnnualMeanInsolation):
         coszen, irradiance_factor = instant_insolation_factors(self.lat, 
                                             self.time['days_elapsed'], 
                                             lon=lon, orb=self.orb,)
-        insolation = self.S0 * coszen * irradiance_factor
-        self.insolation[:] = Field(insolation, domain=dom)
         self.coszen[:] = Field(coszen, domain=dom)
         self.irradiance_factor[:] = Field(irradiance_factor, domain=dom)
+        self.insolation[:] = self.S0 * self.coszen * self.irradiance_factor
