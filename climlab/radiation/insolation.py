@@ -14,7 +14,7 @@ and do not add any tendencies to any state variables.
 
 At least three diagnostics are provided:
 
-- ``insolation``, the incoming solar radiation in :math:`\textrm{W}}{\textrm{m}^2}``
+- ``insolation``, the incoming solar radiation in :math:`\\frac{\\textrm{W}}{\\textrm{m}^2}`
 - ``coszen``, cosine of the solar zenith angle (dimensionless)
 - ``irradiance_factor``, ratio of current total irradiance to its annual average, i.e. solar constant (dimensionless)
 """
@@ -157,7 +157,7 @@ class FixedInsolation(_Insolation):
 
             >>> fixed_ins = FixedInsolation(S0=340.0, domains=sfc)
 
-            >>> print fixed_ins
+            >>> print(fixed_ins)
             climlab Process of type <class 'climlab.radiation.insolation.FixedInsolation'>.
             State variables and domain shapes:
             The subprocess tree:
@@ -205,7 +205,7 @@ class P2Insolation(_Insolation):
 
             >>> p2_ins = P2Insolation(S0=340.0, s2=-0.5, domains=sfc)
 
-            >>> print p2_ins
+            >>> print(p2_ins)
             climlab Process of type <class 'climlab.radiation.insolation.P2Insolation'>.
             State variables and domain shapes:
             The subprocess tree:
@@ -266,25 +266,29 @@ class P2Insolation(_Insolation):
 class AnnualMeanInsolation(_Insolation):
     """A class for latitudewise solar insolation averaged over a year.
 
-    This class computes the solar insolation for each day of the year and
+    This class computes the daily-mean solar insolation for each day of the year and
     latitude specified in the domain on the basis of orbital parameters and
     astronomical formulas.
 
-    Therefore it uses the method :func:`~climlab.solar.insolation.daily_insolation`.
-    For details how the solar distribution is dependend on orbital parameters
-    see there.
+    Internally this process calls the method :func:`~climlab.solar.insolation.daily_insolation_factors`
+    to compute solar zenith angle and adjustments to total irradiance.
+    See there for details on how the solar distribution depends on orbital parameters.
 
-    The mean over the year is calculated from data given by
-    :func:`~climlab.solar.insolation.daily_insolation` and stored in the
-    object's attribute ``self.insolation``
+    The mean over the year is calculated from data returned by
+    :func:`~climlab.solar.insolation.daily_insolation_factors` and stored in the
+    diagnostics ``insolation``, ``coszen``, and ``irrandiance_factor``.
+
+    Different daily averaging methods can be specified for the zenith angle via the 
+    ``weighting`` argument. See :func:`~climlab.solar.insolation.daily_insolation_factors`
+    for more details.
 
     **Initialization parameters** \n
 
-    :param float S0:    solar constant                                       \n
+    :param float ``S0``:    solar constant                                       \n
                         - unit: :math:`\\frac{\\textrm{W}}{\\textrm{m}^2}`   \n
                         - default value: ``1365.2``
 
-    :param dict orb:    a dictionary with three orbital parameters (as provided by
+    :param dict ``orb``:    a dictionary with three orbital parameters (as provided by
                         :class:`~climlab.solar.orbital.OrbitalTable`):
 
                         * ``'ecc'`` - eccentricity
@@ -301,6 +305,11 @@ class AnnualMeanInsolation(_Insolation):
 
                             * unit: degrees
                             * default value: ``23.446``
+
+    :param str ``weighting``:   flag to specify daily averaging method for solar zenith angle. Valid options are: \n
+                            - ``'time'`` (default): unweighted 24 hour daily average
+                            - ``'sunlit'``: time average over sunlit hours
+                            - ``'insolation'``: insolation-weighted average
 
     **Object attributes** \n
 
@@ -326,7 +335,7 @@ class AnnualMeanInsolation(_Insolation):
             >>> # model creation
             >>> model = climlab.EBM()
 
-            >>> print model
+            >>> print(model)
 
         .. code-block:: none
             :emphasize-lines: 12
@@ -355,7 +364,7 @@ class AnnualMeanInsolation(_Insolation):
             >>> # add it to the model
             >>> model.add_subprocess('insolation',new_insol)
 
-            >>> print model
+            >>> print(model)
 
         .. code-block:: none
             :emphasize-lines: 12
@@ -440,15 +449,19 @@ class AnnualMeanInsolation(_Insolation):
 
 
 class DailyInsolation(AnnualMeanInsolation):
-    """A class to compute latitudewise daily solar insolation for specific
+    """A class to compute latitudewise daily average solar insolation for specific
     days of the year.
 
     This class computes the solar insolation on basis of orbital parameters and
     astronomical formulas.
 
-    Therefore it uses the method :func:`~climlab.solar.insolation.daily_insolation`.
-    For details how the solar distribution is dependend on orbital parameters
-    see there.
+    Internally this process calls the method :func:`~climlab.solar.insolation.daily_insolation_factors`.
+    to compute solar zenith angle and adjustments to total irradiance. 
+    See there for details on how the solar distribution depends on orbital parameters.
+
+    Different daily averaging methods can be specified for the zenith angle via the 
+    ``weighting`` argument. See :func:`~climlab.solar.insolation.daily_insolation_factors`
+    for more details.
 
     **Initialization parameters** \n
 
@@ -472,6 +485,11 @@ class DailyInsolation(AnnualMeanInsolation):
 
                             * unit: degrees
                             * default value: ``23.446``
+
+    :param str ``weighting``:   flag to specify daily averaging method for solar zenith angle. Valid options are: \n
+                            - ``'time'`` (default): unweighted 24 hour daily average
+                            - ``'sunlit'``: time average over sunlit hours
+                            - ``'insolation'``: insolation-weighted average
 
     **Object attributes** \n
 
@@ -498,7 +516,7 @@ class DailyInsolation(AnnualMeanInsolation):
             >>> # model creation
             >>> model = climlab.EBM()
 
-            >>> print model
+            >>> print(model)
 
         .. code-block:: none
             :emphasize-lines: 12
@@ -524,7 +542,7 @@ class DailyInsolation(AnnualMeanInsolation):
             >>> # create DailyInsolation subprocess and add it to the model
             >>> model.add_subprocess('insolation',DailyInsolation(domains=sfc, **model.param))
 
-            >>> print model
+            >>> print(model)
 
         .. code-block:: none
             :emphasize-lines: 12
@@ -627,7 +645,7 @@ class InstantInsolation(AnnualMeanInsolation):
             >>> # model creation
             >>> model = climlab.EBM()
 
-            >>> print model
+            >>> print(model)
 
         .. code-block:: none
             :emphasize-lines: 12
@@ -653,7 +671,7 @@ class InstantInsolation(AnnualMeanInsolation):
             >>> # create InstantInsolation subprocess and add it to the model
             >>> model.add_subprocess('insolation',InstantInsolation(domains=sfc, **model.param))
 
-            >>> print model
+            >>> print(model)
 
         .. code-block:: none
             :emphasize-lines: 12
