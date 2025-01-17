@@ -374,9 +374,11 @@ class AnnualMeanInsolation(_Insolation):
                insolation: <class 'climlab.radiation.insolation.AnnualMeanInsolation'>
 
     """
-    def __init__(self, S0=const.S0, orb=const.orb_present, **kwargs):
+    def __init__(self, S0=const.S0, orb=const.orb_present, 
+                 weighting='time', **kwargs):
         super(AnnualMeanInsolation, self).__init__(S0=S0, **kwargs)
         self.orb = orb
+        self.weighting = weighting
         self._compute_fixed()
     
     @property
@@ -407,7 +409,8 @@ class AnnualMeanInsolation(_Insolation):
     def _daily_insolation_factor_arrays(self):
         coszen, irradiance_factor = daily_insolation_factors(self.lat,
                                                              self.time['days_of_year'],
-                                                             orb=self.orb)
+                                                             orb=self.orb,
+                                                             weighting=self.weighting)
         return coszen, irradiance_factor
 
     def _compute_fixed(self):
@@ -540,7 +543,6 @@ class DailyInsolation(AnnualMeanInsolation):
                insolation: <class 'climlab.radiation.insolation.DailyInsolation'>
 
     """
-
     def _compute_fixed(self):
         try:
             coszen, irradiance_factor = self._daily_insolation_factor_arrays()
