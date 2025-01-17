@@ -378,7 +378,6 @@ class AnnualMeanInsolation(_Insolation):
     """
     def __init__(self, S0=const.S0, orb=const.orb_present, **kwargs):
         super(AnnualMeanInsolation, self).__init__(S0=S0, **kwargs)
-        #self.param['orb'] = orb
         self.orb = orb
         self._compute_fixed()
 
@@ -414,18 +413,12 @@ class AnnualMeanInsolation(_Insolation):
                                                              orb=self.orb)
         return coszen, irradiance_factor
 
-    # def _daily_insolation_array(self):
-    #     days_of_year = self.time['days_of_year']
-    #     return daily_insolation(self.lat, days_of_year, orb=self.orb, S0=self.S0)
-
     def _compute_fixed(self):
         try:
-            # temp_array = self._daily_insolation_array()
             coszen, irradiance_factor = self._daily_insolation_factor_arrays()
             insolation = self.S0 * coszen * irradiance_factor
             coszen = np.mean(coszen, axis=1)
             insolation = np.mean(insolation, axis=1)
-            # insolation = np.mean(temp_array, axis=1)
             # make sure that the diagnostic has the correct field dimensions.
             dom = self.domains['default']
             try:
@@ -436,7 +429,6 @@ class AnnualMeanInsolation(_Insolation):
             except:
                 self.insolation[:] = Field(insolation, domain=dom)
                 self.coszen[:] = Field(coszen, domain=dom)
-            # self.coszen[:] = self._coszen_from_insolation()
         #  Silent fail only for attribute error: _orb is not an attribute of self
         #  but orb parameter is being stored in self._orb
         except AttributeError:
@@ -553,12 +545,10 @@ class DailyInsolation(AnnualMeanInsolation):
             coszen, irradiance_factor = self._daily_insolation_factor_arrays()
             self.coszen_array = coszen
             self.insolation_array = self.S0 * coszen * irradiance_factor
-            # self.insolation_array = self._daily_insolation_array()
         except AttributeError:
             pass
 
     def _get_current_insolation(self):
-        # insolation_array = self.insolation_array
         # make sure that the diagnostic has the correct field dimensions.
         dom = self.domains['default']
         time_index = self.time['day_of_year_index']   # THIS ONLY WORKS IF self IS THE MASTER PROCESS
@@ -572,7 +562,7 @@ class DailyInsolation(AnnualMeanInsolation):
             insolation = np.tile(insolation[...,np.newaxis], dom.axes['lon'].num_points)
             coszen = np.tile(coszen[...,np.newaxis], dom.axes['lon'].num_points)
         self.insolation[:] = Field(insolation, domain=dom)
-        self.coszen[:] = self._coszen_from_insolation()
+        self.coszen[:] = Field(coszen, domain=dom)
         
 class InstantInsolation(AnnualMeanInsolation):
     """A class to compute latitudewise instantaneous solar insolation for specific
