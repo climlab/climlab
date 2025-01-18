@@ -217,13 +217,6 @@ class _Radiation_SW(_Radiation):
                  irradiance_factor = 1.,  # instantaneous irradiance = S0 * irradiance_factor
                  **kwargs):
         super(_Radiation_SW, self).__init__(**kwargs)
-        #  coszen is cosine of solar zenith angle
-        #  If unspecified, infer it from the insolation
-        #  (assuming a circular orbit and standard solar constant)
-        # if insolation is None:
-        #     insolation = coszen * S0
-        # if coszen is None:
-        #     coszen = insolation / S0
         self.add_input('S0', S0)
         self.add_input('coszen', coszen)
         self.add_input('irradiance_factor', irradiance_factor)
@@ -261,7 +254,7 @@ class _Radiation_SW(_Radiation):
         return self.S0 * self.irradiance_factor * self.coszen
     @insolation.setter
     def insolation(self, value):
-        self.coszen = value / self.S0 / self.irradiance_factor
+        self.irradiance_factor = value / self.S0 / self.coszen
 
     def _compute_SW_flux_diagnostics(self):
         #  positive down, consistent with ASR

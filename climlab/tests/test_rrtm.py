@@ -181,8 +181,8 @@ def test_latitude():
     #   Set icld=0 for clear-sky only (no need to call cloud overlap routine)
     rad = climlab.radiation.RRTMG(name='Radiation', state=state, icld=0,
                                   S0=sol.S0,
-                                  insolation=sol.insolation,
-                                  coszen=sol.coszen)
+                                  coszen=sol.coszen,
+                                  irradiance_factor=sol.irradiance_factor,)
     #  Couple everything together
     model = rad + sol
     #  Run out to equilibrium
@@ -285,19 +285,15 @@ def test_large_grid():
     
 @pytest.mark.compiled
 @pytest.mark.fast
-def test_sw_insol_propagate():
+def test_sw_params_propagate():
     state = climlab.column_state()
     rad = climlab.radiation.RRTMG(state=state)
     assert rad.insolation == rad.subprocess['SW'].insolation
     rad.insolation *= 1.01
     assert rad.insolation == rad.subprocess['SW'].insolation
-
-@pytest.mark.compiled
-@pytest.mark.fast
-def test_coszen_insol_propagate():
-    state = climlab.column_state()
-    rad = climlab.radiation.RRTMG(state=state)
-    assert rad.coszen == rad.subprocess['SW'].coszen
     rad.coszen *= 1.01
     assert rad.coszen == rad.subprocess['SW'].coszen
-    
+    assert rad.insolation == rad.subprocess['SW'].insolation
+    rad.irradiance_factor *= 1.01
+    assert rad.irradiance_factor == rad.subprocess['SW'].irradiance_factor
+    assert rad.insolation == rad.subprocess['SW'].insolation
