@@ -13,5 +13,5 @@ dependencies:
   - pytest-cov
   - climlab-rrtmg <0.3
   - climlab-emanuel-convection
-  - climlab-cam3-radiation
+  - climlab-cam3-radiation <0.3
   - climlab-sbm-convection
