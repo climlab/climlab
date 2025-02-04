@@ -120,7 +120,6 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         epsilon = const.Rd / const.Rv
         stebol = const.sigma
         scon = self.S0
-        eccf = self.irradiance_factor
         #  Well-mixed greenhouse gases -- scalar values
         wellmixed_vmr = {}
         for GHG in ['CO2','N2O','CH4','CFC11','CFC12']:
@@ -136,8 +135,8 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         # array input
         Tatm = self._climlab_to_cam3(self.Tatm)
         Ts = self._climlab_to_cam3(self.Ts)
-        #insolation = self._climlab_to_cam3(self.insolation * np.ones_like(self.Ts))
         coszen = self._climlab_to_cam3(self.coszen * np.ones_like(self.Ts))
+        eccf = self._climlab_to_cam3(self.irradiance_factor * np.ones_like(self.Ts))
         aldif = self._climlab_to_cam3(self.aldif * np.ones_like(self.Ts))
         aldir = self._climlab_to_cam3(self.aldir * np.ones_like(self.Ts))
         asdif = self._climlab_to_cam3(self.asdif * np.ones_like(self.Ts))
