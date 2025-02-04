@@ -122,11 +122,17 @@ class CAM3(_Radiation_SW, _Radiation_LW):
         scon = self.S0
         eccf = self.irradiance_factor
         #  Well-mixed greenhouse gases -- scalar values
-        CO2vmr = self.absorber_vmr['CO2']
-        N2Ovmr = self.absorber_vmr['N2O']
-        CH4vmr = self.absorber_vmr['CH4']
-        CFC11vmr = self.absorber_vmr['CFC11']
-        CFC12vmr = self.absorber_vmr['CFC12']
+        wellmixed_vmr = {}
+        for GHG in ['CO2','N2O','CH4','CFC11','CFC12']:
+            try:
+                wellmixed_vmr[GHG] = float(self.absorber_vmr[GHG])
+            except TypeError:
+                raise TypeError("CAM3radiation process only handles scalar (well-mixed) values for {} volume mixing ratio.".format(GHG))
+        CO2vmr = wellmixed_vmr['CO2']
+        N2Ovmr = wellmixed_vmr['N2O']
+        CH4vmr = wellmixed_vmr['CH4']
+        CFC11vmr = wellmixed_vmr['CFC11']
+        CFC12vmr = wellmixed_vmr['CFC12']
         # array input
         Tatm = self._climlab_to_cam3(self.Tatm)
         Ts = self._climlab_to_cam3(self.Ts)
