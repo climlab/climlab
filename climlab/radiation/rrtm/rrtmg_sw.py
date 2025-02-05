@@ -129,15 +129,15 @@ class RRTMG_SW(_Radiation_SW):
 
     def _prepare_sw_arguments(self):
         #  prepare insolation
-        #  CLIMLAB provides local insolation, solar constant and
-        #  (optionally, maybe, not yet implemented) the adjustment factor for Sun-Earth distance
+        #  CLIMLAB provides solar constant, cosine of zenith angle,
+        #  and the adjustment factor for Sun-Earth distance
         #  which is (dbar / d)^2 in Hartmann's notation
         #   the factor by which the total irradiance differs from mean annual solar constant
         #   due to time of year and elliptical orbit
+        #   and which is potentially further adjusted to account for the time-averaging
+        #   applied to the zenith angle
         #
         #  RRTMG_SW expects solar constant, adjustment factor, and cosine of zenith angle
-        #
-        #  actually for now let's just let all these things be specified as inputs
 
         #  scalar integer arguments
         icld = self.icld
@@ -151,7 +151,6 @@ class RRTMG_SW(_Radiation_SW):
         solcycfrac = self.solcycfrac
         iaer = self.iaer
         #  scalar real arguments
-        adjes = self.irradiance_factor
         scon = self.S0
         indsolvar = self.indsolvar
         bndsolvar = self.bndsolvar
@@ -166,6 +165,7 @@ class RRTMG_SW(_Radiation_SW):
         asdif = _climlab_to_rrtm_sfc(self.asdif, self.Ts)
         asdir = _climlab_to_rrtm_sfc(self.asdir, self.Ts)
         coszen = _climlab_to_rrtm_sfc(self.coszen, self.Ts)
+        adjes = _climlab_to_rrtm_sfc(self.irradiance_factor, self.Ts)
         #  These arrays have an extra dimension for number of bands
         # in-cloud optical depth [nbndsw,ncol,nlay]
         tauc = _climlab_to_rrtm(self.tauc * np.ones_like(self.Tatm))

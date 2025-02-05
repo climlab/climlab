@@ -88,7 +88,7 @@ def daily_insolation_factors(lat, day, orb=const.orb_present,
     - ``orb``: Orbital parameter dictionary. See docs for ``daily_insolation()``.
     - ``day_type``: Convention for specifying time of year. See docs for ``daily_insolation()``.
     - ``days_per_year``: length of calendar year in days (default = 365.2422)
-    - ``weighting``: flag to specify averaging method for solar zenith angle. Valid options are:
+    - ``weighting``: flag to specify averaging method for solar zenith angle. Valid options are
         - ``'time'`` (default): unweighted 24 hour daily average
         - ``'sunlit'``: time average over sunlit hours
         - ``'insolation'``: insolation-weighted average
