@@ -6,7 +6,7 @@ dependencies:
   - pooch
   - xarray
   - numpy
-  - scipy
+  - scipy >=1.6
   - future
   - pytest
   - codecov

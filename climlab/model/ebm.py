@@ -335,7 +335,7 @@ class EBM(TimeDependentProcess):
         phi = np.deg2rad(self.lat)
         energy_in = np.squeeze(self.net_radiation)
         return (1E-15 * 2 * pi * const.a**2 *
-                integrate.cumtrapz(np.cos(phi)*energy_in, x=phi, initial=0.))
+                integrate.cumulative_trapezoid(np.cos(phi)*energy_in, x=phi, initial=0.))
 
     # def heat_transport(self):
     #     """Returns instantaneous heat transport in unit :math:`\\textrm{PW}`
