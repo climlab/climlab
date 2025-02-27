@@ -96,14 +96,12 @@ These are handled automatically if you install with conda_.
 
 Required
 ------------
-- Python (currently testing on versions 3.8, 3.9, 3.10, 3.11)
+- Python (currently testing on versions 3.10, 3.11, 3.12, 3.13)
 - numpy
 - scipy
 - future
 - pooch (for remote data access and caching)
 - xarray (for data handling)
-
-*climlab will still run on Python 2.7 on some systems but we are no longer supporting this*
 
 Recommended for full functionality
 ----------------------------------
