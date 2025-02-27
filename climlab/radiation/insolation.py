@@ -1,4 +1,4 @@
-r"""
+"""
 Classes to provide insolation as input for other CLIMLAB processes.
 
 Options include
