@@ -78,6 +78,7 @@ We can run both models out to equilibrium and compare the results as follows:
 """
 from __future__ import division
 import numpy as np
+from math import pi
 from climlab import constants as const
 from climlab.domain.field import Field, global_mean
 from climlab.process import EnergyBudget, TimeDependentProcess
@@ -333,8 +334,8 @@ class EBM(TimeDependentProcess):
         """
         phi = np.deg2rad(self.lat)
         energy_in = np.squeeze(self.net_radiation)
-        return (1E-15 * 2 * np.math.pi * const.a**2 *
-                integrate.cumtrapz(np.cos(phi)*energy_in, x=phi, initial=0.))
+        return (1E-15 * 2 * pi * const.a**2 *
+                integrate.cumulative_trapezoid(np.cos(phi)*energy_in, x=phi, initial=0.))
 
     # def heat_transport(self):
     #     """Returns instantaneous heat transport in unit :math:`\\textrm{PW}`
@@ -370,7 +371,7 @@ class EBM(TimeDependentProcess):
         dTdphi = np.diff(T) / np.diff(phi)
         dTdphi = np.append(dTdphi, 0.)
         dTdphi = np.insert(dTdphi, 0, 0.)
-        return (1E-15*-2*np.math.pi*np.cos(phi_stag)*const.a**2*D*dTdphi)
+        return (1E-15*-2*pi*np.cos(phi_stag)*const.a**2*D*dTdphi)
 
     # def heat_transport_convergence(self):
     #     """Returns instantaneous convergence of heat transport.
@@ -393,7 +394,7 @@ class EBM(TimeDependentProcess):
     #     phi = np.deg2rad(self.lat)
     #     phi_stag = np.deg2rad(self.lat_bounds)
     #     H = 1.E15*self.heat_transport()
-    #     return (-1./(2*np.math.pi*const.a**2*np.cos(phi)) *
+    #     return (-1./(2*pi*const.a**2*np.cos(phi)) *
     #             np.diff(H)/np.diff(phi_stag))
 
 
@@ -693,19 +694,19 @@ class EBM_annual(EBM_seasonal):
 #
 #     def diffusive_heat_transport( self ):
 #         '''Compute instantaneous diffusive heat transport in units of PW, on the staggered grid.'''
-#         #return ( 1E-15 * -2 * np.math.pi * np.cos(self.phi_stag) * const.cp * const.ps * const.mb_to_Pa / const.g * self.K *
+#         #return ( 1E-15 * -2 * pi * np.cos(self.phi_stag) * const.cp * const.ps * const.mb_to_Pa / const.g * self.K *
 #         #    np.append( np.append( 0., np.diff( self.T ) ), 0.) / self.dphi )
-#         return ( 1E-15 * -2 * np.math.pi * np.cos(self.phi_stag) * const.a**2 * self.K *
+#         return ( 1E-15 * -2 * pi * np.cos(self.phi_stag) * const.a**2 * self.K *
 #             np.append( np.append( 0., np.diff( self.T ) ), 0.) / self.dphi )
 #
 #     def heat_transport_convergence( self ):
 #         '''Returns instantaneous convergence of heat transport in units of W / m^2.'''
-#         return ( -1./(2*np.math.pi*const.a**2*np.cos(self.phi)) * np.diff( 1.E15*self.heat_transport() )
+#         return ( -1./(2*pi*const.a**2*np.cos(self.phi)) * np.diff( 1.E15*self.heat_transport() )
 #             / np.diff(self.phi_stag) )
 #
 #     def inferred_heat_transport( self ):
 #         '''Returns the inferred heat transport (in PW) by integrating the TOA energy imbalance from pole to pole.'''
-#         return ( 1E-15 * 2 * np.math.pi * const.a**2 * integrate.cumtrapz( np.cos(self.phi)*self.net_radiation,
+#         return ( 1E-15 * 2 * pi * const.a**2 * integrate.cumtrapz( np.cos(self.phi)*self.net_radiation,
 #             x=self.phi, initial=0. ) )
 #
 #     def find_icelines( self ):
