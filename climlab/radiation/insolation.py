@@ -7,14 +7,16 @@ Options include
 - ``climlab.radiation.FixedInsolation`` (generic steady-state insolation)
 - ``climlab.radiation.AnnualMeanInsolation`` (steady-state annual-mean insolation computed from orbital parameters and latitude)
 - ``climlab.radiation.DailyInsolation`` (time-varying daily-mean insolation computed from orbital parameters, latitude and time of year)
+- ``climlab.radiation.InstantInsolation`` (time-varying instantaneous insolation computed from orbital parameters, latitude, longitude, and time of year)
 
 All are subclasses of ``climlab.process.DiagnosticProcess``
-and do add any tendencies to any state variables.
+and do not add any tendencies to any state variables.
 
-At least two diagnostics are provided:
+At least three diagnostics are provided:
 
-- ``insolation``, the incoming solar radiation in :math:`\textrm{W}}{\textrm{m}^2}``
-- ``coszen``, cosine of the solar zenith angle
+- ``insolation``, the incoming solar radiation in :math:`\\frac{\\textrm{W}}{\\textrm{m}^2}`
+- ``coszen``, cosine of the solar zenith angle (dimensionless)
+- ``irradiance_factor``, ratio of current total irradiance to its annual average, i.e. solar constant (dimensionless)
 """
 from __future__ import division
 import numpy as np
@@ -22,7 +24,7 @@ from climlab.process.diagnostic import DiagnosticProcess
 from climlab.domain.field import Field, to_latlon
 from climlab.utils.legendre import P2
 from climlab import constants as const
-from climlab.solar.insolation import daily_insolation, instant_insolation
+from climlab.solar.insolation import daily_insolation_factors, instant_insolation_factors
 
 # REVISE TO MAKE ALL OF THESE CALLABLE WITH NO ARGUMENTS.
 # SET SOME SENSIBLE DEFAULTS FOR DOMAINS
@@ -88,9 +90,8 @@ class _Insolation(DiagnosticProcess):
             domain = self.domains['default']
         self.add_diagnostic('insolation', Field(np.zeros(domain.shape), domain=domain))
         self.add_diagnostic('coszen', Field(np.zeros(domain.shape), domain=domain))
+        self.add_diagnostic('irradiance_factor', Field(np.ones(domain.shape), domain=domain))
         self.S0 = S0
-        #  Now that we have a value for self.S0 we can compute the correct coszen
-        self.coszen = self._coszen_from_insolation()
         self.declare_input(['S0'])
 
     @property
@@ -156,7 +157,7 @@ class FixedInsolation(_Insolation):
 
             >>> fixed_ins = FixedInsolation(S0=340.0, domains=sfc)
 
-            >>> print fixed_ins
+            >>> print(fixed_ins)
             climlab Process of type <class 'climlab.radiation.insolation.FixedInsolation'>.
             State variables and domain shapes:
             The subprocess tree:
@@ -167,8 +168,6 @@ class FixedInsolation(_Insolation):
         super(FixedInsolation, self).__init__(S0=S0, **kwargs)
 
     def _compute_fixed(self):
-        #ins_adjustment = self.S0 - self.insolation
-        #self.insolation += ins_adjustment
         self.insolation[:] = self.S0
         self.coszen[:] = self._coszen_from_insolation()
 
@@ -206,7 +205,7 @@ class P2Insolation(_Insolation):
 
             >>> p2_ins = P2Insolation(S0=340.0, s2=-0.5, domains=sfc)
 
-            >>> print p2_ins
+            >>> print(p2_ins)
             climlab Process of type <class 'climlab.radiation.insolation.P2Insolation'>.
             State variables and domain shapes:
             The subprocess tree:
@@ -253,7 +252,6 @@ class P2Insolation(_Insolation):
             except:
                 self.insolation[:] = Field(insolation, domain=dom)
             # make sure that the diagnostic has the correct field dimensions.
-            #self.insolation = Field(insolation, domain=dom)
             self.insolation[:] = Field(insolation, domain=dom)
             self.coszen[:] = self._coszen_from_insolation()
         #  Silent fail only for attribute error: _s2 is not an attribute of self
@@ -268,25 +266,25 @@ class P2Insolation(_Insolation):
 class AnnualMeanInsolation(_Insolation):
     """A class for latitudewise solar insolation averaged over a year.
 
-    This class computes the solar insolation for each day of the year and
+    This class computes the daily-mean solar insolation for each day of the year and
     latitude specified in the domain on the basis of orbital parameters and
     astronomical formulas.
 
-    Therefore it uses the method :func:`~climlab.solar.insolation.daily_insolation`.
-    For details how the solar distribution is dependend on orbital parameters
-    see there.
+    Internally this process calls the method :func:`~climlab.solar.insolation.daily_insolation_factors`
+    to compute solar zenith angle and adjustments to total irradiance.
+    See there for details on how the solar distribution depends on orbital parameters.
 
-    The mean over the year is calculated from data given by
-    :func:`~climlab.solar.insolation.daily_insolation` and stored in the
-    object's attribute ``self.insolation``
+    The mean over the year is calculated from data returned by
+    :func:`~climlab.solar.insolation.daily_insolation_factors` and stored in the
+    diagnostics ``insolation``, ``coszen``, and ``irrandiance_factor``.
 
     **Initialization parameters** \n
 
-    :param float S0:    solar constant                                       \n
+    :param float ``S0``:    solar constant                                       \n
                         - unit: :math:`\\frac{\\textrm{W}}{\\textrm{m}^2}`   \n
                         - default value: ``1365.2``
 
-    :param dict orb:    a dictionary with three orbital parameters (as provided by
+    :param dict ``orb``:    a dictionary with three orbital parameters (as provided by
                         :class:`~climlab.solar.orbital.OrbitalTable`):
 
                         * ``'ecc'`` - eccentricity
@@ -328,7 +326,7 @@ class AnnualMeanInsolation(_Insolation):
             >>> # model creation
             >>> model = climlab.EBM()
 
-            >>> print model
+            >>> print(model)
 
         .. code-block:: none
             :emphasize-lines: 12
@@ -357,7 +355,7 @@ class AnnualMeanInsolation(_Insolation):
             >>> # add it to the model
             >>> model.add_subprocess('insolation',new_insol)
 
-            >>> print model
+            >>> print(model)
 
         .. code-block:: none
             :emphasize-lines: 12
@@ -376,12 +374,12 @@ class AnnualMeanInsolation(_Insolation):
                insolation: <class 'climlab.radiation.insolation.AnnualMeanInsolation'>
 
     """
-    def __init__(self, S0=const.S0, orb=const.orb_present, **kwargs):
+    def __init__(self, S0=const.S0, orb=const.orb_present, 
+                 **kwargs):
         super(AnnualMeanInsolation, self).__init__(S0=S0, **kwargs)
-        #self.param['orb'] = orb
         self.orb = orb
         self._compute_fixed()
-
+    
     @property
     def orb(self):
         """Property of dictionary for orbital parameters.
@@ -407,25 +405,32 @@ class AnnualMeanInsolation(_Insolation):
         self.param['orb'] = value
         self._compute_fixed()
 
-    def _daily_insolation_array(self):
-        lat = self.lat
-        days_of_year = self.time['days_of_year']
-        orb = self.orb
-        S0 = self.S0
-        return daily_insolation(lat, days_of_year, orb=orb, S0=S0)
+    def _daily_insolation_factor_arrays(self):
+        coszen, irradiance_factor = daily_insolation_factors(self.lat,
+                                                             self.time['days_of_year'],
+                                                             orb=self.orb,)
+        return coszen, irradiance_factor
 
     def _compute_fixed(self):
         try:
-            temp_array = self._daily_insolation_array()
-            insolation = np.mean(temp_array, axis=1)
+            coszen, irradiance_factor = self._daily_insolation_factor_arrays()
+            insolation = self.S0 * coszen * irradiance_factor
+            coszen = np.mean(coszen, axis=1)
+            insolation = np.mean(insolation, axis=1)
+            irradiance_factor = np.mean(irradiance_factor, axis=1)
             # make sure that the diagnostic has the correct field dimensions.
             dom = self.domains['default']
             try:
                 insolation = to_latlon(insolation, domain=dom)
+                coszen = to_latlon(coszen, domain=dom)
+                irradiance_factor = to_latlon(irradiance_factor, domain=dom)
                 self.insolation[:] = insolation
+                self.coszen[:] = coszen
+                self.irradiance_factor[:] = irradiance_factor
             except:
                 self.insolation[:] = Field(insolation, domain=dom)
-            self.coszen[:] = self._coszen_from_insolation()
+                self.coszen[:] = Field(coszen, domain=dom)
+                self.irradiance_factor[:] = Field(irradiance_factor, domain=dom)
         #  Silent fail only for attribute error: _orb is not an attribute of self
         #  but orb parameter is being stored in self._orb
         except AttributeError:
@@ -433,15 +438,15 @@ class AnnualMeanInsolation(_Insolation):
 
 
 class DailyInsolation(AnnualMeanInsolation):
-    """A class to compute latitudewise daily solar insolation for specific
+    """A class to compute latitudewise daily average solar insolation for specific
     days of the year.
 
     This class computes the solar insolation on basis of orbital parameters and
     astronomical formulas.
 
-    Therefore it uses the method :func:`~climlab.solar.insolation.daily_insolation`.
-    For details how the solar distribution is dependend on orbital parameters
-    see there.
+    Internally this process calls the method :func:`~climlab.solar.insolation.daily_insolation_factors`.
+    to compute solar zenith angle and adjustments to total irradiance. 
+    See there for details on how the solar distribution depends on orbital parameters.
 
     **Initialization parameters** \n
 
@@ -491,7 +496,7 @@ class DailyInsolation(AnnualMeanInsolation):
             >>> # model creation
             >>> model = climlab.EBM()
 
-            >>> print model
+            >>> print(model)
 
         .. code-block:: none
             :emphasize-lines: 12
@@ -517,7 +522,7 @@ class DailyInsolation(AnnualMeanInsolation):
             >>> # create DailyInsolation subprocess and add it to the model
             >>> model.add_subprocess('insolation',DailyInsolation(domains=sfc, **model.param))
 
-            >>> print model
+            >>> print(model)
 
         .. code-block:: none
             :emphasize-lines: 12
@@ -536,27 +541,30 @@ class DailyInsolation(AnnualMeanInsolation):
                insolation: <class 'climlab.radiation.insolation.DailyInsolation'>
 
     """
-
     def _compute_fixed(self):
         try:
-            self.insolation_array = self._daily_insolation_array()
+            coszen, irradiance_factor = self._daily_insolation_factor_arrays()
+            self.coszen_array = coszen
+            self.irradiance_factor_array = irradiance_factor
         except AttributeError:
             pass
 
     def _get_current_insolation(self):
-        insolation_array = self.insolation_array
         # make sure that the diagnostic has the correct field dimensions.
         dom = self.domains['default']
         time_index = self.time['day_of_year_index']   # THIS ONLY WORKS IF self IS THE MASTER PROCESS
-        insolation = insolation_array[..., time_index]
+        coszen = self.coszen_array[..., time_index]
+        irradiance_factor = self.irradiance_factor_array[..., time_index]
         if 'lon' in dom.axes:
-            # insolation is latitude-only, need to broadcast across longitude
+            #  coszen is latitude-only, need to broadcast across longitude
             #  assumption is axes are ordered (lat, lon, depth)
             #  NOTE this is a clunky hack and all this will go away
             #  when we use xarray structures for these internals
-            insolation = np.tile(insolation[...,np.newaxis], dom.axes['lon'].num_points)
-        self.insolation[:] = Field(insolation, domain=dom)
-        self.coszen[:] = self._coszen_from_insolation()
+            coszen = np.tile(coszen[...,np.newaxis], dom.axes['lon'].num_points)
+            irradiance_factor = np.tile(irradiance_factor[...,np.newaxis], dom.axes['lon'].num_points)
+        self.coszen[:] = Field(coszen, domain=dom)
+        self.irradiance_factor[:] = Field(irradiance_factor, domain=dom)
+        self.insolation[:] = self.S0 * self.coszen * self.irradiance_factor
         
 class InstantInsolation(AnnualMeanInsolation):
     """A class to compute latitudewise instantaneous solar insolation for specific
@@ -617,7 +625,7 @@ class InstantInsolation(AnnualMeanInsolation):
             >>> # model creation
             >>> model = climlab.EBM()
 
-            >>> print model
+            >>> print(model)
 
         .. code-block:: none
             :emphasize-lines: 12
@@ -643,7 +651,7 @@ class InstantInsolation(AnnualMeanInsolation):
             >>> # create InstantInsolation subprocess and add it to the model
             >>> model.add_subprocess('insolation',InstantInsolation(domains=sfc, **model.param))
 
-            >>> print model
+            >>> print(model)
 
         .. code-block:: none
             :emphasize-lines: 12
@@ -662,21 +670,15 @@ class InstantInsolation(AnnualMeanInsolation):
                insolation: <class 'climlab.radiation.insolation.InstantInsolation'>
 
     """
-
-    def _compute_fixed(self):
-        try:
-            self.insolation_array = self._daily_insolation_array()
-        except AttributeError:
-            pass
-
     def _get_current_insolation(self):
         # make sure that the diagnostic has the correct field dimensions.
         dom = self.domains['default']
         lon = 0
         if 'lon' in dom.axes:
             lon = self.lon
-        insolation = instant_insolation(self.lat, self.time['days_elapsed'], 
-            lon=lon, orb=self.orb, S0=self.S0)
-        self.insolation[:] = Field(insolation, domain=dom)
-        self.coszen[:] = self._coszen_from_insolation()
-                
+        coszen, irradiance_factor = instant_insolation_factors(self.lat, 
+                                            self.time['days_elapsed'], 
+                                            lon=lon, orb=self.orb,)
+        self.coszen[:] = Field(coszen, domain=dom)
+        self.irradiance_factor[:] = Field(irradiance_factor, domain=dom)
+        self.insolation[:] = self.S0 * self.coszen * self.irradiance_factor

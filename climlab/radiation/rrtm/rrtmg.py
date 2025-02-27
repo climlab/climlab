@@ -176,7 +176,6 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
                      coszen = self.coszen,
                      irradiance_factor = self.irradiance_factor,
                      dyofyr = dyofyr,
-                    #  insolation = self.insolation,
                      inflgsw = inflgsw,
                      iceflgsw = iceflgsw,
                      tauc = tauc_sw,
@@ -222,22 +221,10 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
         self.add_input('indsolvar', indsolvar)
         self.add_input('bndsolvar', bndsolvar)
         self.add_input('solcycfrac', solcycfrac)
-    
-    # @property
-    # def insolation(self):
-    #     return self._insolation
-    
-    # @insolation.setter
-    # def insolation(self, x):
-    #     self._insolation = x
-    #     # propagate to 'SW'
-    #     if 'SW' in self.subprocess:
-    #         self.subprocess['SW'].insolation = x
             
     @property
     def coszen(self):
         return self._coszen
-    
     @coszen.setter
     def coszen(self, x):
         self._coszen = x
@@ -245,3 +232,12 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
         if 'SW' in self.subprocess:
             self.subprocess['SW'].coszen = x
             
+    @property
+    def irradiance_factor(self):
+        return self._irradiance_factor
+    @irradiance_factor.setter
+    def irradiance_factor(self, x):
+        self._irradiance_factor = x
+        # propagate to 'SW'
+        if 'SW' in self.subprocess:
+            self.subprocess['SW'].irradiance_factor = x
