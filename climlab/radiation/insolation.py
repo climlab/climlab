@@ -278,10 +278,6 @@ class AnnualMeanInsolation(_Insolation):
     :func:`~climlab.solar.insolation.daily_insolation_factors` and stored in the
     diagnostics ``insolation``, ``coszen``, and ``irrandiance_factor``.
 
-    Different daily averaging methods can be specified for the zenith angle via the 
-    ``weighting`` argument. See :func:`~climlab.solar.insolation.daily_insolation_factors`
-    for more details.
-
     **Initialization parameters** \n
 
     :param float ``S0``:    solar constant                                       \n
@@ -305,11 +301,6 @@ class AnnualMeanInsolation(_Insolation):
 
                             * unit: degrees
                             * default value: ``23.446``
-
-    :param str ``weighting``:   flag to specify daily averaging method for solar zenith angle. Valid options are: \n
-                            - ``'time'`` (default): unweighted 24 hour daily average
-                            - ``'sunlit'``: time average over sunlit hours
-                            - ``'insolation'``: insolation-weighted average
 
     **Object attributes** \n
 
@@ -384,10 +375,9 @@ class AnnualMeanInsolation(_Insolation):
 
     """
     def __init__(self, S0=const.S0, orb=const.orb_present, 
-                 weighting='time', **kwargs):
+                 **kwargs):
         super(AnnualMeanInsolation, self).__init__(S0=S0, **kwargs)
         self.orb = orb
-        self.weighting = weighting
         self._compute_fixed()
     
     @property
@@ -418,8 +408,7 @@ class AnnualMeanInsolation(_Insolation):
     def _daily_insolation_factor_arrays(self):
         coszen, irradiance_factor = daily_insolation_factors(self.lat,
                                                              self.time['days_of_year'],
-                                                             orb=self.orb,
-                                                             weighting=self.weighting)
+                                                             orb=self.orb,)
         return coszen, irradiance_factor
 
     def _compute_fixed(self):
@@ -459,10 +448,6 @@ class DailyInsolation(AnnualMeanInsolation):
     to compute solar zenith angle and adjustments to total irradiance. 
     See there for details on how the solar distribution depends on orbital parameters.
 
-    Different daily averaging methods can be specified for the zenith angle via the 
-    ``weighting`` argument. See :func:`~climlab.solar.insolation.daily_insolation_factors`
-    for more details.
-
     **Initialization parameters** \n
 
     :param float S0:    solar constant                              \n
@@ -485,11 +470,6 @@ class DailyInsolation(AnnualMeanInsolation):
 
                             * unit: degrees
                             * default value: ``23.446``
-
-    :param str ``weighting``:   flag to specify daily averaging method for solar zenith angle. Valid options are: \n
-                            - ``'time'`` (default): unweighted 24 hour daily average
-                            - ``'sunlit'``: time average over sunlit hours
-                            - ``'insolation'``: insolation-weighted average
 
     **Object attributes** \n
 
