@@ -10,7 +10,7 @@ dependencies:
   - netCDF4
   - xarray
   - pooch
-  - sphinx
+  - sphinx <8.2
   - ipython
   - jupyter
   - future
