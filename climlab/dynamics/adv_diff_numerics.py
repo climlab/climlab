@@ -425,4 +425,6 @@ def implicit_step_forward(initial_field, tridiag, source, timestep,
         I = 0.*tridiag
         I[...,inds_main[0],inds_main[1]] = 1.  # stacked identity matrix
         IminusTdt = I-tridiag*timestep
-        return solve(IminusTdt, RHS)
+        # We add a dummy extra dimension here to accommodate a change in the broadcasting rules
+        # for numpy.linalg.solve in numpy >= 2
+        return solve(IminusTdt, RHS[..., None])[..., 0]
