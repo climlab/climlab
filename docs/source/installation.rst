@@ -105,7 +105,6 @@ Required
 - Python (currently testing on versions 3.10, 3.11, 3.12, 3.13)
 - numpy
 - scipy
-- future
 - pooch (for remote data access and caching)
 - xarray (for data handling)
 

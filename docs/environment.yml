@@ -13,7 +13,6 @@ dependencies:
   - sphinx <8.2
   - ipython
   - jupyter
-  - future
   - sphinx_rtd_theme
   - nbsphinx
   - sphinxcontrib-bibtex

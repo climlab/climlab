@@ -37,6 +37,7 @@ Currently, ``climlab`` has out-of-the-box support and documented examples for
     - Simplified band-averaged models (4 bands each in longwave and shortwave)
 - Convection schemes:
     - Emanuel moist convection scheme
+    - Frierson's Simplified Betts Miller scheme
     - Hard convective adjustment (to constant lapse rate or to moist adiabat)
 - 1D Advection-Diffusion solvers
 - Moist and dry Energy Balance Models
@@ -49,10 +50,10 @@ Currently, ``climlab`` has out-of-the-box support and documented examples for
 
 
 Installation
---------------
+------------
 
-Installing pre-built binaries with conda (Mac OSX, Linux, and Windows)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Installing pre-built binaries with conda (Mac OSX, OSX-ARM64, and Linux)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 By far the simplest and recommended way to install ``climlab`` is using conda_
 (which is the wonderful package manager that comes with `Anaconda Python`_).
 
@@ -68,7 +69,8 @@ and then simply do::
 
     conda install climlab
 
-Binaries are available for OSX, Linux, and Windows.
+Binaries are available for OSX and Linux. 
+Some binaries for earlier versions are available for Windows but this is not currently supported.
 
 Installing from source
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -90,16 +92,15 @@ Links
 
 
 Dependencies
------------------
+------------
 
 These are handled automatically if you install with conda_.
 
 Required
-~~~~~~~~~~~~
+~~~~~~~~
 - Python (currently testing on versions 3.10, 3.11, 3.12, 3.13)
 - numpy
 - scipy
-- future
 - pooch (for remote data access and caching)
 - xarray (for data handling)
 
@@ -125,7 +126,10 @@ These are self-describing, and should run out-of-the-box once the package is ins
 
 
 Release history
-----------------------
+---------------
+
+Version 0.9.1 (released February 2025)
+    Bug fix and clean up of the codebase. Some legacy code for former Python 2.7 support was removed (hasn't been tested or supported in a long time).
 
 Version 0.9.0 (released February 2025)
     A major new release with significant new functionality and compatibility with the latest Python and Numpy versions. 
@@ -331,7 +335,7 @@ github at https://github.com/climlab/climlab
 
 
 License
----------------
+-------
 This code is freely available under the MIT license.
 See the accompanying LICENSE file.
 
@@ -362,7 +366,7 @@ See the accompanying LICENSE file.
 
 
 Support
------------------
+-------
 Development of ``climlab`` is partially supported by the National Science Foundation under award AGS-1455071 to Brian Rose.
 
 Any opinions, findings, and conclusions or recommendations expressed in this material are those of the author(s) and do not necessarily reflect the views of the National Science Foundation.
