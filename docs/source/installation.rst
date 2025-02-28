@@ -3,8 +3,8 @@
 Installation
 ============
 
-Installing pre-built binaries with conda (Mac OSX and Linux)
-----------------------------------------------------------------------
+Installing pre-built binaries with conda (Mac OSX, OSX-ARM64, and Linux)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By far the simplest and recommended way to install ``climlab`` is using conda_
 (which is the wonderful package manager that comes with `Anaconda Python`_).
