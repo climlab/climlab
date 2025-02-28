@@ -1,5 +1,4 @@
 """Convenience routines for setting up initial conditions."""
-from __future__ import division
 import numpy as np
 from climlab.domain import domain
 from climlab.domain.field import Field

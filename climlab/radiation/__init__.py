@@ -2,8 +2,6 @@
 Modules for radiative transfer in vertical columns,
 along with processes for insolation and fixed relative humidity.
 '''
-from __future__ import absolute_import
-
 from .aplusbt import AplusBT, AplusBT_CO2
 from .absorbed_shorwave import SimpleAbsorbedShortwave
 from .boltzmann import Boltzmann

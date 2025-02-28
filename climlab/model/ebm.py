@@ -76,7 +76,6 @@ We can run both models out to equilibrium and compare the results as follows:
             plt.show()
 
 """
-from __future__ import division
 import numpy as np
 from math import pi
 from climlab import constants as const

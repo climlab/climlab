@@ -35,7 +35,6 @@ Non-uniform grid spacing is supported.
 The state variable :math:`T` may be multi-dimensional, but the diffusion
 will operate along the latitude dimension only.
 """
-from __future__ import division
 import numpy as np
 from .meridional_advection_diffusion import MeridionalDiffusion
 from climlab import constants as const

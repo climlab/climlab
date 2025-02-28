@@ -4,8 +4,6 @@
 
 # how easy is to implement the Stommel 1961 box model in climlab?
 #  currently... it still requires a fair bit of code:
-from __future__ import division
-from __future__ import print_function
 import numpy as np
 from climlab.process.time_dependent_process import TimeDependentProcess
 from climlab.domain import domain, field

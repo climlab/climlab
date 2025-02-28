@@ -54,7 +54,6 @@ occurs in the lowest atmospheric model level.
                 #  Check for energy balance
                 print(model.ASR - model.OLR)
 '''
-from __future__ import division
 import numpy as np
 from climlab.utils.thermo import qsat
 from climlab import constants as const

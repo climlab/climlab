@@ -3,7 +3,6 @@ A collection of function definitions to handle common
 thermodynamic calculations for the atmosphere.
 """
 
-from __future__ import division
 from numpy import exp, log
 from .constants import (ps, kappa, tempCtoK, eps, Rd, Rv, cpv, cp, g, Lhvap,
                         sigma, hPlanck, c_light, kBoltzmann, molecular_weight)

@@ -1,4 +1,3 @@
-from __future__ import division
 import numpy as np
 from climlab import constants as const
 import sys

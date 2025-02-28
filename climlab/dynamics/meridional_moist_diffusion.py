@@ -116,7 +116,6 @@ we can calculate the diffusion coefficient :math:`D(\phi)` from this formula.
 
 This calculation is implemented in the ``MeridionalMoistDiffusion`` class.
 """
-from __future__ import division
 import numpy as np
 from .meridional_heat_diffusion import MeridionalHeatDiffusion
 from climlab.utils.thermo import qsat

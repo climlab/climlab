@@ -43,7 +43,6 @@ will operate along a single dimension only.
 
 Other classes implement the weighting for spherical geometry.
 """
-from __future__ import division
 import numpy as np
 from climlab.process.implicit import ImplicitProcess
 from climlab.process.process import get_axes

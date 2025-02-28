@@ -10,7 +10,6 @@
 
 """
 
-from __future__ import division
 from numpy import pi
 
 a = 6.373E6      # Radius of Earth (m)

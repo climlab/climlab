@@ -1,5 +1,4 @@
-from __future__ import division
-from climlab.process.time_dependent_process import TimeDependentProcess
+from .time_dependent_process import TimeDependentProcess
 
 
 class ImplicitProcess(TimeDependentProcess):

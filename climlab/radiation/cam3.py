@@ -32,7 +32,6 @@ Input arguments and diagnostics follow specifications in
 
 
 '''
-from __future__ import division, print_function, absolute_import
 import numpy as np
 from climlab import constants as const
 from climlab.utils.thermo import vmr_to_mmr

@@ -35,7 +35,6 @@ and solar longitude, daily average insolation is calculated exactly
 following :cite:`Berger_1978`. Further references: :cite:`Berger_1991`.
 
 """
-from __future__ import division
 import numpy as np
 from climlab import constants as const
 from numpy import sqrt, deg2rad, rad2deg, sin, cos, tan, arcsin, arccos, pi
