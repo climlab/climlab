@@ -140,7 +140,7 @@ Version 0.9.0 (released February 2025)
     - Support for `muliple time-averaging methods for solar zenith angle`_, including more flexible support for zenith angle in RRTMG and CAM3 radiation processes.
 
     The compiled Fortran dependencies have also been updated, with some breaking changes to their interfaces.
-    Thus climlab 0.9.0 requires `climlab-rrtmg`_ >= 0.4.1`` and `climlab-cam3-radiation`_ >= 0.3. 
+    Thus climlab 0.9.0 requires `climlab-rrtmg`_ >= 0.4.1 and `climlab-cam3-radiation`_ >= 0.3. 
     conda_ will handle this for most users.
     
     This release also includes numerous documentation improvements, bug fixes, and support for Numpy 2 and Python 3.12 / 3.13.
