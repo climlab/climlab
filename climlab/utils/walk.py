@@ -1,5 +1,3 @@
-from __future__ import division
-
 def walk_processes(top, topname='top', topdown=True, ignoreFlag=False):
     """Generator for recursive tree of climlab processes
 

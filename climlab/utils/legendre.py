@@ -1,8 +1,6 @@
 """Can calculate the first several Legendre polynomials, along with
 (some of) their first derivatives."""
 
-from __future__ import division
-
 def Pn(x):
     """Calculate Legendre polyomials P0 to P28 and returns them
     in a dictionary ``Pn``.

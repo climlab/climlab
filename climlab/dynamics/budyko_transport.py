@@ -1,4 +1,3 @@
-from __future__ import division
 from climlab.process.energy_budget import EnergyBudget
 from climlab.domain.field import global_mean
 

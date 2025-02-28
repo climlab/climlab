@@ -1,5 +1,4 @@
 '''Tests for the 1D advection-diffusion solver against an analytical benchmark.'''
-from __future__ import division
 import numpy as np
 import pytest
 from climlab.dynamics import adv_diff_numerics

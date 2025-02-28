@@ -1,4 +1,3 @@
-from __future__ import division
 from builtins import range
 import numpy as np
 from climlab.radiation.greygas import GreyGas

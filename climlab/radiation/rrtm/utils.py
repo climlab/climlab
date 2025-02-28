@@ -1,4 +1,3 @@
-from __future__ import division
 import numpy as np
 from scipy.interpolate import interp1d
 from climlab.utils.thermo import mmr_to_vmr

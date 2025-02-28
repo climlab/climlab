@@ -1,4 +1,3 @@
-from __future__ import division, print_function, absolute_import
 import numpy as np
 from climlab import constants as const
 from climlab.solar.insolation import daily_insolation, daily_insolation_factors, instant_insolation, solar_longitude

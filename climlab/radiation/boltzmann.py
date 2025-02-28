@@ -1,4 +1,3 @@
-from __future__ import division
 from climlab import constants as const
 from climlab.process.energy_budget import EnergyBudget
 

@@ -18,7 +18,6 @@ At least three diagnostics are provided:
 - ``coszen``, cosine of the solar zenith angle (dimensionless)
 - ``irradiance_factor``, ratio of current total irradiance to its annual average, i.e. solar constant (dimensionless)
 """
-from __future__ import division
 import numpy as np
 from climlab.process.diagnostic import DiagnosticProcess
 from climlab.domain.field import Field, to_latlon

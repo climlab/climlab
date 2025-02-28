@@ -7,7 +7,6 @@ dependencies:
   - xarray
   - numpy
   - scipy >=1.6
-  - future
   - pytest
   - codecov
   - pytest-cov

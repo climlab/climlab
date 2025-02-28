@@ -75,9 +75,6 @@ If ``return_spectral_olr = True`` (RRTMG only), an additional diagnostic is prod
 
     - ``OLR_spectral`` (W/m2, Outgoing Longwave Radiation at TOA in spectral bands, **positive up**)
 '''
-
-from __future__ import division
-from __future__ import print_function
 import numpy as np
 from climlab.process import EnergyBudget
 from climlab.radiation import ManabeWaterVapor

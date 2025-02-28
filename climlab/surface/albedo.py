@@ -1,4 +1,3 @@
-from __future__ import division
 from builtins import next
 import numpy as np
 from climlab.process.diagnostic import DiagnosticProcess

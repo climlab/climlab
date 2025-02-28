@@ -34,7 +34,6 @@ See <http://vo.imcce.fr/insola/earth/online/earth/La2004/README.TXT>
             from climlab.solar.orbital.long import OrbitalTable as LongTable
             print(LongTable)
 """
-from __future__ import division, print_function, absolute_import
 import numpy as np
 import pandas as pd
 import xarray as xr

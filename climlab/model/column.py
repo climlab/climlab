@@ -34,7 +34,6 @@ This model is now a single column with seasonally varying insolation
 calculated for 45N.
 
 """
-from __future__ import division
 import numpy as np
 from climlab import constants as const
 from climlab.process import TimeDependentProcess

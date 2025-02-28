@@ -5,7 +5,6 @@
 # Following a tutorial on subclassing ndarray here:
 #
 # http://docs.scipy.org/doc/numpy/user/basics.subclassing.html
-from __future__ import division
 import numpy as np
 from climlab.domain.xarray import Field_to_xarray
 

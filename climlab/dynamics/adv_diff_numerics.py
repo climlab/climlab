@@ -241,7 +241,6 @@ to handle multidimensional input. The key assumption is that
 Inputs should be reshaped appropriately (e.g. with ``numpy.moveaxis()``)
 before calling these functions.
 '''
-from __future__ import division
 from numpy import zeros, ones, zeros_like, ones_like, matmul, diag, diag_indices, diff, newaxis
 from numpy.linalg import solve
 from scipy.linalg import solve_banded

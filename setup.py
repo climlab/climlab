@@ -1,6 +1,6 @@
 import setuptools, os
 
-VERSION = '0.9.0'
+VERSION = '0.9.1'
 
 # BEFORE importing setuptools, remove MANIFEST. Otherwise it may not be
 # properly updated when the contents of directories change (true for distutils,
@@ -29,7 +29,6 @@ setuptools.setup(
     author='Brian E. J. Rose',
     author_email='brose@albany.edu',
     setup_requires=['numpy'],
-    install_requires=['numpy','xarray','scipy'],
     license='MIT',
     packages=setuptools.find_packages(),
 )

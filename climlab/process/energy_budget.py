@@ -1,6 +1,5 @@
-from __future__ import division
 import numpy as np
-from climlab.process.time_dependent_process import TimeDependentProcess
+from .time_dependent_process import TimeDependentProcess
 
 
 class EnergyBudget(TimeDependentProcess):

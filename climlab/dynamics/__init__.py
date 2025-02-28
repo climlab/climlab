@@ -24,7 +24,6 @@ meridional diffusion process down the zonal-mean surface temperature gradient.
 with transport down an approximate gradient in near-surface moist static energy.
 '''
 
-from __future__ import absolute_import
 from .budyko_transport import BudykoTransport
 from .advection_diffusion import AdvectionDiffusion, Diffusion
 from .meridional_advection_diffusion import MeridionalAdvectionDiffusion, MeridionalDiffusion
