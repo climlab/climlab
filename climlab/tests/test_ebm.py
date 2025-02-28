@@ -23,6 +23,14 @@ def _check_minmax(array, amin, amax):
     return (np.allclose(array.min(), amin) and
             np.allclose(array.max(), amax))
 
+def test_homemade_ebm():
+    """Create the simplest zero-dimensional EBM from components and step forward."""
+    state = climlab.surface_state(num_lat=1)
+    olr = climlab.radiation.Boltzmann(state=state, name='OutgoingLongwave')
+    asr = climlab.radiation.SimpleAbsorbedShortwave(state=state, name='AbsorbedShortwave')
+    ebm = climlab.couple([olr,asr], name='EBM')
+    ebm.step_forward()
+
 @pytest.mark.fast
 def test_model_creation(EBM_seasonal):
     """Just make sure we can create a model."""
