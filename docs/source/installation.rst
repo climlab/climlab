@@ -3,8 +3,8 @@
 Installation
 ============
 
-Installing pre-built binaries with conda (Mac OSX, Linux, and Windows)
-----------------------------------------------------------------------
+Installing pre-built binaries with conda (Mac OSX, OSX-ARM64, and Linux)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 By far the simplest and recommended way to install ``climlab`` is using conda_
 (which is the wonderful package manager that comes with `Anaconda Python`_).
@@ -21,7 +21,8 @@ and then simply do::
 
     conda install climlab
 
-Binaries are available for OSX, Linux, and Windows.
+Binaries are available for OSX and Linux. 
+Some binaries for earlier versions are available for Windows but this is not currently supported.
 
 Installing into a self-contained conda environment
 --------------------------------------------------
@@ -105,7 +106,6 @@ Required
 - Python (currently testing on versions 3.10, 3.11, 3.12, 3.13)
 - numpy
 - scipy
-- future
 - pooch (for remote data access and caching)
 - xarray (for data handling)
 
