@@ -127,6 +127,25 @@ These are self-describing, and should run out-of-the-box once the package is ins
 Release history
 ----------------------
 
+Version 0.9.0 (released February 2025)
+    A major new release with significant new functionality and compatibility with the latest Python and Numpy versions. 
+    New capabilities include
+
+    - Full support for aerosols in RRTMG
+    - New moist atmospheric physics
+        - A new SimplifiedBettsMiller_ moist convection process following `Frierson (2007)`_
+        - A simple LargeScaleCondensation_ process to represent condensation and precipitation from large-scale moisture convergence.
+    - A new Limiter_ process that implements min/max bounds for state variables
+    - Better consistency for internally generated diagnostics, including a new `additive assumption for same-named diagnostics`_ produced by multiple subprocesses.
+    - Support for `muliple time-averaging methods for solar zenith angle`_, including more flexible support for zenith angle in RRTMG and CAM3 radiation processes.
+
+    The compiled Fortran dependencies have also been updated, with some breaking changes to their interfaces.
+    Thus climlab 0.9.0 requires `climlab-rrtmg`_ >= 0.4.1 and `climlab-cam3-radiation`_ >= 0.3. 
+    conda_ will handle this for most users.
+    
+    This release also includes numerous documentation improvements, bug fixes, and support for Numpy 2 and Python 3.12 / 3.13.
+    See the `release notes`_ and documentation_ for details.
+
 Version 0.8.2 (released November 2023)
     New feature: process class `climlab.radiation.InstantInsolation()` which correctly interprets longitude, respects local solar time and calculates hour angle. 
     A utility function `climlab.solar.insolation.instant_insolation()` is also available, with usage mirroring the existing `climlab.solar.insolation.daily_insolation()`.
@@ -303,7 +322,7 @@ The documentation_ was first created by Moritz Kreuzer
 .. _`The Climate Laboratory`: https://brian-rose.github.io/ClimateLaboratoryBook/
 .. _`attrdict package`: https://github.com/bcj/AttrDict
 .. _`Brendan Curran-Johnson`: https://github.com/bcj
-
+.. _`release notes`: https://github.com/climlab/climlab/releases
 
 Contact and Bug Reports
 -----------------------
@@ -332,6 +351,12 @@ See the accompanying LICENSE file.
 .. _`climlab-rrtmg`: https://github.com/climlab/climlab-rrtmg
 .. _`climlab-cam3-radiation`: https://github.com/climlab/climlab-cam3-radiation
 .. _`climlab-emanuel-convection`: https://github.com/climlab/climlab-emanuel-convection
+.. _`muliple time-averaging methods for solar zenith angle`: https://climlab.readthedocs.io/en/latest/api/climlab.solar.insolation.html#climlab.solar.insolation.daily_insolation_factors
+.. _`Frierson (2007)`: https://doi.org/10.1175/JAS3935.1
+.. _Limiter: https://climlab.readthedocs.io/en/latest/api/climlab.process.limiter.html
+.. _SimplifiedBettsMiller: https://climlab.readthedocs.io/en/latest/api/climlab.convection.SimplifiedBettsMiller.html
+.. _LargeScaleCondensation: https://climlab.readthedocs.io/en/latest/api/climlab.dynamics.LargeScaleCondensation.html
+.. _`additive assumption for same-named diagnostics`: https://climlab.readthedocs.io/en/latest/architecture.html#additive-diagnostics-for-subprocesses
 
 =======
 

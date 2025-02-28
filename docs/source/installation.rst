@@ -56,11 +56,16 @@ and from the ``climlab`` directory, do::
 Please see :ref:`Contributing to CLIMLAB` for more details.
 
 About the compiled Fortran components
---------------------------------------------------
+-------------------------------------
 
 Climlab itself is pure Python and should work on any system.
 As of version 0.8.0, all the Fortran code has been moved into external companion
-packages `climlab-rrtmg`_, `climlab-cam3-radiation`_, and `climlab-emanuel-convection`_.
+packages:
+
+    - `climlab-rrtmg`_
+    - `climlab-cam3-radiation`_
+    - `climlab-emanuel-convection`_
+    - `climlab-sbm-convection`_
 
 If you install climlab via conda-forge, these pre-compiled dependencies will be
 installed automatically.
@@ -70,7 +75,7 @@ In this case you should then find that you can still::
 
     import climlab
 
-and use most of the package. You will see warning messages about the missing components.
+and use parts of the package that don't depend on compiled code. You will see warning messages about the missing components.
 
 .. _conda: https://conda.io/docs/
 .. _`Anaconda Python`: https://www.continuum.io/downloads
@@ -78,10 +83,11 @@ and use most of the package. You will see warning messages about the missing com
 .. _`climlab-rrtmg`: https://github.com/climlab/climlab-rrtmg
 .. _`climlab-cam3-radiation`: https://github.com/climlab/climlab-cam3-radiation
 .. _`climlab-emanuel-convection`: https://github.com/climlab/climlab-emanuel-convection
+.. _`climlab-sbm-convection`: https://github.com/climlab/climlab-sbm-convection
 .. _`Google Colab`: https://colab.research.google.com
 
 Source Code
-=============
+===========
 
 Stables releases as well as the current development version can be found on github:
 
@@ -90,12 +96,12 @@ Stables releases as well as the current development version can be found on gith
 
 
 Dependencies
-================
+============
 
 These are handled automatically if you install with conda_.
 
 Required
-------------
+--------
 - Python (currently testing on versions 3.10, 3.11, 3.12, 3.13)
 - numpy
 - scipy
