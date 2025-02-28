@@ -132,7 +132,7 @@ Version 0.9.0 (released February 2025)
     New capabilities include
 
     - Full support for aerosols in RRTMG
-    - New moist atmospheric physics:
+    - New moist atmospheric physics
         - A new SimplifiedBettsMiller_ moist convection process following `Frierson (2007)`_
         - A simple LargeScaleCondensation_ process to represent condensation and precipitation from large-scale moisture convergence.
     - A new Limiter_ process that implements min/max bounds for state variables
