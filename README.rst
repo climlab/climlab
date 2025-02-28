@@ -137,7 +137,7 @@ Version 0.9.0 (released February 2025)
         - A simple LargeScaleCondensation_ process to represent condensation and precipitation from large-scale moisture convergence.
     - A new Limiter_ process that implements min/max bounds for state variables
     - Better consistency for internally generated diagnostics, including a new `additive assumption for same-named diagnostics`_ produced by multiple subprocesses.
-    - Support for `muliple time-averaging methods for solar zenith angle`_, including more flexible support for zenith angle in RRTMG and CAM3 radiation processes.
+    - Support for `multiple time-averaging methods for solar zenith angle`_, including more flexible support for zenith angle in RRTMG and CAM3 radiation processes.
 
     The compiled Fortran dependencies have also been updated, with some breaking changes to their interfaces.
     Thus climlab 0.9.0 requires `climlab-rrtmg`_ >= 0.4.1 and `climlab-cam3-radiation`_ >= 0.3. 
@@ -351,7 +351,7 @@ See the accompanying LICENSE file.
 .. _`climlab-rrtmg`: https://github.com/climlab/climlab-rrtmg
 .. _`climlab-cam3-radiation`: https://github.com/climlab/climlab-cam3-radiation
 .. _`climlab-emanuel-convection`: https://github.com/climlab/climlab-emanuel-convection
-.. _`muliple time-averaging methods for solar zenith angle`: https://climlab.readthedocs.io/en/latest/api/climlab.solar.insolation.html#climlab.solar.insolation.daily_insolation_factors
+.. _`multiple time-averaging methods for solar zenith angle`: https://climlab.readthedocs.io/en/latest/api/climlab.solar.insolation.html#climlab.solar.insolation.daily_insolation_factors
 .. _`Frierson (2007)`: https://doi.org/10.1175/JAS3935.1
 .. _Limiter: https://climlab.readthedocs.io/en/latest/api/climlab.process.limiter.html
 .. _SimplifiedBettsMiller: https://climlab.readthedocs.io/en/latest/api/climlab.convection.SimplifiedBettsMiller.html
