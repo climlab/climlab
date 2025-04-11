@@ -239,3 +239,12 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
         # propagate to 'SW'
         if 'SW' in self.subprocess:
             self.subprocess['SW'].irradiance_factor = x
+
+    @property
+    def S0(self):
+        return self._S0
+    @S0.setter
+    def S0(self, x):
+        self._S0 = x
+        if 'SW' in self.subprocess:
+            self.subprocess['SW'].S0 = x
