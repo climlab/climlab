@@ -298,3 +298,5 @@ def test_sw_params_propagate():
     rad.irradiance_factor *= 1.01
     assert rad.irradiance_factor == rad.subprocess['SW'].irradiance_factor
     assert rad.insolation == rad.subprocess['SW'].insolation
+    rad.S0 *= 1.01
+    assert rad.S0 == rad.subprocess['SW'].S0
