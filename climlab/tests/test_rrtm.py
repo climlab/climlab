@@ -196,6 +196,20 @@ def test_latitude():
 
 @pytest.mark.compiled
 @pytest.mark.fast
+def test_insolation_and_cozen():
+    '''Can we specific both insolation and coszen simultaneously?'''
+    state = climlab.column_state(num_lev=30, num_lat=40, water_depth=10.)
+    sun = climlab.radiation.DailyInsolation(name='Insolation', domains=state['Ts'].domain)
+    rad = climlab.radiation.RRTMG(name='Radiation',
+                                state=state, 
+                                albedo=0.125,
+                                insolation=sun.insolation,
+                                coszen=sun.coszen)
+    model = climlab.couple([rad,sun], name='RadModel')
+    model.step_forward()
+
+@pytest.mark.compiled
+@pytest.mark.fast
 def test_cozen():
     '''
     Create 2D models with RRTMG radiation and latitudinally-varying radiation.
