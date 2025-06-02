@@ -137,14 +137,16 @@ class RRTMG(_Radiation):
             **kwargs):
         super(RRTMG, self).__init__(**kwargs)
 
-        # # Remove specific inputs from kwargs dictionary.
-        # #  We want any changes implemented in the parent __init__ method to be preserved here
-        # remove_list = ['absorber_vmr','cldfrac','clwp','ciwp','r_liq','r_ice',
-        #                'emissivity','aldif','aldir','asdif','asdir','S0','coszen',
-        #                'irradiance_factor','insolation',]
-        # for item in remove_list:
-        #     if item in kwargs:
-        #         ignored = kwargs.pop(item)
+        # Remove specific inputs from kwargs dictionary.
+        #  We want any changes implemented in the parent __init__ method to be preserved here
+        remove_list = ['absorber_vmr','cldfrac','clwp','ciwp','r_liq','r_ice',
+                    #    'emissivity','aldif','aldir','asdif','asdir',
+                    #    'S0','coszen',
+                    #    'irradiance_factor','insolation',]
+                      ]   
+        for item in remove_list:
+            if item in kwargs:
+                ignored = kwargs.pop(item)
 
         # we need to convert insolation into _insolation so:
         # (we define getters and setters for this at the end)
@@ -198,7 +200,7 @@ class RRTMG(_Radiation):
                      irng = irng,
                      idrv = idrv,
                      permuteseed = permuteseed_lw,
-                     emissivity = self.emissivity,
+                     emissivity = emissivity,
                      inflglw = inflglw,
                      iceflglw = iceflglw,
                      liqflglw = liqflglw,
@@ -214,10 +216,11 @@ class RRTMG(_Radiation):
                      icld = icld,
                      irng = irng,
                      permute = permuteseed_sw,
-                     aldif = self.aldif,
-                     aldir = self.aldir,
-                     asdif = self.asdif,
-                     asdir = self.asdir,
+                     albedo = albedo,
+                     aldif = aldif,
+                     aldir = aldir,
+                     asdif = asdif,
+                     asdir = asdir,
                      S0 = S0,
                      coszen = coszen,
                      irradiance_factor = irradiance_factor,
@@ -277,3 +280,10 @@ class RRTMG(_Radiation):
         # self._S0 = x
         # if 'SW' in self.subprocess:
         #     self.subprocess['SW'].S0 = x
+
+    @property
+    def insolation(self):
+        return self.subprocess['SW'].insolation
+    @insolation.setter
+    def insolation(self, x):
+        self.subprocess['SW'].insolation = x
