@@ -139,7 +139,7 @@ class RRTMG(_Radiation):
 
         # Remove specific inputs from kwargs dictionary.
         #  We want any changes implemented in the parent __init__ method to be preserved here
-        remove_list = ['absorber_vmr','cldfrac','clwp','ciwp','r_liq','r_ice',
+        remove_list = ['absorber_vmr','cldfrac','clwp','ciwp','r_liq','r_ice','specific_humidity',
                     #    'emissivity','aldif','aldir','asdif','asdir',
                     #    'S0','coszen',
                     #    'irradiance_factor','insolation',]
@@ -190,7 +190,8 @@ class RRTMG(_Radiation):
         for var in ['S0', 'coszen', 'irradiance_factor']:
             self._input_vars.append(var)
 
-        LW = RRTMG_LW(absorber_vmr = self.absorber_vmr,
+        LW = RRTMG_LW(specific_humidity = self.specific_humidity,
+                     absorber_vmr = self.absorber_vmr,
                      cldfrac = self.cldfrac,
                      clwp = self.clwp,
                      ciwp = self.ciwp,
@@ -207,7 +208,8 @@ class RRTMG(_Radiation):
                      tauc = tauc_lw,
                      tauaer = tauaer_lw,
                      **kwargs)
-        SW = RRTMG_SW(absorber_vmr = self.absorber_vmr,
+        SW = RRTMG_SW(specific_humidity = self.specific_humidity,
+                     absorber_vmr = self.absorber_vmr,
                      cldfrac = self.cldfrac,
                      clwp = self.clwp,
                      ciwp = self.ciwp,
