@@ -218,7 +218,9 @@ class _Radiation_SW(_Radiation):
         self.add_input('coszen', coszen)
         self.add_input('irradiance_factor', irradiance_factor)
         if insolation is not None:
-            self.add_input('insolation', insolation)
+            # Avoid calling the `add_input` method because insolation is defined as property here
+            self._input_vars.append('insolation')
+            self.insolation = insolation
         if albedo is not None:
             aldif = albedo
             aldir = albedo
