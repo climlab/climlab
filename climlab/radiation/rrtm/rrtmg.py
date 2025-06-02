@@ -187,8 +187,7 @@ class RRTMG(_Radiation):
         # self.add_input('S0', S0)
         # self.add_input('coszen', coszen)
         # self.add_input('irradiance_factor', irradiance_factor)
-        for var in ['S0', 'coszen', 'irradiance_factor']:
-            self._input_vars.append(var)
+        self.declare_input(['S0', 'coszen', 'irradiance_factor'])
 
         LW = RRTMG_LW(specific_humidity = self.specific_humidity,
                      absorber_vmr = self.absorber_vmr,
