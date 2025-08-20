@@ -1,16 +1,29 @@
 import numpy as np
 from climlab import constants as const
-from climlab.radiation.radiation import _Radiation_SW, _Radiation_LW
+from climlab.radiation.radiation import _Radiation #_Radiation_SW, _Radiation_LW
 from .rrtmg_lw import RRTMG_LW
 from .rrtmg_sw import RRTMG_SW, nbndsw
 
 
-class RRTMG(_Radiation_SW, _Radiation_LW):
+# class RRTMG(_Radiation_SW, _Radiation_LW):
+class RRTMG(_Radiation):
     '''Container to drive combined LW and SW radiation models.
 
     For some details about inputs and diagnostics, see the `radiation` module.
     '''
     def __init__(self,
+            # Defined in _Radiation_LW
+            emissivity = 1.,  # surface emissivity
+            # Defined in _Radiation_SW
+            albedo = None,
+            aldif = 0.3,
+            aldir = 0.3,
+            asdif = 0.3,
+            asdir = 0.3,
+            S0    = const.S0,
+            insolation = None,
+            coszen = 0.25,    # cosine of the solar zenith angle
+            irradiance_factor = 1.,  # instantaneous irradiance = S0 * irradiance_factor
             # GENERAL, used in both SW and LW
             icld = 1,    # Cloud overlap method, 0: Clear only, 1: Random, 2,  Maximum/random] 3: Maximum
             irng = 1,  # more monte carlo stuff
@@ -126,72 +139,23 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
 
         # Remove specific inputs from kwargs dictionary.
         #  We want any changes implemented in the parent __init__ method to be preserved here
-        remove_list = ['absorber_vmr','cldfrac','clwp','ciwp','r_liq','r_ice',
-                       'emissivity','aldif','aldir','asdif','asdir','S0','coszen',
-                       'irradiance_factor','insolation',]
+        remove_list = ['absorber_vmr','cldfrac','clwp','ciwp','r_liq','r_ice','specific_humidity',
+                    #    'emissivity','aldif','aldir','asdif','asdir',
+                    #    'S0','coszen',
+                    #    'irradiance_factor','insolation',]
+                      ]   
         for item in remove_list:
             if item in kwargs:
                 ignored = kwargs.pop(item)
 
         # we need to convert insolation into _insolation so:
         # (we define getters and setters for this at the end)
-        self._insolation = self.insolation
+        # self._insolation = self.insolation
         
-        # we repeat the above work to fix this issue for coszen
-        self._coszen = self.coszen
+        # # we repeat the above work to fix this issue for coszen
+        # self._coszen = self.coszen
 
-        LW = RRTMG_LW(absorber_vmr = self.absorber_vmr,
-                     cldfrac = self.cldfrac,
-                     clwp = self.clwp,
-                     ciwp = self.ciwp,
-                     r_liq = self.r_liq,
-                     r_ice = self.r_ice,
-                     icld = icld,
-                     irng = irng,
-                     idrv = idrv,
-                     permuteseed = permuteseed_lw,
-                     emissivity = self.emissivity,
-                     inflglw = inflglw,
-                     iceflglw = iceflglw,
-                     liqflglw = liqflglw,
-                     tauc = tauc_lw,
-                     tauaer = tauaer_lw,
-                     **kwargs)
-        SW = RRTMG_SW(absorber_vmr = self.absorber_vmr,
-                     cldfrac = self.cldfrac,
-                     clwp = self.clwp,
-                     ciwp = self.ciwp,
-                     r_liq = self.r_liq,
-                     r_ice = self.r_ice,
-                     icld = icld,
-                     irng = irng,
-                     permute = permuteseed_sw,
-                     aldif = self.aldif,
-                     aldir = self.aldir,
-                     asdif = self.asdif,
-                     asdir = self.asdir,
-                     S0 = self.S0,
-                     coszen = self.coszen,
-                     irradiance_factor = self.irradiance_factor,
-                     dyofyr = dyofyr,
-                     inflgsw = inflgsw,
-                     iceflgsw = iceflgsw,
-                     tauc = tauc_sw,
-                     ssac = ssac_sw,
-                     asmc = asmc_sw,
-                     fsfc = fsfc_sw,
-                     iaer = iaer,
-                     tauaer = tauaer_sw,
-                     ssaaer = ssaaer_sw,
-                     asmaer = asmaer_sw,
-                     ecaer = ecaer_sw,
-                     isolvar = isolvar,
-                     indsolvar = indsolvar,
-                     bndsolvar = bndsolvar,
-                     solcycfrac = solcycfrac,
-                     **kwargs)
-        self.add_subprocess('SW', SW)
-        self.add_subprocess('LW', LW )
+        self.add_input('emissivity', emissivity)
 
         self.add_input('icld', icld)
         self.add_input('irng', irng)
@@ -219,32 +183,108 @@ class RRTMG(_Radiation_SW, _Radiation_LW):
         self.add_input('indsolvar', indsolvar)
         self.add_input('bndsolvar', bndsolvar)
         self.add_input('solcycfrac', solcycfrac)
+
+        # self.add_input('S0', S0)
+        # self.add_input('coszen', coszen)
+        # self.add_input('irradiance_factor', irradiance_factor)
+        self.declare_input(['S0', 'coszen', 'irradiance_factor'])
+
+        LW = RRTMG_LW(specific_humidity = self.specific_humidity,
+                     absorber_vmr = self.absorber_vmr,
+                     cldfrac = self.cldfrac,
+                     clwp = self.clwp,
+                     ciwp = self.ciwp,
+                     r_liq = self.r_liq,
+                     r_ice = self.r_ice,
+                     icld = icld,
+                     irng = irng,
+                     idrv = idrv,
+                     permuteseed = permuteseed_lw,
+                     emissivity = emissivity,
+                     inflglw = inflglw,
+                     iceflglw = iceflglw,
+                     liqflglw = liqflglw,
+                     tauc = tauc_lw,
+                     tauaer = tauaer_lw,
+                     **kwargs)
+        SW = RRTMG_SW(specific_humidity = self.specific_humidity,
+                     absorber_vmr = self.absorber_vmr,
+                     cldfrac = self.cldfrac,
+                     clwp = self.clwp,
+                     ciwp = self.ciwp,
+                     r_liq = self.r_liq,
+                     r_ice = self.r_ice,
+                     icld = icld,
+                     irng = irng,
+                     permute = permuteseed_sw,
+                     albedo = albedo,
+                     aldif = aldif,
+                     aldir = aldir,
+                     asdif = asdif,
+                     asdir = asdir,
+                     S0 = S0,
+                     coszen = coszen,
+                     irradiance_factor = irradiance_factor,
+                     insolation = insolation,
+                     dyofyr = dyofyr,
+                     inflgsw = inflgsw,
+                     iceflgsw = iceflgsw,
+                     tauc = tauc_sw,
+                     ssac = ssac_sw,
+                     asmc = asmc_sw,
+                     fsfc = fsfc_sw,
+                     iaer = iaer,
+                     tauaer = tauaer_sw,
+                     ssaaer = ssaaer_sw,
+                     asmaer = asmaer_sw,
+                     ecaer = ecaer_sw,
+                     isolvar = isolvar,
+                     indsolvar = indsolvar,
+                     bndsolvar = bndsolvar,
+                     solcycfrac = solcycfrac,
+                     **kwargs)
+        self.add_subprocess('SW', SW)
+        self.add_subprocess('LW', LW )
+
             
     @property
     def coszen(self):
-        return self._coszen
+        # return self._coszen
+        return self.subprocess['SW'].coszen
     @coszen.setter
     def coszen(self, x):
-        self._coszen = x
-        # propagate to 'SW'
-        if 'SW' in self.subprocess:
-            self.subprocess['SW'].coszen = x
+        self.subprocess['SW'].coszen = x
+        # self._coszen = x
+        # # propagate to 'SW'
+        # if 'SW' in self.subprocess:
+        #     self.subprocess['SW'].coszen = x
             
     @property
     def irradiance_factor(self):
-        return self._irradiance_factor
+        # return self._irradiance_factor
+        return self.subprocess['SW'].irradiance_factor
     @irradiance_factor.setter
     def irradiance_factor(self, x):
-        self._irradiance_factor = x
-        # propagate to 'SW'
-        if 'SW' in self.subprocess:
-            self.subprocess['SW'].irradiance_factor = x
+        self.subprocess['SW'].irradiance_factor = x
+        # self._irradiance_factor = x
+        # # propagate to 'SW'
+        # if 'SW' in self.subprocess:
+        #     self.subprocess['SW'].irradiance_factor = x
 
     @property
     def S0(self):
-        return self._S0
+        # return self._S0
+        return self.subprocess['SW'].S0
     @S0.setter
     def S0(self, x):
-        self._S0 = x
-        if 'SW' in self.subprocess:
-            self.subprocess['SW'].S0 = x
+        self.subprocess['SW'].S0 = x
+        # self._S0 = x
+        # if 'SW' in self.subprocess:
+        #     self.subprocess['SW'].S0 = x
+
+    @property
+    def insolation(self):
+        return self.subprocess['SW'].insolation
+    @insolation.setter
+    def insolation(self, x):
+        self.subprocess['SW'].insolation = x
