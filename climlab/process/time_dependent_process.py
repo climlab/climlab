@@ -8,7 +8,7 @@ from climlab.utils import walk
 from climlab.utils.attrdict import AttrDict
 
 
-def couple(proclist, name='Parent'):
+def couple(proclist, name='Parent', bound_dict = {}):
     #  Union of the two state dictionaries
     new_state = AttrDict()
     new_input = AttrDict()
@@ -27,7 +27,7 @@ def couple(proclist, name='Parent'):
             # This quantity is still a necessary input for the parent process
             new_input[key] = all_input[key]
     # The newly created parent process has the minimum timestep
-    coupled = TimeDependentProcess(state=new_state, timestep=timestep, name=name)
+    coupled = TimeDependentProcess(state=new_state, timestep=timestep, name=name, bound_dict=bound_dict)
     for proc in proclist:
         coupled.add_subprocess(proc.name, proc)
     for key in new_input:
@@ -88,10 +88,12 @@ class TimeDependentProcess(Process):
         * ``'days_of_year'``: array which holds the number of numerical steps per year, expressed in days
 
     """
-    def __init__(self, time_type='explicit', timestep=None, topdown=True, **kwargs):
+    def __init__(self, time_type='explicit', timestep=None, topdown=True, bound_dict={}, **kwargs):
         # Create the state dataset
         self.tendencies = {}
         super(TimeDependentProcess, self).__init__(**kwargs)
+        self.fixed_cells_dict = kwargs.get('fixed_cells_dict', {})
+        self.do_fixed_cells = len(self.fixed_cells_dict) > 0
         for name, var in self.state.items():
             self.tendencies[name] = var * 0.
         self.timeave = {}
@@ -102,6 +104,7 @@ class TimeDependentProcess(Process):
         self.time_type = time_type
         self.topdown = topdown
         self.has_process_type_list = False
+        self.bound_dict = bound_dict
 
     def __add__(self, other):
         newparent = couple([self,other])
@@ -239,6 +242,10 @@ class TimeDependentProcess(Process):
         if self.time_type == 'adjustment':
             for varname, adj in self_tend.items():
                 self_tend[varname] /= self.timestep
+        if self.do_fixed_cells:
+            for varname, tend in self_tend.items():
+                if varname in self.fixed_cells_dict:
+                    tend[self.fixed_cells_dict[varname]] *= 0.
         for varname, tend in self_tend.items():
             self.tendencies[varname] += tend
         #  Now accumulate additive diagnostics from subprocesses
@@ -341,7 +348,15 @@ class TimeDependentProcess(Process):
         #  Total tendency is applied as an explicit forward timestep
         # (already accounting properly for order of operations in compute() )
         for varname, tend in tenddict.items():
+            if self.do_fixed_cells:
+                if varname in self.fixed_cells_dict:
+                    tend[self.fixed_cells_dict[varname]] *= 0.
             self.state[varname] += tend * self.timestep
+            if hasattr(self, 'bound_dict'):
+                if varname in self.bound_dict:
+                    val_min, val_max = self.bound_dict[varname]
+                    val = self.state[varname][:]
+                    self.state[varname][:] = np.clip(val, val_min, val_max)
         # Update all time counters for this and all subprocesses in the tree
         #  Also pass diagnostics up the process tree
         for name, proc, level in walk.walk_processes(self, ignoreFlag=True):
