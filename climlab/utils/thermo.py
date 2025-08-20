@@ -52,16 +52,20 @@ def clausius_clapeyron(T):
     es = 6.112 * exp(17.67*Tcel/(Tcel+243.5))
     return es
 
-def qsat(T,p):
+def qsat(T,p, do_simplified=False):
     """Compute saturation specific humidity as function of temperature and pressure.
 
     Input:  T is temperature in Kelvin
             p is pressure in hPa or mb
     Output: saturation specific humidity (dimensionless).
 
+    do_simplified removes the (1-eps)*es term in the denominator, to avoid divergence at low altitudes
     """
     es = clausius_clapeyron(T)
-    q = eps * es / (p - (1 - eps) * es )
+    if do_simplified:
+        q = eps * es / p
+    else:
+        q = eps * es / (p - (1 - eps) * es )
     return q
 
 def virtual_temperature_from_mixing_ratio(T,w):
