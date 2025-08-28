@@ -1,22 +1,18 @@
-from __future__ import division
-from builtins import range
 import numpy as np
 from climlab import constants as const
-from climlab.process.time_dependent_process import TimeDependentProcess
-from climlab.domain.field import Field
-# from scipy.interpolate import CubicSpline
+from climlab.process import TimeDependentProcess
+from climlab.domain import Field
 
-# taken originally from ConvectiveAdjustment
 
 class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
 
     def __init__(self,
                  Kyy=0.,
-                 Kzz=0,
-                 Kyz=0,
+                 Kzz=0.,
+                 Kyz=0.,
                  U=0.,
                  W=0.,
-                 rho=0,
+                 rho=0.,
                  prescribed_flux=0.,
                  interpolation_order=2,
                  use_limiters=True,
