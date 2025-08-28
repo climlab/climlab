@@ -5,6 +5,7 @@ from climlab.domain import Field
 
 
 class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
+    '''A solver for a 2D advection-diffusion equation of the form... (work in progress)'''
 
     def __init__(self,
                  Kyy=0.,
@@ -46,7 +47,7 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         self._Utot = U * 0.0 # total advective velocities (U + Ud)
         self._Wtot = W * 0.0 # total advective velocities (W + Wd)
         self._dt_advdiff = self.timestep
-        self.rho = rho
+        self.rho = rho  # Density of air
         self.Kyy = Kyy  # Diffusivity in units of [length]**2 / [time]
         self.Kzz = Kzz  # Diffusivity in units of [length]**2 / [time]
         self.Kyz = Kyz
