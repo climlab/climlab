@@ -14,6 +14,7 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
                  U=0.,
                  W=0.,
                  rho=0.,
+
                  prescribed_flux=0.,
                  interpolation_order=2,
                  use_limiters=True,
@@ -32,10 +33,10 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
             self._inner_tracer = self._tracer * 0
             self._tracer_integral = np.zeros(np.array(value.shape) + np.array([1,1]))
             self._istar = self._tracer_integral * 0
-            self.advective_flux_yy = self._tracer_integral * 0
-            self.advective_flux_zz = self._tracer_integral * 0
-            self.diffusive_flux_yy = self._tracer_integral * 0
-            self.diffusive_flux_zz = self._tracer_integral * 0
+            self.advective_flux_yy = self._tracer_integral[:,1:] * 0
+            self.advective_flux_zz = self._tracer_integral[1:,:] * 0
+            self.diffusive_flux_yy = self._tracer_integral[:,1:] * 0
+            self.diffusive_flux_zz = self._tracer_integral[1:,:] * 0
 
         self.prescribed_flux = prescribed_flux  # flux including boundary conditions
         self.interpolation_order = interpolation_order
@@ -47,18 +48,11 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         self._Utot = U * 0.0 # total advective velocities (U + Ud)
         self._Wtot = W * 0.0 # total advective velocities (W + Wd)
         self._dt_advdiff = self.timestep
-        self.rho = rho  # Density of air
+        self.rho = rho
         self.Kyy = Kyy  # Diffusivity in units of [length]**2 / [time]
         self.Kzz = Kzz  # Diffusivity in units of [length]**2 / [time]
         self.Kyz = Kyz
-#         self.qsaturation = kwargs.get('qsat', 0.0)
-#         self.heat_capacity = kwargs.get('heat_capacity', 0.0)
-#         self.do_lsc_in_transport = kwargs.get('do_lsc_in_transport', False)
-#         self.condensation_time = kwargs.get('condensation_time', 1e6)
-#         self.RH_ref = kwargs.get('RH_ref', None)
-#         self.sink_vs_RH = kwargs.get('sink_vs_RH', None)
-#         if self.do_lsc_in_transport:
-#             self.add_diagnostic('precipitation_transport', 0.*self._tracer[:,0])
+        self.source_param_dict = kwargs.get('source_param_dict', {})
         self.age_of_air = kwargs.get('age_of_air', 0)
         if self.age_of_air == 1:
             self.tropopause = kwargs.get('tropopause', None) * 1e2
@@ -66,7 +60,33 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
                 raise ValueError("Input parameter 'tropopause' must not be None for age of air calculation")
             lev_2d = np.tile(self._levpoints, (len(self._latpoints), 1))
             self._under_trop = lev_2d > self.tropopause[:,None]
-               
+
+        fy_source_func = kwargs.get('fy_source_func', lambda obj: 0 * obj.advective_flux_yy)
+        fz_source_func = kwargs.get('fz_source_func', lambda obj: 0 * obj.advective_flux_zz)
+        source_func = kwargs.get('source_func', lambda obj: 0 * obj._inner_tracer)
+
+        self.tend_fac_fz_diff = kwargs.get('tend_fac_fz_diff', 1.0)
+        self.tend_fac_fy_diff = kwargs.get('tend_fac_fy_diff', 1.0)
+        self.tend_fac_fz_adv = kwargs.get('tend_fac_fz_adv', 1.0)
+        self.tend_fac_fy_adv = kwargs.get('tend_fac_fy_adv', 1.0)
+        self.tend_fac_fz_source_func = kwargs.get('tend_fac_fz_source_func', 1.0)
+        self.tend_fac_fy_source_func = kwargs.get('tend_fac_fy_source_func', 1.0)
+        self.tend_fac_source_func = kwargs.get('tend_fac_source_func', 1.0)
+        
+        # Run once to validate
+        output_y = fy_source_func(self)
+        assert isinstance(output_y, np.ndarray), "fy_source_func must return a numpy array."
+        assert np.all(output_y.shape == self.advective_flux_yy.shape), f"fy_source_func expected output {self.advective_flux_yy.shape}, got {output_y.shape}."
+        output_z = fz_source_func(self)
+        assert isinstance(output_z, np.ndarray), "fz_source_func must return a numpy array."
+        assert np.all(output_z.shape == self.advective_flux_zz.shape), f"fz_source_func expected output {self.advective_flux_zz.shape}, got {output_z.shape}."
+        output = source_func(self)
+        assert isinstance(output, np.ndarray), "source_func must return a numpy array."
+        assert np.all(output.shape == self._inner_tracer.shape), f"source_func expected output {self._inner_tracer.shape}), got {output.shape}."
+        # If valid, store function
+        self._internal_fy_source_func = lambda: fy_source_func(self)
+        self._internal_fz_source_func = lambda: fz_source_func(self)
+        self._internal_source_func = lambda: source_func(self)
 
     @property
     def Kyy(self):
@@ -114,9 +134,6 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         self._inner_tracer = self._tracer * 1e0
 
         self._advdiff_timestep()
-
-#         if self.do_lsc_in_transport:
-#             self._lsc()
 
         dtracer = self._inner_tracer - self._tracer
 
@@ -278,8 +295,9 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         self._Wtot = self._W + self._Wd
         
     def _update_field_k(self):
-        self._inner_tracer += (self.diffusive_flux_yy[:-1,:] - self.diffusive_flux_yy[1:,:]) * self._dt_advdiff / self._dlatbounds[:, None]
-        self._inner_tracer += (self.diffusive_flux_zz[:,:-1] - self.diffusive_flux_zz[:,1:]) * self._dt_advdiff / self._dlevbounds[None, :]
+        self._inner_tracer += self.tend_fac_fy_diff * (self.diffusive_flux_yy[:-1,:] - self.diffusive_flux_yy[1:,:]) * self._dt_advdiff / self._dlatbounds[:, None]
+        self._inner_tracer += self.tend_fac_fz_diff * (self.diffusive_flux_zz[:,:-1] - self.diffusive_flux_zz[:,1:]) * self._dt_advdiff / self._dlevbounds[None, :]
+        self._inner_tracer += self.tend_fac_source_func * self._internal_source_func() * self._dt_advdiff
 
         # tracer += (kxx_flux[:-1, :] - kxx_flux[1:, :]) / (rho * dx)
         # tracer += (kyy_flux[:, :-1] - kyy_flux[:, 1:]) / (rho * dy)
@@ -304,9 +322,13 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
 
     def _update_field(self, i):
         if i == 0:
-            self._inner_tracer += (self.advective_flux_yy[:-1,:] - self.advective_flux_yy[1:,:]) / (self._dlatbounds[:, None]) * self._dt_advdiff
+            self._inner_tracer += self.tend_fac_fy_adv * (self.advective_flux_yy[:-1,:] - self.advective_flux_yy[1:,:]) / (self._dlatbounds[:, None]) * self._dt_advdiff
+            fy = self._internal_fy_source_func()
+            self._inner_tracer += self.tend_fac_fy_source_func * (fy[:-1,:] - fy[1:,:]) / (self._dlatbounds[:, None]) * self._dt_advdiff
         if i == 1:
-            self._inner_tracer += (self.advective_flux_zz[:,:-1] - self.advective_flux_zz[:,1:]) / (-self._dlevbounds[None, :]) * self._dt_advdiff
+            self._inner_tracer += self.tend_fac_fz_adv * (self.advective_flux_zz[:,:-1] - self.advective_flux_zz[:,1:]) / (-self._dlevbounds[None, :]) * self._dt_advdiff
+            fz = self._internal_fz_source_func()
+            self._inner_tracer += self.tend_fac_fz_source_func * (fz[:,:-1] - fz[:,1:]) / (-self._dlevbounds[None, :]) * self._dt_advdiff
         # global tracer, tracer_b
         # if i == 0:
         #     # tracer += (flux[:-1, :] - flux[1:, :]) / (rhop * dx)
@@ -334,24 +356,6 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         dt = min(dtlat*fac, dtlev*fac, dtkz*fac, dtky*fac, dtkxy*fac, self.timestep)
         nsteps = np.ceil(self.timestep / dt)
         self._dt_advdiff = self.timestep / nsteps
-
-#     def _lsc(self):
-#         if self.sink_vs_RH is None:
-#             dq = -(self._inner_tracer - self.RH_ref * self.qsaturation) / self.condensation_time * self.timestep
-#             dq = np.where(dq > 0.0, 0.0, dq)
-#         elif self.sink_vs_RH.shape[0] == 2:
-#             interp_sink = CubicSpline(self.sink_vs_RH[0,:],self.sink_vs_RH[1,:])
-#             dq = -interp_sink(self._inner_tracer / self.qsaturation) * self.timestep
-#             dq_max = -self._inner_tracer
-#             dq = np.where(dq < dq_max, dq_max, dq)
-#             
-#         # qtendency = np.where(lev_mat >= 750.0, 0.0, qtendency)
-#         pmin = 10.0
-#         dq = np.where(self._levpoints[None, :] <= pmin, 0.0, dq)
-#         self._inner_tracer += dq
-# 
-#         for_precip = -1.0/const.cp * (dq / self.timestep) * self.heat_capacity
-#         self.precipitation_transport = np.sum(for_precip, axis=-1)
 
 
 def _general_linear_interp(xvec, vec, location, i):
