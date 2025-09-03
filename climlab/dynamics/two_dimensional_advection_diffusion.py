@@ -146,14 +146,17 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         return self._U
     @U.setter
     def U(self, Uvalue):
-        self._U = Uvalue #* np.cos(self._phibounds[:, None])
+        self._U = Uvalue * np.cos(self._phibounds[:, None])  # not clear yet how to handle this... WIP
 
     @property
     def W(self):
         return self._W
     @W.setter
     def W(self, Wvalue):
-        self._W = Wvalue
+        arr = self._tracer
+        J = arr.shape[-1]
+        sizeJplus1 = tuple([n for n in arr.shape[:-1]] + [J+1])
+        self._W = Wvalue * np.ones(sizeJplus1)
 
     def _compute(self):
         
