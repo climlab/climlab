@@ -125,7 +125,10 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         return self._Kzz
     @Kzz.setter  # currently this assumes that Kvalue is scalar or has the right dimensions...
     def Kzz(self, Kvalue):
-        self._Kzz = Kvalue * np.ones()
+        arr = self._tracer
+        J = arr.shape[-1]
+        sizeJplus1 = tuple([n for n in arr.shape[:-1]] + [J+1])
+        self._Kzz = Kvalue * np.ones(sizeJplus1)
 
     @property
     def Kyz(self):
