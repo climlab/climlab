@@ -1,7 +1,32 @@
+r"""CLIMLAB Process objects for two-dimensional advection-diffusion processes of the form
+
+ACTUALLY THESE NOTES ARE WRONG FOR NOW
+
+.. math::
+
+    \frac{\partial}{\partial t} \psi(x,t) &= -\frac{1}{w(x)} \frac{\partial}{\partial x} \left[ w(x) ~ \mathcal{F}(x,t) \right] \\
+    \mathcal{F} &= U(x) \psi(x) -K(x) ~ \frac{\partial \psi}{\partial x} + F(x)
+
+for a state variable :math:`\psi(x,t)`, diffusivity :math:`K(x)`
+in units of :math:`x^2 ~ t^{-1}`, advecting velocity :math:`U(x)`
+in units of :math:`x ~ t^{-1}`, and a prescribed flux F(x)
+(including boundary conditions) in units of :math:`\psi ~ x ~ t^{-1}`.
+
+The prescribed flux :math:`F(x)` defaults to zero everywhere. The user can
+implement a non-zero boundary flux condition by passing a non-zero array
+``prescribed_flux`` as input.
+
+:math:`w(x)` is an optional weighting function
+for the divergence operator on curvilinear grids.
+
+The diffusivity :math:`K` and velocity :math:`U` can be scalars,
+or optionally vectors *specified at grid cell boundaries*
+(so their lengths must be exactly 1 greater than the length of :math:`x`).
+"""
+
 import numpy as np
 from climlab import constants as const
 from climlab.process import TimeDependentProcess
-from climlab.domain import Field
 
 
 class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
@@ -100,9 +125,7 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         return self._Kzz
     @Kzz.setter  # currently this assumes that Kvalue is scalar or has the right dimensions...
     def Kzz(self, Kvalue):
-        # rhomz = 0.5*(self.rho[:, 1:] + self.rho[:, :-1])
-        # rhomz = np.append(np.append(self.rho[:, 0:1], rhomz, axis=1), self.rho[:, -1:], axis=1)
-        self._Kzz = Kvalue #* rhomz**2.0 * const.g**2.0
+        self._Kzz = Kvalue * np.ones()
 
     @property
     def Kyz(self):
