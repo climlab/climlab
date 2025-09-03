@@ -198,13 +198,13 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
             istarleft = np.concatenate((istarleft[0:1,:]*0, istarleft), axis = i)
             istarright = _general_linear_interp(self._latbounds[:, None]*np.ones(self._tracer_integral[:,:-1].shape), self._tracer_integral[:,:-1], (self._latbounds[0:-1, None]+np.abs(self._Utot[0:-1,:])*self._dt_advdiff), i)
             istarright = np.concatenate((istarright, self._tracer_integral[-1:,:-1]), axis = i)
-            self._istar[:,:-1] = np.where(self._U>0, istarleft, istarright)
+            self._istar[:,:-1] = np.where(self.U>0, istarleft, istarright)
         if i == 1:
             istarleft = _general_linear_interp(self._levbounds[None, :]*np.ones(self._tracer_integral[:-1,:].shape), self._tracer_integral[:-1,:], (self._levbounds[None, 1:]-np.abs(self._Wtot[:,1:])*self._dt_advdiff), i)
             istarleft = np.concatenate((istarleft[:, 0:1]*0, istarleft), axis = i)
             istarright = _general_linear_interp(self._levbounds[None, :]*np.ones(self._tracer_integral[:-1,:].shape), self._tracer_integral[:-1,:], (self._levbounds[None, 0:-1]+np.abs(self._Wtot[:, 0:-1])*self._dt_advdiff), i)
             istarright = np.concatenate((istarright, self._tracer_integral[:-1, -1:]), axis = i)
-            self._istar[:-1,:] = np.where(self._W>0, istarleft, istarright)
+            self._istar[:-1,:] = np.where(self.W>0, istarleft, istarright)
 
     def _parabolic_interp(self, i):
         if i == 0:
@@ -268,7 +268,7 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
 
     def _compute_fluxes(self, i):
         if i == 0:
-            # rho_up = np.where(self._U[1:-1,:]>0, self.rho[:-1,:], self.rho[1:,:])
+            # rho_up = np.where(self.U[1:-1,:]>0, self.rho[:-1,:], self.rho[1:,:])
             # rho_up = np.concatenate((np.concatenate((rho_up[0:1,:],rho_up), axis=0), rho_up[-1:,:]), axis=0)
             self.advective_flux_yy = (self._tracer_integral[:,:-1] - self._istar[:,:-1]) / self._dt_advdiff #* rho_up
         if i == 1:
@@ -279,13 +279,13 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         tracer_b = np.concatenate((np.concatenate((self._inner_tracer[0:1,:],self._inner_tracer), axis=0), self._inner_tracer[-1:,:]), axis=0)
         dy_b = np.append(np.append(self._dlatbounds[0], self._dlatbounds), self._dlatbounds[-1])
         dym = 0.5*(dy_b[1:] + dy_b[:-1])
-        self.diffusive_flux_yy = -self._Kyy * np.diff(tracer_b, axis = 0)/dym[:, None] #* rhomy
+        self.diffusive_flux_yy = -self.Kyy * np.diff(tracer_b, axis = 0)/dym[:, None] #* rhomy
         self.diffusive_flux_yy[0, :] = 0.0
         self.diffusive_flux_yy[-1, :] = 0.0
         tracer_b = np.concatenate((np.concatenate((self._inner_tracer[:,0:1],self._inner_tracer), axis=1), self._inner_tracer[:,-1:]), axis=1)
         dz_b = np.append(np.append(self._dlevbounds[0], self._dlevbounds), self._dlevbounds[-1])
         dzm = 0.5*(dz_b[1:] + dz_b[:-1])
-        self.diffusive_flux_zz = -self._Kzz * np.diff(tracer_b, axis = 1)/dzm[None, :] #* rhomz
+        self.diffusive_flux_zz = -self.Kzz * np.diff(tracer_b, axis = 1)/dzm[None, :] #* rhomz
         self.diffusive_flux_zz[:,0] = 0.0
         self.diffusive_flux_zz[:,-1] = 0.0
 
@@ -297,8 +297,8 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         tracer_bz = np.concatenate((np.concatenate((self._inner_tracer[:,0:1],self._inner_tracer), axis=1), self._inner_tracer[:,-1:]), axis=1)
         tracer_by = np.concatenate((np.concatenate((self._inner_tracer[0:1,:],self._inner_tracer), axis=0), self._inner_tracer[-1:,:]), axis=0)
 
-        if np.max(np.abs(self._Kyz)) > 0.0:
-            k_y_zmid = 0.5*(self._Kyz[:,:-1] + self._Kyz[:,1:])
+        if np.max(np.abs(self.Kyz)) > 0.0:
+            k_y_zmid = 0.5*(self.Kyz[:,:-1] + self.Kyz[:,1:])
             tracer_edges = 0.5*(tracer_bz[:,:-1] + tracer_bz[:,1:])
             dqdz = np.diff(tracer_edges, axis=1) / self._dlevbounds[None, :]
             dqdz = np.concatenate((np.concatenate((dqdz[0:1,:],dqdz), axis=0), dqdz[-1:,:]), axis=0)
@@ -307,11 +307,11 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
             self._Ud = k_y_zmid * dqdz / tracer_m
             self._Ud = np.where(tracer_m < epsilon * max_tracer, 0, self._Ud)
         else:
-            self._Ud = self._U * 0.0
-        self._Utot = self._U + self._Ud
+            self._Ud = self.U * 0.0
+        self._Utot = self.U + self._Ud
 
-        if np.max(np.abs(self._Kyz)) > 0.0:
-            k_ymid_z = 0.5*(self._Kyz[:-1,:] + self._Kyz[1:,:])
+        if np.max(np.abs(self.Kyz)) > 0.0:
+            k_ymid_z = 0.5*(self.Kyz[:-1,:] + self.Kyz[1:,:])
             tracer_edges = 0.5*(tracer_by[:-1,:] + tracer_by[1:,:])
             dqdy = np.diff(tracer_edges, axis=0) / self._dlatbounds[:, None]
             dqdy = np.concatenate((np.concatenate((dqdy[:, 0:1],dqdy), axis=1), dqdy[:,-1:]), axis=1)
@@ -320,8 +320,8 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
             self._Wd = k_ymid_z * dqdy / tracer_m
             self._Wd = np.where(tracer_m < epsilon * max_tracer, 0, self._Wd)
         else:
-            self._Wd = self._W * 0.0
-        self._Wtot = self._W + self._Wd
+            self._Wd = self.W * 0.0
+        self._Wtot = self.W + self._Wd
         
     def _update_field_k(self):
         self._inner_tracer += self.tend_fac_fy_diff * (self.diffusive_flux_yy[:-1,:] - self.diffusive_flux_yy[1:,:]) * self._dt_advdiff / self._dlatbounds[:, None]
@@ -373,14 +373,14 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         dtlat = (np.abs(dlatm[:, None] / (self._Utot+1e-20))).min()*courant
         dlevm = np.append(np.append(self._dlevbounds[0],np.minimum(self._dlevbounds[:-1], self._dlevbounds[1:])),self._dlevbounds[-1])
         dtlev = (np.abs(dlevm[None, :] / (self._Wtot+1e-20))).min()*courant
-        if self._Kyy.max()>0:
+        if self.Kyy.max()>0:
             dy_b = np.append(np.append(self._dlatbounds[0], self._dlatbounds), self._dlatbounds[-1])
             dym = 0.5*(dy_b[1:] + dy_b[:-1])
-            dtky = (dym[:, None]**2/2/(self._Kyy+1e-9)).min()
-        if self._Kzz.max()>0:
+            dtky = (dym[:, None]**2/2/(self.Kyy+1e-9)).min()
+        if self.Kzz.max()>0:
             dz_b = np.append(np.append(self._dlevbounds[0], self._dlevbounds), self._dlevbounds[-1])
             dzm = 0.5*(dz_b[1:] + dz_b[:-1])
-            dtkz = (dzm[None, :]**2/2/(self._Kzz+1e-9)).min()
+            dtkz = (dzm[None, :]**2/2/(self.Kzz+1e-9)).min()
         fac = 0.5
         dt = min(dtlat*fac, dtlev*fac, dtkz*fac, dtky*fac, dtkxy*fac, self.timestep)
         nsteps = np.ceil(self.timestep / dt)
