@@ -38,21 +38,23 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
                  Kyz=0.,
                  U=0.,
                  W=0.,
-                 rho=0.,
-
-                 prescribed_flux=0.,
-                 interpolation_order=2,
+                 age_of_air=0,  # integer flag, 1 or 0, needs to be documented
+                 prescribed_flux=0.,   #  to be documented
+                 interpolation_order=2,  # integer flag, needs to be documented
                  use_limiters=True,
                  **kwargs):
         super(TwoDimensionalAdvectionDiffusion, self).__init__(**kwargs)
         for dom in list(self.domains.values()):
-            self._phibounds = np.deg2rad(dom.axes['lat'].bounds)
-            self._latbounds = np.sin(self._phibounds) * const.a
+            self._phibounds = np.deg2rad(dom.axes['lat'].bounds)  # units of radians
+            self._latbounds = np.sin(self._phibounds) * const.a  # a sin(latitude) in units of meters
             self._dlatbounds = np.diff(self._latbounds)
-            self._levbounds = dom.axes['lev'].bounds *1e2
+            self._levbounds = dom.axes['lev'].bounds *1e2  # units of Pa instead of hPa
             self._dlevbounds = np.diff(self._levbounds)
-            self._latpoints = 0.5*(self._latbounds[1:] + self._latbounds[:-1])
-            self._levpoints = 0.5*(self._levbounds[1:] + self._levbounds[:-1])
+            # self._latpoints = 0.5*(self._latbounds[1:] + self._latbounds[:-1])
+            # self._levpoints = 0.5*(self._levbounds[1:] + self._levbounds[:-1])
+            # instead of interpolating, we can just use the already-defined points  (BR mod, to be confirmed)
+            self._latpoints = np.sin(np.deg2rad(dom.axes['lat'].points)) * const.a  # a sin(latitude) in units of meters
+            self._levpoints = dom.axes['lev'].points * 1E2  # units of Pa instead of hPa
         for varname, value in self.state.items():
             self._tracer = value
             self._inner_tracer = self._tracer * 0
@@ -73,12 +75,11 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         self._Utot = U * 0.0 # total advective velocities (U + Ud)
         self._Wtot = W * 0.0 # total advective velocities (W + Wd)
         self._dt_advdiff = self.timestep
-        self.rho = rho
         self.Kyy = Kyy  # Diffusivity in units of [length]**2 / [time]
         self.Kzz = Kzz  # Diffusivity in units of [length]**2 / [time]
         self.Kyz = Kyz
-        self.source_param_dict = kwargs.get('source_param_dict', {})
-        self.age_of_air = kwargs.get('age_of_air', 0)
+        # self.source_param_dict = kwargs.get('source_param_dict', {})  # this doesn't seem to be used at all
+        self.age_of_air = age_of_air
         if self.age_of_air == 1:
             self.tropopause = kwargs.get('tropopause', None) * 1e2
             if (self.tropopause is None):
@@ -135,10 +136,6 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         return self._Kyz
     @Kyz.setter  # currently this assumes that Kvalue is scalar or has the right dimensions...
     def Kyz(self, Kvalue):
-        # rhom0 = 0.5*(self.rho[:, 1:] + self.rho[:, :-1])
-        # rhom0 = np.append(np.append(self.rho[:, 0:1], rhom0, axis=1), self.rho[:, -1:], axis=1)
-        # rhom = 0.5*(rhom0[1:, :] + rhom0[:-1, :])
-        # rhom = np.append(np.append(rhom0[0:1, :], rhom, axis=0), rhom0[-1:, :], axis=0)
         self._Kyz = Kvalue * (np.cos(self._phibounds[:, None])) 
 
     @property
@@ -268,9 +265,7 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
 
     def _compute_fluxes(self, i):
         if i == 0:
-            # rho_up = np.where(self.U[1:-1,:]>0, self.rho[:-1,:], self.rho[1:,:])
-            # rho_up = np.concatenate((np.concatenate((rho_up[0:1,:],rho_up), axis=0), rho_up[-1:,:]), axis=0)
-            self.advective_flux_yy = (self._tracer_integral[:,:-1] - self._istar[:,:-1]) / self._dt_advdiff #* rho_up
+            self.advective_flux_yy = (self._tracer_integral[:,:-1] - self._istar[:,:-1]) / self._dt_advdiff 
         if i == 1:
             self.advective_flux_zz = -(self._tracer_integral[:-1,:] - self._istar[:-1,:]) / self._dt_advdiff
         self._boundary_conditions_flux(i)
@@ -279,13 +274,13 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         tracer_b = np.concatenate((np.concatenate((self._inner_tracer[0:1,:],self._inner_tracer), axis=0), self._inner_tracer[-1:,:]), axis=0)
         dy_b = np.append(np.append(self._dlatbounds[0], self._dlatbounds), self._dlatbounds[-1])
         dym = 0.5*(dy_b[1:] + dy_b[:-1])
-        self.diffusive_flux_yy = -self.Kyy * np.diff(tracer_b, axis = 0)/dym[:, None] #* rhomy
+        self.diffusive_flux_yy = -self.Kyy * np.diff(tracer_b, axis = 0)/dym[:, None] 
         self.diffusive_flux_yy[0, :] = 0.0
         self.diffusive_flux_yy[-1, :] = 0.0
         tracer_b = np.concatenate((np.concatenate((self._inner_tracer[:,0:1],self._inner_tracer), axis=1), self._inner_tracer[:,-1:]), axis=1)
         dz_b = np.append(np.append(self._dlevbounds[0], self._dlevbounds), self._dlevbounds[-1])
         dzm = 0.5*(dz_b[1:] + dz_b[:-1])
-        self.diffusive_flux_zz = -self.Kzz * np.diff(tracer_b, axis = 1)/dzm[None, :] #* rhomz
+        self.diffusive_flux_zz = -self.Kzz * np.diff(tracer_b, axis = 1)/dzm[None, :] 
         self.diffusive_flux_zz[:,0] = 0.0
         self.diffusive_flux_zz[:,-1] = 0.0
 
@@ -327,12 +322,6 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         self._inner_tracer += self.tend_fac_fy_diff * (self.diffusive_flux_yy[:-1,:] - self.diffusive_flux_yy[1:,:]) * self._dt_advdiff / self._dlatbounds[:, None]
         self._inner_tracer += self.tend_fac_fz_diff * (self.diffusive_flux_zz[:,:-1] - self.diffusive_flux_zz[:,1:]) * self._dt_advdiff / self._dlevbounds[None, :]
         self._inner_tracer += self.tend_fac_source_func * self._internal_source_func() * self._dt_advdiff
-
-        # tracer += (kxx_flux[:-1, :] - kxx_flux[1:, :]) / (rho * dx)
-        # tracer += (kyy_flux[:, :-1] - kyy_flux[:, 1:]) / (rho * dy)
-        # tracer += (kxy_flux1[:, 1:] - kxy_flux1[:, :-1]) / (rho * dy)
-        # tracer += (kxy_flux2[1:, :] - kxy_flux2[:-1, :]) / (rho * dx)
-        # tracer_b[1:-1, 1:-1] = tracer
         
     def _boundary_conditions_tracer(self):
         if self.age_of_air == 1:
@@ -358,13 +347,6 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
             self._inner_tracer += self.tend_fac_fz_adv * (self.advective_flux_zz[:,:-1] - self.advective_flux_zz[:,1:]) / (-self._dlevbounds[None, :]) * self._dt_advdiff
             fz = self._internal_fz_source_func()
             self._inner_tracer += self.tend_fac_fz_source_func * (fz[:,:-1] - fz[:,1:]) / (-self._dlevbounds[None, :]) * self._dt_advdiff
-        # global tracer, tracer_b
-        # if i == 0:
-        #     # tracer += (flux[:-1, :] - flux[1:, :]) / (rhop * dx)
-        #     tracer += (flux[:-1, :] - flux[1:, :]) / (-dx/g)
-        # elif i == 1:
-        #     tracer += (flux[:, :-1] - flux[:, 1:]) / (rho * dy)
-        # tracer_b[1:-1, 1:-1] = tracer
 
     def _set_advdiff_dt(self):
         dtlat = dtlev = dtkz = dtky = dtkxy = 1e20
@@ -415,7 +397,7 @@ class ParticleSource(TimeDependentProcess):
             self.lat_range = np.sin(np.deg2rad(kwargs['lat_range'])) * const.a
             self.lev_range = kwargs['lev_range'] *1e2
             self.rho = rho
-            dz = self._dlevbounds[None, :] / (const.g * self.rho)
+            dz = self._dlevbounds[None, :] / (const.g * self.rho)   # What units are we working in here (BR)? THis looks like division by zero by default
             z = const.a + np.cumsum(dz[:,::-1], axis = 1)[:,::-1]
             z = np.concatenate((z, z[:,0:1]*0.0 + const.a), axis = 1)
             self.volume = -2*np.pi/3*(np.diff(z**3, axis = 1))*np.diff(np.sin(self._phibounds))[:, None]
