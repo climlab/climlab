@@ -1,23 +1,20 @@
-r"""CLIMLAB Process objects for two-dimensional advection-diffusion processes of the form
-
-ACTUALLY THESE NOTES ARE WRONG FOR NOW
+r"""CLIMLAB Process objects for two-dimensional advection-diffusion processes 
+in the pressure-latitude plane of the form
 
 .. math::
 
-    \frac{\partial}{\partial t} \psi(x,t) &= -\frac{1}{w(x)} \frac{\partial}{\partial x} \left[ w(x) ~ \mathcal{F}(x,t) \right] \\
-    \mathcal{F} &= U(x) \psi(x) -K(x) ~ \frac{\partial \psi}{\partial x} + F(x)
+    \frac{\partial}{\partial t} \xi(\phi,p,t) &= -\frac{v}{a} \frac{\partial \xi}{\partial \phi} - \omega \frac{\partial \xi}{\partial p} + \nabla \cdot \left( D \nabla \xi) + S_\xi
 
-for a state variable :math:`\psi(x,t)`, diffusivity :math:`K(x)`
+for a state variable :math:`\xi(\phi,p,t)`, diffusivity tensor :math:`D(\phi,p)`
 in units of :math:`x^2 ~ t^{-1}`, advecting velocity :math:`U(x)`
 in units of :math:`x ~ t^{-1}`, and a prescribed flux F(x)
 (including boundary conditions) in units of :math:`\psi ~ x ~ t^{-1}`.
 
+THESE ARE NOT CORRECT AND NEED UPDATING
+
 The prescribed flux :math:`F(x)` defaults to zero everywhere. The user can
 implement a non-zero boundary flux condition by passing a non-zero array
 ``prescribed_flux`` as input.
-
-:math:`w(x)` is an optional weighting function
-for the divergence operator on curvilinear grids.
 
 The diffusivity :math:`K` and velocity :math:`U` can be scalars,
 or optionally vectors *specified at grid cell boundaries*
@@ -50,15 +47,14 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
             self._dlatbounds = np.diff(self._latbounds)
             self._levbounds = dom.axes['lev'].bounds *1e2  # units of Pa instead of hPa
             self._dlevbounds = np.diff(self._levbounds)
-            # self._latpoints = 0.5*(self._latbounds[1:] + self._latbounds[:-1])
+            self._latpoints = 0.5*(self._latbounds[1:] + self._latbounds[:-1])
             # self._levpoints = 0.5*(self._levbounds[1:] + self._levbounds[:-1])
             # instead of interpolating, we can just use the already-defined points  (BR mod, to be confirmed)
-            self._latpoints = np.sin(np.deg2rad(dom.axes['lat'].points)) * const.a  # a sin(latitude) in units of meters
             self._levpoints = dom.axes['lev'].points * 1E2  # units of Pa instead of hPa
         for varname, value in self.state.items():
             self._tracer = value
             self._inner_tracer = self._tracer * 0
-            self._tracer_integral = np.zeros(np.array(value.shape) + np.array([1,1]))
+            self._tracer_integral = np.zeros(np.array(self._tracer.shape) + np.array([1,1]))
             self._istar = self._tracer_integral * 0
             self.advective_flux_yy = self._tracer_integral[:,1:] * 0
             self.advective_flux_zz = self._tracer_integral[1:,:] * 0
@@ -76,7 +72,7 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         self._Wtot = W * 0.0 # total advective velocities (W + Wd)
         self._dt_advdiff = self.timestep
         self.Kyy = Kyy  # Diffusivity in units of [length]**2 / [time]
-        self.Kzz = Kzz  # Diffusivity in units of [length]**2 / [time]
+        self.Kzz = Kzz  # Diffusivity in units of [length]**2 / [time]  # BR but the Z length unit is Pa
         self.Kyz = Kyz
         # self.source_param_dict = kwargs.get('source_param_dict', {})  # this doesn't seem to be used at all
         self.age_of_air = age_of_air
