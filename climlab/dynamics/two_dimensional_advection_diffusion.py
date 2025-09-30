@@ -3,7 +3,7 @@ in the pressure-latitude plane of the form
 
 .. math::
 
-    \frac{\partial}{\partial t} \xi(\phi,p,t) &= -\frac{v}{a} \frac{\partial \xi}{\partial \phi} - \omega \frac{\partial \xi}{\partial p} + \nabla \cdot \left( D \nabla \xi) + S_\xi
+    \frac{\partial}{\partial t} \xi(\phi,p,t) = -\frac{v}{a} \frac{\partial \xi}{\partial \phi} - \omega \frac{\partial \xi}{\partial p} + \nabla \cdot \left( D \nabla \xi) + S_\xi
 
 for a state variable :math:`\xi(\phi,p,t)`, diffusivity tensor :math:`D(\phi,p)`
 in units of :math:`x^2 ~ t^{-1}`, advecting velocity :math:`U(x)`
