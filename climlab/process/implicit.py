@@ -1,4 +1,5 @@
 from .time_dependent_process import TimeDependentProcess
+import numpy as np
 
 
 class ImplicitProcess(TimeDependentProcess):
