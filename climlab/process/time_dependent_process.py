@@ -14,7 +14,7 @@ def couple(proclist, name='Parent'):
     new_input = AttrDict()
     all_input = {}
     all_diagnotics_list = []
-    timestep = np.timedelta64(int(const.seconds_per_year) * 1E6, 's')  # very long!
+    timestep = np.timedelta64(int(const.seconds_per_year* 1E6), 's')  # very long!
     for proc in proclist:
         timestep = np.minimum(timestep, proc.timestep)
         for key in proc.state:
