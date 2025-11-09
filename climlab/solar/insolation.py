@@ -487,3 +487,29 @@ def _standardize_inputs(lat, day, orb, lon=None):
         return phi, day, ecc, long_peri, obliquity, input_is_xarray, lam
     else:
         return phi, day, ecc, long_peri, obliquity, input_is_xarray, lon
+
+def dates_to_day_index(datetime):
+    '''Convert dates and time (assumed to be UTC) to a fractional number of days
+    from a hypothetical January 1 00h that is exactly 80 days before the spring equinox.
+
+    Input datetime can be any of
+    - a single datetime object
+    - a scalar np.datetime64 object
+    - numpy array of np.datetime64 objects
+    - xarray.DataArray of np.datetime64 objects
+
+    Output is array of floats (either numpy or Xarray).
+
+    We actually measure number of days from a specific equinox in 2025, so the result is not bounded
+    between 1 and 365.25. When the result is passed to the insolation calculators, it is normalized by the 
+    length of year and used as argument to trig functions, so extra multiples of 365.25 don't matter.
+    '''
+    spring_equinox = np.datetime64('2025-03-20T09:01')  # Precise time of a Spring Equinox in UTC
+    try:
+        datetime = np.datetime64(datetime)
+    except:
+        pass  # this will fail if now is already an array of np.datetime64 objects, 
+              # in which case no conversion is needed
+    time_since_equinox = datetime - spring_equinox
+    time_since_jan1 = time_since_equinox + np.timedelta64(80, 'D')
+    return time_since_jan1 / np.timedelta64(1, 'D')  # result as fractional days

@@ -1,6 +1,6 @@
 import numpy as np
 from climlab import constants as const
-from climlab.solar.insolation import daily_insolation, daily_insolation_factors, instant_insolation, solar_longitude
+from climlab.solar.insolation import daily_insolation, daily_insolation_factors, instant_insolation, solar_longitude, dates_to_day_index
 from climlab.solar.orbital import OrbitalTable
 from climlab.solar.orbital.long import OrbitalTable as LongOrbitalTable
 from climlab import EBM_seasonal
@@ -31,6 +31,22 @@ def test_solar_longitude():
     Q1 = daily_insolation(lat, days, day_type=1)
     Q2 = daily_insolation(lat, solar_longitude(days), day_type=2)
     np.testing.assert_allclose(Q1, Q2)
+
+@pytest.mark.fast
+def test_convert_from_dates():
+    lat = np.linspace(-90., 90., 500)
+    # Evenly sample four calendar years (to account for leap years)
+    dates = np.arange('2022-01-01T00', '2026-01-01T00', dtype='datetime64')
+    Qfromdates = daily_insolation(lat, dates_to_day_index(dates))
+    Qmean_fromdates = Qfromdates.sum(axis=1) / len(dates)
+
+    # Evenly sample 1 year with the day index
+    step = 1./const.hours_per_day
+    days = np.arange(0., const.days_per_year, step)
+    Q = daily_insolation(lat, days)
+    Qmean = Q.mean(axis=1)
+
+    np.testing.assert_allclose(Qmean_fromdates, Qmean, rtol=1E-5)
 
 @pytest.mark.fast    
 def test_instant_insolation():

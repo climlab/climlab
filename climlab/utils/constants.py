@@ -43,9 +43,9 @@ tempKtoC = -tempCtoK  # 0 K in degC
 mb_to_Pa = 100.  # conversion factor from mb to Pa
 
 #  Some useful time conversion factors
-seconds_per_minute = 60.
-minutes_per_hour = 60.
-hours_per_day = 24.
+seconds_per_minute = 60
+minutes_per_hour = 60
+hours_per_day = 24
 
 # the length of the "tropical year" -- time between vernal equinoxes
 # This value is consistent with Berger (1978)
@@ -58,7 +58,7 @@ seconds_per_year = seconds_per_day * days_per_year
 minutes_per_year = seconds_per_year / seconds_per_minute
 hours_per_year = seconds_per_year / seconds_per_hour
 #  average lenghts of months based on dividing the year into 12 equal parts
-months_per_year = 12.
+months_per_year = 12
 seconds_per_month = seconds_per_year / months_per_year
 minutes_per_month = minutes_per_year / months_per_year
 hours_per_month = hours_per_year / months_per_year

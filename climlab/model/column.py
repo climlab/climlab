@@ -50,7 +50,7 @@ class GreyRadiationModel(TimeDependentProcess):
                  lat=None,
                  water_depth=1.0,
                  albedo_sfc=0.299,
-                 timestep=1. * const.seconds_per_day,
+                 timestep=const.seconds_per_day,
                  Q=341.3,
                  # absorption coefficient in m**2 / kg
                  abs_coeff=1.229E-4,
