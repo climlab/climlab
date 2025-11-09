@@ -240,7 +240,7 @@ class SimplifiedBettsMiller(TimeDependentProcess):
         P = self._climlab_to_sbm(dom.lev.points) * 100. # convert to Pascals
         PH = self._climlab_to_sbm(dom.lev.bounds) * 100.
         Q = self._climlab_to_sbm(self.state['q'])
-        dt = self.timestep / np.timedelta64(1, 's')
+        dt = self.timestep_in_seconds
 
         (rain, tdel, qdel, q_ref, bmflag, klzbs, cape, cin, t_ref, \
         invtau_bm_t, invtau_bm_q, capeflag) = \
