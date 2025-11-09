@@ -14,7 +14,7 @@ def couple(proclist, name='Parent'):
     new_input = AttrDict()
     all_input = {}
     all_diagnotics_list = []
-    timestep = np.timedelta64(int(const.seconds_per_year* 1E6), 's')  # very long!
+    timestep = np.timedelta64(const.seconds_per_year* 1E6, 's')  # very long!
     for proc in proclist:
         timestep = np.minimum(timestep, proc.timestep)
         for key in proc.state:
@@ -374,7 +374,7 @@ class TimeDependentProcess(Process):
         """
         self.time['steps'] += 1
         # time in days since beginning
-        self.time['days_elapsed'] += self.timestep / np.timedelta64(int(const.seconds_per_day), 's')
+        self.time['days_elapsed'] += self.timestep / np.timedelta64(const.seconds_per_day, 's')
         if self.time['day_of_year_index'] >= self.time['num_steps_per_year']-1:
             self._do_new_calendar_year()
         else:
