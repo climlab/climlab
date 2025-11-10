@@ -308,6 +308,10 @@ def instant_insolation(lat, day, lon=0., orb=const.orb_present, S0=const.S0,
     :param float S0:        solar constant                                  \n
                             - unit: :math:`\\textrm{W}/\\textrm{m}^2`       \n
                             - default value: ``1365.2``
+    :param float days_per_year: number of days in a year (optional)
+                                (default: 365.2422)
+                                Reads the length of the year from
+                                :mod:`~climlab.utils.constants` if available.
     :returns:               Daily average solar radiation in unit
                             :math:`\\textrm{W}/\\textrm{m}^2`.
 
@@ -328,6 +332,73 @@ def instant_insolation(lat, day, lon=0., orb=const.orb_present, S0=const.S0,
         lon=lon, orb=orb, day_type=day_type, days_per_year=days_per_year)
     Fsw = _compute_insolation(S0, irradiance_factor, coszen)
     return Fsw
+
+def annual_insolation(lat, orb=const.orb_present, S0=const.S0, days_per_year=const.days_per_year):
+    """Compute annual average insolation given latitude and orbital parameters.
+
+    Orbital parameters can be interpolated to any time in the last 5 Myears with
+    ``climlab.solar.orbital.OrbitalTable`` (see example above).
+
+    Longer orbital tables are available with ``climlab.solar.orbital.LongOrbitalTable``
+
+    Inputs can be scalar, ``numpy.ndarray``, or ``xarray.DataArray``.
+
+    The return value will be ``numpy.ndarray`` if **all** the inputs are ``numpy``.
+    Otherwise ``xarray.DataArray``.
+
+    **Function-call argument** \n
+
+    :param array lat:       Latitude in degrees (-90 to 90).
+    :param dict orb:        a dictionary with three members (as provided by
+                            ``climlab.solar.orbital.OrbitalTable``)
+
+                            * ``'ecc'`` - eccentricity
+
+                                * unit: dimensionless
+                                * default value: ``0.017236``
+
+                            * ``'long_peri'`` - longitude of perihelion (precession angle)
+
+                                * unit: degrees
+                                * default value: ``281.37``
+
+                            * ``'obliquity'`` - obliquity angle
+
+                                * unit: degrees
+                                * default value: ``23.446``
+
+    :param float S0:        solar constant                                  \n
+                            - unit: :math:`\\textrm{W}/\\textrm{m}^2`       \n
+                            - default value: ``1365.2``
+    :param float days_per_year: number of days in a year (optional)
+                                (default: 365.2422)
+                                Reads the length of the year from
+                                :mod:`~climlab.utils.constants` if available.
+    
+    :returns:               Annual average solar radiation in unit
+                            :math:`\\textrm{W}/\\textrm{m}^2`.
+
+                            Dimensions of output are ``(lat.size, ecc.size)``
+    :rtype:                 array
+
+
+    Code is fully vectorized to handle array input for all arguments.       \n
+    Orbital arguments should all have the same sizes.
+    This is automatic if computed from
+    :func:`~climlab.solar.orbital.OrbitalTable.lookup_parameters`
+
+        For more information about computation of solar insolation see the
+        :ref:`Tutorial` chapter.
+
+    .. note::
+
+        Annual mean insolation is computed numerically by evenly sampling
+        the instant insolation over one calendar year.
+    """
+    days = np.arange(0., 1., 0.0001) * days_per_year
+    days = xr.DataArray(days, coords=[days], dims=['day'])
+    Fsw = instant_insolation(lat, days, lon=0, orb=orb, S0=S0, day_type=1, days_per_year=days_per_year)
+    return Fsw.mean(dim='day')
 
 def declination_angle(obliquity, lambda_long):
     """Compute solar declination angle in radians.
