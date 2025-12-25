@@ -63,22 +63,33 @@ from climlab.domain.field import Field
 
 class _SurfaceFlux(EnergyBudget):
     '''Abstract parent class for SensibleHeatFlux and LatentHeatFlux'''
-    def __init__(self, Cd=3E-3, resistance=1., **kwargs):
+    def __init__(self, Cd=3E-3, resistance=1., n_avg=1, **kwargs):
         super(_SurfaceFlux, self).__init__(**kwargs)
         self.Cd = Cd
+        self.p_turb_layer = kwargs.get('p_turb_layer', -1.0) # -1.0 will result in injecting the flux into the first cell
+        self.n_avg = n_avg
+        self.first_step = True
         self.add_input('resistance', resistance)
         self.heating_rate['Tatm'] = np.zeros_like(self.Tatm)
         #  fixed wind speed (for now)
         self.add_input('U', 5. * np.ones_like(self.Ts))
         #  retrieving surface pressure from model grid
         self.ps = self.lev_bounds[-1]
+        if self.p_turb_layer > 0:
+            w_bounds = (1.0 - np.exp(-(self.ps-self.lev_bounds)/self.p_turb_layer)) / (1.0 - np.exp(-self.ps/self.p_turb_layer))
+            self.weight = -np.diff(w_bounds)
+            while len(self.weight.shape) < len(self.Tatm.shape):
+                self.weight = self.weight[np.newaxis, ...]
+        else:
+            self.weight = np.zeros(self.Tatm.shape)
+            self.weight[..., -1] = 1.0
+
 
     def _compute_heating_rates(self):
         '''Compute energy flux convergences to get heating rates in :math:`W/m^2`.'''
         self._compute_flux()
-        self.heating_rate['Ts'] = -self._flux
-        # Modify only the lowest model level
-        self.heating_rate['Tatm'][..., -1, np.newaxis] = self._flux
+        self.heating_rate['Ts'] = -np.sum(self._flux, axis=-1)[...,np.newaxis]
+        self.heating_rate['Tatm'] = self._flux
 
     def _air_density(self, Ta):
         return self.ps * const.mb_to_Pa / const.Rd / Ta
@@ -122,11 +133,15 @@ class SensibleHeatFlux(_SurfaceFlux):
         Ts = self.Ts
         DeltaT = Ts - Ta
         rho = self._air_density(Ta)
+        dSHF = self.resistance * const.cp * rho * self.Cd * self.U * DeltaT
         #  flux from bulk formula
-        self._flux = self.resistance * const.cp * rho * self.Cd * self.U * DeltaT
-        self.SHF = self._flux
-
-
+        if self.first_step:
+            SHF = dSHF
+        else:
+            SHF = ((self.n_avg - 1) * self.SHF[:] + dSHF) / self.n_avg
+        self._flux = self.weight * SHF
+        self.SHF = np.sum(self._flux, axis=-1)[...,np.newaxis]
+        self.first_step = False        
 
 class LatentHeatFlux(_SurfaceFlux):
     r'''Surface turbulent latent heat flux implemented through a bulk aerodynamic formula.
@@ -178,10 +193,18 @@ class LatentHeatFlux(_SurfaceFlux):
         Deltaq = Field(qs - q, domain=self.Ts.domain)
         rho = self._air_density(Ta)
         #  flux from bulk formula
-        self._flux = self.resistance * const.Lhvap * rho * self.Cd * self.U * Deltaq
-        self.LHF[:] = self._flux
+        dLHF = self.resistance * const.Lhvap * rho * self.Cd * self.U * Deltaq
+        #  flux from bulk formula
+        if self.first_step:
+            LHF = dLHF
+        else:
+            LHF = ((self.n_avg - 1) * self.LHF[:] + dLHF) / self.n_avg
+
+        self._flux = self.weight * LHF
+        self.LHF[:] = LHF
         # evporation rate, convert from W/m2 to kg/m2/s (or mm/s)
         self.evaporation[:] = self.LHF/const.Lhvap
+        self.first_step = False
 
     def _compute(self):
         '''Overides the _compute method of EnergyBudget'''
@@ -189,10 +212,7 @@ class LatentHeatFlux(_SurfaceFlux):
         if 'q' in self.state:
             # in a model with active water vapor, this flux should affect
             #  water vapor tendency, NOT air temperature tendency!
+            tendencies['q'] = const.cp / const.Lhvap * tendencies['Tatm']
+            self.heating_rate['Tatm'] *= 0.
             tendencies['Tatm'] *= 0.
-            Pa_per_hPa = 100.
-            air_mass_per_area = self.Tatm.domain.lev.delta[...,-1] * Pa_per_hPa / const.g
-            specific_humidity_tendency = 0.*self.q
-            specific_humidity_tendency[...,-1,np.newaxis] = self.LHF/const.Lhvap / air_mass_per_area
-            tendencies['q'] = specific_humidity_tendency
         return tendencies
