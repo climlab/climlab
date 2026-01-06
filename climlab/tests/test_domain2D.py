@@ -40,7 +40,7 @@ def test_2D_insolation():
     assert np.mean(m.subprocess['insolation'].insolation) == pytest.approx(299.30467670961832)
     sfc = m.domains['Ts']
     m.add_subprocess('insolation',
-        climlab.radiation.P2Insolation(domains=sfc, **m.param))
+        climlab.radiation.P2Insolation(domains=sfc, **m.param), verbose=False)
     assert np.mean(m.subprocess['insolation'].insolation) == pytest.approx(300.34399999999999)
 
 @pytest.mark.fast

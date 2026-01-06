@@ -93,10 +93,10 @@ def test_albedo():
     subprocess and get the expected icelat'''
     import numpy as np
     m = climlab.EBM()
-    m.add_subprocess('albedo', climlab.surface.ConstantAlbedo(state=m.state, **m.param))
+    m.add_subprocess('albedo', climlab.surface.ConstantAlbedo(state=m.state, **m.param), verbose=False)
     m.subprocess['SW'].albedo = m.subprocess['albedo'].albedo
     m.integrate_years(1)
-    m.add_subprocess('albedo', climlab.surface.StepFunctionAlbedo(state=m.state, **m.param))
+    m.add_subprocess('albedo', climlab.surface.StepFunctionAlbedo(state=m.state, **m.param), verbose=False)
     m.subprocess['SW'].albedo = m.subprocess['albedo'].albedo
     m.integrate_years(1)
     assert np.all(m.icelat == np.array([-70.,  70.]))

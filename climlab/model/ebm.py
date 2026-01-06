@@ -480,9 +480,9 @@ class EBM_seasonal(EBM):
                                      insolation=ins.insolation,
                                      albedo=alb.albedo,
                                      **self.param)
-        self.add_subprocess('insolation', ins)
-        self.add_subprocess('albedo', alb)
-        self.add_subprocess('SW', sw)
+        self.add_subprocess('insolation', ins, verbose=False)
+        self.add_subprocess('albedo', alb, verbose=False)
+        self.add_subprocess('SW', sw, verbose=False)
 
 
 class EBM_annual(EBM_seasonal):
@@ -536,7 +536,7 @@ class EBM_annual(EBM_seasonal):
         super(EBM_annual, self).__init__(**kwargs)
         sfc = self.domains['Ts']
         ins = AnnualMeanInsolation(domains=sfc, **self.param)
-        self.add_subprocess('insolation', ins)
+        self.add_subprocess('insolation', ins, verbose=False)
         self.subprocess['SW'].insolation = ins.insolation
 
 # an EBM that computes degree-days has an additional state variable.
