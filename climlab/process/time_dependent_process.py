@@ -1,11 +1,10 @@
-from builtins import str
-from builtins import range
+from builtins import str, range
 import numpy as np
 import copy
-from climlab import constants as const
 from .process import Process
-from climlab.utils import walk
+from climlab.utils import walk, ProcNameWarning, constants as const
 from climlab.utils.attrdict import AttrDict
+import warnings
 
 
 def couple(proclist, name='Parent'):
@@ -28,10 +27,15 @@ def couple(proclist, name='Parent'):
             new_input[key] = all_input[key]
     # The newly created parent process has the minimum timestep
     coupled = TimeDependentProcess(state=new_state, timestep=timestep, name=name)
-    for proc in proclist:
-        coupled.add_subprocess(proc.name, proc)
+    warnings.filterwarnings("error", category=ProcNameWarning)  # Warning becomes error
+    try:
+        for proc in proclist:
+            coupled.add_subprocess(proc.name, proc)
+    except ProcNameWarning:
+        raise ValueError('Coupled subprocesses must have unique names.')
     for key in new_input:
         coupled.add_input(key, new_input[key])
+    warnings.resetwarnings()
     return coupled
 
 

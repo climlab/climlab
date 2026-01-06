@@ -11,7 +11,7 @@ def model():
 @pytest.fixture()
 def model_with_insolation(model):
     insolation = climlab.radiation.DailyInsolation(domains=model.Ts.domain)
-    model.add_subprocess('insolation', insolation)
+    model.add_subprocess('insolation', insolation, verbose=False)
     model.subprocess.SW.flux_from_space = insolation.insolation
     return model
 
@@ -19,7 +19,7 @@ def model_with_insolation(model):
 def rcmodel():
     model2 = climlab.RadiativeConvectiveModel(num_lev=30, num_lat=90)
     insolation = climlab.radiation.DailyInsolation(domains=model2.Ts.domain)
-    model2.add_subprocess('insolation', insolation)
+    model2.add_subprocess('insolation', insolation, verbose=False)
     model2.subprocess.SW.flux_from_space = insolation.insolation
     return model2
 
