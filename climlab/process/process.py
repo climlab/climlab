@@ -68,21 +68,10 @@ import time, copy
 import numpy as np
 from climlab.domain.field import Field
 from climlab.domain.domain import _Domain, zonal_mean_surface
-from climlab.utils import walk, ProcNameWarning
+from climlab.utils import walk, ProcNameWarning, _make_dict
 from climlab.utils.attrdict import AttrDict
 from climlab.domain.xarray import state_to_xarray
 from warnings import warn
-
-
-def _make_dict(arg, argtype):
-    if arg is None:
-        return {}
-    elif isinstance(arg, dict):
-        return arg
-    elif isinstance(arg, argtype):
-        return {'default': arg}
-    else:
-        raise ValueError('Problem with input type')
 
 
 class Process(object):
