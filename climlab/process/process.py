@@ -68,7 +68,7 @@ import time, copy
 import numpy as np
 from climlab.domain.field import Field
 from climlab.domain.domain import _Domain, zonal_mean_surface
-from climlab.utils import walk
+from climlab.utils import walk, ProcNameWarning
 from climlab.utils.attrdict import AttrDict
 from climlab.domain.xarray import state_to_xarray
 from warnings import warn
@@ -271,7 +271,8 @@ class Process(object):
         """
         if isinstance(proc, Process):
             if name in self.subprocess:
-                warn('Process name {} is already in the subprocess dictionary. It is being replaced.'.format(name))
+                warn('Process name {} is already in the subprocess dictionary. It is being replaced.'.format(name),
+                category=ProcNameWarning)
             self.subprocess.update({name: proc})
             self.has_process_type_list = False
             # Add subprocess diagnostics to parent
