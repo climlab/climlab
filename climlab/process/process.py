@@ -71,6 +71,7 @@ from climlab.domain.domain import _Domain, zonal_mean_surface
 from climlab.utils import walk
 from climlab.utils.attrdict import AttrDict
 from climlab.domain.xarray import state_to_xarray
+from warnings import warn
 
 
 def _make_dict(arg, argtype):
@@ -208,7 +209,7 @@ class Process(object):
             for name, proc in procdict.items():
                 self.add_subprocess(name, proc)
 
-    def add_subprocess(self, name, proc):
+    def add_subprocess(self, name, proc, verbose=True):
         """Adds a single subprocess to this process.
 
         :param string name:     name of the subprocess
@@ -269,6 +270,8 @@ class Process(object):
 
         """
         if isinstance(proc, Process):
+            if name in self.subprocess:
+                warn('Process name {} is already in the subprocess dictionary. It is being replaced.'.format(name))
             self.subprocess.update({name: proc})
             self.has_process_type_list = False
             # Add subprocess diagnostics to parent
@@ -323,7 +326,7 @@ class Process(object):
             self.subprocess.pop(name)
         except KeyError:
             if verbose:
-                print('WARNING: {} not found in subprocess dictionary.'.format(name))
+                warn('{} not found in subprocess dictionary.'.format(name))
         self.has_process_type_list = False
 
     def set_state(self, name, value):
@@ -497,7 +500,7 @@ class Process(object):
             delattr(self, name)
             self._diag_vars.remove(name)
         except:
-            print('No diagnostic named {} was found.'.format(name))
+            warn('No diagnostic named {} was found.'.format(name))
 
     def to_xarray(self, diagnostics=False, timeave=False):
         """ Convert process variables to ``xarray.Dataset`` format.
