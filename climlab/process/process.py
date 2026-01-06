@@ -270,9 +270,9 @@ class Process(object):
 
         """
         if isinstance(proc, Process):
-            if name in self.subprocess:
+            if name in self.subprocess and verbose:
                 warn('Process name {} is already in the subprocess dictionary. It is being replaced.'.format(name),
-                category=ProcNameWarning)
+                    category=ProcNameWarning)
             self.subprocess.update({name: proc})
             self.has_process_type_list = False
             # Add subprocess diagnostics to parent

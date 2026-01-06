@@ -170,8 +170,8 @@ class BandRCModel(RadiativeConvectiveModel):
                                 absorber_vmr=self.absorber_vmr,
                                 emissivity_sfc=0.,
                                 albedo_sfc=self.param['albedo_sfc'])
-        self.add_subprocess('LW', longwave)
-        self.add_subprocess('SW', shortwave)
+        self.add_subprocess('LW', longwave, verbose=False)  # Suppress warning about replacing LW and SW
+        self.add_subprocess('SW', shortwave, verbose=False)
         # This process has to handle the coupling between
         # insolation and column radiation
         self.subprocess['SW'].flux_from_space = \
