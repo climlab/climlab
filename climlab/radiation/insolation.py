@@ -127,7 +127,7 @@ class _Insolation(DiagnosticProcess):
 
     def _get_current_insolation(self):
         self._compute_fixed()
-
+            
     def _compute(self):
         self._get_current_insolation()
         return {}
@@ -166,6 +166,7 @@ class FixedInsolation(_Insolation):
     """
     def __init__(self, S0=const.S0/4, **kwargs):
         super(FixedInsolation, self).__init__(S0=S0, **kwargs)
+        self._compute_fixed()
 
     def _compute_fixed(self):
         self.insolation[:] = self.S0
@@ -575,6 +576,10 @@ class DailyInsolation(AnnualMeanInsolation):
         self.coszen[:] = Field(coszen, domain=dom)
         self.irradiance_factor[:] = Field(irradiance_factor, domain=dom)
         self.insolation[:] = self.S0 * self.coszen * self.irradiance_factor
+    
+    def _compute(self):
+        self._get_current_insolation()
+        return {}
         
 class InstantInsolation(AnnualMeanInsolation):
     """A class to compute latitudewise instantaneous solar insolation for specific
