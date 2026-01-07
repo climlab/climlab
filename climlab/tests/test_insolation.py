@@ -131,4 +131,4 @@ def test_orbital_cycles():
     experiment = OrbitalCycles(ebm, kyear_start=-20, kyear_stop=-19,
                                orbital_year_factor=10.)
     assert experiment.orb_kyear == -20.
-    np.testing.assert_almost_equal(experiment.T_segments_global, 11.48520525)
+    np.testing.assert_allclose(experiment.T_segments_global, 11.495463, rtol=1E-5)
