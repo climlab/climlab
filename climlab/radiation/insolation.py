@@ -182,7 +182,7 @@ class _SteadyInsolation(_Insolation):
     def _compute_fixed(self):
         try:
             insolation = self._calc_insolation()
-            coszen = self._coszen_from_insolation()
+            coszen = insolation / self.S0
             dom = self.domains['default']
             # make sure that the diagnostic has the correct field dimensions.
             dom = self.domains['default']
