@@ -189,15 +189,20 @@ class _SteadyInsolation(_Insolation):
             try:
                 insolation = to_latlon(insolation, domain=dom)
                 coszen = to_latlon(coszen, domain=dom)
-                self.insolation[:] = insolation
-                self.coszen[:] = coszen
-                self.irradiance_factor[:] = 1.
+                self._steady_insolation = insolation
+                self._steady_coszen = coszen
+                self._steady_irradiance_factor = 1.
             except:
-                self.insolation[:] = Field(insolation, domain=dom)
-                self.coszen[:] = Field(coszen, domain=dom)
-                self.irradiance_factor[:] = 1.
+                self._steady_insolation = Field(insolation, domain=dom)
+                self._steady_coszen = Field(coszen, domain=dom)
+                self._steady_irradiance_factor = 1.
         except AttributeError:  # The silent fail is here just for the initialization step
             pass
+    
+    def _get_current_insolation(self):
+        self.insolation[:] = self._steady_insolation
+        self.coszen[:] = self._steady_coszen
+        self.irradiance_factor[:] = self._steady_irradiance_factor 
     
 
 class P2Insolation(_SteadyInsolation):
