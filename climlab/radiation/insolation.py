@@ -23,7 +23,7 @@ from climlab.process.diagnostic import DiagnosticProcess
 from climlab.domain.field import Field, to_latlon
 from climlab.utils.legendre import P2
 from climlab import constants as const
-from climlab.solar.insolation import daily_insolation_factors, instant_insolation_factors
+from climlab.solar.insolation import daily_insolation_factors, instant_insolation_factors, annual_insolation
 
 # REVISE TO MAKE ALL OF THESE CALLABLE WITH NO ARGUMENTS.
 # SET SOME SENSIBLE DEFAULTS FOR DOMAINS
@@ -132,8 +132,9 @@ class _Insolation(DiagnosticProcess):
         self._get_current_insolation()
         return {}
 
+
 class FixedInsolation(_Insolation):
-    """A class for fixed insolation at each point of latitude off the domain.
+    """A class for fixed insolation at each point of latitude of the domain.
 
     The solar distribution for the whole domain is constant and specified by
     a parameter.
@@ -414,35 +415,23 @@ class AnnualMeanInsolation(_Insolation):
         self.param['orb'] = value
         self._compute_fixed()
 
-    def _daily_insolation_factor_arrays(self):
-        coszen, irradiance_factor = daily_insolation_factors(self.lat,
-                                                             self.time['days_of_year'],
-                                                             orb=self.orb,
-                                                             weighting=self.weighting)
-        return coszen, irradiance_factor
-
     def _compute_fixed(self):
         try:
-            coszen, irradiance_factor = self._daily_insolation_factor_arrays()
-            insolation = self.S0 * coszen * irradiance_factor
-            coszen = np.mean(coszen, axis=1)
-            insolation = np.mean(insolation, axis=1)
-            irradiance_factor = np.mean(irradiance_factor, axis=1)
+            insolation = annual_insolation(self.lat, orb=self.orb, S0=self.S0, days_per_year=const.days_per_year)
+            coszen = self._coszen_from_insolation()
+            dom = self.domains['default']
             # make sure that the diagnostic has the correct field dimensions.
             dom = self.domains['default']
             try:
                 insolation = to_latlon(insolation, domain=dom)
                 coszen = to_latlon(coszen, domain=dom)
-                irradiance_factor = to_latlon(irradiance_factor, domain=dom)
                 self.insolation[:] = insolation
                 self.coszen[:] = coszen
-                self.irradiance_factor[:] = irradiance_factor
+                self.irradiance_factor[:] = 1.
             except:
                 self.insolation[:] = Field(insolation, domain=dom)
                 self.coszen[:] = Field(coszen, domain=dom)
-                self.irradiance_factor[:] = Field(irradiance_factor, domain=dom)
-        #  Silent fail only for attribute error: _orb is not an attribute of self
-        #  but orb parameter is being stored in self._orb
+                self.irradiance_factor[:] = 1.
         except AttributeError:
             pass
 
@@ -560,6 +549,13 @@ class DailyInsolation(AnnualMeanInsolation):
                insolation: <class 'climlab.radiation.insolation.DailyInsolation'>
 
     """
+    def _daily_insolation_factor_arrays(self):
+        coszen, irradiance_factor = daily_insolation_factors(self.lat,
+                                                             self.time['days_of_year'],
+                                                             orb=self.orb,
+                                                             weighting=self.weighting)
+        return coszen, irradiance_factor
+    
     def _compute_fixed(self):
         try:
             coszen, irradiance_factor = self._daily_insolation_factor_arrays()
