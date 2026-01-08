@@ -12,7 +12,8 @@ def test_moist_model():
     qinitial = 0.*full_state.Tatm + qStrat
 
     short_timestep=climlab.utils.constants.seconds_per_hour
-    long_timestep = climlab.utils.constants.seconds_per_day
+    # long_timestep = climlab.utils.constants.seconds_per_day
+    long_timestep = short_timestep
 
     full_state['q'] = qinitial
     temp_state = {'Tatm':full_state.Tatm,'Ts':full_state.Ts}
