@@ -33,15 +33,24 @@ def test_2D_EBM_seasonal():
 
 @pytest.mark.fast
 def test_2D_insolation():
-    m = climlab.EBM_annual(num_lon=4)
+    m = climlab.EBM_annual()
+    m4 = climlab.EBM_annual(num_lon=4)
     #  the answers are the mean of 1D insolation arrays
     #  the mean shouldn't change from 1D to 2D...
     #  there are exactly the same amount of each number in 2D array
-    assert np.mean(m.subprocess['insolation'].insolation) == pytest.approx(299.30467670961832)
+    insdiff = (climlab.to_xarray(m4.subprocess['insolation'].insolation).mean(dim='lon') - 
+               climlab.to_xarray(m.subprocess['insolation'].insolation))
+    assert np.all(insdiff == 0.)
+    #  Try the same thing with P2 insolation
     sfc = m.domains['Ts']
+    sfc4 = m4.domains['Ts']
     m.add_subprocess('insolation',
         climlab.radiation.P2Insolation(domains=sfc, **m.param), verbose=False)
-    assert np.mean(m.subprocess['insolation'].insolation) == pytest.approx(300.34399999999999)
+    m4.add_subprocess('insolation',
+        climlab.radiation.P2Insolation(domains=sfc4, **m4.param), verbose=False)
+    insdiff = (climlab.to_xarray(m4.subprocess['insolation'].insolation).mean(dim='lon') - 
+               climlab.to_xarray(m.subprocess['insolation'].insolation))
+    assert np.all(insdiff == 0.)
 
 @pytest.mark.fast
 def test_diurnal_cycle():

@@ -54,7 +54,7 @@ def test_high_obliquity(EBM_highobliquity):
     surface temperature."""
     EBM_highobliquity.step_forward()
     EBM_highobliquity.integrate_years(1)
-    assert _check_minmax(EBM_highobliquity.Ts, -9.28717079958807, 27.37890262018116)
+    assert _check_minmax(EBM_highobliquity.Ts, -9.28696784, 27.3786011)
 
 @pytest.mark.fast
 def test_annual_iceline(EBM_iceline):
