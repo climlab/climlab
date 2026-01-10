@@ -196,6 +196,8 @@ class _SteadyInsolation(_Insolation):
                 self._steady_insolation = Field(insolation, domain=dom)
                 self._steady_coszen = Field(coszen, domain=dom)
                 self._steady_irradiance_factor = 1.
+            # Correctly populate the diagnostic fields
+            self._get_current_insolation()
         except AttributeError:  # The silent fail is here just for the initialization step
             pass
     
