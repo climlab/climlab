@@ -183,7 +183,7 @@ def test_latitude():
                                   coszen=sol.coszen,
                                   irradiance_factor=sol.irradiance_factor,)
     #  Couple everything together
-    model = rad + sol
+    model = climlab.couple([rad, sol], name='RadModel')
     #  Run out to equilibrium
     model.integrate_years(2.)
     #  Test for energy balance

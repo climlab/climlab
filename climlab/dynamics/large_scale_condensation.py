@@ -108,7 +108,7 @@ class LargeScaleCondensation(TimeDependentProcess):
     - ``precipitation``: precipitation rate (column total) in units of kg m\ :sup:`-2` s\ :sup:`-1` or mm s\ :sup:`-1`
     '''
     def __init__(self, 
-                 condensation_time = 4*const.seconds_per_hour, 
+                 condensation_time = 4. * const.seconds_per_hour, 
                  RH_ref = 0.9,
                  **kwargs):
         super(LargeScaleCondensation, self).__init__(**kwargs)

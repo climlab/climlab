@@ -286,7 +286,7 @@ class EBM(TimeDependentProcess):
         self.subprocess['insolation'].S0 = value
 
     def _compute(self):
-        self.net_radiation = self.subprocess['SW'].ASR - self.subprocess['LW'].OLR
+        self.net_radiation[:] = self.subprocess['SW'].ASR - self.subprocess['LW'].OLR
         return super(EBM, self)._compute()
 
     def global_mean_temperature(self):

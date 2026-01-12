@@ -218,7 +218,7 @@ class EmanuelConvection(TimeDependentProcess):
             V = np.zeros_like(T)
         NTRA = 1
         TRA = np.zeros((NCOL,ND,NTRA), order='F')  # tracers ignored
-        DELT = float(self.timestep)
+        DELT = self.timestep_in_seconds
         CBMF = self.CBMF
         (IFLAG, FT, FQ, FU, FV, FTRA, PRECIP, WD, TPRIME, QPRIME, CBMFnew,
         Tout, Qout, QSout, Uout, Vout, TRAout) = \

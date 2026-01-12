@@ -195,7 +195,7 @@ class AdvectionDiffusion(ImplicitProcess):
         for varname, value in self.state.items():
             field = np.moveaxis(value, self.diffusion_axis_index,-1)
             result = adv_diff_numerics.implicit_step_forward(field,
-                        self._advdiffTriDiag, self._source, self.timestep,
+                        self._advdiffTriDiag, self._source, self.timestep_in_seconds,
                         use_banded_solver=self.use_banded_solver)
             newstate[varname] = np.moveaxis(result,-1,self.diffusion_axis_index)
         return newstate
