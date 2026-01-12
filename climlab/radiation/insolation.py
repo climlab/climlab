@@ -23,7 +23,8 @@ from climlab.process.diagnostic import DiagnosticProcess
 from climlab.domain.field import Field, to_latlon
 from climlab.utils.legendre import P2
 from climlab import constants as const
-from climlab.solar.insolation import daily_insolation_factors, instant_insolation_factors, annual_insolation
+from climlab.solar.insolation import daily_insolation_factors, instant_insolation_factors, \
+                                     annual_insolation, dates_to_day_index
 
 # REVISE TO MAKE ALL OF THESE CALLABLE WITH NO ARGUMENTS.
 # SET SOME SENSIBLE DEFAULTS FOR DOMAINS
@@ -552,27 +553,29 @@ class DailyInsolation(AnnualMeanInsolation):
                insolation: <class 'climlab.radiation.insolation.DailyInsolation'>
 
     """
-    def _daily_insolation_factor_arrays(self):
-        coszen, irradiance_factor = daily_insolation_factors(self.lat,
-                                                             self.time['days_of_year'],
-                                                             orb=self.orb,
-                                                             weighting=self.weighting)
-        return coszen, irradiance_factor
+    # def _daily_insolation_factor_arrays(self):
+    #     coszen, irradiance_factor = daily_insolation_factors(self.lat,
+    #                                                          dates_to_day_index(self.time['current_time']),
+    #                                                          orb=self.orb,
+    #                                                          weighting=self.weighting)
+    #     return coszen, irradiance_factor
     
     def _compute_fixed(self):
         try:
-            coszen, irradiance_factor = self._daily_insolation_factor_arrays()
-            self.coszen_array = coszen
-            self.irradiance_factor_array = irradiance_factor
+            self._get_current_insolation()
         except AttributeError:
             pass
 
     def _get_current_insolation(self):
+        coszen, irradiance_factor = daily_insolation_factors(self.lat,
+                                                             dates_to_day_index(self.time['current_time']),
+                                                             orb=self.orb,
+                                                             weighting=self.weighting)
         # make sure that the diagnostic has the correct field dimensions.
         dom = self.domains['default']
-        time_index = self.time['day_of_year_index']   # THIS ONLY WORKS IF self IS THE MASTER PROCESS
-        coszen = self.coszen_array[..., time_index]
-        irradiance_factor = self.irradiance_factor_array[..., time_index]
+        # time_index = self.time['day_of_year_index']   # THIS ONLY WORKS IF self IS THE MASTER PROCESS
+        # coszen = self.coszen_array[..., time_index]
+        # irradiance_factor = self.irradiance_factor_array[..., time_index]
         if 'lon' in dom.axes:
             #  coszen is latitude-only, need to broadcast across longitude
             #  assumption is axes are ordered (lat, lon, depth)
@@ -699,7 +702,7 @@ class InstantInsolation(AnnualMeanInsolation):
         if 'lon' in dom.axes:
             lon = self.lon
         coszen, irradiance_factor = instant_insolation_factors(self.lat, 
-                                            self.time['days_elapsed'], 
+                                            dates_to_day_index(self.time['current_time']), 
                                             lon=lon, orb=self.orb,)
         self.coszen[:] = Field(coszen, domain=dom)
         self.irradiance_factor[:] = Field(irradiance_factor, domain=dom)
