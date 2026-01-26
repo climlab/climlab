@@ -134,6 +134,7 @@ class TimeDependentProcess(Process):
                      'steps': 0,
                      'time_elapsed': np.timedelta64(0, 's'),
                      'current_time': np.datetime64('1970-01-01T00:00'),
+                    #  'current_time': np.datetime64('2025-03-20T09:01') - np.timedelta64(80, 'D'),
                     #  'days_elapsed': 0,
                     #  'years_elapsed': 0,
                     #  'days_of_year': days_of_year,

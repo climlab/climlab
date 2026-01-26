@@ -6,12 +6,20 @@ from climlab.utils.legendre import P2
 
 @pytest.fixture()
 def EBM_seasonal():
-    return climlab.EBM_seasonal(water_depth=10.)
+    model = climlab.EBM_seasonal(water_depth=10.)
+    # Set the current date to match exactly the old definition of "Jan 1" with respect to insolation
+    #  This ensures that the numerical test values stay the same
+    model.time['current_time'] = np.datetime64('2025-03-20T09:01') - np.timedelta64(80, 'D')
+    ##  NOTE: this is not working because the date is not propagated down to subprocesses!
+    #  Need to rethink the whole issue of time and calendars and syncing across the subprocess tree
+    return model
 
 @pytest.fixture()
 def EBM_highobliquity():
     orb_highobl = {'ecc':0., 'obliquity':90., 'long_peri':0.}
-    return climlab.EBM_seasonal(orb=orb_highobl, water_depth=10.)
+    model = climlab.EBM_seasonal(orb=orb_highobl, water_depth=10.)
+    model.time['current_time'] = np.datetime64('2025-03-20T09:01') - np.timedelta64(80, 'D')
+    return model
 
 @pytest.fixture()
 def EBM_iceline():
