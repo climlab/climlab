@@ -99,8 +99,11 @@ class TimeDependentProcess(Process):
         str1 += 'Current time is {}'.format(self.current_time)
         return str1
 
-    def __init__(self, time_type='explicit', timestep=const.seconds_per_day, 
-                 initial_time=np.datetime64('1970-01-01T00:00'), topdown=True, **kwargs):
+    def __init__(self, time_type='explicit', 
+                 timestep=const.seconds_per_day, 
+                 initial_time=np.datetime64('1970-01-01T00:00'), 
+                 topdown=True, 
+                 **kwargs):
         # Create the state dataset
         self.tendencies = {}
         super(TimeDependentProcess, self).__init__(**kwargs)
