@@ -568,7 +568,7 @@ class DailyInsolation(AnnualMeanInsolation):
 
     def _get_current_insolation(self):
         coszen, irradiance_factor = daily_insolation_factors(self.lat,
-                                                             dates_to_day_index(self.time['current_time']),
+                                                             dates_to_day_index(self.current_time),
                                                              orb=self.orb,
                                                              weighting=self.weighting)
         # make sure that the diagnostic has the correct field dimensions.
@@ -702,7 +702,7 @@ class InstantInsolation(AnnualMeanInsolation):
         if 'lon' in dom.axes:
             lon = self.lon
         coszen, irradiance_factor = instant_insolation_factors(self.lat, 
-                                            dates_to_day_index(self.time['current_time']), 
+                                            dates_to_day_index(self.current_time), 
                                             lon=lon, orb=self.orb,)
         self.coszen[:] = Field(coszen, domain=dom)
         self.irradiance_factor[:] = Field(irradiance_factor, domain=dom)
