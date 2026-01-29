@@ -11,7 +11,6 @@ old_Jan1 = np.datetime64('2025-03-20T09:01') - np.timedelta64(80, 'D')
 @pytest.fixture()
 def EBM_seasonal():
     model = climlab.EBM_seasonal(initial_time=old_Jan1, water_depth=10.)
-    # model.current_time = old_Jan1
     return model
 
 @pytest.fixture()
