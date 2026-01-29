@@ -238,6 +238,7 @@ class EBM(TimeDependentProcess):
                  a2=0.078,
                  ai=0.62,
                  timestep=const.seconds_per_year/90.,
+                 initial_time=np.datetime64('1970-01-01T00:00'),
                  T0 = 12.,  # initial temperature parameters
                  T2 = -40.,  #  (2nd Legendre polynomial)
                  **kwargs):
@@ -248,7 +249,7 @@ class EBM(TimeDependentProcess):
                                   water_depth=water_depth, T0=T0, T2=T2)
             sfc = state.Ts.domain
             kwargs.update({'state': state, 'domains':{'sfc':sfc}})
-        super(EBM, self).__init__(timestep=timestep, **kwargs)
+        super(EBM, self).__init__(timestep=timestep, initial_time=initial_time, **kwargs)
         sfc = self.Ts.domain
         self.param['S0'] = S0
         self.param['s2'] = s2
@@ -261,14 +262,15 @@ class EBM(TimeDependentProcess):
         self.param['a2'] = a2
         self.param['ai'] = ai
         # create sub-models
-        lw = AplusBT(state=self.state, **self.param)
-        ins = P2Insolation(domains=sfc, **self.param)
-        alb = albedo.StepFunctionAlbedo(state=self.state, **self.param)
+        lw = AplusBT(state=self.state, initial_time=initial_time, **self.param)
+        ins = P2Insolation(domains=sfc, initial_time=initial_time, **self.param)
+        alb = albedo.StepFunctionAlbedo(state=self.state, initial_time=initial_time, **self.param)
         sw = SimpleAbsorbedShortwave(state=self.state,
                                      insolation=ins.insolation,
                                      albedo=alb.albedo,
+                                     initial_time=initial_time, 
                                      **self.param)
-        diff = MeridionalHeatDiffusion(state=self.state, use_banded_solver=False, **self.param)
+        diff = MeridionalHeatDiffusion(state=self.state, use_banded_solver=False, initial_time=initial_time, **self.param)
         self.add_subprocess('LW', lw)
         self.add_subprocess('insolation', ins)
         self.add_subprocess('albedo', alb)
@@ -467,18 +469,19 @@ class EBM_seasonal(EBM):
         self.param['a0'] = a0
         self.param['a2'] = a2
         sfc = self.domains['Ts']
-        ins = DailyInsolation(domains=sfc, **self.param)
+        ins = DailyInsolation(domains=sfc, initial_time=self.time['initial_time'], **self.param)
         if no_albedo_feedback:
             # Remove unused parameters here for clarity
             _ = self.param.pop('ai')
             _ = self.param.pop('Tf')
-            alb = albedo.P2Albedo(domains=sfc, **self.param)
+            alb = albedo.P2Albedo(domains=sfc, initial_time=self.time['initial_time'], **self.param)
         else:
             self.param['ai'] = ai
-            alb = albedo.StepFunctionAlbedo(state=self.state, **self.param)
+            alb = albedo.StepFunctionAlbedo(state=self.state, initial_time=self.time['initial_time'], **self.param)
         sw = SimpleAbsorbedShortwave(state=self.state,
                                      insolation=ins.insolation,
                                      albedo=alb.albedo,
+                                     initial_time=self.time['initial_time'],
                                      **self.param)
         self.add_subprocess('insolation', ins, verbose=False)
         self.add_subprocess('albedo', alb, verbose=False)
@@ -535,7 +538,7 @@ class EBM_annual(EBM_seasonal):
         """
         super(EBM_annual, self).__init__(**kwargs)
         sfc = self.domains['Ts']
-        ins = AnnualMeanInsolation(domains=sfc, **self.param)
+        ins = AnnualMeanInsolation(domains=sfc, initial_time=self.time['initial_time'], **self.param)
         self.add_subprocess('insolation', ins, verbose=False)
         self.subprocess['SW'].insolation = ins.insolation
 
