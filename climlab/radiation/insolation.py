@@ -581,7 +581,9 @@ class DailyInsolation(AnnualMeanInsolation):
             #  assumption is axes are ordered (lat, lon, depth)
             #  NOTE this is a clunky hack and all this will go away
             #  when we use xarray structures for these internals
+            coszen = coszen.values
             coszen = np.tile(coszen[...,np.newaxis], dom.axes['lon'].num_points)
+            irradiance_factor = irradiance_factor.values
             irradiance_factor = np.tile(irradiance_factor[...,np.newaxis], dom.axes['lon'].num_points)
         self.coszen[:] = Field(coszen, domain=dom)
         self.irradiance_factor[:] = Field(irradiance_factor, domain=dom)
