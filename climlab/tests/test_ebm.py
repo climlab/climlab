@@ -4,19 +4,21 @@ import pytest
 from climlab.tests.xarray_test import to_xarray
 from climlab.utils.legendre import P2
 
+#  Set the current date to match exactly the old definition of "Jan 1" with respect to insolation
+#  This ensures that the numerical test values stay the same
+old_Jan1 = np.datetime64('2025-03-20T09:01') - np.timedelta64(80, 'D')
+
 @pytest.fixture()
 def EBM_seasonal():
     model = climlab.EBM_seasonal(water_depth=10.)
-    # Set the current date to match exactly the old definition of "Jan 1" with respect to insolation
-    #  This ensures that the numerical test values stay the same
-    model.current_time = np.datetime64('2025-03-20T09:01') - np.timedelta64(80, 'D')
+    model.current_time = old_Jan1
     return model
 
 @pytest.fixture()
 def EBM_highobliquity():
     orb_highobl = {'ecc':0., 'obliquity':90., 'long_peri':0.}
     model = climlab.EBM_seasonal(orb=orb_highobl, water_depth=10.)
-    model.current_time = np.datetime64('2025-03-20T09:01') - np.timedelta64(80, 'D')
+    model.current_time = old_Jan1
     return model
 
 @pytest.fixture()
