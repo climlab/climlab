@@ -57,10 +57,11 @@ class GreyRadiationModel(TimeDependentProcess):
                  **kwargs):
         # Check to see if an initial state is already provided
         #  If not, make one
-        if 'state' not in kwargs:
+        if 'state' in kwargs:
+            state = kwargs.pop('state')
+        else:
             state = column_state(num_lev, num_lat, lev, lat, water_depth)
-            kwargs.update({'state': state})
-        super(GreyRadiationModel, self).__init__(timestep=timestep, **kwargs)
+        super(GreyRadiationModel, self).__init__(timestep=timestep, state=state, **kwargs)
         self.param['water_depth'] = water_depth
         self.param['albedo_sfc'] = albedo_sfc
         self.param['Q'] = Q
@@ -74,12 +75,12 @@ class GreyRadiationModel(TimeDependentProcess):
         absorbLW = Field(np.tile(absorbLW, sfc.shape), domain=atm)
         absorbSW = np.zeros_like(absorbLW)
         longwave = GreyGas(state=self.state, absorptivity=absorbLW,
-                             albedo_sfc=0)
+                             albedo_sfc=0, **kwargs)
         shortwave = GreyGasSW(state=self.state, absorptivity=absorbSW,
-                                albedo_sfc=self.param['albedo_sfc'])
+                                albedo_sfc=self.param['albedo_sfc'], **kwargs)
         # sub-model for insolation ... here we just set constant Q
         thisQ = self.param['Q']*np.ones_like(self.Ts)
-        Q = FixedInsolation(S0=thisQ, domains=sfc, **self.param)
+        Q = FixedInsolation(S0=thisQ, domains=sfc, **self.param, **kwargs)
         self.add_subprocess('LW', longwave)
         self.add_subprocess('SW', shortwave)
         self.add_subprocess('insolation', Q)

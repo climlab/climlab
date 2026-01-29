@@ -244,12 +244,12 @@ class EBM(TimeDependentProcess):
                  **kwargs):
         # Check to see if an initial state is already provided
         #  If not, make one
-        if 'state' not in kwargs:
+        if 'state' in kwargs:
+            state = kwargs.pop('state')
+        else:
             state = surface_state(num_lat=num_lat, num_lon=num_lon,
                                   water_depth=water_depth, T0=T0, T2=T2)
-            sfc = state.Ts.domain
-            kwargs.update({'state': state, 'domains':{'sfc':sfc}})
-        super(EBM, self).__init__(timestep=timestep, initial_time=initial_time, **kwargs)
+        super(EBM, self).__init__(timestep=timestep, state=state, initial_time=initial_time, **kwargs)
         sfc = self.Ts.domain
         self.param['S0'] = S0
         self.param['s2'] = s2
