@@ -13,6 +13,9 @@ def model_with_insolation(model):
     insolation = climlab.radiation.DailyInsolation(domains=model.Ts.domain)
     model.add_subprocess('insolation', insolation, verbose=False)
     model.subprocess.SW.flux_from_space = insolation.insolation
+    # Set the current date to match exactly the old definition of "Jan 1" with respect to insolation
+    #  This ensures that the numerical test values stay the same
+    model.current_time = np.datetime64('2025-03-20T09:01') - np.timedelta64(80, 'D')
     return model
 
 @pytest.fixture()
@@ -21,6 +24,9 @@ def rcmodel():
     insolation = climlab.radiation.DailyInsolation(domains=model2.Ts.domain)
     model2.add_subprocess('insolation', insolation, verbose=False)
     model2.subprocess.SW.flux_from_space = insolation.insolation
+    # Set the current date to match exactly the old definition of "Jan 1" with respect to insolation
+    #  This ensures that the numerical test values stay the same
+    model2.current_time = np.datetime64('2025-03-20T09:01') - np.timedelta64(80, 'D')
     return model2
 
 @pytest.fixture()

@@ -10,8 +10,6 @@ def EBM_seasonal():
     # Set the current date to match exactly the old definition of "Jan 1" with respect to insolation
     #  This ensures that the numerical test values stay the same
     model.current_time = np.datetime64('2025-03-20T09:01') - np.timedelta64(80, 'D')
-    ##  NOTE: this is not working because the date is not propagated down to subprocesses!
-    #  Need to rethink the whole issue of time and calendars and syncing across the subprocess tree
     return model
 
 @pytest.fixture()
