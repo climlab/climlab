@@ -27,6 +27,8 @@ def couple(proclist, name='Parent'):
             new_input[key] = all_input[key]
     # The newly created parent process has the minimum timestep
     coupled = TimeDependentProcess(state=new_state, timestep=timestep, name=name)
+    current_time = proclist[0].current_time  # need to synchronize time across processes
+    coupled.current_time = current_time
     warnings.filterwarnings("error", category=ProcNameWarning)  # Warning becomes error
     try:
         for proc in proclist:
@@ -92,13 +94,23 @@ class TimeDependentProcess(Process):
         * ``'days_of_year'``: array which holds the number of numerical steps per year, expressed in days
 
     """
-    def __init__(self, time_type='explicit', timestep=const.seconds_per_day, topdown=True, **kwargs):
+    def __str__(self):
+        str1 = super(TimeDependentProcess, self).__str__()
+        str1 += 'Current time is {}'.format(self.current_time)
+        return str1
+
+    def __init__(self, time_type='explicit', timestep=const.seconds_per_day, 
+                 initial_time=np.datetime64('1970-01-01T00:00'), topdown=True, **kwargs):
         # Create the state dataset
         self.tendencies = {}
         super(TimeDependentProcess, self).__init__(**kwargs)
         for name, var in self.state.items():
             self.tendencies[name] = var * 0.
         self.timeave = {}
+        self.time = {'initial_time': initial_time,
+                     'current_time': initial_time,
+                     'steps': 0,
+                     'active_now': True,}
         self.timestep = timestep
         self.time_type = time_type
         self.topdown = topdown
@@ -117,32 +129,47 @@ class TimeDependentProcess(Process):
         :type: float
 
         """
-        return self.param['timestep']
+        return self.time['timestep']
     @timestep.setter
     def timestep(self, value):
         #  Convert to timedelta64 in seconds if necessary
         if type(value) is not np.timedelta64:
             # assume the value is in seconds
             value = np.timedelta64(int(value), 's')
-        value_as_float = value / np.timedelta64(1, 's')
+        # value_as_float = value / np.timedelta64(1, 's')
         # num_steps_per_year = const.seconds_per_year / value_as_float
-        timestep_days = value_as_float / const.seconds_per_day
+        # timestep_days = value_as_float / const.seconds_per_day
         # days_of_year = np.arange(0., const.days_per_year, timestep_days)
-        self.time = {'timestep': value,
-                    #  'num_steps_per_year': num_steps_per_year,
-                    #  'day_of_year_index': 0,
-                     'steps': 0,
-                     'time_elapsed': np.timedelta64(0, 's'),
-                     'current_time': np.datetime64('1970-01-01T00:00'),
-                    #  'current_time': np.datetime64('2025-03-20T09:01') - np.timedelta64(80, 'D'),
-                    #  'days_elapsed': 0,
-                    #  'years_elapsed': 0,
-                    #  'days_of_year': days_of_year,
-                     'active_now': True}
+        self.time['timestep'] = value
+        # self.time = {'timestep': value,
+        #             #  'num_steps_per_year': num_steps_per_year,
+        #             #  'day_of_year_index': 0,
+        #              'steps': 0,
+        #             #  'time_elapsed': np.timedelta64(0, 's'),
+        #              'initial_time': init_time,
+        #              'current_time': init_time,
+        #             #  'current_time': np.datetime64('2025-03-20T09:01') - np.timedelta64(80, 'D'),
+        #             #  'days_elapsed': 0,
+        #             #  'years_elapsed': 0,
+        #             #  'days_of_year': days_of_year,
+        #              'active_now': True}
         self.param['timestep'] = value
     @property
     def timestep_in_seconds(self):
         return self.timestep / np.timedelta64(1, 's')
+    
+    @property
+    def current_time(self):
+        return self.time['current_time']
+    @current_time.setter
+    def current_time(self, value):
+        self.time['current_time'] = value
+        for name, proc in self.subprocess.items():
+            proc.current_time = value
+
+    @property
+    def elapsed_time(self):
+        return self.current_time - self.time['initial_time']
 
     def set_state(self, name, value):
         super(TimeDependentProcess, self).set_state(name,value)
@@ -355,10 +382,11 @@ class TimeDependentProcess(Process):
         for varname, tend in tenddict.items():
             self.state[varname] += tend * self.timestep_in_seconds
         # Update all time counters for this and all subprocesses in the tree
-        #  Also pass diagnostics up the process tree
+        self.current_time += self.timestep  # setter method synchronizes subprocesses
         for name, proc, level in walk.walk_processes(self, ignoreFlag=True):
             if proc.time['active_now']:
-                proc._update_time()
+                proc.time['steps'] += 1
+                # proc._update_time()
 
     def compute_diagnostics(self, num_iter=3):
         """Compute all tendencies and diagnostics, but don't update model state.
@@ -370,24 +398,24 @@ class TimeDependentProcess(Process):
         for n in range(num_iter):
             ignored = self.compute()
 
-    def _update_time(self):
-        """Increments the timestep counter by one.
+    # def _update_time(self):
+    #     """Increments the timestep counter by one.
 
-        Furthermore ``self.time['days_elapsed']`` and
-        ``self.time['num_steps_per_year']`` are updated.
+    #     Furthermore ``self.time['days_elapsed']`` and
+    #     ``self.time['num_steps_per_year']`` are updated.
 
-        The function is called by the time stepping methods.
+    #     The function is called by the time stepping methods.
 
-        """
-        self.time['steps'] += 1
-        # time in days since beginning
-        # self.time['days_elapsed'] += self.timestep / np.timedelta64(const.seconds_per_day, 's')
-        # if self.time['day_of_year_index'] >= self.time['num_steps_per_year']-1:
-        #     self._do_new_calendar_year()
-        # else:
-        #     self.time['day_of_year_index'] += 1
-        self.time['time_elapsed'] += self.timestep
-        self.time['current_time'] += self.timestep
+    #     """
+    #     self.time['steps'] += 1
+    #     # time in days since beginning
+    #     # self.time['days_elapsed'] += self.timestep / np.timedelta64(const.seconds_per_day, 's')
+    #     # if self.time['day_of_year_index'] >= self.time['num_steps_per_year']-1:
+    #     #     self._do_new_calendar_year()
+    #     # else:
+    #     #     self.time['day_of_year_index'] += 1
+    #     self.time['time_elapsed'] += self.timestep
+    #     self.time['current_time'] += self.timestep
 
     # def _do_new_calendar_year(self):
     #     """This function is called once at the end of every calendar year.
@@ -397,6 +425,12 @@ class TimeDependentProcess(Process):
     #     """
     #     self.time['day_of_year_index'] = 0  # back to Jan. 1
     #     self.time['years_elapsed'] += 1
+
+    # def _synchronize_subprocesses(self):
+    #     """Propagate the current time through the whole subprocess tree"""
+    #     for name, proc, level in walk.walk_processes(self, ignoreFlag=True):
+    #         proc.time['']
+    #         proc.time['current_time'] = self.time['current_time']
 
     def integrate_years(self, years=1.0, verbose=True):
         """Integrates the model by a given number of years.
@@ -466,8 +500,8 @@ class TimeDependentProcess(Process):
                 continue
             self.timeave[varname] /= numsteps
         if verbose:
-            print("Total elapsed time is {} or {:.4f} years.".format(self.time['time_elapsed'],
-                    self.time['time_elapsed']/np.timedelta64(1, 's') / const.seconds_per_year))
+            print("Total elapsed time is {} or {:.4f} years.".format(self.elapsed_time,
+                    self.elapsed_time/np.timedelta64(1, 's') / const.seconds_per_year))
 
     def integrate_days(self, days=1.0, verbose=True):
         """Integrates the model forward for a specified number of days.
@@ -535,5 +569,5 @@ class TimeDependentProcess(Process):
                 value_old = copy.deepcopy(value)
                 self.integrate_years(1,verbose=False)
         if verbose == True:
-            print("Total elapsed time is {} or {:.4f} years.".format(self.time['time_elapsed'],
-                    self.time['time_elapsed']/np.timedelta64(1, 's') / const.seconds_per_year))
+            print("Total elapsed time is {} or {:.4f} years.".format(self.elapsed_time,
+                    self.elapsed_time/np.timedelta64(1, 's') / const.seconds_per_year))
