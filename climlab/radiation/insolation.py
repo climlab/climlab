@@ -561,39 +561,45 @@ class DailyInsolation(AnnualMeanInsolation):
     #     return coszen, irradiance_factor
     
     def _compute_fixed(self):
+        # One full year of current times
+        self._times_in_a_year = np.arange(self.current_time,
+                          self.current_time + np.timedelta64(int(const.seconds_per_year), 's'),
+                          self.timestep)
         try:
-            self._get_current_insolation()
+            coszen, irradiance_factor = daily_insolation_factors(self.lat,
+                                                                dates_to_day_index(self._times_in_a_year),
+                                                                orb=self.orb,
+                                                                weighting=self.weighting)
+            dom = self.domains['default']
+            if 'lon' in dom.axes:
+                #  coszen is latitude-only, need to broadcast across longitude
+                #  assumption is axes are ordered (lat, lon, depth)
+                #  NOTE this is a clunky hack and all this will go away
+                #  when we use xarray structures for these internals
+                coszen = coszen.values
+                coszen = np.tile(coszen[...,np.newaxis], dom.axes['lon'].num_points)
+                irradiance_factor = irradiance_factor.values
+                irradiance_factor = np.tile(irradiance_factor[...,np.newaxis], dom.axes['lon'].num_points)
+            self._coszen_array = coszen
+            self._irradiance_factor_array = irradiance_factor
         except AttributeError:
             pass
 
     def _get_current_insolation(self):
-        coszen, irradiance_factor = daily_insolation_factors(self.lat,
-                                                             dates_to_day_index(self.current_time),
-                                                             orb=self.orb,
-                                                             weighting=self.weighting)
-        # make sure that the diagnostic has the correct field dimensions.
-        dom = self.domains['default']
-        # time_index = self.time['day_of_year_index']   # THIS ONLY WORKS IF self IS THE MASTER PROCESS
-        # coszen = self.coszen_array[..., time_index]
-        # irradiance_factor = self.irradiance_factor_array[..., time_index]
-        if 'lon' in dom.axes:
-            #  coszen is latitude-only, need to broadcast across longitude
-            #  assumption is axes are ordered (lat, lon, depth)
-            #  NOTE this is a clunky hack and all this will go away
-            #  when we use xarray structures for these internals
-            coszen = coszen.values
-            coszen = np.tile(coszen[...,np.newaxis], dom.axes['lon'].num_points)
-            irradiance_factor = irradiance_factor.values
-            irradiance_factor = np.tile(irradiance_factor[...,np.newaxis], dom.axes['lon'].num_points)
-        self.coszen[:] = Field(coszen, domain=dom)
-        self.irradiance_factor[:] = Field(irradiance_factor, domain=dom)
+        now_index = np.where(self._times_in_a_year==self.current_time)[0]
+        if now_index.size==0:
+            self._compute_fixed()  # No matching date, need to start a new calendar year
+            now_index = np.where(self._times_in_a_year==self.current_time)[0]
+        self.coszen[:] = self._coszen_array[:, now_index]
+        self.irradiance_factor[:] = self._irradiance_factor_array[:, now_index]
         self.insolation[:] = self.S0 * self.coszen * self.irradiance_factor
     
     def _compute(self):
         self._get_current_insolation()
         return {}
+    
         
-class InstantInsolation(AnnualMeanInsolation):
+class InstantInsolation(DailyInsolation):
     """A class to compute latitudewise instantaneous solar insolation for specific
     days of the year.
 
@@ -697,6 +703,26 @@ class InstantInsolation(AnnualMeanInsolation):
                insolation: <class 'climlab.radiation.insolation.InstantInsolation'>
 
     """
+    def _compute_fixed(self):
+        # One full year of current times
+        self._times_in_a_year = np.arange(self.current_time,
+                          self.current_time + np.timedelta64(int(const.seconds_per_year), 's'),
+                          self.timestep)
+        try:
+            dom = self.domains['default']
+            if 'lon' in dom.axes:
+                lon = self.lon
+            else:
+                lon = 0.
+            coszen, irradiance_factor = instant_insolation_factors(self.lat,
+                                                                dates_to_day_index(self._times_in_a_year),
+                                                                lon=lon, orb=self.orb)
+            self._coszen_array = coszen
+            self._irradiance_factor_array = irradiance_factor
+        except AttributeError:
+            pass
+
+
     def _get_current_insolation(self):
         # make sure that the diagnostic has the correct field dimensions.
         dom = self.domains['default']
