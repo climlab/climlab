@@ -128,7 +128,7 @@ class TimeDependentProcess(Process):
         """The amount of time over which :func:`step_forward` is integrating in unit seconds.
 
         :getter: Returns the object timestep which is stored in ``self.param['timestep']``.
-        :setter: Sets the timestep to the given input. See also :func:`set_timestep`.
+        :setter: Sets the timestep to the given input.
         :type: float
 
         """
@@ -139,23 +139,7 @@ class TimeDependentProcess(Process):
         if type(value) is not np.timedelta64:
             # assume the value is in seconds
             value = np.timedelta64(int(value), 's')
-        # value_as_float = value / np.timedelta64(1, 's')
-        # num_steps_per_year = const.seconds_per_year / value_as_float
-        # timestep_days = value_as_float / const.seconds_per_day
-        # days_of_year = np.arange(0., const.days_per_year, timestep_days)
         self.time['timestep'] = value
-        # self.time = {'timestep': value,
-        #             #  'num_steps_per_year': num_steps_per_year,
-        #             #  'day_of_year_index': 0,
-        #              'steps': 0,
-        #             #  'time_elapsed': np.timedelta64(0, 's'),
-        #              'initial_time': init_time,
-        #              'current_time': init_time,
-        #             #  'current_time': np.datetime64('2025-03-20T09:01') - np.timedelta64(80, 'D'),
-        #             #  'days_elapsed': 0,
-        #             #  'years_elapsed': 0,
-        #             #  'days_of_year': days_of_year,
-        #              'active_now': True}
         self.param['timestep'] = value
     @property
     def timestep_in_seconds(self):
@@ -178,26 +162,6 @@ class TimeDependentProcess(Process):
         super(TimeDependentProcess, self).set_state(name,value)
         # Make sure that the new state variable is added to the tendencies dict
         self.tendencies[name] = value * 0.
-
-    # def set_timestep(self, timestep=const.seconds_per_day, num_steps_per_year=None):
-    #     """Calculates the timestep in unit seconds
-    #     and calls the setter function of :func:`timestep`
-
-    #     :param float timestep:              the amount of time over which
-    #                                         :func:`step_forward` is integrating
-    #                                         in unit seconds [default: 24*60*60]
-    #     :param float num_steps_per_year:    a number of steps per calendar year
-    #                                         (optional)
-
-    #     If the parameter *num_steps_per_year* is specified and not ``None``,
-    #     the timestep is calculated accordingly and therefore the given input
-    #     parameter *timestep* is ignored.
-
-    #     """
-    #     if num_steps_per_year is not None:
-    #         timestep = const.seconds_per_year / num_steps_per_year
-    #     # Need a more sensible approach for annual cycle stuff
-    #     self.timestep = timestep
 
     def compute(self):
         """Computes the tendencies for all state variables given current state
@@ -313,9 +277,6 @@ class TimeDependentProcess(Process):
                 tenddict = proc.tendencies
             for name, tend in tenddict.items():
                 tendencies[name] += tend
-            # for diagname, value in proc.diagnostics.items():
-            #     #  additive diagnostics...
-            #     self.__setattr__(diagname, value)
         return tendencies
 
     def _compute(self):
@@ -347,8 +308,6 @@ class TimeDependentProcess(Process):
 
         """
         self.process_types = {'diagnostic': [], 'explicit': [], 'implicit': [], 'adjustment': []}
-        #for name, proc, level in walk.walk_processes(self, topdown=self.topdown):
-        #    self.process_types[proc.time_type].append(proc)
         for name, proc in self.subprocess.items():
             self.process_types[proc.time_type].append(proc)
         self.has_process_type_list = True
@@ -401,40 +360,6 @@ class TimeDependentProcess(Process):
         for n in range(num_iter):
             ignored = self.compute()
 
-    # def _update_time(self):
-    #     """Increments the timestep counter by one.
-
-    #     Furthermore ``self.time['days_elapsed']`` and
-    #     ``self.time['num_steps_per_year']`` are updated.
-
-    #     The function is called by the time stepping methods.
-
-    #     """
-    #     self.time['steps'] += 1
-    #     # time in days since beginning
-    #     # self.time['days_elapsed'] += self.timestep / np.timedelta64(const.seconds_per_day, 's')
-    #     # if self.time['day_of_year_index'] >= self.time['num_steps_per_year']-1:
-    #     #     self._do_new_calendar_year()
-    #     # else:
-    #     #     self.time['day_of_year_index'] += 1
-    #     self.time['time_elapsed'] += self.timestep
-    #     self.time['current_time'] += self.timestep
-
-    # def _do_new_calendar_year(self):
-    #     """This function is called once at the end of every calendar year.
-
-    #     It updates ``self.time['years_elapsed']`` and
-    #     ``self.time['day_of_year_index']``
-    #     """
-    #     self.time['day_of_year_index'] = 0  # back to Jan. 1
-    #     self.time['years_elapsed'] += 1
-
-    # def _synchronize_subprocesses(self):
-    #     """Propagate the current time through the whole subprocess tree"""
-    #     for name, proc, level in walk.walk_processes(self, ignoreFlag=True):
-    #         proc.time['']
-    #         proc.time['current_time'] = self.time['current_time']
-
     def integrate_years(self, years=1.0, verbose=True):
         """Integrates the model by a given number of years.
 
@@ -466,8 +391,6 @@ class TimeDependentProcess(Process):
 
 
         """
-        # days = years * const.days_per_year
-        # numsteps = int(self.time['num_steps_per_year'] * years)
         numsteps = int(np.timedelta64(int(const.seconds_per_year), 's') / self.timestep * years)
         if verbose:
             print("Integrating for {} steps or {} years.".format(numsteps, years))

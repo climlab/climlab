@@ -151,14 +151,8 @@ class Process(object):
             self.set_state(name, value)
         # dictionary of model parameters
         self.param = kwargs
-        # dictionary of diagnostic quantities
-        #self.diagnostics = AttrDict()
-        #self._diag_vars = frozenset()
         self._diag_vars = []
-        # dictionary of input quantities
-        #self.input = _make_dict(input, Field)
         if input is None:
-            #self._input_vars = frozenset()
             self._input_vars = []
         else:
             self.add_input(list(input.keys()))
@@ -170,12 +164,6 @@ class Process(object):
         self.subprocess = AttrDict()
         if subprocess is not None:
             self.add_subprocesses(subprocess)
-        #if subprocess is None:
-        #    #self.subprocess = {}
-        #    # a dictionary whose items can be accessed as attributes
-        #    self.subprocess = AttrDict()
-        #else:
-        #    self.add_subprocesses(subprocess)
 
     def add_subprocesses(self, procdict):
         """Adds a dictionary of subproceses to this process.
@@ -484,8 +472,6 @@ class Process(object):
                 >>>  # to access the diagnostic 'icelat' variable !!!
 
         """
-        #_ = self.diagnostics.pop(name)
-        #delattr(type(self), name)
         try:
             delattr(self, name)
             self._diag_vars.remove(name)
@@ -586,8 +572,6 @@ class Process(object):
         diag_dict = {}
         for key in self._diag_vars:
             try:
-                #diag_dict[key] = getattr(self,key)
-                #  using self.__dict__ doesn't count diagnostics defined as properties
                 diag_dict[key] = self.__dict__[key]
             except:
                 pass
