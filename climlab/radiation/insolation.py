@@ -553,13 +553,6 @@ class DailyInsolation(AnnualMeanInsolation):
                insolation: <class 'climlab.radiation.insolation.DailyInsolation'>
 
     """
-    # def _daily_insolation_factor_arrays(self):
-    #     coszen, irradiance_factor = daily_insolation_factors(self.lat,
-    #                                                          dates_to_day_index(self.time['current_time']),
-    #                                                          orb=self.orb,
-    #                                                          weighting=self.weighting)
-    #     return coszen, irradiance_factor
-    
     def _compute_fixed(self):
         # One full year of current times
         self._times_in_a_year = np.arange(self.current_time,
@@ -576,10 +569,9 @@ class DailyInsolation(AnnualMeanInsolation):
                 #  assumption is axes are ordered (lat, lon, depth)
                 #  NOTE this is a clunky hack and all this will go away
                 #  when we use xarray structures for these internals
-                coszen = coszen.values
-                coszen = np.tile(coszen[...,np.newaxis], dom.axes['lon'].num_points)
-                irradiance_factor = irradiance_factor.values
-                irradiance_factor = np.tile(irradiance_factor[...,np.newaxis], dom.axes['lon'].num_points)
+                num_lon = dom.axes['lon'].num_points
+                coszen = np.tile(coszen[...,np.newaxis, :], [1, num_lon, 1])
+                irradiance_factor = np.tile(irradiance_factor[...,np.newaxis, :], [1, num_lon, 1])
             self._coszen_array = coszen
             self._irradiance_factor_array = irradiance_factor
         except AttributeError:
@@ -590,8 +582,8 @@ class DailyInsolation(AnnualMeanInsolation):
         if now_index.size==0:
             self._compute_fixed()  # No matching date, need to start a new calendar year
             now_index = np.where(self._times_in_a_year==self.current_time)[0]
-        self.coszen[:] = self._coszen_array[:, now_index]
-        self.irradiance_factor[:] = self._irradiance_factor_array[:, now_index]
+        self.coszen[:] = self._coszen_array[..., now_index]
+        self.irradiance_factor[:] = self._irradiance_factor_array[..., now_index]
         self.insolation[:] = self.S0 * self.coszen * self.irradiance_factor
     
     def _compute(self):
