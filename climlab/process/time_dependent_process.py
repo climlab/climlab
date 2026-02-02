@@ -53,7 +53,7 @@ class TimeDependentProcess(Process):
     An instance of ``TimeDependentProcess`` is initialized with the following
     arguments *(for detailed information see Object attributes below)*:
 
-    :param float timestep:  specifies the timestep of the object (optional)
+    :param float timestep:  specifies the timestep of the object (in seconds or numpy.timedelta64) [default: 1 day]
     :param str time_type:   how time-dependent-process should be computed
                             [default: 'explicit']
     :param bool topdown:    whether geneterate *process_types* in regular or
@@ -85,13 +85,11 @@ class TimeDependentProcess(Process):
     :ivar dict time:        a collection of all time-related attributes of the process.
                             The dictionary contains following items:
 
-        * ``'timestep'``: see initialization parameter
-        * ``'num_steps_per_year'``: see :func:`set_timestep` and :func:`timestep` for details
-        * ``'day_of_year_index'``: counter how many steps have been integrated in current year
+        * ``'timestep'``: The model timestep as np.timedelta64 object
         * ``'steps'``: counter how many steps have been integrated in total
-        * ``'days_elapsed'``: time counter for days
-        * ``'years_elapsed'``: time counter for years
-        * ``'days_of_year'``: array which holds the number of numerical steps per year, expressed in days
+        * ``'initial_time'``: The initial time when the Process is first created as np.datetime64 object [default: Jan. 1 1970]
+        * ``'current_time'``: The current model time as np.datetime64 object (should be equal to initial_time + steps*timestep)
+        * ``'active_now'``: Boolean that indicates whether the Process is currently active (used for asynchronous coupling)
 
     """
     def __str__(self):
@@ -127,7 +125,7 @@ class TimeDependentProcess(Process):
     def timestep(self):
         """The amount of time over which :func:`step_forward` is integrating in unit seconds.
 
-        :getter: Returns the object timestep which is stored in ``self.param['timestep']``.
+        :getter: Returns the object timestep which is stored in ``self.time['timestep']``.
         :setter: Sets the timestep to the given input.
         :type: float
 
@@ -143,6 +141,7 @@ class TimeDependentProcess(Process):
         self.param['timestep'] = value
     @property
     def timestep_in_seconds(self):
+        """Return a float value representing the timestep in units of seconds"""
         return self.timestep / np.timedelta64(1, 's')
     
     @property
@@ -152,7 +151,7 @@ class TimeDependentProcess(Process):
     def current_time(self, value):
         self.time['current_time'] = value
         for name, proc in self.subprocess.items():
-            proc.current_time = value
+            proc.current_time = value  # Synchronize time across subprocesses
 
     @property
     def elapsed_time(self):
