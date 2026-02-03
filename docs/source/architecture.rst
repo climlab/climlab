@@ -205,6 +205,7 @@ A few more relevant details about time handling:
 * Climlab supports some limited **asynchronous time coupling** of subprocesses. The timesteps of subprocesses must be integer multiples of the parent's timestep.
 * It is possible to change the current time of a process after creation by setting ``mymodel.current_time`` to a valid ``numpy.datetime64`` value.
 * All subprocesses contained within a process must have the same ``current_time`` and this is enforced interally when time is changed.
+* Where the timestep is used in physical formulas (e.g., for calculating changes in state variables), it is converted to a floating point number in units of seconds. This is accessible through ``mymodel.timestep_in_seconds``.
 
 
 
