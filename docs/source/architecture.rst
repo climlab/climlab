@@ -202,8 +202,7 @@ More details can be found in a dictionary ``mymodel.time``.
 A few more relevant details about time handling:
 
 * Climlab uses the Proleptic Gregorian Calendar following `Numpy <https://numpy.org/doc/stable/reference/arrays.datetime.html#datetime64-conventions-and-assumptions>`__.
-* Climlab supports some limited **asynchronous time coupling** of subprocesses. 
-The timesteps of subprocesses must be integer multiples of the parent's timestep.
+* Climlab supports some limited **asynchronous time coupling** of subprocesses. The timesteps of subprocesses must be integer multiples of the parent's timestep.
 * It is possible to change the current time of a process after creation by setting ``mymodel.current_time`` to a valid ``numpy.datetime64`` value.
 * All subprocesses contained within a process must have the same ``current_time`` and this is enforced interally when time is changed.
 
