@@ -150,7 +150,21 @@ Time and time-dependent Processes
 
 .. note::
 
-	Time handling has been significantly updated and improved in climlab v.0.10
+	Time handling has been significantly updated and improved in climlab v.0.10.
+
+	Previous versions of climlab used a very limited and abstract notion of time as repeating annual cycles. 
+	Processes were initialized to a nominal date of January 1, which was defined to be exactly 80 days prior to spring equinox.
+
+	At present only the insolation processes use the dates internally.
+
+	It's possible to restore exact behavior by setting the initial time appropriately, for example:
+
+		.. code-block:: python
+
+			import climlab
+			import numpy as np
+			old_Jan1 = np.datetime64('2025-03-20T09:01') - np.timedelta64(80, 'D')
+			model = climlab.EBM_seasonal(initial_time=old_Jan1)
 
 Most physical processes of interest can be expressed as a time dependence of state variables. 
 The base class :class:`~climlab.process.time_dependent_process.TimeDependentProcess` introduces functionality for
