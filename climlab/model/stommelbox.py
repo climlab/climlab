@@ -32,4 +32,5 @@ param = {'R': 2., 'lam': 1., 'delta': 1., 'timestep':0.01}
 # instantiate the process
 boxmodel = StommelBox(state=state, **param)
 # change the timestep
-boxmodel.set_timestep(num_steps_per_year=1E9)
+# boxmodel.set_timestep(num_steps_per_year=1E9)
+boxmodel.timestep *= 2

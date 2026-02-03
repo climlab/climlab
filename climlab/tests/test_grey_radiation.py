@@ -3,6 +3,9 @@ import climlab
 import pytest
 from climlab.tests.xarray_test import to_xarray
 
+#  Set the current date to match exactly the old definition of "Jan 1" with respect to insolation
+#  This ensures that the numerical test values stay the same
+old_Jan1 = np.datetime64('2025-03-20T09:01') - np.timedelta64(80, 'D')
 
 @pytest.fixture()
 def model():
@@ -13,11 +16,12 @@ def model_with_insolation(model):
     insolation = climlab.radiation.DailyInsolation(domains=model.Ts.domain)
     model.add_subprocess('insolation', insolation, verbose=False)
     model.subprocess.SW.flux_from_space = insolation.insolation
+    model.current_time = old_Jan1
     return model
 
 @pytest.fixture()
 def rcmodel():
-    model2 = climlab.RadiativeConvectiveModel(num_lev=30, num_lat=90)
+    model2 = climlab.RadiativeConvectiveModel(initial_time=old_Jan1, num_lev=30, num_lat=90,)
     insolation = climlab.radiation.DailyInsolation(domains=model2.Ts.domain)
     model2.add_subprocess('insolation', insolation, verbose=False)
     model2.subprocess.SW.flux_from_space = insolation.insolation
