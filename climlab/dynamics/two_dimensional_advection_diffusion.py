@@ -1,3 +1,4 @@
+#  Clarify the spherical geometrical factors in the documented equation
 r"""Two-dimensional advection-diffusion transport for atmospheric tracers.
 
 This module implements transport of atmospheric tracers using a split-operator
@@ -38,7 +39,8 @@ VELOCITY_EPSILON = 1e-20  # Avoid division by zero in timestep calc
 DIFFUSIVITY_EPSILON = 1e-9  # Avoid division by zero in timestep calc
 CFL_ADVECTION = 0.5  # Courant number for advection
 CFL_DIFFUSION = 0.5  # Safety factor for diffusion timestep
-
+### Some of these are not being used currently.
+### Also need to be propertly documented
 
 class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
     r"""Two-dimensional advection-diffusion transport process.
@@ -68,6 +70,8 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         Suffix for diagnostic variable names.
     """
 
+###  Should there be more diagnostics defined? E.g. advective and diffusive fluxes?
+
     # Axis indices for 2D (lat, lev) arrays
     _AXIS_LAT = 0
     _AXIS_LEV = 1
@@ -79,16 +83,17 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
                  U=0.,
                  W=0.,
                  W_sedimentation=0.,
-                 rho=0,
-                 prescribed_flux=0.,
-                 interpolation_order=2,
-                 use_limiters=True,
-                 diagnostic_name_suffix="",
+                 rho=0,  #  Needs documentation. Not currently used.
+                 prescribed_flux=0.,  # to be documented
+                 interpolation_order=2,  # documented above, currently 1 or 2
+                 #  Probably better to have named options like interpolation_order = "linear"
+                 use_limiters=True,   # Minimal documentation above, need to clarify what it actually does
+                 diagnostic_name_suffix="",  # Should this capability be defined in parent process?
                  **kwargs):
         super(TwoDimensionalAdvectionDiffusion, self).__init__(**kwargs)
         for dom in list(self.domains.values()):
-            self._phibounds = np.deg2rad(dom.axes['lat'].bounds)
-            self._latbounds = np.sin(self._phibounds) * const.a
+            self._phibounds = np.deg2rad(dom.axes['lat'].bounds)  # radians
+            self._latbounds = np.sin(self._phibounds) * const.a  # meters
             self._dlatbounds = np.diff(self._latbounds)
             self._levbounds = dom.axes['lev'].bounds *1e2
             self._dlevbounds = np.diff(self._levbounds)
@@ -434,6 +439,8 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         self._dt_advdiff = self.timestep_in_seconds / nsteps
 
 
+###  This needs documentation and testing!
+###  Maybe also to be moved elsewhere
 class ParticleSink(TimeDependentProcess):
     # copied from "ConvectiveAdjustment"
     #Hard Adjustment to a prescribed particle sink.
