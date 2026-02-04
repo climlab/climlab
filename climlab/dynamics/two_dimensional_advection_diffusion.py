@@ -113,7 +113,7 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         self._Wd = W * 0.0 # Kyz diffusion translated to advective velocities.
         self._Utot = U * 0.0 # total advective velocities (U + Ud)
         self._Wtot = W * 0.0 # total advective velocities (W + Wd)
-        self._dt_advdiff = self.timestep
+        self._dt_advdiff = self.timestep_in_seconds
         self.rho = rho
         self.Kyy = Kyy  # Diffusivity in units of [length]**2 / [time]
         self.Kzz = Kzz  # Diffusivity in units of [length]**2 / [time]
@@ -204,7 +204,7 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
 
         tendencies = {}
         for name, value in self.state.items():
-            tendencies[name] = dtracer / self.timestep
+            tendencies[name] = dtracer / self.timestep_in_seconds
 
         massmat = self.M_air * self._tracer
         area = 2*np.pi*const.a**2.0*np.diff(np.sin(self._phibounds))
@@ -222,7 +222,7 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         self._boundary_conditions_tracer()
         self._mixed_diffusion_to_advection()
         self._set_advdiff_dt()
-        for j in range(int(self.timestep / self._dt_advdiff)):
+        for j in range(int(self.timestep_in_seconds / self._dt_advdiff)):
             self._advect_along_axis(self._AXIS_LAT)
             self._advect_along_axis(self._AXIS_LEV)
             self._compute_k_fluxes()
@@ -425,9 +425,9 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
             dzm = 0.5*(dz_b[1:] + dz_b[:-1])
             dtkz = (dzm[None, :]**2/2/(self.Kzz+1e-9)).min()
         fac = 0.5
-        dt = min(dtlat*fac, dtlev*fac, dtkz*fac, dtky*fac, dtkxy*fac, self.timestep)
-        nsteps = np.ceil(self.timestep / dt)
-        self._dt_advdiff = self.timestep / nsteps
+        dt = min(dtlat*fac, dtlev*fac, dtkz*fac, dtky*fac, dtkxy*fac, self.timestep_in_seconds)
+        nsteps = np.ceil(self.timestep_in_seconds / dt)
+        self._dt_advdiff = self.timestep_in_seconds / nsteps
 
 
 class ParticleSink(TimeDependentProcess):
