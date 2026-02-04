@@ -68,20 +68,10 @@ import time, copy
 import numpy as np
 from climlab.domain.field import Field
 from climlab.domain.domain import _Domain, zonal_mean_surface
-from climlab.utils import walk
+from climlab.utils import walk, ProcNameWarning, _make_dict
 from climlab.utils.attrdict import AttrDict
 from climlab.domain.xarray import state_to_xarray
-
-
-def _make_dict(arg, argtype):
-    if arg is None:
-        return {}
-    elif isinstance(arg, dict):
-        return arg
-    elif isinstance(arg, argtype):
-        return {'default': arg}
-    else:
-        raise ValueError('Problem with input type')
+from warnings import warn
 
 
 class Process(object):
@@ -161,14 +151,8 @@ class Process(object):
             self.set_state(name, value)
         # dictionary of model parameters
         self.param = kwargs
-        # dictionary of diagnostic quantities
-        #self.diagnostics = AttrDict()
-        #self._diag_vars = frozenset()
         self._diag_vars = []
-        # dictionary of input quantities
-        #self.input = _make_dict(input, Field)
         if input is None:
-            #self._input_vars = frozenset()
             self._input_vars = []
         else:
             self.add_input(list(input.keys()))
@@ -180,12 +164,6 @@ class Process(object):
         self.subprocess = AttrDict()
         if subprocess is not None:
             self.add_subprocesses(subprocess)
-        #if subprocess is None:
-        #    #self.subprocess = {}
-        #    # a dictionary whose items can be accessed as attributes
-        #    self.subprocess = AttrDict()
-        #else:
-        #    self.add_subprocesses(subprocess)
 
     def add_subprocesses(self, procdict):
         """Adds a dictionary of subproceses to this process.
@@ -208,7 +186,7 @@ class Process(object):
             for name, proc in procdict.items():
                 self.add_subprocess(name, proc)
 
-    def add_subprocess(self, name, proc):
+    def add_subprocess(self, name, proc, verbose=True):
         """Adds a single subprocess to this process.
 
         :param string name:     name of the subprocess
@@ -269,6 +247,9 @@ class Process(object):
 
         """
         if isinstance(proc, Process):
+            if name in self.subprocess and verbose:
+                warn('Process name {} is already in the subprocess dictionary. It is being replaced.'.format(name),
+                    category=ProcNameWarning)
             self.subprocess.update({name: proc})
             self.has_process_type_list = False
             # Add subprocess diagnostics to parent
@@ -323,7 +304,7 @@ class Process(object):
             self.subprocess.pop(name)
         except KeyError:
             if verbose:
-                print('WARNING: {} not found in subprocess dictionary.'.format(name))
+                warn('{} not found in subprocess dictionary.'.format(name))
         self.has_process_type_list = False
 
     def set_state(self, name, value):
@@ -491,13 +472,11 @@ class Process(object):
                 >>>  # to access the diagnostic 'icelat' variable !!!
 
         """
-        #_ = self.diagnostics.pop(name)
-        #delattr(type(self), name)
         try:
             delattr(self, name)
             self._diag_vars.remove(name)
         except:
-            print('No diagnostic named {} was found.'.format(name))
+            warn('No diagnostic named {} was found.'.format(name))
 
     def to_xarray(self, diagnostics=False, timeave=False):
         """ Convert process variables to ``xarray.Dataset`` format.
@@ -593,8 +572,6 @@ class Process(object):
         diag_dict = {}
         for key in self._diag_vars:
             try:
-                #diag_dict[key] = getattr(self,key)
-                #  using self.__dict__ doesn't count diagnostics defined as properties
                 diag_dict[key] = self.__dict__[key]
             except:
                 pass

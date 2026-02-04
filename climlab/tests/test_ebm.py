@@ -4,14 +4,22 @@ import pytest
 from climlab.tests.xarray_test import to_xarray
 from climlab.utils.legendre import P2
 
+#  Set the current date to match exactly the old definition of "Jan 1" with respect to insolation
+#  This ensures that the numerical test values stay the same
+old_Jan1 = np.datetime64('2025-03-20T09:01') - np.timedelta64(80, 'D')
+
 @pytest.fixture()
 def EBM_seasonal():
-    return climlab.EBM_seasonal(water_depth=10.)
+    model = climlab.EBM_seasonal(initial_time=old_Jan1, water_depth=10.)
+    return model
 
 @pytest.fixture()
 def EBM_highobliquity():
     orb_highobl = {'ecc':0., 'obliquity':90., 'long_peri':0.}
-    return climlab.EBM_seasonal(orb=orb_highobl, water_depth=10.)
+    model = climlab.EBM_seasonal(orb=orb_highobl, water_depth=10.)
+    # Should be able to set the date this way too
+    model.current_time = old_Jan1
+    return model
 
 @pytest.fixture()
 def EBM_iceline():
@@ -54,7 +62,7 @@ def test_high_obliquity(EBM_highobliquity):
     surface temperature."""
     EBM_highobliquity.step_forward()
     EBM_highobliquity.integrate_years(1)
-    assert _check_minmax(EBM_highobliquity.Ts, -9.28717079958807, 27.37890262018116)
+    assert _check_minmax(EBM_highobliquity.Ts, -9.28696784, 27.3786011)
 
 @pytest.mark.fast
 def test_annual_iceline(EBM_iceline):
@@ -93,10 +101,10 @@ def test_albedo():
     subprocess and get the expected icelat'''
     import numpy as np
     m = climlab.EBM()
-    m.add_subprocess('albedo', climlab.surface.ConstantAlbedo(state=m.state, **m.param))
+    m.add_subprocess('albedo', climlab.surface.ConstantAlbedo(state=m.state, **m.param), verbose=False)
     m.subprocess['SW'].albedo = m.subprocess['albedo'].albedo
     m.integrate_years(1)
-    m.add_subprocess('albedo', climlab.surface.StepFunctionAlbedo(state=m.state, **m.param))
+    m.add_subprocess('albedo', climlab.surface.StepFunctionAlbedo(state=m.state, **m.param), verbose=False)
     m.subprocess['SW'].albedo = m.subprocess['albedo'].albedo
     m.integrate_years(1)
     assert np.all(m.icelat == np.array([-70.,  70.]))

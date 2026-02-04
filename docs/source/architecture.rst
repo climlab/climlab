@@ -145,15 +145,88 @@ in the parent process is not meaningful, it can safely be ignored.
 Diagnostics produced by individual subprocesses are never overwritten. 
 
 
-Process Integration over time
-#############################
+Time and time-dependent Processes
+#################################
 
-A :class:`~climlab.process.time_dependent_process.TimeDependentProcess` can be integrated over time to see how the state variables and other diagnostic variables vary in time.
+.. note::
 
-Time Dependency of a State Variable
+	Time handling has been significantly updated and improved in climlab v.0.10.
+
+	Previous versions of climlab used a very limited and abstract notion of time as repeating annual cycles. 
+	Processes were initialized to a nominal date of January 1, which was defined to be exactly 80 days prior to spring equinox.
+
+	At present only the insolation processes use the dates internally.
+
+	It's possible to restore exact behavior by setting the initial time appropriately, for example:
+
+		.. code-block:: python
+
+			import climlab
+			import numpy as np
+			old_Jan1 = np.datetime64('2025-03-20T09:01') - np.timedelta64(80, 'D')
+			model = climlab.EBM_seasonal(initial_time=old_Jan1)
+
+Most physical processes of interest can be expressed as a time dependence of state variables. 
+The base class :class:`~climlab.process.time_dependent_process.TimeDependentProcess` introduces functionality for
+time handling and numerical time integration to see how the state variables and diagnostic quantities evolve.
+
+
+Time Handling and Time Units in climlab
+---------------------------------------
+
+Climlab represents dates, times, and time intervals using 
+`Numpy datetime64 and timedelta64 <https://numpy.org/doc/stable/reference/arrays.datetime.html>`__ objects.
+Every instance of :class:`~climlab.process.time_dependent_process.TimeDependentProcess` and its subclasses 
+include two key time-related properties:
+
+* The current date and time (as ``numpy.datetime64`` and accessible as ``mymodel.current_time``)
+* The timestep (as ``numpy.timedelta64`` and accessible as ``mymodel.timestep``)
+
+The current time advances by exactly one ``timestep`` unit every time the ``.step_forward()`` method is called.
+
+More details can be found in a dictionary ``mymodel.time``.
+
+:Example: Create an Energy Balance Model and inspect its time dictionary:
+
+		.. code-block:: python
+
+			import climlab
+			mymodel = climlab.EBM_seasonal()
+			mymodel.time
+
+	This produces something like
+
+		.. code-block:: python
+
+			{'initial_time': np.datetime64('1970-01-01T00:00'),
+ 			'current_time': np.datetime64('1970-01-01T00:00'),
+ 			'steps': 0,
+ 			'active_now': True,
+ 			'timestep': np.timedelta64(350632,'s')}
+
+	Both the initial time and timestep can be provided at model creation like this:
+
+		.. code-block:: python
+
+			import climlab
+			mymodel = climlab.EBM_seasonal(timestep=3600, initial_time=np.datetime64('2025-01-01'))
+
+	where ``timestep`` can either be given in seconds or as a ``numpy.timedelta64`` object.
+
+A few more relevant details about time handling:
+
+* Climlab uses the Proleptic Gregorian Calendar following `Numpy <https://numpy.org/doc/stable/reference/arrays.datetime.html#datetime64-conventions-and-assumptions>`__.
+* Climlab supports some limited **asynchronous time coupling** of subprocesses. The timesteps of subprocesses must be integer multiples of the parent's timestep.
+* It is possible to change the current time of a process after creation by setting ``mymodel.current_time`` to a valid ``numpy.datetime64`` value.
+* All subprocesses contained within a process must have the same ``current_time`` and this is enforced interally when time is changed.
+* Where the timestep is used in physical formulas (e.g., for calculating changes in state variables), it is converted to a floating point number in units of seconds. This is accessible through ``mymodel.timestep_in_seconds``.
+
+
+
+Time Dependence of a State Variable
 -----------------------------------
 
-For a state variable :math:`S` which is dependendet on processes :math:`P_A`, :math:`P_B`, ... the time dependency can be written as
+For a state variable :math:`S` which is dependent on processes :math:`P_A`, :math:`P_B`, ... the time dependency can be written as
 
 .. math::
 
@@ -180,7 +253,7 @@ and the new state of :math:`S` after one timestep :math:`\Delta t` is then:
 
 Therefore, the new state of :math:`S` is calculated by multiplying the process tendencies of :math:`S` with the timestep and adding them up to the previous state of :math:`S`.
 
-Time Dependency of an Energy Budget
+Time Dependence of an Energy Budget
 -----------------------------------
 
 The time dependency of an EBM energy budget is very similar to the above noted equations, just differing in a heat capacity factor :math:`C`. The state variable is temperature :math:`T` in this case, which is altered by subprocesses :math:`SP_A`, :math:`SP_B`, ...

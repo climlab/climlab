@@ -238,17 +238,18 @@ class EBM(TimeDependentProcess):
                  a2=0.078,
                  ai=0.62,
                  timestep=const.seconds_per_year/90.,
+                 initial_time=np.datetime64('1970-01-01T00:00'),
                  T0 = 12.,  # initial temperature parameters
                  T2 = -40.,  #  (2nd Legendre polynomial)
                  **kwargs):
         # Check to see if an initial state is already provided
         #  If not, make one
-        if 'state' not in kwargs:
+        if 'state' in kwargs:
+            state = kwargs.pop('state')
+        else:
             state = surface_state(num_lat=num_lat, num_lon=num_lon,
                                   water_depth=water_depth, T0=T0, T2=T2)
-            sfc = state.Ts.domain
-            kwargs.update({'state': state, 'domains':{'sfc':sfc}})
-        super(EBM, self).__init__(timestep=timestep, **kwargs)
+        super(EBM, self).__init__(timestep=timestep, state=state, initial_time=initial_time, **kwargs)
         sfc = self.Ts.domain
         self.param['S0'] = S0
         self.param['s2'] = s2
@@ -261,14 +262,15 @@ class EBM(TimeDependentProcess):
         self.param['a2'] = a2
         self.param['ai'] = ai
         # create sub-models
-        lw = AplusBT(state=self.state, **self.param)
-        ins = P2Insolation(domains=sfc, **self.param)
-        alb = albedo.StepFunctionAlbedo(state=self.state, **self.param)
+        lw = AplusBT(state=self.state, initial_time=initial_time, **self.param)
+        ins = P2Insolation(domains=sfc, initial_time=initial_time, **self.param)
+        alb = albedo.StepFunctionAlbedo(state=self.state, initial_time=initial_time, **self.param)
         sw = SimpleAbsorbedShortwave(state=self.state,
                                      insolation=ins.insolation,
                                      albedo=alb.albedo,
+                                     initial_time=initial_time, 
                                      **self.param)
-        diff = MeridionalHeatDiffusion(state=self.state, use_banded_solver=False, **self.param)
+        diff = MeridionalHeatDiffusion(state=self.state, use_banded_solver=False, initial_time=initial_time, **self.param)
         self.add_subprocess('LW', lw)
         self.add_subprocess('insolation', ins)
         self.add_subprocess('albedo', alb)
@@ -286,7 +288,7 @@ class EBM(TimeDependentProcess):
         self.subprocess['insolation'].S0 = value
 
     def _compute(self):
-        self.net_radiation = self.subprocess['SW'].ASR - self.subprocess['LW'].OLR
+        self.net_radiation[:] = self.subprocess['SW'].ASR - self.subprocess['LW'].OLR
         return super(EBM, self)._compute()
 
     def global_mean_temperature(self):
@@ -336,19 +338,6 @@ class EBM(TimeDependentProcess):
         return (1E-15 * 2 * pi * const.a**2 *
                 integrate.cumulative_trapezoid(np.cos(phi)*energy_in, x=phi, initial=0.))
 
-    # def heat_transport(self):
-    #     """Returns instantaneous heat transport in unit :math:`\\textrm{PW}`
-    #     on the staggered grid (bounds) through calling
-    #     :func:`diffusive_heat_transport`.
-    #
-    #     :Example:
-    #
-    #         .. plot:: code_input_manual/example_EBM_heat_transport.py
-    #             :include-source:
-    #
-    #     """
-    #     return self.diffusive_heat_transport()
-    #
     def diffusive_heat_transport(self):
         """Compute instantaneous diffusive heat transport in unit :math:`\\textrm{PW}`
         on the staggered grid (bounds) through calculating:
@@ -371,30 +360,6 @@ class EBM(TimeDependentProcess):
         dTdphi = np.append(dTdphi, 0.)
         dTdphi = np.insert(dTdphi, 0, 0.)
         return (1E-15*-2*pi*np.cos(phi_stag)*const.a**2*D*dTdphi)
-
-    # def heat_transport_convergence(self):
-    #     """Returns instantaneous convergence of heat transport.
-    #
-    #     .. math::
-    #
-    #         h(\\varphi) = - \\frac{1}{2 \pi R^2 cos(\\varphi)} \\frac{dH}{d\\varphi}
-    #                     \\approx - \\frac{1}{2 \pi R^2 cos(\\varphi)} \\frac{\Delta H}{\Delta \\varphi}
-    #
-    #     h is the *dynamical heating rate* in unit :math:`\\textrm{W}/ \\textrm{m}^2`
-    #     which is the convergence of energy transport into each latitude band,
-    #     namely the difference between what's coming in and what's going out.
-    #
-    #     :Example:
-    #
-    #         .. plot:: code_input_manual/example_EBM_heat_transport_convergence.py
-    #             :include-source:
-    #
-    #     """
-    #     phi = np.deg2rad(self.lat)
-    #     phi_stag = np.deg2rad(self.lat_bounds)
-    #     H = 1.E15*self.heat_transport()
-    #     return (-1./(2*pi*const.a**2*np.cos(phi)) *
-    #             np.diff(H)/np.diff(phi_stag))
 
 
 class EBM_seasonal(EBM):
@@ -467,22 +432,23 @@ class EBM_seasonal(EBM):
         self.param['a0'] = a0
         self.param['a2'] = a2
         sfc = self.domains['Ts']
-        ins = DailyInsolation(domains=sfc, **self.param)
+        ins = DailyInsolation(domains=sfc, initial_time=self.time['initial_time'], **self.param)
         if no_albedo_feedback:
             # Remove unused parameters here for clarity
             _ = self.param.pop('ai')
             _ = self.param.pop('Tf')
-            alb = albedo.P2Albedo(domains=sfc, **self.param)
+            alb = albedo.P2Albedo(domains=sfc, initial_time=self.time['initial_time'], **self.param)
         else:
             self.param['ai'] = ai
-            alb = albedo.StepFunctionAlbedo(state=self.state, **self.param)
+            alb = albedo.StepFunctionAlbedo(state=self.state, initial_time=self.time['initial_time'], **self.param)
         sw = SimpleAbsorbedShortwave(state=self.state,
                                      insolation=ins.insolation,
                                      albedo=alb.albedo,
+                                     initial_time=self.time['initial_time'],
                                      **self.param)
-        self.add_subprocess('insolation', ins)
-        self.add_subprocess('albedo', alb)
-        self.add_subprocess('SW', sw)
+        self.add_subprocess('insolation', ins, verbose=False)
+        self.add_subprocess('albedo', alb, verbose=False)
+        self.add_subprocess('SW', sw, verbose=False)
 
 
 class EBM_annual(EBM_seasonal):
@@ -535,8 +501,8 @@ class EBM_annual(EBM_seasonal):
         """
         super(EBM_annual, self).__init__(**kwargs)
         sfc = self.domains['Ts']
-        ins = AnnualMeanInsolation(domains=sfc, **self.param)
-        self.add_subprocess('insolation', ins)
+        ins = AnnualMeanInsolation(domains=sfc, initial_time=self.time['initial_time'], **self.param)
+        self.add_subprocess('insolation', ins, verbose=False)
         self.subprocess['SW'].insolation = ins.insolation
 
 # an EBM that computes degree-days has an additional state variable.

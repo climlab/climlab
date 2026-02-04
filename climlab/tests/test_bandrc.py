@@ -18,7 +18,7 @@ def diffmodel():
     '''
     diffmodel = climlab.BandRCModel(num_lev=30, num_lat=90)
     insolation = climlab.radiation.AnnualMeanInsolation(domains=diffmodel.Ts.domain)
-    diffmodel.add_subprocess('insolation', insolation)
+    diffmodel.add_subprocess('insolation', insolation, verbose=False)
     diffmodel.subprocess.SW.flux_from_space = insolation.insolation
     # thermal diffusivity in W/m**2/degC
     D = 0.05
