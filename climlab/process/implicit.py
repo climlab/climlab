@@ -3,7 +3,7 @@ import numpy as np
 
 
 class ImplicitProcess(TimeDependentProcess):
-    """A parent class for modules that use implicit time discretization.
+    r"""A parent class for modules that use implicit time discretization.
 
     During initialization following attributes are intitialized:
 
@@ -21,7 +21,7 @@ class ImplicitProcess(TimeDependentProcess):
         self.adjustment = {}
 
     def _compute(self):
-        """Computes the state variable tendencies in time for implicit processes.
+        r"""Computes the state variable tendencies in time for implicit processes.
 
         To calculate the new state the :func:`_implicit_solver()` method is
         called for daughter classes. This however returns the new state of the

@@ -1,4 +1,4 @@
-'''
+r'''
 This package contains ready-made models that can be run "off-the-shelf".
 
     :Example:

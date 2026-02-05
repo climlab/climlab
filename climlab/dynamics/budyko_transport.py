@@ -49,7 +49,7 @@ class BudykoTransport(EnergyBudget):
     @property
     def b(self):
         r"""the budyko transport parameter in unit
-        :math:`\\frac{\\textrm{W}}{\\textrm{m}^2 \\textrm{K}}`
+        :math:`\frac{\textrm{W}}{\textrm{m}^2 \textrm{K}}`
 
         :getter: returns the budyko transport parameter
         :setter: sets the budyko transport parameter

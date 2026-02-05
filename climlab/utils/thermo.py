@@ -43,10 +43,9 @@ def clausius_clapeyron(T):
     Input: T is temperature in Kelvin
     Output: saturation vapor pressure in mb or hPa
 
-    Formula from Rogers and Yau "A Short Course in Cloud Physics" (Pergammon Press), p. 16
+    Formula from :cite:t:`Rogers_1989`, p. 16
     claimed to be accurate to within 0.1% between -30degC and 35 degC
-    Based on the paper by Bolton (1980, Monthly Weather Review).
-
+    Based on the paper by :cite:t:`Bolton_1980`.
     """
     Tcel = T - tempCtoK
     es = 6.112 * exp(17.67*Tcel/(Tcel+243.5))
@@ -108,7 +107,7 @@ def pseudoadiabat(T,p):
     The pseudoadiabat describes changes in temperature and pressure for an air
     parcel at saturation assuming instantaneous rain-out of the super-saturated water
 
-    Formula consistent with eq. (2.33) from Raymond Pierrehumbert, "Principles of Planetary Climate"
+    Formula consistent with eq. (2.33) of :cite:t:`Pierrehumbert_2010`
     which nominally accounts for non-dilute effects, but computes the derivative
     dT/dpa, where pa is the partial pressure of the non-condensible gas.
 
@@ -132,16 +131,16 @@ def lifting_condensation_level(T, RH):
 
     This is height (relative to parcel height) at which the parcel would become saturated during adiabatic ascent.
 
-    Based on approximate formula from Bolton (1980 MWR) as given by Romps (2017 JAS)
+    Based on approximate formula from :cite:t:`Bolton_1980` as given by :cite:t:`Romps_2017`.
 
-    For an exact formula see Romps (2017 JAS), doi:10.1175/JAS-D-17-0102.1
+    For an exact formula see :cite:t:`Romps_2017`.
     '''
     Tadj = T-55.  # in Kelvin
     return cp/g*(Tadj - (1/Tadj - log(RH)/2840.)**(-1))
 
 def estimated_inversion_strength(T0,T700):
     '''Compute the Estimated Inversion Strength or EIS,
-    following Wood and Bretherton (2006, J. Climate)
+    following :cite:t:`Wood_2006`.
 
     Inputs: T0 is surface temp in Kelvin
            T700 is air temperature at 700 hPa in Kelvin
@@ -179,7 +178,7 @@ def Planck_frequency(nu, T):
     nu is frequency in 1/s
     T is temperature in Kelvin
 
-    Formula (3.1) from Raymond Pierrehumbert, "Principles of Planetary Climate"
+    Formula (3.1) from :cite:t:`Pierrehumbert_2010`
     '''
     return 2*hPlanck*nu**3/c_light**2/(exp(hPlanck*nu/kBoltzmann/T)-1)
 
@@ -189,7 +188,7 @@ def Planck_wavenumber(n, T):
     n is wavenumber in 1/cm
     T is temperature in Kelvin
 
-    Formula from Raymond Pierrehumbert, "Principles of Planetary Climate", page 140.
+    Formula from :cite:t:`Pierrehumbert_2010`, page 140.
     '''
     # convert to mks units
     n = n*100.
@@ -201,7 +200,7 @@ def Planck_wavelength(l, T):
     l is wavelength in meters
     T is temperature in Kelvin
 
-    Formula (3.3) from Raymond Pierrehumbert, "Principles of Planetary Climate"
+    Formula (3.3) from :cite:t:`Pierrehumbert_2010`
     '''
     u = hPlanck*c_light/l/kBoltzmann/T
     return 2*kBoltzmann**5*T**5/hPlanck**4/c_light**3*u**5/(exp(u)-1)

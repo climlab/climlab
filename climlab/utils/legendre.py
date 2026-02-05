@@ -67,7 +67,7 @@ def P0( x ):
     return 1.
 
 def P1( x ):
-    """
+    r"""
     .. math::
         P_1 (x) = 1
 
@@ -75,13 +75,12 @@ def P1( x ):
     return x
 
 def P2( x ):
-    """The second Legendre polynomial.
+    r"""The second Legendre polynomial.
 
     .. math::
-        P_2(x) = \\frac{1}{2} (3x^2 - 1)
+        P_2(x) = \frac{1}{2} (3x^2 - 1)
 
     """
-    '''The second Legendre polynomial.'''
     return (3. * x**2 - 1. ) / 2.
 
 def P3( x ):

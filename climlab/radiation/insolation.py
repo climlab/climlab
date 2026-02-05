@@ -1,4 +1,4 @@
-"""
+r"""
 Classes to provide insolation as input for other CLIMLAB processes.
 
 Options include
@@ -14,7 +14,7 @@ and do not add any tendencies to any state variables.
 
 At least three diagnostics are provided:
 
-- ``insolation``, the incoming solar radiation in :math:`\\frac{\\textrm{W}}{\\textrm{m}^2}`
+- ``insolation``, the incoming solar radiation in :math:`\frac{\textrm{W}}{\textrm{m}^2}`
 - ``coszen``, cosine of the solar zenith angle (dimensionless)
 - ``irradiance_factor``, ratio of current total irradiance to its annual average, i.e. solar constant (dimensionless)
 """
@@ -41,7 +41,7 @@ from climlab.solar.insolation import daily_insolation_factors, instant_insolatio
 
 
 class _Insolation(DiagnosticProcess):
-    """A private parent class for insolation processes.
+    r"""A private parent class for insolation processes.
 
     Calling compute() will update self.insolation with current values.
 
@@ -50,11 +50,11 @@ class _Insolation(DiagnosticProcess):
     An instance of ``_Insolation`` is initialized with the following
     arguments *(for detailed information see Object attributes below)*:
 
-    :param float S0:        solar constant                              \n
-                            - unit: :math:`\\frac{\\textrm{W}}{\\textrm{m}^2}`   \n
+    :param float S0:        solar constant                             
+                            - unit: :math:`\frac{\textrm{W}}{\textrm{m}^2}`  
                             - default value: ``1365.2``
 
-    **Object attributes** \n
+    **Object attributes** 
 
     Additional to the parent class :class:`~climlab.process.diagnostic.DiagnosticProcess`
     following object attributes are generated and updated during initialization:
@@ -96,7 +96,7 @@ class _Insolation(DiagnosticProcess):
 
     @property
     def S0(self):
-        """Property of solar constant S0.
+        r"""Property of solar constant S0.
 
         The parameter S0 is stored using a python property and can be changed through
         ``self.S0 = newvalue`` which will also update the parameter dictionary.
@@ -135,15 +135,15 @@ class _Insolation(DiagnosticProcess):
 
 
 class FixedInsolation(_Insolation):
-    """A class for fixed insolation at each point of latitude of the domain.
+    r"""A class for fixed insolation at each point of latitude of the domain.
 
     The solar distribution for the whole domain is constant and specified by
     a parameter.
 
-    **Initialization parameters** \n
+    **Initialization parameters** 
 
-    :param float S0:        solar constant                              \n
-                            - unit: :math:`\\frac{\\textrm{W}}{\\textrm{m}^2}`   \n
+    :param float S0:        solar constant                             
+                            - unit: :math:`\frac{\textrm{W}}{\textrm{m}^2}`  
                             - default value: ``const.S0/4 = 341.2``
 
     :Example:
@@ -209,24 +209,24 @@ class _SteadyInsolation(_Insolation):
     
 
 class P2Insolation(_SteadyInsolation):
-    """A class for parabolic solar distribution over the domain's latitude
+    r"""A class for parabolic solar distribution over the domain's latitude
     on the basis of the second order Legendre Polynomial.
 
     Calculates the latitude dependent solar distribution as
 
     .. math::
 
-        S(\\varphi) = \\frac{S_0}{4} \\left( 1 + s_2 P_2(x) \\right)
+        S(\varphi) = \frac{S_0}{4} \left( 1 + s_2 P_2(x) \right)
 
-    where :math:`P_2(x) = \\frac{1}{2} (3x^2 - 1)` is the second order Legendre Polynomial
-    and :math:`x=sin(\\varphi)`.
+    where :math:`P_2(x) = \frac{1}{2} (3x^2 - 1)` is the second order Legendre Polynomial
+    and :math:`x=sin(\varphi)`.
 
-    **Initialization parameters** \n
+    **Initialization parameters**
 
-    :param float S0:        solar constant                              \n
-                            - unit: :math:`\\frac{\\textrm{W}}{\\textrm{m}^2}`   \n
+    :param float S0:        solar constant                           
+                            - unit: :math:`\frac{\textrm{W}}{\textrm{m}^2}`
                             - default value: ``1365.2``
-    :param floar s2:        factor for second legendre polynominal term \n
+    :param floar s2:        factor for second legendre polynominal term
                             - default value: ``-0.48``
 
     :Example:
@@ -255,13 +255,13 @@ class P2Insolation(_SteadyInsolation):
 
     @property
     def s2(self):
-        """Property of second legendre polynomial factor s2.
+        r"""Property of second legendre polynomial factor s2.
 
         s2 in following equation:
 
         .. math::
 
-            S(\\varphi) = \\frac{S_0}{4} \\left( 1 + s_2 P_2(x) \\right)
+            S(\varphi) = \frac{S_0}{4} \left( 1 + s_2 P_2(x) \right)
 
         :getter:    Returns the s2 parameter which is stored in attribute ``self._s2``.
         :setter:    * sets s2 which is addressed as ``self._S0`` to the new value
@@ -285,7 +285,7 @@ class P2Insolation(_SteadyInsolation):
 #  and astronomical formulas
 
 class AnnualMeanInsolation(_SteadyInsolation):
-    """A class for latitudewise solar insolation averaged over a year.
+    r"""A class for latitudewise solar insolation averaged over a year.
 
     This class computes the daily-mean solar insolation for each day of the year and
     latitude specified in the domain on the basis of orbital parameters and
@@ -306,7 +306,7 @@ class AnnualMeanInsolation(_SteadyInsolation):
     **Initialization parameters** \n
 
     :param float ``S0``:    solar constant                                       \n
-                        - unit: :math:`\\frac{\\textrm{W}}{\\textrm{m}^2}`   \n
+                        - unit: :math:`\frac{\textrm{W}}{\textrm{m}^2}`   \n
                         - default value: ``1365.2``
 
     :param dict ``orb``:    a dictionary with three orbital parameters (as provided by
@@ -413,7 +413,7 @@ class AnnualMeanInsolation(_SteadyInsolation):
     
     @property
     def orb(self):
-        """Property of dictionary for orbital parameters.
+        r"""Property of dictionary for orbital parameters.
 
         orb contains: (for more information see :class:`~climlab.solar.orbital.OrbitalTable`)
 
@@ -441,7 +441,7 @@ class AnnualMeanInsolation(_SteadyInsolation):
 
 
 class DailyInsolation(AnnualMeanInsolation):
-    """A class to compute latitudewise daily average solar insolation for specific
+    r"""A class to compute latitudewise daily average solar insolation for specific
     days of the year.
 
     This class computes the solar insolation on basis of orbital parameters and
@@ -455,10 +455,10 @@ class DailyInsolation(AnnualMeanInsolation):
     ``weighting`` argument. See :func:`~climlab.solar.insolation.daily_insolation_factors`
     for more details.
 
-    **Initialization parameters** \n
+    **Initialization parameters**
 
-    :param float S0:    solar constant                              \n
-                        - unit: :math:`\\frac{\\textrm{W}}{\\textrm{m}^2}`   \n
+    :param float S0:    solar constant                           
+                        - unit: :math:`\frac{\textrm{W}}{\textrm{m}^2}` 
                         - default value: ``1365.2``
 
     :param dict orb:    a dictionary with orbital parameters:
@@ -592,7 +592,7 @@ class DailyInsolation(AnnualMeanInsolation):
     
         
 class InstantInsolation(DailyInsolation):
-    """A class to compute latitudewise instantaneous solar insolation for specific
+    r"""A class to compute latitudewise instantaneous solar insolation for specific
     days of the year.
 
     This class computes the solar insolation on basis of orbital parameters and
@@ -602,10 +602,10 @@ class InstantInsolation(DailyInsolation):
     For details how the solar distribution is dependend on orbital parameters
     see there.
 
-    **Initialization parameters** \n
+    **Initialization parameters**
 
-    :param float S0:    solar constant                              \n
-                        - unit: :math:`\\frac{\\textrm{W}}{\\textrm{m}^2}`   \n
+    :param float S0:    solar constant                            
+                        - unit: :math:`\frac{\textrm{W}}{\textrm{m}^2}`
                         - default value: ``1365.2``
 
     :param dict orb:    a dictionary with orbital parameters:

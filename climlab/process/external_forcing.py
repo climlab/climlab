@@ -1,7 +1,7 @@
 from .time_dependent_process import TimeDependentProcess
 
 class ExternalForcing(TimeDependentProcess):
-    """A Process class for user-defined tendencies of state variables.
+    r"""A Process class for user-defined tendencies of state variables.
     Useful for combining some prescribed external forcing with an interactive model.
 
     :Example:

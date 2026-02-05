@@ -1,4 +1,4 @@
-'''
+r'''
 climlab wrappers for the NCAR CAM3 radiation code
 
 Input arguments and diagnostics follow specifications in

@@ -1,4 +1,4 @@
-"""This module contains general-purpose routines for computing
+r"""This module contains general-purpose routines for computing
 daily-average incoming solar radiation at the top of the atmosphere.
 
     :Example:
@@ -75,7 +75,7 @@ def _compute_solar_angles(lat, day, orb, lon=None, day_type=1, days_per_year=con
 def daily_insolation_factors(lat, day, orb=const.orb_present, 
                      day_type=1, days_per_year=const.days_per_year,
                      weighting='time'):
-    """
+    r"""
     Compute daily average cosine of solar zenith angle and irradiance factor
     given latitude, time of year and orbital parameters. Multiple zenith angle
     averaging methods are supported.
@@ -130,7 +130,7 @@ def daily_insolation_factors(lat, day, orb=const.orb_present,
 
 def instant_insolation_factors(lat, day, lon=0., orb=const.orb_present, 
                         day_type=1, days_per_year=const.days_per_year):
-    """
+    r"""
     Compute instantaneous cosine of solar zenith angle and irradiance factor
     given latitude, longitude, time of year and orbital parameters.
 
@@ -166,7 +166,7 @@ def instant_insolation_factors(lat, day, lon=0., orb=const.orb_present,
 def daily_insolation(lat, day, orb=const.orb_present, S0=const.S0, 
                      day_type=1, days_per_year=const.days_per_year,
                      ):
-    """Compute daily average insolation given latitude, time of year and orbital parameters.
+    r"""Compute daily average insolation given latitude, time of year and orbital parameters.
 
     Orbital parameters can be interpolated to any time in the last 5 Myears with
     ``climlab.solar.orbital.OrbitalTable`` (see example above).
@@ -202,7 +202,7 @@ def daily_insolation(lat, day, orb=const.orb_present, S0=const.S0,
                                 * default value: ``23.446``
 
     :param float S0:        solar constant                                  \n
-                            - unit: :math:`\\textrm{W}/\\textrm{m}^2`       \n
+                            - unit: :math:`textrm{W}/\textrm{m}^2`       \n
                             - default value: ``1365.2``
     :param int day_type:    Convention for specifying time of year (+/- 1,2) [optional].
 
@@ -220,7 +220,7 @@ def daily_insolation(lat, day, orb=const.orb_present, S0=const.S0,
     :raises: :exc:`ValueError`
                             if day_type is neither 1 nor 2
     :returns:               Daily average solar radiation in unit
-                            :math:`\\textrm{W}/\\textrm{m}^2`.
+                            :math:`\textrm{W}/\textrm{m}^2`.
 
                             Dimensions of output are ``(lat.size, day.size, ecc.size)``
     :rtype:                 array
@@ -251,9 +251,9 @@ def daily_insolation(lat, day, orb=const.orb_present, S0=const.S0,
     return Fsw
 
 def _solar_distance_Berger(ecc, lambda_long, long_peri):
-    """Earth-Sun distance relative to its reference value at which the solar constant is measured.
+    r"""Earth-Sun distance relative to its reference value at which the solar constant is measured.
 
-    See Berger (JAS 1978), unnumbered equation on page 2367.
+    See :cite:t:`Berger_1978`, unnumbered equation on page 2367.
     
     Inputs:
 
@@ -268,7 +268,7 @@ def _compute_insolation(S0, irradiance_factor, coszen):
 
 def instant_insolation(lat, day, lon=0., orb=const.orb_present, S0=const.S0, 
                        day_type=1, days_per_year=const.days_per_year):
-    """Compute instantaneous insolation given latitude, longitude, time of year and orbital parameters.
+    r"""Compute instantaneous insolation given latitude, longitude, time of year and orbital parameters.
 
     Orbital parameters can be interpolated to any time in the last 5 Myears with
     ``climlab.solar.orbital.OrbitalTable`` (see example above).
@@ -306,14 +306,14 @@ def instant_insolation(lat, day, lon=0., orb=const.orb_present, S0=const.S0,
                                 * default value: ``23.446``
 
     :param float S0:        solar constant                                  \n
-                            - unit: :math:`\\textrm{W}/\\textrm{m}^2`       \n
+                            - unit: :math:`\textrm{W}/\textrm{m}^2`       \n
                             - default value: ``1365.2``
     :param float days_per_year: number of days in a year (optional)
                                 (default: 365.2422)
                                 Reads the length of the year from
                                 :mod:`~climlab.utils.constants` if available.
     :returns:               Daily average solar radiation in unit
-                            :math:`\\textrm{W}/\\textrm{m}^2`.
+                            :math:`\textrm{W}/\textrm{m}^2`.
 
                             Dimensions of output are ``(lat.size, day.size, ecc.size)``
     :rtype:                 array
@@ -334,7 +334,7 @@ def instant_insolation(lat, day, lon=0., orb=const.orb_present, S0=const.S0,
     return Fsw
 
 def annual_insolation(lat, orb=const.orb_present, S0=const.S0, days_per_year=const.days_per_year):
-    """Compute annual average insolation given latitude and orbital parameters.
+    r"""Compute annual average insolation given latitude and orbital parameters.
 
     Orbital parameters can be interpolated to any time in the last 5 Myears with
     ``climlab.solar.orbital.OrbitalTable`` (see example above).
@@ -346,7 +346,7 @@ def annual_insolation(lat, orb=const.orb_present, S0=const.S0, days_per_year=con
     The return value will be ``numpy.ndarray`` if **all** the inputs are ``numpy``.
     Otherwise ``xarray.DataArray``.
 
-    **Function-call argument** \n
+    **Function-call argument**
 
     :param array lat:       Latitude in degrees (-90 to 90).
     :param dict orb:        a dictionary with three members (as provided by
@@ -368,7 +368,7 @@ def annual_insolation(lat, orb=const.orb_present, S0=const.S0, days_per_year=con
                                 * default value: ``23.446``
 
     :param float S0:        solar constant                                  \n
-                            - unit: :math:`\\textrm{W}/\\textrm{m}^2`       \n
+                            - unit: :math:`\textrm{W}/\textrm{m}^2`       \n
                             - default value: ``1365.2``
     :param float days_per_year: number of days in a year (optional)
                                 (default: 365.2422)
@@ -376,7 +376,7 @@ def annual_insolation(lat, orb=const.orb_present, S0=const.S0, days_per_year=con
                                 :mod:`~climlab.utils.constants` if available.
     
     :returns:               Annual average solar radiation in unit
-                            :math:`\\textrm{W}/\\textrm{m}^2`.
+                            :math:`\textrm{W}/\textrm{m}^2`.
 
                             Dimensions of output are ``(lat.size, ecc.size)``
     :rtype:                 array
@@ -401,7 +401,7 @@ def annual_insolation(lat, orb=const.orb_present, S0=const.S0, days_per_year=con
     return Fsw.mean(dim='day')
 
 def declination_angle(obliquity, lambda_long):
-    """Compute solar declination angle in radians.
+    r"""Compute solar declination angle in radians.
 
     Inputs:
 
@@ -411,9 +411,9 @@ def declination_angle(obliquity, lambda_long):
     return arcsin(sin(obliquity) * sin(lambda_long))
 
 def hour_angle_at_sunset(phi, delta):
-    """Compute the hour angle (in radians) at sunset.
+    r"""Compute the hour angle (in radians) at sunset.
     
-    Formulas based on Berger (1978) eqns (8), (9).
+    Formulas based on :cite:t:`Berger_1978` eqns (8), (9).
     
     Inputs:
 
@@ -426,7 +426,7 @@ def hour_angle_at_sunset(phi, delta):
               xr.where(phi*delta>0., pi, 0.) )
 
 def coszen_instantaneous(phi, delta, h):
-    """Cosine of solar zenith angle (instantaneous).
+    r"""Cosine of solar zenith angle (instantaneous).
 
     Returns zero if the sun is below the horizon.
     
@@ -440,7 +440,7 @@ def coszen_instantaneous(phi, delta, h):
     return np.maximum(coszen, 0.0)
 
 def coszen_daily_time_weighted(phi, delta):
-    """Cosine of solar zenith angle averaged in time over 24 hours.
+    r"""Cosine of solar zenith angle averaged in time over 24 hours.
     
     Inputs:
 
@@ -452,7 +452,7 @@ def coszen_daily_time_weighted(phi, delta):
     return np.maximum(coszen, 0.0)
 
 def coszen_daily_insolation_weighted(phi, delta):
-    """Cosine of solar zenith angle, insolation-weighted daily average.
+    r"""Cosine of solar zenith angle, insolation-weighted daily average.
     
     Inputs:
 
@@ -467,7 +467,7 @@ def coszen_daily_insolation_weighted(phi, delta):
     return coszen
 
 def coszen_daily_time_weighted_sunlit(delta, phi):
-    """Cosine of solar zenith angle averaged in time sunlit hours only.
+    r"""Cosine of solar zenith angle averaged in time sunlit hours only.
     
     Inputs:
 
@@ -479,9 +479,9 @@ def coszen_daily_time_weighted_sunlit(delta, phi):
     return coszen
 
 def solar_longitude(day, orb=const.orb_present, days_per_year=const.days_per_year):
-    """Estimates solar longitude from calendar day.
+    r"""Estimates solar longitude from calendar day.
 
-    Method is using an approximation from :cite:`Berger_1978` section 3
+    Method is using an approximation from :cite:t:`Berger_1978` section 3
     (lambda = 0 at spring equinox).
 
     **Function-call arguments** \n
@@ -560,7 +560,7 @@ def _standardize_inputs(lat, day, orb, lon=None):
         return phi, day, ecc, long_peri, obliquity, input_is_xarray, lon
 
 def dates_to_day_index(datetime):
-    '''Convert dates and time (assumed to be UTC) to a fractional number of days
+    r'''Convert dates and time (assumed to be UTC) to a fractional number of days
     from a hypothetical January 1 00h that is exactly 80 days before the spring equinox.
 
     Input datetime can be any of

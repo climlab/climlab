@@ -51,16 +51,16 @@ from . import adv_diff_numerics
 
 
 class AdvectionDiffusion(ImplicitProcess):
-    """A parent class for one dimensional implicit advection-diffusion modules.
+    r"""A parent class for one dimensional implicit advection-diffusion modules.
 
     **Initialization parameters** \n
 
     :param float K:                 the diffusivity parameter in units of
-                                    :math:`\\frac{[\\textrm{length}]^2}{\\textrm{time}}`
+                                    :math:`\frac{[\textrm{length}]^2}{\textrm{time}}`
                                     where length is the unit of the spatial axis
                                     on which the diffusion is occuring.
     :param float U:                 Advection velocity in units of
-                                    :math:`\\frac{[\\textrm{length}]}{\\textrm{time}}`
+                                    :math:`\frac{[\textrm{length}]}{\textrm{time}}`
     :param str diffusion_axis:      dictionary key for axis on which the
                                     diffusion is occuring in process's domain
                                     axes dictionary
@@ -82,7 +82,7 @@ class AdvectionDiffusion(ImplicitProcess):
 
     :ivar dict param:               parameter dictionary is extended by
                                     diffusivity parameter K (unit:
-                                    :math:`\\frac{[\\textrm{length}]^2}{\\textrm{time}}`)
+                                    :math:`\frac{[\textrm{length}]^2}{\textrm{time}}`)
     :ivar bool use_banded_solver:   input flag specifying numerical solving
                                     method (given during initialization)
     :ivar str diffusion_axis:       dictionary key for axis where diffusion

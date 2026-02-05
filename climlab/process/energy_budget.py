@@ -19,7 +19,7 @@ class EnergyBudget(TimeDependentProcess):
     Every EnergyBudget object has a ``heating_rate`` dictionary with items
     corresponding to each state variable. The heating rate accounts the actual
     heating of a subprocess, namely the contribution to the energy budget
-    of :math:`R\\downarrow, R\\uparrow` and :math:`H` in this case.
+    of :math:`R\downarrow, R\uparrow` and :math:`H` in this case.
     The temperature tendencies for each subprocess are then calculated
     through dividing the heating rate by the heat capacitiy :math:`C`.
 
@@ -46,8 +46,8 @@ class EnergyBudget(TimeDependentProcess):
         self.heating_rate = {}
 
     def _compute_heating_rates(self):
-        """Computes energy flux convergences to get heating rates in unit
-        :math:`\\textrm{W}/ \\textrm{m}^2`.
+        r"""Computes energy flux convergences to get heating rates in unit
+        :math:`\textrm{W}/ \textrm{m}^2`.
 
         This method should be over-ridden by daughter classes.
 
@@ -73,7 +73,7 @@ class EnergyBudget(TimeDependentProcess):
 
 
 class ExternalEnergySource(EnergyBudget):
-    """A fixed energy source or sink to be specified by the user.
+    r"""A fixed energy source or sink to be specified by the user.
 
     **Object attributes** \n
 
@@ -85,12 +85,12 @@ class ExternalEnergySource(EnergyBudget):
 
     After initialization the user should modify the fields in the
     ``heating_rate`` dictionary, which contain heating rates in
-    unit :math:`\\textrm{W}/ \\textrm{m}^2` for all state variables.
+    unit :math:`textrm{W}/ \textrm{m}^2` for all state variables.
 
     :Example:
 
         Creating an Energy Balance Model with a uniform external energy source
-        of :math:`10 \\ \\textrm{W}/ \\textrm{m}^2` for all latitudes::
+        of :math:`10 ~ \textrm{W}/ \textrm{m}^2` for all latitudes::
 
             >>> import climlab
             >>> from climlab.process.energy_budget import ExternalEnergySource

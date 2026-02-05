@@ -4,7 +4,7 @@ import sys
 
 
 def convective_adjustment_direct(p, T, c, lapserate=6.5):
-    """Convective Adjustment to a specified lapse rate.
+    r"""Convective Adjustment to a specified lapse rate.
 
     Input argument lapserate gives the lapse rate expressed in degrees K per km
     (positive means temperature increasing downward).

@@ -6,7 +6,7 @@ from climlab.domain.field import Field, global_mean
 
 
 class ConstantAlbedo(DiagnosticProcess):
-    """A class for constant albedo values at all spatial points of the domain.
+    r"""A class for constant albedo values at all spatial points of the domain.
 
     **Initialization parameters** \n
 
@@ -58,17 +58,17 @@ class ConstantAlbedo(DiagnosticProcess):
 
 
 class P2Albedo(DiagnosticProcess):
-    """A class for parabolic distributed albedo values across the domain
+    r"""A class for parabolic distributed albedo values across the domain
     on basis of the second order Legendre Polynomial.
 
     Calculates the latitude dependent albedo values as
 
     .. math::
 
-         \\alpha(\\varphi) = a_0 + a_2 P_2(x)
+         \alpha(\varphi) = a_0 + a_2 P_2(x)
 
-    where :math:`P_2(x) = \\frac{1}{2} (3x^2 - 1)` is the second order Legendre Polynomial
-    and :math:`x=sin(\\varphi)`.
+    where :math:`P_2(x) = \frac{1}{2} (3x^2 - 1)` is the second order Legendre Polynomial
+    and :math:`x=sin(\varphi)`.
 
     **Initialization parameters** \n
 
@@ -76,7 +76,7 @@ class P2Albedo(DiagnosticProcess):
     :param float a2:    factor for second legendre polynominal term in albedo
                         function [default: 0.25]
 
-    **Object attributes** \n
+    **Object attributes**
 
     Additional to the parent class
     :class:`~climlab.process.diagnostic.DiagnosticProcess`
@@ -126,7 +126,7 @@ class P2Albedo(DiagnosticProcess):
 
     @property
     def a0(self):
-        """Property of albedo parameter a0.
+        r"""Property of albedo parameter a0.
 
         :getter:    Returns the albedo parameter value which is stored in attribute
                     ``self._a0``
@@ -145,7 +145,7 @@ class P2Albedo(DiagnosticProcess):
         self._compute_fixed()
     @property
     def a2(self):
-        """Property of albedo parameter a2.
+        r"""Property of albedo parameter a2.
 
         :getter:    Returns the albedo parameter value which is stored in attribute
                     ``self._a2``
@@ -184,7 +184,7 @@ class P2Albedo(DiagnosticProcess):
 
 
 class Iceline(DiagnosticProcess):
-    """A class for an Iceline subprocess.
+    r"""A class for an Iceline subprocess.
 
     Depending on a freezing temperature it calculates where on the domain the
     surface is covered with ice, where there is no ice and on which latitude the ice-edge
@@ -194,10 +194,10 @@ class Iceline(DiagnosticProcess):
 
     :param float Tf:    freezing temperature where sea water freezes and
                         surface is covered with ice                     \n
-                        - unit: :math:`^{\circ} \\textrm{C}`            \n
+                        - unit: :math:`^{\circ} \textrm{C}`            \n
                         - default value: ``-10``
 
-    **Object attributes** \n
+    **Object attributes** 
 
     Additional to the parent class
     :class:`~climlab.process.diagnostic.DiagnosticProcess`
@@ -222,7 +222,7 @@ class Iceline(DiagnosticProcess):
         self.find_icelines()
 
     def find_icelines(self):
-        """Finds iceline according to the surface temperature.
+        r"""Finds iceline according to the surface temperature.
 
         This method is called by the private function
         :func:`~climlab.surface.albedo.Iceline._compute`
@@ -232,7 +232,7 @@ class Iceline(DiagnosticProcess):
         **Object attributes** \n
 
         :ivar Field noice:      a Field of booleans which are ``True`` where
-                                :math:`T_s \\ge T_f`
+                                :math:`T_s \ge T_f`
         :ivar Field ice:        a Field of booleans which are ``True`` where
                                 :math:`T_s < T_f`
         :ivar array icelat:     an array with two elements indicating the
@@ -284,7 +284,7 @@ class Iceline(DiagnosticProcess):
 
 
 class StepFunctionAlbedo(DiagnosticProcess):
-    """A step function albedo suprocess.
+    r"""A step function albedo suprocess.
 
     This class itself defines three subprocesses that are created during
     initialization:
@@ -296,7 +296,7 @@ class StepFunctionAlbedo(DiagnosticProcess):
     **Initialization parameters** \n
 
     :param float Tf:    freezing temperature for Iceline subprocess     \n
-                        - unit: :math:`^{\circ} \\textrm{C}`            \n
+                        - unit: :math:`^{\circ} \textrm{C}`            \n
                         - default value: ``-10``
     :param float a0:    basic parameter for P2Albedo subprocess [default: 0.3]
     :param float a2:    factor for second legendre polynominal term in P2Albedo

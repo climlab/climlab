@@ -4,25 +4,25 @@ from climlab import constants as const
 
 
 def atmosphere(dp):
-    """Returns heat capacity of a unit area of atmosphere, in units J /m**2 / K.
+    r"""Returns heat capacity of a unit area of atmosphere, in units J /m**2 / K.
 
     .. math::
 
-        C_a = \\frac{c_p \\cdot dp \\cdot f_{\\textrm{mb-to-Pa}}}{g}
+        C_a = \frac{c_p \cdot dp \cdot f_{\textrm{mb-to-Pa}}}{g}
 
     where
 
     ==============================  ==============  ==================================================  ===============================================
     variable                        value           unit                                                description
     ==============================  ==============  ==================================================  ===============================================
-    :math:`C_a`                     *output*        :math:`\\textrm{J} / \\textrm{m}^2 / \\textrm{K}`      heat capacity for atmospheric cell
-    :math:`c_p`                     :math:`1004.`   :math:`\\textrm{J} / \\textrm{kg} / \\textrm{K}`       specific heat at constant pressure for dry air
-    :math:`dp`                      *input*         :math:`\\textrm{mb}`                                 pressure for atmospheric cell
-    :math:`f_{\\textrm{mb-to-Pa}}`   :math:`100`     :math:`\\textrm{Pa} / \\textrm{mb}`                   conversion factor from mb to Pa
-    :math:`g`                       :math:`9.8`     :math:`\\textrm{m} / \\textrm{s}^2`                   gravitational acceleration
+    :math:`C_a`                     *output*        :math:`\textrm{J} / \textrm{m}^2 / \textrm{K}`      heat capacity for atmospheric cell
+    :math:`c_p`                     :math:`1004.`   :math:`\textrm{J} / \textrm{kg} / \textrm{K}`       specific heat at constant pressure for dry air
+    :math:`dp`                      *input*         :math:`\textrm{mb}`                                 pressure for atmospheric cell
+    :math:`f_{\textrm{mb-to-Pa}}`   :math:`100`     :math:`\textrm{Pa} / \textrm{mb}`                   conversion factor from mb to Pa
+    :math:`g`                       :math:`9.8`     :math:`\textrm{m} / \textrm{s}^2`                   gravitational acceleration
     ==============================  ==============  ==================================================  ===============================================
 
-    **Function-call argument** \n
+    **Function-call argument**
 
     :param array dp:    pressure intervals (*unit:* mb)
     :returns:           the heat capacity for atmosphere cells correspoding to
@@ -45,24 +45,24 @@ def atmosphere(dp):
 
 
 def ocean(dz):
-    """Returns heat capacity of a unit area of water, in units J /m**2 / K.
+    r"""Returns heat capacity of a unit area of water, in units J /m**2 / K.
 
     .. math::
 
-        C_o = \\rho_w \\cdot c_w \\cdot dz
+        C_o = \rho_w \cdot c_w \cdot dz
 
     where
 
     ==============================  ==============  ==================================================  ==================================
     variable                        value           unit                                                description
     ==============================  ==============  ==================================================  ==================================
-    :math:`C_o`                     *output*        :math:`\\textrm{J} / \\textrm{m}^2 / \\textrm{K}`      heat capacity for oceanic cell
-    :math:`c_w`                     :math:`4181.3`  :math:`\\textrm{J} / \\textrm{kg} / \\textrm{K}`       specific heat of liquid water
-    :math:`dz`                      *input*         :math:`\\textrm{m}`                                  water depth of oceanic cell
-    :math:`\\rho_w`                  :math:`1000.`   :math:`\\textrm{kg} / \\textrm{m}^3`                   density of water
+    :math:`C_o`                     *output*        :math:`\textrm{J} / \textrm{m}^2 / \textrm{K}`      heat capacity for oceanic cell
+    :math:`c_w`                     :math:`4181.3`  :math:`\textrm{J} / \textrm{kg} / \textrm{K}`       specific heat of liquid water
+    :math:`dz`                      *input*         :math:`\textrm{m}`                                  water depth of oceanic cell
+    :math:`\rho_w`                  :math:`1000.`   :math:`\textrm{kg} / \textrm{m}^3`                   density of water
     ==============================  ==============  ==================================================  ==================================
 
-    **Function-call argument** \n
+    **Function-call argument**
 
     :param array dz:    water depth of ocean cells (*unit:* m)
     :returns:           the heat capacity for ocean cells correspoding to
@@ -85,11 +85,11 @@ def ocean(dz):
 
 
 def slab_ocean(water_depth):
-    """Returns heat capacity of a unit area slab of water, in units of J / m**2 / K.
+    r"""Returns heat capacity of a unit area slab of water, in units of J / m**2 / K.
 
     Takes input argument ``water_depth`` and calls :func:`ocean()`
 
-    **Function-call argument** \n
+    **Function-call argument**
 
     :param float:   water depth of slab ocean (*unit:* m)
     :returns:       the heat capacity for slab ocean cell (*unit:* J / m**2 / K)

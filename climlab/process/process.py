@@ -75,13 +75,13 @@ from warnings import warn
 
 
 class Process(object):
-    """A generic parent class for all climlab process objects.
+    r"""A generic parent class for all climlab process objects.
     Every process object has a set of state variables on a spatial grid.
 
     For more general information about `Processes` and their role in climlab,
     see :ref:`process_architecture` section climlab-architecture.
 
-    **Initialization parameters** \n
+    **Initialization parameters**
 
     An instance of ``Process`` is initialized with the following
     arguments *(for detailed information see Object attributes below)*:
@@ -103,7 +103,7 @@ class Process(object):
     :param bool verbose: Flag to control text output during instantiation
                          of the Process [default: True]
 
-    **Object attributes** \n
+    **Object attributes**
 
     Additional to the parent class :class:`~climlab.process.process.Process`
     following object attributes are generated during initialization:
@@ -166,7 +166,7 @@ class Process(object):
             self.add_subprocesses(subprocess)
 
     def add_subprocesses(self, procdict):
-        """Adds a dictionary of subproceses to this process.
+        r"""Adds a dictionary of subproceses to this process.
 
         Calls :func:`add_subprocess` for every process given in the
         input-dictionary. It can also pass a single process, which will
@@ -187,7 +187,7 @@ class Process(object):
                 self.add_subprocess(name, proc)
 
     def add_subprocess(self, name, proc, verbose=True):
-        """Adds a single subprocess to this process.
+        r"""Adds a single subprocess to this process.
 
         :param string name:     name of the subprocess
         :param proc:            a Process object
@@ -260,7 +260,7 @@ class Process(object):
             raise ValueError('subprocess must be Process object')
 
     def remove_subprocess(self, name, verbose=True):
-        """Removes a single subprocess from this process.
+        r"""Removes a single subprocess from this process.
 
         :param string name:     name of the subprocess
         :param bool verbose:    information whether warning message
@@ -308,7 +308,7 @@ class Process(object):
         self.has_process_type_list = False
 
     def set_state(self, name, value):
-        """Sets the variable ``name`` to a new state ``value``.
+        r"""Sets the variable ``name`` to a new state ``value``.
 
         :param string name:     name of the state
         :param value:           state variable
@@ -322,7 +322,7 @@ class Process(object):
         :Example:
 
             Resetting the surface temperature of an EBM to
-            :math:`-5 ^{\circ} \\textrm{C}` on all latitues::
+            :math:`-5 ^{\circ} \textrm{C}` on all latitues::
 
                 >>> import climlab
                 >>> from climlab import Field
@@ -372,7 +372,7 @@ class Process(object):
                     self.state_domain[name] = dom
 
     def _add_field(self, field_type, name, value):
-        """Adds a new field to a specified dictionary. The field is also added
+        r"""Adds a new field to a specified dictionary. The field is also added
         as a process attribute. field_type can be 'input', 'diagnostics' """
         try:
             self.__getattribute__(field_type).update({name: value})
@@ -383,7 +383,7 @@ class Process(object):
         self.__setattr__(name, value)
 
     def add_diagnostic(self, name, value=None):
-        """Create a new diagnostic variable called ``name`` for this process
+        r"""Create a new diagnostic variable called ``name`` for this process
         and initialize it with the given ``value``.
 
         Quantity is accessible in two ways:
@@ -419,7 +419,7 @@ class Process(object):
         self.__setattr__(name, value)
 
     def add_input(self, name, value=None):
-        '''Create a new input variable called ``name`` for this process
+        r'''Create a new input variable called ``name`` for this process
         and initialize it with the given ``value``.
 
         Quantity is accessible in two ways:
@@ -448,7 +448,7 @@ class Process(object):
             self._diag_vars.append(name)
 
     def remove_diagnostic(self, name):
-        """	Removes a diagnostic from the ``process.diagnostic`` dictionary
+        r"""	Removes a diagnostic from the ``process.diagnostic`` dictionary
         and also delete the associated process attribute.
 
         :param str name:    name of diagnostic quantity to be removed
@@ -479,7 +479,7 @@ class Process(object):
             warn('No diagnostic named {} was found.'.format(name))
 
     def to_xarray(self, diagnostics=False, timeave=False):
-        """ Convert process variables to ``xarray.Dataset`` format.
+        r""" Convert process variables to ``xarray.Dataset`` format.
 
         With ``diagnostics=True``, both state and diagnostic variables are included.
 
@@ -598,7 +598,7 @@ class Process(object):
     # a single axis of that type in the process.
     @property
     def lat(self):
-        """Latitude of grid centers (degrees North)
+        r"""Latitude of grid centers (degrees North)
 
         :getter:    Returns the points of axis ``'lat'`` if availible in the
                     process's domains.
@@ -618,7 +618,7 @@ class Process(object):
             raise ValueError('Can\'t resolve a lat axis.')
     @property
     def lat_bounds(self):
-        """Latitude of grid interfaces (degrees North)
+        r"""Latitude of grid interfaces (degrees North)
 
         :getter:    Returns the bounds of axis ``'lat'`` if availible in the
                     process's domains.
@@ -638,7 +638,7 @@ class Process(object):
             raise ValueError('Can\'t resolve a lat axis.')
     @property
     def lon(self):
-        """Longitude of grid centers (degrees)
+        r"""Longitude of grid centers (degrees)
 
         :getter:    Returns the points of axis ``'lon'`` if availible in the
                     process's domains.
@@ -658,7 +658,7 @@ class Process(object):
             raise ValueError('Can\'t resolve a lon axis.')
     @property
     def lon_bounds(self):
-        """Longitude of grid interfaces (degrees)
+        r"""Longitude of grid interfaces (degrees)
 
         :getter:    Returns the bounds of axis ``'lon'`` if availible in the
                     process's domains.
@@ -678,7 +678,7 @@ class Process(object):
             raise ValueError('Can\'t resolve a lon axis.')
     @property
     def lev(self):
-        """Pressure levels at grid centers (hPa or mb)
+        r"""Pressure levels at grid centers (hPa or mb)
 
         :getter:    Returns the points of axis ``'lev'`` if availible in the
                     process's domains.
@@ -698,7 +698,7 @@ class Process(object):
             raise ValueError('Can\'t resolve a lev axis.')
     @property
     def lev_bounds(self):
-        """Pressure levels at grid interfaces (hPa or mb)
+        r"""Pressure levels at grid interfaces (hPa or mb)
 
         :getter:    Returns the bounds of axis ``'lev'`` if availible in the
                     process's domains.
@@ -718,7 +718,7 @@ class Process(object):
             raise ValueError('Can\'t resolve a lev axis.')
     @property
     def depth(self):
-        """Depth at grid centers (m)
+        r"""Depth at grid centers (m)
 
         :getter:    Returns the points of axis ``'depth'`` if availible in the
                     process's domains.
@@ -738,7 +738,7 @@ class Process(object):
             raise ValueError('Can\'t resolve a depth axis.')
     @property
     def depth_bounds(self):
-        """Depth at grid interfaces (m)
+        r"""Depth at grid interfaces (m)
 
         :getter:    Returns the bounds of axis ``'depth'`` if availible in the
                     process's domains.
@@ -759,7 +759,7 @@ class Process(object):
 
 
 def process_like(proc):
-    """Make an exact clone of a process, including state and all subprocesses.
+    r"""Make an exact clone of a process, including state and all subprocesses.
 
     The creation date is updated.
 
@@ -796,7 +796,7 @@ def process_like(proc):
 
 
 def get_axes(process_or_domain):
-    """Returns a dictionary of all Axis in a domain or dictionary of domains.
+    r"""Returns a dictionary of all Axis in a domain or dictionary of domains.
 
     :param process_or_domain:   a process or a domain object
     :type process_or_domain:    :class:`~climlab.process.process.Process` or

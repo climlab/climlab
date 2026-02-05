@@ -10,13 +10,13 @@ from climlab.domain.xarray import Field_to_xarray
 
 
 class Field(np.ndarray):
-    """Custom class for climlab gridded quantities, called Field.
+    r"""Custom class for climlab gridded quantities, called Field.
 
     This class behaves exactly like :py:class:`numpy.ndarray`
     but every object has an attribute called ``self.domain``
     which is the domain associated with that field (e.g. state variables).
 
-    **Initialization parameters** \n
+    **Initialization parameters**
 
     An instance of ``Field`` is initialized with the following
     arguments:
@@ -27,7 +27,7 @@ class Field(np.ndarray):
                                 (e.g. state variables)
     :type domain:               :class:`~climlab.domain.domain._Domain`
 
-    **Object attributes** \n
+    **Object attributes**
 
     Following object attribute is generated during initialization:
 
@@ -191,7 +191,7 @@ class Field(np.ndarray):
 
 
 def global_mean(field):
-    """Calculates the latitude weighted global mean of a field
+    r"""Calculates the latitude weighted global mean of a field
     with latitude dependence.
 
     :param Field field: input field
@@ -240,7 +240,7 @@ def _global_mean_latlon(field):
 
 
 def to_latlon(array, domain, axis = 'lon'):
-    """Broadcasts a 1D axis dependent array across another axis.
+    r"""Broadcasts a 1D axis dependent array across another axis.
 
     :param array input_array:   the 1D array used for broadcasting
     :param domain:              the domain associated with that

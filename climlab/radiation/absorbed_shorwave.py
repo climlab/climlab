@@ -3,7 +3,7 @@ from climlab import constants as const
 
 
 class SimpleAbsorbedShortwave(EnergyBudget):
-    '''A class for the shortwave radiation process in a one-layer EBM.
+    r'''A class for the shortwave radiation process in a one-layer EBM.
     The basic assumption is that all the shortwave absorption occurs at the surface.
 
     Computes the diagnostic ``ASR`` (absorbed shortwave radiation)

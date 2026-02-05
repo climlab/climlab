@@ -21,7 +21,7 @@ Testing multi-dimensional column radiation
 '''
 
 class Transmissivity(object):
-    '''Class for calculating and store transmissivity between levels,
+    r'''Class for calculating and store transmissivity between levels,
     and computing radiative fluxes between levels.
 
     Input: numpy array of absorptivities.
@@ -42,30 +42,30 @@ class Transmissivity(object):
 
     .. math::
 
-        \\tau = \\left[ 1, \\tau_0, \\tau_1, \\tau_2 \\right]
+        \tau = \left[ 1, \tau_0, \tau_1, \tau_2 \right]
 
     A is a matrix
 
     .. math::
 
-        A= \\left[ \\begin{array}{cccc}
-        1       & 1         & 1         & 1         \\\\
-        \\tau_0 & 1         & 1         & 1         \\\\
-        \\tau_1 & \\tau_1   & 1         & 1         \\\\
-        \\tau_2 & \\tau_2   & \\tau_2   & 1         \\\\
-        \\end{array} \\right]
+        A= \left[ \begin{array}{cccc}
+        1       & 1         & 1         & 1         \\
+        \tau_0 & 1         & 1         & 1         \\
+        \tau_1 & \tau_1   & 1         & 1         \\
+        \tau_2 & \tau_2   & \tau_2   & 1         \\
+        \end{array} \right]
 
     We then take the cumulative product along columns,
     and finally take the lower triangle of the result to get
 
     .. math::
 
-        T_{down} = \\left[ \\begin{array}{cccc}
-                               1 &               0 &       0 &  0   \\\\
-                         \\tau_0 &               1 &       0 &  0   \\\\
-                 \\tau_0 \\tau_1 &         \\tau_1 &       1 &  0   \\\\
-        \\tau_0 \\tau_1 \\tau_2 & \\tau_1 \\tau_2 & \\tau_2 &  1   \\\\
-        \\end{array} \\right]
+        T_{down} = \left[ \begin{array}{cccc}
+                               1 &               0 &       0 &  0   \\
+                         \tau_0 &               1 &       0 &  0   \\
+                 \tau_0 \tau_1 &         \tau_1 &       1 &  0   \\
+        \tau_0 \tau_1 \tau_2 & \tau_1 \tau_2 & \tau_2 &  1   \\
+        \end{array} \right]
 
     and Tup = transpose(Tdown)
 
@@ -73,16 +73,18 @@ class Transmissivity(object):
 
     .. math::
         
-        E_{down} = \\left[ \\begin{array}{c}
-            \text{flux_from_space} \\\\
-            E0 \\\\
-            E1 \\\\
-            E2 \\\\
-        \\end{array} \\right]
+        E_{down} = \left[ \begin{array}{c}
+            \text{flux_from_space} \\
+            E0 \\
+            E1 \\
+            E2 \\
+        \end{array} \right]
 
     Now we can get the downwelling beam at layer interfaces by matrix multiplication:
 
-    D = Tdown * Edown
+    .. math::
+    
+        D = T_{down} * E_{down}
 
     For the upwelling beam, we start by adding the reflected part
     at the surface to the surface emissions:
@@ -91,12 +93,12 @@ class Transmissivity(object):
 
     .. math::
         
-        Eup = \\left[ \\begin{array}{c}
-            E0 \\\\
-            E1 \\\\
-            E2 \\\\
+        Eup = \left[ \begin{array}{c}
+            E0 \\
+            E1 \\
+            E2 \\
             emit_{sfc} + albedo_{sfc} * D[-1]
-        \\end{array} \\right]
+        \end{array} \right]
 
     So that the upwelling flux is
 
@@ -129,7 +131,7 @@ class Transmissivity(object):
         self.Tdown = Tdown
 
     def flux_up(self, fluxUpBottom, emission=None):
-        '''Compute downwelling radiative flux at interfaces between layers.
+        r'''Compute downwelling radiative flux at interfaces between layers.
 
         Inputs:
 
@@ -154,7 +156,7 @@ class Transmissivity(object):
         return reflectivity*fluxDown
 
     def flux_down(self, fluxDownTop, emission=None):
-        '''Compute upwelling radiative flux at interfaces between layers.
+        r'''Compute upwelling radiative flux at interfaces between layers.
 
         Inputs:
 
