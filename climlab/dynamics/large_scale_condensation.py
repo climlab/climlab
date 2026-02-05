@@ -87,7 +87,7 @@ from climlab.utils.thermo import qsat
 
 
 class LargeScaleCondensation(TimeDependentProcess):
-    '''Climlab process class for LargeScaleCondensation. 
+    r'''Climlab process class for LargeScaleCondensation. 
     Condensation is modeled as a relaxation of relative humidity toward a 
     specified reference value wherever the tropospheric relative humidity 
     exceeds the target.

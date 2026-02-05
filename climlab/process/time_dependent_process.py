@@ -42,13 +42,13 @@ def couple(proclist, name='Parent'):
 
 
 class TimeDependentProcess(Process):
-    """A generic parent class for all time-dependent processes.
+    r"""A generic parent class for all time-dependent processes.
 
     ``TimeDependentProcess`` is a child of the
     :class:`~climlab.process.process.Process` class and therefore inherits
     all those attributes.
 
-    **Initialization parameters** \n
+    **Initialization parameters**
 
     An instance of ``TimeDependentProcess`` is initialized with the following
     arguments *(for detailed information see Object attributes below)*:
@@ -59,7 +59,7 @@ class TimeDependentProcess(Process):
     :param bool topdown:    whether geneterate *process_types* in regular or
                             in reverse order [default: True]
 
-    **Object attributes** \n
+    **Object attributes**
 
     Additional to the parent class :class:`~climlab.process.process.Process`
     following object attributes are generated during initialization:
@@ -123,7 +123,7 @@ class TimeDependentProcess(Process):
 
     @property
     def timestep(self):
-        """The amount of time over which :func:`step_forward` is integrating in unit seconds.
+        r"""The amount of time over which :func:`step_forward` is integrating in unit seconds.
 
         :getter: Returns the object timestep which is stored in ``self.time['timestep']``.
         :setter: Sets the timestep to the given input.
@@ -163,7 +163,7 @@ class TimeDependentProcess(Process):
         self.tendencies[name] = value * 0.
 
     def compute(self):
-        """Computes the tendencies for all state variables given current state
+        r"""Computes the tendencies for all state variables given current state
         and specified input.
 
         The function first computes all diagnostic processes. They don't produce
@@ -193,7 +193,7 @@ class TimeDependentProcess(Process):
         method has been called.
 
 
-        **Object attributes** \n
+        **Object attributes**
 
         During method execution following object attributes are modified:
 
@@ -254,7 +254,7 @@ class TimeDependentProcess(Process):
         return self.tendencies
 
     def _compute_type(self, proctype):
-        """Computes tendencies due to all subprocesses of given type
+        r"""Computes tendencies due to all subprocesses of given type
         ``'proctype'``. Also pass all diagnostics up to parent process."""
         tendencies = {}
         for varname in self.state:
@@ -290,7 +290,7 @@ class TimeDependentProcess(Process):
         return tendencies
 
     def _build_process_type_list(self):
-        """Generates lists of processes organized by process type.
+        r"""Generates lists of processes organized by process type.
 
         Following object attributes are generated or updated:
 
@@ -312,7 +312,7 @@ class TimeDependentProcess(Process):
         self.has_process_type_list = True
 
     def step_forward(self):
-        """Updates state variables with computed tendencies.
+        r"""Updates state variables with computed tendencies.
 
         Calls the :func:`compute` method to get current tendencies for all
         process states. Multiplied with the timestep and added up to the state
@@ -350,7 +350,7 @@ class TimeDependentProcess(Process):
                 # proc._update_time()
 
     def compute_diagnostics(self, num_iter=3):
-        """Compute all tendencies and diagnostics, but don't update model state.
+        r"""Compute all tendencies and diagnostics, but don't update model state.
         By default it will call compute() 3 times to make sure all
         subprocess coupling is accounted for. The number of iterations can
         be changed with the input argument.
@@ -360,7 +360,7 @@ class TimeDependentProcess(Process):
             ignored = self.compute()
 
     def integrate_years(self, years=1.0, verbose=True):
-        """Integrates the model by a given number of years.
+        r"""Integrates the model by a given number of years.
 
         :param float years:     integration time for the model in years
                                 [default: 1.0]
@@ -429,7 +429,7 @@ class TimeDependentProcess(Process):
                     self.elapsed_time/np.timedelta64(1, 's') / const.seconds_per_year))
 
     def integrate_days(self, days=1.0, verbose=True):
-        """Integrates the model forward for a specified number of days.
+        r"""Integrates the model forward for a specified number of days.
 
         It convertes the given number of days into years and calls
         :func:`integrate_years`.
@@ -461,7 +461,7 @@ class TimeDependentProcess(Process):
         self.integrate_years(years=years, verbose=verbose)
 
     def integrate_converge(self, crit=1e-4, verbose=True):
-        """Integrates the model until model states are converging.
+        r"""Integrates the model until model states are converging.
 
         :param crit:            exit criteria for difference of iterated
                                 solutions [default: 0.0001]

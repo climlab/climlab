@@ -3,7 +3,7 @@ from climlab.process import TimeDependentProcess
 
 
 class Limiter(TimeDependentProcess):
-    '''A process that implements strict bounds on the allowable range of values of state variables.
+    r'''A process that implements strict bounds on the allowable range of values of state variables.
     Values outside the given bounds are adjusted back to the bounding value at each timestep.
 
     Bounding values are stored in a dictionary ``.bounds`` which has identical keys to ``.state``

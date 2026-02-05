@@ -75,13 +75,13 @@ from warnings import warn
 
 
 class Process(object):
-    """A generic parent class for all climlab process objects.
+    r"""A generic parent class for all climlab process objects.
     Every process object has a set of state variables on a spatial grid.
 
     For more general information about `Processes` and their role in climlab,
     see :ref:`process_architecture` section climlab-architecture.
 
-    **Initialization parameters** \n
+    **Initialization parameters**
 
     An instance of ``Process`` is initialized with the following
     arguments *(for detailed information see Object attributes below)*:
@@ -103,7 +103,7 @@ class Process(object):
     :param bool verbose: Flag to control text output during instantiation
                          of the Process [default: True]
 
-    **Object attributes** \n
+    **Object attributes**
 
     Additional to the parent class :class:`~climlab.process.process.Process`
     following object attributes are generated during initialization:
@@ -166,7 +166,7 @@ class Process(object):
             self.add_subprocesses(subprocess)
 
     def add_subprocesses(self, procdict):
-        """Adds a dictionary of subproceses to this process.
+        r"""Adds a dictionary of subproceses to this process.
 
         Calls :func:`add_subprocess` for every process given in the
         input-dictionary. It can also pass a single process, which will
@@ -187,7 +187,7 @@ class Process(object):
                 self.add_subprocess(name, proc)
 
     def add_subprocess(self, name, proc, verbose=True):
-        """Adds a single subprocess to this process.
+        r"""Adds a single subprocess to this process.
 
         :param string name:     name of the subprocess
         :param proc:            a Process object
@@ -260,7 +260,7 @@ class Process(object):
             raise ValueError('subprocess must be Process object')
 
     def remove_subprocess(self, name, verbose=True):
-        """Removes a single subprocess from this process.
+        r"""Removes a single subprocess from this process.
 
         :param string name:     name of the subprocess
         :param bool verbose:    information whether warning message
@@ -308,7 +308,7 @@ class Process(object):
         self.has_process_type_list = False
 
     def set_state(self, name, value):
-        """Sets the variable ``name`` to a new state ``value``.
+        r"""Sets the variable ``name`` to a new state ``value``.
 
         :param string name:     name of the state
         :param value:           state variable
@@ -322,7 +322,7 @@ class Process(object):
         :Example:
 
             Resetting the surface temperature of an EBM to
-            :math:`-5 ^{\circ} \\textrm{C}` on all latitues::
+            :math:`-5 ^{\circ} \textrm{C}` on all latitues::
 
                 >>> import climlab
                 >>> from climlab import Field

@@ -98,7 +98,7 @@ from scipy import integrate
 
 
 class EBM(TimeDependentProcess):
-    """A parent class for all Energy-Balance-Model classes.
+    r"""A parent class for all Energy-Balance-Model classes.
 
     This class sets up a typical EnergyBalance Model with following subprocesses:
 
@@ -292,7 +292,7 @@ class EBM(TimeDependentProcess):
         return super(EBM, self)._compute()
 
     def global_mean_temperature(self):
-        """Convenience method to compute global mean surface temperature.
+        r"""Convenience method to compute global mean surface temperature.
 
         Calls :func:`~climlab.domain.field.global_mean` method which
         for the object attriute ``Ts`` which calculates the latitude weighted
@@ -312,7 +312,7 @@ class EBM(TimeDependentProcess):
         return global_mean(self.Ts)
 
     def inferred_heat_transport(self):
-        """Calculates the inferred heat transport by integrating the TOA
+        r"""Calculates the inferred heat transport by integrating the TOA
         energy imbalance from pole to pole.
 
         The method is calculating
@@ -339,7 +339,7 @@ class EBM(TimeDependentProcess):
                 integrate.cumulative_trapezoid(np.cos(phi)*energy_in, x=phi, initial=0.))
 
     def diffusive_heat_transport(self):
-        """Compute instantaneous diffusive heat transport in unit :math:`\\textrm{PW}`
+        r"""Compute instantaneous diffusive heat transport in unit :math:`\\textrm{PW}`
         on the staggered grid (bounds) through calculating:
 
         .. math::
@@ -364,7 +364,7 @@ class EBM(TimeDependentProcess):
 
 class EBM_seasonal(EBM):
     def __init__(self, a0=0.33, a2=0.25, ai=None, **kwargs):
-        """A class that implements Energy Balance Models with realistic
+        r"""A class that implements Energy Balance Models with realistic
         daily insolation.
 
         This class is inherited from the general :class:`~climlab.EBM`
@@ -453,7 +453,7 @@ class EBM_seasonal(EBM):
 
 class EBM_annual(EBM_seasonal):
     def __init__(self, **kwargs):
-        """A class that implements Energy Balance Models with annual mean insolation.
+        r"""A class that implements Energy Balance Models with annual mean insolation.
 
         The annual solar distribution is calculated through averaging the
         :class:`~climlab.radiation.insolation.DailyInsolation` over time
