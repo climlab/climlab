@@ -22,11 +22,11 @@ class AplusBT(EnergyBudget):
     An instance of ``AplusBT`` is initialized with the following
     arguments:
 
-    :param float A:             parameter for linear OLR parametrization   \n
-                                - unit: :math:`\frac{\textrm{W}}{\textrm{m}^2}` \n
+    :param float A:             parameter for linear OLR parametrization  
+                                - unit: :math:`\frac{\textrm{W}}{\textrm{m}^2}` 
                                 - default value: ``200.0``
-    :param float B:             parameter for linear OLR parametrization   \n
-                                - unit: :math:`\frac{\textrm{W}} {\textrm{m}^2 ^{\circ}\textrm{C}}`  \n
+    :param float B:             parameter for linear OLR parametrization  
+                                - unit: :math:`\frac{\textrm{W}} {\textrm{m}^2 ^{\circ}\textrm{C}}` 
                                 - default value: ``2.0``
 
     **Object attributes** \n
@@ -167,7 +167,7 @@ class AplusBT_CO2(EnergyBudget):
 
     .. math::
 
-        A(c) = -326.4 + 9.161 c - 3.164 c^2 + 0.5468 c^3            \n
+        A(c) = -326.4 + 9.161 c - 3.164 c^2 + 0.5468 c^3           \\
         B(c) =  1.953 - 0.04866 c + 0.01309 c^2 - 0.002577 c^3
 
     where :math:`c=\log \frac{p}{300}` and :math:`p` represents
@@ -182,8 +182,8 @@ class AplusBT_CO2(EnergyBudget):
     argument:
 
     :param float CO2:   The concentration of :math:`CO_2` in the atmosphere.
-                        Referred to as :math:`p` in the above given formulas.\n
-                        - unit: :math:`\textrm{ppm}` (parts per million)   \n
+                        Referred to as :math:`p` in the above given formulas.
+                        - unit: :math:`\textrm{ppm}` (parts per million)  
                         - default value: ``300.0``
 
 
@@ -315,7 +315,7 @@ class AplusBT_CO2(EnergyBudget):
             self.OLR[:] = self.A + self.B * (value + const.tempCtoK)
 
     def _compute_heating_rates(self):
-        """Computes energy flux convergences to get heating rates in :math:`W/m^2`."""
+        r"""Computes energy flux convergences to get heating rates in :math:`W/m^2`."""
         self._compute_emission()
         for varname, value in self.state.items():
             self.heating_rate[varname] = -self.OLR
