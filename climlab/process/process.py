@@ -372,7 +372,7 @@ class Process(object):
                     self.state_domain[name] = dom
 
     def _add_field(self, field_type, name, value):
-        """Adds a new field to a specified dictionary. The field is also added
+        r"""Adds a new field to a specified dictionary. The field is also added
         as a process attribute. field_type can be 'input', 'diagnostics' """
         try:
             self.__getattribute__(field_type).update({name: value})
@@ -383,7 +383,7 @@ class Process(object):
         self.__setattr__(name, value)
 
     def add_diagnostic(self, name, value=None):
-        """Create a new diagnostic variable called ``name`` for this process
+        r"""Create a new diagnostic variable called ``name`` for this process
         and initialize it with the given ``value``.
 
         Quantity is accessible in two ways:
@@ -419,7 +419,7 @@ class Process(object):
         self.__setattr__(name, value)
 
     def add_input(self, name, value=None):
-        '''Create a new input variable called ``name`` for this process
+        r'''Create a new input variable called ``name`` for this process
         and initialize it with the given ``value``.
 
         Quantity is accessible in two ways:
@@ -448,7 +448,7 @@ class Process(object):
             self._diag_vars.append(name)
 
     def remove_diagnostic(self, name):
-        """	Removes a diagnostic from the ``process.diagnostic`` dictionary
+        r"""	Removes a diagnostic from the ``process.diagnostic`` dictionary
         and also delete the associated process attribute.
 
         :param str name:    name of diagnostic quantity to be removed
@@ -479,7 +479,7 @@ class Process(object):
             warn('No diagnostic named {} was found.'.format(name))
 
     def to_xarray(self, diagnostics=False, timeave=False):
-        """ Convert process variables to ``xarray.Dataset`` format.
+        r""" Convert process variables to ``xarray.Dataset`` format.
 
         With ``diagnostics=True``, both state and diagnostic variables are included.
 
@@ -598,7 +598,7 @@ class Process(object):
     # a single axis of that type in the process.
     @property
     def lat(self):
-        """Latitude of grid centers (degrees North)
+        r"""Latitude of grid centers (degrees North)
 
         :getter:    Returns the points of axis ``'lat'`` if availible in the
                     process's domains.
@@ -618,7 +618,7 @@ class Process(object):
             raise ValueError('Can\'t resolve a lat axis.')
     @property
     def lat_bounds(self):
-        """Latitude of grid interfaces (degrees North)
+        r"""Latitude of grid interfaces (degrees North)
 
         :getter:    Returns the bounds of axis ``'lat'`` if availible in the
                     process's domains.
@@ -638,7 +638,7 @@ class Process(object):
             raise ValueError('Can\'t resolve a lat axis.')
     @property
     def lon(self):
-        """Longitude of grid centers (degrees)
+        r"""Longitude of grid centers (degrees)
 
         :getter:    Returns the points of axis ``'lon'`` if availible in the
                     process's domains.
@@ -658,7 +658,7 @@ class Process(object):
             raise ValueError('Can\'t resolve a lon axis.')
     @property
     def lon_bounds(self):
-        """Longitude of grid interfaces (degrees)
+        r"""Longitude of grid interfaces (degrees)
 
         :getter:    Returns the bounds of axis ``'lon'`` if availible in the
                     process's domains.
@@ -678,7 +678,7 @@ class Process(object):
             raise ValueError('Can\'t resolve a lon axis.')
     @property
     def lev(self):
-        """Pressure levels at grid centers (hPa or mb)
+        r"""Pressure levels at grid centers (hPa or mb)
 
         :getter:    Returns the points of axis ``'lev'`` if availible in the
                     process's domains.
@@ -698,7 +698,7 @@ class Process(object):
             raise ValueError('Can\'t resolve a lev axis.')
     @property
     def lev_bounds(self):
-        """Pressure levels at grid interfaces (hPa or mb)
+        r"""Pressure levels at grid interfaces (hPa or mb)
 
         :getter:    Returns the bounds of axis ``'lev'`` if availible in the
                     process's domains.
@@ -718,7 +718,7 @@ class Process(object):
             raise ValueError('Can\'t resolve a lev axis.')
     @property
     def depth(self):
-        """Depth at grid centers (m)
+        r"""Depth at grid centers (m)
 
         :getter:    Returns the points of axis ``'depth'`` if availible in the
                     process's domains.
@@ -738,7 +738,7 @@ class Process(object):
             raise ValueError('Can\'t resolve a depth axis.')
     @property
     def depth_bounds(self):
-        """Depth at grid interfaces (m)
+        r"""Depth at grid interfaces (m)
 
         :getter:    Returns the bounds of axis ``'depth'`` if availible in the
                     process's domains.
@@ -759,7 +759,7 @@ class Process(object):
 
 
 def process_like(proc):
-    """Make an exact clone of a process, including state and all subprocesses.
+    r"""Make an exact clone of a process, including state and all subprocesses.
 
     The creation date is updated.
 
@@ -796,7 +796,7 @@ def process_like(proc):
 
 
 def get_axes(process_or_domain):
-    """Returns a dictionary of all Axis in a domain or dictionary of domains.
+    r"""Returns a dictionary of all Axis in a domain or dictionary of domains.
 
     :param process_or_domain:   a process or a domain object
     :type process_or_domain:    :class:`~climlab.process.process.Process` or

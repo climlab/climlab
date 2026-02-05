@@ -1,4 +1,4 @@
-'''
+r'''
 Modules for simple dynamics, mostly for use in Energy Balance Models.
 
 :class:`~climlab.dynamics.BudykoTransport` is a relaxation to global mean.

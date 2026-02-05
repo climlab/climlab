@@ -1,4 +1,4 @@
-"""Object-oriented code for radiative-convective models with grey-gas radiation.
+r"""Object-oriented code for radiative-convective models with grey-gas radiation.
 
 Code developed by Brian Rose, University at Albany
 brose@albany.edu
