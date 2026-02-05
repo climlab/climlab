@@ -70,6 +70,18 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         Suffix for diagnostic variable names.
     """
 
+## Docs must clarify that the independent coordinate in the latitude dimension is
+## y = a sin(phi)
+##  so the differential is dy = a cos(phi) dphi 
+## with phi the latitude in radians
+##   Miller (1981)
+##  "equal increments in y correspond to equal increments in global surface area"
+##
+##  And if Vphi is the velocity in the latitudinal direction
+## Then we define Vy = Vphi cos(phi)
+##                Kyy = Kphiphi cos^2(phi)
+##                Kyz = Kphiz cos(phi) 
+
 ###  Should there be more diagnostics defined? E.g. advective and diffusive fluxes?
 
     # Axis indices for 2D (lat, lev) arrays
@@ -93,6 +105,7 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         super(TwoDimensionalAdvectionDiffusion, self).__init__(**kwargs)
         for dom in list(self.domains.values()):
             self._phibounds = np.deg2rad(dom.axes['lat'].bounds)  # radians
+            #  Consider renaming "lat" to "y" in the code. This is y = a sin(phi) as defined in Miller (1981)
             self._latbounds = np.sin(self._phibounds) * const.a  # meters
             self._dlatbounds = np.diff(self._latbounds)
             self._levbounds = dom.axes['lev'].bounds *1e2
@@ -123,6 +136,7 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         self.Kyy = Kyy  # Diffusivity in units of [length]**2 / [time]
         self.Kzz = Kzz  # Diffusivity in units of [length]**2 / [time]
         self.Kyz = Kyz
+        #  This is mass of air on the staggered grid I think. Probably a clearer way to express this
         self.M_air = 2*np.pi*const.a**2.0*np.diff(np.sin(self._phibounds))[:, None] * self._dlevbounds[None,:] / const.g
         self.diagname_total_tracer_mass = 'total_tracer_mass'+diagnostic_name_suffix
         self.diagname_column_density = 'column_density'+diagnostic_name_suffix
@@ -166,6 +180,8 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
 
     @property
     def Kyy(self):
+        ##  Here the factor cos(phi)**2 is applied
+        # The user-facing Kyy is actuall Kphiphi without area weighting
         return np.where(self._Kyy < 0, 0, self._Kyy) * (np.cos(self._phibounds[:, None]))**2.0
     @Kyy.setter
     def Kyy(self, Kvalue):
@@ -180,6 +196,7 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
 
     @property
     def Kyz(self):
+        #  Same here, the weighting factor is automatically applied
         return self._Kyz * np.cos(self._phibounds[:, None])
     @Kyz.setter
     def Kyz(self, Kvalue):
@@ -187,6 +204,8 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
 
     @property
     def U(self):
+        #  But now I'm confused. Are we applying the area weighting for U elsewhere?
+        #  And why is it U and not V?
         return self._U #* np.cos(self._phibounds[:, None])
     @U.setter
     def U(self, Uvalue):
@@ -216,6 +235,7 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
             tendencies[name] = dtracer / self.timestep_in_seconds
 
         massmat = self.M_air * self._tracer
+        #  Can we use the already computed M here instead??
         area = 2*np.pi*const.a**2.0*np.diff(np.sin(self._phibounds))
         # print(self.diagname_total_tracer_mass)
         # print(type(self.diagname_total_tracer_mass))
