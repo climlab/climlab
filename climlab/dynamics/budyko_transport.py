@@ -6,32 +6,32 @@ class BudykoTransport(EnergyBudget):
     r"""calculates the 1 dimensional heat transport as the difference
     between the local temperature and the global mean temperature.
 
-    :param float b:     budyko transport parameter                      \n
-                        - unit: :math:`\\textrm{W} / \\left( \\textrm{m}^2 \\ ^{\circ} \\textrm{C} \\right)`   \n
-                        - default value: ``3.81``
+    :param float b:     Budyko transport parameter in units of
+                        :math:`\textrm{W} / \left( \textrm{m}^2 \ ^{\circ} \textrm{C} \right)`
+                        [default value: 3.81]
 
     As BudykoTransport is a :class:`~climlab.process.process.Process` it needs
     a state do be defined on. See example for details.
 
-    **Computation Details:** \n
+    **Computation Details:**
 
     In a global Energy Balance Model
 
     .. math::
 
-        C \\frac{dT}{dt} = R\downarrow - R\uparrow - H
+        C \frac{dT}{dt} = R\downarrow - R\uparrow - H
 
     with model state :math:`T`, the energy transport term :math:`H`
     can be described as
 
     .. math::
 
-        H = b [T - \\bar{T}]
+        H = b [T - \bar{T}]
 
-    where :math:`T` is a vector of the model temperature and :math:`\\bar{T}`
+    where :math:`T` is a vector of the model temperature and :math:`\bar{T}`
     describes the mean value of :math:`T`.
 
-    For further information see :cite:`Budyko_1969`.
+    For further information see :cite:t:`Budyko_1969`.
 
     :Example:
 

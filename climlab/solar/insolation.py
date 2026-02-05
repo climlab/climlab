@@ -32,7 +32,7 @@ If using calendar days, solar longitude is found using an
 approximate solution to the differential equation representing conservation
 of angular momentum (Kepler's Second Law).  Given the orbital parameters
 and solar longitude, daily average insolation is calculated exactly
-following :cite:`Berger_1978`. Further references: :cite:`Berger_1991`.
+following :cite:t:`Berger_1978`. Further references: :cite:t:`Berger_1991`.
 
 """
 import numpy as np

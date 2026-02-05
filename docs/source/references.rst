@@ -4,4 +4,4 @@ References
 ==========
 
 .. bibliography:: bibliography.bib
-   :list: bullet
+   :all:

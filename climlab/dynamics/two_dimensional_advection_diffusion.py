@@ -4,7 +4,7 @@ r"""Two-dimensional advection-diffusion transport for atmospheric tracers.
 This module implements transport of atmospheric tracers using a split-operator
 advection-diffusion scheme in latitude (y) and pressure (p) coordinates.
 
-The transport equation solved is (from Miller 1981, Western 2024):
+The transport equation solved is :cite:p:`{from}Miller_1981,Western_2024`:
 
 .. math::
 
@@ -14,16 +14,9 @@ The transport equation solved is (from Miller 1981, Western 2024):
     + \frac{\partial}{\partial p}\left(K_{pp} \frac{\partial \bar{\chi}}{\partial p}\right)
     + \text{mixed derivative terms}
 
-The advection is computed using the NIRVANA scheme (Leonard 1995, Gregory 2002),
+The advection is computed using the NIRVANA scheme :cite:p:`Leonard_1995,Gregory_2002`,
 which uses a cumulative integral formulation with parabolic interpolation
 and monotonicity limiters.
-
-References
-----------
-.. [1] Leonard, B.P. (1995). "NIRVANA" scheme.
-.. [2] Gregory, D. (2002). Q. J. R. Meteorol. Soc.
-.. [3] Miller, M. (1981). Two-dimensional transport.
-.. [4] Western, L. (2024). MALTA scheme for mixed diffusion.
 """
 from __future__ import division
 from builtins import range

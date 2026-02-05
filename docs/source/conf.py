@@ -155,6 +155,7 @@ intersphinx_mapping = {	'python':('http://docs.python.org/', None),
 		      }
 
 bibtex_bibfiles = ['bibliography.bib']
+bibtex_reference_style = 'author_year'
 
 # -- Options for HTML output ----------------------------------------------
 

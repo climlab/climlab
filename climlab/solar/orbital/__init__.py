@@ -1,7 +1,7 @@
 """
 The object ``climlab.solar.orbital.OrbitalTable`` is an ``xarray.Dataset``
 holding orbital data (**eccentricity**, **obliquity**, and **longitude of perihelion**)
-for the past 5 Myears. The data are from :cite:`Berger_1991`.
+for the past 5 Myears. The data are from :cite:t:`Berger_1991`.
 
 Data are read from the file ``orbit91``, which was originally obtained from
 <https://www1.ncdc.noaa.gov/pub/data/paleo/climate_forcing/orbital_variations/insolation/>
@@ -10,7 +10,7 @@ from the above URL.
 
 A subclass ``climlab.solar.orbital.long.OrbitalTable``
 works with La2004 orbital data for
--51 to +21 Myears as calculated by :cite:`Laskar_2004`.
+-51 to +21 Myears as calculated by :cite:t:`Laskar_2004`.
 See <http://vo.imcce.fr/insola/earth/online/earth/La2004/README.TXT>
 
 (Breaking change from climlab 0.7.0 and previous)
