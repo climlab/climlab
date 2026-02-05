@@ -30,3 +30,4 @@ from .meridional_advection_diffusion import MeridionalAdvectionDiffusion, Meridi
 from .meridional_heat_diffusion import MeridionalHeatDiffusion
 from .meridional_moist_diffusion import MeridionalMoistDiffusion
 from .large_scale_condensation import LargeScaleCondensation
+from .two_dimensional_advection_diffusion import TwoDimensionalAdvectionDiffusion
