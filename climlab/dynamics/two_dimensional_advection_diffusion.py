@@ -17,6 +17,8 @@ The transport equation solved is :cite:p:`{from}Miller_1981,Western_2024`:
 The advection is computed using the NIRVANA scheme :cite:p:`Leonard_1995,Gregory_2002`,
 which uses a cumulative integral formulation with parabolic interpolation
 and monotonicity limiters.
+
+Work in progress! Will be adding more documentation here.
 """
 from __future__ import division
 from builtins import range
