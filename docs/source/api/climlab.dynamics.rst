@@ -11,7 +11,6 @@ climlab.dynamics
 
     climlab.dynamics.BudykoTransport
     climlab.dynamics.AdvectionDiffusion
-    climlab.dynamics.TwoDimensionalAdvectionDiffusion
     climlab.dynamics.MeridionalAdvectionDiffusion
     climlab.dynamics.MeridionalHeatDiffusion
     climlab.dynamics.MeridionalMoistDiffusion
