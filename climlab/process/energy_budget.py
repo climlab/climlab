@@ -73,7 +73,7 @@ class EnergyBudget(TimeDependentProcess):
 
 
 class ExternalEnergySource(EnergyBudget):
-    """A fixed energy source or sink to be specified by the user.
+    r"""A fixed energy source or sink to be specified by the user.
 
     **Object attributes** \n
 
@@ -85,12 +85,12 @@ class ExternalEnergySource(EnergyBudget):
 
     After initialization the user should modify the fields in the
     ``heating_rate`` dictionary, which contain heating rates in
-    unit :math:`\\textrm{W}/ \\textrm{m}^2` for all state variables.
+    unit :math:`textrm{W}/ \textrm{m}^2` for all state variables.
 
     :Example:
 
         Creating an Energy Balance Model with a uniform external energy source
-        of :math:`10 \\ \\textrm{W}/ \\textrm{m}^2` for all latitudes::
+        of :math:`10 ~ \textrm{W}/ \textrm{m}^2` for all latitudes::
 
             >>> import climlab
             >>> from climlab.process.energy_budget import ExternalEnergySource

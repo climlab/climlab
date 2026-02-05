@@ -109,9 +109,9 @@ def surface_state(num_lat=90,
     :param int num_lat:         number of latitude points [default: 90]
     :param int num_lat:         (optional) number of longitude points [default: None]
     :param float water_depth:   depth of the slab ocean in meters [default: 10.]
-    :param float T0:            global-mean initial temperature in :math:`^{\circ} \\textrm{C}` [default: 12.]
+    :param float T0:            global-mean initial temperature in :math:`^{\circ} \textrm{C}` [default: 12.]
     :param float T2:            2nd Legendre coefficient for equator-to-pole gradient in
-                                initial temperature, in :math:`^{\circ} \\textrm{C}` [default: -40.]
+                                initial temperature, in :math:`^{\circ} \textrm{C}` [default: -40.]
 
     :returns:                   dictionary with temperature
                                 :class:`~climlab.domain.field.Field`

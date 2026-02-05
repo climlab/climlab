@@ -46,8 +46,7 @@ class FixedRelativeHumidity(DiagnosticProcess):
 
 class ManabeWaterVapor(FixedRelativeHumidity):
     def __init__(self, **kwargs):
-        '''Compute water vapor mixing ratio profile following
-        Manabe and Wetherald JAS 1967
+        '''Compute water vapor mixing ratio profile following :cite:t:`Manabe_1967`:
         Fixed surface relative humidity and a specified fractional profile.
 
         relative_humidity is the specified surface RH

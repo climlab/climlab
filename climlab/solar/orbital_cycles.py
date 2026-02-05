@@ -15,7 +15,7 @@ class OrbitalCycles(object):
                  segment_length_years=100.,
                  orbital_year_factor=1.,
                  verbose=True ):
-        """Automatically integrates a process through changes in orbital parameters.
+        r"""Automatically integrates a process through changes in orbital parameters.
 
         OrbitalCycles is a module for setting up long integrations of climlab
         processes over orbital cycles.
@@ -52,7 +52,7 @@ class OrbitalCycles(object):
 
         :param float kyear_stop:            integration stop time.             \n
                                             As time reference
-                                            is present, argument should be :math:`\\le 0`
+                                            is present, argument should be :math:`\le 0`
                                             for time before present.
 
                                                 * *unit:* kiloyears        \n
@@ -83,7 +83,7 @@ class OrbitalCycles(object):
 
                                             .. math::
 
-                                                num_{seg} = \\frac{-(kyear_{start}-kyear_{stop})*1000}{seg_{length} * orb_{factor}}
+                                                num_{seg} = \frac{-(kyear_{start}-kyear_{stop})*1000}{seg_{length} * orb_{factor}}
 
         :ivar array T_segments_global:      storage for global mean temperature
                                             for final year of each segment

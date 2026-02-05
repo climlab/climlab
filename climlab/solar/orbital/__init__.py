@@ -1,4 +1,4 @@
-"""
+r"""
 The object ``climlab.solar.orbital.OrbitalTable`` is an ``xarray.Dataset``
 holding orbital data (**eccentricity**, **obliquity**, and **longitude of perihelion**)
 for the past 5 Myears. The data are from :cite:t:`Berger_1991`.

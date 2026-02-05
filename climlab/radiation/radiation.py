@@ -1,4 +1,4 @@
-'''``_Radiation``, ``_Radiation_SW`` and ``_Radiation_LW``
+r'''``_Radiation``, ``_Radiation_SW`` and ``_Radiation_LW``
 are the base classes for radiative transfer modules
 
 Currently this includes :class:`~climlab.radiation.cam3.CAM3`,

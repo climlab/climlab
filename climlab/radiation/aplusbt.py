@@ -90,7 +90,7 @@ class AplusBT(EnergyBudget):
 
     @property
     def A(self):
-        """Property of AplusBT parameter A.
+        r"""Property of AplusBT parameter A.
 
         :getter:    Returns the parameter A which is stored in attribute
                     ``self._A``
@@ -127,7 +127,7 @@ class AplusBT(EnergyBudget):
         self.param['A'] = value
     @property
     def B(self):
-        """Property of AplusBT parameter B.
+        r"""Property of AplusBT parameter B.
 
         :getter:    Returns the parameter B which is stored in attribute
                     ``self._B``
@@ -155,7 +155,7 @@ class AplusBT(EnergyBudget):
 
 
 class AplusBT_CO2(EnergyBudget):
-    """Linear longwave radiation module considering CO2 concentration.
+    r"""Linear longwave radiation module considering CO2 concentration.
 
     This radiation subprocess is based in the idea to linearize the Outgoing
     Longwave Radiation (OLR) emitted to space according to the surface temperature
@@ -170,20 +170,20 @@ class AplusBT_CO2(EnergyBudget):
         A(c) = -326.4 + 9.161 c - 3.164 c^2 + 0.5468 c^3            \n
         B(c) =  1.953 - 0.04866 c + 0.01309 c^2 - 0.002577 c^3
 
-    where :math:`c=\\log \\frac{p}{300}` and :math:`p` represents
+    where :math:`c=\log \frac{p}{300}` and :math:`p` represents
     the concentration of :math:`CO_2` in the atmosphere.
 
-    For further reading see :cite:`Caldeira_1992`.
+    For further reading see :cite:t:`Caldeira_1992`.
 
 
-    **Initialization parameters** \n
+    **Initialization parameters**
 
     An instance of ``AplusBT_CO2`` is initialized with the following
     argument:
 
     :param float CO2:   The concentration of :math:`CO_2` in the atmosphere.
                         Referred to as :math:`p` in the above given formulas.\n
-                        - unit: :math:`\\textrm{ppm}` (parts per million)   \n
+                        - unit: :math:`\textrm{ppm}` (parts per million)   \n
                         - default value: ``300.0``
 
 
@@ -265,7 +265,7 @@ class AplusBT_CO2(EnergyBudget):
 
     @property
     def CO2(self):
-        """Property of AplusBT_CO2 parameter CO2.
+        r"""Property of AplusBT_CO2 parameter CO2.
 
         :getter:    Returns the CO2 concentration which is stored in attribute
                     ``self._CO2``

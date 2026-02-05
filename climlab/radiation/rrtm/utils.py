@@ -51,7 +51,7 @@ def interface_temperature(Ts, Tatm, **kwargs):
     return Tinterp
 
 def _climlab_to_rrtm(field, spectral_axis=False, do_lev_flip=True):
-    '''Prepare field with proper dimension order.
+    r'''Prepare field with proper dimension order.
     RRTM code expects arrays with (ncol, nlay)
     and with pressure decreasing from surface at element 0
 

@@ -121,60 +121,60 @@ class EBM(TimeDependentProcess):
     :param int num_lat:         number of equally spaced points for the
                                 latitue grid. Used for domain intialization of
                                 :class:`~climlab.domain.domain.zonal_mean_surface`
-                                                                            \n
+                                                                            
                                 - default value: ``90``
     :param int num_lon:         number of equally spaced points in longitude
-                                                                            \n
+                                                                            
                                 - default value: ``None``
-    :param float S0:            solar constant                              \n
-                                - unit: :math:`\\frac{\\textrm{W}}{\\textrm{m}^2}`   \n
+    :param float S0:            solar constant                             
+                                - unit: :math:`\frac{\textrm{W}}{\textrm{m}^2}`   
                                 - default value: ``1365.2``
     :param float A:             parameter for linear OLR parametrization
-                                :class:`~climlab.radiation.AplusBT.AplusBT` \n
-                                - unit: :math:`\\frac{\\textrm{W}}{\\textrm{m}^2}`   \n
+                                :class:`~climlab.radiation.AplusBT.AplusBT`
+                                - unit: :math:`\frac{\textrm{W}}{\textrm{m}^2}`
                                 - default value: ``210.0``
     :param float B:             parameter for linear OLR parametrization
-                                :class:`~climlab.radiation.AplusBT.AplusBT` \n
-                                - unit: :math:`\\frac{\\textrm{W}}{\\textrm{m}^2 \\ ^{\circ} \\textrm{C}}`   \n
+                                :class:`~climlab.radiation.AplusBT.AplusBT`
+                                - unit: :math:`\frac{\textrm{W}}{\textrm{m}^2 ~ ^{\circ} \textrm{C}}` 
                                 - default value: ``2.0``
     :param float D:             diffusion parameter for Meridional Energy Diffusion
                                 :class:`~climlab.dynamics.diffusion.MeridionalDiffusion`
-                                                                            \n
-                                - unit: :math:`\\frac{\\textrm{W}}{\\textrm{m}^2 \\ ^{\circ} \\textrm{C}}`   \n
+                                                                            
+                                - unit: :math:`\frac{\textrm{W}}{\textrm{m}^2 ~ ^{\circ} \textrm{C}}`   
                                 - default value: ``0.555``
     :param float water_depth:   depth of :class:`~climlab.domain.domain.zonal_mean_surface`
                                 domain, which the heat capacity is dependent on
-                                                                            \n
-                                - unit: meters                              \n
+                                                                            
+                                - unit: meters                              
                                 - default value: ``10.0``
-    :param float Tf:            freezing temperature                        \n
-                                - unit: :math:`^{\circ} \\textrm{C}`                    \n
+    :param float Tf:            freezing temperature                        
+                                - unit: :math:`^{\circ} \textrm{C}`                   
                                 - default value: ``-10.0``
     :param float a0:            base value for planetary albedo parametrization
                                 :class:`~climlab.surface.albedo.StepFunctionAlbedo`
-                                                                            \n
+                                                                            
                                 - unit: dimensionless
                                 - default value: ``0.3``
     :param float a2:            parabolic value for planetary  albedo parametrization
                                 :class:`~climlab.surface.albedo.StepFunctionAlbedo`
-                                                                            \n
+                                                                            
                                 - unit: dimensionless
                                 - default value: ``0.078``
     :param float ai:            value for ice albedo paramerization in
                                 :class:`~climlab.surface.albedo.StepFunctionAlbedo`
-                                                                            \n
+                                                                            
                                 - unit: dimensionless
                                 - default value: ``0.62``
-    :param float timestep:      specifies the EBM's timestep                \n
+    :param float timestep:      specifies the EBM's timestep                
                                 - unit: seconds
-                                - default value: (365.2422 * 24 * 60 * 60 ) / 90 \n
+                                - default value: (365.2422 * 24 * 60 * 60 ) / 90 
                                   -> (90 timesteps per year)
-    :param float T0:            base value for initial temperature          \n
-                                - unit :math:`^{\circ} \\textrm{C}`         \n
+    :param float T0:            base value for initial temperature          
+                                - unit :math:`^{\circ} \textrm{C}`         
                                 - default value: ``12``
     :param float T2:            factor for 2nd Legendre polynomial
                                 :class:`~climlab.utils.legendre.P2`
-                                to calculate initial temperature            \n
+                                to calculate initial temperature            
                                 - unit: dimensionless
                                 - default value: ``40``
 
@@ -319,12 +319,12 @@ class EBM(TimeDependentProcess):
 
         .. math::
 
-            H(\\varphi) = 2 \pi R^2 \int_{-\pi/2}^{\\varphi} cos\phi \ R_{TOA} d\phi
+            H(\varphi) = 2 \pi R^2 \int_{-\pi/2}^{\varphi} cos\phi \ R_{TOA} d\phi
 
         where :math:`R_{TOA}` is the net radiation at top of atmosphere.
 
 
-        :return: total heat transport on the latitude grid in unit :math:`\\textrm{PW}`
+        :return: total heat transport on the latitude grid in unit :math:`\textrm{PW}`
         :rtype: array of size ``np.size(self.lat_lat)``
 
         :Example:
@@ -339,13 +339,13 @@ class EBM(TimeDependentProcess):
                 integrate.cumulative_trapezoid(np.cos(phi)*energy_in, x=phi, initial=0.))
 
     def diffusive_heat_transport(self):
-        r"""Compute instantaneous diffusive heat transport in unit :math:`\\textrm{PW}`
+        r"""Compute instantaneous diffusive heat transport in unit :math:`\textrm{PW}`
         on the staggered grid (bounds) through calculating:
 
         .. math::
 
-            H(\\varphi) = - 2 \pi R^2 cos(\\varphi) D \\frac{dT}{d\\varphi}
-                        \\approx - 2 \pi R^2 cos(\\varphi) D \\frac{\Delta T}{\Delta \\varphi}
+            H(\varphi) = - 2 \pi R^2 cos(\varphi) D \frac{dT}{d\varphi}
+                        \approx - 2 \pi R^2 cos(\varphi) D \frac{\Delta T}{\Delta \varphi}
 
         :rtype: array of size ``np.size(self.lat_bounds)``
 
