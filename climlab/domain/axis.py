@@ -10,7 +10,7 @@ axis_types = ['lev', 'lat', 'lon', 'depth', 'abstract']
 # and probaly also an abstract dimensionless axis type (for box models)
 
 class Axis(object):
-    """Creates a new climlab Axis object.
+    r"""Creates a new climlab Axis object.
 
     An :class:`~climlab.domain.axis.Axis` is an object where information of a
     spacial dimension of a :class:`~climlab.domain.domain._Domain` are specified.
@@ -24,7 +24,7 @@ class Axis(object):
     is an instance of :class:`~climlab.domain.domain._Domain`.
 
 
-    **Initialization parameters** \n
+    **Initialization parameters**
 
     An instance of ``Axis`` is initialized with the following
     arguments *(for detailed information see Object attributes below)*:
@@ -43,7 +43,7 @@ class Axis(object):
     :raises: :exc:`ValueError`
                             if ``bounds`` are given and not array-like.
 
-    **Object attributes** \n
+    **Object attributes**
 
     Following object attributes are generated during initialization:
 
@@ -63,7 +63,7 @@ class Axis(object):
     :ivar array delta:      array with spatial differences between bounds
 
 
-    **Axis Types** \n
+    **Axis Types**
 
     A couple of differing axis type strings are rendered to valid axis types.
     Alternate forms are listed here:

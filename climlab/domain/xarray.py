@@ -29,7 +29,7 @@ def Field_to_xarray(field):
     return da
 
 def state_to_xarray(state):
-    '''Convert a dictionary of climlab.Field objects to xarray.Dataset
+    r'''Convert a dictionary of climlab.Field objects to xarray.Dataset
 
     Input: dictionary of climlab.Field objects
     (e.g. process.state or process.diagnostics dictionary)
@@ -59,7 +59,7 @@ def state_to_xarray(state):
     return ds
 
 def to_xarray(input):
-    '''Convert climlab input to xarray format.
+    r'''Convert climlab input to xarray format.
 
     If input is a climlab.Field object, return xarray.DataArray
 

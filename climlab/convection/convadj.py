@@ -8,7 +8,7 @@ from .akmaev_adjustment import convective_adjustment_direct
 
 
 class ConvectiveAdjustment(TimeDependentProcess):
-    '''Hard Convective Adjustment to a prescribed lapse rate.
+    r'''Hard Convective Adjustment to a prescribed lapse rate.
 
     This process computes the instantaneous adjustment to conservatively
     remove any instabilities in each column.

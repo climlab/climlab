@@ -11,14 +11,14 @@ def column_state(num_lev=30,
                  lev=None,
                  lat=None,
                  water_depth=1.0):
-    """Sets up a state variable dictionary consisting of temperatures
+    r"""Sets up a state variable dictionary consisting of temperatures
     for atmospheric column (``Tatm``) and surface mixed layer (``Ts``).
 
     Surface temperature is always 288 K. Atmospheric temperature is initialized
     between 278 K at lowest altitude and 200 at top of atmosphere according to
     the number of levels given.
 
-    **Function-call arguments** \n
+    **Function-call arguments**
 
     :param int num_lev:         number of pressure levels
                                 (evenly spaced from surface to top of atmosphere)
@@ -86,7 +86,7 @@ def surface_state(num_lat=90,
                   water_depth=10.,
                   T0=12.,
                   T2=-40.):
-    """Sets up a state variable dictionary for a surface model
+    r"""Sets up a state variable dictionary for a surface model
     (e.g. :class:`~climlab.model.ebm.EBM`) with a uniform slab ocean depth.
 
     The domain is either 1D (latitude) or 2D (latitude, longitude)
@@ -104,7 +104,7 @@ def surface_state(num_lat=90,
     where :math:`\phi` is latitude, and :math:`P_2` is the second Legendre
     polynomial :class:`~climlab.utils.legendre.P2`.
 
-    **Function-call arguments** \n
+    **Function-call arguments**
 
     :param int num_lat:         number of latitude points [default: 90]
     :param int num_lat:         (optional) number of longitude points [default: None]
