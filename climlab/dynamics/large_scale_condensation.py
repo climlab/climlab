@@ -24,7 +24,7 @@ Diagnostics:
 - ``latent_heating``: latent heating rate (every grid cell) in units of W m\ :sup:`-2`
 - ``precipitation``: precipitation rate (column total) in units of kg m\ :sup:`-2` s\ :sup:`-1` or mm s\ :sup:`-1`
 
-The condensation rule follows the SPEEDY model (Molteni 2003 doi:10.1007/s00382-002-0268-2). 
+The condensation rule follows the SPEEDY model :cite:p:`Molteni_2003`. 
 Condensation is modeled as a relaxation of relative humidity toward a 
 specified profile wherever the tropospheric relative humidity exceeds the target.
 

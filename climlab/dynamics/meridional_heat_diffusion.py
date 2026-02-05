@@ -41,7 +41,7 @@ from climlab import constants as const
 
 
 class MeridionalHeatDiffusion(MeridionalDiffusion):
-    '''A 1D diffusion solver for Energy Balance Models.
+    r'''A 1D diffusion solver for Energy Balance Models.
 
     Solves the meridional heat diffusion equation
 

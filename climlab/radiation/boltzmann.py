@@ -25,7 +25,7 @@ class Boltzmann(EnergyBudget):
 
     .. math::
 
-        C \frac{dT}{dt} = R\downarrow - R\uparrow - H  \n
+        C \frac{dT}{dt} = R\downarrow - R\uparrow - H
 
     The :class:`Boltzmann` radiation subprocess represents the outgoing radiation
     :math:`R\uparrow` which then can be written as
@@ -36,7 +36,7 @@ class Boltzmann(EnergyBudget):
 
     with state variable :math:`T`.
 
-    **Initialization parameters** \n
+    **Initialization parameters**
 
     An instance of ``Boltzmann`` is initialized with the following
     arguments:
@@ -48,7 +48,7 @@ class Boltzmann(EnergyBudget):
                         effectiveness in transmitting the longwave radiation
                         emitted from the surface [default: 0.95]
 
-    **Object attributes** \n
+    **Object attributes**
 
     During initialization both arguments described above are created as object
     attributes which calls their setter function (see below).
