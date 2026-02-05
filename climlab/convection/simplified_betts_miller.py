@@ -1,5 +1,6 @@
-'''
-A climlab process for the Frierson Simplified Betts Miller convection scheme
+r'''
+A climlab process for the Frierson Simplified Betts Miller 
+convection scheme :cite:p:`Frierson_2007`:
 
         :Example:
 
@@ -119,9 +120,9 @@ es0 = 1.0
 
 
 class SimplifiedBettsMiller(TimeDependentProcess):
-    '''
+    r'''
     The climlab wrapper for Dargan Frierson's Simplified Betts Miller moist 
-    convection scheme (Frierson 2007, J. Atmos. Sci. 64, doi:10.1175/JAS3935.1)
+    convection scheme :cite:p:`Frierson_2007`.
 
     Basic characteristics:
 

@@ -10,7 +10,7 @@ dependencies:
   - netCDF4
   - xarray
   - pooch
-  - sphinx <8.2
+  - sphinx
   - ipython
   - jupyter
   - sphinx_rtd_theme

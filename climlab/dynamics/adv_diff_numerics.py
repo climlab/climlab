@@ -133,7 +133,7 @@ and :math:`\boldsymbol{T}` is a :math:`J\times J` tridiagonal matrix:
 .. math::
 
     \begin{equation}
-    \boldsymbol{T} ~ \boldsymbol{\psi} = \left[\begin{array}{ccccccc} T_{m0} & T_{u1} & 0 & ... & 0 & 0 & 0 \\T_{l0} & T_{m1} & T_{u2} & ... & 0 & 0 & 0 \\ 0 & T_{l1} & T_{m2} & ... & 0 & 0 & 0 \\... & ... & ... & ... & ... & ... & ... \\0 & 0 & 0 & ... & T_{m(J-3)} & T_{u(J-2)} & 0 \\0 & 0 & 0 & ... & T_{l(J-3)} & T_{m(J-2)} & T_{u(J-1)} \\0 & 0 & 0 & ... & 0 & T_{l(J-2)} & T_{m(J-1)}\end{array}\right] \left[\begin{array}{c} \psi_0 \\ \psi_1 \\ \psi_2 \\... \\ \psi_{J-3} \\ \psi_{J-2} \\ \psi_{J-1} \end{array}\right]
+    \boldsymbol{T} ~ \boldsymbol{\psi} = \left[\begin{array}{ccccccc} T_{m0} & T_{u1} & 0 & ... & 0 & 0 & 0 \\ T_{l0} & T_{m1} & T_{u2} & ... & 0 & 0 & 0 \\ 0 & T_{l1} & T_{m2} & ... & 0 & 0 & 0 \\... & ... & ... & ... & ... & ... & ... \\0 & 0 & 0 & ... & T_{m(J-3)} & T_{u(J-2)} & 0 \\0 & 0 & 0 & ... & T_{l(J-3)} & T_{m(J-2)} & T_{u(J-1)} \\0 & 0 & 0 & ... & 0 & T_{l(J-2)} & T_{m(J-1)}\end{array}\right] \left[\begin{array}{c} \psi_0 \\ \psi_1 \\ \psi_2 \\... \\ \psi_{J-3} \\ \psi_{J-2} \\ \psi_{J-1} \end{array}\right]
     \end{equation}
 
 with vectors :math:`T_l, T_m, T_u` representing respectively the lower, main, and upper diagonals of :math:`\boldsymbol{T}`.

@@ -6,7 +6,7 @@ from climlab.process import EnergyBudget
 
 
 class GreyGas(EnergyBudget):
-    '''Base class for all band radiation models,
+    r'''Base class for all band radiation models,
     including grey and semi-grey model.
 
     Input argument absorptivity is band absorptivity

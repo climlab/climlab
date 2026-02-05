@@ -1,4 +1,4 @@
-'''Processes for surface turbulent heat and moisture fluxes
+r'''Processes for surface turbulent heat and moisture fluxes
 
 :class:`~climlab.surface.SensibleHeatFlux` and
 :class:`~climlab.surface.LatentHeatFlux` implement standard bulk formulae

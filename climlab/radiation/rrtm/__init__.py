@@ -1,4 +1,4 @@
-''' climlab wrapper for RRTMG radiation schemes.
+r''' climlab wrapper for RRTMG radiation schemes.
 
 This is implemented with classes :class:`~climlab.radiation.rrtm.RRTMG_LW`, and
 :class:`~climlab.radiation.rrtm.RRTMG_SW`,

@@ -7,7 +7,7 @@ from copy import copy
 
 
 class NbandRadiation(GreyGas):
-    '''Process for radiative transfer.
+    r'''Process for radiative transfer.
     Solves the discretized Schwarschild two-stream equations
     with the spectrum divided into N spectral bands.
 
@@ -143,7 +143,7 @@ class NbandRadiation(GreyGas):
 
 class ThreeBandSW(NbandRadiation):
     def __init__(self, emissivity_sfc=0., **kwargs):
-        '''A three-band mdoel for shortwave radiation.
+        r'''A three-band mdoel for shortwave radiation.
 
         The spectral decomposition used here is largely based on the
         "Moist Radiative-Convective Model" by Aarnout van Delden, Utrecht University
@@ -194,7 +194,7 @@ class FourBandSW(NbandRadiation):
     #  visible band with no absorption and near-infrared with weak H2O absorption
     #   But this needs some tuning and better documentation
     def __init__(self, emissivity_sfc=0., **kwargs):
-        '''A four-band mdoel for shortwave radiation.
+        r'''A four-band mdoel for shortwave radiation.
 
         The spectral decomposition used here is largely based on the
         "Moist Radiative-Convective Model" by Aarnout van Delden, Utrecht University
@@ -242,7 +242,7 @@ class FourBandSW(NbandRadiation):
 
 class FourBandLW(NbandRadiation):
     def __init__(self, **kwargs):
-        '''Closely following SPEEDY / MITgcm longwave model
+        r'''Closely following SPEEDY / MITgcm longwave model
         band 0 is window region (between 8.5 and 11 microns)
         band 1 is CO2 channel (the band of strong absorption by CO2 around 15 microns)
         band 2 is weak H2O channel (aggregation of spectral regions with weak to moderate absorption by H2O)
@@ -294,7 +294,7 @@ class FourBandLW(NbandRadiation):
 
 
 def SPEEDY_band_fraction(T):
-    '''Python / numpy implementation of the formula used by SPEEDY and MITgcm
+    r'''Python / numpy implementation of the formula used by SPEEDY and MITgcm
     to partition longwave emissions into 4 spectral bands.
 
     Input: temperature in Kelvin

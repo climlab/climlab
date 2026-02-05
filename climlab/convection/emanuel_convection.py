@@ -29,7 +29,7 @@ CL=2500.0
 #CPV = CPD  #  try neglecting effect of water vapor on heat capacity
 
 class EmanuelConvection(TimeDependentProcess):
-    '''
+    r'''
     The climlab wrapper for Kerry Emanuel's moist convection scheme <https://emanuel.mit.edu/FORTRAN-subroutine-convect>
 
     From the documentation distributed with the Fortran 77 code CONVECT:
