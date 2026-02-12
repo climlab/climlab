@@ -24,7 +24,7 @@ PLOT_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'test_plots'
 # Test grid parameters
 NUM_LAT = 18  # Latitude points
 NUM_LEV = 10  # Pressure levels
-TIMESTEP = 86400.0  # 1 day in seconds
+TIMESTEP = np.timedelta64(86400, 's')  # 1 day in seconds
 
 
 def create_test_domain():
