@@ -403,7 +403,9 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
             dqdz = numerics.extend_to_boundaries(dqdz, axis=0)
             dqdz = 0.5 * (dqdz[1:, :] + dqdz[:-1, :])
             tracer_m = 0.5 * (tracer_by[:-1, :] + tracer_by[1:, :])
-            self._Ud = k_y_zmid * dqdz / tracer_m
+            # avoid division by zero:
+            self._Ud = np.divide(k_y_zmid * dqdz, tracer_m, out=np.zeros_like(k_y_zmid, dtype=float), 
+                                 where=(tracer_m != 0))
             self._Ud = np.where(tracer_m < MIXED_DIFFUSION_EPSILON * max_tracer, 0, self._Ud)
         else:
             self._Ud = self._U * 0.0
@@ -417,7 +419,9 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
             dqdy = numerics.extend_to_boundaries(dqdy, axis=1)
             dqdy = 0.5 * (dqdy[:, 1:] + dqdy[:, :-1])
             tracer_m = 0.5 * (tracer_bz[:, :-1] + tracer_bz[:, 1:])
-            self._Wd = k_ymid_z * dqdy / tracer_m
+            # avoid division by zero:
+            self._Wd = np.divide(k_ymid_z * dqdy, tracer_m, out=np.zeros_like(k_ymid_z, dtype=float), 
+                                 where=(tracer_m != 0))
             self._Wd = np.where(tracer_m < MIXED_DIFFUSION_EPSILON * max_tracer, 0, self._Wd)
         else:
             self._Wd = self._W * 0.0
