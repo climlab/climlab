@@ -6,12 +6,9 @@ produces consistent results after refactoring.
 import os
 import numpy as np
 import pytest
-from climlab.domain.domain import zonal_mean_column
-from climlab.domain.field import Field
-from climlab.dynamics.two_dimensional_advection_diffusion import (
-    TwoDimensionalAdvectionDiffusion,
-    ParticleSink,
-)
+from climlab.domain import zonal_mean_column
+from climlab.domain import Field
+from climlab.dynamics import TwoDimensionalAdvectionDiffusion, ParticleSink
 from climlab.dynamics import two_d_adv_diff_numerics as numerics
 
 try:
