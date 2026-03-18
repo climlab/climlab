@@ -1,4 +1,3 @@
-#  Clarify the spherical geometrical factors in the documented equation
 r"""Two-dimensional advection-diffusion transport for atmospheric tracers.
 
 This module implements transport of atmospheric tracers using a split-operator
@@ -79,12 +78,37 @@ from climlab.dynamics import two_d_adv_diff_numerics as numerics
 
 # Named constants for numerical stability
 MIXED_DIFFUSION_EPSILON = 1e-2  # Cutoff for Kyz effective velocity
-VELOCITY_EPSILON = 1e-20  # Avoid division by zero in timestep calc
-DIFFUSIVITY_EPSILON = 1e-9  # Avoid division by zero in timestep calc
+# VELOCITY_EPSILON = 1e-20  # Avoid division by zero in timestep calc
+# DIFFUSIVITY_EPSILON = 1e-9  # Avoid division by zero in timestep calc
 CFL_ADVECTION = 0.5  # Courant number for advection
-CFL_DIFFUSION = 0.5  # Safety factor for diffusion timestep
+# CFL_DIFFUSION = 0.5  # Safety factor for diffusion timestep
 ### Some of these are not being used currently.
 ### Also need to be propertly documented
+
+
+# BR thoughts about refactoring this code
+# - Age of Air should definitely be removed and handled in a subclass rather than runtime switches
+# - Several different pieces are combined here
+# - MALTA scheme takes off-diagonal diffusivities and recasts them as advecting velocities
+#   - This could be a standalone diagnostic process
+# - After that, diffusion is very simple, and we should just be using the existing climlab solvers
+#   - We have two independent 1D diffusive processes occuring in the meridional and vertical (pressure) dimensions
+#   - So the pure diffusion part of the problem can be implemented with subprocesses 
+#   - This will simplify the code and result in automated diagnostics for each component
+# - The rest of the code here is to implement the 2D advection solver using NIRVANA scheme
+#   - with the complicating issue of the adaptive timestep.
+# - It should be possible to separate and encapsulate things in simpler ways:
+#   - A process that implements 2D advection via the NIRVANA scheme, given advecting velocities as inputs
+#   - Processes for vertical and meridional advection (these already exist)
+#   - The existing TwoDimensionalAdvectionDiffusion process could then be implemented a parent process that handles
+#     - Calculation of the eddy-induced advecting velocities (MALTA)
+#     - Subprocesses for calculating tracer tendencies from advection and the two diffusion equations
+# - The adaptive timestep is a challenge. Climlab gracefully handles subproceses with longer timesteps,
+#   but the assumption is that top-level process always has the shortest timestep (this is enforced)
+#   - So if a process modifies its own timestep after model creation, that will throw things off
+
+# To do: implement more non-trivial tests of advection and diffusion before mucking around too much
+
 
 class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
     r"""Two-dimensional advection-diffusion transport process.
@@ -279,13 +303,17 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         # self._inner_tracer is modified by the call to self._advdiff_timestep()        
         self._inner_tracer = self._tracer * 1e0
 
+        # Where all the action happens. Resulting tendencies are applied to self._inner_tracer
         self._advdiff_timestep()
 
+        # Adjustment to tracer state has already been computed but needs to be re-expressed as a tendency here
+        #  I think this logic is only necessary because of the adaptive inner timestep
         dtracer = self._inner_tracer - self._tracer
-
         tendencies = {}
         for name, value in self.state.items():
             tendencies[name] = dtracer / self.timestep_in_seconds
+
+        # The rest is strictly diagnostics
 
         # massmat here is the tracer mass element
         massmat = self.M_air * self._tracer
@@ -326,6 +354,7 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         #  and no diagnostics
         #  (it also doesn't make use of new timedelta64 units for the time handling)
         for j in range(int(self.timestep_in_seconds / self._dt_advdiff)):
+
             # These handle advection using the NIRVANA scheme
             #   self.advective_flux_yy and self.advective_flux_zz are calculated 
             #   self._inner_tracer is incremented to account for two types of flux convergence:
@@ -532,7 +561,7 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
 
     def _set_advdiff_dt(self):
         dtlat = dtlev = dtkz = dtky = dtkxy = 1e20  # Start very large
-        courant = 0.5
+        courant = CFL_ADVECTION
         #  I think this is just to deal with some broadcasting of dy = a cos(phi) dphi onto the same grid as U
         dlatm = np.append(np.append(self._dlatbounds[0],np.minimum(self._dlatbounds[:-1], self._dlatbounds[1:])),self._dlatbounds[-1])
         # Minimum dy / U in units of seconds * 0.5
