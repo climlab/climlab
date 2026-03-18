@@ -72,7 +72,6 @@ and monotonicity limiters.
 
 Work in progress! Will be adding more documentation here.
 """
-from __future__ import division
 from builtins import range
 import numpy as np
 from climlab import constants as const
