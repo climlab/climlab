@@ -9,18 +9,18 @@ The transport equation solved is :cite:p:`{from}Miller_1981,Western_2024`:
 .. math::
 
     \frac{\partial \chi}{\partial t} + \frac{v}{a} \frac{\partial \chi}{\partial \phi}
-    + \omega \frac{\partial \chi}{\partial p} = S - \nabla \cdot \vec{F}
+    + \omega \frac{\partial \chi}{\partial p} = S - \nabla \cdot \left( \vec{F} + \vec{F_s} \right)
 
 for zonally averaged tracer :math:`\chi`, and velocity components :math:`v` and :math:`\omega`
 in the :math:`\phi, p` plane, where :math:`a` is the planetary radius. 
-On the right hand side, :math:`S` is a prescribed tracer source and :math:`\vec{F}` 
-is a diffusive tracer flux with components :math:`F_\phi, F_p` in the :math:`\phi, p` plane
+On the right hand side, :math:`S` is a prescribed tracer source, :math:`\vec{F_s}` is
+a prescribed tracer flux, and :math:`\vec{F}` is a diffusive tracer flux 
+with components :math:`F_\phi, F_p` in the :math:`\phi, p` plane:
 
 .. math::
 
-    F_\phi = -K_{\phi\phi} \frac{1}{a} \frac{\partial \chi}{\partial \phi}  - K_{\phi p} \frac{\partial \chi}{\partial p} \\
+    F_\phi = - K_{\phi\phi} \frac{1}{a} \frac{\partial \chi}{\partial \phi}  - K_{\phi p} \frac{\partial \chi}{\partial p} \\
     F_p = - K_{p \phi} \frac{1}{a} \frac{\partial \chi}{\partial \phi} - K_{pp} \frac{\partial \chi}{\partial p} 
-
 
 whose divergence on the sphere is given by
 
@@ -67,8 +67,7 @@ with transformed diffusivitiy tensor components
     K_{p y} = K_{p \phi} \cos\phi 
 
 The advection is computed using the NIRVANA scheme :cite:p:`Leonard_1995,Gregory_2002`,
-which uses a cumulative integral formulation with parabolic interpolation
-and monotonicity limiters.
+which uses a cumulative integral formulation with parabolic interpolation and monotonicity limiters.
 
 Work in progress! Will be adding more documentation here.
 """
@@ -150,6 +149,7 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
             self._tracer = value
             self._inner_tracer = self._tracer * 0
             nlat, nlev = value.shape
+            #  These should probably be properly defined as diagnostics and initialized as Field objects
             self.advective_flux_yy = np.zeros((nlat + 1, nlev))
             self.advective_flux_zz = np.zeros((nlat, nlev + 1))
             self.diffusive_flux_yy = np.zeros((nlat + 1, nlev))
@@ -177,6 +177,9 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         self.add_diagnostic(self.diagname_column_density, 0.*self._tracer[:,0])  # Column-integrated tracer mass per unit surface area in kg / m^2
         #  Why are we using kwargs.get() here rather than just naming explicit (optional) inputs??
         self.source_param_dict = kwargs.get('source_param_dict', {})
+        #  BR question: should the logic for the age of air calculation be implemented elsewhere?
+        #   This process should be completely agnostic about what tracer we are advecting
+        #  We can just create a subclass of the process to implement this specific case
         self.age_of_air = kwargs.get('age_of_air', 0)
         if self.age_of_air == 1:
             self.tropopause = kwargs.get('tropopause', None) * 1e2
@@ -186,11 +189,23 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
             self._under_trop = lev_2d > self.tropopause[:,None]
 
         #  Why are we using kwargs.get() here rather than just naming explicit (optional) inputs??
+        #  These are for specified tracer sources, but implemented as arbitrary functions
+        #   Including specified FLUXES in y and p (or z) direction, and specified tracer tendency
+        #  BR question: can we remove this and just treat source as externally computed?
+        #   If we want the source to be dependent on model state or time in some way, 
+        #  that should be handled in a separate diagnostic process within climlab
+        #  We should avoid formulations where the source depends on strictly internal information 
+        #  local to this process
+        #    The assumption here with the default value is that the source function calculates a FLUX of tracer
+        #    Not a tracer tendency
         fy_source_func = kwargs.get('fy_source_func', lambda obj: 0 * obj.advective_flux_yy)
         fz_source_func = kwargs.get('fz_source_func', lambda obj: 0 * obj.advective_flux_zz)
         source_func = kwargs.get('source_func', lambda obj: 0 * obj._inner_tracer)
 
-        #  Same question here
+        #  Why are we using kwargs.get() here rather than just naming explicit (optional) inputs??
+        #  and what purpose are these factors serving? 
+        #  They are applied to the computed tracer tendencies, so seems to be a way to scale tendencies arbitrarily up or down.
+        #  What circumstances are we trying to cover here?
         self.tend_fac_fz_diff = kwargs.get('tend_fac_fz_diff', 1.0)
         self.tend_fac_fy_diff = kwargs.get('tend_fac_fy_diff', 1.0)
         self.tend_fac_fz_adv = kwargs.get('tend_fac_fz_adv', 1.0)
@@ -284,11 +299,12 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         return tendencies
 
     def _advdiff_timestep(self):
-        #  Is is possible to refactor much of this as functions rather than methods 
-        # so it's clearer what are the inputs and outputs?
+        #  Refactor much of this as functions rather than methods so it's clearer 
+        #  what is being computed / modified in each step
 
         # This step only does anything if self.age_of_air == 1
         #  In which case set self._inner_tracer to self.time['days_elapsed'] / 365.0 below tropopause
+        #  This should be removed and handled in an age-of-air specific subclass
         self._boundary_conditions_tracer()
 
         #  This step implements the MALTA scheme from Western et al. (2024) which approximates
@@ -302,6 +318,7 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         #       self._dt_advdiff = self.timestep_in_seconds / nsteps
         #  Should be a function returning dt_advdiff, nsteps
         self._set_advdiff_dt()
+
         #  This iterates of the number nsteps of internal timesteps
         #   Is it possible to replace this internal loop with a system that dynamically adjusts
         #   the known-to-climlab timestep of the process?
@@ -309,9 +326,22 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         #  and no diagnostics
         #  (it also doesn't make use of new timedelta64 units for the time handling)
         for j in range(int(self.timestep_in_seconds / self._dt_advdiff)):
+            # These handle advection using the NIRVANA scheme
+            #   self.advective_flux_yy and self.advective_flux_zz are calculated 
+            #   self._inner_tracer is incremented to account for two types of flux convergence:
+            #       - advective tracer flux convergence
+            #       - prescribed tracer source flux convergence
             self._advect_along_axis(self._AXIS_LAT)
             self._advect_along_axis(self._AXIS_LEV)
+
+            #  This calculates the diffusive fluxes self.diffusive_flux_yy, self.diffusive_flux_zz
+            #  Basically just computing -Kyy d/dy (tracer) and -Kpp d/dp (tracer)
             self._compute_k_fluxes()
+
+            #  Add three increments to self._inner_tracer:
+            #   - diffusive flux convergence in y direction
+            #   - diffusive flux convergence in p (or z) direction
+            #   - prescribed tracer source tendency
             self._update_field_k()
 
     def _advect_along_axis(self, axis):
@@ -436,6 +466,7 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         self.diffusive_flux_yy = -self.Kyy * np.diff(tracer_by, axis=0) / dym[:, None]
         self.diffusive_flux_yy[0, :] = 0.0
         self.diffusive_flux_yy[-1, :] = 0.0
+        # BR: need to clarify the geometric factors for this flux
 
         # Z-direction diffusive flux
         tracer_bz = numerics.extend_to_boundaries(self._inner_tracer, axis=1)
