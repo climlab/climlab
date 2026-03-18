@@ -128,6 +128,9 @@ These are self-describing, and should run out-of-the-box once the package is ins
 Release history
 ---------------
 
+Version 0.9.2 (released March 2025)
+    Maintenance release bringing compatibility with Pandas 3.0 and some bug fixes.
+
 Version 0.9.1 (released February 2025)
     Bug fix and clean up of the codebase. Some legacy code for former Python 2.7 support was removed (hasn't been tested or supported in a long time).
 
