@@ -28,7 +28,7 @@ whose divergence on the sphere is given by
 
     \nabla \cdot \vec{F} = \frac{1}{a\cos\phi} \frac{\partial}{\partial \phi} \left( \cos\phi F_\phi \right) +  \frac{\partial F_p}{\partial p}
 
-so that the full convergence tracer flux convergence including mixed derivative terms is
+so that the full tracer flux convergence including mixed derivative terms is
     
 .. math::
 
@@ -44,8 +44,24 @@ Internally, the horizontal coordinate is transformed to an area-preserving coord
 
     y \equiv a \sin\phi
 
-so that increments :math:`dy = a \cos\phi` represent equal surface area increments. 
-    
+so that increments :math:`dy = a \cos\phi` represent equal surface area increments, following :cite:t:`Miller_1981`.
+
+Defining a transformed meridional wind :math:`v^* \equiv v \cos\phi`, the advection-diffusion equation becomes
+
+.. math::
+
+    \frac{\partial \chi}{\partial t} + v^* \frac{\partial \chi}{\partial y} + \omega \frac{\partial \chi}{\partial p} = 
+    S + \frac{\partial}{\partial y}\left(K_{yy} \frac{\partial \chi}{\partial y} + K_{y p} \frac{\partial \chi}{\partial p} \right) \\
+    + \frac{\partial}{\partial p} \left(K_{p y} \frac{\partial \chi}{\partial y} + K_{pp} \frac{\partial \chi}{\partial p} \right)
+   
+with transformed diffusivitiy tensor components
+
+.. math::
+
+    K_{y y} = K_{\phi\phi} \cos^2\phi \\
+    K_{y p} = K_{\phi p} \cos\phi \\
+    K_{p y} = K_{p \phi} \cos\phi 
+
 The advection is computed using the NIRVANA scheme :cite:p:`Leonard_1995,Gregory_2002`,
 which uses a cumulative integral formulation with parabolic interpolation
 and monotonicity limiters.
