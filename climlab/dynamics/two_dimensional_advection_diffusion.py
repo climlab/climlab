@@ -2,9 +2,20 @@
 r"""Two-dimensional advection-diffusion transport for atmospheric tracers.
 
 This module implements transport of atmospheric tracers using a split-operator
-advection-diffusion scheme in latitude (y) and pressure (p) coordinates.
+advection-diffusion scheme in latitude (:math:`\phi`) and pressure (:math:`p`) coordinates.
 
 The transport equation solved is :cite:p:`{from}Miller_1981,Western_2024`:
+
+.. math::
+
+    \frac{\partial \chi}{\partial t} + \frac{v}{a} \frac{\partial \chi}{\partial \phi}
+    + \omega \frac{\partial \chi}{\partial p} = S 
+    + \frac{1}{a^2 \cos\phi} \frac{\partial}{\partial \phi}\left(\cos\phi K_{\phi\phi} \frac{\partial \chi}{\partial \phi}\right)
+
+for zonally averaged tracer :math:`\chi`, and velocity components :math:`v` and :math:`\omega`
+in the :math:`\phi, p` plane, where :math:`a` is the planetary radius.
+
+or this
 
 .. math::
 
