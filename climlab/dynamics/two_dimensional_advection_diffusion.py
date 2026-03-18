@@ -72,7 +72,6 @@ and monotonicity limiters.
 
 Work in progress! Will be adding more documentation here.
 """
-from builtins import range
 import numpy as np
 from climlab import constants as const
 from climlab.process.time_dependent_process import TimeDependentProcess
