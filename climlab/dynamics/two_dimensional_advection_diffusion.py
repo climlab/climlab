@@ -8,20 +8,25 @@ The transport equation solved is :cite:p:`{from}Miller_1981,Western_2024`:
 .. math::
 
     \frac{\partial \chi}{\partial t} + \frac{v}{a} \frac{\partial \chi}{\partial \phi}
-    + \omega \frac{\partial \chi}{\partial p} = S - \nabla \cdot \left( \vec{F} + \vec{F_s} \right)
+    + \omega \frac{\partial \chi}{\partial p} = S - \nabla \cdot \left( \vec{F_s} - \mathbf{K} \cdot \nabla \chi \right)
 
 for zonally averaged tracer :math:`\chi`, and velocity components :math:`v` and :math:`\omega`
 in the :math:`\phi, p` plane, where :math:`a` is the planetary radius. 
 On the right hand side, :math:`S` is a prescribed tracer source, :math:`\vec{F_s}` is
-a prescribed tracer flux, and :math:`\vec{F}` is a diffusive tracer flux 
-with components :math:`F_\phi, F_p` in the :math:`\phi, p` plane:
+a prescribed tracer flux, and :math:`\mathbf{K}` is a diffusivity tensor in the :math:`\phi, p` plane:
+
+.. math::
+
+    \mathbf{K} = \begin{bmatrix} K_{\phi\phi} & K_{\phi p} \\ K_{p \phi} & K_{pp} \end{bmatrix}
+
+The diffusive flux :math:`\vec{F}` in the :math:`\phi, p` plane has components :math:`F_\phi, F_p`:
 
 .. math::
 
     F_\phi = - K_{\phi\phi} \frac{1}{a} \frac{\partial \chi}{\partial \phi}  - K_{\phi p} \frac{\partial \chi}{\partial p} \\
     F_p = - K_{p \phi} \frac{1}{a} \frac{\partial \chi}{\partial \phi} - K_{pp} \frac{\partial \chi}{\partial p} 
 
-whose divergence on the sphere is given by
+and its divergence on the sphere is given by
 
 .. math::
 
