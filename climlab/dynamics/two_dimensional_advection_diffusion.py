@@ -9,22 +9,43 @@ The transport equation solved is :cite:p:`{from}Miller_1981,Western_2024`:
 .. math::
 
     \frac{\partial \chi}{\partial t} + \frac{v}{a} \frac{\partial \chi}{\partial \phi}
-    + \omega \frac{\partial \chi}{\partial p} = S 
-    + \frac{1}{a^2 \cos\phi} \frac{\partial}{\partial \phi}\left(\cos\phi K_{\phi\phi} \frac{\partial \chi}{\partial \phi}\right)
+    + \omega \frac{\partial \chi}{\partial p} = S - \nabla \cdot \vec{F}
 
 for zonally averaged tracer :math:`\chi`, and velocity components :math:`v` and :math:`\omega`
-in the :math:`\phi, p` plane, where :math:`a` is the planetary radius.
-
-or this
+in the :math:`\phi, p` plane, where :math:`a` is the planetary radius. 
+On the right hand side, :math:`S` is a prescribed tracer source and :math:`\vec{F}` 
+is a diffusive tracer flux with components :math:`F_\phi, F_p` in the :math:`\phi, p` plane
 
 .. math::
 
-    \frac{\partial \bar{\chi}}{\partial t} + v^{adv}_y \frac{\partial \bar{\chi}}{\partial y}
-    + w^{adv} \frac{\partial \bar{\chi}}{\partial p} = \bar{S}_\chi
-    + \frac{\partial}{\partial y}\left(K_{yy} \frac{\partial \bar{\chi}}{\partial y}\right)
-    + \frac{\partial}{\partial p}\left(K_{pp} \frac{\partial \bar{\chi}}{\partial p}\right)
-    + \text{mixed derivative terms}
+    F_\phi = -K_{\phi\phi} \frac{1}{a} \frac{\partial \chi}{\partial \phi}  - K_{\phi p} \frac{\partial \chi}{\partial p} \\
+    F_p = - K_{p \phi} \frac{1}{a} \frac{\partial \chi}{\partial \phi} - K_{pp} \frac{\partial \chi}{\partial p} 
 
+
+whose divergence on the sphere is given by
+
+.. math::
+
+    \nabla \cdot \vec{F} = \frac{1}{a\cos\phi} \frac{\partial}{\partial \phi} \left( \cos\phi F_\phi \right) +  \frac{\partial F_p}{\partial p}
+
+so that the full convergence tracer flux convergence including mixed derivative terms is
+    
+.. math::
+
+    - \nabla \cdot \vec{F} = 
+    + \frac{1}{a^2 \cos\phi} \frac{\partial}{\partial \phi}\left(\cos\phi K_{\phi\phi} \frac{\partial \chi}{\partial \phi}\right) \\
+    + \frac{1}{a\cos\phi} \frac{\partial}{\partial \phi} \left( \cos\phi K_{\phi p} \frac{\partial \chi}{\partial p} \right) \\
+    + \frac{\partial}{\partial p} \left(K_{p \phi} \frac{1}{a} \frac{\partial \chi}{\partial \phi} \right)\\
+    + \frac{\partial}{\partial p}\left(K_{pp} \frac{\partial \chi}{\partial p}\right)
+
+Internally, the horizontal coordinate is transformed to an area-preserving coordinate :math:`y` defined by 
+
+.. math::
+
+    y \equiv a \sin\phi
+
+so that increments :math:`dy = a \cos\phi` represent equal surface area increments. 
+    
 The advection is computed using the NIRVANA scheme :cite:p:`Leonard_1995,Gregory_2002`,
 which uses a cumulative integral formulation with parabolic interpolation
 and monotonicity limiters.
