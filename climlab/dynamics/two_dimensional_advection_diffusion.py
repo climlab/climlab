@@ -115,18 +115,6 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         Suffix for diagnostic variable names.
     """
 
-## Docs must clarify that the independent coordinate in the latitude dimension is
-## y = a sin(phi)
-##  so the differential is dy = a cos(phi) dphi 
-## with phi the latitude in radians
-##   Miller (1981)
-##  "equal increments in y correspond to equal increments in global surface area"
-##
-##  And if Vphi is the velocity in the latitudinal direction
-## Then we define Vy = Vphi cos(phi)
-##                Kyy = Kphiphi cos^2(phi)
-##                Kyz = Kphiz cos(phi) 
-
 ###  Should there be more diagnostics defined? E.g. advective and diffusive fluxes?
 
     # Axis indices for 2D (lat, lev) arrays
