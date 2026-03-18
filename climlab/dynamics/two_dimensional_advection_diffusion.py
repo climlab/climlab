@@ -38,6 +38,10 @@ so that the full tracer flux convergence including mixed derivative terms is
     + \frac{\partial}{\partial p} \left(K_{p \phi} \frac{1}{a} \frac{\partial \chi}{\partial \phi} \right)\\
     + \frac{\partial}{\partial p}\left(K_{pp} \frac{\partial \chi}{\partial p}\right)
 
+Here :math:`K_{\phi\phi}, K_{\phi p}, K_{p \phi}, K_{pp}` are components of the diffusivity tensor, 
+assumed to be functions of position :math:`\phi, p`. Units are m²/s for :math:`K_{\phi\phi}`, 
+Pa²/s for :math:`K_{pp}`, and Pa m/s for the off-diagonal components.
+
 Internally, the horizontal coordinate is transformed to an area-preserving coordinate :math:`y` defined by 
 
 .. math::
