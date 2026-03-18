@@ -122,13 +122,12 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
     _AXIS_LEV = 1
 
     def __init__(self,
-                 Kyy=0.,
-                 Kzz=0,
-                 Kyz=0,
-                 U=0.,
-                 W=0.,
+                 Kyy=0.,  # consider renaming Kphiphi
+                 Kzz=0.,  # consider renaming Kpp   
+                 Kyz=0.,  # consider renaming Kphip
+                 U=0.,    # consider renaming V
+                 W=0.,    # consider renaming Omega  (pressure coordinates)
                  W_sedimentation=0.,
-                 rho=0,  #  Needs documentation. Not currently used.
                  prescribed_flux=0.,  # to be documented
                  interpolation_order=2,  # documented above, currently 1 or 2
                  #  Probably better to have named options like interpolation_order = "linear"
@@ -141,10 +140,12 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
             #  Consider renaming "lat" to "y" in the code. This is y = a sin(phi) as defined in Miller (1981)
             self._latbounds = np.sin(self._phibounds) * const.a  # meters
             self._dlatbounds = np.diff(self._latbounds)
-            self._levbounds = dom.axes['lev'].bounds *1e2
-            self._dlevbounds = np.diff(self._levbounds)
-            self._latpoints = 0.5*(self._latbounds[1:] + self._latbounds[:-1])
-            self._levpoints = 0.5*(self._levbounds[1:] + self._levbounds[:-1])
+            self._levbounds = dom.axes['lev'].bounds *1e2  # convert from hPa to Pascals
+            self._dlevbounds = np.diff(self._levbounds)  # Pascals
+            # this is y = a sin(phi) at tracer points, not sure why we don't use the actual center point coordinates for this
+            self._latpoints = 0.5*(self._latbounds[1:] + self._latbounds[:-1])  
+            # Similarly here, not sure why we interpolate rather than use actual grid center points
+            self._levpoints = 0.5*(self._levbounds[1:] + self._levbounds[:-1])  # Pascals
         for varname, value in self.state.items():
             self._tracer = value
             self._inner_tracer = self._tracer * 0
@@ -157,24 +158,24 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         self.prescribed_flux = prescribed_flux  # flux including boundary conditions
         self.interpolation_order = interpolation_order
         self.use_limiters = use_limiters
-        self.U = U  # Advecting velocity in units of [length] / [time]
-        self.W = W  # Advecting velocity in units of [hpa] / [time]
+        self.U = U  # Advecting velocity in units of m / s
+        self.W = W  # Advecting velocity in units of Pa / s
         self.W_sedimentation = W_sedimentation
         self._Ud = U * 0.0 # Kyz diffusion translated to advective velocities.
         self._Wd = W * 0.0 # Kyz diffusion translated to advective velocities.
         self._Utot = U * 0.0 # total advective velocities (U + Ud)
         self._Wtot = W * 0.0 # total advective velocities (W + Wd)
         self._dt_advdiff = self.timestep_in_seconds
-        self.rho = rho
         self.Kyy = Kyy  # Diffusivity in units of [length]**2 / [time]
         self.Kzz = Kzz  # Diffusivity in units of [length]**2 / [time]
         self.Kyz = Kyz
-        #  This is mass of air on the staggered grid I think. Probably a clearer way to express this
+        #  This is mass of air per grid point
         self.M_air = 2*np.pi*const.a**2.0*np.diff(np.sin(self._phibounds))[:, None] * self._dlevbounds[None,:] / const.g
-        self.diagname_total_tracer_mass = 'total_tracer_mass'+diagnostic_name_suffix
+        self.diagname_total_tracer_mass = 'total_tracer_mass'+diagnostic_name_suffix 
         self.diagname_column_density = 'column_density'+diagnostic_name_suffix
-        self.add_diagnostic(self.diagname_total_tracer_mass, np.array([0.0]))
-        self.add_diagnostic(self.diagname_column_density, 0.*self._tracer[:,0])
+        self.add_diagnostic(self.diagname_total_tracer_mass, np.array([0.0]))  # Total tracer mass in kg
+        self.add_diagnostic(self.diagname_column_density, 0.*self._tracer[:,0])  # Column-integrated tracer mass per unit surface area in kg / m^2
+        #  Why are we using kwargs.get() here rather than just naming explicit (optional) inputs??
         self.source_param_dict = kwargs.get('source_param_dict', {})
         self.age_of_air = kwargs.get('age_of_air', 0)
         if self.age_of_air == 1:
@@ -184,10 +185,12 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
             lev_2d = np.tile(self._levpoints, (len(self._latpoints), 1))
             self._under_trop = lev_2d > self.tropopause[:,None]
 
+        #  Why are we using kwargs.get() here rather than just naming explicit (optional) inputs??
         fy_source_func = kwargs.get('fy_source_func', lambda obj: 0 * obj.advective_flux_yy)
         fz_source_func = kwargs.get('fz_source_func', lambda obj: 0 * obj.advective_flux_zz)
         source_func = kwargs.get('source_func', lambda obj: 0 * obj._inner_tracer)
 
+        #  Same question here
         self.tend_fac_fz_diff = kwargs.get('tend_fac_fz_diff', 1.0)
         self.tend_fac_fy_diff = kwargs.get('tend_fac_fy_diff', 1.0)
         self.tend_fac_fz_adv = kwargs.get('tend_fac_fz_adv', 1.0)
@@ -215,6 +218,7 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
     def Kyy(self):
         ##  Here the factor cos(phi)**2 is applied
         # The user-facing Kyy is actuall Kphiphi without area weighting
+        #  which we should probably rename
         return np.where(self._Kyy < 0, 0, self._Kyy) * (np.cos(self._phibounds[:, None]))**2.0
     @Kyy.setter
     def Kyy(self, Kvalue):
@@ -237,8 +241,9 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
 
     @property
     def U(self):
-        #  But now I'm confused. Are we applying the area weighting for U elsewhere?
-        #  And why is it U and not V?
+        #  For now, the assumption is that the geometric weighting factor cos(latitude) has already been applied
+        #    Consider renaming to V
+        #    And consider requiring that the input in unweighted, so we would need to apply the weighting here
         return self._U #* np.cos(self._phibounds[:, None])
     @U.setter
     def U(self, Uvalue):
@@ -256,7 +261,7 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         self._W = Wvalue * np.ones(sizeJplus1)
 
     def _compute(self):
-        
+        # self._inner_tracer is modified by the call to self._advdiff_timestep()        
         self._inner_tracer = self._tracer * 1e0
 
         self._advdiff_timestep()
@@ -267,23 +272,42 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
         for name, value in self.state.items():
             tendencies[name] = dtracer / self.timestep_in_seconds
 
+        # massmat here is the tracer mass element
         massmat = self.M_air * self._tracer
-        #  Can we use the already computed M here instead??
+        #  Surface area of a ring
         area = 2*np.pi*const.a**2.0*np.diff(np.sin(self._phibounds))
-        # print(self.diagname_total_tracer_mass)
-        # print(type(self.diagname_total_tracer_mass))
-        # print(type(massmat))
-        # print(type(np.array([np.sum(massmat)])))
-        # print(f"total mass: {np.sum(massmat)}")
-        self.__setattr__(self.diagname_total_tracer_mass, np.array([np.sum(massmat)]))
-        self.__setattr__(self.diagname_column_density, np.sum(massmat, axis=1) / area)
+        #  __setattr__ is used here because the name of the diagnostic name is user-configurable with diagnostic_name_suffix
+        #  There's probably a clearer way to handle this
+        self.__setattr__(self.diagname_total_tracer_mass, np.array([np.sum(massmat)]))  # Total tracer mass in kg
+        self.__setattr__(self.diagname_column_density, np.sum(massmat, axis=1) / area)  # Column-integrated tracer mass per unit surface area in kg / m^2
             
         return tendencies
 
     def _advdiff_timestep(self):
+        #  Is is possible to refactor much of this as functions rather than methods 
+        # so it's clearer what are the inputs and outputs?
+
+        # This step only does anything if self.age_of_air == 1
+        #  In which case set self._inner_tracer to self.time['days_elapsed'] / 365.0 below tropopause
         self._boundary_conditions_tracer()
+
+        #  This step implements the MALTA scheme from Western et al. (2024) which approximates
+        #  the mixed derivative diffusion terms as effective advective velocities
+        #    It sets self._Ud and self._Utot, and  self._Wd and self._Wtot
+        #  It would be simple to make this a function returning Ud, Wd
+        #  And define Utot, Wtot as dynamically computed properties
         self._mixed_diffusion_to_advection()
+
+        #  This step divides the full timestep into a number nsteps and set the field
+        #       self._dt_advdiff = self.timestep_in_seconds / nsteps
+        #  Should be a function returning dt_advdiff, nsteps
         self._set_advdiff_dt()
+        #  This iterates of the number nsteps of internal timesteps
+        #   Is it possible to replace this internal loop with a system that dynamically adjusts
+        #   the known-to-climlab timestep of the process?
+        #  The problem here is that there is no information reported about these intermediate steps
+        #  and no diagnostics
+        #  (it also doesn't make use of new timedelta64 units for the time handling)
         for j in range(int(self.timestep_in_seconds / self._dt_advdiff)):
             self._advect_along_axis(self._AXIS_LAT)
             self._advect_along_axis(self._AXIS_LEV)
@@ -476,22 +500,29 @@ class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
             self._inner_tracer[self._under_trop] = self.time['days_elapsed'] / 365.0
 
     def _set_advdiff_dt(self):
-        dtlat = dtlev = dtkz = dtky = dtkxy = 1e20
+        dtlat = dtlev = dtkz = dtky = dtkxy = 1e20  # Start very large
         courant = 0.5
+        #  I think this is just to deal with some broadcasting of dy = a cos(phi) dphi onto the same grid as U
         dlatm = np.append(np.append(self._dlatbounds[0],np.minimum(self._dlatbounds[:-1], self._dlatbounds[1:])),self._dlatbounds[-1])
+        # Minimum dy / U in units of seconds * 0.5
         dtlat = (np.abs(dlatm[:, None] / (self._Utot+1e-20))).min()*courant
         dlevm = np.append(np.append(self._dlevbounds[0],np.minimum(self._dlevbounds[:-1], self._dlevbounds[1:])),self._dlevbounds[-1])
+        #  And minimum dp / omega also in units of seconds * 0.5
         dtlev = (np.abs(dlevm[None, :] / (self._Wtot+1e-20))).min()*courant
         if self.Kyy.max()>0:
             dy_b = np.append(np.append(self._dlatbounds[0], self._dlatbounds), self._dlatbounds[-1])
             dym = 0.5*(dy_b[1:] + dy_b[:-1])
+            # Minimum value of dy**2 / Kyy in units of seconds
             dtky = (dym[:, None]**2/2/(self.Kyy+1e-9)).min()
         if self.Kzz.max()>0:
             dz_b = np.append(np.append(self._dlevbounds[0], self._dlevbounds), self._dlevbounds[-1])
             dzm = 0.5*(dz_b[1:] + dz_b[:-1])
+            # Minimum value of dp**2 / Kpp in units of seconds
             dtkz = (dzm[None, :]**2/2/(self.Kzz+1e-9)).min()
         fac = 0.5
+        #  Smallest one wins
         dt = min(dtlat*fac, dtlev*fac, dtkz*fac, dtky*fac, dtkxy*fac, self.timestep_in_seconds)
+        #  These are the two quantities that should be returned to the caller if we refactor as a function
         nsteps = np.ceil(self.timestep_in_seconds / dt)
         self._dt_advdiff = self.timestep_in_seconds / nsteps
 
