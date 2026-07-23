@@ -3,7 +3,6 @@ from climlab import constants as const
 from climlab.solar.insolation import daily_insolation, daily_insolation_factors, \
     instant_insolation, annual_insolation, solar_longitude, dates_to_day_index
 from climlab.solar.orbital import OrbitalTable
-from climlab.solar.orbital.long import OrbitalTable as LongOrbitalTable
 from climlab import EBM_seasonal
 from climlab.solar.orbital_cycles import OrbitalCycles
 from climlab.surface import StepFunctionAlbedo
