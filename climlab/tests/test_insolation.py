@@ -103,22 +103,6 @@ def test_orbital_interpolation():
     # test if insolation varies by more than 0.1 W/m2 per year
     assert S30.diff(dim='kyear').max() < 0.1
 
-
-@pytest.mark.slow
-def test_long_orbital_parameters():
-    kyears = np.arange( -1000., +500.)
-    orb = LongOrbitalTable.interp(kyear=kyears)
-
-    # check that orb has the right dictionary keys
-    # key: (min, max)
-    orb_expected = {'ecc': (0.0018, 0.0579),
-                    #'long_peri': (0.182, 360),
-                    'obliquity': (22, 24.5) }
-
-    for k in orb_expected:
-        assert orb[k].min() > orb_expected[k][0]
-        assert orb[k].max() < orb_expected[k][1]
-
 #  Tests of automatic orbital cycles with EBM
 @pytest.mark.slow
 def test_orbital_cycles():

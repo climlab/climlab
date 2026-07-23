@@ -9,4 +9,5 @@ markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
     "fast: marks tests as fast (select these only with '-m fast')",
     "compiled: marks tests as requiring compiled components (deselect with '-m \"not compiled\"')",
+    "long_orbital: marks tests that require the long orbital table which is accessed remotely (deselect with '-m \"not long_orbital\"')"
 ]
