@@ -17,7 +17,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.10', '3.11', '3.12', '3.13']
+        python-version: ['3.11', '3.12', '3.13', '3.14']
         os: [Ubuntu, macOS]
         include:
           - os: Ubuntu
@@ -30,14 +30,11 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Setup Python environment with Miniforge
-        uses: conda-incubator/setup-miniconda@v4
+      - name: Setup Python environment with micromamba
+        uses: mamba-org/setup-micromamba@v3
         with:
-          miniforge-version: latest
-          python-version: ${{ matrix.python-version }}
-          activate-environment: test_env
-          channel-priority: strict
           environment-file: ${{ matrix.environment-file }}
+          create-args: python=${{ matrix.python-version }}
 
       - name: Build and install climlab
         run: |
