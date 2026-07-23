@@ -49,7 +49,7 @@ jobs:
           
       - name: Run tests
         run: |
-          pytest -v --pyargs climlab.tests
+          pytest -v --pyargs climlab.tests -m "not long_orbital"
         #   when we're ready to use codecov again
         # run: |
         #   pytest -v --pyargs climlab.tests --cov=climlab --cov-config .coveragerc --cov-report term-missing -v

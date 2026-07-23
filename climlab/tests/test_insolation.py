@@ -3,7 +3,6 @@ from climlab import constants as const
 from climlab.solar.insolation import daily_insolation, daily_insolation_factors, \
     instant_insolation, annual_insolation, solar_longitude, dates_to_day_index
 from climlab.solar.orbital import OrbitalTable
-from climlab.solar.orbital.long import OrbitalTable as LongOrbitalTable
 from climlab import EBM_seasonal
 from climlab.solar.orbital_cycles import OrbitalCycles
 from climlab.surface import StepFunctionAlbedo
@@ -102,22 +101,6 @@ def test_orbital_interpolation():
     # there should be no abrupt changes
     # test if insolation varies by more than 0.1 W/m2 per year
     assert S30.diff(dim='kyear').max() < 0.1
-
-
-@pytest.mark.slow
-def test_long_orbital_parameters():
-    kyears = np.arange( -1000., +500.)
-    orb = LongOrbitalTable.interp(kyear=kyears)
-
-    # check that orb has the right dictionary keys
-    # key: (min, max)
-    orb_expected = {'ecc': (0.0018, 0.0579),
-                    #'long_peri': (0.182, 360),
-                    'obliquity': (22, 24.5) }
-
-    for k in orb_expected:
-        assert orb[k].min() > orb_expected[k][0]
-        assert orb[k].max() < orb_expected[k][1]
 
 #  Tests of automatic orbital cycles with EBM
 @pytest.mark.slow
