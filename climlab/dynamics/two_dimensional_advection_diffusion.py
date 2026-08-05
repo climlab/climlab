@@ -1,0 +1,641 @@
+r"""Two-dimensional advection-diffusion transport for atmospheric tracers.
+
+This module implements transport of atmospheric tracers using a split-operator
+advection-diffusion scheme in latitude (:math:`\phi`) and pressure (:math:`p`) coordinates.
+
+The transport equation solved is :cite:p:`{from}Miller_1981,Western_2024`:
+
+.. math::
+
+    \frac{\partial \chi}{\partial t} + \frac{v}{a} \frac{\partial \chi}{\partial \phi}
+    + \omega \frac{\partial \chi}{\partial p} = S - \nabla \cdot \left( \vec{F_s} - \mathbf{K} \cdot \nabla \chi \right)
+
+for zonally averaged tracer :math:`\chi`, and velocity components :math:`v` and :math:`\omega`
+in the :math:`\phi, p` plane, where :math:`a` is the planetary radius. 
+On the right hand side, :math:`S` is a prescribed tracer source, :math:`\vec{F_s}` is
+a prescribed tracer flux, and :math:`\mathbf{K}` is a diffusivity tensor in the :math:`\phi, p` plane:
+
+.. math::
+
+    \mathbf{K} = \begin{bmatrix} K_{\phi\phi} & K_{\phi p} \\ K_{p \phi} & K_{pp} \end{bmatrix}
+
+The diffusive flux :math:`\vec{F}` in the :math:`\phi, p` plane has components :math:`F_\phi, F_p`:
+
+.. math::
+
+    F_\phi = - K_{\phi\phi} \frac{1}{a} \frac{\partial \chi}{\partial \phi}  - K_{\phi p} \frac{\partial \chi}{\partial p} \\
+    F_p = - K_{p \phi} \frac{1}{a} \frac{\partial \chi}{\partial \phi} - K_{pp} \frac{\partial \chi}{\partial p} 
+
+and its divergence on the sphere is given by
+
+.. math::
+
+    \nabla \cdot \vec{F} = \frac{1}{a\cos\phi} \frac{\partial}{\partial \phi} \left( \cos\phi F_\phi \right) +  \frac{\partial F_p}{\partial p}
+
+so that the full tracer flux convergence including mixed derivative terms is
+    
+.. math::
+
+    - \nabla \cdot \vec{F} = 
+    + \frac{1}{a^2 \cos\phi} \frac{\partial}{\partial \phi}\left(\cos\phi K_{\phi\phi} \frac{\partial \chi}{\partial \phi}\right) \\
+    + \frac{1}{a\cos\phi} \frac{\partial}{\partial \phi} \left( \cos\phi K_{\phi p} \frac{\partial \chi}{\partial p} \right) \\
+    + \frac{\partial}{\partial p} \left(K_{p \phi} \frac{1}{a} \frac{\partial \chi}{\partial \phi} \right)\\
+    + \frac{\partial}{\partial p}\left(K_{pp} \frac{\partial \chi}{\partial p}\right)
+
+Here :math:`K_{\phi\phi}, K_{\phi p}, K_{p \phi}, K_{pp}` are components of the diffusivity tensor, 
+assumed to be functions of position :math:`\phi, p`. Units are m²/s for :math:`K_{\phi\phi}`, 
+Pa²/s for :math:`K_{pp}`, and Pa m/s for the off-diagonal components.
+
+Internally, the horizontal coordinate is transformed to an area-preserving coordinate :math:`y` defined by 
+
+.. math::
+
+    y \equiv a \sin\phi
+
+so that increments :math:`dy = a \cos\phi` represent equal surface area increments, following :cite:t:`Miller_1981`.
+
+Defining a transformed meridional wind :math:`v^* \equiv v \cos\phi`, the advection-diffusion equation becomes
+
+.. math::
+
+    \frac{\partial \chi}{\partial t} + v^* \frac{\partial \chi}{\partial y} + \omega \frac{\partial \chi}{\partial p} = 
+    S + \frac{\partial}{\partial y}\left(K_{yy} \frac{\partial \chi}{\partial y} + K_{y p} \frac{\partial \chi}{\partial p} \right) \\
+    + \frac{\partial}{\partial p} \left(K_{p y} \frac{\partial \chi}{\partial y} + K_{pp} \frac{\partial \chi}{\partial p} \right)
+   
+with transformed diffusivitiy tensor components
+
+.. math::
+
+    K_{y y} = K_{\phi\phi} \cos^2\phi \\
+    K_{y p} = K_{\phi p} \cos\phi \\
+    K_{p y} = K_{p \phi} \cos\phi 
+
+The advection is computed using the NIRVANA scheme :cite:p:`Leonard_1995,Gregory_2002`,
+which uses a cumulative integral formulation with parabolic interpolation and monotonicity limiters.
+
+Work in progress! Will be adding more documentation here.
+"""
+import numpy as np
+from climlab import constants as const
+from climlab.process.time_dependent_process import TimeDependentProcess
+from climlab.domain.field import Field
+from climlab.dynamics import two_d_adv_diff_numerics as numerics
+
+# Named constants for numerical stability
+MIXED_DIFFUSION_EPSILON = 1e-2  # Cutoff for Kyz effective velocity
+# VELOCITY_EPSILON = 1e-20  # Avoid division by zero in timestep calc
+# DIFFUSIVITY_EPSILON = 1e-9  # Avoid division by zero in timestep calc
+CFL_ADVECTION = 0.5  # Courant number for advection
+# CFL_DIFFUSION = 0.5  # Safety factor for diffusion timestep
+### Some of these are not being used currently.
+### Also need to be propertly documented
+
+
+# BR thoughts about refactoring this code
+# - Age of Air should definitely be removed and handled in a subclass rather than runtime switches
+# - Several different pieces are combined here
+# - MALTA scheme takes off-diagonal diffusivities and recasts them as advecting velocities
+#   - This could be a standalone diagnostic process
+# - After that, diffusion is very simple, and we should just be using the existing climlab solvers
+#   - We have two independent 1D diffusive processes occuring in the meridional and vertical (pressure) dimensions
+#   - So the pure diffusion part of the problem can be implemented with subprocesses 
+#   - This will simplify the code and result in automated diagnostics for each component
+# - The rest of the code here is to implement the 2D advection solver using NIRVANA scheme
+#   - with the complicating issue of the adaptive timestep.
+# - It should be possible to separate and encapsulate things in simpler ways:
+#   - A process that implements 2D advection via the NIRVANA scheme, given advecting velocities as inputs
+#   - Processes for vertical and meridional advection (these already exist)
+#   - The existing TwoDimensionalAdvectionDiffusion process could then be implemented a parent process that handles
+#     - Calculation of the eddy-induced advecting velocities (MALTA)
+#     - Subprocesses for calculating tracer tendencies from advection and the two diffusion equations
+# - The adaptive timestep is a challenge. Climlab gracefully handles subproceses with longer timesteps,
+#   but the assumption is that top-level process always has the shortest timestep (this is enforced)
+#   - So if a process modifies its own timestep after model creation, that will throw things off
+
+# To do: implement more non-trivial tests of advection and diffusion before mucking around too much
+
+
+class TwoDimensionalAdvectionDiffusion(TimeDependentProcess):
+    r"""Two-dimensional advection-diffusion transport process.
+
+    Solves the zonally-averaged tracer transport equation using split-operator
+    advection (NIRVANA scheme) and explicit diffusion.
+
+    Parameters
+    ----------
+    Kyy : float or ndarray
+        Meridional diffusivity in m²/s. Shape (nlat+1, nlev) at lat boundaries.
+    Kzz : float or ndarray
+        Vertical diffusivity in m²/s. Shape (nlat, nlev+1) at lev boundaries.
+    Kyz : float or ndarray
+        Mixed (off-diagonal) diffusivity in m²/s. Shape (nlat+1, nlev+1).
+    U : float or ndarray
+        Meridional advecting velocity in m/s. Shape (nlat+1, nlev).
+    W : float or ndarray
+        Vertical advecting velocity in Pa/s. Shape (nlat, nlev+1).
+    W_sedimentation : float or ndarray
+        Additional vertical sedimentation velocity in Pa/s.
+    interpolation_order : int
+        Order of interpolation: 1 for linear, 2 for parabolic (default: 2).
+    use_limiters : bool
+        Whether to apply monotonicity limiters (default: True).
+    diagnostic_name_suffix : str
+        Suffix for diagnostic variable names.
+    """
+
+###  Should there be more diagnostics defined? E.g. advective and diffusive fluxes?
+
+    # Axis indices for 2D (lat, lev) arrays
+    _AXIS_LAT = 0
+    _AXIS_LEV = 1
+
+    def __init__(self,
+                 Kyy=0.,  # consider renaming Kphiphi
+                 Kzz=0.,  # consider renaming Kpp   
+                 Kyz=0.,  # consider renaming Kphip
+                 U=0.,    # consider renaming V
+                 W=0.,    # consider renaming Omega  (pressure coordinates)
+                 W_sedimentation=0.,
+                 prescribed_flux=0.,  # to be documented
+                 interpolation_order=2,  # documented above, currently 1 or 2
+                 #  Probably better to have named options like interpolation_order = "linear"
+                 use_limiters=True,   # Minimal documentation above, need to clarify what it actually does
+                 diagnostic_name_suffix="",  # Should this capability be defined in parent process?
+                 **kwargs):
+        super(TwoDimensionalAdvectionDiffusion, self).__init__(**kwargs)
+        for dom in list(self.domains.values()):
+            self._phibounds = np.deg2rad(dom.axes['lat'].bounds)  # radians
+            #  Consider renaming "lat" to "y" in the code. This is y = a sin(phi) as defined in Miller (1981)
+            self._latbounds = np.sin(self._phibounds) * const.a  # meters
+            self._dlatbounds = np.diff(self._latbounds)
+            self._levbounds = dom.axes['lev'].bounds *1e2  # convert from hPa to Pascals
+            self._dlevbounds = np.diff(self._levbounds)  # Pascals
+            # this is y = a sin(phi) at tracer points, not sure why we don't use the actual center point coordinates for this
+            self._latpoints = 0.5*(self._latbounds[1:] + self._latbounds[:-1])  
+            # Similarly here, not sure why we interpolate rather than use actual grid center points
+            self._levpoints = 0.5*(self._levbounds[1:] + self._levbounds[:-1])  # Pascals
+        for varname, value in self.state.items():
+            self._tracer = value
+            self._inner_tracer = self._tracer * 0
+            nlat, nlev = value.shape
+            #  These should probably be properly defined as diagnostics and initialized as Field objects
+            self.advective_flux_yy = np.zeros((nlat + 1, nlev))
+            self.advective_flux_zz = np.zeros((nlat, nlev + 1))
+            self.diffusive_flux_yy = np.zeros((nlat + 1, nlev))
+            self.diffusive_flux_zz = np.zeros((nlat, nlev + 1))
+
+        self.prescribed_flux = prescribed_flux  # flux including boundary conditions
+        self.interpolation_order = interpolation_order
+        self.use_limiters = use_limiters
+        self.U = U  # Advecting velocity in units of m / s
+        self.W = W  # Advecting velocity in units of Pa / s
+        self.W_sedimentation = W_sedimentation
+        self._Ud = U * 0.0 # Kyz diffusion translated to advective velocities.
+        self._Wd = W * 0.0 # Kyz diffusion translated to advective velocities.
+        self._Utot = U * 0.0 # total advective velocities (U + Ud)
+        self._Wtot = W * 0.0 # total advective velocities (W + Wd)
+        self._dt_advdiff = self.timestep_in_seconds
+        self.Kyy = Kyy  # Diffusivity in units of [length]**2 / [time]
+        self.Kzz = Kzz  # Diffusivity in units of [length]**2 / [time]
+        self.Kyz = Kyz
+        #  This is mass of air per grid point
+        self.M_air = 2*np.pi*const.a**2.0*np.diff(np.sin(self._phibounds))[:, None] * self._dlevbounds[None,:] / const.g
+        self.diagname_total_tracer_mass = 'total_tracer_mass'+diagnostic_name_suffix 
+        self.diagname_column_density = 'column_density'+diagnostic_name_suffix
+        self.add_diagnostic(self.diagname_total_tracer_mass, np.array([0.0]))  # Total tracer mass in kg
+        self.add_diagnostic(self.diagname_column_density, 0.*self._tracer[:,0])  # Column-integrated tracer mass per unit surface area in kg / m^2
+        #  Why are we using kwargs.get() here rather than just naming explicit (optional) inputs??
+        self.source_param_dict = kwargs.get('source_param_dict', {})
+        #  BR question: should the logic for the age of air calculation be implemented elsewhere?
+        #   This process should be completely agnostic about what tracer we are advecting
+        #  We can just create a subclass of the process to implement this specific case
+        self.age_of_air = kwargs.get('age_of_air', 0)
+        if self.age_of_air == 1:
+            self.tropopause = kwargs.get('tropopause', None) * 1e2
+            if (self.tropopause is None):
+                raise ValueError("Input parameter 'tropopause' must not be None for age of air calculation")
+            lev_2d = np.tile(self._levpoints, (len(self._latpoints), 1))
+            self._under_trop = lev_2d > self.tropopause[:,None]
+
+        #  Why are we using kwargs.get() here rather than just naming explicit (optional) inputs??
+        #  These are for specified tracer sources, but implemented as arbitrary functions
+        #   Including specified FLUXES in y and p (or z) direction, and specified tracer tendency
+        #  BR question: can we remove this and just treat source as externally computed?
+        #   If we want the source to be dependent on model state or time in some way, 
+        #  that should be handled in a separate diagnostic process within climlab
+        #  We should avoid formulations where the source depends on strictly internal information 
+        #  local to this process
+        #    The assumption here with the default value is that the source function calculates a FLUX of tracer
+        #    Not a tracer tendency
+        fy_source_func = kwargs.get('fy_source_func', lambda obj: 0 * obj.advective_flux_yy)
+        fz_source_func = kwargs.get('fz_source_func', lambda obj: 0 * obj.advective_flux_zz)
+        source_func = kwargs.get('source_func', lambda obj: 0 * obj._inner_tracer)
+
+        #  Why are we using kwargs.get() here rather than just naming explicit (optional) inputs??
+        #  and what purpose are these factors serving? 
+        #  They are applied to the computed tracer tendencies, so seems to be a way to scale tendencies arbitrarily up or down.
+        #  What circumstances are we trying to cover here?
+        self.tend_fac_fz_diff = kwargs.get('tend_fac_fz_diff', 1.0)
+        self.tend_fac_fy_diff = kwargs.get('tend_fac_fy_diff', 1.0)
+        self.tend_fac_fz_adv = kwargs.get('tend_fac_fz_adv', 1.0)
+        self.tend_fac_fy_adv = kwargs.get('tend_fac_fy_adv', 1.0)
+        self.tend_fac_fz_source_func = kwargs.get('tend_fac_fz_source_func', 1.0)
+        self.tend_fac_fy_source_func = kwargs.get('tend_fac_fy_source_func', 1.0)
+        self.tend_fac_source_func = kwargs.get('tend_fac_source_func', 1.0)
+        
+        # Run once to validate
+        output_y = fy_source_func(self)
+        assert isinstance(output_y, np.ndarray), "fy_source_func must return a numpy array."
+        assert np.all(output_y.shape == self.advective_flux_yy.shape), f"fy_source_func expected output {self.advective_flux_yy.shape}, got {output_y.shape}."
+        output_z = fz_source_func(self)
+        assert isinstance(output_z, np.ndarray), "fz_source_func must return a numpy array."
+        assert np.all(output_z.shape == self.advective_flux_zz.shape), f"fz_source_func expected output {self.advective_flux_zz.shape}, got {output_z.shape}."
+        output = source_func(self)
+        assert isinstance(output, np.ndarray), "source_func must return a numpy array."
+        assert np.all(output.shape == self._inner_tracer.shape), f"source_func expected output {self._inner_tracer.shape}), got {output.shape}."
+        # If valid, store function
+        self._internal_fy_source_func = lambda: fy_source_func(self)
+        self._internal_fz_source_func = lambda: fz_source_func(self)
+        self._internal_source_func = lambda: source_func(self)
+
+    @property
+    def Kyy(self):
+        ##  Here the factor cos(phi)**2 is applied
+        # The user-facing Kyy is actuall Kphiphi without area weighting
+        #  which we should probably rename
+        return np.where(self._Kyy < 0, 0, self._Kyy) * (np.cos(self._phibounds[:, None]))**2.0
+    @Kyy.setter
+    def Kyy(self, Kvalue):
+        self._Kyy = Kvalue
+
+    @property
+    def Kzz(self):
+        return np.where(self._Kzz < 0, 0, self._Kzz)
+    @Kzz.setter
+    def Kzz(self, Kvalue):
+        self._Kzz = Kvalue
+
+    @property
+    def Kyz(self):
+        #  Same here, the weighting factor is automatically applied
+        return self._Kyz * np.cos(self._phibounds[:, None])
+    @Kyz.setter
+    def Kyz(self, Kvalue):
+        self._Kyz = Kvalue
+
+    @property
+    def U(self):
+        #  For now, the assumption is that the geometric weighting factor cos(latitude) has already been applied
+        #    Consider renaming to V
+        #    And consider requiring that the input in unweighted, so we would need to apply the weighting here
+        return self._U #* np.cos(self._phibounds[:, None])
+    @U.setter
+    def U(self, Uvalue):
+        # Set correct dimensions?
+        self._U = Uvalue * np.ones_like(self._phibounds[:, np.newaxis])
+
+    @property
+    def W(self):
+        return self._W
+    @W.setter
+    def W(self, Wvalue):
+        arr = self._tracer
+        J = arr.shape[-1]
+        sizeJplus1 = tuple([n for n in arr.shape[:-1]] + [J+1])
+        self._W = Wvalue * np.ones(sizeJplus1)
+
+    def _compute(self):
+        # self._inner_tracer is modified by the call to self._advdiff_timestep()        
+        self._inner_tracer = self._tracer * 1e0
+
+        # Where all the action happens. Resulting tendencies are applied to self._inner_tracer
+        self._advdiff_timestep()
+
+        # Adjustment to tracer state has already been computed but needs to be re-expressed as a tendency here
+        #  I think this logic is only necessary because of the adaptive inner timestep
+        dtracer = self._inner_tracer - self._tracer
+        tendencies = {}
+        for name, value in self.state.items():
+            tendencies[name] = dtracer / self.timestep_in_seconds
+
+        # The rest is strictly diagnostics
+
+        # massmat here is the tracer mass element
+        massmat = self.M_air * self._tracer
+        #  Surface area of a ring
+        area = 2*np.pi*const.a**2.0*np.diff(np.sin(self._phibounds))
+        #  __setattr__ is used here because the name of the diagnostic name is user-configurable with diagnostic_name_suffix
+        #  There's probably a clearer way to handle this
+        self.__setattr__(self.diagname_total_tracer_mass, np.array([np.sum(massmat)]))  # Total tracer mass in kg
+        self.__setattr__(self.diagname_column_density, np.sum(massmat, axis=1) / area)  # Column-integrated tracer mass per unit surface area in kg / m^2
+            
+        return tendencies
+
+    def _advdiff_timestep(self):
+        #  Refactor much of this as functions rather than methods so it's clearer 
+        #  what is being computed / modified in each step
+
+        # This step only does anything if self.age_of_air == 1
+        #  In which case set self._inner_tracer to self.time['days_elapsed'] / 365.0 below tropopause
+        #  This should be removed and handled in an age-of-air specific subclass
+        self._boundary_conditions_tracer()
+
+        #  This step implements the MALTA scheme from Western et al. (2024) which approximates
+        #  the mixed derivative diffusion terms as effective advective velocities
+        #    It sets self._Ud and self._Utot, and  self._Wd and self._Wtot
+        #  It would be simple to make this a function returning Ud, Wd
+        #  And define Utot, Wtot as dynamically computed properties
+        self._mixed_diffusion_to_advection()
+
+        #  This step divides the full timestep into a number nsteps and set the field
+        #       self._dt_advdiff = self.timestep_in_seconds / nsteps
+        #  Should be a function returning dt_advdiff, nsteps
+        self._set_advdiff_dt()
+
+        #  This iterates of the number nsteps of internal timesteps
+        #   Is it possible to replace this internal loop with a system that dynamically adjusts
+        #   the known-to-climlab timestep of the process?
+        #  The problem here is that there is no information reported about these intermediate steps
+        #  and no diagnostics
+        #  (it also doesn't make use of new timedelta64 units for the time handling)
+        for j in range(int(self.timestep_in_seconds / self._dt_advdiff)):
+
+            # These handle advection using the NIRVANA scheme
+            #   self.advective_flux_yy and self.advective_flux_zz are calculated 
+            #   self._inner_tracer is incremented to account for two types of flux convergence:
+            #       - advective tracer flux convergence
+            #       - prescribed tracer source flux convergence
+            self._advect_along_axis(self._AXIS_LAT)
+            self._advect_along_axis(self._AXIS_LEV)
+
+            #  This calculates the diffusive fluxes self.diffusive_flux_yy, self.diffusive_flux_zz
+            #  Basically just computing -Kyy d/dy (tracer) and -Kpp d/dp (tracer)
+            self._compute_k_fluxes()
+
+            #  Add three increments to self._inner_tracer:
+            #   - diffusive flux convergence in y direction
+            #   - diffusive flux convergence in p (or z) direction
+            #   - prescribed tracer source tendency
+            self._update_field_k()
+
+    def _advect_along_axis(self, axis):
+        """Perform advection step along specified axis using NIRVANA scheme.
+
+        Uses the numerics module functions which operate on the last array axis.
+        Arrays are transposed as needed using np.moveaxis.
+
+        Parameters
+        ----------
+        axis : int
+            Axis to advect along: _AXIS_LAT (0) for latitude, _AXIS_LEV (1) for level
+        """
+        # Select axis-specific parameters
+        if axis == self._AXIS_LAT:
+            bounds_1d = self._latbounds
+            dbounds_1d = self._dlatbounds
+            velocity = self._Utot
+            flux_sign = 1.0
+            tend_fac_adv = self.tend_fac_fy_adv
+            tend_fac_source = self.tend_fac_fy_source_func
+            source_func = self._internal_fy_source_func
+        else:  # axis == self._AXIS_LEV
+            bounds_1d = self._levbounds
+            dbounds_1d = self._dlevbounds
+            velocity = self._Wtot
+            flux_sign = -1.0
+            tend_fac_adv = self.tend_fac_fz_adv
+            tend_fac_source = self.tend_fac_fz_source_func
+            source_func = self._internal_fz_source_func
+
+        # Move target axis to last position for numerics functions
+        tracer = np.moveaxis(self._inner_tracer, axis, -1)
+        velocity_moved = np.moveaxis(velocity, axis, -1)
+
+        # Create 2D bounds/dbounds arrays by broadcasting 1D arrays
+        nlat, nlev = self._inner_tracer.shape
+        if axis == self._AXIS_LAT:
+            bounds_2d = bounds_1d[:, None] * np.ones((nlat + 1, nlev))
+            dbounds_2d = dbounds_1d[:, None] * np.ones((nlat, nlev))
+        else:
+            bounds_2d = bounds_1d[None, :] * np.ones((nlat, nlev + 1))
+            dbounds_2d = dbounds_1d[None, :] * np.ones((nlat, nlev))
+
+        # Move bounds arrays to match tracer orientation
+        bounds_2d = np.moveaxis(bounds_2d, axis, -1)
+        dbounds_2d = np.moveaxis(dbounds_2d, axis, -1)
+
+        # Compute cumulative integral (operates on last axis)
+        integral = numerics.calc_integral(tracer, dbounds_2d)
+
+        # Extend tracer and dbounds for boundary treatment
+        tracer_ext = numerics.extend_to_boundaries(tracer, axis=-1)
+        dbounds_ext = numerics.extend_dbounds(dbounds_2d, axis=-1)
+
+        # Interpolate integral to upstream position
+        if self.interpolation_order == 1:
+            istar = numerics.linear_interp_istar(
+                bounds_2d, integral, velocity_moved, self._dt_advdiff
+            )
+        else:  # order == 2
+            istar = numerics.parabolic_interp_istar(
+                bounds_2d, dbounds_ext, integral, tracer_ext,
+                velocity_moved, self._dt_advdiff
+            )
+            if self.use_limiters:
+                istar = numerics.apply_limiters(
+                    bounds_2d, integral, istar, velocity_moved, self._dt_advdiff
+                )
+
+        # Compute advective flux with appropriate sign convention
+        flux = numerics.compute_advective_flux(
+            integral, istar, self._dt_advdiff, sign=flux_sign
+        )
+
+        # Apply zero-flux boundary conditions
+        flux[..., 0] = 0.0
+        flux[..., -1] = 0.0
+
+        # Store flux for diagnostics (move back to original axis order)
+        flux_original = np.moveaxis(flux, -1, axis)
+        if axis == self._AXIS_LAT:
+            self.advective_flux_yy = flux_original
+        else:
+            self.advective_flux_zz = flux_original
+
+        # Compute tracer update from flux convergence
+        # For pressure coordinate (lev), need negative sign due to coordinate convention
+        if axis == self._AXIS_LAT:
+            tracer_update = numerics.apply_flux_convergence(
+                flux, dbounds_2d, self._dt_advdiff, tend_fac=tend_fac_adv
+            )
+        else:
+            tracer_update = -numerics.apply_flux_convergence(
+                flux, dbounds_2d, self._dt_advdiff, tend_fac=tend_fac_adv
+            )
+
+        # Move update back to original axis order and apply
+        tracer_update = np.moveaxis(tracer_update, -1, axis)
+        self._inner_tracer += tracer_update
+
+        # Apply source function flux contribution
+        source_flux = source_func()
+        source_flux_moved = np.moveaxis(source_flux, axis, -1)
+        if axis == self._AXIS_LAT:
+            source_update = numerics.apply_flux_convergence(
+                source_flux_moved, dbounds_2d, self._dt_advdiff, tend_fac=tend_fac_source
+            )
+        else:
+            source_update = -numerics.apply_flux_convergence(
+                source_flux_moved, dbounds_2d, self._dt_advdiff, tend_fac=tend_fac_source
+            )
+        source_update = np.moveaxis(source_update, -1, axis)
+        self._inner_tracer += source_update
+
+    def _compute_k_fluxes(self):
+        """Compute diffusive fluxes in both y and z directions."""
+        # Y-direction diffusive flux
+        tracer_by = numerics.extend_to_boundaries(self._inner_tracer, axis=0)
+        dy_ext = numerics.extend_dbounds(self._dlatbounds)
+        dym = 0.5 * (dy_ext[1:] + dy_ext[:-1])
+        self.diffusive_flux_yy = -self.Kyy * np.diff(tracer_by, axis=0) / dym[:, None]
+        self.diffusive_flux_yy[0, :] = 0.0
+        self.diffusive_flux_yy[-1, :] = 0.0
+        # BR: need to clarify the geometric factors for this flux
+
+        # Z-direction diffusive flux
+        tracer_bz = numerics.extend_to_boundaries(self._inner_tracer, axis=1)
+        dz_ext = numerics.extend_dbounds(self._dlevbounds)
+        dzm = 0.5 * (dz_ext[1:] + dz_ext[:-1])
+        self.diffusive_flux_zz = -self.Kzz * np.diff(tracer_bz, axis=1) / dzm[None, :]
+        self.diffusive_flux_zz[:, 0] = 0.0
+        self.diffusive_flux_zz[:, -1] = 0.0
+
+    def _mixed_diffusion_to_advection(self):
+        """Convert mixed derivative diffusion (Kyz) to effective advective velocities.
+
+        Implements the MALTA scheme from Western et al. (2024) which approximates
+        the mixed derivative diffusion terms as effective advective velocities.
+        """
+        max_tracer = np.max(self._inner_tracer)
+
+        # Extend tracer to boundaries in both directions
+        tracer_bz = numerics.extend_to_boundaries(self._inner_tracer, axis=1)
+        tracer_by = numerics.extend_to_boundaries(self._inner_tracer, axis=0)
+
+        # Compute effective velocity in y-direction from Kyz * d(chi)/dz
+        if np.max(np.abs(self.Kyz)) > 0.0:
+            k_y_zmid = 0.5 * (self.Kyz[:, :-1] + self.Kyz[:, 1:])
+            tracer_edges = 0.5 * (tracer_bz[:, :-1] + tracer_bz[:, 1:])
+            dqdz = np.diff(tracer_edges, axis=1) / self._dlevbounds[None, :]
+            dqdz = numerics.extend_to_boundaries(dqdz, axis=0)
+            dqdz = 0.5 * (dqdz[1:, :] + dqdz[:-1, :])
+            tracer_m = 0.5 * (tracer_by[:-1, :] + tracer_by[1:, :])
+            # avoid division by zero:
+            self._Ud = np.divide(k_y_zmid * dqdz, tracer_m, out=np.zeros_like(k_y_zmid, dtype=float), 
+                                 where=(tracer_m != 0))
+            self._Ud = np.where(tracer_m < MIXED_DIFFUSION_EPSILON * max_tracer, 0, self._Ud)
+        else:
+            self._Ud = self._U * 0.0
+        self._Utot = self.U + self._Ud
+
+        # Compute effective velocity in z-direction from Kyz * d(chi)/dy
+        if np.max(np.abs(self.Kyz)) > 0.0:
+            k_ymid_z = 0.5 * (self.Kyz[:-1, :] + self.Kyz[1:, :])
+            tracer_edges = 0.5 * (tracer_by[:-1, :] + tracer_by[1:, :])
+            dqdy = np.diff(tracer_edges, axis=0) / self._dlatbounds[:, None]
+            dqdy = numerics.extend_to_boundaries(dqdy, axis=1)
+            dqdy = 0.5 * (dqdy[:, 1:] + dqdy[:, :-1])
+            tracer_m = 0.5 * (tracer_bz[:, :-1] + tracer_bz[:, 1:])
+            # avoid division by zero:
+            self._Wd = np.divide(k_ymid_z * dqdy, tracer_m, out=np.zeros_like(k_ymid_z, dtype=float), 
+                                 where=(tracer_m != 0))
+            self._Wd = np.where(tracer_m < MIXED_DIFFUSION_EPSILON * max_tracer, 0, self._Wd)
+        else:
+            self._Wd = self._W * 0.0
+        self._Wtot = self.W + self._Wd + self.W_sedimentation
+        
+    def _update_field_k(self):
+        """Update tracer field from diffusive fluxes and source terms."""
+        self._inner_tracer += self.tend_fac_fy_diff * (self.diffusive_flux_yy[:-1,:] - self.diffusive_flux_yy[1:,:]) * self._dt_advdiff / self._dlatbounds[:, None]
+        self._inner_tracer += self.tend_fac_fz_diff * (self.diffusive_flux_zz[:,:-1] - self.diffusive_flux_zz[:,1:]) * self._dt_advdiff / self._dlevbounds[None, :]
+        self._inner_tracer += self.tend_fac_source_func * self._internal_source_func() * self._dt_advdiff
+
+    def _boundary_conditions_tracer(self):
+        if self.age_of_air == 1:
+            self._inner_tracer[self._under_trop] = self.time['days_elapsed'] / 365.0
+
+    def _set_advdiff_dt(self):
+        dtlat = dtlev = dtkz = dtky = dtkxy = 1e20  # Start very large
+        courant = CFL_ADVECTION
+        #  I think this is just to deal with some broadcasting of dy = a cos(phi) dphi onto the same grid as U
+        dlatm = np.append(np.append(self._dlatbounds[0],np.minimum(self._dlatbounds[:-1], self._dlatbounds[1:])),self._dlatbounds[-1])
+        # Minimum dy / U in units of seconds * 0.5
+        dtlat = (np.abs(dlatm[:, None] / (self._Utot+1e-20))).min()*courant
+        dlevm = np.append(np.append(self._dlevbounds[0],np.minimum(self._dlevbounds[:-1], self._dlevbounds[1:])),self._dlevbounds[-1])
+        #  And minimum dp / omega also in units of seconds * 0.5
+        dtlev = (np.abs(dlevm[None, :] / (self._Wtot+1e-20))).min()*courant
+        if self.Kyy.max()>0:
+            dy_b = np.append(np.append(self._dlatbounds[0], self._dlatbounds), self._dlatbounds[-1])
+            dym = 0.5*(dy_b[1:] + dy_b[:-1])
+            # Minimum value of dy**2 / Kyy in units of seconds
+            dtky = (dym[:, None]**2/2/(self.Kyy+1e-9)).min()
+        if self.Kzz.max()>0:
+            dz_b = np.append(np.append(self._dlevbounds[0], self._dlevbounds), self._dlevbounds[-1])
+            dzm = 0.5*(dz_b[1:] + dz_b[:-1])
+            # Minimum value of dp**2 / Kpp in units of seconds
+            dtkz = (dzm[None, :]**2/2/(self.Kzz+1e-9)).min()
+        fac = 0.5
+        #  Smallest one wins
+        dt = min(dtlat*fac, dtlev*fac, dtkz*fac, dtky*fac, dtkxy*fac, self.timestep_in_seconds)
+        #  These are the two quantities that should be returned to the caller if we refactor as a function
+        nsteps = np.ceil(self.timestep_in_seconds / dt)
+        self._dt_advdiff = self.timestep_in_seconds / nsteps
+
+
+###  This needs documentation and testing!
+###  Maybe also to be moved elsewhere
+class ParticleSink(TimeDependentProcess):
+    # copied from "ConvectiveAdjustment"
+    #Hard Adjustment to a prescribed particle sink.
+
+    def __init__(self, tropopause_p=0, adjust_to_0=True, lifetime=30*86400, **kwargs):
+        super(ParticleSink, self).__init__(**kwargs)
+        # tropopause definition, in Pa
+        self.tropopause_p = tropopause_p
+        self.adjust_to_0 = adjust_to_0
+        self.lifetime = lifetime
+        if(self.adjust_to_0):
+            self.time_type = 'adjustment'
+            self.adjustment = {}
+        for dom in list(self.domains.values()):
+            self._levbounds = dom.axes['lev'].bounds *1e2
+            self._dlevbounds = np.diff(self._levbounds)
+            self._levpoints = 0.5*(self._levbounds[1:] + self._levbounds[:-1])
+        self.under_tropopause = self._levpoints[None, :] > self.tropopause_p[:, None]
+
+    @property
+    def tropopause_p(self):
+        return self._tropopause_p * 1e2
+    @tropopause_p.setter
+    def tropopause_p(self, tropvalue):
+        self._tropopause_p = tropvalue #* 1e2
+
+    def _compute(self):
+        self.under_tropopause = self._levpoints[None, :] > self.tropopause_p[:, None]
+        if(self.adjust_to_0):
+            for name, value in self.state.items():
+                if self.tropopause_p is None:
+                    self.adjustment[name] = value * 0.
+                else:
+                    self.adjustment[name] = np.where(self.under_tropopause, -value, 0.0)
+            #  return the adjustment, independent of timestep
+            #  because the parent process might have set a different timestep!
+            return self.adjustment
+        else:
+            tendencies = {}
+            for name, value in self.state.items():
+                if self.tropopause_p is None:
+                    self.tendencies[name] = 0.0
+                else:
+                    tendencies[name] = np.where(self.under_tropopause, -value / self.lifetime, 0.0)
+            return tendencies            
