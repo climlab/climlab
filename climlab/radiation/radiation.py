@@ -197,6 +197,9 @@ class _Radiation(EnergyBudget):
         self.add_input('ciwp', ciwp)
         self.add_input('r_liq', r_liq)
         self.add_input('r_ice', r_ice)
+        self.do_col_by_col = kwargs.get('do_col_by_col', False)
+        self.do_seed_permutation = kwargs.get('do_seed_permutation', False)
+        self.n_rrtmg_repeat = kwargs.get('n_rrtmg_repeat', 1)
 
 
 class _Radiation_SW(_Radiation):
