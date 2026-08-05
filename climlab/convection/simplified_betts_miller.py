@@ -29,7 +29,7 @@ convection scheme :cite:p:`Frierson_2007`:
 
                 num_lev = 30
                 water_depth = 10.
-                short_timestep = const.seconds_per_hour * 3
+                short_timestep = np.timedelta64(3, 'h')
                 long_timestep = short_timestep*3
                 insolation = 342.
                 albedo = 0.18

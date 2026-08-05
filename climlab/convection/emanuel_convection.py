@@ -109,7 +109,6 @@ class EmanuelConvection(TimeDependentProcess):
 
                 import numpy as np
                 import climlab
-                from climlab import constants as const
                 # Temperatures in a single column
                 full_state = climlab.column_state(num_lev=30, water_depth=2.5)
                 temperature_state = {'Tatm':full_state.Tatm,'Ts':full_state.Ts}
@@ -118,23 +117,26 @@ class EmanuelConvection(TimeDependentProcess):
                 #  Add specific_humidity to the state dictionary
                 full_state['q'] = q
                 #  ASYNCHRONOUS COUPLING -- the radiation uses a much longer timestep
+                short_timestep = np.timedelta64(1, 'h')
+                long_timestep = np.timedelta64(1, 'D')
+
                 #  The top-level model
                 model = climlab.TimeDependentProcess(state=full_state,
-                                              timestep=const.seconds_per_hour)
+                                              timestep=short_timestep)
                 #  Radiation coupled to water vapor
                 rad = climlab.radiation.RRTMG(state=temperature_state,
                                               specific_humidity=full_state.q,
                                               albedo=0.3,
-                                              timestep=const.seconds_per_day
+                                              timestep=long_timestep
                                               )
                 #  Convection scheme -- water vapor is a state variable
                 conv = climlab.convection.EmanuelConvection(state=full_state,
-                                              timestep=const.seconds_per_hour)
+                                              timestep=short_timestep)
                 #  Surface heat flux processes
                 shf = climlab.surface.SensibleHeatFlux(state=temperature_state, Cd=0.5E-3,
-                                              timestep=const.seconds_per_hour)
+                                              timestep=short_timestep)
                 lhf = climlab.surface.LatentHeatFlux(state=full_state, Cd=0.5E-3,
-                                              timestep=const.seconds_per_hour)
+                                              timestep=short_timestep)
                 #  Couple all the submodels together
                 model.add_subprocess('Radiation', rad)
                 model.add_subprocess('Convection', conv)
